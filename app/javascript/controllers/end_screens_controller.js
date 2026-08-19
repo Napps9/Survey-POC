@@ -27,7 +27,7 @@ export default class extends Controller {
       <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="${t("editor.end_screens.body_placeholder").replace(/"/g, "&quot;")}"
                 style="width:100%;box-sizing:border-box;resize:vertical;${inp}"></textarea>
       <div style="font-size:11px;color:rgba(255,255,255,0.45);">
-        Personalise with %{name}, %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{name|there}
+        Personalise with %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{score|a few}
       </div>
       <input type="url" data-end-screens-target="forwardUrl" placeholder="${t("editor.end_screens.url_placeholder").replace(/"/g, "&quot;")}"
              style="width:100%;box-sizing:border-box;${inp}" />

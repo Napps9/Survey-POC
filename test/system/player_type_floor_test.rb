@@ -132,7 +132,7 @@ class PlayerTypeFloorTest < ApplicationSystemTestCase
           subtitle:  ".q-subtitle",
           label:     ".choice-label, .choice-list-label, .pick-text, .slider-label-text",
           control:   ".preview-btn:not(.hidden)",
-          input:     ".freeform-textarea, .contact-field, .location-search-field",
+          input:     ".freeform-textarea, .location-search-field",
           other:     ".other-cta-btn",
           counter:   ".freeform-counter"
         }

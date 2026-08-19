@@ -57,13 +57,13 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
   end
 
   test "a multilingual Verto gets its translations prefilled from the locale files" do
-    add!(survey(locales: %w[en fr]), "neurodiversity")
+    add!(survey(locales: %w[en fr]), "heritage")
 
     json = JSON.parse(response.body)
     fr = json.dig("card", "i18n", "fr")
     assert fr.present?, "the next autosave must not persist the card monolingual"
     refute_equal json.dig("card", "text"), fr["text"]
-    assert_equal 7, fr["options"].size, "neurodiversity retires two vocabulary entries"
+    assert_equal 8, fr["options"].size, "heritage retires one vocabulary entry"
   end
 
   test "a French-default Verto gets the French card at the top level" do
@@ -78,6 +78,11 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     add!(survey, "astrology")
     assert_response :unprocessable_entity
 
+    # Withdrawn from the platform, so the endpoint treats it as any other
+    # unknown key — the server-side half of the removal.
+    add!(survey, "neurodiversity")
+    assert_response :unprocessable_entity
+
     s = survey(cards: [ DemographicQuestions.optional_card("heritage") ])
     add!(s, "heritage")
     assert_response :unprocessable_entity
@@ -85,7 +90,7 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
 
     live = survey
     live.update!(publish_token: SecureRandom.hex(8))
-    add!(live, "neurodiversity")
+    add!(live, "heritage")
     assert_response :locked
   end
 
@@ -143,27 +148,13 @@ class AddDemographicCardTest < ActionDispatch::IntegrationTest
     assert_equal 8, JSON.parse(response.body)["card"]["options"].size
   end
 
-  test "neurodiversity is untouched by the audience country" do
-    called = false
-    fake = Object.new
-    fake.define_singleton_method(:call) { |**| called = true; FIVE }
-    HeritageOptionsGenerator.define_singleton_method(:new) { |*| fake }
-    begin
-      add!(survey(audience_country: "GB"), "neurodiversity")
-    ensure
-      HeritageOptionsGenerator.singleton_class.remove_method(:new)
-    end
-
-    assert_equal 7, JSON.parse(response.body)["card"]["options"].size
-    refute called, "only heritage varies by country"
-  end
-
   test "the editor renders the tiles and greys out an added one" do
     s = survey(cards: [ DemographicQuestions.optional_card("heritage") ])
     get survey_path(s)
 
     assert_response :success
     assert_select "button[data-demographic-key=heritage][disabled]", 1
-    assert_select "button[data-demographic-key=neurodiversity]:not([disabled])", 1
+    assert_select "button[data-demographic-key=neurodiversity]", 0,
+                  "the withdrawn tile must not be offerable from the editor"
   end
 end

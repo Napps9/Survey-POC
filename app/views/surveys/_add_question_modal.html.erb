@@ -77,9 +77,7 @@
                else
                  "Ethnic or cultural background — optional question added to the end of your Verto. Set an audience country in Publish & share to tailor it."
                end %>
-          <% [["heritage", "👥", "Heritage", heritage_desc],
-              ["neurodiversity", "🧠", "Neurodiversity",
-               "How people think and process information — optional, never framed around disability"]].each do |key, icon, name, desc| %>
+          <% [["heritage", "👥", "Heritage", heritage_desc]].each do |key, icon, name, desc| %>
             <% already = Array(@survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key } %>
             <button type="button"
                     class="aq-choice-card aq-demographic-tile"

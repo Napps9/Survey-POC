@@ -96,13 +96,12 @@ module ResolvesResultSegments
     [ "65+",      65, 200 ]
   ].freeze
 
-  # Slices by the set demographic questions plus the opt-in ones (Heritage,
-  # Neurodiversity), from the denormalised columns (see
-  # AddDemographicsToResponses for why they aren't read out of the answers
-  # JSON). Suppressed below the small-cell threshold, like regions.
+  # Slices by the set demographic questions plus the opt-in Heritage one, from
+  # the denormalised columns (see AddDemographicsToResponses for why they aren't
+  # read out of the answers JSON). Suppressed below the small-cell threshold,
+  # like regions.
   def demographic_segments(base)
-    gender_segments(base) + age_segments(base) +
-      heritage_segments(base) + neurodiversity_segments(base)
+    gender_segments(base) + age_segments(base) + heritage_segments(base)
   end
 
   def gender_segments(base)
@@ -129,30 +128,6 @@ module ResolvesResultSegments
           .map do |heritage, count|
       { id: "heritage_#{heritage.parameterize}", label: "👥 #{heritage}",
         scope: base.where(demographic_heritage: heritage), count: count }
-    end
-  end
-
-  # Neurodiversity is multi-select, packed "|A|B|" (see the column migration),
-  # so the column can't be GROUPed: unpack in Ruby (one pluck, not N COUNTs),
-  # then build a LIKE scope per surviving label. Segments deliberately OVERLAP
-  # (one respondent with ADHD+Dyslexia belongs to both) — correct for filters.
-  # The exclusive picks are stored alone, so "None of these" is never inflated
-  # by condition-pickers.
-  def neurodiversity_segments(base)
-    tallies = Hash.new(0)
-    base.reorder(nil).where.not(demographic_neurodiversity: nil)
-        .pluck(:demographic_neurodiversity).each do |packed|
-      packed.to_s.split("|").reject(&:empty?).uniq.each { |label| tallies[label] += 1 }
-    end
-
-    tallies.select { |_l, n| n >= MIN_DEMOGRAPHIC_SAMPLE }
-           .sort_by { |_l, n| -n }
-           .map do |label, count|
-      # Explicit ESCAPE: SQLite's LIKE has no default escape character
-      # (Postgres defaults to backslash — stating it is a no-op there).
-      pattern = "%|#{Response.sanitize_sql_like(label)}|%"
-      { id: "neuro_#{label.parameterize}", label: "🧠 #{label}", count: count,
-        scope: base.where("demographic_neurodiversity LIKE ? ESCAPE '\\'", pattern) }
     end
   end
 

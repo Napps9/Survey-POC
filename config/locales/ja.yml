@@ -47,12 +47,6 @@ ja:
       strongly_agree: "強くそう思う"
       slightly_disagree: "どちらかといえばそう思わない"
       slightly_agree: "どちらかといえばそう思う"
-    contact_name: "名前"
-    contact_company: "会社"
-    contact_industry: "業種"
-    contact_email: "メール"
-    contact_note: "入力された情報は、このVertoの作成者に送られ、連絡に使用されます。"
-    contact_email_invalid: "メールアドレスの形式が正しくないようです — ご確認ください。"
     add_statement: ステートメントを追加
     swipe_no: "いいえ"
     swipe_unsure: "わからない"
@@ -94,7 +88,6 @@ ja:
       select_many_grid: "当てはまるものをすべて選択"
       tap_card: "スワイプして回答"
       open_ended: "回答を入力"
-      contact_form: "連絡先を入力"
       scenario: "読み進めてから選択"
     badge:
       range: "範囲"
@@ -109,7 +102,6 @@ ja:
       tap_card: "スワイプ"
       scenario: "シナリオ"
       open_ended: "自由記述"
-      contact_form: "連絡先"
       welcome_card: "ウェルカムカード"
       token_checkpoint: "チェックポイント"
       consent_gate: "同意"
@@ -126,7 +118,6 @@ ja:
       tap_card: "スワイプして回答"
       scenario: "読み進めてから選択"
       open_ended: "回答を入力"
-      contact_form: "連絡先を入力"
     type_label:
       multiple_choice: "1つ選択（リスト）"
       select_many: "複数選択（リスト）"
@@ -283,7 +274,6 @@ ja:
     tap_card: ["ステートメント1", "ステートメント2", "ステートメント3", "ステートメント4", "ステートメント5"]
     scenario: ["選択肢A", "選択肢B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1490,10 +1480,6 @@ ja:
         text: "あなたのルーツに最も当てはまるものはどれですか？"
         description: "あなたの民族的・文化的背景について。"
         options: ["アジア系", "黒人・アフリカ系・カリブ系", "ヒスパニック・ラテン系", "中東・北アフリカ系", "白人・ヨーロッパ系", "先住民系", "混合・複数のルーツ", "その他のルーツ", "回答しない"]
-      neurodiversity:
-        text: "当てはまるものはありますか？"
-        description: "考え方や情報の処理の仕方について — 当てはまるものをすべて選んでください。"
-        options: ["ADHD", "自閉スペクトラム症", "ディスレクシア（読み書き障害）", "ディスプラクシア（発達性協調運動障害）", "ディスカリキュリア（算数障害）", "トゥレット症", "その他のニューロダイバージェンス", "当てはまるものはない", "回答しない"]
     postcode_placeholder: "郵便番号（任意）"
     postcode_note: "大まかな地域傾向を把握するためだけに使用され、個別に表示されることはありません。"
   oops:
@@ -1725,7 +1711,6 @@ ja:
       description: "この Verto の結果を Ask Verto に提供し、他の研究者・出資者・パートナーの質問への回答に役立てます。いつでも取り下げられます。"
       never_items:
         - "個々の回答レコード"
-        - "問い合わせフォームの入力内容とリード"
         - "回答者コードやセッショントークン"
         - "30 人未満のあらゆるセグメント"
         - "個人・学校・地名を挙げた引用"

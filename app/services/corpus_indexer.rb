@@ -27,7 +27,6 @@ class CorpusIndexer
   # decides what citing it would mean, which is the safe direction to fail.
   #
   # Excluded on purpose:
-  #   contact_form    collects a name and an email. Never.
   #   prioritise      rank sums, not counts — see above. Indexed separately.
   #   welcome_card,
   #   consent_gate,

@@ -46,12 +46,6 @@ sn:
       strongly_agree: "Ndinobvuma Zvikuru"
       slightly_disagree: "Handibvumi Zvishoma"
       slightly_agree: "Ndinobvuma Zvishoma"
-    contact_name: "Zita"
-    contact_company: "Kambani"
-    contact_industry: "Indasitiri"
-    contact_email: "Imeyili"
-    contact_note: "Ruzivo rwako runoenda kumugadziri weVerto iyi kuti vagone kukutevedzera."
-    contact_email_invalid: "Iyoyo haitaridziki seaderesi yeimeyili — ndapota itarisise."
     add_statement: "Wedzera Chirevo"
     swipe_no: "Kwete"
     swipe_unsure: "Handina Chokwadi"
@@ -93,7 +87,6 @@ sn:
       select_many_grid: "Sarudza Dzose Dzinokodzera"
       tap_card: "Zvuzvurudza Kuti Upindure"
       open_ended: "Nyora Mhinduro Yako"
-      contact_form: "Govana Ruzivo Rwako"
       scenario: "Verenga, Wozosarudza"
     # Dashboard chrome only (results screen, the editor's deleted-cards list,
     # the "Rules of the Game" scoring feedback) — never rendered to a
@@ -111,7 +104,6 @@ sn:
       tap_card: "ZVUZVURUDZA"
       scenario: "MAMIRIRO"
       open_ended: "RUNYORO RWAKASUNUNGUKA"
-      contact_form: "KUBATANA"
       welcome_card: "KADHI REKUGAMUCHIRA"
       token_checkpoint: "CHEKIPOINTI"
       consent_gate: "MVUMO"
@@ -128,7 +120,6 @@ sn:
       tap_card: "ZVUZVURUDZA KUTI UPINDURE"
       scenario: "VERENGA, WOZOSARUDZA"
       open_ended: "NYORA MHINDURO YAKO"
-      contact_form: "GOVANA RUZIVO RWAKO"
     type_label:
       multiple_choice: "Sarudza imwe (runyorwa)"
       select_many: "Sarudza zhinji (runyorwa)"
@@ -287,7 +278,6 @@ sn:
     tap_card: ["Chirevo 1", "Chirevo 2", "Chirevo 3", "Chirevo 4", "Chirevo 5"]
     scenario: ["Sarudzo A", "Sarudzo B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1502,10 +1492,6 @@ sn:
         text: "Ndeipi Yezvinotevera Inoratidza Zvakanyanya Nhaka Yako?"
         description: "Nhoroondo yako yerudzi kana yetsika."
         options: ["Nhaka yeAsia", "Nhaka yeVatema, veAfrica kana veCaribbean", "VeHispanic kana veLatino/a", "Nhaka yeMiddle East kana North Africa", "Nhaka yeVachena kana veEurope", "Nhaka yeVanhu Vepakutanga", "Nhaka Yakasanganiswa kana Yakawanda", "Imwe Nhaka", "Handidi Kutaura"]
-      neurodiversity:
-        text: "Pane Chero Chinotevera Chinokutsanangura Here?"
-        description: "Pamusoro pekuti unofunga uye unogadzirisa sei ruzivo — sarudza chero chinokodzera."
-        options: ["ADHD", "Autism", "Dyslexia", "Dyspraxia", "Dyscalculia", "Tourette's", "Rimwe Rudzi Rwekusiyana Kwepfungwa", "Hapana Pane Izvi", "Handidi Kutaura"]
     postcode_placeholder: "Kodhi Yeposi (hazvina kumanikidzwa)"
     postcode_note: "Inoshandiswa chete kunzwisisa maitiro makuru edunhu — haitomboratidzwi zvemunhu mumwe."
   oops:
@@ -1737,7 +1723,6 @@ sn:
       description: "Ipa mhedzisiro yeVerto iyi kuAsk Verto, kuti vagobatsira kupindura mibvunzo yevamwe vatsvakurudzi, vapi vemari nevabatanidzi. Unogona kudzosa nguva ipi neipi."
       never_items:
         - "Mitsara yemhinduro yemunhu mumwe"
-        - "Zvinyorwa zvefomu rekubata nemakwikwi"
         - "Makodhi evapinduri kana tokeni dzenguva yekufambisa"
         - "Chero chikamu chine vanhu vasingasviki makumi matatu"
         - "Mashoko anodaidza munhu, chikoro kana nzvimbo"

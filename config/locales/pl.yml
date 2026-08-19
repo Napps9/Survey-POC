@@ -47,12 +47,6 @@ pl:
       strongly_agree: "Zdecydowanie się zgadzam"
       slightly_disagree: "Raczej się nie zgadzam"
       slightly_agree: "Raczej się zgadzam"
-    contact_name: "Imię i nazwisko"
-    contact_company: "Firma"
-    contact_industry: "Branża"
-    contact_email: "E-mail"
-    contact_note: "Twoje dane trafiają do twórcy tego Verto, aby mógł się z Tobą skontaktować."
-    contact_email_invalid: "To nie wygląda na adres e-mail — sprawdź go, proszę."
     add_statement: Dodaj stwierdzenie
     swipe_no: "Nie"
     swipe_unsure: "Nie jestem pewien"
@@ -94,7 +88,6 @@ pl:
       select_many_grid: "Zaznacz wszystkie pasujące odpowiedzi"
       tap_card: "Przeciągnij, aby odpowiedzieć"
       open_ended: "Wpisz swoją odpowiedź"
-      contact_form: "Podaj swoje dane"
       scenario: "Czytaj dalej, a potem wybierz"
     badge:
       range: "SKALA"
@@ -109,7 +102,6 @@ pl:
       tap_card: "PRZESUŃ"
       scenario: "SCENARIUSZ"
       open_ended: "TEKST OTWARTY"
-      contact_form: "KONTAKT"
       welcome_card: "KARTA POWITALNA"
       token_checkpoint: "PUNKT KONTROLNY"
       consent_gate: "ZGODA"
@@ -126,7 +118,6 @@ pl:
       tap_card: "PRZECIĄGNIJ, ABY ODPOWIEDZIEĆ"
       scenario: "CZYTAJ DALEJ, A POTEM WYBIERZ"
       open_ended: "WPISZ SWOJĄ ODPOWIEDŹ"
-      contact_form: "PODAJ SWOJE DANE"
     type_label:
       multiple_choice: "Wybierz jedną (lista)"
       select_many: "Wybierz wiele (lista)"
@@ -283,7 +274,6 @@ pl:
     tap_card: ["Stwierdzenie 1", "Stwierdzenie 2", "Stwierdzenie 3", "Stwierdzenie 4", "Stwierdzenie 5"]
     scenario: ["Opcja A", "Opcja B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1494,10 +1484,6 @@ pl:
         text: "Które z poniższych najlepiej oddaje Twoje pochodzenie?"
         description: "Twoje pochodzenie etniczne lub kulturowe."
         options: ["Pochodzenie azjatyckie", "Pochodzenie czarne, afrykańskie lub karaibskie", "Latynoskie", "Pochodzenie bliskowschodnie lub północnoafrykańskie", "Pochodzenie białe lub europejskie", "Pochodzenie rdzennych ludów", "Pochodzenie mieszane lub wielorakie", "Inne pochodzenie", "Wolę nie mówić"]
-      neurodiversity:
-        text: "Czy któreś z poniższych Cię opisuje?"
-        description: "Chodzi o to, jak myślisz i przetwarzasz informacje — wybierz wszystkie pasujące."
-        options: ["ADHD", "Autyzm", "Dysleksja", "Dyspraksja", "Dyskalkulia", "Zespół Tourette'a", "Inna forma neuroróżnorodności", "Żadne z powyższych", "Wolę nie mówić"]
     postcode_placeholder: "Kod pocztowy (opcjonalnie)"
     postcode_note: "Używany wyłącznie do zrozumienia ogólnych wzorców regionalnych — nigdy nie jest wyświetlany indywidualnie."
   oops:
@@ -1737,7 +1723,6 @@ pl:
       description: "Udostępnij wyniki tego Verto do Ask Verto, aby pomogły odpowiadać na pytania innych badaczy, grantodawców i partnerów. Możesz wycofać zgodę w każdej chwili."
       never_items:
         - "Pojedyncze odpowiedzi"
-        - "Wpisy i kontakty z formularzy"
         - "Kody uczestników i tokeny sesji"
         - "Każdy segment poniżej 30 osób"
         - "Cytaty wymieniające osobę, szkołę lub miejsce"

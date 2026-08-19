@@ -47,12 +47,6 @@ vi:
       strongly_agree: "Hoàn toàn đồng ý"
       slightly_disagree: "Hơi không đồng ý"
       slightly_agree: "Hơi đồng ý"
-    contact_name: "Họ tên"
-    contact_company: "Công ty"
-    contact_industry: "Ngành"
-    contact_email: "Email"
-    contact_note: "Thông tin của bạn được gửi đến người tạo Verto này để họ có thể liên hệ với bạn."
-    contact_email_invalid: "Đó có vẻ không phải là địa chỉ email — vui lòng kiểm tra lại."
     add_statement: Thêm phát biểu
     swipe_no: "Không"
     swipe_unsure: "Không chắc"
@@ -94,7 +88,6 @@ vi:
       select_many_grid: "Chọn tất cả đáp án phù hợp"
       tap_card: "Vuốt để trả lời"
       open_ended: "Nhập câu trả lời của bạn"
-      contact_form: "Chia sẻ thông tin của bạn"
       scenario: "Đọc tiếp rồi chọn"
     badge:
       range: "THANG ĐO"
@@ -109,7 +102,6 @@ vi:
       tap_card: "VUỐT"
       scenario: "TÌNH HUỐNG"
       open_ended: "VĂN BẢN TỰ DO"
-      contact_form: "LIÊN HỆ"
       welcome_card: "THẺ CHÀO MỪNG"
       token_checkpoint: "ĐIỂM KIỂM TRA"
       consent_gate: "ĐỒNG Ý"
@@ -126,7 +118,6 @@ vi:
       tap_card: "VUỐT ĐỂ TRẢ LỜI"
       scenario: "ĐỌC TIẾP RỒI CHỌN"
       open_ended: "NHẬP CÂU TRẢ LỜI CỦA BẠN"
-      contact_form: "CHIA SẺ THÔNG TIN CỦA BẠN"
     type_label:
       multiple_choice: "Chọn một (danh sách)"
       select_many: "Chọn nhiều (danh sách)"
@@ -283,7 +274,6 @@ vi:
     tap_card: ["Phát biểu 1", "Phát biểu 2", "Phát biểu 3", "Phát biểu 4", "Phát biểu 5"]
     scenario: ["Lựa chọn A", "Lựa chọn B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1491,10 +1481,6 @@ vi:
         text: "Điều nào sau đây phản ánh đúng nhất nguồn gốc của bạn?"
         description: "Nguồn gốc dân tộc hoặc văn hóa của bạn."
         options: ["Gốc Á", "Gốc da đen, châu Phi hoặc Caribe", "Gốc Tây Ban Nha hoặc Mỹ Latinh", "Gốc Trung Đông hoặc Bắc Phi", "Gốc da trắng hoặc châu Âu", "Gốc bản địa", "Nguồn gốc pha trộn hoặc đa dạng", "Nguồn gốc khác", "Không muốn trả lời"]
-      neurodiversity:
-        text: "Có điều nào sau đây mô tả bạn không?"
-        description: "Về cách bạn suy nghĩ và xử lý thông tin — chọn tất cả những mục phù hợp."
-        options: ["ADHD", "Tự kỷ", "Chứng khó đọc", "Chứng khó vận động (dyspraxia)", "Chứng khó tính toán", "Hội chứng Tourette", "Một dạng khác biệt thần kinh khác", "Không có mục nào", "Không muốn trả lời"]
     postcode_placeholder: "Mã bưu điện (không bắt buộc)"
     postcode_note: "Chỉ dùng để hiểu các xu hướng khu vực chung — không bao giờ hiển thị riêng lẻ."
   oops:
@@ -1726,7 +1712,6 @@ vi:
       description: "Đề nghị kết quả của Verto này cho Ask Verto, để giúp trả lời câu hỏi của các nhà nghiên cứu, nhà tài trợ và đối tác khác. Bạn có thể rút lại bất cứ lúc nào."
       never_items:
         - "Từng dòng phản hồi riêng lẻ"
-        - "Dữ liệu biểu mẫu liên hệ và khách hàng tiềm năng"
         - "Mã người trả lời hoặc token phiên"
         - "Bất kỳ nhóm nào dưới 30 người"
         - "Trích dẫn nêu tên người, trường học hoặc địa điểm"

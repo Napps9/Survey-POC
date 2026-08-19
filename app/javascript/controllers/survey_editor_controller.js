@@ -1658,7 +1658,7 @@ export default class extends Controller {
       // otherwise-unrelated field on the card is edited.
       if (card.dataset.cardInput) out.input = card.dataset.cardInput
       if (card.dataset.cardDemographic === "true") out.demographic = true
-      // Which opt-in demographic question this is (heritage/neurodiversity) —
+      // Which opt-in demographic question this is (heritage) —
       // the discriminator the answer sync and results segments slice on. Not
       // emitting it here would strip it on the first autosave, degrading the
       // card to an unkeyed demographic MC that then collides with the gender

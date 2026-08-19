@@ -242,7 +242,7 @@
                 <summary style="cursor:pointer;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);white-space:nowrap;transition:all 0.15s;">🔗 Share results</summary>
                 <div style="position:absolute;right:0;top:calc(100% + 6px);background:#272D4A;border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:14px;min-width:280px;z-index:30;box-shadow:0 10px 28px rgba(0,0,0,0.4);">
                   <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);line-height:1.5;margin-bottom:10px;">
-                    A read-only link to these results — no sign-in needed. Open-ended answers, contact details and exports stay hidden.
+                    A read-only link to these results — no sign-in needed. Open-ended answers and exports stay hidden.
                   </div>
                   <% if @survey.results_share_token.present? %>
                     <input type="text" readonly id="results-share-url"

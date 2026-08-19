@@ -1,4 +1,14 @@
 class Response < ApplicationRecord
+  # demographic_neurodiversity backed the withdrawn Neurodiversity card. The
+  # values are nulled by PurgeContactAndNeurodiversityCards and the column is
+  # dropped by RemoveNeurodiversityColumnFromResponses, which ships in a LATER
+  # deploy: Render swaps processes after migrations run, so dropping it in the
+  # same release would leave the outgoing process issuing SQL against a column
+  # that no longer exists. Ignoring it here is what makes the new code stop
+  # SELECTing and INSERTing it a deploy ahead of the drop. Remove this line once
+  # the drop is live.
+  self.ignored_columns += %w[ demographic_neurodiversity ]
+
   belongs_to :survey
   belongs_to :survey_share, optional: true
   # Which named send link this respondent arrived through, if any. Optional:
@@ -104,7 +114,6 @@ class Response < ApplicationRecord
     self.demographic_gender = nil
     self.demographic_birth_year = nil
     self.demographic_heritage = nil
-    self.demographic_neurodiversity = nil
     self.score = nil
     self.quiz_max = nil
     self.token_totals = {}

@@ -60,19 +60,6 @@ module DemographicQuestions
                      "White or European heritage", "Indigenous heritage",
                      "Mixed or multiple heritage", "Another heritage", "Prefer not to say" ],
       "demographic" => true, "demographic_key" => "heritage"
-    },
-    # Deliberately framed around how people think and process information —
-    # many neurodivergent respondents don't describe themselves as disabled or
-    # having a disability, and a disability-framed question would undercount
-    # exactly the people it is trying to understand.
-    "neurodiversity" => {
-      "type" => "select_many",
-      "text" => "Do any of these describe you?",
-      "description" => "About how you think and process information — choose any that apply.",
-      "options" => [ "ADHD", "Autism", "Dyslexia", "Dyspraxia", "Dyscalculia",
-                     "Tourette's", "Another form of neurodivergence",
-                     "None of these", "Prefer not to say" ],
-      "demographic" => true, "demographic_key" => "neurodiversity"
     }
   }.freeze
 
@@ -87,30 +74,24 @@ module DemographicQuestions
   #   · decks inserted before they were retired still carry them as real
   #     options, and their stored answers still have to validate;
   #   · one of them is still the label a typed answer is recorded as
-  #     (OFF_LIST_OPTION_INDEX below);
-  #   · neuro_exclusive_labels reads "None of these" positionally across every
-  #     locale, and must keep recognising it for those older decks.
+  #     (OFF_LIST_OPTION_INDEX below).
   #
   # Retired so far:
   #   heritage       7 "Another heritage"
-  #   neurodiversity 6 "Another form of neurodivergence"
-  #                    — both dead ends: a button recording that someone didn't
-  #                      fit the list without ever asking what they are. The
+  #                    — a dead end: a button recording that someone didn't fit
+  #                      the list without ever asking what they are. The
   #                      free-text box (optional_card sets allow_other) asks.
-  #   neurodiversity 7 "None of these"
-  #                    — the card is a select-many asking "choose any that
-  #                      apply", so ticking nothing already says none of them do.
   #
   # Pinned by INDEX, because the locale merge is positional and the parity test
   # compares translated lists to the registry by length. Reorder a list without
   # moving these and the registry guard in
   # test/models/demographic_questions_test.rb fails.
-  RETIRED_OPTION_INDEXES = { "heritage" => [ 7 ], "neurodiversity" => [ 6, 7 ] }.freeze
+  RETIRED_OPTION_INDEXES = { "heritage" => [ 7 ] }.freeze
 
   # Which retired entry a typed answer is recorded as — never the respondent's
   # own words, which would put respondent-authored text into the creator's
   # dashboard as a segment pill.
-  OFF_LIST_OPTION_INDEX = { "heritage" => 7, "neurodiversity" => 6 }.freeze
+  OFF_LIST_OPTION_INDEX = { "heritage" => 7 }.freeze
 
   # One optional card resolved in `locale`, or nil for an unknown key. Deep
   # dup (options array included) — callers mutate the hash (cid stamping,
@@ -170,8 +151,8 @@ module DemographicQuestions
   end
 
   # The label a typed answer on `key`'s card is recorded as — "Another
-  # heritage", "Another form of neurodivergence" — in `locale`. Never shown to
-  # a respondent; see OFF_LIST_OPTION_INDEX for why it still exists.
+  # heritage" — in `locale`. Never shown to a respondent; see
+  # OFF_LIST_OPTION_INDEX for why it still exists.
   def self.off_list_label(key, locale: nil)
     idx = OFF_LIST_OPTION_INDEX[key.to_s]
     idx && translated_options(key, locale: locale)[idx]
@@ -224,23 +205,5 @@ module DemographicQuestions
     card["options"]          = Array(five).map(&:to_s) + [ heritage_decline_option(locale: locale) ]
     card["heritage_country"] = code
     card
-  end
-
-  # The neurodiversity card's two mutually-exclusive options ("None of these",
-  # "Prefer not to say") in EVERY available locale. Stored answers are
-  # canonical primary-language labels, so a French Verto stores the French
-  # pair — the sync's exclusivity rule has to recognise them all. Identified
-  # positionally as the LAST TWO registry options, mirroring optional_card's
-  # whole-list-only translation guard.
-  def self.neuro_exclusive_labels
-    @neuro_exclusive_labels ||= begin
-      size = OPTIONAL_CARDS["neurodiversity"]["options"].size
-      labels = OPTIONAL_CARDS["neurodiversity"]["options"].last(2)
-      I18n.available_locales.each do |loc|
-        opts = I18n.t("demographics.optional.neurodiversity.options", locale: loc, default: nil)
-        labels += opts.last(2).map(&:to_s) if opts.is_a?(Array) && opts.size == size
-      end
-      labels.to_set.freeze
-    end
   end
 end

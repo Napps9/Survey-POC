@@ -259,9 +259,6 @@ export default class extends Controller {
   // star is a rating, one tick is a multi-select, a moved thumb is a scale,
   // a non-blank string is an open question. _answerOf/_read own that table
   // (and the server agrees with it — see test/system/answer_parity_test.rb).
-  //
-  // Silent: this runs on every keystroke, and the contact card's read would
-  // otherwise flash its email nudge while someone is still typing the address.
   // Which cards the respondent has actually put a finger on. A Range slider
   // renders with its thumb at the middle of the scale and a dot already
   // marked active, so _read gives it a value from the moment it paints — and
@@ -282,7 +279,7 @@ export default class extends Controller {
     const owned = key != null &&
       (this._touched.has(key) || this._isAnswerGiven(this._answers[key]))
     const answered = !!card && owned &&
-      this._isAnswerGiven(this._answerOf(card, { silent: true }))
+      this._isAnswerGiven(this._answerOf(card))
 
     for (const btn of [ this.hasNextBtnTarget   && this.nextBtnTarget,
                         this.hasFinishBtnTarget && this.finishBtnTarget ]) {
@@ -429,8 +426,8 @@ export default class extends Controller {
   // A respondent accessibility preference, not a creator setting: three
   // steps, remembered across every Verto this browser plays. data-font-scale
   // on the overlay drives CSS tiers on the reading surfaces only (the
-  // question title, option labels, book pages, consent copy, free-text and
-  // contact inputs) — footer buttons and chrome are deliberately untouched.
+  // question title, option labels, book pages, consent copy and free text) —
+  // footer buttons and chrome are deliberately untouched.
   _loadFontScale() {
     try {
       const v = localStorage.getItem(FONT_SCALE_KEY)
@@ -1096,14 +1093,9 @@ export default class extends Controller {
   // _capture stores it on the way past; the Next button's answered state asks
   // the same question live, on every tap. Both go through here so the button
   // can never light up for something the deck wouldn't actually record.
-  //
-  // `silent` is for the live path: reading a contact_form has the side effect
-  // of showing or hiding its inline email nudge, and that must happen when the
-  // respondent moves on — not on every keystroke while they are still mid
-  // address.
-  _answerOf(card, { silent = false } = {}) {
+  _answerOf(card) {
     const type  = card.dataset.cardType
-    const value = this._read(card, type, { silent })
+    const value = this._read(card, type)
     // "Other" is a standalone answer: if the respondent typed free text it
     // replaces any normal selection for this card.
     const other = card.querySelector("[data-other-input]")?.value.trim()
@@ -1118,7 +1110,7 @@ export default class extends Controller {
     return el.querySelector(".pick-text, .choice-label")?.textContent.trim() ?? null
   }
 
-  _read(card, type, { silent = false } = {}) {
+  _read(card, type) {
     switch (type) {
       // Choice answers store the CANONICAL (primary-language) option label, so
       // results aggregate across languages regardless of the displayed text.
@@ -1172,26 +1164,6 @@ export default class extends Controller {
       case "tap_card": {
         const wrap = card.querySelector(".rotate-wrap")
         try { return JSON.parse(wrap?.dataset.swipeResults || "null") } catch { return null }
-      }
-
-      case "contact_form": {
-        // Object of the non-blank fields; null when nothing was entered. A
-        // malformed email shows the inline nudge and is left out, so what the
-        // server receives is only ever plausibly-shaped (it re-validates —
-        // Survey#clamp_contact_entries — because this endpoint is public).
-        const out = {}
-        card.querySelectorAll(".contact-field").forEach(el => {
-          const v = el.value.trim()
-          if (v) out[el.dataset.contactKey] = v
-        })
-        const error = card.querySelector("[data-contact-error]")
-        if (out.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(out.email)) {
-          if (error && !silent) error.hidden = false
-          delete out.email
-        } else if (error && !silent) {
-          error.hidden = true
-        }
-        return Object.keys(out).length ? out : null
       }
 
       case "open_ended": {
@@ -1268,24 +1240,19 @@ export default class extends Controller {
     }
   }
 
-  // Template variables an end-screen title/body may reference: %{name} (from
-  // an answered contact_form card's name field — the first one found, if a
-  // deck somehow has more than one), %{score}/%{max} (quiz totals, only when
-  // this Verto actually grades), %{points} (summed across every token type)
-  // and %{points:<token_id>} (one type only). Deliberately never covers
-  // forward_url — that stays a creator-authored literal link, not text.
+  // Template variables an end-screen title/body may reference: %{score}/%{max}
+  // (quiz totals, only when this Verto actually grades), %{points} (summed
+  // across every token type) and %{points:<token_id>} (one type only).
+  // Deliberately never covers forward_url — that stays a creator-authored
+  // literal link, not text.
+  //
+  // %{name} used to resolve here, from an answered contact card. That card type
+  // was withdrawn, so the variable was withdrawn with it rather than left to
+  // resolve empty forever; stored copy still carrying it falls through to the
+  // inline fallback below, exactly as an unanswered path always did.
   _endScreenVars() {
-    let name = null
-    for (const key in this._answers) {
-      const a = this._answers[key]
-      if (a?.type === "contact_form" && a.value && typeof a.value === "object" && a.value.name) {
-        name = a.value.name
-        break
-      }
-    }
     const hasTokens = Object.keys(this._tokenTotals).length > 0
     return {
-      name,
       score: this._quizMax > 0 ? this._quizScore : null,
       max: this._quizMax > 0 ? this._quizMax : null,
       points: hasTokens ? Object.values(this._tokenTotals).reduce((sum, v) => sum + (v || 0), 0) : null
@@ -1293,8 +1260,8 @@ export default class extends Controller {
   }
 
   // %{var}, %{points:<token_id>} for one token type, and an inline fallback
-  // %{var|text} for when the value never resolved (no contact card on this
-  // path, not a quiz, tokenisation off) — stripped to "" without a fallback,
+  // %{var|text} for when the value never resolved (not a quiz, tokenisation
+  // off, or a withdrawn variable) — stripped to "" without a fallback,
   // same as the rest of this method already did for a missing var before
   // personalisation existed, so an unanswered path never prints a raw %{...}.
   _interpolateEndScreen(str, vars) {
@@ -2085,15 +2052,11 @@ export default class extends Controller {
       card.querySelectorAll(".rating-star").forEach((s, i) => {
         const on = i < Number(value); s.classList.toggle("active", on); s.textContent = on ? "★" : "☆"
       })
-    } else if (type === "contact_form" && value && typeof value === "object") {
-      card.querySelectorAll(".contact-field").forEach(el => {
-        if (value[el.dataset.contactKey] != null) el.value = value[el.dataset.contactKey]
-      })
     }
   }
 
   _lockInputs(card) {
-    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .prioritise-list, .rating-wrap, .freeform-wrap, .other-block, .contact-form-wrap")
+    card.querySelectorAll(".choice-list, .choice-grid, .rotate-wrap, .slider-wrap, .nps-slider, .prioritise-list, .rating-wrap, .freeform-wrap, .other-block")
         .forEach(el => { el.style.pointerEvents = "none" })
     card.querySelectorAll("textarea, input, button[data-other-target='btn']").forEach(el => { el.disabled = true })
   }

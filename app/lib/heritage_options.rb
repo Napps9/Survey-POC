@@ -85,7 +85,7 @@ module HeritageOptions
     def clean_label(raw)
       raw.to_s
          .gsub(/[[:cntrl:]]/, " ") # a newline in an option label breaks the row
-         .tr("|", " ")             # pipes pack the neurodiversity column; keep them out of answers
+         .tr("|", " ")             # a pipe has packed a demographic column before; keep them out of answers
          .squeeze(" ")
          .strip
          .first(MAX_LABEL)

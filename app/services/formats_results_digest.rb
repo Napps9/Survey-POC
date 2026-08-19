@@ -73,11 +73,6 @@ module FormatsResultsDigest
         sample = result[:texts].first(5)
         lines << "  Sample responses (#{result[:total]} total):"
         sample.each { |t| lines << "    - #{PromptSafety.quote(t, limit: 120)}" }
-
-      when "contact_form"
-        # Names/companies/emails are identifying data — deliberately NOT put
-        # in an AI prompt. The count is the only thing worth summarising.
-        lines << "  #{result[:total]} contact-detail submissions (identifying data, withheld from AI)"
       end
 
       lines << ""

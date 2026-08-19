@@ -49,12 +49,6 @@ en:
       strongly_agree: "Strongly agree"
       slightly_disagree: "Slightly disagree"
       slightly_agree: "Slightly agree"
-    contact_name: "Name"
-    contact_company: "Company"
-    contact_industry: "Industry"
-    contact_email: "Email"
-    contact_note: "Your details go to the creator of this Verto so they can follow up with you."
-    contact_email_invalid: "That doesn't look like an email address — please check it."
     add_statement: "Add statement"
     swipe_no: "No"
     swipe_unsure: "Unsure"
@@ -96,7 +90,6 @@ en:
       select_many_grid: "Choose all that apply"
       tap_card: "Swipe to respond"
       open_ended: "Type your answer"
-      contact_form: "Share your details"
       scenario: "Read on, then choose"
     # Dashboard chrome only (results screen, the editor's deleted-cards list,
     # the "Rules of the Game" scoring feedback) — never rendered to a
@@ -119,7 +112,6 @@ en:
       tap_card: "SWIPE"
       scenario: "SCENARIO"
       open_ended: "OPEN TEXT"
-      contact_form: "CONTACT"
       welcome_card: "WELCOME CARD"
       token_checkpoint: "CHECKPOINT"
       consent_gate: "CONSENT"
@@ -136,7 +128,6 @@ en:
       tap_card: "SWIPE TO RESPOND"
       scenario: "READ ON, THEN CHOOSE"
       open_ended: "TYPE YOUR ANSWER"
-      contact_form: "SHARE YOUR DETAILS"
     type_label:
       multiple_choice: "Pick one (list)"
       select_many: "Select many (list)"
@@ -299,7 +290,6 @@ en:
     tap_card: ["Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1520,17 +1510,12 @@ en:
         options: ["Male", "Female", "Non-binary", "Other", "Prefer not to say"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options
-    # are only taken whole and at registry length; the last two neurodiversity
-    # options are the mutually-exclusive pair in every language.
+    # are only taken whole and at registry length.
     optional:
       heritage:
         text: "Which of these best reflects your heritage?"
         description: "Your ethnic or cultural background."
         options: ["Asian heritage", "Black, African or Caribbean heritage", "Hispanic or Latino/a", "Middle Eastern or North African heritage", "White or European heritage", "Indigenous heritage", "Mixed or multiple heritage", "Another heritage", "Prefer not to say"]
-      neurodiversity:
-        text: "Do any of these describe you?"
-        description: "About how you think and process information — choose any that apply."
-        options: ["ADHD", "Autism", "Dyslexia", "Dyspraxia", "Dyscalculia", "Tourette's", "Another form of neurodivergence", "None of these", "Prefer not to say"]
     # The optional postcode field on the "Where do you live?" card
     # (Survey#capture_postcode?) — not part of the cards/optional registries
     # above since it isn't a question of its own, just an extra field on the
@@ -1766,7 +1751,6 @@ en:
       description: "Offer this Verto's results to Ask Verto, so they can help answer questions from other researchers, funders and partners. You can withdraw at any time."
       never_items:
         - "Individual response rows"
-        - "Contact-form entries and leads"
         - "Respondent codes or session tokens"
         - "Any segment under 30 people"
         - "Quotes naming a person, school or place"

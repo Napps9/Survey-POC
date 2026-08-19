@@ -19,8 +19,7 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
       cards: [
         { "type" => "welcome_card", "title" => "hi" },
         { "type" => "multiple_choice", "cid" => "c_mc", "text" => "Colour?", "options" => %w[Blue Green] },
-        { "type" => "open_ended", "cid" => "c_oe", "text" => "Tell us more" },
-        { "type" => "contact_form", "cid" => "c_cf", "text" => "Contact" }
+        { "type" => "open_ended", "cid" => "c_oe", "text" => "Tell us more" }
       ],
       publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current
     )
@@ -31,17 +30,15 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
     follow_redirect! if response.redirect?
   end
 
-  # One response carrying every kind of thing the shared page must redact:
-  # an "other" free-text on the closed question, an open_ended answer, and a
-  # contact_form submission — each with a distinctive, greppable value.
+  # One response carrying every kind of thing the shared page must redact: an
+  # "other" free-text on the closed question and an open_ended answer — each
+  # with a distinctive, greppable value.
   def add_secret_response
     @survey.responses.create!(
       session_token: SecureRandom.uuid, status: "completed",
       answers: {
         "1" => { "value" => "Blue", "other" => "TOPSECRET_OTHER_TEXT" },
-        "2" => { "value" => "TOPSECRET_OPEN_ENDED_TEXT" },
-        "3" => { "value" => { "name" => "Jane Secretname", "email" => "jane@secret.example",
-                              "company" => "SecretCo", "industry" => "Testing" } }
+        "2" => { "value" => "TOPSECRET_OPEN_ENDED_TEXT" }
       }
     )
   end
@@ -157,7 +154,7 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
 
   # ── PII posture ────────────────────────────────────────────────────────────
 
-  test "shows closed-question distributions and counts, but hides open text, other-text and contact details" do
+  test "shows closed-question distributions and counts, but hides open text and other-text" do
     add_secret_response
     token = enable_share!
     delete session_path
@@ -168,12 +165,9 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
     assert_match "Colour?", response.body
     assert_match "Blue", response.body
 
-    # None of the three free-text carriers may leak, in any form.
+    # Neither free-text carrier may leak, in any form.
     assert_no_match "TOPSECRET_OTHER_TEXT", response.body
     assert_no_match "TOPSECRET_OPEN_ENDED_TEXT", response.body
-    assert_no_match "Jane Secretname", response.body
-    assert_no_match "jane@secret.example", response.body
-    assert_no_match "SecretCo", response.body
     # Redacted sections still say *something* exists, just not what it says.
     assert_match "hidden on shared links", response.body
   end
@@ -186,7 +180,6 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "TOPSECRET_OTHER_TEXT", response.body
     assert_match "TOPSECRET_OPEN_ENDED_TEXT", response.body
-    assert_match "Jane Secretname", response.body
   end
 
   test "carries no turbo_stream_from, live-results element, leaderboard, exports, chat or report-edit controls" do

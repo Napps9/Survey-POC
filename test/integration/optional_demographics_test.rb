@@ -1,11 +1,10 @@
 require "test_helper"
 
-# The opt-in demographic questions (Heritage, Neurodiversity) end to end:
-# answers denormalise into their columns under the same tamper-guard posture
-# as gender, the multi-select packing + exclusivity rules hold, the gender
-# sync survives sharing a deck with another demographic multiple_choice (the
-# collision this feature's demographic_key exists to prevent), and results
-# grow the new segment pills with small-cell suppression.
+# The opt-in demographic question (Heritage) end to end: answers denormalise
+# into its column under the same tamper-guard posture as gender, the gender sync
+# survives sharing a deck with another demographic multiple_choice (the
+# collision this feature's demographic_key exists to prevent), and results grow
+# the segment pills with small-cell suppression.
 class OptionalDemographicsTest < ActionDispatch::IntegrationTest
   include ResolvesResultSegments
 
@@ -19,11 +18,10 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
       default_locale: "en", locales: [ "en" ],
       cards: [ { "type" => "yes_no", "text" => "Fun?" } ] +
              DemographicQuestions.cards +
-             [ DemographicQuestions.optional_card("heritage"),
-               DemographicQuestions.optional_card("neurodiversity") ]
+             [ DemographicQuestions.optional_card("heritage") ]
     )
     @survey.update!(publish_token: SecureRandom.hex(8))
-    # Deck: 0 yes_no · 1 birth · 2 location · 3 gender · 4 heritage · 5 neuro
+    # Deck: 0 yes_no · 1 birth · 2 location · 3 gender · 4 heritage
   end
 
   def submit!(answers)
@@ -91,99 +89,22 @@ class OptionalDemographicsTest < ActionDispatch::IntegrationTest
     assert_equal "Indigenous heritage", resp.demographic_heritage
   end
 
-  test "neurodiversity packs sorted, pipe-wrapped canonical labels" do
-    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "Dyslexia", "ADHD" ] } })
-    assert_equal "|ADHD|Dyslexia|", resp.demographic_neurodiversity
-  end
-
-  test "real conditions beat the exclusive picks; exclusives store alone" do
-    # "None of these" is retired from new cards — ticking nothing on a
-    # select-many already says it — but decks that predate that still offer it,
-    # and their answers must keep sorting the same way.
-    with_legacy_options!(5, "neurodiversity")
-
-    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "ADHD", "None of these" ] } })
-    assert_equal "|ADHD|", resp.demographic_neurodiversity
-
-    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "None of these" ] } })
-    assert_equal "|None of these|", resp.demographic_neurodiversity
-
-    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "None of these", "Prefer not to say" ] } })
-    assert_equal "|None of these|", resp.demographic_neurodiversity, "first-picked exclusive wins, alone"
-  end
-
-  test "a new card no longer offers 'None of these' — ticking nothing says it" do
-    card = @survey.cards[5]
-    refute_includes card["options"], "None of these"
-    assert_equal "Prefer not to say", card["options"].last,
-                 "declining is still a distinct answer from nothing applying"
-
-    # And a payload claiming it against a card that doesn't offer it is dropped,
-    # like any other value the card never showed.
-    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "None of these" ] } })
-    assert_nil resp.demographic_neurodiversity
-  end
-
-  test "tampered neurodiversity values are dropped" do
-    resp = submit!({ "5" => { "type" => "select_many", "value" => [ "ADHD", "Fake condition", "x|y" ] } })
-    assert_equal "|ADHD|", resp.demographic_neurodiversity
-  end
-
-  # The neurodiversity card lost its "Another form of neurodivergence" button
-  # for the same reason heritage lost "Another heritage": it recorded that
-  # someone didn't fit without asking what they are.
-  test "a typed neurodivergence packs under the canonical label" do
-    resp = submit!({ "5" => { "type" => "select_many", "value" => nil, "other" => "Misophonia" } })
-
-    assert_equal "|Another form of neurodivergence|", resp.demographic_neurodiversity,
-                 "otherwise the people the list missed vanish from the segments"
-    refute_match(/Misophonia/, resp.demographic_neurodiversity.to_s,
-                 "a respondent's own words must never become a dashboard segment label")
-    assert_equal "Misophonia", resp.answers["5"]["other"]
-  end
-
-  test "a typed neurodivergence beats an exclusive pick" do
-    # The Other box replaces the selection platform-wide, so this is really a
-    # tampered payload — but if it ever arrives on a deck that still offers the
-    # exclusive, a real condition wins, exactly as a ticked one does.
-    with_legacy_options!(5, "neurodiversity")
-
-    resp = submit!({ "5" => { "type" => "select_many",
-                              "value" => [ "None of these" ], "other" => "Misophonia" } })
-    assert_equal "|Another form of neurodivergence|", resp.demographic_neurodiversity
-  end
-
-  test "a typed answer is ignored on a card that doesn't offer the box" do
-    # Decks inserted before the box existed carry 9 options and no allow_other.
-    legacy = @survey.cards.dup
-    legacy[5] = legacy[5].except("allow_other")
-    @survey.update!(cards: legacy)
-
-    resp = submit!({ "5" => { "type" => "select_many", "value" => nil, "other" => "Misophonia" } })
-    assert_nil resp.demographic_neurodiversity
-  end
-
-  test "heritage and neurodiversity segments appear at the sample floor and overlap correctly" do
+  test "heritage segments appear at the sample floor and suppress below it" do
     5.times do
-      submit!({ "4" => { "type" => "multiple_choice", "value" => "Mixed or multiple heritage" },
-                "5" => { "type" => "select_many", "value" => [ "ADHD", "Dyslexia" ] } })
+      submit!({ "4" => { "type" => "multiple_choice", "value" => "Mixed or multiple heritage" } })
     end
-    4.times { submit!({ "5" => { "type" => "select_many", "value" => [ "Autism" ] } }) }
+    4.times { submit!({ "4" => { "type" => "multiple_choice", "value" => "Asian heritage" } }) }
     @survey.responses.update_all(status: "completed")
 
     segments = result_segments(@survey, @survey.responses)
     ids = segments.map { |s| s[:id] }
 
     assert_includes ids, "heritage_mixed-or-multiple-heritage"
-    assert_includes ids, "neuro_adhd"
-    assert_includes ids, "neuro_dyslexia"
-    refute_includes ids, "neuro_autism", "4 responders sits under the small-cell floor"
+    refute_includes ids, "heritage_asian-heritage", "4 responders sits under the small-cell floor"
 
-    adhd = segments.find { |s| s[:id] == "neuro_adhd" }
-    dyslexia = segments.find { |s| s[:id] == "neuro_dyslexia" }
-    assert_equal 5, adhd[:count]
-    assert_equal 5, dyslexia[:count], "a two-condition respondent belongs to both segments"
-    assert_equal 5, adhd[:scope].count
+    mixed = segments.find { |s| s[:id] == "heritage_mixed-or-multiple-heritage" }
+    assert_equal 5, mixed[:count]
+    assert_equal 5, mixed[:scope].count
   end
 
   test "the results page renders the new pills" do

@@ -47,12 +47,6 @@ id:
       strongly_agree: "Sangat setuju"
       slightly_disagree: "Agak tidak setuju"
       slightly_agree: "Agak setuju"
-    contact_name: "Nama"
-    contact_company: "Perusahaan"
-    contact_industry: "Industri"
-    contact_email: "Email"
-    contact_note: "Detail Anda dikirim ke pembuat Verto ini agar mereka dapat menghubungi Anda."
-    contact_email_invalid: "Itu tidak tampak seperti alamat email — mohon periksa."
     add_statement: Tambah pernyataan
     swipe_no: "Tidak"
     swipe_unsure: "Tidak yakin"
@@ -94,7 +88,6 @@ id:
       select_many_grid: "Pilih semua yang sesuai"
       tap_card: "Geser untuk menjawab"
       open_ended: "Ketik jawaban Anda"
-      contact_form: "Bagikan detail Anda"
       scenario: "Lanjutkan membaca, lalu pilih"
     badge:
       range: "RENTANG"
@@ -109,7 +102,6 @@ id:
       tap_card: "GESER"
       scenario: "SKENARIO"
       open_ended: "TEKS BEBAS"
-      contact_form: "KONTAK"
       welcome_card: "KARTU SAMBUTAN"
       token_checkpoint: "PATOK UJI"
       consent_gate: "PERSETUJUAN"
@@ -126,7 +118,6 @@ id:
       tap_card: "GESER UNTUK MENJAWAB"
       scenario: "LANJUTKAN MEMBACA, LALU PILIH"
       open_ended: "KETIK JAWABAN ANDA"
-      contact_form: "BAGIKAN DETAIL ANDA"
     type_label:
       multiple_choice: "Pilih satu (daftar)"
       select_many: "Pilih beberapa (daftar)"
@@ -283,7 +274,6 @@ id:
     tap_card: ["Pernyataan 1", "Pernyataan 2", "Pernyataan 3", "Pernyataan 4", "Pernyataan 5"]
     scenario: ["Opsi A", "Opsi B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1491,10 +1481,6 @@ id:
         text: "Mana yang paling mencerminkan warisan budaya Anda?"
         description: "Latar belakang etnis atau budaya Anda."
         options: ["Warisan Asia", "Warisan kulit hitam, Afrika, atau Karibia", "Hispanik atau Latin", "Warisan Timur Tengah atau Afrika Utara", "Warisan kulit putih atau Eropa", "Warisan masyarakat adat", "Warisan campuran atau ganda", "Warisan lainnya", "Memilih untuk tidak menjawab"]
-      neurodiversity:
-        text: "Apakah ada yang menggambarkan diri Anda?"
-        description: "Tentang cara Anda berpikir dan memproses informasi — pilih semua yang sesuai."
-        options: ["ADHD", "Autisme", "Disleksia", "Dispraksia", "Diskalkulia", "Tourette", "Bentuk neurodivergensi lainnya", "Tidak ada yang sesuai", "Memilih untuk tidak menjawab"]
     postcode_placeholder: "Kode pos (opsional)"
     postcode_note: "Hanya digunakan untuk memahami pola regional secara umum — tidak pernah ditampilkan secara individual."
   oops:
@@ -1726,7 +1712,6 @@ id:
       description: "Tawarkan hasil Verto ini ke Ask Verto, agar dapat membantu menjawab pertanyaan peneliti, pemberi dana, dan mitra lain. Anda bisa menariknya kapan saja."
       never_items:
         - "Baris tanggapan individual"
-        - "Isian formulir kontak dan prospek"
         - "Kode responden atau token sesi"
         - "Segmen mana pun di bawah 30 orang"
         - "Kutipan yang menyebut nama orang, sekolah, atau tempat"

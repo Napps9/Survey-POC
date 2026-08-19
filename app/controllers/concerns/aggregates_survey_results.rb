@@ -94,10 +94,6 @@ module AggregatesSurveyResults
     when "open_ended"
       str = value.to_s
       st[:texts] << str unless str.blank?
-    when "contact_form"
-      # The submitted field-object, whole — the results view renders these as
-      # a lead table rather than counting anything.
-      st[:texts] << value if value.is_a?(Hash) && value.present?
     end
   end
 
@@ -123,8 +119,6 @@ module AggregatesSurveyResults
       base.merge(total: st[:value_count] + other_count, counts: st[:counts], avg:)
     when "open_ended"
       base.merge(total: st[:value_count] + other_count, texts: st[:texts])
-    when "contact_form"
-      base.merge(total: st[:value_count], entries: st[:texts])
     else
       base.merge(total: total_responses, counts: {})
     end

@@ -47,12 +47,6 @@ de:
       strongly_agree: "Stimme voll zu"
       slightly_disagree: "Stimme eher nicht zu"
       slightly_agree: "Stimme eher zu"
-    contact_name: "Name"
-    contact_company: "Unternehmen"
-    contact_industry: "Branche"
-    contact_email: "E-Mail"
-    contact_note: "Deine Angaben gehen an die Person hinter diesem Verto, damit sie sich bei dir melden kann."
-    contact_email_invalid: "Das sieht nicht wie eine E-Mail-Adresse aus — bitte prüfen."
     add_statement: Aussage hinzufügen
     swipe_no: "Nein"
     swipe_unsure: "Unsicher"
@@ -94,7 +88,6 @@ de:
       select_many_grid: "Alle zutreffenden Optionen wählen"
       tap_card: "Wischen, um zu antworten"
       open_ended: "Antwort eingeben"
-      contact_form: "Teile deine Kontaktdaten"
       scenario: "Weiterlesen, dann wählen"
     badge:
       range: "SKALA"
@@ -109,7 +102,6 @@ de:
       tap_card: "WISCHEN"
       scenario: "SZENARIO"
       open_ended: "FREITEXT"
-      contact_form: "KONTAKT"
       welcome_card: "WILLKOMMENSKARTE"
       token_checkpoint: "ZWISCHENSTAND"
       consent_gate: "EINWILLIGUNG"
@@ -126,7 +118,6 @@ de:
       tap_card: "ZUM ANTWORTEN WISCHEN"
       scenario: "WEITERLESEN, DANN WÄHLEN"
       open_ended: "ANTWORT EINGEBEN"
-      contact_form: "KONTAKTDATEN TEILEN"
     type_label:
       multiple_choice: "Eins wählen (Liste)"
       select_many: "Mehrere wählen (Liste)"
@@ -283,7 +274,6 @@ de:
     tap_card: ["Aussage 1", "Aussage 2", "Aussage 3", "Aussage 4", "Aussage 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ de:
         text: "Was spiegelt deine Herkunft am besten wider?"
         description: "Dein ethnischer oder kultureller Hintergrund."
         options: ["Asiatische Herkunft", "Schwarze, afrikanische oder karibische Herkunft", "Hispanisch oder Latino/Latina", "Nahöstliche oder nordafrikanische Herkunft", "Weiße oder europäische Herkunft", "Indigene Herkunft", "Gemischte oder mehrfache Herkunft", "Andere Herkunft", "Möchte ich nicht angeben"]
-      neurodiversity:
-        text: "Trifft etwas davon auf dich zu?"
-        description: "Es geht darum, wie du denkst und Informationen verarbeitest — wähle alles Zutreffende."
-        options: ["ADHS", "Autismus", "Legasthenie", "Dyspraxie", "Dyskalkulie", "Tourette", "Eine andere Form von Neurodivergenz", "Nichts davon", "Möchte ich nicht angeben"]
     postcode_placeholder: "Postleitzahl (optional)"
     postcode_note: "Wird nur verwendet, um grobe regionale Muster zu verstehen — nie einzeln angezeigt."
   oops:
@@ -1727,7 +1713,6 @@ de:
       description: "Stelle die Ergebnisse dieses Vertos Ask Verto zur Verfügung, damit sie Fragen anderer Forschender, Fördernder und Partner beantworten helfen. Du kannst das jederzeit zurückziehen."
       never_items:
         - "Einzelne Antwortdatensätze"
-        - "Kontaktformular-Einträge und Leads"
         - "Teilnehmendencodes oder Session-Tokens"
         - "Jedes Segment unter 30 Personen"
         - "Zitate, die eine Person, Schule oder einen Ort nennen"

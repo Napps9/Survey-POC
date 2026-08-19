@@ -530,7 +530,7 @@ class Survey < ApplicationRecord
         outcome.present? ? c["outcome"] = outcome : c.delete("outcome")
       end
 
-      # Which opt-in demographic question a card is (heritage/neurodiversity) —
+      # Which opt-in demographic question a card is (heritage) —
       # only a known key survives, and only on a card that is actually flagged
       # demographic. The flag requirement means a crafted payload can't hang a
       # key on an arbitrary card without also flagging it demographic (which
@@ -1305,48 +1305,6 @@ class Survey < ApplicationRecord
       clamped = entry.dup
       clamped["value"] = entry["value"].first(limit) if entry["value"].is_a?(String)
       clamped["other"] = entry["other"].first(limit) if entry["other"].is_a?(String)
-      out[key] = clamped
-    end
-  end
-
-  # The contact card's answer shape: an object of these fields (any subset).
-  # 120 chars is generous for a name/company/industry and stops the public
-  # JSON endpoint being used to stuff paragraphs into a lead field.
-  CONTACT_FIELDS      = %w[name company industry email].freeze
-  CONTACT_FIELD_LIMIT = 120
-
-  # Bound and validate contact-card answers. Same posture as clamp_free_text
-  # directly above the call site: the client validates as a courtesy, but the
-  # endpoint is public JSON, so the server owns the contract — only the four
-  # known fields survive, each stripped and clamped, and an email that isn't
-  # one is dropped rather than stored malformed.
-  def clamp_contact_entries(answers)
-    return answers unless answers.is_a?(Hash)
-
-    contact_keys = Array(cards).each_with_index
-                               .select { |card, _| card.is_a?(Hash) && card["type"].to_s == "contact_form" }
-                               .map { |_, idx| idx.to_s }
-    return answers if contact_keys.empty?
-
-    answers.each_with_object({}) do |(key, entry), out|
-      unless contact_keys.include?(key) && entry.is_a?(Hash)
-        out[key] = entry
-        next
-      end
-
-      clamped = entry.dup
-      value = entry["value"]
-      if value.is_a?(Hash)
-        cleaned = CONTACT_FIELDS.each_with_object({}) do |field, acc|
-          v = (value[field] || value[field.to_sym]).to_s.strip.first(CONTACT_FIELD_LIMIT)
-          acc[field] = v if v.present?
-        end
-        cleaned.delete("email") unless cleaned["email"]&.match?(URI::MailTo::EMAIL_REGEXP)
-        clamped["value"] = cleaned.presence
-      else
-        # A contact answer is an object or nothing — scalars are junk.
-        clamped["value"] = nil
-      end
       out[key] = clamped
     end
   end

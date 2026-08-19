@@ -47,12 +47,6 @@ it:
       strongly_agree: "Completamente d'accordo"
       slightly_disagree: "Poco d'accordo"
       slightly_agree: "Abbastanza d'accordo"
-    contact_name: "Nome"
-    contact_company: "Azienda"
-    contact_industry: "Settore"
-    contact_email: "Email"
-    contact_note: "I tuoi dati vanno al creatore di questo Verto perché possa ricontattarti."
-    contact_email_invalid: "Non sembra un indirizzo email — controlla, per favore."
     add_statement: Aggiungi affermazione
     swipe_no: "No"
     swipe_unsure: "Incerto"
@@ -94,7 +88,6 @@ it:
       select_many_grid: "Scegli tutte le opzioni pertinenti"
       tap_card: "Scorri per rispondere"
       open_ended: "Scrivi la tua risposta"
-      contact_form: "Condividi i tuoi dati"
       scenario: "Continua a leggere, poi scegli"
     badge:
       range: "SCALA"
@@ -109,7 +102,6 @@ it:
       tap_card: "SCORRI"
       scenario: "SCENARIO"
       open_ended: "TESTO LIBERO"
-      contact_form: "CONTATTO"
       welcome_card: "SCHEDA DI BENVENUTO"
       token_checkpoint: "CHECKPOINT"
       consent_gate: "CONSENSO"
@@ -126,7 +118,6 @@ it:
       tap_card: "SCORRI PER RISPONDERE"
       scenario: "CONTINUA A LEGGERE, POI SCEGLI"
       open_ended: "SCRIVI LA TUA RISPOSTA"
-      contact_form: "CONDIVIDI I TUOI DATI"
     type_label:
       multiple_choice: "Scegli uno (elenco)"
       select_many: "Scegli più (elenco)"
@@ -283,7 +274,6 @@ it:
     tap_card: ["Affermazione 1", "Affermazione 2", "Affermazione 3", "Affermazione 4", "Affermazione 5"]
     scenario: ["Opzione A", "Opzione B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ it:
         text: "Quale di queste opzioni riflette meglio la tua origine?"
         description: "Il tuo background etnico o culturale."
         options: ["Origine asiatica", "Origine nera, africana o caraibica", "Ispanico o latinoamericano/a", "Origine mediorientale o nordafricana", "Origine bianca o europea", "Origine indigena", "Origine mista o multipla", "Un'altra origine", "Preferisco non rispondere"]
-      neurodiversity:
-        text: "Qualcuna di queste ti descrive?"
-        description: "Riguarda il modo in cui pensi ed elabori le informazioni — scegli tutte quelle pertinenti."
-        options: ["ADHD", "Autismo", "Dislessia", "Disprassia", "Discalculia", "Tourette", "Un'altra forma di neurodivergenza", "Nessuna di queste", "Preferisco non rispondere"]
     postcode_placeholder: "CAP (facoltativo)"
     postcode_note: "Usato solo per capire modelli regionali generali — non viene mai mostrato singolarmente."
   oops:
@@ -1727,7 +1713,6 @@ it:
       description: "Offri i risultati di questo Verto ad Ask Verto, così potranno aiutare a rispondere alle domande di altri ricercatori, finanziatori e partner. Puoi ritirarlo in qualsiasi momento."
       never_items:
         - "Le singole risposte"
-        - "Voci e contatti dei moduli"
         - "Codici partecipante o token di sessione"
         - "Qualsiasi segmento sotto le 30 persone"
         - "Citazioni che nominano una persona, una scuola o un luogo"

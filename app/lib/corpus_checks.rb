@@ -42,7 +42,6 @@ module CorpusChecks
       sample_size(answered_count),
       pii_options(cards),
       free_text(cards),
-      contact_forms(cards),
       question_count(cards)
     ]
   end
@@ -88,16 +87,6 @@ module CorpusChecks
 
     Check.new(key: :free_text, status: :warn,
               label: "#{count} open-text question#{"s" if count != 1} — quotes need a read")
-  end
-
-  # Contact forms collect a name and an email on purpose. They are never indexed,
-  # and their presence is worth stating so nobody assumes they were.
-  def contact_forms(cards)
-    count = cards.count { |card| card["type"].to_s == "contact_form" }
-    return Check.new(key: :contact_forms, status: :pass, label: "No contact forms") if count.zero?
-
-    Check.new(key: :contact_forms, status: :warn,
-              label: "#{count} contact form#{"s" if count != 1} — excluded from the corpus")
   end
 
   def question_count(cards)

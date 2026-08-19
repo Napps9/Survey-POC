@@ -11,15 +11,14 @@ require "application_system_test_case"
 #
 # The app has had the cure since long lists needed it: .split-right > .mt-2
 # becomes a scroll container, the overflow is absorbed inside the answer box, and
-# the flex line never overflows. But it was :has()-scoped to four answer shapes —
-# lists, grids, prioritise and the contact form. The five types below had no
-# scroll path at all, so for them overflow was silent clipping.
+# the flex line never overflows. But it was :has()-scoped to a few answer shapes —
+# lists, grids and prioritise. The five types below had no scroll path at all, so
+# for them overflow was silent clipping.
 #
 # It has shipped, too: one_pager_fit_test's header records "1000x567 cut 82px off
-# the top of every card", and contact_form_sideways_test was written after the
-# same failure on a sideways phone. This is that assertion generalised to the two
-# surfaces that share the fixed 850x680 box — the editor canvas and the desktop
-# player — across every type that was excluded.
+# the top of every card". This is that assertion generalised to the two surfaces
+# that share the fixed 850x680 box — the editor canvas and the desktop player —
+# across every type that was excluded.
 class CardHeaderPinnedTest < ApplicationSystemTestCase
   # Long enough to wrap, with a description under it, because that is the shape
   # the owner hit: it is the SECOND line plus the subtitle that tips the column

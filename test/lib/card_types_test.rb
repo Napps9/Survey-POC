@@ -90,4 +90,14 @@ class CardTypesTest < ActiveSupport::TestCase
     end
     assert_empty problems, problems.join("\n")
   end
+
+  # The withdrawal, pinned. contact_form was the one card type that collected
+  # identifying data (name, company, industry, email). It was removed from the
+  # platform along with every card already sitting in a deck, so re-adding it to
+  # the registry would quietly make it pickable again.
+  test "contact_form is not a card type" do
+    refute CardTypes::DATA_BY_KEY.key?("contact_form")
+    refute_includes CardTypes.pickable.map(&:first), "contact_form"
+    refute_includes SurveyGenerator::CARD_TYPES, "contact_form"
+  end
 end

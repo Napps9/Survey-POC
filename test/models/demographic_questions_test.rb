@@ -29,13 +29,22 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     assert_nil DemographicQuestions.optional_card("astrology")
   end
 
+  # The withdrawal, pinned. Neurodiversity was an opt-in demographic card until
+  # it was removed from the platform along with every card already in a deck;
+  # re-adding it here would quietly make it offerable again from the editor.
+  test "neurodiversity is not offerable" do
+    refute DemographicQuestions::OPTIONAL_CARDS.key?("neurodiversity")
+    refute_includes DemographicQuestions::DEMOGRAPHIC_KEYS, "neurodiversity"
+    assert_nil DemographicQuestions.optional_card("neurodiversity")
+  end
+
   test "optional_card resolves a locale and falls back to English" do
-    fr = DemographicQuestions.optional_card("neurodiversity", locale: "fr")
-    en = DemographicQuestions.optional_card("neurodiversity")
+    fr = DemographicQuestions.optional_card("heritage", locale: "fr")
+    en = DemographicQuestions.optional_card("heritage")
 
     refute_equal en["text"], fr["text"], "the French Verto must ask in French"
-    assert_equal 7, fr["options"].size, "9 vocabulary entries, two retired"
-    assert_equal en, DemographicQuestions.optional_card("neurodiversity", locale: "xx-nope")
+    assert_equal 8, fr["options"].size, "9 vocabulary entries, one retired"
+    assert_equal en, DemographicQuestions.optional_card("heritage", locale: "xx-nope")
   end
 
   test "a wrong-length translated options list is refused — answers are positional" do
@@ -56,25 +65,15 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     refute DemographicQuestions::OPTIONAL_CARDS["heritage"].key?("cid")
   end
 
-  test "neuro_exclusive_labels carries the exclusive pair across locales" do
-    labels = DemographicQuestions.neuro_exclusive_labels
-
-    assert_includes labels, "None of these"
-    assert_includes labels, "Prefer not to say"
-    assert_includes labels, "Aucune de ces réponses", "French exclusives must be recognised too"
-    refute_includes labels, "ADHD", "a real condition must never be treated as exclusive"
-  end
-
   # ── The country-tailored heritage card ────────────────────────────────────
 
   # The pin that everything else rests on. OFF_LIST_OPTION_INDEX names a
   # POSITION in each registry list; move an entry without moving the index and
   # a typed answer starts being filed under a real category instead. Nothing
   # else would raise, so this is the alarm.
-  test "the retired indexes point at the labels they claim, on both cards" do
+  test "the retired indexes point at the labels they claim" do
     {
-      "heritage"       => { 7 => "Another heritage" },
-      "neurodiversity" => { 6 => "Another form of neurodivergence", 7 => "None of these" }
+      "heritage" => { 7 => "Another heritage" }
     }.each do |key, expected|
       assert_equal expected.keys, DemographicQuestions::RETIRED_OPTION_INDEXES[key],
                    "#{key}: retired list has drifted"
@@ -90,8 +89,7 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
   end
 
   test "the off-list label is one of the retired entries, and is recorded not shown" do
-    { "heritage" => "Another heritage",
-      "neurodiversity" => "Another form of neurodivergence" }.each do |key, label|
+    { "heritage" => "Another heritage" }.each do |key, label|
       idx = DemographicQuestions::OFF_LIST_OPTION_INDEX[key]
       assert_includes DemographicQuestions::RETIRED_OPTION_INDEXES[key], idx,
                       "#{key}: a label that is still shown cannot also be the typed-answer label"
@@ -99,10 +97,9 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
     end
   end
 
-  test "both cards drop their dead ends and take the free-text box instead" do
+  test "the heritage card drops its dead end and takes the free-text box instead" do
     {
-      "heritage" => 8,        # 9 vocabulary entries, "Another heritage" retired
-      "neurodiversity" => 7   # …plus "None of these": ticking nothing already says it
+      "heritage" => 8         # 9 vocabulary entries, "Another heritage" retired
     }.each do |key, shown|
       card = DemographicQuestions.optional_card(key)
       assert_equal shown, card["options"].size
@@ -110,14 +107,6 @@ class DemographicQuestionsTest < ActiveSupport::TestCase
       assert_equal DemographicQuestions.decline_option(key), card["options"].last,
                    "#{key}: declining stays a real choice"
     end
-  end
-
-  # The exclusivity rule outlives the option: decks inserted before it was
-  # retired still offer "None of these", and their answers still have to sort.
-  test "neuro_exclusive_labels still recognises the retired 'None of these'" do
-    refute_includes DemographicQuestions.shown_options("neurodiversity"), "None of these"
-    assert_includes DemographicQuestions.neuro_exclusive_labels, "None of these"
-    assert_includes DemographicQuestions.neuro_exclusive_labels, "Aucune de ces réponses"
   end
 
   test "the off-list and decline labels resolve per locale and stay distinct" do

@@ -31,7 +31,6 @@ class RespondentDataTest < ActionDispatch::IntegrationTest
                  "1" => { "type" => "open_ended", "value" => "London" } },
       demographic_birth_year: 1990, demographic_gender: "Female",
       demographic_heritage: "Mixed or multiple heritage",
-      demographic_neurodiversity: "|ADHD|Dyslexia|",
       region_country: "GB", region_label: "London", locale: "en", device_kind: "mobile",
       consent_agreed_at: Time.current, consent_text_snapshot: "You agreed to this.",
       started_at: 3.minutes.ago, completed_at: Time.current
@@ -127,8 +126,6 @@ class RespondentDataTest < ActionDispatch::IntegrationTest
     assert_equal "Female", row["demographics"]["gender"]
     assert_equal "London", row["demographics"]["region"]
     assert_equal "Mixed or multiple heritage", row["demographics"]["heritage"]
-    assert_equal %w[ADHD Dyslexia], row["demographics"]["neurodiversity"],
-                 "the packed column must unpack for a subject-access reader"
     assert_equal "mobile", row["device"]
     assert_equal "en",     row["language"]
     assert_equal "You agreed to this.", row["consent"]["agreed_to"]

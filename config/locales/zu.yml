@@ -47,12 +47,6 @@ zu:
       strongly_agree: "Ngiyavumelana ngokuphelele"
       slightly_disagree: "Angivumelani kancane"
       slightly_agree: "Ngiyavumelana kancane"
-    contact_name: "Igama"
-    contact_company: "Inkampani"
-    contact_industry: "Imboni"
-    contact_email: "I-imeyili"
-    contact_note: "Imininingwane yakho iya kumdali wale-Verto ukuze akwazi ukuxhumana nawe."
-    contact_email_invalid: "Lokho akubukeki njengekheli le-imeyili — sicela uhlole."
     add_statement: "Engeza isitatimende"
     swipe_no: "Cha"
     swipe_unsure: "Angiqiniseki"
@@ -94,7 +88,6 @@ zu:
       select_many_grid: "Khetha konke okufanele"
       tap_card: "Hudula ukuze uphendule"
       open_ended: "Bhala impendulo yakho"
-      contact_form: "Yabelana ngemininingwane yakho"
       scenario: "Qhubeka ufunde, bese ukhetha"
     # Dashboard chrome only (results screen, the editor's deleted-cards list,
     # the "Rules of the Game" scoring feedback) — never rendered to a
@@ -117,7 +110,6 @@ zu:
       tap_card: "HUDULA"
       scenario: "ISIBONELO"
       open_ended: "UMBHALO OVULEKILE"
-      contact_form: "UXHUMANO"
       welcome_card: "IKHADI LOKWAMUKELA"
       token_checkpoint: "ISIGABA SOKUHLOLA"
       consent_gate: "IMVUME"
@@ -134,7 +126,6 @@ zu:
       tap_card: "HUDULA UKUZE UPHENDULE"
       scenario: "QHUBEKA UFUNDE, BESE UKHETHA"
       open_ended: "BHALA IMPENDULO YAKHO"
-      contact_form: "YABELANA NGEMININGWANE YAKHO"
     type_label:
       multiple_choice: "Khetha okukodwa (uhlu)"
       select_many: "Khetha okuningi (uhlu)"
@@ -297,7 +288,6 @@ zu:
     tap_card: ["Isitatimende 1", "Isitatimende 2", "Isitatimende 3", "Isitatimende 4", "Isitatimende 5"]
     scenario: ["Inketho A", "Inketho B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1516,17 +1506,12 @@ zu:
         options: ["Owesilisa", "Owesifazane", "Ongewesilisa nowesifazane", "Okunye", "Ngithanda ukungasho"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options
-    # are only taken whole and at registry length; the last two neurodiversity
-    # options are the mutually-exclusive pair in every language.
+    # are only taken whole and at registry length.
     optional:
       heritage:
         text: "Yikuphi kulokhu okuveza kahle ifa lakho?"
         description: "Isizinda sakho sobuzwe noma samasiko."
         options: ["Ifa lase-Asia", "Ifa labamnyama, base-Afrika noma base-Caribbean", "Elase-Hispanic noma Latino/a", "Ifa laseMpumalanga Ephakathi noma eNyakatho Afrika", "Ifa labamhlophe noma base-Europe", "Ifa lomdabu", "Ifa elixubile noma eziningi", "Elinye ifa", "Ngithanda ukungasho"]
-      neurodiversity:
-        text: "Ikhona kulokhu okukuchazayo?"
-        description: "Mayelana nendlela ocabanga futhi ucubungula ulwazi ngayo — khetha konke okufanele."
-        options: ["I-ADHD", "Ubunsonge (Autism)", "I-Dyslexia", "I-Dyspraxia", "I-Dyscalculia", "I-Tourette's", "Olunye uhlobo lokungafani kobuchopho", "Akukho kulokhu", "Ngithanda ukungasho"]
     # The optional postcode field on the "Where do you live?" card
     # (Survey#capture_postcode?) — not part of the cards/optional registries
     # above since it isn't a question of its own, just an extra field on the
@@ -1762,7 +1747,6 @@ zu:
       description: "Nikeza imiphumela yale-Verto ku-Ask Verto, ukuze isize ukuphendula imibuzo yabanye abacwaningi, abaxhasi nozakwethu. Ungahoxisa noma nini."
       never_items:
         - "Imigqa yezimpendulo zomuntu ngamunye"
-        - "Okufakwe kumafomu oxhumano nabathengi abengeziwe"
         - "Amakhodi abaphenduli noma ama-thokheni esikhathi esisebenzayo"
         - "Noma yisiphi isigaba esiphansi kwabantu abangu-30"
         - "Izicaphuno eziqamba umuntu, isikole noma indawo"

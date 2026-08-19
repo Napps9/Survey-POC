@@ -47,12 +47,6 @@ tr:
       strongly_agree: "Kesinlikle katılıyorum"
       slightly_disagree: "Kısmen katılmıyorum"
       slightly_agree: "Kısmen katılıyorum"
-    contact_name: "Ad"
-    contact_company: "Şirket"
-    contact_industry: "Sektör"
-    contact_email: "E-posta"
-    contact_note: "Bilgilerin, seninle iletişime geçebilmesi için bu Verto'nun sahibine iletilir."
-    contact_email_invalid: "Bu bir e-posta adresine benzemiyor — lütfen kontrol et."
     add_statement: İfade ekle
     swipe_no: "Hayır"
     swipe_unsure: "Emin değilim"
@@ -94,7 +88,6 @@ tr:
       select_many_grid: "Uygun olan tüm seçenekleri seçin"
       tap_card: "Yanıtlamak için kaydırın"
       open_ended: "Cevabınızı yazın"
-      contact_form: "Bilgilerini paylaş"
       scenario: "Okumaya devam et, sonra seç"
     badge:
       range: "ARALIK"
@@ -109,7 +102,6 @@ tr:
       tap_card: "KAYDIR"
       scenario: "SENARYO"
       open_ended: "SERBEST METİN"
-      contact_form: "İLETİŞİM"
       welcome_card: "KARŞILAMA KARTI"
       token_checkpoint: "KONTROL NOKTASI"
       consent_gate: "ONAY"
@@ -126,7 +118,6 @@ tr:
       tap_card: "YANITLAMAK İÇİN KAYDIRIN"
       scenario: "OKUMAYA DEVAM ET, SONRA SEÇ"
       open_ended: "CEVABINIZI YAZIN"
-      contact_form: "BİLGİLERİNİ PAYLAŞ"
     type_label:
       multiple_choice: "Birini seç (liste)"
       select_many: "Birden fazla seç (liste)"
@@ -283,7 +274,6 @@ tr:
     tap_card: ["İfade 1", "İfade 2", "İfade 3", "İfade 4", "İfade 5"]
     scenario: ["Seçenek A", "Seçenek B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ tr:
         text: "Aşağıdakilerden hangisi kökenini en iyi yansıtıyor?"
         description: "Etnik veya kültürel kökenin."
         options: ["Asya kökenli", "Siyah, Afrika veya Karayip kökenli", "Hispanik veya Latin kökenli", "Orta Doğu veya Kuzey Afrika kökenli", "Beyaz veya Avrupa kökenli", "Yerli halk kökenli", "Karma veya çoklu köken", "Başka bir köken", "Belirtmek istemiyorum"]
-      neurodiversity:
-        text: "Bunlardan herhangi biri seni tanımlıyor mu?"
-        description: "Düşünme ve bilgi işleme şeklinle ilgili — uyan hepsini seç."
-        options: ["DEHB", "Otizm", "Disleksi", "Dispraksi", "Diskalkuli", "Tourette", "Başka bir nörofarklılık türü", "Hiçbiri", "Belirtmek istemiyorum"]
     postcode_placeholder: "Posta kodu (isteğe bağlı)"
     postcode_note: "Yalnızca genel bölgesel eğilimleri anlamak için kullanılır — asla ayrı ayrı gösterilmez."
   oops:
@@ -1727,7 +1713,6 @@ tr:
       description: "Bu Verto'nun sonuçlarını Ask Verto'ya sunun; böylece diğer araştırmacıların, fon sağlayıcıların ve ortakların sorularını yanıtlamaya yardımcı olurlar. İstediğiniz zaman geri çekebilirsiniz."
       never_items:
         - "Tek tek yanıt kayıtları"
-        - "İletişim formu kayıtları ve adaylar"
         - "Katılımcı kodları veya oturum anahtarları"
         - "30 kişinin altındaki her kırılım"
         - "Bir kişiyi, okulu veya yeri adıyla anan alıntılar"

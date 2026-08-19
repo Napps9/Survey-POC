@@ -73,14 +73,18 @@ class CorpusIndexerTest < ActiveSupport::TestCase
     assert_not_includes question.distribution.to_json, "120"
   end
 
-  test "contact_form is never indexed" do
-    survey = survey_with([ { "type" => "contact_form", "cid" => "c_cf", "text" => "Stay in touch" } ])
-    seed!(survey, 40) { { "0" => { "value" => { "name" => "Real Person", "email" => "a@b.com" } } } }
+  # INDEXABLE_TYPES is an allow-list, not a deny-list: a type that isn't on it
+  # produces no corpus row at all, however much data sits behind it. That is the
+  # safe direction to fail, and it is what kept the withdrawn contact card out of
+  # Ask Verto for its whole life.
+  test "a type outside the allow-list is never indexed" do
+    survey = survey_with([ { "type" => "welcome_card", "cid" => "c_w", "text" => "Welcome" } ])
+    seed!(survey, 40) { { "0" => { "value" => "SENSITIVE_PAYLOAD" } } }
 
     entry = index!(survey)
 
     assert_empty entry.corpus_questions
-    assert_not_includes entry.corpus_questions.to_json, "a@b.com"
+    assert_not_includes entry.corpus_questions.to_json, "SENSITIVE_PAYLOAD"
   end
 
   # ── Sample floors ─────────────────────────────────────────────────────────

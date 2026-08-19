@@ -47,12 +47,6 @@ pt:
       strongly_agree: "Concordo totalmente"
       slightly_disagree: "Discordo um pouco"
       slightly_agree: "Concordo um pouco"
-    contact_name: "Nome"
-    contact_company: "Empresa"
-    contact_industry: "Setor"
-    contact_email: "E-mail"
-    contact_note: "Seus dados vão para o criador deste Verto para que ele possa entrar em contato."
-    contact_email_invalid: "Isso não parece um endereço de e-mail — verifique, por favor."
     add_statement: Adicionar afirmação
     swipe_no: "Não"
     swipe_unsure: "Não tenho certeza"
@@ -94,7 +88,6 @@ pt:
       select_many_grid: "Escolha todas as opções aplicáveis"
       tap_card: "Arraste para responder"
       open_ended: "Escreva a sua resposta"
-      contact_form: "Compartilhe seus dados"
       scenario: "Continue a ler e depois escolha"
     badge:
       range: "ESCALA"
@@ -109,7 +102,6 @@ pt:
       tap_card: "DESLIZAR"
       scenario: "CENÁRIO"
       open_ended: "TEXTO LIVRE"
-      contact_form: "CONTATO"
       welcome_card: "CARTÃO DE BOAS-VINDAS"
       token_checkpoint: "PONTO DE CONTROLO"
       consent_gate: "CONSENTIMENTO"
@@ -126,7 +118,6 @@ pt:
       tap_card: "ARRASTE PARA RESPONDER"
       scenario: "CONTINUE A LER E DEPOIS ESCOLHA"
       open_ended: "ESCREVA A SUA RESPOSTA"
-      contact_form: "COMPARTILHE SEUS DADOS"
     type_label:
       multiple_choice: "Escolher uma (lista)"
       select_many: "Escolher várias (lista)"
@@ -283,7 +274,6 @@ pt:
     tap_card: ["Afirmação 1", "Afirmação 2", "Afirmação 3", "Afirmação 4", "Afirmação 5"]
     scenario: ["Opção A", "Opção B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ pt:
         text: "Qual destas opções reflete melhor a sua herança?"
         description: "Sua origem étnica ou cultural."
         options: ["Herança asiática", "Herança negra, africana ou caribenha", "Hispânico ou latino/a", "Herança do Oriente Médio ou do Norte da África", "Herança branca ou europeia", "Herança indígena", "Herança mista ou múltipla", "Outra herança", "Prefiro não dizer"]
-      neurodiversity:
-        text: "Alguma destas opções descreve você?"
-        description: "Sobre como você pensa e processa informações — escolha todas que se aplicam."
-        options: ["TDAH", "Autismo", "Dislexia", "Dispraxia", "Discalculia", "Tourette", "Outra forma de neurodivergência", "Nenhuma destas", "Prefiro não dizer"]
     postcode_placeholder: "Código postal (opcional)"
     postcode_note: "Usado apenas para entender padrões regionais amplos — nunca mostrado individualmente."
   oops:
@@ -1727,7 +1713,6 @@ pt:
       description: "Ofereça os resultados deste Verto ao Ask Verto, para ajudarem a responder a perguntas de outros investigadores, financiadores e parceiros. Pode retirar a qualquer momento."
       never_items:
         - "Respostas individuais"
-        - "Entradas e contactos de formulários"
         - "Códigos de participante ou tokens de sessão"
         - "Qualquer segmento com menos de 30 pessoas"
         - "Citações que nomeiem uma pessoa, escola ou local"

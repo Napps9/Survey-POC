@@ -47,12 +47,6 @@ fr:
       strongly_agree: "Tout à fait d'accord"
       slightly_disagree: "Plutôt pas d'accord"
       slightly_agree: "Plutôt d'accord"
-    contact_name: "Nom"
-    contact_company: "Entreprise"
-    contact_industry: "Secteur"
-    contact_email: "E-mail"
-    contact_note: "Vos coordonnées sont transmises au créateur de ce Verto afin qu'il puisse vous recontacter."
-    contact_email_invalid: "Cela ne ressemble pas à une adresse e-mail — merci de vérifier."
     add_statement: Ajouter une affirmation
     swipe_no: "Non"
     swipe_unsure: "Incertain"
@@ -94,7 +88,6 @@ fr:
       select_many_grid: "Sélectionnez toutes les réponses qui s'appliquent"
       tap_card: "Glissez pour répondre"
       open_ended: "Saisissez votre réponse"
-      contact_form: "Partagez vos coordonnées"
       scenario: "Lisez, puis choisissez"
     badge:
       range: "ÉCHELLE"
@@ -109,7 +102,6 @@ fr:
       tap_card: "GLISSER"
       scenario: "SCÉNARIO"
       open_ended: "TEXTE LIBRE"
-      contact_form: "CONTACT"
       welcome_card: "CARTE D'ACCUEIL"
       token_checkpoint: "BILAN"
       consent_gate: "CONSENTEMENT"
@@ -126,7 +118,6 @@ fr:
       tap_card: "GLISSEZ POUR RÉPONDRE"
       scenario: "LISEZ, PUIS CHOISISSEZ"
       open_ended: "SAISISSEZ VOTRE RÉPONSE"
-      contact_form: "PARTAGEZ VOS COORDONNÉES"
     type_label:
       multiple_choice: "Choix unique (liste)"
       select_many: "Choix multiple (liste)"
@@ -283,7 +274,6 @@ fr:
     tap_card: ["Affirmation 1", "Affirmation 2", "Affirmation 3", "Affirmation 4", "Affirmation 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ fr:
         text: "Laquelle de ces réponses reflète le mieux votre héritage ?"
         description: "Votre origine ethnique ou culturelle."
         options: ["Héritage asiatique", "Héritage noir, africain ou caribéen", "Hispanique ou latino-américain(e)", "Héritage du Moyen-Orient ou d'Afrique du Nord", "Héritage blanc ou européen", "Héritage autochtone", "Héritage mixte ou multiple", "Autre héritage", "Je préfère ne pas répondre"]
-      neurodiversity:
-        text: "Est-ce que l'une de ces propositions vous décrit ?"
-        description: "Sur votre façon de penser et de traiter l'information — choisissez tout ce qui s'applique."
-        options: ["TDAH", "Autisme", "Dyslexie", "Dyspraxie", "Dyscalculie", "Tourette", "Une autre forme de neurodivergence", "Aucune de ces réponses", "Je préfère ne pas répondre"]
     postcode_placeholder: "Code postal (facultatif)"
     postcode_note: "Utilisé uniquement pour comprendre les grandes tendances régionales — jamais affiché individuellement."
   oops:
@@ -1727,7 +1713,6 @@ fr:
       description: "Proposez les résultats de ce Verto à Ask Verto, afin qu'ils aident à répondre aux questions d'autres chercheurs, financeurs et partenaires. Vous pouvez le retirer à tout moment."
       never_items:
         - "Les réponses individuelles"
-        - "Les entrées et contacts des formulaires"
         - "Les codes participants ou jetons de session"
         - "Tout segment de moins de 30 personnes"
         - "Les citations nommant une personne, une école ou un lieu"

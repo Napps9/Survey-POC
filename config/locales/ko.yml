@@ -47,12 +47,6 @@ ko:
       strongly_agree: "매우 동의한다"
       slightly_disagree: "약간 동의하지 않는다"
       slightly_agree: "약간 동의한다"
-    contact_name: "이름"
-    contact_company: "회사"
-    contact_industry: "업종"
-    contact_email: "이메일"
-    contact_note: "입력하신 정보는 이 Verto 제작자에게 전달되어 연락에 사용됩니다."
-    contact_email_invalid: "이메일 주소 형식이 아닌 것 같습니다 — 확인해 주세요."
     add_statement: 문장 추가
     swipe_no: "아니요"
     swipe_unsure: "잘 모르겠다"
@@ -94,7 +88,6 @@ ko:
       select_many_grid: "해당하는 항목을 모두 선택하세요"
       tap_card: "스와이프해서 답변하세요"
       open_ended: "답변을 입력하세요"
-      contact_form: "연락처를 알려주세요"
       scenario: "계속 읽고 나서 선택하세요"
     badge:
       range: "범위"
@@ -109,7 +102,6 @@ ko:
       tap_card: "스와이프"
       scenario: "시나리오"
       open_ended: "자유 서술"
-      contact_form: "연락처"
       welcome_card: "환영 카드"
       token_checkpoint: "체크포인트"
       consent_gate: "동의"
@@ -126,7 +118,6 @@ ko:
       tap_card: "스와이프해서 답변하세요"
       scenario: "계속 읽고 나서 선택하세요"
       open_ended: "답변을 입력하세요"
-      contact_form: "연락처를 알려주세요"
     type_label:
       multiple_choice: "하나 선택 (목록)"
       select_many: "여러 개 선택 (목록)"
@@ -283,7 +274,6 @@ ko:
     tap_card: ["문장 1", "문장 2", "문장 3", "문장 4", "문장 5"]
     scenario: ["옵션 A", "옵션 B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1490,10 +1480,6 @@ ko:
         text: "다음 중 어떤 것이 당신의 뿌리를 가장 잘 나타내나요?"
         description: "당신의 민족적 또는 문화적 배경에 관한 질문입니다."
         options: ["아시아계", "흑인·아프리카계·카리브계", "히스패닉 또는 라틴계", "중동 또는 북아프리카계", "백인 또는 유럽계", "원주민계", "혼합 또는 복수의 뿌리", "기타 배경", "답하고 싶지 않아요"]
-      neurodiversity:
-        text: "다음 중 해당되는 것이 있나요?"
-        description: "생각하고 정보를 처리하는 방식에 관한 질문입니다 — 해당되는 것을 모두 선택하세요."
-        options: ["ADHD", "자폐 스펙트럼", "난독증", "운동조절장애(디스프락시아)", "난산증", "투렛 증후군", "다른 형태의 신경다양성", "해당 없음", "답하고 싶지 않아요"]
     postcode_placeholder: "우편번호 (선택 사항)"
     postcode_note: "대략적인 지역 패턴을 파악하는 데만 사용되며 개별적으로 표시되지 않습니다."
   oops:
@@ -1725,7 +1711,6 @@ ko:
       description: "이 Verto의 결과를 Ask Verto에 제공하여 다른 연구자, 후원자, 파트너의 질문에 답하는 데 활용되도록 합니다. 언제든 철회할 수 있습니다."
       never_items:
         - "개별 응답 레코드"
-        - "문의 양식 입력값 및 리드"
         - "응답자 코드 또는 세션 토큰"
         - "30명 미만의 모든 세그먼트"
         - "개인, 학교, 장소를 언급한 인용문"

@@ -54,9 +54,9 @@ class CorpusEnrolmentTest < ActiveSupport::TestCase
   end
 
   test "a Verto with no citable questions is offered but NOT approved" do
-    # Contact forms are never indexed, so a deck of only those has nothing to cite.
+    # Welcome cards are never indexed, so a deck of only those has nothing to cite.
     survey = survey_with(responses: 40,
-                         cards: [ { "type" => "contact_form", "cid" => "c_cf", "text" => "Stay in touch" } ])
+                         cards: [ { "type" => "welcome_card", "cid" => "c_w", "text" => "Welcome" } ])
 
     result = enrol(survey)
 

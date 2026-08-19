@@ -49,12 +49,6 @@ tn:
       strongly_agree: "Ke dumelana gotlhelele"
       slightly_disagree: "Ga ke dumelane go le gonnye"
       slightly_agree: "Ke dumelana go le gonnye"
-    contact_name: "Leina"
-    contact_company: "Khampani"
-    contact_industry: "Lekala"
-    contact_email: "Imeile"
-    contact_note: "Dintlha tsa gago di ya go motlhami wa Verto e gore a kgone go go latela."
-    contact_email_invalid: "Seo ga se lebege jaaka aterese ya imeile — tsweetswee e sekaseke."
     add_statement: "Oketsa polelo"
     swipe_no: "Nnyaa"
     swipe_unsure: "Ga ke tlhomamise"
@@ -96,7 +90,6 @@ tn:
       select_many_grid: "Tlhopha tsotlhe tse di go amang"
       tap_card: "Sutha go araba"
       open_ended: "Kwala karabo ya gago"
-      contact_form: "Abelana dintlha tsa gago"
       scenario: "Tswelela go bala, o bo o tlhopha"
     # Dashboard chrome only (results screen, the editor's deleted-cards list,
     # the "Rules of the Game" scoring feedback) — never rendered to a
@@ -119,7 +112,6 @@ tn:
       tap_card: "SUTHA"
       scenario: "TIRAGALO"
       open_ended: "MOKWALO O GOLOLESEGILENG"
-      contact_form: "TSHWAELANO"
       welcome_card: "KARATA YA TAMOGELO"
       token_checkpoint: "KGATO YA DINTLHA"
       consent_gate: "TUMELANO"
@@ -136,7 +128,6 @@ tn:
       tap_card: "SUTHA GO ARABA"
       scenario: "TSWELELA GO BALA, O BO O TLHOPHA"
       open_ended: "KWALA KARABO YA GAGO"
-      contact_form: "ABELANA DINTLHA TSA GAGO"
     type_label:
       multiple_choice: "Tlhopha nngwe (lenaane)"
       select_many: "Tlhopha tse dintsi (lenaane)"
@@ -299,7 +290,6 @@ tn:
     tap_card: ["Polelo 1", "Polelo 2", "Polelo 3", "Polelo 4", "Polelo 5"]
     scenario: ["Tlhopho A", "Tlhopho B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1518,17 +1508,12 @@ tn:
         options: ["Monna", "Mosadi", "Ga se monna kgotsa mosadi", "E Sele", "Ke rata go se bue"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options
-    # are only taken whole and at registry length; the last two neurodiversity
-    # options are the mutually-exclusive pair in every language.
+    # are only taken whole and at registry length.
     optional:
       heritage:
         text: "Ke efe ya tse e bontshang setso sa gago sentle?"
         description: "Setso sa gago sa morafe kgotsa ngwao."
         options: ["Setso sa Asia", "Setso sa Baaphiri, Afrika kgotsa Karibiane", "Sepanishe kgotsa Latino/a", "Setso sa Bogareng jwa Botlhaba kgotsa Bokone jwa Afrika", "Setso sa Makgowa kgotsa Yuropa", "Setso sa Baagi ba Tlhago", "Setso se se tswakantsweng kgotsa se le mmalwa", "Setso se sengwe", "Ke rata go se bue"]
-      neurodiversity:
-        text: "A go na le tse di go tlhalosang mo go tse?"
-        description: "Ka ga kafa o akanyang le go sekaseka tshedimosetso ka teng — tlhopha tsotlhe tse di go amang."
-        options: ["ADHD", "Autism", "Dyslexia", "Dyspraxia", "Dyscalculia", "Tourette's", "Mofuta o mongwe wa pharologano ya boko", "Ga go na epe ya tse", "Ke rata go se bue"]
     # The optional postcode field on the "Where do you live?" card
     # (Survey#capture_postcode?) — not part of the cards/optional registries
     # above since it isn't a question of its own, just an extra field on the
@@ -1764,7 +1749,6 @@ tn:
       description: "Naya diphetho tsa Verto e go Ask Verto, gore di kgone go thusa go araba dipotso tsa babatlisisi ba bangwe, bathusi le balekane. O ka ikgogela nako nngwe le nngwe."
       never_items:
         - "Mela ya dikarabo tsa motho a le mongwe"
-        - "Dikwalo tsa foromo ya tshwaelano le dikgokelo"
         - "Dikhoutu tsa baarabi kgotsa dikhoutu tsa kopano"
         - "Karolo epe fela e e nang le batho ba ba kwa tlase ga 30"
         - "Dikwalo tse di umakang motho, sekolo kgotsa lefelo"

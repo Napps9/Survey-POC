@@ -8,8 +8,8 @@
 #
 # PII posture (see app/views/surveys/_result_cards.html.erb, shared: true):
 # closed-question distributions, the regions map, the cached AI summary and
-# response counts are shown. open_ended texts, "other" free text and
-# contact_form lead tables are NOT — each replaced by a count-only line. The
+# response counts are shown. open_ended texts and "other" free text are NOT —
+# each replaced by a count-only line. The
 # leaderboard, exports, Ask Verto, and the report's edit/regenerate controls
 # never render on this controller's views at all.
 #

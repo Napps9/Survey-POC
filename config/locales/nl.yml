@@ -47,12 +47,6 @@ nl:
       strongly_agree: "Helemaal eens"
       slightly_disagree: "Enigszins oneens"
       slightly_agree: "Enigszins eens"
-    contact_name: "Naam"
-    contact_company: "Bedrijf"
-    contact_industry: "Branche"
-    contact_email: "E-mail"
-    contact_note: "Je gegevens gaan naar de maker van deze Verto zodat die contact met je kan opnemen."
-    contact_email_invalid: "Dat lijkt geen e-mailadres — controleer het even."
     add_statement: Stelling toevoegen
     swipe_no: "Nee"
     swipe_unsure: "Weet ik niet"
@@ -94,7 +88,6 @@ nl:
       select_many_grid: "Kies alles wat van toepassing is"
       tap_card: "Sleep om te antwoorden"
       open_ended: "Typ je antwoord"
-      contact_form: "Deel je gegevens"
       scenario: "Lees verder en kies dan"
     badge:
       range: "SCHAAL"
@@ -109,7 +102,6 @@ nl:
       tap_card: "SWIPEN"
       scenario: "SCENARIO"
       open_ended: "VRIJE TEKST"
-      contact_form: "CONTACT"
       welcome_card: "WELKOMSTKAART"
       token_checkpoint: "CHECKPOINT"
       consent_gate: "TOESTEMMING"
@@ -126,7 +118,6 @@ nl:
       tap_card: "SWIPE OM TE ANTWOORDEN"
       scenario: "LEES VERDER EN KIES DAN"
       open_ended: "TYP JE ANTWOORD"
-      contact_form: "DEEL JE GEGEVENS"
     type_label:
       multiple_choice: "Eén kiezen (lijst)"
       select_many: "Meerdere kiezen (lijst)"
@@ -283,7 +274,6 @@ nl:
     tap_card: ["Stelling 1", "Stelling 2", "Stelling 3", "Stelling 4", "Stelling 5"]
     scenario: ["Optie A", "Optie B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ nl:
         text: "Wat weerspiegelt jouw afkomst het best?"
         description: "Je etnische of culturele achtergrond."
         options: ["Aziatische afkomst", "Zwarte, Afrikaanse of Caribische afkomst", "Hispanic of Latino/a", "Afkomst uit het Midden-Oosten of Noord-Afrika", "Witte of Europese afkomst", "Inheemse afkomst", "Gemengde of meervoudige afkomst", "Een andere afkomst", "Zeg ik liever niet"]
-      neurodiversity:
-        text: "Is een van deze op jou van toepassing?"
-        description: "Over hoe je denkt en informatie verwerkt — kies alles wat van toepassing is."
-        options: ["ADHD", "Autisme", "Dyslexie", "Dyspraxie", "Dyscalculie", "Tourette", "Een andere vorm van neurodivergentie", "Geen van deze", "Zeg ik liever niet"]
     postcode_placeholder: "Postcode (optioneel)"
     postcode_note: "Wordt alleen gebruikt om brede regionale patronen te begrijpen — nooit individueel getoond."
   oops:
@@ -1727,7 +1713,6 @@ nl:
       description: "Bied de resultaten van deze Verto aan Ask Verto aan, zodat ze vragen van andere onderzoekers, financiers en partners helpen beantwoorden. Je kunt dit altijd intrekken."
       never_items:
         - "Individuele antwoordregels"
-        - "Contactformulier-invoer en leads"
         - "Deelnemerscodes of sessietokens"
         - "Elk segment onder de 30 personen"
         - "Citaten die een persoon, school of plaats noemen"

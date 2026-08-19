@@ -47,12 +47,6 @@ xh:
       strongly_agree: "Ndiyavumelana kakhulu"
       slightly_disagree: "Andivumelani kancinane"
       slightly_agree: "Ndiyavumelana kancinane"
-    contact_name: "Igama"
-    contact_company: "Inkampani"
-    contact_industry: "Icandelo loshishino"
-    contact_email: "I-imeyile"
-    contact_note: "Iinkcukacha zakho ziya kumdali we-Verto ukuze akwazi ukuqhagamshelana nawe."
-    contact_email_invalid: "Oko akubonakali njengedilesi ye-imeyile — nceda ukhangele kwakhona."
     add_statement: "Yongeza ingxelo"
     swipe_no: "Hayi"
     swipe_unsure: "Andiqinisekanga"
@@ -94,7 +88,6 @@ xh:
       select_many_grid: "Khetha zonke ezikufaneleyo"
       tap_card: "Tyhala ukuze uphendule"
       open_ended: "Bhala impendulo yakho"
-      contact_form: "Yabelana ngeenkcukacha zakho"
       scenario: "Qhubeka ufunda, uze ukhethe"
     # Ulwakhiwo lwe-dashboard kuphela (isikrini seziphumo, uluhlu lwamakhadi
     # acinyiweyo kumhleli, impendulo ye-scoring ye-"Imigaqo yoMdlalo") —
@@ -118,7 +111,6 @@ xh:
       tap_card: "TYHALA"
       scenario: "IMEKO"
       open_ended: "UMBHALO OVULEKILEYO"
-      contact_form: "UNXIBELELWANO"
       welcome_card: "IKHADI LOKWAMKELA"
       token_checkpoint: "INDAWO YOKUJONGA"
       consent_gate: "IMVUME"
@@ -135,7 +127,6 @@ xh:
       tap_card: "TYHALA UKUZE UPHENDULE"
       scenario: "QHUBEKA UFUNDA, UZE UKHETHE"
       open_ended: "BHALA IMPENDULO YAKHO"
-      contact_form: "YABELANA NGEENKCUKACHA ZAKHO"
     type_label:
       multiple_choice: "Khetha enye (uluhlu)"
       select_many: "Khetha ezininzi (uluhlu)"
@@ -299,7 +290,6 @@ xh:
     tap_card: ["Ingxelo 1", "Ingxelo 2", "Ingxelo 3", "Ingxelo 4", "Ingxelo 5"]
     scenario: ["Ukhetho A", "Ukhetho B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1527,10 +1517,6 @@ xh:
         text: "Yeyiphi kwezi ebonisa kakuhle imvelaphi yakho?"
         description: "Imvelaphi yakho yobuzwe okanye yenkcubeko."
         options: ["Imvelaphi yaseAsia", "Imvelaphi yabantu abamnyama, base-Afrika okanye yaseCaribbean", "Imvelaphi yamaHispanic okanye amaLatino", "Imvelaphi yaseMpuma Ephakathi okanye yaseNyakatho ye-Afrika", "Imvelaphi yabamhlophe okanye yaseYurophu", "Imvelaphi yemveli", "Imvelaphi exubeneyo okanye ezininzi", "Enye imvelaphi", "Ndikhetha ukungatsho"]
-      neurodiversity:
-        text: "Ngaba ikho kwezi ekuchazayo?"
-        description: "Malunga nendlela ocinga nokucubungula ulwazi ngayo — khetha konke okukufaneleyo."
-        options: ["I-ADHD", "Ubunsokothi bengqondo (Autism)", "IDyslexia", "IDyspraxia", "IDyscalculia", "ITourette's", "Olunye uhlobo lobunzulu bengqondo", "Akukho nanye kwezi", "Ndikhetha ukungatsho"]
     # Ibhokisi yekhowudi yeposi ekhethekileyo kwikhadi "Uhlala phi?"
     # (Survey#capture_postcode?) — ayikho kuluhlu lwamakhadi/olungayomfuneko
     # ngasentla ngoba ayingombuzo wodwa, yinkcukacha eyongezelelweyo kwikhadi
@@ -1766,7 +1752,6 @@ xh:
       description: "Nikela ngeziphumo zale Verto kwiAsk Verto, ukuze zinokunceda ziphendule imibuzo yabanye abaphandi, abaxhasi namaqabane. Ungakwazi ukuhlehla nanini na."
       never_items:
         - "Imigca yeempendulo zomntu ngamnye"
-        - "Amaxwebhu efomu yonxibelelwano kunye neenkokeli"
         - "Iikhowudi zabaphenduli okanye ii-token zesigqibo"
         - "Naliphi na iqela elingaphantsi kwabantu abangama-30"
         - "Amaxwebhu acaphula igama lomntu, isikolo okanye indawo"

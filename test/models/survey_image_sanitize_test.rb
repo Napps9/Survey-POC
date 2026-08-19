@@ -299,18 +299,22 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
   test "sanitize_cards_images! whitelists demographic_key on demographic cards and drops the rest" do
     cards = [
       { "type" => "multiple_choice", "text" => "Q", "demographic" => true, "demographic_key" => "heritage" },
-      { "type" => "select_many", "text" => "Q", "demographic" => true, "demographic_key" => "neurodiversity" },
+      { "type" => "multiple_choice", "text" => "Q", "demographic" => true, "demographic_key" => "gender" },
       { "type" => "multiple_choice", "text" => "Q", "demographic" => true, "demographic_key" => "astrology" },
-      { "type" => "multiple_choice", "text" => "Q", "demographic_key" => "heritage" }
+      { "type" => "multiple_choice", "text" => "Q", "demographic_key" => "heritage" },
+      { "type" => "select_many", "text" => "Q", "demographic" => true, "demographic_key" => "neurodiversity" }
     ]
     out = Survey.sanitize_cards_images!(cards)
 
     assert_equal "heritage", out[0]["demographic_key"]
-    assert_equal "neurodiversity", out[1]["demographic_key"]
+    assert_equal "gender", out[1]["demographic_key"]
     assert_nil out[2]["demographic_key"], "unknown key is dropped"
     assert_nil out[3]["demographic_key"],
                "a key without the demographic flag is dropped — the flag is what buys " \
                "consent gating and imagery suppression, so a key can't ride without it"
+    assert_nil out[4]["demographic_key"],
+               "neurodiversity was withdrawn, so the sanitiser now treats it as any other " \
+               "unknown key — the backstop if one ever reappears in a deck"
   end
 
   test "sanitize_cards_images! whitelists slider_axis on range cards and drops the rest" do

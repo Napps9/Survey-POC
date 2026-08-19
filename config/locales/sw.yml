@@ -47,12 +47,6 @@ sw:
       strongly_agree: "Nakubaliana kabisa"
       slightly_disagree: "Sikubaliani kiasi"
       slightly_agree: "Nakubaliana kiasi"
-    contact_name: "Jina"
-    contact_company: "Kampuni"
-    contact_industry: "Sekta"
-    contact_email: "Barua pepe"
-    contact_note: "Maelezo yako yanaenda kwa mtengenezaji wa Verto hii ili aweze kuwasiliana nawe."
-    contact_email_invalid: "Hiyo haionekani kama anwani ya barua pepe — tafadhali angalia."
     add_statement: Ongeza kauli
     swipe_no: "Hapana"
     swipe_unsure: "Sina uhakika"
@@ -94,7 +88,6 @@ sw:
       select_many_grid: "Chagua zote zinazofaa"
       tap_card: "Buruta ili kujibu"
       open_ended: "Andika jibu lako"
-      contact_form: "Shiriki maelezo yako"
       scenario: "Endelea kusoma, kisha chagua"
     badge:
       range: "MASAFA"
@@ -109,7 +102,6 @@ sw:
       tap_card: "BURUTA"
       scenario: "HALI"
       open_ended: "MAANDISHI HURU"
-      contact_form: "MAWASILIANO"
       welcome_card: "KADI YA KARIBU"
       token_checkpoint: "KIPIMO"
       consent_gate: "RIDHAA"
@@ -126,7 +118,6 @@ sw:
       tap_card: "BURUTA ILI KUJIBU"
       scenario: "ENDELEA KUSOMA, KISHA CHAGUA"
       open_ended: "ANDIKA JIBU LAKO"
-      contact_form: "SHIRIKI MAELEZO YAKO"
     type_label:
       multiple_choice: "Chagua moja (orodha)"
       select_many: "Chagua nyingi (orodha)"
@@ -283,7 +274,6 @@ sw:
     tap_card: ["Kauli 1", "Kauli 2", "Kauli 3", "Kauli 4", "Kauli 5"]
     scenario: ["Chaguo A", "Chaguo B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
@@ -1492,10 +1482,6 @@ sw:
         text: "Ni ipi kati ya hizi inayoakisi vyema urithi wako?"
         description: "Asili yako ya kikabila au kitamaduni."
         options: ["Urithi wa Kiasia", "Urithi wa watu weusi, Kiafrika au Karibiani", "Kihispania au Kilatino", "Urithi wa Mashariki ya Kati au Afrika Kaskazini", "Urithi wa wazungu au Ulaya", "Urithi wa wenyeji asilia", "Urithi mchanganyiko au wa aina nyingi", "Urithi mwingine", "Napendelea kutosema"]
-      neurodiversity:
-        text: "Je, yoyote kati ya haya yanakuelezea?"
-        description: "Kuhusu jinsi unavyofikiri na kuchakata taarifa — chagua yote yanayokuhusu."
-        options: ["ADHD", "Usonji (Autism)", "Dyslexia", "Dyspraxia", "Dyscalculia", "Tourette", "Aina nyingine ya tofauti za ubongo", "Hakuna kati ya haya", "Napendelea kutosema"]
     postcode_placeholder: "Msimbo wa posta (si lazima)"
     postcode_note: "Hutumika tu kuelewa mienendo mipana ya kikanda — haionyeshwi kamwe kibinafsi."
   oops:
@@ -1727,7 +1713,6 @@ sw:
       description: "Toa matokeo ya Verto hii kwa Ask Verto, ili yasaidie kujibu maswali ya watafiti, wafadhili na washirika wengine. Unaweza kuondoa idhini wakati wowote."
       never_items:
         - "Safu za majibu ya mtu mmoja mmoja"
-        - "Maingizo ya fomu za mawasiliano"
         - "Misimbo ya wahojiwa au tokeni za kipindi"
         - "Kundi lolote lenye chini ya watu 30"
         - "Nukuu zinazotaja mtu, shule au mahali"
