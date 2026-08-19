@@ -84,6 +84,10 @@ Rails.application.routes.draw do
 
   # Health + PWA
   get "up"             => "health#show", as: :rails_health_check
+  # NOT polled by Render itself (healthCheckPath is /up only) — for an
+  # external check or a scheduled Routine to hit occasionally. See
+  # StorageHealthController for why it's split from /up.
+  get "up/storage"     => "storage_health#show", as: :storage_health_check
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest"       => "rails/pwa#manifest",       as: :pwa_manifest
 
