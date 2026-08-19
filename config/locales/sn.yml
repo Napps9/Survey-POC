@@ -1204,6 +1204,8 @@ sn:
     recalled_badge: "Yadzoswa"
     test_mode_title: "Muitiro Wekuedza"
     test_mode_hint: "Rinki yakasiyana inogara ichitamba vhezheni yako yekupedzisira — kusanganisira madhirafiti — uye haichanyore chinhu."
+    live_test_title: "Kuedza chinongedzo chiri kushanda"
+    live_test_hint: "Ani naani atova nechinongedzo chiri kushanda anogona kuisa kufamba kwake muTest Mode asingabvisi Verto pa/play: dzvanya wobata kona yekumusoro kuruboshwe kwemutambi kwemasekondi maviri, wozobaya “Tanga test mode”. Hapana chaanonyora chinonyorwa. Chinongedzo ichi chinoenda ipapo zvakananga — chitumire kune ari kuratidzira."
     convert_test_button: "Chinja Kuita Muitiro Wekuedza"
     convert_test_confirm: "Chinja Kuita Muitiro Wekuedza? Rinki yeruzhinji inomira kutora mhinduro, uye unowana rinki yekuedza isingachanyori chinhu. Buritsazve gare gare uye rinki yeruzhinji inodzoka."
     test_link_create: "Gadzira Rinki Yekuedza"

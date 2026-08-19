@@ -8598,10 +8598,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
    touch-action:none stops a hold turning into the browser's own long-press
    (text selection, the iOS callout) mid-gesture. */
 .test-hatch-hotspot {
+  position: relative;
   width: 34px; height: 26px; flex-shrink: 0; margin-right: auto;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
   user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
+/* A finger needs a 44px target, and this one is invisible — there is no edge to
+   aim at, so a press that lands 8px high simply does nothing and the person has
+   no way to tell they missed (navigator.vibrate, the only other feedback, is a
+   no-op on iOS). Growing the LAYOUT box would push the whole deck down by 18px
+   on every Verto, so the hit area is supplied by an overflowing ::after
+   instead: hit-testing treats a pseudo-element as part of the element that
+   generated it, so the pointer events still land on the span and the utility
+   bar's height is unchanged. Sits over empty space at the leading edge of the
+   bar on every breakpoint — the visible controls are all at the trailing one. */
+.test-hatch-hotspot::after {
+  content: ""; position: absolute;
+  top: -9px; bottom: -9px; left: -5px; right: -5px;
 }
 /* Armed. Same pill as .lite-mode-btn, in the Test Mode yellow of
    .play-banner-test — the chip looks like where it is about to take you. */

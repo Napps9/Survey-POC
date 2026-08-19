@@ -241,6 +241,32 @@
                 class: "share-btn", style: "width:100%;" %>
         <% end %>
 
+        <% if live && main_key.present? %>
+          <%# The OTHER way into Test Mode, and the only one that doesn't take
+              the Verto off /play: the player's hidden press-and-hold hatch
+              (player/_test_mode_hatch), for whoever is already holding the live
+              link — a facilitator at an event, a partner demoing on their own
+              phone. It is deliberately unlabelled and unannounced IN THE PLAYER,
+              because anyone with the public link can reach that page and a
+              respondent who tripped into it would have their real answers
+              silently discarded. None of that argues for hiding it from the
+              creator, who is signed in and is the person handing the link out —
+              and with nothing here, the gesture was undiscoverable to everyone,
+              which is not "hidden", it is missing. So: the gesture spelled out,
+              plus the plain URL it leads to, for anyone who can't perform it. %>
+          <div class="share-field">
+            <div class="share-label"><%= t("share_modal.live_test_title") %></div>
+            <div class="share-hint" style="margin-bottom:8px;"><%= t("share_modal.live_test_hint") %></div>
+            <div class="share-url-row">
+              <input type="text" readonly id="share-url-live-test" value="<%= live_test_survey_url(main_key) %>"
+                     class="share-url share-url--test" />
+              <button type="button" class="share-btn"
+                      data-copy-label="<%= t("share_modal.copy") %>"
+                      onclick="(navigator.clipboard?.writeText(document.getElementById('share-url-live-test').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("share_modal.copied") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2000)}).catch(()=>{this.textContent='<%= j t("share_modal.copy_failed") %>';setTimeout(()=>this.textContent=this.dataset.copyLabel,2500)})"><%= t("share_modal.copy") %></button>
+            </div>
+          </div>
+        <% end %>
+
         <% if live %>
           <% has_responses = @survey.responses.exists? %>
           <div class="share-field">

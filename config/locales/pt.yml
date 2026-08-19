@@ -1194,6 +1194,8 @@ pt:
     recalled_badge: "Recolhida"
     test_mode_title: "Modo de teste"
     test_mode_hint: "Uma ligação à parte que reproduz sempre a versão mais recente — rascunhos incluídos — e não grava nada."
+    live_test_title: "Testar o link ativo"
+    live_test_hint: "Quem já tem o link ativo pode passar a própria sessão para o Modo de teste sem tirar o Verto do /play: mantenha pressionado o canto superior esquerdo do player por dois segundos e toque em «Iniciar modo de teste». Nada do que essa pessoa preencher é registado. Este link leva diretamente para lá — envie-o a quem vai fazer a demonstração."
     convert_test_button: "Converter para modo de teste"
     convert_test_confirm: "Converter para modo de teste? A ligação pública deixa de receber respostas e fica com uma ligação de teste que não grava nada. Publique de novo mais tarde e a ligação pública volta."
     test_link_create: "Criar ligação de teste"

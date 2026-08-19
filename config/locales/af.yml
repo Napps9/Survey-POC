@@ -1201,6 +1201,8 @@ af:
     recalled_badge: "Teruggetrek"
     test_mode_title: "Toetsmodus"
     test_mode_hint: "'n Aparte skakel wat altyd jou jongste weergawe speel — konsepte ingesluit — en niks aanteken nie."
+    live_test_title: "Toets die lewendige skakel"
+    live_test_hint: "Enigiemand wat reeds die lewendige skakel het, kan hul eie deurloop in Toetsmodus sit sonder om die Verto van /play af te haal: druk en hou die player se boonste linkerhoek twee sekondes lank, tik dan “Begin toetsmodus”. Niks wat hulle invoer word aangeteken nie. Hierdie skakel gaan reguit daarheen — stuur dit aan wie ook al demonstreer."
     convert_test_button: "Skakel om na Toetsmodus"
     convert_test_confirm: "Skakel om na Toetsmodus? Die openbare skakel hou op antwoorde in te neem, en jy kry 'n toetsskakel wat niks aanteken nie. Publiseer later weer en die openbare skakel kom terug."
     test_link_create: "Skep toetsskakel"

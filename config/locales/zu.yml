@@ -1214,6 +1214,8 @@ zu:
     recalled_badge: "Kubuyisiwe"
     test_mode_title: "Imodi Yokuhlola"
     test_mode_hint: "Isixhumanisi esihlukile esihlale sidlala uhlobo lwakho lwakamuva — kubandakanya izinhlaka — futhi asilondolozi lutho."
+    live_test_title: "Ukuhlola ilinki esebenzayo"
+    live_test_hint: "Noma ubani osevele enelinki esebenzayo angafaka uhambo lwakhe kuTest Mode ngaphandle kokususa iVerto ku-/play: cindezela futhi ubambe ikhona eliphezulu ngakwesobunxele lomdlali imizuzwana emibili, bese ucindezela “Qala imodi yokuhlola”. Akukho lutho aluvalayo olulondolozwayo. Le linki iya khona ngqo — yithumele kunoma ubani obonisayo."
     convert_test_button: "Guqulela kube Imodi Yokuhlola"
     convert_test_confirm: "Uguqulele kube Imodi Yokuhlola? Isixhumanisi somphakathi siyeka ukwamukela izimpendulo, futhi uthola isixhumanisi sokuhlola esingalondolozi lutho. Uma ushicilela futhi ngokuzayo, isixhumanisi somphakathi siyabuya."
     test_link_create: "Dala isixhumanisi sokuhlola"

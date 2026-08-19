@@ -1194,6 +1194,8 @@ id:
     recalled_badge: "Ditarik"
     test_mode_title: "Mode Uji"
     test_mode_hint: "Tautan terpisah yang selalu memutar versi terbaru — termasuk draf — dan tidak menyimpan apa pun."
+    live_test_title: "Menguji tautan aktif"
+    live_test_hint: "Siapa pun yang sudah memegang tautan aktif bisa memindahkan sesinya sendiri ke Mode Uji tanpa menurunkan Verto dari /play: tekan dan tahan sudut kiri atas pemutar selama dua detik, lalu ketuk “Mulai mode uji”. Tidak ada yang dia isi akan tercatat. Tautan ini langsung menuju ke sana — kirimkan ke siapa pun yang mendemokan."
     convert_test_button: "Ubah ke Mode Uji"
     convert_test_confirm: "Ubah ke Mode Uji? Tautan publik berhenti menerima jawaban, dan kamu mendapat tautan uji yang tidak menyimpan apa pun. Terbitkan lagi nanti dan tautan publik kembali."
     test_link_create: "Buat tautan uji"

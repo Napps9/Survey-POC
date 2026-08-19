@@ -1216,6 +1216,8 @@ st:
     recalled_badge: "E Hlakotswe Nakwana"
     test_mode_title: "Mokgwa wa Teko"
     test_mode_hint: "Kgokahano e arohaneng e dulang e bontsha phetolelo ya hao ya morao-rao — mehlala e kenyeleditswe — mme ha e boloke letho."
+    live_test_title: "Ho leka sehokelo se sebetsang"
+    live_test_hint: "Mang kapa mang ya se nang le sehokelo se sebetsang a ka kenya tsamaiso ya hae Mokgoeng wa Teko ntle le ho tlosa Verto ho /play: tobetsa mme o tshware khutlo e ka holimo ho le letshehadi la sebapali metsotswana e mmedi, ebe o tobetsa “Qala mokgoa wa teko”. Ha ho letho leo a le kenyang le ngodisoang. Sehokelo sena se ya moo ka kotloloho — se romele ho ya bontshang."
     convert_test_button: "Fetola ho ba Mokgwa wa Teko"
     convert_test_confirm: "Fetola ho ba Mokgwa wa Teko? Kgokahano ya setjhaba e tla kgaotsa ho amohela dikarabo, mme o tla fumana kgokahano ya teko e sa bolokeng letho. Ha o phatlalatsa hape hamorao, kgokahano ya setjhaba e tla kgutla."
     test_link_create: "Theha kgokahano ya teko"

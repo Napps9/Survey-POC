@@ -1194,6 +1194,8 @@ fr:
     recalled_badge: "Rappelé"
     test_mode_title: "Mode test"
     test_mode_hint: "Un lien à part qui joue toujours votre dernière version — brouillons compris — et n'enregistre rien."
+    live_test_title: "Tester le lien actif"
+    live_test_hint: "Toute personne disposant déjà du lien actif peut basculer son propre parcours en mode test sans retirer le Verto de /play : appuyez deux secondes sur le coin supérieur gauche du lecteur, puis touchez « Démarrer le mode test ». Rien de ce qu'elle saisit n'est enregistré. Ce lien y mène directement — envoyez-le à qui fait la démonstration."
     convert_test_button: "Convertir en mode test"
     convert_test_confirm: "Convertir en mode test ? Le lien public cesse de recevoir des réponses et vous obtenez un lien de test qui n'enregistre rien. Publiez à nouveau plus tard et le lien public revient."
     test_link_create: "Créer un lien de test"

@@ -49,11 +49,25 @@ class TestModeHatchTest < ApplicationSystemTestCase
     [ r["x"], r["y"] ]
   end
 
+  # A point inside the hatch's TOUCH target but outside its 34×26 layout box —
+  # the ::after that supplies the 44px minimum. Above the box rather than beside
+  # it, because that is the edge a thumb reaching for the top-left corner of a
+  # phone actually overshoots.
+  def hotspot_overshoot
+    r = evaluate_script(<<~JS)
+      (() => {
+        const b = document.querySelector(".test-hatch-hotspot").getBoundingClientRect()
+        return { x: b.left + b.width / 2, y: b.top - 5 }
+      })()
+    JS
+    [ r["x"], r["y"] ]
+  end
+
   # Press and hold, optionally sliding partway through. CDP's mouse input is
   # what Chrome turns into the pointerdown/pointermove/pointerup the hatch
   # listens for, so this is a real gesture and not a synthesised event.
-  def press_and_hold(seconds, drag_by: 0)
-    x, y = hotspot_centre
+  def press_and_hold(seconds, drag_by: 0, at: nil)
+    x, y = at || hotspot_centre
     mouse = page.driver.browser.mouse
     mouse.move(x: x, y: y).down
     if drag_by.positive?
@@ -101,6 +115,22 @@ class TestModeHatchTest < ApplicationSystemTestCase
     refute chip_shown?, "a press that travelled is a swipe, not a hold"
 
     assert_current_path "/play/#{@survey.publish_token}"
+  end
+
+  # The target is invisible, so there is no edge to aim at and no way to tell a
+  # miss from a Verto that simply doesn't have the hatch — and the buzz that
+  # would have said "you're on it" is a no-op on iOS. A press that lands just
+  # outside the 34×26 box is therefore the ordinary case, not the careless one,
+  # and it has to arm. The layout box stays 34×26 (growing it would push every
+  # Verto's deck down); the ::after is what a finger gets to hit.
+  test "a hold that lands just above the box still arms it" do
+    open_player
+
+    box_h = evaluate_script(%{document.querySelector(".test-hatch-hotspot").getBoundingClientRect().height})
+    assert_equal 26, box_h.round, "the visible bar's height must not have changed"
+
+    press_and_hold 2.4, at: hotspot_overshoot
+    assert_selector ".test-hatch-confirm", wait: 2
   end
 
   test "an armed chip that is left alone hides itself again" do

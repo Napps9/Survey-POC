@@ -1194,6 +1194,8 @@ es:
     recalled_badge: "Retirado"
     test_mode_title: "Modo de prueba"
     test_mode_hint: "Un enlace aparte que siempre reproduce tu última versión — borradores incluidos — y no guarda nada."
+    live_test_title: "Probar el enlace activo"
+    live_test_hint: "Quien ya tenga el enlace activo puede pasar su propia sesión al modo de prueba sin retirar el Verto de /play: mantén pulsada la esquina superior izquierda del reproductor dos segundos y luego toca «Iniciar modo de prueba». Nada de lo que introduzca se guarda. Este enlace lleva directamente allí: envíaselo a quien vaya a hacer la demostración."
     convert_test_button: "Convertir a modo de prueba"
     convert_test_confirm: "¿Convertir a modo de prueba? El enlace público deja de recibir respuestas y obtienes un enlace de prueba que no guarda nada. Si publicas de nuevo más adelante, el enlace público vuelve."
     test_link_create: "Crear enlace de prueba"

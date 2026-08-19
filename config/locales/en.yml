@@ -1216,6 +1216,8 @@ en:
     recalled_badge: "Recalled"
     test_mode_title: "Test Mode"
     test_mode_hint: "A separate link that always plays your latest version — drafts included — and records nothing."
+    live_test_title: "Testing the live link"
+    live_test_hint: "Anyone already holding the live link can put their own run into Test Mode, without taking the Verto off /play: press and hold the top-left corner of the player for two seconds, then tap “Start test mode”. Nothing they enter is recorded. This link goes straight there — send it to whoever is demoing."
     convert_test_button: "Convert to Test Mode"
     convert_test_confirm: "Convert to Test Mode? The public link stops taking responses, and you get a test link that records nothing. Publish again later and the public link comes back."
     test_link_create: "Create test link"

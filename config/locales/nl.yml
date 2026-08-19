@@ -1194,6 +1194,8 @@ nl:
     recalled_badge: "Teruggetrokken"
     test_mode_title: "Testmodus"
     test_mode_hint: "Een aparte link die altijd je nieuwste versie afspeelt — ook concepten — en niets opslaat."
+    live_test_title: "De live link testen"
+    live_test_hint: "Wie de live link al heeft, kan de eigen doorloop in Testmodus zetten zonder de Verto van /play te halen: houd de linkerbovenhoek van de player twee seconden ingedrukt en tik dan op “Testmodus starten”. Niets wat diegene invult wordt vastgelegd. Deze link gaat er rechtstreeks heen — stuur hem naar wie de demo doet."
     convert_test_button: "Omzetten naar testmodus"
     convert_test_confirm: "Omzetten naar testmodus? De openbare link neemt geen antwoorden meer aan en je krijgt een testlink die niets opslaat. Publiceer later opnieuw en de openbare link komt terug."
     test_link_create: "Testlink maken"

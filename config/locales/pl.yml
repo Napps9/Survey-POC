@@ -1196,6 +1196,8 @@ pl:
     recalled_badge: "Wycofany"
     test_mode_title: "Tryb testowy"
     test_mode_hint: "Osobny link, który zawsze odtwarza najnowszą wersję — także szkice — i niczego nie zapisuje."
+    live_test_title: "Testowanie działającego linku"
+    live_test_hint: "Każdy, kto ma już działający link, może przełączyć własne przejście w Tryb testowy bez zdejmowania Verto z /play: przytrzymaj lewy górny róg odtwarzacza przez dwie sekundy, a potem dotknij „Uruchom tryb testowy”. Nic, co wpisze, nie zostanie zapisane. Ten link prowadzi tam bezpośrednio — wyślij go osobie, która prowadzi pokaz."
     convert_test_button: "Przełącz w tryb testowy"
     convert_test_confirm: "Przełączyć w tryb testowy? Publiczny link przestaje przyjmować odpowiedzi, a Ty dostajesz link testowy, który niczego nie zapisuje. Opublikuj ponownie później, a publiczny link wróci."
     test_link_create: "Utwórz link testowy"

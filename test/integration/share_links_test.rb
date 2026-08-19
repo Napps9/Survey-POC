@@ -351,6 +351,48 @@ class ShareLinksTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", unpublish_survey_path(survey, return_to: "share")
   end
 
+  # The player's press-and-hold hatch is hidden from RESPONDENTS by design, but
+  # it was hidden from the creator too — nothing anywhere named the gesture or
+  # the address it leads to, so the only people who could use it were the ones
+  # who had read the source. The modal is the right place to say it: signed in,
+  # and the screen the creator is on when they hand the link out.
+  test "a live Verto's modal names the in-player route into Test Mode" do
+    org = sign_in_org("tm-live")
+    survey = published_survey(org)
+
+    get share_survey_path(survey)
+    assert_select "input#share-url-live-test[value=?]", live_test_survey_url(survey.publish_token)
+    assert_select ".share-hint", text: /Start test mode/
+  end
+
+  # It has to follow the address respondents actually use, not just the raw
+  # token — a Verto with a vanity slug hands that out, and /test/live resolves
+  # by the same four-way lookup, so pointing at the token here would send the
+  # creator somewhere they never share.
+  test "the in-player route follows the vanity slug when there is one" do
+    org = sign_in_org("tm-slug")
+    survey = published_survey(org, slug: "open-day")
+
+    get share_survey_path(survey)
+    assert_select "input#share-url-live-test[value=?]", live_test_survey_url("open-day")
+  end
+
+  # Nothing to enter Test Mode FROM: a draft has no live link, and a Verto
+  # already converted has been taken off /play, so the hatch has no page to sit
+  # on. Offering the address either way would be a link straight to a 410.
+  test "a draft and a converted Verto get no in-player route" do
+    org = sign_in_org("tm-nolive")
+    draft = org.surveys.create!(title: "D", theme: "T", audience_age: "all", key_insight: "x",
+                                default_locale: "en", locales: [ "en" ], cards: CARDS)
+    get share_survey_path(draft)
+    assert_select "input#share-url-live-test", 0
+
+    converted = published_survey(org)
+    post test_mode_survey_path(converted)
+    get share_survey_path(converted)
+    assert_select "input#share-url-live-test", 0
+  end
+
   test "converting to Test Mode takes the Verto off /play and mints a test link" do
     org = sign_in_org("tm-convert")
     survey = published_survey(org)

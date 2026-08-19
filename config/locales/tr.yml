@@ -1194,6 +1194,8 @@ tr:
     recalled_badge: "Geri çekildi"
     test_mode_title: "Test Modu"
     test_mode_hint: "Her zaman en son sürümü — taslaklar dahil — oynatan ve hiçbir şey kaydetmeyen ayrı bir bağlantı."
+    live_test_title: "Yayındaki bağlantıyı test etme"
+    live_test_hint: "Yayındaki bağlantıya zaten sahip olan herkes, Verto'yu /play'den kaldırmadan kendi turunu Test Moduna alabilir: oynatıcının sol üst köşesine iki saniye basılı tutun, sonra “Test modunu başlat”a dokunun. Girdiği hiçbir şey kaydedilmez. Bu bağlantı doğrudan oraya gider — tanıtımı yapan kişiye gönderin."
     convert_test_button: "Test Moduna geçir"
     convert_test_confirm: "Test Moduna geçirilsin mi? Herkese açık bağlantı yanıt almayı durdurur ve hiçbir şey kaydetmeyen bir test bağlantısı alırsınız. Daha sonra yeniden yayınlayın, açık bağlantı geri gelir."
     test_link_create: "Test bağlantısı oluştur"

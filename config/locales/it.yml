@@ -1194,6 +1194,8 @@ it:
     recalled_badge: "Richiamato"
     test_mode_title: "Modalità test"
     test_mode_hint: "Un link a parte che riproduce sempre l'ultima versione — bozze comprese — e non salva nulla."
+    live_test_title: "Provare il link attivo"
+    live_test_hint: "Chi ha già il link attivo può portare la propria sessione in Modalità test senza togliere il Verto da /play: tieni premuto l'angolo in alto a sinistra del player per due secondi, poi tocca «Avvia modalità test». Nulla di ciò che inserisce viene registrato. Questo link porta direttamente lì — mandalo a chi fa la dimostrazione."
     convert_test_button: "Converti in modalità test"
     convert_test_confirm: "Convertire in modalità test? Il link pubblico smette di ricevere risposte e ottieni un link di test che non salva nulla. Pubblica di nuovo più avanti e il link pubblico torna."
     test_link_create: "Crea link di test"

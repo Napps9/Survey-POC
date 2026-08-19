@@ -1216,6 +1216,8 @@ xh:
     recalled_badge: "Ibuyisiwe"
     test_mode_title: "Inkqubo yoVavanyo"
     test_mode_hint: "Ikhonkco elahlukileyo elidlala uhlaziyo lwakho lwamva nje ngamaxesha onke — kubandakanya uyilo — kwaye alugcini nto."
+    live_test_title: "Ukuvavanya ikhonkco elisebenzayo"
+    live_test_hint: "Nabani na osele enekhonkco elisebenzayo unokufaka uhambo lwakhe kwiTest Mode ngaphandle kokususa iVerto ku-/play: cofa uze ubambe ikona ephezulu ngasekhohlo yomdlali imizuzwana emibini, uze ucofe “Qalisa imowudi yovavanyo”. Akukho nto ayifakayo egcinwayo. Eli khonkco liya ngqo apho — lithumele kubani na obonisayo."
     convert_test_button: "Guqulela kwiNkqubo yoVavanyo"
     convert_test_confirm: "Guqulela kwiNkqubo yoVavanyo? Ikhonkco lasesidlangalaleni liyeka ukwamkela iimpendulo, kwaye ufumana ikhonkco lovavanyo elingagcini nto. Papasha kwakhona kamva kwaye ikhonkco lasesidlangalaleni liyabuya."
     test_link_create: "Yenza ikhonkco lovavanyo"

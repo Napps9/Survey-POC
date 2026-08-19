@@ -1194,6 +1194,8 @@ vi:
     recalled_badge: "Đã thu hồi"
     test_mode_title: "Chế độ thử nghiệm"
     test_mode_hint: "Một liên kết riêng luôn chạy phiên bản mới nhất — kể cả bản nháp — và không lưu gì cả."
+    live_test_title: "Thử nghiệm liên kết đang hoạt động"
+    live_test_hint: "Bất kỳ ai đã có liên kết đang hoạt động đều có thể chuyển lượt trả lời của mình sang Chế độ thử nghiệm mà không cần gỡ Verto khỏi /play: nhấn giữ góc trên bên trái của trình phát trong hai giây, rồi chạm “Bắt đầu chế độ thử nghiệm”. Không có gì họ nhập được ghi lại. Liên kết này dẫn thẳng tới đó — hãy gửi cho người trình diễn."
     convert_test_button: "Chuyển sang chế độ thử nghiệm"
     convert_test_confirm: "Chuyển sang chế độ thử nghiệm? Liên kết công khai ngừng nhận câu trả lời, và bạn có một liên kết thử nghiệm không lưu gì cả. Xuất bản lại sau thì liên kết công khai sẽ trở lại."
     test_link_create: "Tạo liên kết thử nghiệm"

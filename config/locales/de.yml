@@ -1194,6 +1194,8 @@ de:
     recalled_badge: "Zurückgezogen"
     test_mode_title: "Testmodus"
     test_mode_hint: "Ein separater Link, der immer deine neueste Version abspielt — auch als Entwurf — und nichts speichert."
+    live_test_title: "Den Live-Link testen"
+    live_test_hint: "Wer den Live-Link bereits hat, kann seinen eigenen Durchlauf in den Testmodus schalten, ohne den Verto von /play zu nehmen: die obere linke Ecke des Players zwei Sekunden lang gedrückt halten und dann auf „Testmodus starten“ tippen. Nichts davon wird gespeichert. Dieser Link führt direkt dorthin — schick ihn an alle, die vorführen."
     convert_test_button: "In den Testmodus wechseln"
     convert_test_confirm: "In den Testmodus wechseln? Der öffentliche Link nimmt keine Antworten mehr an, und du bekommst einen Testlink, der nichts speichert. Veröffentlichst du später erneut, kommt der öffentliche Link zurück."
     test_link_create: "Testlink erstellen"

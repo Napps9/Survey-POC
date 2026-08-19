@@ -1216,6 +1216,8 @@ tn:
     recalled_badge: "E Gogetswe"
     test_mode_title: "Mokgwa wa Teko"
     test_mode_hint: "Kgokaganyo e sele e e dirisang toloko ya gago ya bofelo ka gale — go akaretswa dintlhamo — mme ga e boloke sepe."
+    live_test_title: "Go leka kgokaganyo e e dirang"
+    live_test_hint: "Mongwe le mongwe yo o setseng a na le kgokaganyo e e dirang a ka tsenya tsamaiso ya gagwe mo Mokgweng wa Teko ntle le go ntsha Verto mo /play: gatelela o tshware sekhutlo se se kwa godimo ka fa molemeng sa sebapadi metsotswana e le mebedi, morago o tobetse “Simolola mokgwa wa teko”. Ga go sepe se a se tsenyang se se kwalwang. Kgokaganyo e e ya koo ka tlhamalalo — e romele mongwe yo o bontshang."
     convert_test_button: "Fetolela go Mokgwa wa Teko"
     convert_test_confirm: "Fetolela go Mokgwa wa Teko? Kgokaganyo ya botlhe e tla emisa go amogela dikarabo, mme o tla bona kgokaganyo ya teko e e sa bolokeng sepe. Fa o phasaladitsa gape moragonyana, kgokaganyo ya botlhe e a boa."
     test_link_create: "Dira kgokaganyo ya teko"

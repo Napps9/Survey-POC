@@ -1194,6 +1194,8 @@ sw:
     recalled_badge: "Kimesitishwa"
     test_mode_title: "Hali ya Jaribio"
     test_mode_hint: "Kiungo tofauti kinachoonyesha toleo jipya kila mara — hata rasimu — na hakihifadhi chochote."
+    live_test_title: "Kujaribu kiungo hai"
+    live_test_hint: "Yeyote aliye tayari na kiungo hai anaweza kuweka kipindi chake katika Hali ya Majaribio bila kuondoa Verto kwenye /play: bonyeza na ushikilie kona ya juu kushoto ya kicheza kwa sekunde mbili, kisha gusa “Anza hali ya majaribio”. Hakuna anachoingiza kinachohifadhiwa. Kiungo hiki kinakwenda huko moja kwa moja — mtumie yeyote anayeonyesha."
     convert_test_button: "Badilisha kuwa Hali ya Jaribio"
     convert_test_confirm: "Ubadilishe kuwa Hali ya Jaribio? Kiungo cha umma kitaacha kupokea majibu, nawe utapata kiungo cha jaribio kisichohifadhi chochote. Ukichapisha tena baadaye, kiungo cha umma kitarejea."
     test_link_create: "Tengeneza kiungo cha jaribio"
