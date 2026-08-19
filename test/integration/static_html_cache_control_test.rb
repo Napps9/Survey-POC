@@ -8,12 +8,17 @@ class StaticHtmlCacheControlTest < ActionDispatch::IntegrationTest
     response.headers["cache-control"] || response.headers["Cache-Control"]
   end
 
-  test "static HTML revalidates, so an updated page can't hide behind a heuristic cache" do
-    get "/vertonow.html"
-    assert_response :success
+  # The middleware matches on the .html suffix rather than on a filename, so a
+  # new one-pager is covered the moment it lands in public/. Both are asserted
+  # anyway: that's the property worth pinning, and it costs two requests.
+  %w[ /vertonow.html /verto-for-research.html ].each do |path|
+    test "#{path} revalidates, so an updated page can't hide behind a heuristic cache" do
+      get path
+      assert_response :success
 
-    assert_equal StaticHtmlCacheControl::CACHE_CONTROL, cache_control,
-      "the one-pager must revalidate — it's edited in place, and a stale copy has no other way out"
+      assert_equal StaticHtmlCacheControl::CACHE_CONTROL, cache_control,
+        "the one-pager must revalidate — it's edited in place, and a stale copy has no other way out"
+    end
   end
 
   test "non-HTML public files keep the app's own caching" do

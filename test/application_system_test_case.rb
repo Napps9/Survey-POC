@@ -68,6 +68,27 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   driven_by :cuprite_headless
 
+  # The standalone one-pagers under public/ that frame a live Verto in a device
+  # mockup. They're forks of one another, so they share the demo constants, the
+  # mockup ids and the bezel geometry — which means they share their tests too,
+  # rather than only the first one anybody happened to write a test for.
+  ONE_PAGERS = %w[ vertonow.html verto-for-research.html ].freeze
+
+  # A copy of a shipped one-pager pointed at this test's server instead of
+  # production. Everything else — the boot handshake, the fallback, the sizing —
+  # is the shipped code. `dest` is repo-relative and decides how the copy is
+  # reached: under tmp/ it's visited over file:// (the cross-origin case), under
+  # public/ the app serves it (same origin, so the frame can be introspected).
+  def one_pager_copy(source, origin:, token:, dest:)
+    html = Rails.root.join("public", source).read
+      .sub('const DEMO_ORIGIN = "https://app.playverto.com";', %(const DEMO_ORIGIN = "#{origin}";))
+      .sub('const DEMO_PATH   = "/play/KcwFrqUdXqFCfcmKapJH_JrO";', %(const DEMO_PATH   = "/play/#{token}";))
+
+    path = Rails.root.join(dest)
+    path.write(html)
+    path
+  end
+
   # The player writes to sessionStorage and registers a Service Worker, so each
   # test starts from a clean slate rather than inheriting the last one's.
   def setup
