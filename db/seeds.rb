@@ -68,9 +68,11 @@ AlpbachAccountProvisioner.new.call
 # a re-seed must never overwrite edits made to it in the editor. Rebuild
 # deliberately with `bin/rails showcase:seed FORCE=1`.
 #
-# The deck only — the simulated respondents are demo data the rake task seeds
-# on request, not something a boot should invent in a live account.
-ShowcaseVertoSeeder.new(responses: false).call
+# Seeded in Test Mode — a /test/:token link that records nothing and leaves the
+# deck editable — and with no simulated respondents: those are demo data the
+# rake task seeds on request, not something a boot should invent in a live
+# account (and they would lock the deck).
+ShowcaseVertoSeeder.new.call
 
 # Internal BI: starter Blazer queries for VertoNow staff (idempotent).
 load Rails.root.join("db/seeds/blazer_starter_queries.rb")

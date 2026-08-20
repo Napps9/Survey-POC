@@ -177,7 +177,54 @@ class ShowcaseVertoSeederTest < ActiveSupport::TestCase
     end
   end
 
+  # ── how it lands in the account ──────────────────────────────────────────
+  # Test Mode, not published: the showcase is handed round and edited, and a
+  # published deck is locked (Survey#editing_locked?) and collecting for real.
+
+  test "seeds in Test Mode — a test link, no /play link, no responses" do
+    survey = seed!
+    assert survey.test_playable?, "no test link minted"
+    assert_not survey.published?, "showcase should not be published by default"
+    assert_not survey.editing_locked?, "the deck must stay editable"
+    assert_equal 0, survey.responses.count
+  end
+
+  test "publishing and simulated respondents are opt-in" do
+    survey = seed!(publish: true, responses: true)
+    assert survey.published?
+    assert survey.test_playable?, "a published showcase keeps its test link too"
+    assert_equal ShowcaseVertoSeeder::RESPONSE_COUNT, survey.responses.count
+  end
+
+  test "ensure_test_mode! takes a published showcase off /play and keeps its test link" do
+    survey = seed!(publish: true)
+    token  = survey.test_token
+
+    ShowcaseVertoSeeder.new.ensure_test_mode!
+    survey.reload
+
+    assert_not survey.published?, "should have come off /play"
+    assert survey.test_playable?
+    assert_equal token, survey.test_token, "an existing test link must not be rotated"
+  end
+
+  test "ensure_test_mode! provisions the Verto when it isn't there at all" do
+    playverto_org
+    survey = ShowcaseVertoSeeder.new.ensure_test_mode!
+    assert survey.test_playable?
+    assert_not survey.published?
+  end
+
   private
+
+  def playverto_org
+    Organisation.find_or_create_by!(slug: ShowcaseVertoSeeder::ORG_SLUG) { |o| o.name = "Playverto" }
+  end
+
+  def seed!(**opts)
+    playverto_org
+    ShowcaseVertoSeeder.new(force: true, **opts).call
+  end
 
   # The cards the editor's per-card analysis actually scores: questions, minus
   # the demographic tail (a fixed platform taxonomy the creator can't edit, and

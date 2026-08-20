@@ -11,10 +11,15 @@
 # `showcase:seed` never touches a deck that already exists unless asked to
 # rebuild it.
 #
+# It is seeded in TEST MODE — a /test/:token link that plays the real thing
+# without sign-in, records nothing, and leaves the deck editable. See
+# #initialize for why that is the default rather than published.
+#
 # Usage:
-#   bin/rails showcase:seed              # create it if it isn't there
+#   bin/rails showcase:seed              # create it in Test Mode if it isn't there
+#   bin/rails showcase:test_mode         # put an existing one INTO Test Mode
 #   bin/rails showcase:seed FORCE=1      # rebuild it from scratch
-#   bin/rails showcase:seed RESPONSES=0  # skip the simulated respondents
+#   bin/rails showcase:seed PUBLISH=1 RESPONSES=1   # the live variant, with demo data
 #   bin/rails showcase:destroy
 #
 # Why sport: every bundled asset library the deck draws on — the option icons
@@ -60,9 +65,21 @@ class ShowcaseVertoSeeder
   ].freeze
   TAP_KEYS = TAP_RESPONSES.map { |r| r["key"] }.freeze
 
-  def initialize(force: false, responses: true)
+  # Test Mode by default. The showcase exists to be handed round and edited,
+  # and that is exactly the state Test Mode is for: /test/:token plays the real
+  # thing without sign-in, records NOTHING, and stays current while the deck is
+  # edited — so the editor never locks (Survey#editing_locked?) and no
+  # respondent data is ever written against a demonstration deck.
+  #
+  # `publish: true` mints a /play link instead (or as well), and `responses:
+  # true` seeds simulated respondents so the results, map and leaderboard have
+  # numbers in them. The second one LOCKS THE DECK: answers are keyed by card
+  # index, so a Verto with responses can never be structurally edited again,
+  # which is the opposite of what Test Mode is for. Ask for it deliberately.
+  def initialize(force: false, responses: false, publish: false)
     @force     = force
     @responses = responses
+    @publish   = publish
   end
 
   def call
@@ -132,9 +149,36 @@ class ShowcaseVertoSeeder
                      "swipes, sliders, stars, a story and a slider that reacts as you drag it. " \
                      "Same Verto, same two minutes.",
       forward_url: Survey.sanitize_forward_url("playverto.com"),
-      slug: VERTO_SLUG
+      slug: VERTO_SLUG,
+      # The Test Mode link. Minted at build time whether or not the Verto is
+      # also published: a test link is distribution state, independent of
+      # published?/editing_locked?, and having one costs nothing.
+      test_token: SecureRandom.urlsafe_base64(18)
     )
-    survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current) if @publish
+    survey
+  end
+
+  # Bring an EXISTING showcase Verto into Test Mode — mint the test link if it
+  # hasn't got one, and take it off /play if it is live. Idempotent, and the
+  # only thing that can reach a deck the create-only path has already left
+  # alone. Mirrors SurveysController#convert_to_test_mode, including keeping
+  # any existing test_token rather than rotating it: that URL may already be in
+  # somebody's hands.
+  #
+  # Provisions the Verto first if it isn't there at all, so one call gets to
+  # the same end state from either side.
+  def ensure_test_mode!
+    survey = Survey.unscoped.find_by(slug: VERTO_SLUG) || call
+    return nil if survey.nil?
+
+    attrs = {}
+    attrs[:test_token]     = SecureRandom.urlsafe_base64(18) if survey.test_token.blank?
+    attrs[:unpublished_at] = Time.current if survey.published?
+    survey.update!(attrs) if attrs.any?
+
+    puts "Showcase Verto ##{survey.id} is in Test Mode: /test/#{survey.test_token}"
+    puts "  (it had collected #{survey.responses.count} responses, so the deck stays locked)" if survey.responses.exists?
     survey
   end
 
@@ -525,7 +569,12 @@ class ShowcaseVertoSeeder
     puts "\nShowcase Verto seeded into #{survey.organisation.name} (#{ORG_SLUG}):"
     puts "  Title      : #{survey.title}"
     puts "  Editor     : /surveys/#{survey.id}"
-    puts "  Play       : /play/#{survey.publish_token}   (also /play/#{survey.slug})"
+    puts "  Test link  : /test/#{survey.test_token}   (records nothing, deck stays editable)"
+    if survey.published?
+      puts "  Play       : /play/#{survey.publish_token}   (also /play/#{survey.slug})"
+    else
+      puts "  Play       : not published — Test Mode only"
+    end
     puts "  Cards      : #{survey.cards.size} in the deck, #{LogicGraph.longest_path(survey.cards)} on the longest path"
     types = survey.cards.map { |c| c["type"] }.uniq
     puts "  Types      : #{types.join(', ')}"
