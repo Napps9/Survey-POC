@@ -736,7 +736,7 @@ class PlayerController < ApplicationController
     # be bounded — the client's maxlength is a courtesy, and this endpoint is
     # public and takes JSON.
     incoming = @survey.clamp_free_text(incoming.is_a?(Hash) ? incoming : {})
-    incoming = @survey.clamp_contact_entries(incoming)
+    incoming = @survey.drop_retired_answers(incoming)
     return incoming unless @survey.quiz? || @survey.tokenisation_enabled?
     stored = stored.is_a?(Hash) ? stored : {}
     merged = incoming.dup

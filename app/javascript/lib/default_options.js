@@ -25,7 +25,6 @@ export const DEFAULT_OPTIONS = {
   tap_card:         [ "Statement 1", "Statement 2", "Statement 3", "Statement 4", "Statement 5" ],
   scenario:         [ "Option A", "Option B" ],
   open_ended:       [],
-  contact_form:     [],
   welcome_card:     [],
   token_checkpoint: [],
   consent_gate:     []

@@ -50,8 +50,6 @@ sn:
     contact_company: "Kambani"
     contact_industry: "Indasitiri"
     contact_email: "Imeyili"
-    contact_note: "Ruzivo rwako runoenda kumugadziri weVerto iyi kuti vagone kukutevedzera."
-    contact_email_invalid: "Iyoyo haitaridziki seaderesi yeimeyili — ndapota itarisise."
     add_statement: "Wedzera Chirevo"
     swipe_no: "Kwete"
     swipe_unsure: "Handina Chokwadi"
@@ -285,7 +283,6 @@ sn:
     tap_card: ["Chirevo 1", "Chirevo 2", "Chirevo 3", "Chirevo 4", "Chirevo 5"]
     scenario: ["Sarudzo A", "Sarudzo B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

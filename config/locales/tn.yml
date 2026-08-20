@@ -53,8 +53,6 @@ tn:
     contact_company: "Khampani"
     contact_industry: "Lekala"
     contact_email: "Imeile"
-    contact_note: "Dintlha tsa gago di ya go motlhami wa Verto e gore a kgone go go latela."
-    contact_email_invalid: "Seo ga se lebege jaaka aterese ya imeile — tsweetswee e sekaseke."
     add_statement: "Oketsa polelo"
     swipe_no: "Nnyaa"
     swipe_unsure: "Ga ke tlhomamise"
@@ -297,7 +295,6 @@ tn:
     tap_card: ["Polelo 1", "Polelo 2", "Polelo 3", "Polelo 4", "Polelo 5"]
     scenario: ["Tlhopho A", "Tlhopho B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

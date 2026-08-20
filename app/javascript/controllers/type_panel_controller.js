@@ -433,18 +433,6 @@ const COMPONENTS = {
   // consent_gate defect (BUG-015), in the one other type that had the same gap.
   token_checkpoint: () => `
     <div class="token-checkpoint-placeholder">${esc(t("card.token_checkpoint_placeholder"))}</div>`,
-
-  // Mirrors the "when contact_form" branch in _card_component.html.erb —
-  // fields disabled, as in editor mode there.
-  contact_form: () => `
-    <div class="contact-form-wrap">
-      ${["name", "company", "industry", "email"].map((key) => `
-        <label class="contact-field-row">
-          <span class="contact-field-label">${esc(t("card.contact_" + key))}</span>
-          <input type="${key === "email" ? "email" : "text"}" class="contact-field" data-contact-key="${key}" disabled />
-        </label>`).join("")}
-      <div class="contact-note">${esc(t("card.contact_note"))}</div>
-    </div>`,
 }
 
 function prioritiseHtml(opts, styles = []) {

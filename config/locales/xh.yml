@@ -51,8 +51,6 @@ xh:
     contact_company: "Inkampani"
     contact_industry: "Icandelo loshishino"
     contact_email: "I-imeyile"
-    contact_note: "Iinkcukacha zakho ziya kumdali we-Verto ukuze akwazi ukuqhagamshelana nawe."
-    contact_email_invalid: "Oko akubonakali njengedilesi ye-imeyile — nceda ukhangele kwakhona."
     add_statement: "Yongeza ingxelo"
     swipe_no: "Hayi"
     swipe_unsure: "Andiqinisekanga"
@@ -297,7 +295,6 @@ xh:
     tap_card: ["Ingxelo 1", "Ingxelo 2", "Ingxelo 3", "Ingxelo 4", "Ingxelo 5"]
     scenario: ["Ukhetho A", "Ukhetho B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

@@ -51,8 +51,6 @@ vi:
     contact_company: "Công ty"
     contact_industry: "Ngành"
     contact_email: "Email"
-    contact_note: "Thông tin của bạn được gửi đến người tạo Verto này để họ có thể liên hệ với bạn."
-    contact_email_invalid: "Đó có vẻ không phải là địa chỉ email — vui lòng kiểm tra lại."
     add_statement: Thêm phát biểu
     swipe_no: "Không"
     swipe_unsure: "Không chắc"
@@ -281,7 +279,6 @@ vi:
     tap_card: ["Phát biểu 1", "Phát biểu 2", "Phát biểu 3", "Phát biểu 4", "Phát biểu 5"]
     scenario: ["Lựa chọn A", "Lựa chọn B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

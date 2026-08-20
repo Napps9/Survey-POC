@@ -51,8 +51,6 @@ ko:
     contact_company: "회사"
     contact_industry: "업종"
     contact_email: "이메일"
-    contact_note: "입력하신 정보는 이 Verto 제작자에게 전달되어 연락에 사용됩니다."
-    contact_email_invalid: "이메일 주소 형식이 아닌 것 같습니다 — 확인해 주세요."
     add_statement: 문장 추가
     swipe_no: "아니요"
     swipe_unsure: "잘 모르겠다"
@@ -281,7 +279,6 @@ ko:
     tap_card: ["문장 1", "문장 2", "문장 3", "문장 4", "문장 5"]
     scenario: ["옵션 A", "옵션 B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

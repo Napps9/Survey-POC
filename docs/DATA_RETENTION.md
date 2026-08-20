@@ -28,14 +28,23 @@ A `responses` row can hold:
 | `session_token` | A random per-session UUID minted in the browser |
 | `respondent_code_digest` | HMAC of a code the respondent chose, if the creator enabled codes |
 
-No email address, name or account is attached to a response — with one
-deliberate, creator-chosen exception: a Verto that includes a **contact card**
-(`contact_form`) stores whatever the respondent typed into its name / company /
-industry / email fields inside `answers`, like any other answer. The card tells
-respondents their details go to the Verto's creator, every field is optional,
-and these answers ride the existing respondent-data export and deletion paths
-(`/respondent-data`) like the rest of the response. The
-`respondent_code_digest` is a one-way HMAC keyed per Verto
+No email address, name or account is attached to a response. There used to be
+one deliberate, creator-chosen exception — the **contact card**
+(`contact_form`), which stored whatever the respondent typed into its name /
+company / industry / email fields inside `answers`, like any other answer.
+That card type has been **retired**: it can no longer be added to a Verto, the
+player skips any copy left in a published deck, and the server refuses an
+answer to one, so no response created from now on can carry identifying data
+of this kind.
+
+Details collected while the card was live are still held, in the `answers` of
+the responses that carry them, and are still shown in that Verto's results and
+CSV/Excel export to the creator who collected them. They ride the existing
+respondent-data export and deletion paths (`/respondent-data`) like the rest of
+the response, and go when the response or the Verto does. Retiring the card
+stopped the collection; it did not delete what was already collected.
+
+The `respondent_code_digest` is a one-way HMAC keyed per Verto
 (`Survey#respondent_code_key`), so a code is comparable **within** one Verto and
 nowhere else, and the plaintext is never stored, logged or returned.
 

@@ -8,6 +8,12 @@
 # Order matters — it's the order the picker shows. `pickable: false` hides
 # a type from the picker but keeps its metadata available for rendering
 # saved cards.
+#
+# `retired: true` goes further: the type is withdrawn from the product. It
+# can't be picked, can't be saved onto a deck, and the player skips any copy
+# still sitting in a published deck — but the metadata stays, because the
+# results dashboard still has to label answers collected while it was live.
+# See CardTypes.retired?.
 
 range:
   badge:        "RANGE"
@@ -161,9 +167,10 @@ contact_form:
   eyebrow:      "Share your details"
   picker_name:  "Contact details"
   picker_desc:  "Name, company, industry, email"
-  explainer:    "A lead-capture card: name, company, industry and email, each optional for the respondent. The ONE card type that collects identifying data — the card says so to respondents, and these answers appear in results and exports like any other."
+  explainer:    "RETIRED. A lead-capture card that collected name, company, industry and email — the one card type that ever collected identifying data. It can no longer be added, and the player skips any copy left in a published deck, so nothing more is collected. Details gathered while it was live are still in that Verto's results and exports."
   picker_icon:  "✉"
-  pickable:     true
+  pickable:     false
+  retired:      true
 
 welcome_card:
   badge:        "WELCOME CARD"

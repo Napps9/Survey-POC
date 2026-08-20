@@ -51,8 +51,6 @@ de:
     contact_company: "Unternehmen"
     contact_industry: "Branche"
     contact_email: "E-Mail"
-    contact_note: "Deine Angaben gehen an die Person hinter diesem Verto, damit sie sich bei dir melden kann."
-    contact_email_invalid: "Das sieht nicht wie eine E-Mail-Adresse aus — bitte prüfen."
     add_statement: Aussage hinzufügen
     swipe_no: "Nein"
     swipe_unsure: "Unsicher"
@@ -281,7 +279,6 @@ de:
     tap_card: ["Aussage 1", "Aussage 2", "Aussage 3", "Aussage 4", "Aussage 5"]
     scenario: ["Option A", "Option B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

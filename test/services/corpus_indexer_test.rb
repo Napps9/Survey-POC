@@ -73,6 +73,9 @@ class CorpusIndexerTest < ActiveSupport::TestCase
     assert_not_includes question.distribution.to_json, "120"
   end
 
+  # The card type is retired, but decks that ran while it was live still hold
+  # both the card and what it collected — so "never indexed" is still a live
+  # guarantee about data Ask Verto can reach, not a historical note.
   test "contact_form is never indexed" do
     survey = survey_with([ { "type" => "contact_form", "cid" => "c_cf", "text" => "Stay in touch" } ])
     seed!(survey, 40) { { "0" => { "value" => { "name" => "Real Person", "email" => "a@b.com" } } } }
