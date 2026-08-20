@@ -194,6 +194,7 @@ export default class extends Controller {
     if (this.tokenisationValue) this._initTokens()
     if (this.hasRegionsMapViewportTarget) this._setupMapPanZoom()
     this._watchFooterFit()
+    this._watchTyping()
 
     // Live answered-state for the Next button. Delegated on the deck rather
     // than wired per widget: every answer type ultimately lands as a pointer
@@ -254,6 +255,12 @@ export default class extends Controller {
   disconnect() {
     this._footerObserver?.disconnect()
     if (this._answeredFrame) cancelAnimationFrame(this._answeredFrame)
+    clearTimeout(this._revealTimer)
+    // kbd-open lives on <html>, outside this controller's element, so it does
+    // NOT go away with the deck. Left behind it would guard _fitCard on
+    // whatever renders next (the thank-you screen, a Turbo visit) and that
+    // card would keep whatever hero state it happened to have.
+    document.documentElement.classList.remove("kbd-open")
     this._clearTestTimers()
   }
 
@@ -374,6 +381,14 @@ export default class extends Controller {
   //
   // The widget, the question and the footer are never on the list.
   _fitCard() {
+    // Typing layout is a policy, not a measurement. While a text control has
+    // focus the hero is off because the field IS the card (see _watchTyping),
+    // and the ladder must not buy it back on top of the keyboard. It must not
+    // run at all here either: with interactive-widget=resizes-content the
+    // layout viewport shrinks on keyboard open, which resizes the footer,
+    // which fires _watchFooterFit's observer — so without this guard the
+    // ladder would re-price the card between keystrokes.
+    if (document.documentElement.classList.contains("kbd-open")) return
     const card = this.cardTargets[this.currentValue]
     if (!card) return
     const box = card.querySelector(".split-right > .mt-2")
@@ -386,6 +401,7 @@ export default class extends Controller {
 
     // The floor: the answer, undecorated.
     card.classList.add("hero-off")
+    card.classList.remove("hero-slim")
     grid?.classList.add("art-off")
     let owed = over()
 
@@ -399,9 +415,21 @@ export default class extends Controller {
       else owed = over()
     }
 
-    // Rung 2 — the hero, against whatever rung 1 settled on.
+    // Rung 2 — the hero, against whatever rung 1 settled on. Two sizes, dearest
+    // first: the full 45% strip, then the slim band it is always allowed to
+    // shrink to (--play-hero-min). The second offer exists because the verdict
+    // used to be all-or-nothing, and once the hero grew to 45% that meant a
+    // handful of answers traded their picture away entirely to buy back a few
+    // dozen pixels. The PRICE is unchanged — still "free or not at all",
+    // still `over() > owed + 1`, still nothing allowed to overflow.
     card.classList.remove("hero-off")
-    if (over() > owed + 1) card.classList.add("hero-off")
+    if (over() > owed + 1) {
+      card.classList.add("hero-slim")
+      if (over() > owed + 1) {
+        card.classList.remove("hero-slim")
+        card.classList.add("hero-off")
+      }
+    }
 
     // The "more below" fade is drawn over the last of the content, so it has
     // to know whether there IS anything below — left unconditional it greys
@@ -418,6 +446,61 @@ export default class extends Controller {
     // bar itself, so the observer would never hear about them.
     this._footerObserver = new ResizeObserver(() => { this._fitFooter(); this._fitCard() })
     this._footerObserver.observe(footer)
+  }
+
+  // The one DETERMINISTIC keyboard signal: a text control inside the deck has
+  // focus. It reads the same on every platform, unlike anything measured off
+  // the viewport — so everything that has to be right hangs off this, and only
+  // the overlay's own height hangs off the measurement in lib/viewport_height.
+  _watchTyping() {
+    const TEXTY = /^(?:text|search|email|tel|url|number|password)$/
+    const isText = (el) => !!el && (el.tagName === "TEXTAREA" || el.isContentEditable ||
+                                    (el.tagName === "INPUT" && TEXTY.test(el.type || "text")))
+    const sync = () => {
+      const el = document.activeElement
+      const on = isText(el) && this.element.contains(el)
+      document.documentElement.classList.toggle("kbd-open", on)
+      const card = this.cardTargets[this.currentValue]
+      if (on) {
+        // Reuse hero-off rather than a second hide list: it already covers
+        // every inset:0 medium (see the .hero-off rules and
+        // player_hero_css_test's fourth test), and a parallel list is a
+        // parallel thing to forget a card type from. On a 45/55 card this one
+        // line hands the field ~45% of the screen back, which on its own is
+        // usually the whole fix.
+        card?.classList.add("hero-off")
+        this._revealField(el)
+      } else {
+        // Not classList.remove: _fitCard may have set hero-off for its own
+        // reasons. It starts from the floor every time, so re-running it is
+        // the correct restore — and it is now unguarded again, because
+        // kbd-open has just come off.
+        this._fitCard()
+      }
+    }
+    this.element.addEventListener("focusin", sync)
+    this.element.addEventListener("focusout", () => requestAnimationFrame(sync))
+  }
+
+  // The browser's own "scroll the focused field into view" walks up the tree
+  // looking for a box that can take the scroll, and on this card every box is
+  // overflow: hidden except the answer scroller — so when a field is not
+  // inside one, the browser scrolls the VISUAL VIEWPORT and drags the overlay
+  // off screen with it. Do it ourselves, in the box that owns the card's
+  // scroll, measured against the VISIBLE height rather than the layout one.
+  _revealField(el) {
+    const box = el.closest(".split-right > .mt-2, .split-right > .other-block, " +
+                           ".split-right > .play-consent-main")
+    if (!box) return
+    clearTimeout(this._revealTimer)
+    // The keyboard animates in (~250ms on iOS). Measuring before it lands
+    // reads the pre-keyboard visible height and under-scrolls.
+    this._revealTimer = setTimeout(() => {
+      const visible = window.visualViewport ? window.visualViewport.height : window.innerHeight
+      const floor   = Math.min(box.getBoundingClientRect().bottom, visible) - 8
+      const over    = el.getBoundingClientRect().bottom - floor
+      if (over > 0) box.scrollTop += over
+    }, 300)
   }
 
   // ── Text size ("Aa" pill) ──────────────────────────────────────────────

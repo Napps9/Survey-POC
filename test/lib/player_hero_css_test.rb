@@ -62,6 +62,42 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
     end
   end
 
+  # 45/55 is one number in two halves, and both halves are clamp() middles.
+  # Retuning either alone is how the split silently stops being a split, and
+  # the failure is invisible because each token on its own still reads as a
+  # sensible number. So pin the RATIO, not the values — every mobile tier is
+  # free to state it at whatever absolutes that tier can afford.
+  test "the hero and the answer panel state one ratio, in every tier" do
+    pairs = css.scan(
+      /--play-hero-h:\s*clamp\([^,]+,\s*([\d.]+)svh.*?--play-right-min:\s*clamp\([^,]+,\s*([\d.]+)svh/m
+    )
+
+    assert_operator pairs.size, :>=, 3,
+                    "expected the base, tablet-portrait and short-viewport tiers each to state " \
+                    "the pair — found #{pairs.size}"
+    pairs.each do |hero, right|
+      share = hero.to_f / (hero.to_f + right.to_f)
+      assert_in_delta 0.45, share, 0.01,
+                      "a mobile tier splits the card #{(share * 100).round(1)}/" \
+                      "#{((1 - share) * 100).round(1)}. The hero and the answer panel are tuned " \
+                      "as a PAIR to 45/55 (the split the owner asked for); moving one without " \
+                      "the other is the whole failure mode this pins."
+    end
+  end
+
+  # The ladder's middle rung. Without it the hero's only verdicts are "45% of
+  # the card" and "gone", and once the hero grew to 45% a handful of answers
+  # started trading their picture away entirely to buy back a few dozen pixels
+  # — measured, not hypothesised: a six-tile grid and a free-text card both
+  # crossed that line on an iPhone 15.
+  test "the shed ladder can slim the hero, not only remove it" do
+    assert_match(/\.preview-card\.hero-slim .*\.split-left\s*\{[^}]*max-height:\s*var\(--play-hero-min\)/m,
+                 css,
+                 "hero-slim is gone or no longer caps the strip at --play-hero-min — the ladder " \
+                 "is back to all-or-nothing and image cards with long answers lose their art " \
+                 "outright instead of keeping a band of it.")
+  end
+
   test "hero-off hides the range animation too" do
     hide_rule = css[/\.preview-overlay \.preview-card\.hero-off[^{]*\.card-lottie[^{]*\{[^}]*\}/m]
 
