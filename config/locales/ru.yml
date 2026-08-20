@@ -51,8 +51,6 @@ ru:
     contact_company: "Компания"
     contact_industry: "Отрасль"
     contact_email: "Эл. почта"
-    contact_note: "Ваши данные передаются создателю этого Verto, чтобы он мог с вами связаться."
-    contact_email_invalid: "Это не похоже на адрес электронной почты — проверьте, пожалуйста."
     add_statement: Добавить утверждение
     swipe_no: "Нет"
     swipe_unsure: "Не уверен"
@@ -281,7 +279,6 @@ ru:
     tap_card: ["Утверждение 1", "Утверждение 2", "Утверждение 3", "Утверждение 4", "Утверждение 5"]
     scenario: ["Вариант А", "Вариант Б"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

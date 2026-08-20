@@ -51,8 +51,6 @@ tr:
     contact_company: "Şirket"
     contact_industry: "Sektör"
     contact_email: "E-posta"
-    contact_note: "Bilgilerin, seninle iletişime geçebilmesi için bu Verto'nun sahibine iletilir."
-    contact_email_invalid: "Bu bir e-posta adresine benzemiyor — lütfen kontrol et."
     add_statement: İfade ekle
     swipe_no: "Hayır"
     swipe_unsure: "Emin değilim"
@@ -281,7 +279,6 @@ tr:
     tap_card: ["İfade 1", "İfade 2", "İfade 3", "İfade 4", "İfade 5"]
     scenario: ["Seçenek A", "Seçenek B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

@@ -33,7 +33,10 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
 
   # One response carrying every kind of thing the shared page must redact:
   # an "other" free-text on the closed question, an open_ended answer, and a
-  # contact_form submission — each with a distinctive, greppable value.
+  # contact_form submission — each with a distinctive, greppable value. The
+  # contact card is retired and collects nothing new, but a Verto that ran
+  # while it was live still holds its leads, and a share link must still
+  # withhold them.
   def add_secret_response
     @survey.responses.create!(
       session_token: SecureRandom.uuid, status: "completed",

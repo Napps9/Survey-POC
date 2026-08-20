@@ -864,28 +864,11 @@
         </div>
       <% end %>
 
-    <% when "contact_form" %>
-      <%# Lead-gen contact card: four fixed fields, each optional for the
-          respondent (the card-level `required` flag covers "must answer at
-          least something"). The ONE card type that collects identifying data,
-          so the card itself says so (contact_note). Inputs are disabled in
-          the editor — the labels are the editable content, the fields are the
-          respondent's. Mirrored client-side in type_panel's COMPONENTS. %>
-      <div class="contact-form-wrap">
-        <% [["name", "name", "text"], ["company", "organization", "text"],
-            ["industry", "off", "text"], ["email", "email", "email"]].each do |key, autocomplete, input_type| %>
-          <label class="contact-field-row">
-            <span class="contact-field-label"><%= t("card.contact_#{key}", locale: display_locale) %></span>
-            <input type="<%= input_type %>" class="contact-field"
-                   data-contact-key="<%= key %>"
-                   autocomplete="<%= autocomplete %>"
-                   <%= 'inputmode="email"'.html_safe if key == "email" %>
-                   <%= "disabled" if editable %> />
-          </label>
-        <% end %>
-        <div class="contact-email-error" data-contact-error hidden><%= t("card.contact_email_invalid", locale: display_locale) %></div>
-        <div class="contact-note"><%= t("card.contact_note", locale: display_locale) %></div>
-      </div>
+    <%# contact_form had its branch here. The type is retired (CardTypes.retired?)
+        — the player skips it and the editor drops it on save — so a deck can
+        only still hold one if it is locked against edits, and then only its
+        title is ever rendered. There is deliberately nothing to fall through
+        to: no fields means nothing left that could take an entry. %>
 
     <% when "welcome_card" %>
       <%# Welcome card — in the player it hosts the intake (compare promise +

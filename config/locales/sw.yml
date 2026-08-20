@@ -51,8 +51,6 @@ sw:
     contact_company: "Kampuni"
     contact_industry: "Sekta"
     contact_email: "Barua pepe"
-    contact_note: "Maelezo yako yanaenda kwa mtengenezaji wa Verto hii ili aweze kuwasiliana nawe."
-    contact_email_invalid: "Hiyo haionekani kama anwani ya barua pepe — tafadhali angalia."
     add_statement: Ongeza kauli
     swipe_no: "Hapana"
     swipe_unsure: "Sina uhakika"
@@ -281,7 +279,6 @@ sw:
     tap_card: ["Kauli 1", "Kauli 2", "Kauli 3", "Kauli 4", "Kauli 5"]
     scenario: ["Chaguo A", "Chaguo B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

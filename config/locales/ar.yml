@@ -51,8 +51,6 @@ ar:
     contact_company: "الشركة"
     contact_industry: "القطاع"
     contact_email: "البريد الإلكتروني"
-    contact_note: "تُرسل بياناتك إلى منشئ هذا الاستطلاع ليتمكن من التواصل معك."
-    contact_email_invalid: "هذا لا يبدو كعنوان بريد إلكتروني — يرجى التحقق منه."
     add_statement: إضافة عبارة
     swipe_no: "لا"
     swipe_unsure: "غير متأكد"
@@ -281,7 +279,6 @@ ar:
     tap_card: ["العبارة 1", "العبارة 2", "العبارة 3", "العبارة 4", "العبارة 5"]
     scenario: ["الخيار أ", "الخيار ب"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

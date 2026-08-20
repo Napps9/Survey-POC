@@ -51,8 +51,6 @@ hi:
     contact_company: "कंपनी"
     contact_industry: "उद्योग"
     contact_email: "ईमेल"
-    contact_note: "आपका विवरण इस Verto के निर्माता को जाता है ताकि वे आपसे संपर्क कर सकें।"
-    contact_email_invalid: "यह ईमेल पता जैसा नहीं लगता — कृपया जांचें।"
     add_statement: कथन जोड़ें
     swipe_no: "नहीं"
     swipe_unsure: "अनिश्चित"
@@ -281,7 +279,6 @@ hi:
     tap_card: ["कथन 1", "कथन 2", "कथन 3", "कथन 4", "कथन 5"]
     scenario: ["विकल्प A", "विकल्प B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

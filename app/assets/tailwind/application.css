@@ -720,7 +720,6 @@
 .split-right .choice-grid,
 .split-right .slider-wrap,
 .split-right .freeform-wrap,
-.split-right .contact-form-wrap,
 .split-right .rating-wrap,
 .split-right .rotate-wrap { text-align: left; }
 
@@ -729,7 +728,7 @@
    (.q-header) at the top and let the answer container scroll internally
    instead.
    This used to be scoped to the four answer shapes that stack — lists, grids,
-   prioritise and the contact form — on the reasoning that "other card types
+   prioritise and the (since retired) contact form — on the reasoning that "other card types
    (slider, tap-card, freeform, …) keep their own layout". That reasoning was
    wrong: keeping their own layout meant having no scroll path at all, so for
    them overflow was not a scroll, it was a silent cut. The swipe card is the
@@ -742,7 +741,6 @@
 .split-right > .mt-2:has(> .choice-list),
 .split-right > .mt-2:has(> .choice-grid),
 .split-right > .mt-2:has(> .prioritise-list),
-.split-right > .mt-2:has(> .contact-form-wrap),
 .split-right > .mt-2:has(> .rotate-wrap),
 .split-right > .mt-2:has(> .slider-wrap),
 .split-right > .mt-2:has(> .nps-slider),
@@ -765,7 +763,6 @@
 .split-right > .mt-2:has(> .choice-list) > .choice-list,
 .split-right > .mt-2:has(> .choice-grid) > .choice-grid,
 .split-right > .mt-2:has(> .prioritise-list) > .prioritise-list,
-.split-right > .mt-2:has(> .contact-form-wrap) > .contact-form-wrap,
 .split-right > .mt-2:has(> .slider-wrap) > .slider-wrap,
 .split-right > .mt-2:has(> .nps-slider) > .nps-slider,
 .split-right > .mt-2:has(> .rating-wrap) > .rating-wrap,
@@ -2475,53 +2472,6 @@
 .size-s  { font-size: 0.85em; }
 .size-l  { font-size: 1.25em; }
 .size-xl { font-size: 1.5em; }
-
-/* ── Contact card (lead capture) ─────────────────── */
-/* Same vessel recipe as .freeform-wrap: every typed answer in the player sits
-   in this soft grey container with left-aligned content. Without it the form
-   was four naked white fields floating full-bleed on the white card with
-   centre-aligned labels — the one answer widget that didn't look like the
-   platform. */
-.contact-form-wrap {
-  display: flex; flex-direction: column; gap: 12px;
-  background: rgba(0,0,0,0.05);
-  border-radius: 14px;
-  padding: 14px;
-}
-.contact-field-row { display: flex; flex-direction: column; gap: 4px; }
-.contact-field-label {
-  font-family: "Alata", sans-serif;
-  font-size: var(--text-sm);
-  color: rgba(0, 0, 0, 0.55);
-  letter-spacing: 0.02em;
-}
-.contact-field {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 12px; /* the pick rows' radius, not the vessel's 14 */
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #fff;
-  font-family: "ABeeZee", sans-serif;
-  font-size: var(--text-base);
-  color: #1C2034;
-  outline: none;
-  transition: border-color 0.12s;
-}
-.contact-field:focus { border-color: var(--brand-primary, #01EACB); }
-/* Editor preview: half-opaque white on the vessel, so the fields still read
-   as fields (a black-tint here vanished into the vessel's own grey). */
-.contact-field:disabled { background: rgba(255, 255, 255, 0.55); cursor: default; }
-.contact-email-error {
-  font-family: "ABeeZee", sans-serif;
-  font-size: var(--text-sm);
-  color: #D80027;
-}
-.contact-note {
-  font-family: "ABeeZee", sans-serif;
-  font-size: var(--text-xs);
-  color: rgba(0, 0, 0, 0.4);
-  line-height: 1.5;
-}
 
 /* ── Activity (welcome / static) ─────────────────── */
 .activity-content { display: flex; flex-direction: column; gap: 12px; }
@@ -5518,10 +5468,11 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
      the page on focus and leaves it zoomed, which on a card-per-screen layout
      means the question scrolls off and the footer goes with it. Three controls
      were under the line — the free-text answer (15px), the contact card's
-     fields including email (14px) and the location search in every Verto's
-     demographic tail (13px) — and the rule written to stop exactly this
+     fields (14px) and the location search in every Verto's demographic tail
+     (13px) — and the rule written to stop exactly this
      (`textarea { font-size: 16px }`, in the mobile block) has been losing on
-     specificity to all three.
+     specificity to all three. Two are left: the contact card has since been
+     retired and no longer renders anywhere a respondent can reach.
 
      max(), not a bare rem: the threshold is 16 CSS PX, so a respondent who has
      made their browser text SMALLER would otherwise get the zoom handed back.
@@ -5531,7 +5482,6 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   --play-input-fs: max(1rem, 16px);
 }
 .preview-overlay .freeform-textarea,
-.preview-overlay .contact-field,
 .preview-overlay .location-search-field { font-size: var(--play-input-fs); }
 .preview-nav {
   height: 54px; flex-shrink: 0;
@@ -7006,7 +6956,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-list),
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-grid),
   .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list),
-  .preview-overlay .split-card .split-right > .mt-2:has(> .contact-form-wrap),
   .preview-overlay .split-card .split-right > .mt-2:has(> .rotate-wrap),
   .preview-overlay .split-card .split-right > .mt-2:has(> .slider-wrap),
   .preview-overlay .split-card .split-right > .mt-2:has(> .nps-slider),
@@ -8662,8 +8611,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .preview-overlay[data-font-scale="larger"] .play-consent-body{ font-size: 18px; }
 .preview-overlay[data-font-scale="large"] .freeform-textarea { font-size: 17px; }
 .preview-overlay[data-font-scale="larger"] .freeform-textarea{ font-size: 19px; }
-.preview-overlay[data-font-scale="large"] .contact-field     { font-size: 16px; }
-.preview-overlay[data-font-scale="larger"] .contact-field    { font-size: 18px; }
 
 /* Floating Close for the editor's inline Preview overlay (no nav bar). */
 .preview-close-float {

@@ -51,8 +51,6 @@ es:
     contact_company: "Empresa"
     contact_industry: "Sector"
     contact_email: "Correo electrónico"
-    contact_note: "Tus datos van al creador de este Verto para que pueda ponerse en contacto contigo."
-    contact_email_invalid: "Eso no parece una dirección de correo — revísala, por favor."
     add_statement: Agregar enunciado
     swipe_no: "No"
     swipe_unsure: "No estoy seguro"
@@ -281,7 +279,6 @@ es:
     tap_card: ["Afirmación 1", "Afirmación 2", "Afirmación 3", "Afirmación 4", "Afirmación 5"]
     scenario: ["Opción A", "Opción B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
