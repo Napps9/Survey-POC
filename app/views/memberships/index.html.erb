@@ -25,10 +25,11 @@
           <div>
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#F7F7F7;">Brand</div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.5;">
-              Your logo replaces the Playverto wordmark at the top of every Verto preview and shared play link.
+              Shown at the top of every Verto preview and shared play link. Without one, no logo is shown at all.
             </div>
           </div>
           <div style="height:44px;min-width:120px;display:flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:10px;background:rgba(28,32,52,0.7);border:1px solid rgba(255,255,255,0.06);">
+            <span class="logo-slot-empty">No logo</span>
             <%= brand_logo_tag current_organisation, style: "height:32px;width:auto;max-width:160px;" %>
           </div>
         </div>
@@ -49,7 +50,7 @@
                   organisation_path(current_organisation),
                   method: :patch,
                   params: { organisation: { remove_logo: "1" } },
-                  data: { turbo_confirm: "Remove your organisation's logo and revert to the Playverto wordmark?" },
+                  data: { turbo_confirm: "Remove your organisation's logo? Your Vertos will show no logo until you upload another." },
                   form: { style: "display:inline;margin:0;" },
                   style: "padding:10px 16px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
           <% end %>

@@ -1615,7 +1615,6 @@
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);"
                data-controller="logo-uploader"
                data-logo-uploader-url-value="<%= organisation_path(current_organisation) %>"
-               data-logo-uploader-fallback-value="<%= image_path('playverto.svg') %>"
                <%# The model's own limits, so the pre-upload check matches the
                    validation that would reject it server-side. %>
                data-logo-uploader-max-bytes-value="<%= Organisation::LOGO_MAX_BYTES %>"
@@ -1625,8 +1624,15 @@
               Shown at the top of every Verto preview and shared play link. Applies across your organisation.
             </div>
             <div style="display:flex;align-items:center;gap:11px;">
+              <%# An org with no logo shows an empty slot, not our wordmark. The
+                  placeholder keeps that reading as "nothing uploaded yet"
+                  rather than as a failed render; it is a sibling of the <img>
+                  (not a wrapper) so logo-uploader#_setPreview can add and
+                  remove the image around it, and CSS hides it whenever an
+                  image is present. %>
               <div data-logo-uploader-target="preview"
                    style="height:48px;min-width:90px;display:flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;">
+                <span class="logo-slot-empty">No logo</span>
                 <%= brand_logo_tag current_organisation, style: "height:30px;width:auto;max-width:150px;" %>
               </div>
               <% if current_membership&.admin? %>

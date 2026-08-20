@@ -150,13 +150,17 @@
     </div>
   <% end %>
 
-  <%# Publishing org's logo (or the Playverto mark, for an org with none),
-      centred above the deck — desktop only. Mobile has no room for a
-      persistent masthead above the card, so the brand there stays where it
-      already was: inside the thank-you card at the very end (below). %>
-  <div class="player-brand-header">
-    <%= brand_logo_tag @survey.organisation, style: "height:36px;width:auto;max-width:50%;" %>
-  </div>
+  <%# Publishing org's logo, centred above the deck — desktop only. Mobile has
+      no room for a persistent masthead above the card, so the brand there
+      stays where it already was: inside the thank-you card at the very end
+      (below).
+      Only drawn when there IS a logo: an org that hasn't uploaded one gets no
+      masthead rather than our wordmark in their slot, and the wrapper is
+      skipped along with it because its own 18px of padding would otherwise
+      hold an empty band open above the deck. %>
+  <% if (masthead = brand_logo_tag(@survey.organisation, style: "height:36px;width:auto;max-width:50%;")) %>
+    <div class="player-brand-header"><%= masthead %></div>
+  <% end %>
 
   <%# Slim top-utility bar: the content-language switcher (multilingual Vertos
       only) alongside the text-size control (always — a reading preference,
@@ -308,7 +312,9 @@
       <div data-player-target="thankyouMain" class="preview-thankyou-card">
         <%# Publishing org's logo, mobile only — desktop already has the
             persistent masthead above the deck (.player-brand-header), and
-            showing both would double up on the thank-you screen. %>
+            showing both would double up on the thank-you screen. Renders
+            nothing for an org with no logo; the "Powered by Playverto"
+            wordmark further down is the attribution and is unaffected. %>
         <%= brand_logo_tag @survey.organisation,
               style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;",
               class: "player-thankyou-logo" %>
