@@ -145,7 +145,12 @@
       Dashboard mini-previews (:preview) stay logo-free on purpose. %>
   <% if (mode == :player || mode == :editor) && type == "welcome_card" && @survey&.organisation&.logo&.attached? %>
     <div class="split-right-logo">
-      <%= brand_logo_tag @survey.organisation, style: "height:34px;width:auto;max-width:60%;display:block;" %>
+      <%# Sized by WIDTH, not height: "about 30% of the card" is how the brief
+          reads and how a logo actually scales against a panel. The max-height
+          is the guard for a square or portrait mark, which at 30% width would
+          otherwise tower over the title it sits above; object-fit (added by
+          brand_logo_tag) keeps either shape undistorted inside that box. %>
+      <%= brand_logo_tag @survey.organisation, style: "width:30%;height:auto;max-height:72px;" %>
     </div>
   <% end %>
 

@@ -70,11 +70,25 @@ class PlayerFontScaleTest < ApplicationSystemTestCase
 
   # Mirrors player_type_floor_test's "the controls survive a raised browser
   # font-size" — same claim, this control instead of the root font-size.
+  #
+  # The preference is seeded rather than clicked because the pill is hidden on
+  # phones now (the strip it lived in was costing every card ~44px, which the
+  # 45/55 split reclaimed) — and this test is specifically about a PHONE. The
+  # claim is unchanged and, if anything, matters more than before: a taller
+  # hero leaves less room, so this is the first place an over-eager 45/55
+  # would show up. Seeding is also how a phone respondent genuinely arrives at
+  # "larger" now — they set it on a desktop and _loadFontScale reads it back
+  # out of localStorage on connect.
   test "the controls survive the larger step by shedding artwork, not by clipping" do
     open_player(width: 375, height: 553)
+    page.execute_script("localStorage.setItem('verto_font_scale', 'larger')")
+    visit "/play/#{@survey.publish_token}"
+    dismiss_cookie_banner
+    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
     click_button "Next"
 
-    find(".font-scale-btn[data-scale='larger']").click
+    assert_equal "larger", find(".preview-overlay")["data-font-scale"],
+                 "the stored preference must still apply on a phone even though the pill is hidden"
     sleep 0.4 # _fitCard's re-measure
 
     assert page.evaluate_script(<<~JS), "Back and Next/Finish left the screen once the text grew"
