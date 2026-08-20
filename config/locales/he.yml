@@ -1072,6 +1072,8 @@ he:
     brand_library: "ספריית המותג שלך"
     change_animation: "החלפת אנימציה"
     change_animation_title: "החלפת האנימציה של הכרטיס הזה"
+    change_background: "רקע"
+    change_background_title: "התאמה אישית של צבע או תמונת הרקע של הכרטיס הזה"
     change_statement_image_title: "החלפת התמונה של המשפט הזה"
     slider_axis_auto: "השתמש בפריסה אוטומטית"
     slider_axis_horizontal: "החלף לפריסה אופקית"

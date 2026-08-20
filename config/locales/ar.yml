@@ -1072,6 +1072,8 @@ ar:
     brand_library: "مكتبة علامتك التجارية"
     change_animation: "تغيير الرسوم المتحركة"
     change_animation_title: "تغيير الرسوم المتحركة لهذه البطاقة"
+    change_background: "الخلفية"
+    change_background_title: "خصّص لون خلفية هذه البطاقة أو صورتها"
     change_statement_image_title: "تغيير صورة هذه العبارة"
     slider_axis_auto: "استخدام التخطيط التلقائي"
     slider_axis_horizontal: "التبديل إلى التخطيط الأفقي"

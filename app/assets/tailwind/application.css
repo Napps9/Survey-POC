@@ -866,6 +866,41 @@
   display: inline-flex; align-items: center;
 }
 
+/* Range cards show TWO bottom CTAs (change animation + background settings)
+   side by side, so neither can claim .split-left's centred bottom-14px spot
+   on its own the way a single .add-media-fab/.add-animation-fab does. */
+.split-left-cta-row {
+  position: absolute;
+  bottom: 14px; left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 4;
+}
+.split-left-cta-row .add-animation-fab {
+  position: static;
+  transform: none;
+}
+.add-bg-fab {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-family: "Alata", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.add-bg-fab:hover {
+  background: rgba(1,234,203,0.85);
+  color: #1C2034;
+  border-color: rgba(1,234,203,1);
+}
+
 /* ── Animation picker grid (reuses the .media-modal-* chrome) ── */
 .anim-modal-sub {
   color: rgba(255,255,255,0.6);

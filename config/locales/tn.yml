@@ -1094,6 +1094,8 @@ tn:
     brand_library: "Laeboraring ya gago ya letshwao"
     change_animation: "Fetola tshakgamiso"
     change_animation_title: "Fetola tshakgamiso ya karata e"
+    change_background: "Bokamorago"
+    change_background_title: "Fetola mmala kgotsa setshwantsho sa bokamorago sa karata e"
     change_statement_image_title: "Fetola setshwantsho sa polelo e"
     slider_axis_auto: "Dirisa thulaganyo e e itiragalelang"
     slider_axis_horizontal: "Fetolela go thulaganyo e e rapaletseng"

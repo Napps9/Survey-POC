@@ -1072,6 +1072,8 @@ vi:
     brand_library: "Thư viện thương hiệu của bạn"
     change_animation: "Đổi hoạt ảnh"
     change_animation_title: "Đổi hoạt ảnh của thẻ này"
+    change_background: "Nền"
+    change_background_title: "Tùy chỉnh màu hoặc hình nền của thẻ này"
     change_statement_image_title: "Đổi hình ảnh của câu này"
     slider_axis_auto: "Dùng bố cục tự động"
     slider_axis_horizontal: "Chuyển sang bố cục ngang"

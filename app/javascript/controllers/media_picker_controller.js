@@ -74,22 +74,36 @@ export default class extends Controller {
     this._pendingUrl = null
     this._pendingVideo = null
     this._setApplyEnabled(false)
-    // Open on the Verto Library so the curated designs are visible straight
-    // away — uploading your own image is one click away on the other tab.
-    this._switchTabKey("library")
-    this._setMedia("photos")            // cards can be photo or video
-    this._showMediaToggle(true)
-    this._showLottieSection(true)       // paste-a-LottieFiles-URL, cards only
+
+    // A range card has no photo/video/lottie slot of its own — its reaction
+    // animation is swapped through the separate animation-picker modal. This
+    // modal opens for such a card only for the per-card SETTINGS below (the
+    // Animation background), so the source tabs/panes have nothing to act on
+    // and stay hidden; openAnimBgImage() brings them back for its own "Use an
+    // image" sub-flow regardless of card type.
+    const isRange = card.dataset.cardType === "range"
+    this._showMediaSwapUI(!isRange)
+    if (isRange) {
+      this.paneTargets.forEach(p => { p.hidden = true })
+      this.clearBtnTarget.hidden = true
+    } else {
+      // Open on the Verto Library so the curated designs are visible straight
+      // away — uploading your own image is one click away on the other tab.
+      this._switchTabKey("library")
+      this._setMedia("photos")            // cards can be photo or video
+      this._showMediaToggle(true)
+      this._showLottieSection(true)       // paste-a-LottieFiles-URL, cards only
+
+      const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || card.dataset.cardLottie || ""
+      this.clearBtnTarget.hidden = !currentUrl
+
+      this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
+      this._seedSearch()
+      this._loadApprovedAppeals()
+    }
     this._syncAnimationBg()             // backdrop, only when the panel animates
     this._syncAnimateAsset()            // push in/out loop, photo or lottie only
     this._syncFocal()                   // mobile header position, images only
-
-    const currentUrl = card.dataset.cardImage || card.dataset.cardVideo || card.dataset.cardLottie || ""
-    this.clearBtnTarget.hidden = !currentUrl
-
-    this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages), "Recommended for this card")
-    this._seedSearch()
-    this._loadApprovedAppeals()
 
     this.backdropTarget.hidden = false
     this._resetModalScroll()
@@ -229,6 +243,11 @@ export default class extends Controller {
     this._pendingUrl = null
     this._pendingVideo = null
     this._setApplyEnabled(false)
+    // Reset to shown: only open()'s range-card branch ever hides it, and
+    // every other entry point (openBackground/openConsent/openComms/
+    // openTapOption) relies on it being visible without setting it itself.
+    this._showMediaSwapUI(true)
+    this._switchTabKey("library")
     this.libraryItemTargets.forEach(i => i.setAttribute("aria-selected", "false"))
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
     this._clearUploadError()
@@ -253,6 +272,15 @@ export default class extends Controller {
       t.setAttribute("aria-selected", t.dataset.tab === key ? "true" : "false")
     )
     this.paneTargets.forEach(p => { p.hidden = p.dataset.pane !== key })
+  }
+
+  // Hides the Upload/Verto Library tabs bar — irrelevant on open() for a
+  // range card, which has no photo/video/lottie slot for them to fill.
+  // openAnimBgImage() shows it again regardless of card type: picking a
+  // backdrop image reuses these same tabs/panes.
+  _showMediaSwapUI(show) {
+    const tabs = this.element.querySelector(".media-modal-tabs")
+    if (tabs) tabs.hidden = !show
   }
 
   // ── Upload tab ─────────────────────────────────────────
@@ -1447,6 +1475,7 @@ export default class extends Controller {
   openAnimBgImage(event) {
     event?.preventDefault()
     this._mode = "animBg"
+    this._showMediaSwapUI(true)
     this._switchTabKey("library")
     this._setMedia("photos")
     this._showMediaToggle(false)

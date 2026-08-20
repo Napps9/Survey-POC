@@ -1074,6 +1074,8 @@ ru:
     brand_library: "Ваша библиотека бренда"
     change_animation: "Сменить анимацию"
     change_animation_title: "Сменить анимацию этой карточки"
+    change_background: "Фон"
+    change_background_title: "Настройте цвет или изображение фона этой карточки"
     change_statement_image_title: "Сменить изображение этого утверждения"
     slider_axis_auto: "Использовать автоматический макет"
     slider_axis_horizontal: "Переключить на горизонтальный макет"

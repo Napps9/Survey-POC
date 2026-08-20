@@ -1082,6 +1082,8 @@ sn:
     brand_library: "Laibhurari Yako Yechiratidzo"
     change_animation: "Chinja Animeshoni"
     change_animation_title: "Chinja Animeshoni yeKadhi Iri"
+    change_background: "Bhekigirawundi"
+    change_background_title: "Gadzirira ruvara kana mufananidzo webhekigirawundi yekadhi iri"
     change_statement_image_title: "Chinja Mufananidzo weChirevo Ichi"
     slider_axis_auto: "Shandisa Rongedzero Inozviitira"
     slider_axis_horizontal: "Chinjira Kurongedzero Yakarara"

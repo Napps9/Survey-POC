@@ -1094,6 +1094,8 @@ xh:
     brand_library: "Ithala lakho lophawu"
     change_animation: "Tshintsha ushukumo"
     change_animation_title: "Tshintsha ushukumo lweli khadi"
+    change_background: "Umva"
+    change_background_title: "Lungelelanisa umbala okanye umfanekiso womva weli khadi"
     change_statement_image_title: "Tshintsha umfanekiso wale ngxelo"
     slider_axis_auto: "Sebenzisa ulwakhiwo oluzenzekelayo"
     slider_axis_horizontal: "Tshintshela kulwakhiwo olulele"

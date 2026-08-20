@@ -1072,6 +1072,8 @@ nl:
     brand_library: "Je merkbibliotheek"
     change_animation: "Animatie wijzigen"
     change_animation_title: "De animatie van deze kaart wijzigen"
+    change_background: "Achtergrond"
+    change_background_title: "Pas de achtergrondkleur of afbeelding van deze kaart aan"
     change_statement_image_title: "De afbeelding van deze stelling wijzigen"
     slider_axis_auto: "Automatische lay-out gebruiken"
     slider_axis_horizontal: "Overschakelen naar horizontale lay-out"

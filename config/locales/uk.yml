@@ -1074,6 +1074,8 @@ uk:
     brand_library: "Ваша бібліотека бренду"
     change_animation: "Змінити анімацію"
     change_animation_title: "Змінити анімацію цієї картки"
+    change_background: "Тло"
+    change_background_title: "Налаштуйте колір або зображення тла цієї картки"
     change_statement_image_title: "Змінити зображення цього твердження"
     slider_axis_auto: "Використати автоматичний макет"
     slider_axis_horizontal: "Перемкнути на горизонтальний макет"

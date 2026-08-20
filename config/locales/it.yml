@@ -1072,6 +1072,8 @@ it:
     brand_library: "La tua libreria del brand"
     change_animation: "Cambia animazione"
     change_animation_title: "Cambia l'animazione di questa scheda"
+    change_background: "Sfondo"
+    change_background_title: "Personalizza il colore o l'immagine di sfondo di questa scheda"
     change_statement_image_title: "Cambia l'immagine di questa affermazione"
     slider_axis_auto: "Usa layout automatico"
     slider_axis_horizontal: "Passa al layout orizzontale"

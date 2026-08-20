@@ -1072,6 +1072,8 @@ fr:
     brand_library: "Votre bibliothèque de marque"
     change_animation: "Changer d'animation"
     change_animation_title: "Changer l'animation de cette carte"
+    change_background: "Arrière-plan"
+    change_background_title: "Personnaliser la couleur ou l'image d'arrière-plan de cette carte"
     change_statement_image_title: "Changer l'image de cette affirmation"
     slider_axis_auto: "Utiliser la disposition automatique"
     slider_axis_horizontal: "Passer à la disposition horizontale"

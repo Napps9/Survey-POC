@@ -1074,6 +1074,8 @@ pl:
     brand_library: "Twoja biblioteka marki"
     change_animation: "Zmień animację"
     change_animation_title: "Zmień animację tej karty"
+    change_background: "Tło"
+    change_background_title: "Dostosuj kolor lub obraz tła tej karty"
     change_statement_image_title: "Zmień obraz tego stwierdzenia"
     slider_axis_auto: "Użyj automatycznego układu"
     slider_axis_horizontal: "Przełącz na układ poziomy"

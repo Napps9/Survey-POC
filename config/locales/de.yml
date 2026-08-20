@@ -1072,6 +1072,8 @@ de:
     brand_library: "Deine Markenbibliothek"
     change_animation: "Animation ändern"
     change_animation_title: "Animation dieser Karte ändern"
+    change_background: "Hintergrund"
+    change_background_title: "Hintergrundfarbe oder -bild dieser Karte anpassen"
     change_statement_image_title: "Bild dieser Aussage ändern"
     slider_axis_auto: "Automatisches Layout verwenden"
     slider_axis_horizontal: "Zu horizontalem Layout wechseln"

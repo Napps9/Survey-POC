@@ -1079,6 +1079,8 @@ af:
     brand_library: "Jou handelsmerkbiblioteek"
     change_animation: "Verander animasie"
     change_animation_title: "Verander hierdie kaart se animasie"
+    change_background: "Agtergrond"
+    change_background_title: "Pas hierdie kaart se agtergrondkleur of -prent aan"
     change_statement_image_title: "Verander hierdie stelling se prent"
     slider_axis_auto: "Gebruik outomatiese uitleg"
     slider_axis_horizontal: "Skakel na horisontale uitleg"

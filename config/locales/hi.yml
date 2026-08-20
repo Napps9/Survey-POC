@@ -1072,6 +1072,8 @@ hi:
     brand_library: "आपकी ब्रांड लाइब्रेरी"
     change_animation: "एनिमेशन बदलें"
     change_animation_title: "इस कार्ड का एनिमेशन बदलें"
+    change_background: "पृष्ठभूमि"
+    change_background_title: "इस कार्ड की पृष्ठभूमि का रंग या छवि अनुकूलित करें"
     change_statement_image_title: "इस कथन की छवि बदलें"
     slider_axis_auto: "स्वचालित लेआउट का उपयोग करें"
     slider_axis_horizontal: "क्षैतिज लेआउट पर स्विच करें"

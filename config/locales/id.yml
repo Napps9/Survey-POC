@@ -1072,6 +1072,8 @@ id:
     brand_library: "Pustaka merek Anda"
     change_animation: "Ubah animasi"
     change_animation_title: "Ubah animasi kartu ini"
+    change_background: "Latar belakang"
+    change_background_title: "Sesuaikan warna atau gambar latar belakang kartu ini"
     change_statement_image_title: "Ubah gambar pernyataan ini"
     slider_axis_auto: "Gunakan tata letak otomatis"
     slider_axis_horizontal: "Beralih ke tata letak horizontal"

@@ -1094,6 +1094,8 @@ en:
     brand_library: "Your brand library"
     change_animation: "Change animation"
     change_animation_title: "Change this card's animation"
+    change_background: "Background"
+    change_background_title: "Customise this card's background colour or image"
     change_statement_image_title: "Change this statement's image"
     slider_axis_auto: "Use automatic layout"
     slider_axis_horizontal: "Switch to horizontal layout"

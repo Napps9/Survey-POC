@@ -1072,6 +1072,8 @@ es:
     brand_library: "Tu biblioteca de marca"
     change_animation: "Cambiar animación"
     change_animation_title: "Cambiar la animación de esta tarjeta"
+    change_background: "Fondo"
+    change_background_title: "Personaliza el color o la imagen de fondo de esta tarjeta"
     change_statement_image_title: "Cambiar la imagen de esta afirmación"
     slider_axis_auto: "Usar diseño automático"
     slider_axis_horizontal: "Cambiar a diseño horizontal"

@@ -1072,6 +1072,8 @@ ja:
     brand_library: "ブランドライブラリ"
     change_animation: "アニメーションを変更"
     change_animation_title: "このカードのアニメーションを変更"
+    change_background: "背景"
+    change_background_title: "このカードの背景色または画像をカスタマイズ"
     change_statement_image_title: "この文の画像を変更"
     slider_axis_auto: "自動レイアウトを使う"
     slider_axis_horizontal: "横向きレイアウトに切り替え"

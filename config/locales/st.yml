@@ -1094,6 +1094,8 @@ st:
     brand_library: "Polokelo ya letshwao la hao"
     change_animation: "Fetola motsamao"
     change_animation_title: "Fetola motsamao wa karete ena"
+    change_background: "Bokamorao"
+    change_background_title: "Fetola mmala kapa setshwantsho sa bokamorao sa karete ena"
     change_statement_image_title: "Fetola setshwantsho sa polelo ena"
     slider_axis_auto: "Sebedisa mokgwa wa boitshebeletso"
     slider_axis_horizontal: "Fetohela mokgweng o robaletseng"
