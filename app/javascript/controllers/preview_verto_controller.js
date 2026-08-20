@@ -157,6 +157,14 @@ export default class extends Controller {
       this._stripEditorChrome(clone)
 
       const previewCard = previewCards[i]
+      // The card's TYPE has to ride along, because CSS asks about it: the
+      // player puts data-card-type on .preview-card and the editor on
+      // .survey-card-wrap, and every rule written against it — a scenario's
+      // centred story page, a grid's third column on a wide panel — matched
+      // both of those and missed this one, which is the surface whose whole
+      // promise is "what the respondent sees". Set on every rebuild, not only
+      // when the wrapper is created, so switching a card's type re-points it.
+      previewCard.dataset.cardType = editorCard.dataset.cardType || ""
       previewCard.innerHTML = ""
       previewCard.appendChild(clone)
     })

@@ -3182,6 +3182,31 @@
   text-align: left; outline: none;
 }
 .book-page-text[contenteditable]:empty::before { content: attr(data-placeholder); color: rgba(0,0,0,0.32); }
+/* A scenario's story sits in the middle of its page, both ways.
+   The leaf is a fixed rectangle and the story is usually two or three
+   sentences, so top-left alignment left the words huddled in one corner of a
+   large white card with the page number alone at the bottom — a page with its
+   type pushed into the gutter rather than set on it.
+   `safe` centre, not plain centre, for the reason this stylesheet has met twice
+   already: a centred flex line puts its overflow at BOTH ends, so a page whose
+   story runs long would push its first lines above scroll-top, where there is
+   no negative scroll position to reach them. `safe` reverts to top alignment
+   the moment the text outgrows the page, which is exactly when a reader wants
+   to start at the first line anyway.
+   Scoped by data-card-type, which the player puts on .preview-card and the
+   editor on .survey-card-wrap — so a creator writing the page sees the same
+   composition a respondent reads. NOT the consent gate, which shares this
+   markup and whose pages are an information sheet: centred prose is the wrong
+   setting for something written to be read carefully. NOT the final
+   .is-answer page either — that one holds the choice list, and lists are read
+   down a left edge. */
+[data-card-type="scenario"] .book-page:not(.is-answer) .book-page-scroll {
+  justify-content: safe center;
+}
+[data-card-type="scenario"] .book-page:not(.is-answer) .book-page-kicker,
+[data-card-type="scenario"] .book-page:not(.is-answer) .book-page-text {
+  text-align: center;
+}
 .book-page-corner {
   position: absolute; bottom: 10px; right: 14px;
   font-family: "Alata", sans-serif; font-size: 18px; color: rgba(0,0,0,0.09);
