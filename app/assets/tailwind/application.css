@@ -819,12 +819,20 @@
    (there is no negative scroll position), so it was simply cut off: "in
    designer, answer type gets cut off", with the first scale label sheared with
    it. Padding gives the overhang somewhere to live and the negative margin
-   gives the space back, so nothing else moves. */
+   gives the space back, so nothing else moves.
+   12px, not the 30 it was. The negative margin pulls the pane OUT past the
+   panel's own padding, and on a phone that padding is only 16px — so a 30px
+   reserve made the panel itself overflow sideways by 10-14px on every phone
+   measured, which .split-right then clipped. The track's end inset (see
+   .slider-track-wrap) now holds most of the thumb's overhang anyway: 36px of it
+   on a desktop card, 33 on a 390px phone, against a 26-28px thumb. 12 covers
+   what is left on the narrowest scales and matches the grid's reserve above,
+   which is the number already proven not to overflow. */
 .split-right > .mt-2:has(> .slider-wrap) {
-  padding-left: 30px;
-  padding-right: 30px;
-  margin-left: -30px;
-  margin-right: -30px;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
 }
 /* "There are more options below" — the desktop counterpart of the mobile
    .is-scrollable::after cue further down (search "is-scrollable .choice-list"
@@ -2574,7 +2582,11 @@
 }
 .contact-note {
   font-family: "ABeeZee", sans-serif;
-  font-size: var(--text-xs);
+  /* Stated, not --text-xs (11px): this is the line telling a respondent what
+     personal data the card collects, and it sits on the respondent's card, not
+     in the studio chrome the token is tuned for. Nothing they read goes under
+     12px. */
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.4);
   line-height: 1.5;
 }
@@ -2661,6 +2673,15 @@
   min-height: 430px; max-height: 560px;
   margin: 0 auto;
 }
+/* …but 430 is the EDITOR CANVAS's floor, and only its floor. It was safe as a
+   universal one only while the player's card was a flat 680px tall; now that
+   the card fits the room it is given, a 1280x800 laptop offers the stack about
+   370px and a rigid 430 hangs the response buttons off the bottom of the card
+   — the half of the widget you answer with. The player floors at 260 for the
+   reasons set out on the phone rule of the same name (the fan's pills stop
+   clearing each other below about 250), and it floors there at EVERY width,
+   because a short desktop window and a tall phone are the same problem. */
+.preview-overlay .rotate-card-stack { min-height: 260px; }
 .rotate-card {
   position: absolute; inset: 0;
   border-radius: 20px;
@@ -2760,8 +2781,14 @@
 .rotate-dot.done   { background: rgba(255,255,255,0.25); }
 .rotate-reset-row { display: flex; justify-content: center; }
 .rotate-reset-btn {
-  font-family: "ABeeZee", sans-serif; font-size: 11px;
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
   color: rgba(0,0,0,0.4); background: none; border: none; cursor: pointer;
+  /* Undoing your swipes is not how you answer the card, so this takes WCAG
+     2.5.8's 24px minimum rather than the 44 the answer buttons take — it was a
+     17px-tall strip of text, which is under both. Kept short on purpose: the
+     height it takes comes straight off the swipe card above it. */
+  min-height: 24px; padding: 0 10px;
+  display: inline-flex; align-items: center; justify-content: center;
 }
 .rotate-reset-btn:hover { color: var(--brand-primary, #01EACB); }
 
@@ -2910,7 +2937,12 @@
      an iPhone SE, and it is the arc's own geometry doing the arithmetic rather
      than a table of breakpoints. Six is the tighter scale vertically, so the
      six-point figure governs both. */
-  --tap-pill-h: clamp(34px, 12cqh, 56px);
+  /* The floor is 44, not 34: the pill IS the answer button, and 34px is under
+     the touch target every platform asks for. The arc can afford it — the
+     closest same-height pair is 36.94% of the card apart, which is 96px even on
+     the 260px card the player now floors at, so a 44px pill still clears its
+     neighbour by more than its own height. */
+  --tap-pill-h: clamp(44px, 12cqh, 56px);
   --tap-pill-pad: 5px 11px 5px 9px;
   --tap-pill-gap: 5px;
 }
@@ -2991,6 +3023,9 @@
    here — overriding padding directly would leave the width behind and put the
    pills back out of step. */
 .phone-bottom .rotate-actions--fan {
+  /* .phone-bottom is the small phone-mockup skin, not the player's own phone
+     tier (which is the @media block far below) — nothing a thumb touches, so
+     it keeps its scaled-down pill rather than the 44px touch floor. */
   --tap-pill-h: 36px;
   --tap-pill-pad: 4px 9px 4px 8px;
 }
@@ -3076,7 +3111,22 @@
 /* _card_component.html.erb wraps every type's slot in a plain .mt-2 div —
    it has to join the flex-column chain too, or .book-wrap's flex:1 below has
    nothing to grow against and the book collapses to its min-height. */
-.split-right--book .mt-2 { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+/* …and it is a scroller, like every other answer shape that can outgrow the
+   card. The book is fixed costs — a page-turn row, the dots and the padding —
+   around one flexible stack, so when the panel is shorter than the sum the
+   stack hits its floor and the rest goes past the card's edge into
+   overflow:hidden. That edge is where the page-turn row lives, which on a
+   scenario is the only way to the answer and on a consent gate is the only way
+   into the survey. Scrolling to a page-turn button is not lovely; it is what
+   the rest of the panel already does, and it is the difference between a hard
+   card and an impossible one. */
+.split-right--book .mt-2 {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.18) transparent;
+}
 .book-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; text-align: left; }
 .book-stack { position: relative; flex: 1; min-height: 140px; width: 100%; perspective: 1500px; }
 .book-page {
@@ -3121,8 +3171,10 @@
   opacity: 0; transition: opacity 0.2s ease;
 }
 .book-page.has-more .book-page-fade { opacity: 1; }
+/* 12px is the floor for anything a respondent reads, meta furniture included —
+   the number player_type_floor_test states and this was two under it. */
 .book-page-kicker {
-  font-family: "Alata", sans-serif; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
   color: rgba(0,0,0,0.32); margin-bottom: 10px; flex-shrink: 0;
 }
 .book-page-text {
@@ -3154,9 +3206,14 @@
 .book-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 .book-nav-row { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+/* 44px, not the 34 it was. On a book card — a scenario, or the consent gate
+   that stands in front of the whole Verto — this chevron is the ONLY way to
+   reach the answer: no page turn, no options, no Agree button, no survey. A
+   34px circle is under every touch-target guideline there is, and it is the
+   one control on those cards that a respondent cannot do without. */
 .book-chevron {
-  width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14);
-  background: white; color: rgba(0,0,0,0.55); font-size: 15px;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14);
+  background: white; color: rgba(0,0,0,0.55); font-size: 17px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.12s, opacity 0.12s, transform 0.12s; flex-shrink: 0;
 }
@@ -3231,7 +3288,7 @@
   position: absolute;
   right: 14px; bottom: 12px;
   font-family: "Alata", sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(0,0,0,0.5);
   background: rgba(0,0,0,0.04);
   border-radius: 12px;
@@ -3401,7 +3458,12 @@
   .card-flag-track, .card-flag-track::after { transition: none; }
 }
 .other-cta-btn {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  /* min-height, not more padding: "+ Other" is a way of ANSWERING the question,
+     so it takes the same 44px touch target as the options above it. It printed
+     33-38px tall across the phone tiers, which is under every platform's
+     minimum for something a thumb has to hit. */
+  min-height: 44px;
   padding: 8px 16px; border-radius: 100px;
   background: transparent; border: 1px dashed rgba(0,0,0,0.2);
   font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(0,0,0,0.55);
@@ -5191,10 +5253,35 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .mini-rating-star  { font-size: 14px; line-height: 1; }
 
 /* ── Rating component ────────────────────────────── */
-.rating-wrap   { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; }
-.rating-stars  { display: flex; gap: 8px; position: relative; }
+.rating-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px;
+  /* So the icons can size against the PANEL they are in rather than against
+     the viewport — same trick, and the same reason, as .choice-card's tile. */
+  container-type: inline-size; container-name: rating;
+}
+.rating-stars {
+  --rating-gap: 8px;
+  display: flex; gap: var(--rating-gap); position: relative;
+  justify-content: center; align-items: center;
+  width: 100%;
+}
+/* Five icons that always fit the panel, at any width.
+   They used to be five 40px glyphs in a row that was simply as wide as it was:
+   on a 280px Galaxy Fold that row is wider than the card, so the first and last
+   icons — "Poor" and "Outstanding", the two ends of the scale — were cut in
+   half by the panel edge and could not be tapped at all. A rating card where
+   two of the five ratings are unreachable is not a rating card.
+   The slot is now whatever is left after the gaps, divided five ways, capped at
+   the size the card was drawn for: 56px on a desktop panel, 44.8 on a Fold —
+   still over the 44px touch target, because the gap shrinks on the phone tier
+   before the slot does. The glyph inside follows the slot (cqw), so it can
+   never be wider than the box holding it. */
 .rating-star {
-  font-size: 40px;
+  flex: 0 1 calc((100% - 4 * var(--rating-gap)) / 5);
+  max-width: 56px;
+  aspect-ratio: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: min(40px, 12cqw);
   cursor: pointer;
   color: #D1D5DB;
   transition: color 0.1s, transform 0.12s;
@@ -5278,8 +5365,13 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .editor-feed .rating-mid-labels > .rating-label-mid {
   opacity: 1; text-align: center; min-width: 0;
 }
+/* A rating card's captions ARE its answer's words — "Poor" and "Outstanding"
+   are what the five icons mean — so they read at the same size as a range
+   card's stops, not at the 11px of a caption. They were the last answer text
+   under the stylesheet's own 12px floor, and on a phone they sat at 11 while
+   the list options beside them were 16. */
 .rating-label {
-  font-size: 11px; color: rgba(0,0,0,0.4);
+  font-size: 13px; color: rgba(0,0,0,0.5);
   font-family: "ABeeZee", sans-serif;
   outline: none;
 }
@@ -5590,6 +5682,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .preview-overlay .freeform-textarea,
 .preview-overlay .contact-field,
 .preview-overlay .location-search-field { font-size: var(--play-input-fs); }
+
 .preview-nav {
   height: 54px; flex-shrink: 0;
   background: var(--brand-bg, rgba(28,32,52,0.9)); backdrop-filter: blur(10px);
@@ -5625,6 +5718,38 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-card { display: none; width: 845px; max-width: 100%; }
 .preview-card.active { display: block; }
+
+/* The card fits the room it is given, on every screen — the single rule the
+   desktop layout never had.
+   .split-card is a flat 680px tall and .preview-body is whatever is left
+   between the header and the footer, with `align-items: center` and
+   `overflow: hidden`. Below about 860px of viewport those two disagree and the
+   card is cut at BOTH ends: on a 1280x800 laptop the body is 622px, so 15px
+   comes off the top of the card — the question — and 43px off the bottom,
+   which on a scenario or consent card is the entire page-turn row. Nothing
+   scrolls to reach either: the clipping is outside the card, above the answer
+   box's own scroller. A respondent on a 1366x768 laptop cannot read the top of
+   the question and cannot page a consent gate to the Agree button, which is
+   the whole survey.
+   1280x800 and 1366x768 are the two commonest laptops there are. The mobile
+   layout has had the cure since it was written — see the matching rule in the
+   phone block, and the note about flex "shrinking the 680 basis to fit" — and
+   it is the same three lines here: bound the wrapper to the space available
+   and let .split-card shrink into it. Its overflow:hidden zeroes its automatic
+   minimum, so it can; .split-right's answer box already scrolls what no longer
+   fits; the question stays pinned where it always was.
+   Scoped to the player/preview overlay on purpose — .preview-card is also the
+   create wizard's panel, and that one is a form, not a card. */
+.preview-overlay .preview-card.active {
+  display: flex;
+  flex-direction: column;
+  /* `safe`, for the same reason .split-right uses it: a centred flex line puts
+     its overflow at BOTH ends, so a card taller than the wrapper would lose the
+     top of the question rather than the bottom of the answer. `safe` aligns to
+     the start the moment it overflows, which is where the scroll path is. */
+  justify-content: safe center;
+  max-height: 100%;
+}
 
 /* Card-to-card motion.
  *
@@ -5863,6 +5988,9 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   font-family: "Alata", sans-serif; font-size: 15px; letter-spacing: 0.04em;
 }
 .play-consent-decline {
+  /* 41px tall was three pixels under the touch floor, on the one control that
+     says no to taking part at all — the last button that should be fiddly. */
+  min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
   padding: 11px 22px; border-radius: 100px; cursor: pointer;
   background: transparent; color: rgba(28,32,52,0.75);
   border: 1px solid rgba(28,32,52,0.4);
@@ -6567,8 +6695,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   input[type="number"] { font-size: 16px; }
   .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
   .pick-item { padding: 12px 14px; }
-  .rating-star { font-size: 36px; padding: 4px; }
-  .rating-stars { gap: 6px; }
+  /* Tighter gaps so the five slots stay above the 44px touch target on the
+     narrowest phone — the gap is the thing that gives way, not the target. */
+  .rating-star { font-size: min(36px, 12cqw); padding: 0; }
+  .rating-stars { --rating-gap: 6px; }
   .slider-track { width: 100%; height: 44px; }
   .slider-thumb { width: 52px; height: 52px; }
 
@@ -6679,12 +6809,27 @@ body.generating-overlay-active .bottom-bar { display: none; }
      compare-results promise) is accounted for. Pinning 100dvh here made the
      card taller than its container: it overflowed and the next card bled
      through — the torn / double-image look on mobile. */
+  /* The book's desktop padding is 36px over 22 — 58px of a panel that, on a
+     phone held sideways, has about 240 in total. It takes the same fluid
+     padding as every other card here. */
+  .preview-overlay .split-right--book {
+    padding: var(--play-pad-y) var(--play-pad-x) var(--play-pad-y);
+  }
+
   .preview-overlay .preview-card.active {
     display: flex;
     flex-direction: column;
     min-height: 100%;
     width: 100%;
     max-width: 100%;
+    /* The desktop rule bounds the card to the body's height because the body
+       clips; this one is the opposite case — the body SCROLLS here, so the
+       card is free to be taller than the viewport and a ceiling would only
+       squeeze the answer for no reason. Which also means it must start at the
+       TOP: a card taller than the screen, centred, hangs its question above the
+       first line a respondent can scroll to. */
+    max-height: none;
+    justify-content: flex-start;
   }
 
   /* Player split-card: white background by default. When the Verto's
@@ -7002,7 +7147,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card .split-right {
     width: 100%;
     flex: 1 1 auto;
-    min-height: var(--play-right-min);
+    /* Bounded by the card, not just by the token. --play-right-min is the
+       panel's CLAIM on the card — the answer widget outranking the hero — and
+       it was being asserted even when the card was smaller than the claim: on a
+       phone held sideways the card comes out 236px tall and the panel insisted
+       on 300, so 53px of it hung past the card's edge and was cut off. Nothing
+       could reach it. The card is overflow:hidden, so the overflow never
+       reaches .preview-body's scrollHeight either, and the body doesn't scroll
+       to it; on a scenario or consent card that 53px is the page-turn row,
+       which is the only way to the answer and, on the consent gate, the only
+       way into the survey at all.
+       Clamping the claim to the card keeps the panel inside it, which puts the
+       pressure back where the ladder can see it: the answer box overflows, so
+       _fitCard sheds the artwork for it, and whatever is still too tall scrolls
+       INSIDE the answer box — the behaviour player_shed_order_test pins, and
+       the one a respondent wants (options on screen, pictures gone) rather than
+       a taller card to scroll past. */
+    min-height: min(var(--play-right-min), 100%);
     /* No safe-area inset here any more. This panel is not the bottom-most
        element — the footer below it is, and that is where the inset moved to.
        Padding for a bezel two boxes away cost ~34px of card interior while
@@ -7162,7 +7323,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border: 1px solid rgba(0,0,0,0.08);
     color: #1C2034;
     border-radius: 14px;
-    min-height: 140px;
+    /* The floor follows the screen, like the cap below it already did. A flat
+       140 is more than the whole answer area on a phone held sideways (the
+       panel offers about 106px there), so a third of the field — and the
+       character counter under it — sat outside the panel with only a scroll to
+       reach them. Typing does not need 140px of box; seeing what you typed
+       does, and 26svh is that on any screen: 101px sideways, the full 140 on
+       an ordinary phone. Stated in svh rather than as a percentage because the
+       box it sits in has no definite height for a percentage to resolve
+       against — that failure is silent, `min()` simply behaving as the flat
+       value. */
+    min-height: min(140px, 26svh);
     /* svh, not vh — vh is the toolbar-hidden height on mobile Safari, so this
        cap was ~15% larger than the room actually on screen and let the box
        grow under the footer. */
@@ -7480,6 +7651,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* The condensed rung's readout is the answer in words — the same reading
      surface as the labels it stands in for, so it takes the same size. */
   .preview-overlay .slider-readout { font-size: var(--play-label); }
+  /* A rating's captions are the same kind of thing as a scale's stops: the
+     words that say what the answer means. They were the one answer label the
+     phone tier never picked up, so they stayed at 11px beside 16px options. */
+  .preview-overlay .rating-label { font-size: var(--play-label); }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
