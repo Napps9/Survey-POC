@@ -200,11 +200,16 @@ class ShowcaseVertoSeeder
   # this list after responses exist re-points every stored answer. Append, or
   # rebuild with FORCE=1 and accept losing the simulated ones.
   #
-  # Card count is deliberate: 19 cards, of which a respondent plays 16 (three
-  # spine cards, one three-card lane, then ten shared cards including the
-  # demographic tail). Sixteen is the top of the Rules of the Game green band
+  # Card count is deliberate: 18 cards, of which a respondent plays 15 (three
+  # spine cards, one three-card lane, then nine shared cards including the
+  # demographic tail). That sits inside the Rules of the Game green band (12-16)
   # for the longest path a respondent can take — the showcase has to be able
   # to hold up its own scoreboard.
+  #
+  # It ended on a contact card until that type was retired (CardTypes.retired?).
+  # Dropping it here rather than leaving it in is the point of a showcase deck:
+  # it exists to play every answer type the platform HAS, and the player skips
+  # a retired card, so keeping one would seed a card nobody would ever see.
   def cards
     DemographicQuestions.append_to([
       welcome_card, consent_card, router_card,
@@ -212,9 +217,14 @@ class ShowcaseVertoSeeder
       grid_one_card, rating_card, tap_card,
       # Lane B — people who watch.
       grid_many_card, nps_card, scenario_card,
-      # Rejoin: everyone plays the rest.
-      range_card, prioritise_card, yes_no_card, select_many_card,
-      open_ended_card, checkpoint_card, contact_card
+      # Rejoin: everyone plays the rest. open_ended sits BEFORE select_many
+      # rather than last, because the demographic tail append_to adds below
+      # opens with two open_ended cards (birth year, location) — ending the
+      # spine on a third would break the no-more-than-two-in-a-row rule that
+      # showcase_verto_seeder_test §1.4 enforces. The retired contact card used
+      # to sit in that gap and hide the adjacency.
+      range_card, prioritise_card, yes_no_card,
+      open_ended_card, select_many_card, checkpoint_card
     ]).then { |list| image_demographic_tail(list) }
   end
 
@@ -458,16 +468,6 @@ class ShowcaseVertoSeeder
     { "cid" => "c_checkpoint", "type" => "token_checkpoint",
       "text" => "Nice one — here's what you've collected so far.",
       "image" => asset("select-art", "select-icon-8.jpg") }
-  end
-
-  # The one card type that collects identifying data, and the card says so —
-  # here it also proves the point that a showcase can end on a lead capture
-  # without any of it being required.
-  def contact_card
-    { "cid" => "c_contact", "type" => "contact_form",
-      "text" => "Want to see what your answers built?",
-      "description" => "Every field is optional.",
-      "image" => asset("select-art", "select-icon-7.jpg") }
   end
 
   # ── simulated respondents ────────────────────────────────────────────────
