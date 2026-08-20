@@ -270,8 +270,6 @@ sn:
     leaderboard_teaser: "Vaunganidzi vemapoinzi vepamusoro vanopinda pabhodhi remhedzisiro pakupera!"
     play_again: "Tamba Zvakare"
     font_size: "Hukuru hweRunyoro"
-    lite_mode: "Muitiro Unochengetedza Dhata"
-    lite_mode_short: "Rutete"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Positional; keep every array's length exact.
   defaults:

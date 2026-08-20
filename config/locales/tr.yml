@@ -268,8 +268,6 @@ tr:
     leaderboard_teaser: "En çok puan toplayanlar sonunda liderlik tablosuna girer!"
     play_again: "Tekrar oyna"
     font_size: "Yazı boyutu"
-    lite_mode: "Veri tasarrufu modu"
-    lite_mode_short: "Lite"
   defaults:
     range: ["Kesinlikle katılmıyorum", "Katılmıyorum", "Kararsızım", "Katılıyorum", "Kesinlikle katılıyorum"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

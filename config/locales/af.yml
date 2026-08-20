@@ -269,8 +269,6 @@ af:
     leaderboard_teaser: "Die beste puntinsamelaars maak die ranglys aan die einde!"
     play_again: "Speel weer"
     font_size: "Teksgrootte"
-    lite_mode: "Data-besparingsmodus"
-    lite_mode_short: "Lig"
   defaults:
     range: ["Stem heeltemal nie saam nie", "Stem nie saam nie", "Neutraal", "Stem saam", "Stem heeltemal saam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]

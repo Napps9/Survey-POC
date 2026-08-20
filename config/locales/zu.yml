@@ -276,8 +276,6 @@ zu:
     leaderboard_teaser: "Abaqoqi bamaphoyinti abaphambili bafinyelela ebhodini labaholayo ekugcineni!"
     play_again: "Dlala futhi"
     font_size: "Usayizi wombhalo"
-    lite_mode: "Imodi yokongela idatha"
-    lite_mode_short: "Elula"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are

@@ -25,9 +25,14 @@ const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card" ]
 const FONT_SCALE_KEY    = "verto_font_scale"
 const FONT_SCALE_STEPS  = [ "default", "large", "larger" ]
 
-// Respondent-local data-saving preference, same shape and reasoning as the
-// font-size key above — one browser-wide toggle, not a per-Verto setting.
-const LITE_MODE_KEY = "verto_lite_mode"
+// Retired. "Lite" was a respondent-local data-saving toggle that hid the hero
+// image, the option artwork, autoplaying video and looping Lottie. Because the
+// preference was browser-wide rather than per-Verto, one tap stripped the
+// imagery from every Verto that browser would ever play, and the pill said only
+// "Lite" — so it read as the platform losing its images, and was reported as
+// exactly that (20 Aug). The toggle is gone; this key is cleared on load so a
+// respondent still carrying it isn't left wondering where the pictures went.
+const RETIRED_LITE_MODE_KEY = "verto_lite_mode"
 
 // The hidden Test Mode hatch (player/_test_mode_hatch). Two deliberate acts,
 // both timed: hold the unlabelled hotspot this long to arm the confirm chip,
@@ -50,7 +55,7 @@ export default class extends Controller {
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentMain", "consentDeclined", "respondentCode",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
-                    "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn", "liteModeBtn",
+                    "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "testConfirm"]
   static values  = {
     progressUrl: { type: String, default: "" },
@@ -183,7 +188,7 @@ export default class extends Controller {
     // Before the first render, so the very first card already paints at the
     // remembered size instead of flashing default-size and then jumping.
     this._applyFontScale(this._loadFontScale())
-    this._applyLiteMode(this._loadLiteMode())
+    this._clearRetiredLiteMode()
     this._update()
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
@@ -387,13 +392,6 @@ export default class extends Controller {
     grid?.classList.add("art-off")
     let owed = over()
 
-    // Lite mode never buys artwork back, even where there'd be room — the
-    // point is skipping the image weight itself, not just the animation.
-    if (this.element.classList.contains("lite-mode")) {
-      box.classList.toggle("is-scrollable", over() > 1)
-      return
-    }
-
     // Rung 1 — the option artwork. It can come out CHEAPER than the floor as
     // well as dearer: dropping tiles turns the grid into full-width rows, and
     // on a narrow phone that is taller than the two-column grid it replaced.
@@ -465,39 +463,15 @@ export default class extends Controller {
     this._fitFooter()
   }
 
-  // ── Data-saving ("Lite") toggle ──────────────────────────────────────────
-  // A respondent bandwidth preference, not a creator setting — remembered
-  // the same way as the font-size pill. Adds .lite-mode on the overlay root:
-  // application.css extends every .forms-mode motion rule to also match it,
-  // and _fitCard/_animateCardEntry below gate on it directly for the parts
-  // CSS alone can't reach (which image rungs get bought back, whether a
-  // card-entry animation plays). autoplay_video_controller.js and
-  // lottie_player_controller.js check for the class themselves at the point
-  // they'd otherwise start fetching or playing something.
-  _loadLiteMode() {
-    try { return localStorage.getItem(LITE_MODE_KEY) === "1" } catch (_e) { return false }
-  }
-
-  // Mid-toggle, the card already on screen keeps whatever it already
-  // mounted (a playing video isn't yanked out from under a respondent
-  // mid-question) — the new state takes effect from the next card entry
-  // onward, same as everywhere else a preference changes what a card holds.
-  toggleLite() {
-    const on = !this.element.classList.contains("lite-mode")
-    this._applyLiteMode(on)
-    try { localStorage.setItem(LITE_MODE_KEY, on ? "1" : "0") } catch (_e) { /* private mode */ }
-  }
-
-  _applyLiteMode(on) {
-    this.element.classList.toggle("lite-mode", on)
-    if (this.hasLiteModeBtnTarget) {
-      this.liteModeBtnTarget.classList.toggle("is-active", on)
-      this.liteModeBtnTarget.setAttribute("aria-pressed", on ? "true" : "false")
-    }
-    // A mode change can change what the current card holds (its art rungs),
-    // same as a font-scale change — both fit passes have to re-run.
-    this._fitCard()
-    this._fitFooter()
+  // ── Retired "Lite" preference ────────────────────────────────────────────
+  // Nothing reads this key any more, but a respondent who tapped the old pill
+  // is still carrying it. Dropping it costs one localStorage write on the
+  // first visit after this ships and means the flag can never be revived by
+  // accident — the alternative, leaving it, keeps a value in the field whose
+  // meaning has changed underneath it. Silent by design: a respondent who
+  // never noticed the toggle should not now be told about it.
+  _clearRetiredLiteMode() {
+    try { localStorage.removeItem(RETIRED_LITE_MODE_KEY) } catch (_e) { /* private mode */ }
   }
 
   // ── Test Mode hatch ──────────────────────────────────────────────────────
@@ -2244,7 +2218,6 @@ export default class extends Controller {
     if (changed && !first) this._focusCard(card)
     if (!card || !changed) return
     if (this.formsValue) return           // form mode strips game-like motion
-    if (this.element.classList.contains("lite-mode")) return
     if (this._reducedMotion) return
 
     card.classList.remove("is-entering", "is-entering-back", "is-entering--from-book")

@@ -278,8 +278,6 @@ tn:
     leaderboard_teaser: "Bakgobokantshi ba dintlha tse dintsi ba tsena mo lenaaneng la baetapele kwa bokhutlong!"
     play_again: "Tshameka gape"
     font_size: "Bogolo jwa mokwalo"
-    lite_mode: "Mokgwa wa go boloka data"
-    lite_mode_short: "Bonnye"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are

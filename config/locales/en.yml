@@ -278,8 +278,6 @@ en:
     leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
     play_again: "Play again"
     font_size: "Text size"
-    lite_mode: "Data-saving mode"
-    lite_mode_short: "Lite"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
