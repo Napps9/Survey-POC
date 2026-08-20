@@ -671,9 +671,9 @@
    i/(N-1): a ~14px error at the bottom of an 11-point scale, and the reason the
    tube looked like it stopped short of 0 and 10. */
 /* Compound selector on purpose: the generic `.slider-labels` rule further down
-   the file sets `padding: 0 4px` and `margin-top: 6px`, and at equal
-   specificity the later rule wins — which silently zeroed the insets below and
-   pushed the whole column 6px down, putting "0" 38px under the vessel floor.
+   the file sets `margin-top: 6px` (and once set the side padding this column's
+   own insets need), and at equal specificity the later rule wins — which
+   pushed the whole column 6px down and put "0" 38px under the vessel floor.
    Matching both classes outranks it wherever it sits. */
 .slider-labels.nps-slider-labels {
   display: flex;
@@ -756,7 +756,19 @@
 .split-right > .mt-2:has(> .nps-slider),
 .split-right > .mt-2:has(> .rating-wrap),
 .split-right > .mt-2:has(> .freeform-wrap) {
-  flex: 1 1 auto;
+  /* Shrink-to-fit, then shrink further if that's all there is. NOT `1 1 auto`:
+     growing to fill split them apart. The question is pinned at the top of the
+     panel (above) and the answer box took every pixel that was left, then
+     centred the widget inside it — so on the two cards that ask for the least
+     room, a range scale and a rating, the question sat at the top, the answer
+     floated in the middle, and 300px of white ran between them with nothing in
+     it. They are one thing: a question and the way you answer it. With no
+     growth the box is exactly as tall as the answer, and .split-right's own
+     `safe center` centres the PAIR — which is the composition the card was
+     drawn as, and the same rule it already applied to the two of them
+     separately. Shrink is untouched, so a long list still gives up height to
+     the scroller and nothing about the overflow path changes. */
+  flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -783,7 +795,9 @@
 }
 /* The swipe card is the exception: it does not centre inside the scroller, it
    GROWS to fill it (see .rotate-card-stack), so auto margins would fight the
-   flex growth for the space. */
+   flex growth for the space — and its box keeps the growth the others gave up,
+   because a stack of cards with nothing to fill is a stack with no height. */
+.split-right > .mt-2:has(> .rotate-wrap) { flex-grow: 1; }
 .split-right > .mt-2:has(> .rotate-wrap) > .rotate-wrap {
   flex: 1 1 auto;
   min-height: 0;
@@ -1961,7 +1975,25 @@
 
 /* ── Slider ─────────────────────────────────────── */
 .slider-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
-.slider-track-wrap { position: relative; padding: 8px 0; }
+/* The track is inset by HALF A LABEL COLUMN at each end, and that inset is the
+   whole reason the scale lines up.
+   A stop's dot sits at i/(n-1) along the track; its label sits in one of n
+   equal columns, centred at (i+0.5)/n of the row. Those two only ever agreed in
+   the middle: on a 359px desktop track the outer labels printed 39px INSIDE
+   their own dot and the second and fourth 20px off theirs — "the labels don't
+   line up with the scale". Solving the pair for a full-width label row gives
+   exactly one answer: inset the track by row/2n and the columns land on the
+   dots, every one of them, at any stop count and any width.
+   The alternative — a full-bleed track with half-width columns at the ends —
+   aligns just as well and costs the end labels half their room, which is the
+   two labels that are always there, on the rung that is always shown. This
+   spends ~10% of the track's length instead, and buys the thumb's 28px
+   overhang somewhere to sit while it's at it.
+   --slider-steps is set on .slider-wrap by both renderers (see
+   _card_component.html.erb and sliderHtml in type_panel_controller.js); the
+   fallback is the default five-point scale. Percentage padding resolves against
+   the wrap's width on every side, which is what makes this one line work. */
+.slider-track-wrap { position: relative; padding: 8px calc(50% / var(--slider-steps, 5)); }
 .slider-track {
   height: 48px;
   background: linear-gradient(90deg, #d0e8ff 0%, #01EACB 43%, #ffd88a 100%);
@@ -1999,11 +2031,17 @@
 }
 /* Grip lines sit on the brand-coloured thumb, so they read in white. */
 .s-line { width: 2px; height: 11px; background: rgba(255,255,255,0.8); border-radius: 1px; }
-.slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
+/* The row spans the track exactly — no padding of its own — because the two
+   have to share one geometry: see the column widths below. */
+.slider-labels { display: flex; margin-top: 6px; }
 .slider-label-text {
   font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75);
-  /* Equal shares of the track, so every stop's label sits under its own dot
-     and one long one can't take width off its neighbours. */
+  /* Equal shares of the ROW — ends included — so one long label can't take
+     width off its neighbours. Equal shares of the TRACK is what this used to
+     claim to be, and the two are not the same thing: it's the track's inset
+     (see .slider-track-wrap) that lands these columns on the dots. The ends are
+     centred like every other stop for the same reason; they used to align their
+     text outward to fake an alignment they didn't have. */
   flex: 1 1 0; min-width: 0;
   text-align: center; outline: none;
   /* A capped label still wraps inside its column, and on a narrow phone a wide
@@ -2013,18 +2051,48 @@
      but never lets the label spill over its neighbour. */
   overflow-wrap: break-word; hyphens: auto; line-height: 1.2;
 }
-.slider-label-text:first-child { text-align: left; }
-.slider-label-text:last-child { text-align: right; }
+/* Rung 2 of the scale's fit ladder (slider_controller#_fitLabels): the middle
+   stops come out and the two ends take the whole row, with the chosen stop
+   named in full above the track (.slider-readout). Not `visibility: hidden` —
+   the row's height has to come off the labels that are actually shown — and
+   not removal either: the labels stay in the DOM, so the accessible value
+   (aria-valuetext) and label#jump keep reading the same nodes.
+   The row takes the track's own inset here so the two survivors still start
+   and end on their dots; with room to spare they read outward from them. */
+.slider-labels.is-condensed { padding: 0 calc(50% / var(--slider-steps, 5)); }
+.slider-labels.is-condensed > .slider-label-text { display: none; }
+.slider-labels.is-condensed > .slider-label-text:first-child,
+.slider-labels.is-condensed > .slider-label-text:last-child {
+  display: block;
+  flex-grow: 1;
+}
+.slider-labels.is-condensed > .slider-label-text:first-child { text-align: left; }
+.slider-labels.is-condensed > .slider-label-text:last-child  { text-align: right; }
+/* The chosen stop, stated in words above the track. Only ever shown on rung 2,
+   where the labels alone no longer say what the thumb is pointing at. The
+   reserved height is what stops the card jogging as the words change under a
+   dragging thumb. */
+.slider-readout {
+  font-size: 15px; font-weight: 700; line-height: 1.25;
+  text-align: center;
+  min-height: 1.25em;
+  color: var(--brand-primary, var(--color-green-500));
+}
 /* Five labels used to be staggered onto two rows — a 4-track grid with labels
    1/3/5 up and 2/4 down — because at the player's 16px a flex item refuses to
    shrink below its longest word and the row printed as one unbroken string.
    The stagger bought width, and paid for it in a scale that read as two
    separate rows of words rather than one run of stops.
-   The cap is the better lever: bounded at 17 characters (SCALE_LABEL_MAX), a
-   label wraps to at most two lines inside its own column, so the five sit in
-   ONE row, each centred under its own dot. The type does NOT shrink to help —
-   see the note on .preview-overlay .slider-label-text for why, and for what
-   that costs on the narrowest phones. */
+   The 17-character cap (SCALE_LABEL_MAX) was the answer to that, and it is a
+   guess made where the width isn't known: it is applied as the creator types,
+   in a panel that is not the phone, and 13 of the 19 locales ship a preset
+   agreement label longer than it anyway. It still earns its place as advice —
+   short scale words are better scale words — but what a stop's label actually
+   costs is now measured where it is spent, against the column it landed in
+   (slider_controller#_fitLabels), and a scale that cannot print five columns
+   drops to its two ends rather than breaking words to keep them.
+   The type still does NOT shrink to help — see the note on
+   .preview-overlay .slider-label-text. */
 /* The chosen step's label answers the thumb (same convention as the NPS
    is-active label). Scoped under .slider-labels so the NPS column, which
    shares the span class, keeps its own treatment. */
@@ -2060,11 +2128,18 @@
   align-items: stretch;
   justify-content: center;
   gap: 16px;
-  height: 320px;
+  height: var(--slider-v-height, 320px);
 }
+/* The column has the horizontal row's alignment problem and takes the
+   horizontal row's fix: inset the track by half a label band so the n equal
+   bands beside it are centred on the n dots, rather than at (i+0.5)/n where the
+   ends miss theirs by half a band. Stated in px off the wrap's own height
+   because a percentage padding resolves against WIDTH on every side, which is
+   exactly what a column can't use. */
 .slider-wrap[data-slider-axis-value="vertical"] .slider-track-wrap {
-  padding: 0 8px;
+  padding: calc(var(--slider-v-height, 320px) / (2 * var(--slider-steps, 5))) 8px;
   height: 100%;
+  box-sizing: border-box;
 }
 .slider-wrap[data-slider-axis-value="vertical"] .slider-track {
   width: 48px;
@@ -2094,6 +2169,14 @@
   align-items: center;
   text-align: left;
 }
+/* Half-height end bands were the other way to align this column, and they cost
+   more than they're worth: a band with its words pushed to one end is a band
+   that is half empty, and in the editor those labels are contenteditable — a
+   click in the empty half lands ABOVE the only line of text, which puts the
+   caret at offset 0, where backspace deletes nothing. A creator clicking a
+   label to shorten it and getting no response is a worse bug than the 30px it
+   fixed. Equal bands over an inset track give the same alignment with no dead
+   half to click into. */
 
 /* ── Pick list (single + multi) ─────────────────── */
 .pick-list {
@@ -7394,6 +7477,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
      for it is the cap instead — 17 characters is room for a short scale word,
      not a long one. */
   .preview-overlay .slider-label-text { font-size: var(--play-label); }
+  /* The condensed rung's readout is the answer in words — the same reading
+     surface as the labels it stands in for, so it takes the same size. */
+  .preview-overlay .slider-readout { font-size: var(--play-label); }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
@@ -8655,6 +8741,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .preview-overlay[data-font-scale="larger"] .freeform-textarea{ font-size: 19px; }
 .preview-overlay[data-font-scale="large"] .contact-field     { font-size: 16px; }
 .preview-overlay[data-font-scale="larger"] .contact-field    { font-size: 18px; }
+/* A range scale's stop words are that card's answer options — the .pick-text of
+   a slider — and they were the one reading surface the text-size pill didn't
+   reach, so the respondent who needed the setting got it everywhere except the
+   card they had to aim at. They are here now because it is finally affordable:
+   bigger words in a fixed column used to mean words broken down the middle,
+   and slider_controller#_fitLabels now answers that by dropping the scale to
+   its ends rather than by leaving the type where it was.
+   NPS is excluded on the same grounds it keeps 13px everywhere else: its
+   labels are the digits 0-10 in a fixed-height column, where 11 of them at 19px
+   would collide rather than read. */
+.preview-overlay[data-font-scale="large"]  .slider-labels:not(.nps-slider-labels) .slider-label-text { font-size: 17px; }
+.preview-overlay[data-font-scale="larger"] .slider-labels:not(.nps-slider-labels) .slider-label-text { font-size: 19px; }
+.preview-overlay[data-font-scale="large"]  .slider-readout  { font-size: 17px; }
+.preview-overlay[data-font-scale="larger"] .slider-readout  { font-size: 19px; }
 
 /* Floating Close for the editor's inline Preview overlay (no nav bar). */
 .preview-close-float {

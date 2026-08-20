@@ -664,7 +664,8 @@ function sliderHtml(opts, ctx = {}) {
   const nextAxis = { auto: "horizontal", horizontal: "vertical", vertical: "auto" }[storedAxis] || "horizontal"
   const axisToggleTitle = esc(t(`editor.slider_axis_${nextAxis}`, { default: "Change layout" }))
   return `
-    <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}" data-slider-axis-value="${axis}">
+    <div class="slider-wrap" style="--slider-steps: ${n};" data-controller="slider" data-slider-steps-value="${n}" data-slider-axis-value="${axis}">
+      <div class="slider-readout" data-slider-target="readout" aria-hidden="true" hidden></div>
       <div class="slider-track-wrap">
         <div class="slider-track" data-slider-target="track"
              data-action="pointerdown->slider#start">
@@ -674,7 +675,7 @@ function sliderHtml(opts, ctx = {}) {
           </div>
         </div>
       </div>
-      <div class="slider-labels">
+      <div class="slider-labels" data-slider-target="labels">
         ${labels.map(o => `<span class="slider-label-text" contenteditable="true">${esc(o)}</span>`).join("")}
       </div>
       <button type="button" class="slider-axis-toggle" data-action="click->type-panel#setSliderAxis" title="${axisToggleTitle}">

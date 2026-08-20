@@ -593,7 +593,13 @@
           pattern (P2-4). Without it the range card is drag-only: pointerdown
           is the sole way to answer. Editor excluded — the labels underneath
           are contenteditable there. %>
+      <%# --slider-steps is the scale's geometry, not decoration: the track's
+          end inset and the label row's columns are both derived from it, so
+          the labels land on the dots (see .slider-track-wrap). Emitted in the
+          markup rather than set by the controller so it is right on the first
+          paint, and stays right if the JS never arrives. %>
       <div class="slider-wrap"
+           style="--slider-steps: <%= n %>;"
            data-controller="slider"
            data-slider-steps-value="<%= n %>"
            data-slider-axis-value="<%= axis %>"
@@ -602,6 +608,13 @@
                  "aria-valuemin": 0, "aria-valuemax": n - 1,
                  "aria-orientation": axis) %>
            data-action="<%= (editable ? "" : "keydown->slider#key").html_safe %>">
+        <%# The chosen stop in words, shown only when the labels underneath have
+            had to give up their middle (slider_controller#_fitLabels). Hidden
+            in the markup so a card that never condenses never reserves the
+            row; aria-hidden because the wrap already announces the same value
+            as aria-valuetext. Deliberately NOT a .slider-label-text — the
+            editor rebuilds a range card's options from those nodes. %>
+        <div class="slider-readout" data-slider-target="readout" aria-hidden="true" hidden></div>
         <div class="slider-track-wrap">
           <div class="slider-track"
                data-slider-target="track"
@@ -617,7 +630,7 @@
             </div>
           </div>
         </div>
-        <div class="slider-labels">
+        <div class="slider-labels" data-slider-target="labels">
           <%# Players can tap a label to jump to that step; editor labels are
               contenteditable, so they never carry the action. %>
           <% labels.each do |opt| %>
