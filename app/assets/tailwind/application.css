@@ -504,32 +504,24 @@
    tap_stack_controller.js; here we remove the ambient motion and swipe
    affordances. Functional control feedback (sliders, pickers) is left intact.
 
-   .lite-mode (a respondent's own toggle, not the creator's — see
-   player_controller.js#toggleLite) shares every rule below: reduced motion
-   is reduced motion whichever side chose it, and lite additionally skips
-   media weight (hero/option art, autoplaying video, decorative Lottie
-   loops) that forms mode has no opinion on — see _fitCard and
-   autoplay_video_controller.js/lottie_player_controller.js. */
-.forms-mode .gen-orb,
-.lite-mode .gen-orb { animation: none; }
-.forms-mode .nps-liquid,
-.lite-mode .nps-liquid { transition: none; }
+   A respondent-side "Lite" toggle used to share every rule below and also hid
+   the hero image, the option artwork, autoplaying video and looping Lottie.
+   It was removed on 20 Aug: the preference was browser-wide, so one tap
+   stripped the imagery from every Verto that browser played, and a pill
+   labelled only "Lite" gave no way to connect the two. A respondent who wants
+   less motion gets it from the OS (prefers-reduced-motion, handled by
+   player_controller.js#_reducedMotion); a creator who wants a calmer Verto has
+   forms mode. */
+.forms-mode .gen-orb { animation: none; }
+.forms-mode .nps-liquid { transition: none; }
 .forms-mode .nps-wave,
 .forms-mode .nps-wave2,
 .forms-mode .nps-surface,
-.forms-mode .nps-bub,
-.lite-mode .nps-wave,
-.lite-mode .nps-wave2,
-.lite-mode .nps-surface,
-.lite-mode .nps-bub { animation: none; }
-.forms-mode .nps-bub,
-.lite-mode .nps-bub { opacity: .55; }
-.forms-mode .audio-bar.animating,
-.lite-mode .audio-bar.animating { animation: none; }
-.forms-mode .rotate-card,
-.lite-mode .rotate-card { transition: none; }
-.forms-mode .swipe-indicator,
-.lite-mode .swipe-indicator { display: none; }
+.forms-mode .nps-bub { animation: none; }
+.forms-mode .nps-bub { opacity: .55; }
+.forms-mode .audio-bar.animating { animation: none; }
+.forms-mode .rotate-card { transition: none; }
+.forms-mode .swipe-indicator { display: none; }
 /* LEFT panel: the Lottie mount. lottie-web injects an <svg> into the
    .nps-lottie-mount child; the wrapper fills the left panel. */
 .nps-lottie {
@@ -3052,8 +3044,7 @@
 .book-page.is-turning {
   transition: transform 0.52s cubic-bezier(.4,0,.2,1), opacity 0.3s ease 0.22s;
 }
-.forms-mode .book-page,
-.lite-mode .book-page { transition: none; }
+.forms-mode .book-page { transition: none; }
 /* Scrolls when a page runs long, but never shows a scrollbar — it should
    read as a page, not a textarea. Overflow is cued by .book-page-fade
    instead of a visible bar (see .book-page.has-more below). */
@@ -5612,15 +5603,12 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    card after it read as a cut rather than a continuation. Same slide, same
    direction, just paced closer to the turn it follows. */
 .preview-card.is-entering--from-book { animation: player-card-in 0.4s cubic-bezier(.4, 0, .2, 1) both; }
-/* Form mode and lite mode both strip the game-like motion, and reduced-motion
-   means it. All three are belt-and-braces — player_controller skips adding
-   the class in any of these cases — but a stylesheet shouldn't rely on that. */
+/* Form mode strips the game-like motion, and reduced-motion means it. Both are
+   belt-and-braces — player_controller skips adding the class in either case —
+   but a stylesheet shouldn't rely on that. */
 .forms-mode .preview-card.is-entering,
 .forms-mode .preview-card.is-entering-back,
-.forms-mode .preview-card.is-entering--from-book,
-.lite-mode .preview-card.is-entering,
-.lite-mode .preview-card.is-entering-back,
-.lite-mode .preview-card.is-entering--from-book { animation: none; }
+.forms-mode .preview-card.is-entering--from-book { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .preview-card.is-entering,
   .preview-card.is-entering-back,
@@ -8610,20 +8598,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .font-scale-btn:hover { color: #fff; }
 .font-scale-btn.is-active { background: rgba(1,234,203,0.18); color: #01EACB; }
 
-.lite-mode-btn {
-  display: inline-flex; align-items: center;
-  height: 26px; padding: 0 11px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(20,23,38,0.5);
-  backdrop-filter: blur(8px);
-  color: rgba(255,255,255,0.6);
-  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-.lite-mode-btn:hover { color: #fff; }
-.lite-mode-btn.is-active { background: rgba(1,234,203,0.18); border-color: rgba(1,234,203,0.4); color: #01EACB; }
-
 /* Player: the hidden Test Mode hatch (player/_test_mode_hatch.html.erb).
    The hotspot has to read as empty space — no background, no border, no
    cursor change, no hover state — or it stops being hidden. margin-right:auto
@@ -8652,7 +8626,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   content: ""; position: absolute;
   top: -9px; bottom: -9px; left: -5px; right: -5px;
 }
-/* Armed. Same pill as .lite-mode-btn, in the Test Mode yellow of
+/* Armed. The player's standard 26px control pill, in the Test Mode yellow of
    .play-banner-test — the chip looks like where it is about to take you. */
 .test-hatch-confirm {
   display: inline-flex; align-items: center;

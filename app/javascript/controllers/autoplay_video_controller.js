@@ -29,11 +29,6 @@ export default class extends Controller {
   }
 
   _play() {
-    // Lite mode (player_controller.js#toggleLite): never fetch or play an
-    // autoplaying background video — this is most of the real saving lite
-    // mode can honestly claim, since CSS alone can't reliably stop an
-    // already-requested background-image fetch.
-    if (this.element.closest(".lite-mode")) return
     // Defer loading until the clip is actually needed.
     if (this.video.preload === "none") this.video.preload = "auto"
     const p = this.video.play()
