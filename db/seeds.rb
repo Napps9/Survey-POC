@@ -59,5 +59,18 @@ end
 # path runs first, the other is a no-op.
 AlpbachAccountProvisioner.new.call
 
+# The showcase Verto in the Playverto org itself — one deck that plays every
+# answer type, with imagery, branching and points on. Same split as the Alpbach
+# account above, for the same reason: this line covers a FRESH database,
+# db/migrate/20260820120000_provision_showcase_verto.rb covers an existing one.
+#
+# Create-only by design: it is a real Verto in an account somebody works in, so
+# a re-seed must never overwrite edits made to it in the editor. Rebuild
+# deliberately with `bin/rails showcase:seed FORCE=1`.
+#
+# The deck only — the simulated respondents are demo data the rake task seeds
+# on request, not something a boot should invent in a live account.
+ShowcaseVertoSeeder.new(responses: false).call
+
 # Internal BI: starter Blazer queries for VertoNow staff (idempotent).
 load Rails.root.join("db/seeds/blazer_starter_queries.rb")
