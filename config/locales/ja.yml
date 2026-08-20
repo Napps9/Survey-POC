@@ -51,8 +51,6 @@ ja:
     contact_company: "会社"
     contact_industry: "業種"
     contact_email: "メール"
-    contact_note: "入力された情報は、このVertoの作成者に送られ、連絡に使用されます。"
-    contact_email_invalid: "メールアドレスの形式が正しくないようです — ご確認ください。"
     add_statement: ステートメントを追加
     swipe_no: "いいえ"
     swipe_unsure: "わからない"
@@ -281,7 +279,6 @@ ja:
     tap_card: ["ステートメント1", "ステートメント2", "ステートメント3", "ステートメント4", "ステートメント5"]
     scenario: ["選択肢A", "選択肢B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

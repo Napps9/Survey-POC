@@ -94,6 +94,22 @@ module CardTypes
     DATA.select { |_key, attrs| attrs["pickable"] }
   end
 
+  # Types withdrawn from the product (`retired: true` in the YAML).
+  #
+  # Retiring is not deleting, and the difference is the whole design. Answers
+  # are keyed by card INDEX, and a Verto that has collected any is locked
+  # against structural edits (Survey#editing_locked?) precisely so nothing can
+  # renumber them. So a retired card is left exactly where it sits in a live
+  # deck — pulling it out would shift every later answer already stored — and
+  # is instead made inert: never offered (pickable: false), dropped from any
+  # deck still editable (Survey.drop_retired_cards), skipped by the player
+  # (player/show.html.erb) and refused as an answer (Survey#drop_retired_answers).
+  # Its metadata stays so the results dashboard can still label what it
+  # collected while it was live.
+  def retired?(type)
+    meta(type)["retired"] == true
+  end
+
   # Card types with no answer captured — a "question" card is everything else.
   # welcome_card and token_checkpoint are intro/milestone screens; consent_gate
   # captures an agreement, which is recorded on the response itself

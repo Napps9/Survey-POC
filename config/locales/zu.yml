@@ -51,8 +51,6 @@ zu:
     contact_company: "Inkampani"
     contact_industry: "Imboni"
     contact_email: "I-imeyili"
-    contact_note: "Imininingwane yakho iya kumdali wale-Verto ukuze akwazi ukuxhumana nawe."
-    contact_email_invalid: "Lokho akubukeki njengekheli le-imeyili — sicela uhlole."
     add_statement: "Engeza isitatimende"
     swipe_no: "Cha"
     swipe_unsure: "Angiqiniseki"
@@ -295,7 +293,6 @@ zu:
     tap_card: ["Isitatimende 1", "Isitatimende 2", "Isitatimende 3", "Isitatimende 4", "Isitatimende 5"]
     scenario: ["Inketho A", "Inketho B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

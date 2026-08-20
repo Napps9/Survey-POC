@@ -51,8 +51,6 @@ id:
     contact_company: "Perusahaan"
     contact_industry: "Industri"
     contact_email: "Email"
-    contact_note: "Detail Anda dikirim ke pembuat Verto ini agar mereka dapat menghubungi Anda."
-    contact_email_invalid: "Itu tidak tampak seperti alamat email — mohon periksa."
     add_statement: Tambah pernyataan
     swipe_no: "Tidak"
     swipe_unsure: "Tidak yakin"
@@ -281,7 +279,6 @@ id:
     tap_card: ["Pernyataan 1", "Pernyataan 2", "Pernyataan 3", "Pernyataan 4", "Pernyataan 5"]
     scenario: ["Opsi A", "Opsi B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

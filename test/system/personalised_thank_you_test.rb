@@ -1,15 +1,19 @@
 require "application_system_test_case"
 
-# %{name} (and friends) in the thank-you title/body is interpolated
-# client-side in player_controller.js#_applyEndScreen, from whichever
-# contact_form card's name field the respondent actually answered. This pins
-# both directions: filled in, and left blank — where the inline fallback (or
-# a plain strip to "" without one) has to take over, never a raw %{name} left
-# on screen.
+# Template variables in the thank-you title/body are interpolated client-side
+# in player_controller.js#_applyEndScreen.
+#
+# This used to pin both directions of %{name}, read off an answered contact
+# card. That card type is retired, so nothing asks a respondent their name any
+# more and %{name} is gone from _endScreenVars — which makes the surviving
+# direction the important one: thank-you copy WRITTEN BEFORE the retirement
+# still says "%{name|friend}", and it has to render "friend". A variable that
+# no longer exists must take its inline fallback, or be stripped where there
+# isn't one — never leave a raw %{name} on screen in front of a respondent.
 class PersonalisedThankYouTest < ApplicationSystemTestCase
   CARDS = [
     { "type" => "welcome_card", "title" => "Welcome" },
-    { "type" => "contact_form", "cid" => "c1", "text" => "Stay in touch" }
+    { "type" => "open_ended", "cid" => "c1", "text" => "Anything else?" }
   ].freeze
 
   def setup
@@ -19,30 +23,21 @@ class PersonalisedThankYouTest < ApplicationSystemTestCase
                                    key_insight: "k", default_locale: "en", locales: [ "en" ],
                                    cards: CARDS,
                                    thankyou_title: "Thanks, %{name|friend}!",
-                                   thankyou_body: "See you soon, %{name|there}.")
+                                   thankyou_body: "See you soon, %{name|there}. %{name}")
     @survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
   end
 
-  def open_contact_card
+  def play_to_the_end
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
     click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
     click_button "Next" # past the welcome card
-    assert_selector ".preview-card.active .contact-form-wrap", wait: 5
+    assert_selector ".preview-card.active .freeform-wrap", wait: 5
+    find("[data-player-target='finishBtn']").click
   end
 
-  test "an answered name interpolates into the thank-you copy" do
-    open_contact_card
-    find(".contact-field[data-contact-key='name']").set("Alex")
-    find("[data-player-target='finishBtn']").click
-
-    assert_selector ".preview-thankyou-title", text: "Thanks, Alex!", wait: 5
-    assert_text "See you soon, Alex."
-  end
-
-  test "a skipped contact card falls back to the inline default, never a raw placeholder" do
-    open_contact_card
-    find("[data-player-target='finishBtn']").click
+  test "a retired variable takes its inline fallback, and is stripped without one" do
+    play_to_the_end
 
     assert_selector ".preview-thankyou-title", text: "Thanks, friend!", wait: 5
     assert_text "See you soon, there."

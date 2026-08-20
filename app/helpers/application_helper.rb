@@ -681,14 +681,6 @@ module ApplicationHelper
       # interactive content and isn't allowed inside a <button> either.
       "<div class=\"mini-textarea\">Type your answer here…</div>"
 
-    when "contact_form"
-      # Two stub fields stand in for the four — enough to read as a form at
-      # mini size. Divs, not inputs, for the same inside-a-button reason.
-      rows = [ t("card.contact_name", default: "Name"), t("card.contact_email", default: "Email") ].map { |label|
-        "<div class=\"mini-pick-item\" style=\"justify-content:flex-start;opacity:0.75\">#{h(label)}</div>"
-      }.join
-      "<div class=\"mini-pick-list\">#{rows}</div>"
-
     when "scenario"
       "<div class=\"mini-swipe-stack\">" \
       "<div class=\"mini-swipe-card c1\"></div>" \

@@ -51,8 +51,6 @@ nl:
     contact_company: "Bedrijf"
     contact_industry: "Branche"
     contact_email: "E-mail"
-    contact_note: "Je gegevens gaan naar de maker van deze Verto zodat die contact met je kan opnemen."
-    contact_email_invalid: "Dat lijkt geen e-mailadres — controleer het even."
     add_statement: Stelling toevoegen
     swipe_no: "Nee"
     swipe_unsure: "Weet ik niet"
@@ -281,7 +279,6 @@ nl:
     tap_card: ["Stelling 1", "Stelling 2", "Stelling 3", "Stelling 4", "Stelling 5"]
     scenario: ["Optie A", "Optie B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

@@ -51,8 +51,6 @@ uk:
     contact_company: "Компанія"
     contact_industry: "Галузь"
     contact_email: "Ел. пошта"
-    contact_note: "Ваші дані передаються творцеві цього Verto, щоб він міг з вами зв'язатися."
-    contact_email_invalid: "Це не схоже на адресу електронної пошти — перевірте, будь ласка."
     add_statement: Додати твердження
     swipe_no: "Ні"
     swipe_unsure: "Не впевнений"
@@ -281,7 +279,6 @@ uk:
     tap_card: ["Твердження 1", "Твердження 2", "Твердження 3", "Твердження 4", "Твердження 5"]
     scenario: ["Варіант А", "Варіант Б"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

@@ -52,8 +52,6 @@ af:
     contact_company: "Maatskappy"
     contact_industry: "Bedryf"
     contact_email: "E-pos"
-    contact_note: "Jou besonderhede gaan na die skepper van hierdie Verto sodat hulle jou kan opvolg."
-    contact_email_invalid: "Dit lyk nie na 'n e-posadres nie — gaan dit asseblief na."
     add_statement: "Voeg stelling by"
     swipe_no: "Nee"
     swipe_unsure: "Onseker"
@@ -282,7 +280,6 @@ af:
     tap_card: ["Stelling 1", "Stelling 2", "Stelling 3", "Stelling 4", "Stelling 5"]
     scenario: ["Opsie A", "Opsie B"]
     open_ended: []
-    contact_form: []
     welcome_card: []
     token_checkpoint: []
     consent_gate: []

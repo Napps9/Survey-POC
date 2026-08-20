@@ -895,7 +895,28 @@ class Survey < ApplicationRecord
       end
       c
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
+       .then { |list| drop_retired_cards(list, warnings: warnings) }
        .then { |list| hoist_consent_gate(list, warnings: warnings) }
+  end
+
+  # Cards of a retired type never survive a save (see CardTypes.retired?).
+  #
+  # Safe to drop rather than merely hide, because this runs only on the
+  # editor's save path and #update refuses any edit to a Verto that is
+  # published or has responses (editing_locked?) — so a deck reaching here has
+  # no stored answers for the renumbering to misalign. Live decks keep their
+  # copy and the player skips it instead.
+  #
+  # Dropped with a warning rather than a 422, for the same reason
+  # enforce_single_welcome drops: decks holding a retired card already exist,
+  # and rejecting would turn a historical oddity into an editor that can no
+  # longer save.
+  def self.drop_retired_cards(list, warnings: nil)
+    list.filter_map do |c|
+      next c unless c.is_a?(Hash) && CardTypes.retired?(c["type"])
+      warnings << "retired_card" if warnings
+      nil
+    end
   end
 
   # At most one welcome card per deck. Nothing enforced this: welcome_card was
@@ -1309,45 +1330,36 @@ class Survey < ApplicationRecord
     end
   end
 
-  # The contact card's answer shape: an object of these fields (any subset).
-  # 120 chars is generous for a name/company/industry and stops the public
-  # JSON endpoint being used to stuff paragraphs into a lead field.
-  CONTACT_FIELDS      = %w[name company industry email].freeze
-  CONTACT_FIELD_LIMIT = 120
+  # The retired contact card's answer shape: an object of these fields (any
+  # subset). Nothing writes this shape any more — it survives because results
+  # and the CSV/Excel export still have to READ the details collected while the
+  # card was live, and they need to know which fields to lay out in which order.
+  CONTACT_FIELDS = %w[name company industry email].freeze
 
-  # Bound and validate contact-card answers. Same posture as clamp_free_text
-  # directly above the call site: the client validates as a courtesy, but the
-  # endpoint is public JSON, so the server owns the contract — only the four
-  # known fields survive, each stripped and clamped, and an email that isn't
-  # one is dropped rather than stored malformed.
-  def clamp_contact_entries(answers)
+  # Refuse answers to a retired card type. Same posture as clamp_free_text
+  # directly above the call site: the player no longer renders these cards at
+  # all, but this endpoint is public JSON, so the server owns the contract
+  # rather than trusting that nothing will post one — including a respondent
+  # whose Service Worker is still serving a player cached from before the
+  # retirement.
+  #
+  # The entry is kept and blanked rather than deleted, so the card still reads
+  # as unanswered rather than as never having been in the deck.
+  def drop_retired_answers(answers)
     return answers unless answers.is_a?(Hash)
 
-    contact_keys = Array(cards).each_with_index
-                               .select { |card, _| card.is_a?(Hash) && card["type"].to_s == "contact_form" }
+    retired_keys = Array(cards).each_with_index
+                               .select { |card, _| card.is_a?(Hash) && CardTypes.retired?(card["type"]) }
                                .map { |_, idx| idx.to_s }
-    return answers if contact_keys.empty?
+    return answers if retired_keys.empty?
 
     answers.each_with_object({}) do |(key, entry), out|
-      unless contact_keys.include?(key) && entry.is_a?(Hash)
+      unless retired_keys.include?(key) && entry.is_a?(Hash)
         out[key] = entry
         next
       end
 
-      clamped = entry.dup
-      value = entry["value"]
-      if value.is_a?(Hash)
-        cleaned = CONTACT_FIELDS.each_with_object({}) do |field, acc|
-          v = (value[field] || value[field.to_sym]).to_s.strip.first(CONTACT_FIELD_LIMIT)
-          acc[field] = v if v.present?
-        end
-        cleaned.delete("email") unless cleaned["email"]&.match?(URI::MailTo::EMAIL_REGEXP)
-        clamped["value"] = cleaned.presence
-      else
-        # A contact answer is an object or nothing — scalars are junk.
-        clamped["value"] = nil
-      end
-      out[key] = clamped
+      out[key] = entry.merge("value" => nil)
     end
   end
 

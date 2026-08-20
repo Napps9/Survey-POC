@@ -17,8 +17,13 @@
   <% end %>
 <% end %>
 <%
-  cards   = Array(@survey.cards)
-  total_q = cards.count { |c| CardTypes.question?(c["type"]) }
+  # Retired card types are skipped, not renumbered. Each surviving card keeps
+  # the index it holds in @survey.cards — that index IS the answer key
+  # (data-card-index below), so the deck is paired with its own positions and
+  # iterated as pairs rather than re-enumerated. Dropping a card and letting
+  # the rest slide up by one would re-point every answer after it.
+  cards   = Array(@survey.cards).each_with_index.reject { |c, _| CardTypes.retired?(c["type"]) }
+  total_q = cards.count { |c, _| CardTypes.question?(c["type"]) }
   prev_q  = 0
 
   # Owner preview (from the dashboard): the exact respondent experience but
@@ -266,7 +271,7 @@
       </div>
     <% end %>
 
-    <% cards.each_with_index do |card, idx| %>
+    <% cards.each do |card, idx| %>
       <%
         type    = card["type"].to_s
         is_q    = CardTypes.question?(type)
