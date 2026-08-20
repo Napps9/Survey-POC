@@ -97,6 +97,29 @@ class OnePagerFitTest < ApplicationSystemTestCase
         assert_selector "[data-card-type]", minimum: 1, wait: 10
       end
 
+      # With the phone live, the laptop shows a "bring it back" scrim, which has
+      # to sit on the screen glass and nowhere else. `.laptop-overlay` reaches
+      # that position by overriding the `inset: 10px` it inherits from
+      # `.device-overlay` — and `inset` is a shorthand for all four offsets, so
+      # declaring it *after* left/top silently resets them to auto and the scrim
+      # lands at its static position, hanging off the side of the laptop. That
+      # shipped once.
+      scrim = page.evaluate_script(<<~JS)
+        (() => {
+          const o = document.getElementById('laptopPlayOverlay');
+          const m = document.getElementById('demoMockup');
+          const r = o.getBoundingClientRect(), mr = m.getBoundingClientRect();
+          return { dx: r.x - (mr.x + mr.width * 0.124),
+                   dy: r.y - (mr.y + mr.height * 0.031),
+                   dw: r.width - mr.width * 0.7515,
+                   dh: r.height - mr.height * 0.69 };
+        })()
+      JS
+      assert_in_delta 0, scrim["dx"], 1.5, "the scrim is offset horizontally from the laptop's screen"
+      assert_in_delta 0, scrim["dy"], 1.5, "the scrim is offset vertically from the laptop's screen"
+      assert_in_delta 0, scrim["dw"], 1.5, "the scrim isn't the width of the laptop's screen"
+      assert_in_delta 0, scrim["dh"], 1.5, "the scrim isn't the height of the laptop's screen"
+
       find("#laptopPlayOverlay").click
       assert_selector "#demoMockup.is-live", wait: 15
       assert_no_selector "#phoneMockup.is-live"

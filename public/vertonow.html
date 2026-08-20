@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- vertonow one-pager · build 2026-08-06-e · view-source and check this line to confirm
+<!-- vertonow one-pager · build 2026-08-20-a · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-08-06-e">
+<html lang="en" data-build="2026-08-20-a">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -821,9 +821,12 @@
   }
   .device-overlay:hover span{ transform: scale(1.04); }
   .laptop-overlay{
+    /* `inset` must come FIRST: it is a shorthand for top/right/bottom/left, so
+       declaring it after them resets the two we actually want back to auto and
+       the scrim lands at its static position instead of over the screen. */
+    inset: auto;
     left: 12.4%; top: 3.1%;
     width: 75.15%; height: 69%;
-    inset: auto;
     border-radius: 6px;
   }
   @media (max-width: 860px){
@@ -1104,7 +1107,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('VertoNow one-pager · build 2026-08-06-e');
+  console.info('VertoNow one-pager · build 2026-08-20-a');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
