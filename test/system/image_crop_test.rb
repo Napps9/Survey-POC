@@ -218,4 +218,52 @@ class ImageCropTest < ApplicationSystemTestCase
       FileUtils.rm_f(svg_path)
     end
   end
+
+  # The smallest legal GIF (43 bytes: header, logical screen descriptor,
+  # a 2-colour global colour table, one image descriptor, LZW-compressed
+  # 1x1 pixel data, trailer) — enough to be recognised as image/gif by both
+  # the browser's file-picker and the server, without needing a real
+  # multi-frame animation. What this test guards against doesn't care how
+  # many frames the source has: a canvas re-encode (drawImage + toDataURL)
+  # would still swap the bytes for a different, WebP/JPEG-flattened payload
+  # even on a single-frame GIF, which is exactly the regression to catch.
+  MINIMAL_GIF_BYTES = [
+    0x47, 0x49, 0x46, 0x38, 0x39, 0x61,               # "GIF89a"
+    0x01, 0x00, 0x01, 0x00,                           # 1x1 logical screen
+    0x80, 0x00, 0x00,                                 # packed (2-colour GCT), bg index, aspect
+    0xFF, 0xFF, 0xFF,  0x00, 0x00, 0x00,               # global colour table: white, black
+    0x2C, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, # image descriptor
+    0x02, 0x02, 0x44, 0x01, 0x00,                     # LZW min code size 2, one sub-block
+    0x3B                                              # trailer
+  ].pack("C*").freeze
+
+  test "a GIF upload bypasses the crop stage and reaches the card byte-for-byte, not re-encoded" do
+    open_card_media_picker
+    gif_path = Rails.root.join("tmp", "image_crop_test_#{SecureRandom.hex(4)}.gif")
+    File.binwrite(gif_path, MINIMAL_GIF_BYTES)
+
+    begin
+      attach_upload(gif_path.to_s)
+      assert_selector "[data-media-picker-target='applyBtn']:not([disabled])"
+      assert_no_selector "[data-media-picker-target='cropStage']", visible: true
+
+      # _pendingUrl at this point is exactly what _readFile stashed — before
+      # applyImage's server round-trip swaps it for a stored blob path, so
+      # this isolates _readFile's own behaviour precisely.
+      pending_url = evaluate_script(<<~JS)
+        (() => {
+          const app  = window.Stimulus || window.application
+          const root = document.querySelector('[data-controller~="media-picker"]')
+          const c    = app.getControllerForElementAndIdentifier(root, "media-picker")
+          return c._pendingUrl
+        })()
+      JS
+      assert_match %r{\Adata:image/gif;base64,}, pending_url
+      stored_bytes = Base64.decode64(pending_url.split(",", 2).last)
+      assert_equal MINIMAL_GIF_BYTES, stored_bytes,
+        "a canvas re-encode would have flattened the GIF to a different format/byte stream"
+    ensure
+      FileUtils.rm_f(gif_path)
+    end
+  end
 end

@@ -32,6 +32,10 @@ export default class extends Controller {
   static MAX_EDGE        = 1600             // longest side, px
   static ENCODE_QUALITY  = 0.82
   static SVG_BYTE_CAP    = 500 * 1024       // SVGs skip downscaling, so cap them directly
+  // GIFs skip downscaling too (see _readFile) — capped directly at the
+  // server's own Survey::CARD_IMAGE_MAX_BYTES so nothing the client accepts
+  // can still be rejected once it reaches CardImageStore.decode.
+  static GIF_BYTE_CAP    = 3 * 1024 * 1024
 
   // Fixed [width, height] output ratio per slot, matching PexelsClient::CROP_FOR
   // — a Pexels pick already arrives pre-cropped to these dimensions server-side,
@@ -342,6 +346,21 @@ export default class extends Controller {
       if (file.size > this.constructor.SVG_BYTE_CAP) {
         const kb = Math.round(this.constructor.SVG_BYTE_CAP / 1024)
         this._showUploadError(`That SVG is too large — please choose one under ${kb} KB.`)
+        return
+      }
+      this._readAsDataUrl(file)
+      return
+    }
+    // GIFs are frame sequences — drawing one onto a canvas (what both the
+    // crop stage and the plain downscale path do) captures only whichever
+    // frame happened to be current, silently flattening the animation to a
+    // single still. Store the original bytes untouched instead, same as SVG,
+    // and skip the crop stage for the same reason: there's no single frame
+    // to crop that wouldn't also freeze the animation.
+    if (file.type === "image/gif" || /\.gif$/i.test(name)) {
+      if (file.size > this.constructor.GIF_BYTE_CAP) {
+        const mb = Math.round(this.constructor.GIF_BYTE_CAP / (1024 * 1024))
+        this._showUploadError(`That GIF is too large — please choose one under ${mb} MB.`)
         return
       }
       this._readAsDataUrl(file)
@@ -1078,7 +1097,9 @@ export default class extends Controller {
       if (!ok) return
       await this._saveToLibrary(dataUrl)
     }
-    if (file.type === "image/svg+xml") this._readAsDataUrl(file, done)
+    // Same reasoning as _readFile: a canvas re-encode captures only one frame
+    // of a GIF, silently freezing it. Store the brand-library asset untouched.
+    if (file.type === "image/svg+xml" || file.type === "image/gif") this._readAsDataUrl(file, done)
     else this._downscale(file, done)
   }
 
