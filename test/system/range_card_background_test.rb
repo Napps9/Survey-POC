@@ -62,6 +62,11 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
     # animate_asset is explicitly excluded for range cards (its own reaction
     # set already animates) — the toggle must stay hidden here too.
     assert_no_selector "[data-media-picker-target='animateAssetSection']", visible: true
+    # Colour/asset settings here all save live — a permanently-disabled Apply
+    # with nothing to ever enable it read as "did my change not stick?" (a
+    # real report from actually using this). Hidden until there is something
+    # to apply, i.e. after "Use an image" is picked.
+    assert_no_selector "[data-media-picker-target='applyBtn']", visible: true
   end
 
   test "setting a background colour on a range card saves it live, no Apply needed" do
@@ -90,5 +95,7 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
 
     assert_selector ".media-modal-tabs", visible: true
     assert_selector "[data-media-picker-target='pane'][data-pane='library']", visible: true
+    # Now there's something a pick could apply to — Apply comes back.
+    assert_selector "[data-media-picker-target='applyBtn']", visible: true
   end
 end

@@ -86,7 +86,13 @@ export default class extends Controller {
     if (isRange) {
       this.paneTargets.forEach(p => { p.hidden = true })
       this.clearBtnTarget.hidden = true
+      // The colour/asset settings below all save live (_writeAnimBg calls
+      // _notifyDirty itself) — there is never anything pending to Apply here
+      // until "Use an image" is picked, so a permanently-disabled Apply only
+      // reads as broken. openAnimBgImage() brings it back for that sub-flow.
+      this.applyBtnTarget.hidden = true
     } else {
+      this.applyBtnTarget.hidden = false
       // Open on the Verto Library so the curated designs are visible straight
       // away — uploading your own image is one click away on the other tab.
       this._switchTabKey("library")
@@ -243,10 +249,11 @@ export default class extends Controller {
     this._pendingUrl = null
     this._pendingVideo = null
     this._setApplyEnabled(false)
-    // Reset to shown: only open()'s range-card branch ever hides it, and
+    // Reset to shown: only open()'s range-card branch ever hides these, and
     // every other entry point (openBackground/openConsent/openComms/
-    // openTapOption) relies on it being visible without setting it itself.
+    // openTapOption) relies on them being visible without setting it itself.
     this._showMediaSwapUI(true)
+    this.applyBtnTarget.hidden = false
     this._switchTabKey("library")
     this.libraryItemTargets.forEach(i => i.setAttribute("aria-selected", "false"))
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
@@ -1476,6 +1483,7 @@ export default class extends Controller {
     event?.preventDefault()
     this._mode = "animBg"
     this._showMediaSwapUI(true)
+    this.applyBtnTarget.hidden = false
     this._switchTabKey("library")
     this._setMedia("photos")
     this._showMediaToggle(false)
