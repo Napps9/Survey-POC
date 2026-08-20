@@ -128,6 +128,47 @@ class OnePagerFitTest < ApplicationSystemTestCase
       FileUtils.rm_f(Rails.root.join(probe_path(pager)))
     end
 
+    test "#{pager}: nothing spills sideways on a phone" do
+      survey = published_survey
+      origin = Capybara.current_session.server.base_url
+      serve_probe_copy(pager, origin, survey.publish_token)
+
+      # A narrow *window* doesn't measure a phone: Chromium clamps its window to
+      # roughly 500px wide, so the layout quietly stays desktop-ish. Device
+      # metrics are the only honest way to get 390 here.
+      page.driver.browser.page.command("Emulation.setDeviceMetricsOverride",
+                                       width: 390, height: 900, deviceScaleFactor: 1, mobile: true)
+      begin
+        visit "#{origin}#{probe_url}"
+        assert_selector "#demoMockup", wait: 15
+
+        widths = page.evaluate_script(<<~JS)
+          ({ scroll: document.documentElement.scrollWidth,
+             client: document.documentElement.clientWidth })
+        JS
+        assert_equal 390, widths["client"], "device emulation didn't take"
+        assert_operator widths["scroll"], :<=, widths["client"] + 1,
+          "the page scrolls sideways on a phone — something is wider than the viewport " \
+          "and can't shrink (a grid or flex item defaulting to min-width: auto will do it)"
+
+        # The screenshots are deliberately wider than the phone, but they have to
+        # pan inside their own frame rather than drag the page with them.
+        panned = page.evaluate_script(<<~JS)
+          [...document.querySelectorAll('.shot-pan')].map(e => ({
+            clips: e.scrollWidth > e.clientWidth,
+            overflow: getComputedStyle(e).overflowX,
+          }))
+        JS
+        panned.each do |p|
+          assert_equal "auto", p["overflow"], "a wide screenshot isn't in a scrollable frame"
+        end
+      ensure
+        page.driver.browser.page.command("Emulation.clearDeviceMetricsOverride")
+      end
+    ensure
+      FileUtils.rm_f(Rails.root.join(probe_path(pager)))
+    end
+
     test "#{pager}: the frame fills the screen area exactly, without spilling onto the bezel" do
       survey = published_survey
       origin = Capybara.current_session.server.base_url

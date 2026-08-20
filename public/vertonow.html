@@ -881,6 +881,10 @@
   /* ---------- Mobile ---------- */
   @media (max-width: 860px){
     .shell{ grid-template-columns: 1fr; }
+    /* Grid items default to min-width: auto, so they refuse to shrink below
+       their content — which makes the side nav's own overflow-x: auto useless
+       and drags the whole page sideways instead of scrolling the strip. */
+    .shell, main, nav.sidenav{ min-width: 0; }
     nav.sidenav{
       position: sticky;
       top: 66px;
