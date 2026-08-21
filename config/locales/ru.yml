@@ -1097,13 +1097,12 @@ ru:
     shuffle_title: Выбрать новые изображения из библиотеки Verto
     shuffle_confirm: Перемешать изображения? Текущие картинки будут заменены новой подборкой из библиотеки.
     shuffle_direction_toggle_title: "Добавить ориентир для этого перемешивания"
-    shuffle_direction_active: "Для этого перемешивания задан ориентир"
     shuffle_direction_heading: "Задайте направление"
     shuffle_direction_hint: "Необязательно. Расскажите Verto, что вы хотите видеть на изображениях и в анимациях — настроение, обстановку или то, чего лучше избегать."
     shuffle_direction_label: "Направление"
     shuffle_direction_placeholder: "напр. тёплый естественный свет, на улице, небольшие группы, без офисов"
-    shuffle_direction_toward: "Ищем: %{terms}"
-    shuffle_direction_avoiding: "Исключаем: %{terms}"
+    shuffle_direction_toward: "Последнее перемешивание искало: %{terms}"
+    shuffle_direction_avoiding: "и исключило: %{terms}"
     shuffle_direction_clear: "Очистить"
     shuffle_direction_apply: "Перемешать с этим"
     publish_share: Опубликовать и поделиться →

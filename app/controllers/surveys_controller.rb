@@ -843,16 +843,19 @@ class SurveysController < ApplicationController
     if survey.editing_locked?
       return redirect_to survey_path(survey), alert: editing_locked_message
     end
-    # The optional direction prompt travels with the click but LIVES on the
-    # Verto: the box stays filled in for the next shuffle, and every later
-    # re-population (the picker's Recommended rail, AssetPopulator anywhere)
-    # reads the same steer. Submitting it empty is how a creator clears it,
-    # so an absent key means "unchanged" and a blank one means "drop it" —
-    # which is why this writes only when the form actually sent the field.
-    if params.key?(:direction)
-      survey.update!(shuffle_direction: Survey.sanitize_shuffle_direction(params[:direction]))
+    # The optional direction prompt belongs to THIS click and is not stored:
+    # the box comes back empty, and a steer typed once never goes on quietly
+    # deciding shuffles the creator didn't type it for.
+    direction = params[:direction]
+    AssetPopulator.new(survey, seed: SecureRandom.hex(4), direction: direction).populate!
+    # Report what the prompt reduced to, so a misparse is visible in the editor
+    # rather than only in the pictures. Flash, not a column: it describes the
+    # run that just happened, and it should be gone by the next page view.
+    if direction.present?
+      reading = AssetPopulator.direction_reading(survey, direction)
+      flash[:shuffle_toward]   = reading[:toward].join(", ").presence
+      flash[:shuffle_avoiding] = reading[:avoiding].join(", ").presence
     end
-    AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
     redirect_to survey_path(survey)
   rescue => e
     ErrorReporting.report("SurveysController#shuffle_assets", e)

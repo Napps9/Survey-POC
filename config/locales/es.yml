@@ -1095,13 +1095,12 @@ es:
     shuffle_title: Seleccionar nuevas imágenes de la biblioteca de Verto
     shuffle_confirm: "¿Mezclar imágenes? Tus imágenes actuales serán reemplazadas por una nueva selección de la biblioteca."
     shuffle_direction_toggle_title: "Añadir una indicación para esta mezcla"
-    shuffle_direction_active: "Hay una indicación definida para esta mezcla"
     shuffle_direction_heading: "Orienta esta mezcla"
     shuffle_direction_hint: "Opcional. Dile a Verto qué buscas en las imágenes y animaciones: un ambiente, un escenario o algo que quieras evitar."
     shuffle_direction_label: "Indicación"
     shuffle_direction_placeholder: "p. ej. luz natural cálida, exteriores, grupos pequeños, sin oficinas"
-    shuffle_direction_toward: "Buscando: %{terms}"
-    shuffle_direction_avoiding: "Excluyendo: %{terms}"
+    shuffle_direction_toward: "La última mezcla buscó: %{terms}"
+    shuffle_direction_avoiding: "y excluyó: %{terms}"
     shuffle_direction_clear: "Borrar"
     shuffle_direction_apply: "Mezclar con esto"
     publish_share: Publicar y compartir →

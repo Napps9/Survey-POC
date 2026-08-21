@@ -3907,12 +3907,6 @@
   line-height: 1;
 }
 .shuffle-pill-go:hover, .shuffle-pill-caret:hover { background: #383D4E; }
-/* A dot on the caret when a direction is already stored, so the creator can
-   see the next shuffle is steered without opening the panel. */
-.shuffle-pill-caret.is-set::after {
-  content: ""; position: absolute; top: 6px; inset-inline-end: 7px;
-  width: 6px; height: 6px; border-radius: 50%; background: #01EACB;
-}
 
 .shuffle-direction {
   position: absolute; bottom: calc(100% + 10px); inset-inline-start: 0;

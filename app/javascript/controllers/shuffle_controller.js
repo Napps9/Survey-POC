@@ -30,13 +30,7 @@ export default class extends Controller {
   open() {
     this.panelTarget.hidden = false
     if (this.hasToggleTarget) this.toggleTarget.setAttribute("aria-expanded", "true")
-    if (this.hasInputTarget) {
-      this.inputTarget.focus()
-      // Caret to the end rather than selecting the stored direction — the
-      // common edit is adding to it, not replacing it.
-      const end = this.inputTarget.value.length
-      this.inputTarget.setSelectionRange(end, end)
-    }
+    if (this.hasInputTarget) this.inputTarget.focus()
   }
 
   close() {
@@ -45,9 +39,9 @@ export default class extends Controller {
     if (this.hasToggleTarget) this.toggleTarget.setAttribute("aria-expanded", "false")
   }
 
-  // Empties the box without submitting. Shuffling with it empty is what
-  // actually clears the stored direction (the field posts blank), so the panel
-  // stays open on the assumption the next click is Shuffle.
+  // Empties the box. Nothing is stored, so this is the whole of clearing — it
+  // used to only empty the textarea while a saved steer went on applying,
+  // which meant a button labelled Clear that cleared nothing you could see.
   clear(event) {
     event?.preventDefault()
     if (!this.hasInputTarget) return

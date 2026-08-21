@@ -432,16 +432,24 @@ class Survey < ApplicationRecord
 
   # The Shuffle direction prompt — the creator's optional free-text steer for
   # what they want out of the Verto's content and imagery ("warm, outdoors,
-  # small groups, no offices"). Never rendered to a respondent and never sent
-  # to Claude; it only widens the words AssetPopulator searches and scores on,
-  # so the only handling it needs is a length cap and whitespace collapse.
-  # Blank comes back as nil, which is what "no direction" means everywhere
-  # downstream.
+  # small groups, no offices"). It belongs to one shuffle and is NOT persisted;
+  # this just normalises what arrives with the click. Never rendered to a
+  # respondent and never sent to Claude; it only widens the words
+  # AssetPopulator searches and scores on, so the only handling it needs is a
+  # length cap and whitespace collapse. Blank comes back as nil, which is what
+  # "no direction" means everywhere downstream.
   MAX_SHUFFLE_DIRECTION = 200
 
   def self.sanitize_shuffle_direction(value)
     value.to_s.gsub(/\s+/, " ").strip.first(MAX_SHUFFLE_DIRECTION).presence
   end
+
+  # `shuffle_direction` shipped as a column and is no longer written or read:
+  # a saved steer is invisible state, and the box now starts empty every time.
+  # Ignored rather than dropped in the same change, so the containers still
+  # serving during the release don't SELECT a column the migration just
+  # removed. The DROP is a follow-up migration, safe once this is live.
+  self.ignored_columns += %w[shuffle_direction]
 
   # Whether a blob filename already ends in an extension ACTIVE_STORAGE_IMAGE_URL
   # accepts. Active Storage serves a blob at /rails/active_storage/…/<filename>,

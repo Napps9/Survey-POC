@@ -21,7 +21,7 @@ export default class extends Controller {
     "cropStage", "cropFrame", "cropImg", "cropZoom",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
-  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, direction: String, backgroundRecommended: Array, appealCreateUrl: String, appealsListUrl: String }
+  static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array, appealCreateUrl: String, appealsListUrl: String }
 
   // Uploaded images are normalised before they're stored: capped in source
   // size, downscaled to a max edge, and re-encoded to a compact format. Raw
@@ -686,20 +686,15 @@ export default class extends Controller {
   // surfaces on-theme stock photos immediately instead of waiting for the
   // editor to type. The editor can refine the query at any time.
   //
-  // Shuffle's direction prompt joins the theme in the seed: a creator who has
-  // told Verto they want "warm, outdoors" should not have to say it again the
-  // moment they open the picker. The server sends the search-safe slice of it
-  // (AssetPopulator.search_hint_for — wanted words only, capped), never the raw
-  // prompt, so a vetoed clause can't end up asking Pexels for the thing it
-  // vetoes. It's only the SEED — the box is editable and typing over it
-  // searches for exactly what's typed, as always.
+  //
+  // Theme only. Shuffle's direction prompt deliberately does NOT join it: a
+  // steer belongs to the shuffle it was typed for, and seeding the picker from
+  // one would mean a sentence typed minutes ago silently deciding what this
+  // search returns.
   _seedSearch() {
     if (!this.hasSearchInputTarget || !this.hasPexsearchUrlValue) return
     if (this.searchInputTarget.value.trim()) return
-    const seed = [
-      this.hasThemeValue ? this.themeValue : "",
-      this.hasDirectionValue ? this.directionValue : ""
-    ].map(s => s.trim()).filter(Boolean).join(" ").trim()
+    const seed = (this.hasThemeValue ? this.themeValue : "").trim()
     if (!seed) return
     this.searchInputTarget.value = seed
     this._runSearch()

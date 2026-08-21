@@ -1095,13 +1095,12 @@ id:
     shuffle_title: Pilih ulang gambar dari pustaka verto
     shuffle_confirm: Acak gambar? Gambar Anda saat ini akan diganti dengan pilihan baru dari pustaka.
     shuffle_direction_toggle_title: "Tambahkan arahan untuk pengacakan ini"
-    shuffle_direction_active: "Arahan sudah diatur untuk pengacakan ini"
     shuffle_direction_heading: "Arahkan pengacakan ini"
     shuffle_direction_hint: "Opsional. Beri tahu Verto apa yang Anda inginkan dari gambar dan animasinya — suasana, latar, atau hal yang ingin dihindari."
     shuffle_direction_label: "Arahan"
     shuffle_direction_placeholder: "mis. cahaya alami hangat, di luar ruangan, kelompok kecil, tanpa kantor"
-    shuffle_direction_toward: "Mencari: %{terms}"
-    shuffle_direction_avoiding: "Mengecualikan: %{terms}"
+    shuffle_direction_toward: "Pengacakan terakhir mencari: %{terms}"
+    shuffle_direction_avoiding: "dan mengecualikan: %{terms}"
     shuffle_direction_clear: "Hapus"
     shuffle_direction_apply: "Acak dengan ini"
     publish_share: Publikasikan & bagikan →

@@ -62,9 +62,6 @@
      data-media-picker-appeal-create-url-value="<%= image_appeal_survey_path(@survey) %>"
      data-media-picker-appeals-list-url-value="<%= image_appeals_survey_path(@survey) %>"
      data-media-picker-theme-value="<%= @survey.theme %>"
-     <%# The search-safe slice of the Shuffle direction, NOT the raw prompt —
-         see AssetPopulator.search_hint_for. %>
-     data-media-picker-direction-value="<%= AssetPopulator.search_hint_for(@survey) %>"
      data-rating-icon-on="<%= rating_icon(@survey)[:on] %>"
      data-rating-icon-off="<%= rating_icon(@survey)[:off] %>"
      data-rating-icon-kind="<%= rating_icon(@survey)[:kind] %>"
@@ -498,8 +495,8 @@
                 a line of free text telling Verto what the creator wants out of
                 the content and imagery ("warm, outdoors, no offices"). The
                 textarea lives inside the same form, so either submit button
-                carries it, and it is stored on the Verto (see
-                SurveysController#shuffle_assets) so the box stays filled in. %>
+                carries it. It is NOT stored: the box starts empty every time,
+                and a steer applies only to the shuffle it was typed for. %>
             <%= form_with url: shuffle_survey_assets_path(@survey), method: :post,
                           data: { controller: "shuffle", action: "keydown.esc->shuffle#close" },
                           class: "shuffle-form" do %>
@@ -507,9 +504,9 @@
                 <button type="submit" class="shuffle-pill-go"
                         title="<%= t("editor.shuffle_title") %>"
                         data-turbo-confirm="<%= t("editor.shuffle_confirm") %>"><%= t("editor.shuffle") %></button>
-                <button type="button" class="shuffle-pill-caret<%= " is-set" if @survey.shuffle_direction.present? %>"
+                <button type="button" class="shuffle-pill-caret"
                         aria-expanded="false" aria-haspopup="true"
-                        title="<%= @survey.shuffle_direction.present? ? t("editor.shuffle_direction_active") : t("editor.shuffle_direction_toggle_title") %>"
+                        title="<%= t("editor.shuffle_direction_toggle_title") %>"
                         data-shuffle-target="toggle"
                         data-action="click->shuffle#toggle">▾</button>
               </div>
@@ -520,23 +517,25 @@
                 <label class="shuffle-direction-label" for="shuffle-direction">
                   <%= t("editor.shuffle_direction_label") %>
                 </label>
+                <%# Always empty. A prompt box that comes back pre-filled is
+                    answering a question nobody asked again. %>
                 <textarea id="shuffle-direction" name="direction" rows="3"
                           class="shuffle-direction-input"
                           maxlength="<%= Survey::MAX_SHUFFLE_DIRECTION %>"
                           data-shuffle-target="input"
-                          placeholder="<%= t("editor.shuffle_direction_placeholder") %>"><%= @survey.shuffle_direction %></textarea>
-                <%# What the populator actually took from the stored direction.
-                    Shown so a prompt that parsed to something the creator
-                    didn't mean is visible here rather than only in the
-                    pictures. See AssetPopulator.direction_reading_for. %>
-                <% reading = AssetPopulator.direction_reading_for(@survey) %>
-                <% if reading[:toward].any? || reading[:avoiding].any? %>
+                          placeholder="<%= t("editor.shuffle_direction_placeholder") %>"></textarea>
+                <%# What the LAST shuffle's prompt reduced to, carried in the
+                    flash by SurveysController#shuffle_assets. Shown so a prompt
+                    that parsed to something the creator didn't mean is visible
+                    here rather than only in the pictures — and gone by the next
+                    page view, like the run it describes. %>
+                <% if flash[:shuffle_toward].present? || flash[:shuffle_avoiding].present? %>
                   <p class="shuffle-direction-reading">
-                    <% if reading[:toward].any? %>
-                      <span><%= t("editor.shuffle_direction_toward", terms: reading[:toward].join(", ")) %></span>
+                    <% if flash[:shuffle_toward].present? %>
+                      <span><%= t("editor.shuffle_direction_toward", terms: flash[:shuffle_toward]) %></span>
                     <% end %>
-                    <% if reading[:avoiding].any? %>
-                      <span><%= t("editor.shuffle_direction_avoiding", terms: reading[:avoiding].join(", ")) %></span>
+                    <% if flash[:shuffle_avoiding].present? %>
+                      <span><%= t("editor.shuffle_direction_avoiding", terms: flash[:shuffle_avoiding]) %></span>
                     <% end %>
                   </p>
                 <% end %>

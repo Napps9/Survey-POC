@@ -1095,13 +1095,12 @@ de:
     shuffle_title: Neue Bilder aus der Verto-Bibliothek auswählen
     shuffle_confirm: Bilder neu mischen? Ihre aktuellen Bilder werden durch eine neue Auswahl aus der Bibliothek ersetzt.
     shuffle_direction_toggle_title: "Eine Vorgabe für dieses Mischen hinzufügen"
-    shuffle_direction_active: "Für dieses Mischen ist eine Vorgabe gesetzt"
     shuffle_direction_heading: "Dieses Mischen lenken"
     shuffle_direction_hint: "Optional. Sag Verto, was du dir von den Bildern und Animationen wünschst — eine Stimmung, ein Umfeld oder etwas, das weggelassen werden soll."
     shuffle_direction_label: "Vorgabe"
     shuffle_direction_placeholder: "z. B. warmes natürliches Licht, draußen, kleine Gruppen, keine Büros"
-    shuffle_direction_toward: "Suche nach: %{terms}"
-    shuffle_direction_avoiding: "Ausgeschlossen: %{terms}"
+    shuffle_direction_toward: "Letztes Mischen suchte nach: %{terms}"
+    shuffle_direction_avoiding: "und ließ aus: %{terms}"
     shuffle_direction_clear: "Leeren"
     shuffle_direction_apply: "Damit mischen"
     publish_share: Veröffentlichen & teilen →

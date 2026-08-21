@@ -1095,13 +1095,12 @@ it:
     shuffle_title: Scegli nuove immagini dalla libreria Verto
     shuffle_confirm: Rimescolare le immagini? Le foto attuali verranno sostituite con una nuova selezione dalla libreria.
     shuffle_direction_toggle_title: "Aggiungi un'indicazione per questo rimescolamento"
-    shuffle_direction_active: "È impostata un'indicazione per questo rimescolamento"
     shuffle_direction_heading: "Orienta questo rimescolamento"
     shuffle_direction_hint: "Facoltativo. Di' a Verto cosa cerchi nelle immagini e nelle animazioni: un'atmosfera, un contesto o qualcosa da escludere."
     shuffle_direction_label: "Indicazione"
     shuffle_direction_placeholder: "es. luce naturale calda, all'aperto, piccoli gruppi, niente uffici"
-    shuffle_direction_toward: "Ricerca: %{terms}"
-    shuffle_direction_avoiding: "Esclusi: %{terms}"
+    shuffle_direction_toward: "L'ultimo rimescolamento ha cercato: %{terms}"
+    shuffle_direction_avoiding: "ed ha escluso: %{terms}"
     shuffle_direction_clear: "Cancella"
     shuffle_direction_apply: "Rimescola con questo"
     publish_share: Pubblica e condividi →

@@ -720,14 +720,13 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "the demographic card gets a theme photo or a clean curated fallback, got #{img.inspect}")
   end
 
-  # ── Shuffle direction prompt (survey.shuffle_direction) ──────────────────
+  # ── Shuffle direction prompt (one shuffle, not stored) ───────────────────
   # The creator's optional steer for what they want out of the content and
   # imagery. A PREFERENCE: it colours every pick without displacing the theme,
   # the card's subject, safety or relevance.
 
   def steer(survey, direction)
-    survey.update!(shuffle_direction: direction)
-    AssetPopulator.new(survey)
+    AssetPopulator.new(survey, direction: direction)
   end
 
   MOUNTAIN_CARD = { "type" => "multiple_choice", "text" => "Favourite peak?" }.freeze
@@ -783,15 +782,14 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       AssetPopulator.direction_buckets("for a bank client \u2014 serious, city \u2014 no glass")
   end
 
-  test "direction_reading_for reports what was actually taken from the prompt" do
+  test "direction_reading reports what was actually taken from the prompt" do
     s = make_survey(theme: "Mountains", audience_age: "all", cards: [])
-    s.update!(shuffle_direction: "warm natural light, outdoors, no offices")
 
-    reading = AssetPopulator.direction_reading_for(s)
+    reading = AssetPopulator.direction_reading(s, "warm natural light, outdoors, no offices")
     assert_equal %w[warm natural light], reading[:toward], "exactly what goes to the search"
-    assert_equal %w[offices],      reading[:avoiding]
+    assert_equal %w[offices],            reading[:avoiding]
 
-    blank = AssetPopulator.direction_reading_for(make_survey(theme: "Mountains", cards: []))
+    blank = AssetPopulator.direction_reading(s, nil)
     assert_empty blank[:toward]
     assert_empty blank[:avoiding]
   end
@@ -832,11 +830,10 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
   test "a vetoed subject is filtered out of the Pexels results" do
     s = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
-    s.update!(shuffle_direction: "no snow")
 
     photos = [ pexels_photo(1, "Snow on a mountain peak in winter"),
                pexels_photo(2, "Green mountain peak in summer") ]
-    with_pexels(photos) { AssetPopulator.new(s).populate! }
+    with_pexels(photos) { AssetPopulator.new(s, direction: "no snow").populate! }
 
     img = s.reload.cards[0]["image"].to_s
     refute_includes img, "/photos/1/", "the vetoed photo must never be applied"
@@ -875,8 +872,8 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_includes plain.cards[0]["image"], "left-panel/"
 
     vetoed = make_survey(theme: "Football fans", audience_age: "18-24", cards: cards.map(&:dup))
-    vetoed.update!(shuffle_direction: "no sport")
-    AssetPopulator.new(vetoed, seed: "veto").populate!
+    direction = "no sport"
+    AssetPopulator.new(vetoed, seed: "veto", direction: direction).populate!
     vetoed.reload
     refute_includes vetoed.background_image, "backgrounds/sport-",
       "the sport backdrop carries the vetoed tag"
@@ -895,8 +892,8 @@ class AssetPopulatorTest < ActiveSupport::TestCase
       "an off-theme Verto still lands in the neutral General group"
 
     steered = make_survey(theme: "Weekly check-in", audience_age: "all", cards: cards.map(&:dup))
-    steered.update!(shuffle_direction: "recycling")
-    AssetPopulator.new(steered, seed: "anim").populate!
+    direction = "recycling"
+    AssetPopulator.new(steered, seed: "anim", direction: direction).populate!
 
     picked = steered.reload.cards[0]["range_theme"]
     refute_includes NpsHelper::RANGE_THEME_FALLBACK, picked, "the direction moved it off the fallback"
@@ -906,9 +903,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
   test "a vetoed animation is not played even when the theme asks for it" do
     s = make_survey(theme: "Football fans", audience_age: "all",
                     cards: [ { "type" => "range", "text" => "How was the match?", "options" => %w[Low High] } ])
-    s.update!(shuffle_direction: "no football")
+    direction = "no football"
 
-    AssetPopulator.new(s, seed: "anim").populate!
+    AssetPopulator.new(s, seed: "anim", direction: direction).populate!
 
     picked = s.reload.cards[0]["range_theme"]
     refute_includes %w[football football_goal], picked
@@ -917,9 +914,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
 
   test "a directed query that finds nothing relaxes back to the undirected one" do
     s = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
-    s.update!(shuffle_direction: "brutalist concrete")
+    direction = "brutalist concrete"
 
-    pop        = AssetPopulator.new(s)
+    pop        = AssetPopulator.new(s, direction: direction)
     directed   = pop.send(:card_query, s.cards[0])
     undirected = pop.send(:card_query, s.cards[0], directed: false)
     assert_not_equal directed, undirected, "the fixture must exercise two different queries"
@@ -927,7 +924,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     # Nothing for the directed query; a relevant photo only for the query with
     # the direction dropped.
     photo = pexels_photo(1, "Snowy mountain peak and alpine landscape")
-    with_pexels_by_query(undirected => [ photo ]) { AssetPopulator.new(s).populate! }
+    with_pexels_by_query(undirected => [ photo ]) do
+      AssetPopulator.new(s, direction: direction).populate!
+    end
 
     assert_includes s.reload.cards[0]["image"].to_s, "/photos/1/",
       "a preference that finds nothing must not cost the card its picture"
@@ -942,16 +941,20 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_includes q, "garden", "the rest of the direction still applies"
   end
 
-  test "search_hint_for gives the picker the wanted words only, never a veto" do
-    s = make_survey(theme: "Community and belonging", audience_age: "all", cards: [])
-    s.update!(shuffle_direction: "warm natural light, outdoors, small groups, no offices")
+  test "a populator built without a direction behaves as if the feature isn't there" do
+    cards = [ MOUNTAIN_CARD.dup ]
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: cards)
+    pop = AssetPopulator.new(s)
 
-    hint = AssetPopulator.search_hint_for(s)
-    assert_equal "warm natural light", hint, "capped to the same slice the populator sends"
-    refute_includes hint, "offices", "a veto in a search box asks for the thing it vetoes"
-
-    assert_equal "", AssetPopulator.search_hint_for(make_survey(theme: "T", cards: [])),
-      "no direction, no hint — the picker seeds on the theme alone as before"
+    # Everything the direction drives is inert, so nothing that populates
+    # outside Shuffle — the picker's Recommended rail, the player's mobile
+    # backdrop — can pick up a steer it was never given.
+    assert_empty pop.send(:direction_terms)
+    assert_empty pop.send(:direction_vetoes)
+    assert_empty pop.send(:direction_affinity)
+    assert_equal AssetPopulator::DEFAULT_MOODS, pop.send(:survey_query_tags)[:mood]
+    assert_equal pop.send(:card_query, cards[0], directed: false),
+                 pop.send(:card_query, cards[0])
   end
 
   # ── Prompt-first: a direction that names a subject leads the whole deck ───
@@ -1000,9 +1003,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
   test "a subject direction is followed by every card, not just a lucky one" do
     cards = (1..4).map { { "type" => "open_ended", "text" => "Tell us more" } }
     s = make_survey(theme: "Community sport", audience_age: "all", cards: cards)
-    s.update!(shuffle_direction: "We want to make this verto professional and corporate")
+    direction = "We want to make this verto professional and corporate"
 
-    with_pexels(mixed_pool) { AssetPopulator.new(s, seed: "led").populate! }
+    with_pexels(mixed_pool) { AssetPopulator.new(s, seed: "led", direction: direction).populate! }
 
     s.reload
     s.cards.each_with_index do |c, i|
@@ -1014,9 +1017,9 @@ class AssetPopulatorTest < ActiveSupport::TestCase
   test "a treatment-only direction leaves the deck's own subject alone" do
     cards = (1..4).map { { "type" => "open_ended", "text" => "Tell us more" } }
     s = make_survey(theme: "Community sport", audience_age: "all", cards: cards)
-    s.update!(shuffle_direction: "warm minimal")
+    direction = "warm minimal"
 
-    with_pexels(mixed_pool) { AssetPopulator.new(s, seed: "led").populate! }
+    with_pexels(mixed_pool) { AssetPopulator.new(s, seed: "led", direction: direction).populate! }
 
     s.reload.cards.each_with_index do |c, i|
       refute corporate?(c["image"]),

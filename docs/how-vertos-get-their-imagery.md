@@ -26,8 +26,7 @@ this covers visuals).*
    re-rolls the picks (and it's disabled once a Verto is live).
 5. **A shuffle can be steered.** An optional **direction prompt** beside
    Shuffle lets the creator say what they're after — a mood, a setting, or
-   something to keep out — and that preference colours every pick from then on
-   (see §4a).
+   something to keep out — for that one shuffle (see §4a).
 
 ---
 
@@ -156,9 +155,19 @@ next; repeats are allowed only once a pool is exhausted.
 Beside the editor's **Shuffle** button is an optional free-text box — the
 **direction prompt** — where a creator says what they want out of the Verto's
 content and imagery: *"warm natural light, outdoors, small groups, no
-offices."* It is saved on the Verto, so the box stays filled in, the next
-shuffle leans the same way, and so does anything else that re-populates (the
-picker's Recommended rail, the picker's first search).
+offices."*
+
+**It belongs to one shuffle and is not stored.** The box starts empty every
+time; a steer applies to the click it was typed for and nothing else. It first
+shipped saved on the Verto so the box would stay filled in, which turned it
+into invisible state — a sentence typed once went on quietly deciding every
+later shuffle, under a panel headed "Steer *this* shuffle". Nothing outside a
+shuffle reads a direction, so the picker's Recommended rail, its first search
+and the player's mobile backdrop are all theme-only.
+
+After a shuffle the panel reports what the prompt reduced to — *"Last shuffle
+searched for: professional, corporate"* — carried in the flash, so it describes
+the run that just happened and is gone by the next page view.
 
 It is a **preference layered over** everything above, never a replacement for
 it. The theme still anchors the search, a card still names its own subject,
@@ -421,11 +430,13 @@ drop onto any card or background from the editor's media picker.
 - `app/javascript/controllers/media_picker_controller.js` — the editor's
   picker; `SurveysController#pexels_search` / `#shuffle_assets` — its
   endpoints.
-- The direction prompt (§4a): stored as `Survey#shuffle_direction`, parsed by
+- The direction prompt (§4a): passed per-shuffle as
+  `AssetPopulator.new(survey, direction:)` and never persisted, parsed by
   `AssetPopulator.direction_buckets` (wants vs. vetoes) and applied through the
-  populator's `direction_*` helpers; `AssetPopulator.search_hint_for` is the
-  search-box-safe slice the media picker seeds with;
-  `app/javascript/controllers/shuffle_controller.js` opens the panel.
+  populator's `direction_*` helpers — `direction_subject?` decides whether it
+  leads or only shades. `AssetPopulator.direction_reading` is what the editor
+  reports back after a run; `app/javascript/controllers/shuffle_controller.js`
+  opens the panel.
 - `Organisation#assets` + `OrganisationAssetsController` — the per-account brand
   asset library; surfaced in `surveys/_media_modal` ("Your brand library") and
   managed on `memberships/index`; `Survey::ACTIVE_STORAGE_IMAGE_URL` allows its

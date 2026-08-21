@@ -1095,13 +1095,12 @@ hi:
     shuffle_title: Verto लाइब्रेरी से नई इमेजरी चुनें
     shuffle_confirm: इमेजरी शफ़ल करें? आपकी मौजूदा तस्वीरें लाइब्रेरी से नई चुनी गई तस्वीरों से बदल दी जाएंगी।
     shuffle_direction_toggle_title: "इस शफ़ल के लिए दिशा जोड़ें"
-    shuffle_direction_active: "इस शफ़ल के लिए एक दिशा तय है"
     shuffle_direction_heading: "इस शफ़ल को दिशा दें"
     shuffle_direction_hint: "वैकल्पिक। Verto को बताएं कि आप तस्वीरों और एनिमेशन में क्या चाहते हैं — कोई मूड, कोई जगह, या जो नहीं चाहिए।"
     shuffle_direction_label: "दिशा"
     shuffle_direction_placeholder: "उदा. गर्म प्राकृतिक रोशनी, बाहर, छोटे समूह, ऑफ़िस नहीं"
-    shuffle_direction_toward: "खोज रहे हैं: %{terms}"
-    shuffle_direction_avoiding: "बाहर रख रहे हैं: %{terms}"
+    shuffle_direction_toward: "पिछले शफ़ल ने खोजा: %{terms}"
+    shuffle_direction_avoiding: "और बाहर रखा: %{terms}"
     shuffle_direction_clear: "साफ़ करें"
     shuffle_direction_apply: "इसी से शफ़ल करें"
     publish_share: प्रकाशित करें और साझा करें →

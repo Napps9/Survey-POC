@@ -1095,13 +1095,12 @@ pt:
     shuffle_title: Escolher novas imagens da biblioteca Verto
     shuffle_confirm: Embaralhar imagens? As suas imagens atuais serão substituídas por uma nova seleção da biblioteca.
     shuffle_direction_toggle_title: "Adicionar uma orientação para este embaralhamento"
-    shuffle_direction_active: "Há uma orientação definida para este embaralhamento"
     shuffle_direction_heading: "Oriente este embaralhamento"
     shuffle_direction_hint: "Opcional. Diga ao Verto o que procura nas imagens e animações — um clima, um cenário ou algo a deixar de fora."
     shuffle_direction_label: "Orientação"
     shuffle_direction_placeholder: "ex. luz natural quente, ao ar livre, grupos pequenos, sem escritórios"
-    shuffle_direction_toward: "A procurar: %{terms}"
-    shuffle_direction_avoiding: "A excluir: %{terms}"
+    shuffle_direction_toward: "O último embaralhamento procurou: %{terms}"
+    shuffle_direction_avoiding: "e excluiu: %{terms}"
     shuffle_direction_clear: "Limpar"
     shuffle_direction_apply: "Embaralhar com isto"
     publish_share: Publicar e partilhar →

@@ -1095,13 +1095,12 @@ he:
     shuffle_title: בחר מחדש תמונות מספריית verto
     shuffle_confirm: לערבב תמונות? התמונות הנוכחיות שלך יוחלפו בבחירה חדשה מהספרייה.
     shuffle_direction_toggle_title: "הוסיפו הנחיה לערבוב הזה"
-    shuffle_direction_active: "הוגדרה הנחיה לערבוב הזה"
     shuffle_direction_heading: "כוונו את הערבוב"
     shuffle_direction_hint: "אופציונלי. ספרו ל-Verto מה אתם מחפשים בתמונות ובאנימציות — אווירה, סביבה, או משהו להשמיט."
     shuffle_direction_label: "הנחיה"
     shuffle_direction_placeholder: "לדוגמה: אור טבעי חמים, בחוץ, קבוצות קטנות, בלי משרדים"
-    shuffle_direction_toward: "מחפש: %{terms}"
-    shuffle_direction_avoiding: "משאיר בחוץ: %{terms}"
+    shuffle_direction_toward: "הערבוב האחרון חיפש: %{terms}"
+    shuffle_direction_avoiding: "והשאיר בחוץ: %{terms}"
     shuffle_direction_clear: "ניקוי"
     shuffle_direction_apply: "ערבבו לפי זה"
     publish_share: פרסם ושתף →

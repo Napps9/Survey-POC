@@ -28,15 +28,22 @@
 #
 # Shuffle: pass a different `seed:` and call populate! again.
 #
-# ── The direction prompt (survey.shuffle_direction) ────────────────────────
+# ── The direction prompt (AssetPopulator.new(survey, direction:)) ──────────
 # Optional free text the creator types beside Shuffle saying what they want out
 # of the Verto's content and imagery — "warm, outdoors, small groups, no
-# offices". It is a PREFERENCE laid over every existing signal, never a
+# offices". It belongs to ONE shuffle: it arrives with the click, steers that
+# run, and is not stored. It first shipped saved on the Verto so the box would
+# stay filled in, which turned it into invisible state — a steer typed once
+# went on quietly deciding every later shuffle, under a panel headed "Steer
+# THIS shuffle". A prompt box that comes back pre-filled is answering a
+# question nobody asked again.
+#
+# It is a PREFERENCE laid over every existing signal, never a
 # replacement for them: the theme still anchors the search, the card still
 # names its subject, safety and relevance still decide what may be applied.
 # Concretely it does four things (see the "Direction" section below):
 #
-#   * appends up to DIRECTION_QUERY_TERMS of its words to every Pexels query,
+#   * leads every Pexels query with up to DIRECTION_QUERY_TERMS of its words,
 #     with a one-step relaxation back to the undirected query when the
 #     narrowed one finds nothing;
 #   * widens the curated library's theme match/scoring with its words, and
@@ -45,9 +52,12 @@
 #   * vetoes: a clause the creator negated ("no offices") is never searched
 #     for and is filtered OUT of both Pexels results and the curated pool.
 #
-# It lives on the Verto rather than on the click so the box stays filled in and
-# every later re-population — Shuffle again, the picker's Recommended rail —
-# leans the same way.
+# And, when it names a subject area rather than a treatment, it leads outright
+# — see direction_subject?.
+#
+# Nothing here reads the survey for it. A populator built without a direction
+# behaves exactly as it did before the feature existed, which is what every
+# caller other than Shuffle gets.
 class AssetPopulator
   MANIFEST_PATH       = Rails.root.join("app/assets/images/verto-library/manifest.yml").freeze
   BACKGROUND_DIR      = "verto-library/backgrounds".freeze
@@ -217,12 +227,9 @@ class AssetPopulator
       candidates = Array(manifest["mobile_backgrounds"])
       return nil if candidates.empty?
 
-      # The direction widens the themes considered here exactly as it does for
-      # every other pick, so a Verto steered toward "coastal, calm" doesn't
-      # keep a mobile backdrop chosen off the bare theme alone.
-      wanted, unwanted = direction_buckets(survey.shuffle_direction)
-      themes = theme_keywords(survey.theme) | expand_themes(wanted)
-      query  = { themes: themes, age: age_buckets(survey.audience_age) }
+      # Theme-only. This runs on the PLAYER, long after any shuffle, so there
+      # is no direction in scope — a steer belongs to the run it was typed for.
+      query  = { themes: theme_keywords(survey.theme), age: age_buckets(survey.audience_age) }
       themed = candidates.select do |a|
         asset_themes = Array(a["themes"]).map { |t| t.to_s.downcase }
         (asset_themes & query[:themes]).any?
@@ -230,9 +237,6 @@ class AssetPopulator
       # No themed match? Fall back to a random pick from the whole pool so
       # the card body still gets a mobile background instead of going blank.
       pool = themed.presence || candidates
-      # A vetoed asset is dropped, but never to the point of blanking the
-      # backdrop — "not that" is a preference, "something" is the invariant.
-      pool = pool.reject { |a| vetoed_asset?(a, unwanted) }.presence || pool
 
       # Stable per-survey choice; same Verto always lands on the same
       # picture so re-rendering doesn't flicker.
@@ -312,6 +316,21 @@ class AssetPopulator
       (tags & unwanted.map(&:singularize)).any?
     end
 
+    # What a direction prompt reduces to: the terms that will be searched on,
+    # and the words that will be kept out. Shuffle reports this back to the
+    # editor after a run, because the alternative is what happened the first
+    # time this shipped — "We want to make this verto professional and
+    # corporate" reduced to `make verto`, searched for THAT, and nothing
+    # anywhere said why the pictures came back unchanged in character. A parse
+    # the creator can see is a parse they can correct.
+    #
+    # Needs the survey as well as the text: safety scrubbing is audience-
+    # dependent and the charged-term strip reads the theme.
+    def direction_reading(survey, direction)
+      pop = new(survey, direction: direction)
+      { toward: pop.send(:direction_terms), avoiding: pop.send(:direction_vetoes) }
+    end
+
     def age_buckets(audience_age)
       s = audience_age.to_s.downcase
       buckets = []
@@ -340,29 +359,6 @@ class AssetPopulator
     #
     #   recommended_paths(survey, context: :background)
     #   recommended_paths(survey, context: :card, card: cards_hash)
-    # The slice of a Verto's direction prompt that is fit to drop into a SEARCH
-    # BOX: the wanted words only, safety-scrubbed and capped exactly as the
-    # populator's own queries are. The editor's media picker seeds its first
-    # search with it so a creator who has already said "warm, outdoors" doesn't
-    # have to say it again — and so the picker sends the same hint the shuffle
-    # did. The vetoed half is deliberately dropped rather than passed through:
-    # "no offices" in a query string asks Pexels FOR offices.
-    def search_hint_for(survey)
-      new(survey).send(:direction_terms).join(" ")
-    end
-
-    # What the populator actually TOOK from the direction prompt: the terms it
-    # will search on, and the words it will keep out. The editor prints this
-    # under the box, because the alternative is what happened the first time
-    # this shipped — a direction that reduced to `make verto` searched for that
-    # instead of the "professional and corporate" the creator wrote, the
-    # pictures came back unchanged in character, and nothing anywhere said why.
-    # A parse the creator can see is a parse they can correct.
-    def direction_reading_for(survey)
-      pop = new(survey)
-      { toward: pop.send(:direction_terms), avoiding: pop.send(:direction_vetoes) }
-    end
-
     def recommended_paths(survey, context:, card: nil, limit: 8)
       pop = new(survey)
       case context
@@ -373,9 +369,13 @@ class AssetPopulator
     end
   end
 
-  def initialize(survey, seed: nil)
-    @survey = survey
-    @seed   = seed || survey.id
+  # `direction`: the creator's optional steer for THIS run (see the header).
+  # Absent for every caller but Shuffle, and absent means "behave as if the
+  # feature isn't there".
+  def initialize(survey, seed: nil, direction: nil)
+    @survey    = survey
+    @seed      = seed || survey.id
+    @direction = Survey.sanitize_shuffle_direction(direction)
     # Memoises Pexels search results per (query, orientation) so a populate!
     # run makes at most one API call per distinct query — keeps us well inside
     # the rate limit even for a long Verto.
@@ -1023,7 +1023,7 @@ class AssetPopulator
   # ── Direction ─────────────────────────────────────────────────────────────
 
   def direction_text
-    @survey.shuffle_direction
+    @direction
   end
 
   # [wanted, vetoed] — parsed once per run.
