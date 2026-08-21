@@ -7921,7 +7921,25 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-btn-max-w: 110px;      /* desktop's .preview-btn min-width */
     --play-btn-h:      44px;      /* desktop is 40; this is the touch floor */
     --play-btn-fs:     0.9375rem; /* 15px — desktop's, raised from 13 to match */
+
+    /* White, because on a phone the CARD IS THE SCREEN.
+       The footer has never had a background of its own — it is transparent and
+       the Verto's brand backdrop shows through it. On desktop that is right:
+       the card floats on the backdrop and the bar belongs to the backdrop. Full
+       bleed it is not, because the white card runs to the footer's top edge and
+       the bar reads as a dark strip pasted under it ("weird black bit at the
+       bottom is still there, should be white").
+       Mobile only, deliberately. Painting the desktop footer white would put a
+       white bar across a branded backdrop the card is only floating on. */
+    background: #fff;
+    /* The hairline was rgba(255,255,255,0.07) — a white line for a dark bar,
+       invisible the moment the bar turns white. Inverted so the seam between
+       the answer and the controls still reads. */
+    border-top: 1px solid rgba(0,0,0,0.08);
   }
+  /* The points counter carries its own dark backing pill so it can sit on any
+     backdrop — still true, still correct on white. Left alone.
+     Back is inverted where it is actually defined, further down this block. */
   .preview-overlay .preview-btn {
     flex: 1 1 0;
     max-width: var(--play-btn-max-w);
@@ -7938,10 +7956,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
     white-space: nowrap;
     border-radius: 14px;
   }
+  /* Inverted, because the bar underneath it is now white (see the footer's
+     background above). These were white-on-white the moment that landed:
+     6% white fill, 75% white text, 8% white border — the button measured
+     present, visible and opacity 1, and could not be seen at all. A reminder
+     that "visible" in the DOM is not the same as legible on screen. */
   .preview-overlay .preview-btn-back {
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.75);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.05);
+    backdrop-filter: none;
+    color: #1C2034;
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+  .preview-overlay .preview-btn-back:hover {
+    background: rgba(0,0,0,0.09);
+    color: #1C2034;
   }
   .preview-overlay .preview-btn-back.invisible {
     visibility: visible;

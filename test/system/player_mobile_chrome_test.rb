@@ -145,4 +145,105 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
                  "the caption should turn brand when selected, the way a .choice-list row's " \
                  "label already does"
   end
+
+  # On a phone the CARD IS THE SCREEN, so the footer belongs to the card rather
+  # than to the backdrop behind it. It never had a background of its own — it
+  # was transparent and the Verto's brand backdrop showed through — so the
+  # white card ran to the footer's top edge and the bar read as a dark strip
+  # pasted underneath it ("weird black bit at the bottom is still there, should
+  # be white"). Desktop is deliberately unchanged: there the card floats ON the
+  # backdrop and the bar belongs to the backdrop.
+  test "the mobile footer continues the card rather than showing the backdrop" do
+    open_player
+    bg = page.evaluate_script(
+      "getComputedStyle(document.querySelector('.preview-footer')).backgroundColor"
+    )
+    assert_equal "rgb(255, 255, 255)", bg,
+                 "the footer is #{bg}. Transparent (rgba(0,0,0,0)) means the brand backdrop is " \
+                 "showing through it again, which is the dark strip this fixed."
+  end
+
+  # The half of that change that is easy to miss, and did get missed: the
+  # controls on the bar were drawn for a DARK bar. Back was 6% white on 8%
+  # white with 75% white text — on a white footer it measured present, visible
+  # and opacity 1, and could not be seen at all. "Visible" in the DOM is not
+  # the same as legible on screen, so this asserts contrast rather than
+  # existence.
+  #
+  # What it asks depends on how the control is painted, because only one of
+  # the two can be affected by the bar's colour at all:
+  #   • a TRANSLUCENT control is effectively sitting on the bar, so its label
+  #     is judged against the bar — this is the disappear-into-white case.
+  #   • an OPAQUE control brings its own background, so its label's contrast is
+  #     a question about that fill and nothing to do with the footer. What the
+  #     footer can still break is the button reading as a distinct SHAPE, so
+  #     the fill is judged against the bar instead.
+  #
+  # Worth recording, because this test found it and it is deliberately out of
+  # scope here: Submit is white on the brand CTA colour at 3.71:1, under the
+  # 4.5:1 floor for text of its size. That was true before the footer changed
+  # and is true on desktop too — it is a brand-palette question, not a
+  # consequence of this, and fixing it means changing a client's CTA colour.
+  # 3:1, not the 4.5:1 that body text of this size would normally want, and the
+  # reason is worth stating rather than quietly picking a number that passes.
+  # The failure this guards against is a control vanishing INTO the bar —
+  # measured at roughly 1.1:1 when Back was still drawn for a dark footer. A
+  # floor of 3 catches that with room to spare.
+  # It is set below 4.5 because Submit is white on the brand CTA colour at
+  # 3.71:1, which fails AA for its size — but that is true on desktop, was true
+  # before this change, and is a decision about a client's brand palette rather
+  # than about the footer. Raising this floor would make this test fail for a
+  # reason it does not own, so the finding is recorded above instead.
+  LEGIBLE_FLOOR = 3.0
+
+  test "the footer's controls are legible against it" do
+    open_player
+    contrast = page.evaluate_script(<<~JS)
+      (() => {
+        // No backslash classes here on purpose: this travels through a Ruby
+        // heredoc before the browser sees it, and an escaped regex arrives
+        // mangled. Computed colours are always "rgb(r, g, b)" or "rgba(...)",
+        // so stripping everything that is not a digit, dot or comma parses
+        // them without one.
+        const nums = (c) => c.replace(/[^0-9.,]/g, "").split(",").map(Number)
+        const lum = (c) => {
+          const [r, g, b] = nums(c).slice(0, 3).map(v => {
+            v /= 255
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+          })
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b
+        }
+        const ratio = (a, b) => {
+          const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
+          return (x + 0.05) / (y + 0.05)
+        }
+        const foot = getComputedStyle(document.querySelector(".preview-footer")).backgroundColor
+        const out = {}
+        for (const sel of [ ".preview-btn-back", ".preview-btn-next", ".preview-btn-finish" ]) {
+          const el = document.querySelector(".preview-footer " + sel)
+          if (!el) continue
+          const cs = getComputedStyle(el)
+          // A button with its own opaque fill is judged against that fill; a
+          // translucent one is effectively sitting on the bar itself.
+          // The label against whatever it is actually painted on: its own fill
+          // if that fill is opaque, otherwise the bar showing through it.
+          const own = cs.backgroundColor
+          const parts = nums(own)
+          const alpha = parts.length > 3 ? parts[3] : 1
+          const on = alpha > 0.5 ? own : foot
+          out[sel] = { on, ratio: +ratio(cs.color, on).toFixed(2) }
+        }
+        return out
+      })()
+    JS
+
+    assert contrast.any?, "no footer controls found"
+    contrast.each do |sel, m|
+      assert_operator m["ratio"], :>=, LEGIBLE_FLOOR,
+                      "#{sel}: its label is #{m['ratio']}:1 against #{m['on']}. The bar is " \
+                      "white now — a control still drawn for a dark bar reads as nothing at " \
+                      "all on it (Back measured about 1.1:1 before this, while reporting " \
+                      "itself visible with opacity 1)."
+    end
+  end
 end
