@@ -195,13 +195,24 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_includes html, "error-&gt;brand-logo#failed"
   end
 
-  test "an organisation with no logo falls back to the Playverto wordmark" do
+  test "an organisation with no logo gets no logo, not our wordmark" do
     org = Organisation.create!(name: "Bare Co", slug: "bare-co-#{SecureRandom.hex(3)}")
 
     html = brand_logo_tag(org)
 
-    assert_match(/playverto.*\.svg/, html)
-    # Nothing to fail, so no fallback hook — the wordmark is a local asset.
-    refute_includes html, "brand-logo"
+    # This used to substitute playverto.svg. That put OUR mark in the slot
+    # reserved for the customer's — above their deck, and on the thank-you card
+    # directly above the "Powered by Playverto" line, so it appeared twice.
+    assert_nil html,
+               "an org with no logo must render nothing at all — nil rather than an empty " \
+               "string, so a caller can skip drawing a wrapper whose padding would otherwise " \
+               "hold an empty band open (see .player-brand-header)"
+  end
+
+  test "a nil organisation is handled the same way" do
+    # The player resolves its org through @survey.organisation, and a caller
+    # reaching this helper with nothing at all should get nothing back rather
+    # than an exception or a stray wordmark.
+    assert_nil brand_logo_tag(nil)
   end
 end

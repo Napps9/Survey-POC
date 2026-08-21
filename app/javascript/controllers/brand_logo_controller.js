@@ -12,11 +12,12 @@ import { Controller } from "@hotwired/stimulus"
 // each remove one of those; none of them can make bytes reappear. Whatever the
 // reason, a logo that isn't there should simply not be there.
 //
-// Deliberately does NOT substitute the Playverto wordmark. The fallback in
-// brand_logo_tag is for an org that never uploaded a logo; swapping OUR mark in
-// where a client's own logo failed would put the wrong brand on their Verto,
-// and on the thank-you card it would sit right above the "Powered by Playverto"
-// wordmark that is already there.
+// Deliberately does NOT substitute the Playverto wordmark — and nothing else
+// does either any more: brand_logo_tag renders nothing at all for an org with
+// no logo, so a failed load and a missing upload now reach the same place from
+// opposite directions. Swapping OUR mark in where a client's own logo failed
+// would put the wrong brand on their Verto, and on the thank-you card it would
+// sit right above the "Powered by Playverto" wordmark that is already there.
 export default class extends Controller {
   connect() {
     // The image can finish (and fail) before this lazily-loaded controller

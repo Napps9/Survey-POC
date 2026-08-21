@@ -8,7 +8,6 @@ export default class extends Controller {
   static targets = ["input", "preview", "removeBtn", "status"]
   static values  = {
     url: String,
-    fallback: String,
     // Mirrors of Organisation::LOGO_MAX_BYTES / LOGO_CONTENT_TYPES, passed in
     // from the view so the check here and the model's validation can't drift.
     maxBytes: Number,
@@ -99,11 +98,31 @@ export default class extends Controller {
     return `${mb >= 10 ? Math.round(mb) : mb.toFixed(1)} MB`
   }
 
-  // logo_url is the org logo path, or null when reverted to the Playverto
-  // wordmark (its asset path is passed in as the fallback value).
+  // logo_url is the org logo path, or null once the logo has been removed.
+  //
+  // The <img> is CREATED and DESTROYED here rather than merely re-pointed.
+  // This used to read the existing tag and bail if it wasn't there — which was
+  // safe only while brand_logo_tag always rendered one, falling back to the
+  // Playverto wordmark. Now an org with no logo has no <img> in the preview at
+  // all, so "find it and set its src" would find nothing and do nothing: the
+  // upload would succeed server-side and the preview would silently stay
+  // empty, which is the worst shape this bug could take — it looks like the
+  // upload failed when it didn't.
   _setPreview(logoUrl) {
-    const img = this.previewTarget.querySelector("img")
-    if (img) img.src = logoUrl || this.fallbackValue
+    let img = this.previewTarget.querySelector("img")
+    if (logoUrl) {
+      if (!img) {
+        img = document.createElement("img")
+        // Mirrors brand_logo_tag's own sizing for this slot, so the tag the
+        // server would have rendered and the one built here look identical.
+        img.style.cssText = "height:30px;width:auto;max-width:150px;object-fit:contain;"
+        img.alt = ""
+        this.previewTarget.appendChild(img)
+      }
+      img.src = logoUrl
+    } else {
+      img?.remove()
+    }
     if (this.hasRemoveBtnTarget) this.removeBtnTarget.hidden = !logoUrl
   }
 

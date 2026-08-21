@@ -444,8 +444,20 @@ module ApplicationHelper
     grouped.reject { |_, files| files.empty? }
   end
 
-  # Renders the organisation's uploaded logo if present, otherwise falls back
-  # to the Playverto wordmark. `style` overrides the default sizing.
+  # Renders the organisation's uploaded logo, or NOTHING when they haven't
+  # uploaded one. `style` overrides the default sizing.
+  #
+  # No-logo means no logo, everywhere. This used to substitute the Playverto
+  # wordmark, which put OUR mark in the space reserved for the customer's —
+  # above their deck, and on the thank-you card directly above the "Powered by
+  # Playverto" line that is the real attribution, so it appeared twice. That
+  # line (player.powered_by) is untouched and remains the one place we sign the
+  # work; this slot belongs to whoever published the Verto or to nobody.
+  #
+  # Returns nil rather than an empty string so `<%= %>` renders nothing and a
+  # caller can test the result to decide whether its wrapper is worth drawing
+  # at all (see .player-brand-header and .split-right-logo, both of which skip
+  # an empty box that would otherwise hold its padding open).
   #
   # PROXY rather than the usual redirect path. `rails_blob_path` returns
   # /rails/active_storage/blobs/redirect/…: a 302 cached for 300s pointing at a
@@ -473,8 +485,6 @@ module ApplicationHelper
         class: css_class,
         data:  { controller: "brand-logo", action: "error->brand-logo#failed" }
       )
-    else
-      image_tag("playverto.svg", style: style, alt: alt || "Playverto", class: css_class)
     end
   end
 

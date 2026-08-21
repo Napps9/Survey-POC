@@ -4976,6 +4976,27 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   transition: transform 0.15s;
 }
 .publish-block[open] .pub-chev { transform: rotate(180deg); }
+/* The "nothing uploaded yet" state of a logo slot, on the branding panel and
+   the dashboard's brand row. Both slots are bordered boxes that used to be
+   filled by the Playverto wordmark standing in for an absent logo; now that no
+   logo means no logo, an empty bordered box would read as a failed render
+   rather than as an empty slot, so it says so instead.
+   :has() rather than a server-side conditional because logo-uploader paints
+   the <img> in and out client-side after an upload or a remove — the label has
+   to answer to the DOM as it is now, not as it was rendered. Anchored on the
+   label itself (does a sibling image follow me?) rather than on the slot
+   (`:has(> img) > …`): the latter has no class to match first, so the browser
+   evaluates the :has against every element on the page, and the editor's DOM
+   is not small. The span always precedes the image in both slots. */
+.logo-slot-empty {
+  font-family: "ABeeZee", sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.35);
+  white-space: nowrap;
+}
+.logo-slot-empty:has(~ img) { display: none; }
+
 .publish-block-btn {
   width: 100%;
   padding: 10px;
