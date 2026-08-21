@@ -72,3 +72,100 @@ document.addEventListener("focusout", schedule, true)
 if (window.visualViewport) {
   window.visualViewport.addEventListener("resize", setAppViewportHeight)
 }
+
+// ── Pinning the player overlay to the VISUAL viewport ─────────────────────
+//
+// Everything above measures the toolbar and publishes a height for CSS to use.
+// That was never quite enough, and a device pass showed why: on an iPhone with
+// the "+ Other" box open, the card sat with its top off screen, the footer
+// stranded mid-screen, and a band of bare <body> navy between the card and the
+// keyboard — the exact shape the comment at the top of this file describes.
+//
+// The root cause is the one that comment names: `.preview-overlay` is
+// `position: fixed; inset: 0` PLUS a height. Over-constrained, `bottom` is
+// dropped, so the box is ANCHORED to the layout viewport and SIZED to the
+// visual one. A height alone cannot fix that — get the size right and the box
+// is still in the wrong place the moment the two viewports disagree.
+//
+// The delta test above infers which platform it is on and freezes. That is an
+// inference about browser behaviour, and browser behaviour moves: the whole
+// design rests on "iOS Safari ignores interactive-widget entirely", which was
+// true when it was written. So stop inferring. Measure the visible rectangle
+// and put the overlay exactly on it:
+//
+//   height    = visualViewport.height     → the right size
+//   translateY(visualViewport.offsetTop)  → the right place
+//
+// This is correct without needing to know which platform, or which way this
+// year's Safari jumped:
+//   - keyboard shrinks the visual viewport only (classic iOS): height tracks
+//     it, the translate cancels the reveal-scroll. No bare body, ever.
+//   - keyboard shrinks the layout viewport too (Chrome with
+//     interactive-widget, and any Safari that starts honouring it): the two
+//     viewports agree, offsetTop is 0, and this is a no-op that sets the
+//     height it already had.
+//
+// --app-100vh is deliberately left alone. It still measures the toolbar for
+// its other consumers (.regions-overlay, and a max-height further down), and
+// the freeze above still protects them.
+//
+// One transform caveat, checked rather than assumed: a transform makes the
+// overlay a containing block for `position: fixed` DESCENDANTS. The player has
+// exactly one — .regions-overlay, the Compare panel — and it is `inset: 0`, so
+// positioning it against an overlay that exactly covers the visible area puts
+// it precisely where a fullscreen panel belongs. The transform is also only
+// set while there IS a scroll to cancel, so in the ordinary case no containing
+// block is created at all.
+const pinOverlay = () => {
+  const el = document.querySelector(".preview-overlay")
+  const vv = window.visualViewport
+  if (!el || !vv) return
+  el.style.height = `${vv.height}px`
+  el.style.transform = vv.offsetTop ? `translateY(${vv.offsetTop}px)` : ""
+}
+
+// ── ?vpdebug=1 ────────────────────────────────────────────────────────────
+// The numbers behind all of the above, on the device, because this is the one
+// path that cannot be exercised in a headless browser: the delta the freeze
+// keys off, whether the freeze is engaged, and where the overlay actually
+// ended up. Pinned to the visual viewport itself so it stays on screen with a
+// keyboard up.
+const vpDebug = () => {
+  if (!/[?&]vpdebug=1/.test(window.location.search)) return null
+  const box = document.createElement("div")
+  box.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:2147483647;" +
+    "background:rgba(0,0,0,0.82);color:#0f0;font:11px/1.45 ui-monospace,Menlo,monospace;" +
+    "padding:6px 8px;white-space:pre;pointer-events:none"
+  document.body.appendChild(box)
+  return () => {
+    const vv = window.visualViewport
+    const el = document.querySelector(".preview-overlay")
+    const r  = el && el.getBoundingClientRect()
+    const a  = document.activeElement
+    box.style.transform = vv && vv.offsetTop ? `translateY(${vv.offsetTop}px)` : ""
+    box.textContent = [
+      `innerH ${window.innerHeight}  vv.h ${vv ? Math.round(vv.height) : "-"}  ` +
+        `delta ${vv ? Math.round(window.innerHeight - vv.height) : "-"}  (freeze >${KEYBOARD_DELTA})`,
+      `vv.offsetTop ${vv ? Math.round(vv.offsetTop) : "-"}  vv.pageTop ${vv ? Math.round(vv.pageTop) : "-"}`,
+      `--app-100vh ${getComputedStyle(document.documentElement).getPropertyValue("--app-100vh").trim() || "(unset)"}`,
+      `kbd-open ${document.documentElement.classList.contains("kbd-open")}  focus ${a ? a.tagName.toLowerCase() : "-"}`,
+      `overlay top ${r ? Math.round(r.top) : "-"} h ${r ? Math.round(r.height) : "-"} bottom ${r ? Math.round(r.bottom) : "-"}`
+    ].join("\n")
+  }
+}
+
+const drawDebug = vpDebug()
+const syncViewport = () => { pinOverlay(); if (drawDebug) drawDebug() }
+
+syncViewport()
+window.addEventListener("resize", syncViewport)
+window.addEventListener("orientationchange", () => requestAnimationFrame(syncViewport))
+document.addEventListener("focusin", () => requestAnimationFrame(syncViewport), true)
+document.addEventListener("focusout", () => requestAnimationFrame(syncViewport), true)
+if (window.visualViewport) {
+  // scroll as well as resize: offsetTop changes when the browser scrolls the
+  // visual viewport to reveal a field, and that scroll is the half of this
+  // that a height-only fix could never see.
+  window.visualViewport.addEventListener("resize", syncViewport)
+  window.visualViewport.addEventListener("scroll", syncViewport)
+}
