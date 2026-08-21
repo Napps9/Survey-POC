@@ -2258,9 +2258,26 @@
   color: #111;
   outline: none;
 }
+/* Selecting an option must not re-typeset it. This used to swap the font
+   FAMILY — ABeeZee to Alata — which is two metric changes at once: Alata sits
+   on a taller line box and its glyphs are narrower, so a long label visibly
+   re-wrapped the moment you chose it (measured on a three-line option: text
+   height 57px → 66px, widest line 224.6px → 214.7px). Reported as "the font
+   size actually reduces slightly... it would be good if the font size doesnt
+   change at all - just applies a bold format".
+
+   A bold format is exactly what it cannot get from font-weight either:
+   ABeeZee and Alata are both self-hosted at weight 400 ONLY (see the
+   @font-face block at the top of this file), so any weight above that is
+   SYNTHESISED by the browser — which widens every glyph and re-wraps the line
+   just the same, only less.
+
+   text-stroke thickens the strokes without touching a single advance width,
+   so the line breaks exactly where it did unselected. Same paint as a heavier
+   weight; none of the layout. */
 .pick-item[data-selected="true"] .pick-text {
-  font-family: "Alata", sans-serif;
-  font-weight: 600;
+  -webkit-text-stroke: 0.4px currentColor;
+  paint-order: stroke fill;
   color: var(--brand-primary, var(--color-green-500));
 }
 
@@ -7107,7 +7124,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
      The one viewport that still scrolls is a landscape phone — 844×390 offers
      the card 228px, less than five answers can be drawn in — and it now scrolls
      32px instead of the ~200 the fixed floor cost it. */
-  .preview-overlay .rotate-card-stack { min-height: 260px; }
+  /* Squarer, and lower. The stack is 320px wide and used to run to the base
+     rule's 560px cap, which on an iPhone 15 is exactly what it reached — a
+     1.75 ratio, and the card filled its scroller with nothing left over
+     ("while I love the cards on mobile, it feels a bit squashed... reduce
+     overall card height a touch, gives more room above and below").
+     448px is 1.4 — near enough square to read as a card rather than a column,
+     and it hands 112px back to the space above and below. It is also what a
+     shorter phone was already choosing for itself: an SE measured 449px here
+     before this rule existed, because its scroller could not afford the cap.
+     So this makes every phone agree with the one that was already right. */
+  .preview-overlay .rotate-card-stack { min-height: 260px; max-height: 448px; }
   /* The vessel scales with the phone instead of assuming the smallest one.
      232px was chosen so the liquid column fits a short viewport, and then
      applied to every viewport — so a tall phone drew the same small vessel
@@ -7280,6 +7307,25 @@ body.generating-overlay-active .bottom-bar { display: none; }
      collapsed to its floor. tap_card_fits_test is the only guard. */
   .preview-overlay .split-card .split-right > .mt-2:has(> .rotate-wrap) {
     flex-grow: 1;
+  }
+
+  /* Keep the slider's travel out of the browser's edge back-swipe zone.
+     Measured before: the track ran to within 19.6px of each screen edge on an
+     iPhone 15 (18.8 on an SE), and the thumb CENTRES on the track's end at 0%
+     and 100% — so reaching for it at either extreme put a finger inside the
+     ~20px the OS reserves for "go back", and the drag navigated away instead
+     of moving the slider ("it's making me go back a page on the browser, and
+     not scroll").
+
+     `touch-action: none` is already on the track (:2086) and cannot help
+     here: the edge swipe is a SYSTEM gesture, not one a page is allowed to
+     claim. The only fix available is to stop putting a control there.
+
+     Horizontal only — the vertical variant's travel is up/down, its track is
+     48px wide and centred, and it sets its own wrap padding. */
+  .preview-overlay .slider-wrap:not([data-slider-axis-value="vertical"]) .slider-track-wrap {
+    padding-left: 26px;
+    padding-right: 26px;
   }
   /* "There are more options below" affordance. The usual pure-CSS trick —
      background-attachment: local/scroll shadow layers on the scroll

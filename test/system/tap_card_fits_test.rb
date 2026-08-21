@@ -129,7 +129,41 @@ class TapCardFitsTest < ApplicationSystemTestCase
 
   # The card is fluid, so it should actually be BIGGER where there is room —
   # otherwise the floor is doing all the work and the growth is decorative.
+  #
+  # This used to assert `tall > short + 100`, on the reasoning that a big
+  # difference proves growth. That stopped being the right test when the stack
+  # gained a mobile CAP: a tall phone now reaches the cap instead of running on
+  # to the base rule's 560px, so the honest gap narrowed to ~67px and the
+  # assertion failed on a card that was working perfectly. The cap is
+  # deliberate — 320x448 rather than 320x560, because 1.75 read as a column
+  # rather than a card and left nothing above or below it.
+  #
+  # So the question the test asks has moved: not "is the difference large" but
+  # "is each phone getting what it should" — the tall one its cap, the short
+  # one less than that because it genuinely cannot afford it, and NEITHER of
+  # them the 260px floor. That still catches the failure this file exists for
+  # (the stack collapsing to its floor when the flex growth chain breaks, which
+  # _fitCard's over() cannot see), and it no longer fails when the cap works.
+  #
+  # The cap is read from the CSS rather than restated here, the same trick
+  # player_type_floor_test uses: a deliberate retune moves the rule and this
+  # follows it; an accidental collapse still fails.
+  CSS = Rails.root.join("app/assets/tailwind/application.css").freeze
+
+  def mobile_stack_cap
+    body = File.read(CSS)[/\.preview-overlay \.rotate-card-stack \{([^}]*)\}/, 1]
+    body[/max-height:\s*(\d+)px/, 1].to_i
+  end
+
+  def mobile_stack_floor
+    body = File.read(CSS)[/\.preview-overlay \.rotate-card-stack \{([^}]*)\}/, 1]
+    body[/min-height:\s*(\d+)px/, 1].to_i
+  end
+
   test "the card grows into a tall phone rather than sitting at its floor" do
+    cap, floor = mobile_stack_cap, mobile_stack_floor
+    assert_operator cap, :>, floor, "the stack's cap and floor have crossed over"
+
     survey = deck(5)
     open_player(survey, 375, 553)
     short = fit_report["card"]
@@ -137,9 +171,16 @@ class TapCardFitsTest < ApplicationSystemTestCase
     open_player(survey, 390, 844)
     tall = fit_report["card"]
 
-    assert_operator tall, :>, short + 100,
-                    "a tall phone gave the card #{tall}px and a short one #{short}px. The point " \
-                    "of a fluid card is that the extra room is used; if these are close, the " \
-                    "growth is not happening."
+    assert_in_delta cap, tall, 6,
+                    "a tall phone gave the card #{tall}px, not its #{cap}px cap. There is room " \
+                    "for the whole card here, so anything less means the growth chain is broken " \
+                    "and the stack is falling back toward its floor."
+    assert_operator short, :>, floor + 40,
+                    "a short phone dropped the card to #{short}px against a #{floor}px floor. " \
+                    "Sitting ON the floor is the collapse this file exists to catch — nothing " \
+                    "in the app can see it, because _fitCard's over() reads 0 either way."
+    assert_operator tall, :>, short,
+                    "the tall phone (#{tall}px) gave the card no more than the short one " \
+                    "(#{short}px), so the card is not fluid at all any more."
   end
 end

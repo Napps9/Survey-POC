@@ -116,8 +116,18 @@ if (window.visualViewport) {
 // it precisely where a fullscreen panel belongs. The transform is also only
 // set while there IS a scroll to cancel, so in the ordinary case no containing
 // block is created at all.
-const pinOverlay = () => {
+// RENDERED, not merely present. The editor ships a .preview-overlay too — its
+// preview mode's, `hidden` until a creator opens it (surveys/show:1683) — so
+// existence is not the question, being laid out is. An overlay that is
+// display:none has no geometry to pin and writing an inline height onto it
+// just leaves a stale one for whenever it IS opened.
+const liveOverlay = () => {
   const el = document.querySelector(".preview-overlay")
+  return el && el.getClientRects().length ? el : null
+}
+
+const pinOverlay = () => {
+  const el = liveOverlay()
   const vv = window.visualViewport
   if (!el || !vv) return
   el.style.height = `${vv.height}px`
@@ -191,12 +201,13 @@ const step = () => {
 
 const settle = () => {
   // This module is imported by application.js, so it loads on every page — but
-  // there is only something to track on a page carrying a player overlay.
-  // Without this guard, every focusin in the EDITOR (a creator clicking into
-  // any card's contenteditable, which is most of what editing is) would arm a
-  // 700ms 60fps chain of calls that early-return, all day, on a laptop that is
-  // also rendering the designer.
-  if (!document.querySelector(".preview-overlay")) return
+  // there is only something to track while a player overlay is actually on
+  // screen. Testing for the element's EXISTENCE does not say that and was the
+  // first version of this guard: the editor has one too, so every focusin
+  // while editing — which is most of what editing is — armed a 700ms 60fps
+  // chain on a laptop already rendering the designer. liveOverlay() asks the
+  // question that was meant: is there a laid-out overlay to pin?
+  if (!liveOverlay()) return
   settleUntil = Date.now() + SETTLE_MS
   if (settleFrame === null) settleFrame = requestAnimationFrame(step)
 }
