@@ -166,7 +166,8 @@ and safety and relevance still decide what may actually be applied.
 
 | Where it lands | What it does |
 |---|---|
-| Pexels queries | Up to two of its words are appended to every query, *after* the theme and the card's subject. If the narrowed query finds nothing relevant, the direction is the first thing dropped and the query is re-run without it. |
+| Pexels queries | Up to three of its words **lead** every query, ahead of the theme and the card's subject. If the narrowed query finds nothing relevant, the direction is the first thing dropped and the query is re-run without it. |
+| Which result is applied | Candidates that visibly answer the direction are taken first. This is what makes a direction stick across a whole deck rather than landing on whichever card the seed happened to favour. |
 | Library scoring | Its words count as theme keywords (and expand through the same clusters), so an asset the creator asked for can clear the theme gate. A mood or style it names (*calm, minimal*) replaces the default spread instead of adding to it. |
 | Range animations | Its words join the theme's when matching the reaction-animation set, so a Verto steered toward "recycling" reacts with recycling. |
 | Mobile backdrop | Widens the themes that backdrop is matched on. |
@@ -192,13 +193,23 @@ come back looking untouched. That is exactly how this shipped broken the first
 time: *"We want to make this verto professional and corporate"* reduced to
 `make verto` and searched for that.
 
-**It shades; it doesn't override.** The query stays theme-anchored, so a
-direction changes *how* the Verto's subject is depicted, not *what* is
-depicted. "Professional and corporate" on a community-safety Verto biases the
-results toward the more formal community photos — it will not return
-boardrooms, because the relevance floor still requires a picture to depict the
-subject. A direction that names a subject of its own ("city, glass buildings")
-moves the imagery much further than one that names only a treatment.
+**A direction that names a subject leads; one that names a treatment shades.**
+The two are told apart by whether the theme clusters recognise any of its words
+— "professional and corporate" reaches the work cluster, "warm minimal" reaches
+nothing, because no cluster claims an adjective.
+
+- **Names a subject** → the direction goes first. A prompt-first query (the
+  direction plus one theme word) is tried *before* each card's own search, its
+  vocabulary counts toward the relevance floor, and on-direction results are
+  applied ahead of the rest. A community-sport Verto told "professional and
+  corporate" comes back corporate — background and every card.
+- **Names only a treatment** → nothing above applies, and the direction does
+  what it always did: rides along on the query and narrows the library's
+  mood/style. It biases *among* pictures of the Verto's own subject rather
+  than replacing them.
+
+If a direction isn't moving things far enough, name a subject in it: *"offices,
+meeting rooms, city skyline"* moves a deck much further than *"more formal"*.
 
 **Safety is not negotiable by it.** The direction goes through the same
 age-aware content-safety scrub as every other search term, and a charged

@@ -128,7 +128,7 @@ class AssetPopulator
   # the query it's appended to. The REST of the direction is far from wasted;
   # it still drives library theme/mood/style scoring, the vetoes, and the range
   # card's animation match. This is only the Pexels hint.
-  DIRECTION_QUERY_TERMS = 2
+  DIRECTION_QUERY_TERMS = 3
 
   # Words that flip the rest of their clause from "want" to "don't want".
   # Without this a direction reading "no offices" would put `offices` INTO the
@@ -709,7 +709,7 @@ class AssetPopulator
       break if photos.any?
     end
     return nil if photos.blank?
-    chosen = photos[rand_for("bg").rand(photos.size)]
+    chosen = direction_first(photos, rand_for("bg")) { |p| p["alt"] }.first
     PexelsClient.url_for(chosen, :background)
   end
 
@@ -721,7 +721,7 @@ class AssetPopulator
     query  = card_query(card)
     photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :card) }) { |p| p["alt"] }
     return nil if photos.empty?
-    ordered = photos.shuffle(random: rand_for("px-#{idx}"))
+    ordered = direction_first(photos, rand_for("px-#{idx}")) { |p| p["alt"] }
     ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
   end
 
@@ -733,7 +733,7 @@ class AssetPopulator
     videos = relevant_with_subject_retry(card, query, ->(q) { pexels_videos(q) }) { |v| v["url"] }
     return nil if videos.empty?
 
-    ordered = videos.shuffle(random: rand_for("pxv-#{idx}"))
+    ordered = direction_first(videos, rand_for("pxv-#{idx}")) { |v| v["url"] }
     chosen  = ordered.find { |v| (u = PexelsClient.video_file_url(v)) && !used.include?(u) }
     url     = chosen && PexelsClient.video_file_url(chosen)
     return nil unless url
@@ -768,12 +768,16 @@ class AssetPopulator
     return nil unless PexelsClient.configured?
     query  = card_query(card)
     photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :swipe) }) { |p| p["alt"] }
+    # Direction preference is applied to the PHOTOS, before they become URLs —
+    # the alt text is the only evidence of what a picture shows, and it doesn't
+    # survive the mapping. The unused-first rule then re-partitions without
+    # re-shuffling, so both orderings hold.
+    photos = direction_first(photos, rand_for("pxtap-#{card_idx}")) { |p| p["alt"] }
     urls   = photos.map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
     return nil if urls.empty?
 
-    rng = rand_for("pxtap-#{card_idx}")
     fresh, used_elsewhere = urls.partition { |u| !swipe_used.include?(u) }
-    ordered = fresh.shuffle(random: rng) + used_elsewhere.shuffle(random: rng)
+    ordered = fresh + used_elsewhere
     ordered *= ((count.to_f / ordered.size).ceil) if ordered.size < count
 
     picks = ordered.first(count)
@@ -845,11 +849,16 @@ class AssetPopulator
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract background"
   end
 
-  # The backdrop queries to try, narrowest first: with the direction, then
-  # without it. One entry (and identical behaviour to before) when there's no
-  # direction to drop.
+  # The backdrop queries to try — same prompt-first ladder as the cards: the
+  # direction-led query when the direction names a subject area, then the
+  # theme+direction query, then the theme alone. One entry (and identical
+  # behaviour to before) when there's no direction.
   def background_queries
-    [ background_query, (background_query(directed: false) if direction_terms.any?) ].compact.uniq
+    [
+      (direction_led_query if direction_affinity.any?),
+      background_query,
+      (background_query(directed: false) if direction_terms.any?)
+    ].compact.uniq
   end
 
   # Theme-anchored: the BASE of every card query is the Verto theme's subject,
@@ -913,21 +922,30 @@ class AssetPopulator
     items
   end
 
-  # The queries to try for one card, narrowest first:
+  # The queries to try for one card, most direction-led first:
   #
-  #   1. what the caller built — theme base + card subject + direction;
-  #   2. the same without the direction, when there is one. A preference is the
-  #      first thing to give up: it is how the creator wants the subject shown,
-  #      not what the card is about.
+  #   0. the prompt-first query — the direction plus one theme word — whenever
+  #      the direction names a subject area. The creator said what they want
+  #      the Verto to look like; ask for that before asking for anything else.
+  #   1. what the caller built — direction + theme base + card subject;
+  #   2. the same without the direction. A preference is the first thing to
+  #      give up: it is how the creator wants the subject shown, not what the
+  #      card is about.
   #   3. the bare theme base, when an AI-extracted subject narrowed the query.
   #      A subject can legitimately be more specific than what this theme's
   #      Pexels library covers ("vintage bicycle" vs. plain "commute"), and a
   #      theme-anchored photo still beats none.
   #
+  # Rung 0 leading is the whole point and also its own risk, so the rungs below
+  # it stay exactly as they were: a direction that finds nothing still falls
+  # through to the card's own search rather than leaving the panel blank.
+  #
   # De-duped, so a step that would re-send an identical query is skipped rather
   # than spending a second API call to re-filter the same results.
   def card_queries(card, query)
-    ladder = [ query ]
+    ladder = []
+    ladder << direction_led_query if direction_affinity.any?
+    ladder << query
     ladder << card_query(card, directed: false) if direction_terms.any?
     ladder << theme_base_query                  if card["subject"].to_s.strip.present?
     ladder.uniq
@@ -1046,6 +1064,73 @@ class AssetPopulator
     @direction_themes ||= self.class.expand_themes(direction_words)
   end
 
+  # ── Direction affinity: does the direction name a SUBJECT AREA? ───────────
+  # The direction's words expanded through the theme clusters, minus the
+  # Verto's own theme words. What's left is the vocabulary that counts as
+  # evidence a candidate followed the direction — and only the direction, which
+  # is why the theme words go: on a "community sport" Verto, a photo of a
+  # community sports day must not read as proof we found something "corporate"
+  # just because the work cluster happens to list "community" too.
+  #
+  # Subtracting the theme's LITERAL words, not its cluster expansion. The
+  # expansion is bidirectional and bridges hard on words like "community", so a
+  # community-sport theme already pulls the entire work vocabulary in —
+  # subtracting that cancelled "professional and corporate" down to nothing and
+  # silently disabled every prompt-first path below it. Bridges are why a
+  # nature background can win a food Verto; they are far too broad to define
+  # "what the theme already asked for".
+  #
+  # Empty unless the direction names a SUBJECT AREA (see direction_subject?),
+  # and that emptiness is load-bearing: everything prompt-first below is gated
+  # on it, so a direction that only says how a picture should look leaves the
+  # existing behaviour alone, while one that names a subject takes the lead.
+  #
+  # Alt text almost never repeats the creator's own adjective, so the cluster
+  # expansion is also what makes matching work at all: "corporate" is satisfied
+  # by an alt that says office, business or colleagues.
+  def direction_affinity
+    @direction_affinity ||=
+      if direction_subject?
+        (direction_themes - theme_query_terms).map(&:singularize).uniq
+      else
+        []
+      end
+  end
+
+  # Does the direction name a subject area, or only a treatment? The test is
+  # whether the theme clusters RECOGNISED any of its words — expand_themes
+  # returns what it was given plus whatever the clusters add, so anything left
+  # after removing the original words is a cluster saying "I know this topic".
+  # "professional and corporate" reaches the work cluster; "warm minimal"
+  # reaches nothing, because no cluster claims an adjective.
+  #
+  # Testing `direction_affinity.any?` directly would NOT work and looked like it
+  # would: expand_themes always echoes its input, so every non-empty direction
+  # has a non-empty expansion, the gate never closed, and "warm minimal" would
+  # have taken the prompt-first rung and flattened every card's own subject.
+  def direction_subject?
+    return @direction_subject if defined?(@direction_subject)
+    @direction_subject = (direction_themes - direction_words).any?
+  end
+
+  # True when a candidate's description shows what the direction asked for.
+  def direction_preferred?(text)
+    return false if direction_affinity.empty?
+    (relevance_tokens(text) & direction_affinity).any?
+  end
+
+  # Order candidates so the ones answering the direction come first, seeded so
+  # a given seed still yields a stable result. THIS is what makes a direction
+  # stick across a whole deck: two cards with the same query draw from the same
+  # Pexels pool, and picking from it at random meant one card got the office
+  # and the next got the rugby match. With no direction — or nothing in the
+  # pool that matches one — it is exactly the shuffle it replaces.
+  def direction_first(items, rng, &text_for)
+    return items.shuffle(random: rng) if direction_affinity.empty?
+    preferred, rest = items.partition { |it| direction_preferred?(text_for.call(it)) }
+    preferred.shuffle(random: rng) + rest.shuffle(random: rng)
+  end
+
   def direction_moods
     @direction_moods ||= direction_words.filter_map { |w| DIRECTION_MOODS[w] }.uniq
   end
@@ -1074,10 +1159,23 @@ class AssetPopulator
     assets.reject { |a| self.class.vetoed_asset?(a, direction_vetoes) }
   end
 
-  # Append the direction to a query's terms. Kept to the END of the term list
-  # so the theme (and, on a card, its subject) still lead the search.
+  # Put the direction at the FRONT of a query's terms. It used to trail them,
+  # which read well in the code and badly in practice: a prioritise card's copy
+  # alone runs to a dozen words, so the instruction arrived as the last two of
+  # fifteen and the results came back looking like it was never typed.
   def with_direction(terms)
-    (terms + direction_terms).uniq { |w| w.singularize }
+    (direction_terms + terms).uniq { |w| w.singularize }
+  end
+
+  # The prompt-first query: the direction plus just enough theme to keep the
+  # Verto recognisable. Tried BEFORE the card's own query whenever the direction
+  # names a subject area (see direction_affinity), because "make this verto
+  # professional and corporate" is an instruction about the whole deck, not a
+  # flavour to sprinkle on each card's separate search. It is one query for the
+  # whole run, so it also costs one API call rather than one per card.
+  def direction_led_query
+    raw = (direction_terms + clean_theme_terms.first(1)).uniq { |w| w.singularize }.join(" ")
+    ContentSafety.scrub_query(raw, safety_age_buckets).presence || theme_base_query
   end
 
   # theme_keywords / age_buckets are class methods now (see top of file);
@@ -1109,10 +1207,21 @@ class AssetPopulator
     (salient_words(text) - SLUG_NOISE.to_a).map(&:singularize).uniq
   end
 
-  # Library-parity weights: +4 per card-subject hit, +3 per theme-term hit.
+  # Library-parity weights: +4 per card-subject hit, +3 per theme-term hit,
+  # +3 per direction-affinity hit.
+  #
+  # The direction has to count here or the prompt-first rung is self-defeating:
+  # ask Pexels for "professional corporate community", get back a photo of
+  # colleagues in an office, and score it against the literal query words it
+  # doesn't contain — zero, rejected, fall through to the card's own search and
+  # the deck stays exactly as it was. Crediting the affinity is not a loosening
+  # either: it is the same "does this picture depict something we asked for?"
+  # question, asked about the half of the request the creator typed themselves.
   def relevance_score(text, card_words, theme_words)
     tokens = relevance_tokens(text)
-    4 * (tokens & card_words).size + 3 * (tokens & theme_words).size
+    4 * (tokens & card_words).size +
+      3 * (tokens & theme_words).size +
+      3 * (tokens & direction_affinity).size
   end
 
   # The card's own subject words for scoring — empty for theme-only cards

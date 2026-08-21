@@ -788,7 +788,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     s.update!(shuffle_direction: "warm natural light, outdoors, no offices")
 
     reading = AssetPopulator.direction_reading_for(s)
-    assert_equal %w[warm natural], reading[:toward], "exactly what goes to the search"
+    assert_equal %w[warm natural light], reading[:toward], "exactly what goes to the search"
     assert_equal %w[offices],      reading[:avoiding]
 
     blank = AssetPopulator.direction_reading_for(make_survey(theme: "Mountains", cards: []))
@@ -796,15 +796,16 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_empty blank[:avoiding]
   end
 
-  test "the direction rides along on the card and background queries, behind the theme" do
+  test "the direction leads the query, ahead of the theme and the card subject" do
     s   = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
     pop = steer(s, "golden hour")
 
     card_q = pop.send(:card_query, s.cards[0]).split
-    assert_equal "mountains", card_q.first, "the theme still leads the query"
-    assert_includes card_q, "peak",   "the card's own subject is still in it"
-    assert_includes card_q, "golden", "and the direction colours it"
-    assert_includes pop.send(:background_query).split, "golden"
+    assert_equal "golden", card_q.first,
+      "trailing the query meant a wordy card drowned the instruction in its own copy"
+    assert_includes card_q, "mountains", "the theme is still in it"
+    assert_includes card_q, "peak",      "so is the card's own subject"
+    assert_equal "golden", pop.send(:background_query).split.first
   end
 
   test "no direction means no change: directed and undirected queries are identical" do
@@ -946,11 +947,108 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     s.update!(shuffle_direction: "warm natural light, outdoors, small groups, no offices")
 
     hint = AssetPopulator.search_hint_for(s)
-    assert_equal "warm natural", hint, "capped to the same slice the populator sends"
+    assert_equal "warm natural light", hint, "capped to the same slice the populator sends"
     refute_includes hint, "offices", "a veto in a search box asks for the thing it vetoes"
 
     assert_equal "", AssetPopulator.search_hint_for(make_survey(theme: "T", cards: [])),
       "no direction, no hint — the picker seeds on the theme alone as before"
+  end
+
+  # ── Prompt-first: a direction that names a subject leads the whole deck ───
+  # The reported failure: on a community-sport Verto steered "professional and
+  # corporate", ONE card came back corporate and the rest stayed rugby. Two
+  # cards with identical queries drew the same Pexels pool, and picking from it
+  # at random decided which of them honoured the instruction.
+
+  CORPORATE_ALTS = [
+    "Colleagues in a modern office having a meeting",
+    "Business people in a glass workplace lobby",
+    "A manager presenting to employees in a corporate boardroom",
+    "Professional woman working at a desk in an office"
+  ].freeze
+
+  SPORT_ALTS = [
+    "Rugby players in a scrum on a wet pitch",
+    "A football team celebrating a goal",
+    "Young athletes training on a running track",
+    "Community sports club members after a match"
+  ].freeze
+
+  # A pool that is half on-direction and half on-theme, which is what a real
+  # search for a directed query comes back with.
+  def mixed_pool
+    (CORPORATE_ALTS + SPORT_ALTS).each_with_index.map { |alt, i| pexels_photo(i + 1, alt) }
+  end
+
+  def corporate?(url)
+    (1..CORPORATE_ALTS.size).any? { |i| url.to_s.include?("/photos/#{i}/") }
+  end
+
+  test "only a direction that names a subject area takes the lead" do
+    s = make_survey(theme: "Community sport", audience_age: "all", cards: [])
+
+    assert steer(s, "professional and corporate").send(:direction_subject?),
+      "the work cluster recognises these, so they name a subject"
+    assert steer(s, "recycling").send(:direction_subject?)
+
+    refute steer(s, "warm minimal").send(:direction_subject?),
+      "no cluster claims an adjective — this is a treatment, not a subject"
+    assert_empty steer(s, "warm minimal").send(:direction_affinity),
+      "and an empty affinity is what leaves the existing behaviour alone"
+  end
+
+  test "a subject direction is followed by every card, not just a lucky one" do
+    cards = (1..4).map { { "type" => "open_ended", "text" => "Tell us more" } }
+    s = make_survey(theme: "Community sport", audience_age: "all", cards: cards)
+    s.update!(shuffle_direction: "We want to make this verto professional and corporate")
+
+    with_pexels(mixed_pool) { AssetPopulator.new(s, seed: "led").populate! }
+
+    s.reload
+    s.cards.each_with_index do |c, i|
+      assert corporate?(c["image"]), "card #{i} ignored the direction: #{c['image'].inspect}"
+    end
+    assert corporate?(s.background_image), "the backdrop follows the direction too"
+  end
+
+  test "a treatment-only direction leaves the deck's own subject alone" do
+    cards = (1..4).map { { "type" => "open_ended", "text" => "Tell us more" } }
+    s = make_survey(theme: "Community sport", audience_age: "all", cards: cards)
+    s.update!(shuffle_direction: "warm minimal")
+
+    with_pexels(mixed_pool) { AssetPopulator.new(s, seed: "led").populate! }
+
+    s.reload.cards.each_with_index do |c, i|
+      refute corporate?(c["image"]),
+        "card #{i} took an office photo for a direction that never named one"
+    end
+  end
+
+  test "the prompt-first query leads the ladder only for a subject direction" do
+    s = make_survey(theme: "Community sport", audience_age: "all",
+                    cards: [ { "type" => "open_ended", "text" => "Tell us more" } ])
+
+    pop = steer(s, "professional and corporate")
+    assert_equal "professional corporate community",
+                 pop.send(:card_queries, s.cards[0], pop.send(:card_query, s.cards[0])).first,
+      "ask for what the creator asked for before asking for anything else"
+
+    treat = steer(s, "warm minimal")
+    ladder = treat.send(:card_queries, s.cards[0], treat.send(:card_query, s.cards[0]))
+    refute_equal treat.send(:direction_led_query), ladder.first,
+      "a treatment must not replace the card's own search"
+  end
+
+  test "an on-direction photo clears the relevance floor on its affinity alone" do
+    s = make_survey(theme: "Community sport", audience_age: "all",
+                    cards: [ { "type" => "open_ended", "text" => "Tell us more" } ])
+    pop = steer(s, "professional and corporate")
+
+    # The alt names neither the query's literal words nor the card's subject —
+    # only what the direction is ABOUT. Without affinity credit it scores zero,
+    # the prompt-first rung returns nothing and the deck never changes.
+    score = pop.send(:relevance_score, "Colleagues in a modern office", [], [])
+    assert_operator score, :>=, AssetPopulator::CARD_RELEVANCE_FLOOR
   end
 
   test "a charged word in the direction is stripped, as it is from a theme" do
