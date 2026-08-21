@@ -915,7 +915,15 @@
   gap: 8px;
   z-index: 4;
 }
-.split-left-cta-row .add-animation-fab {
+/* Both FABs, not just the animation one. Each is `position: absolute` with a
+   `left: 50%; translateX(-50%)` of its own, which is right when it is the
+   panel's only control and wrong the moment it shares a row: left unreset,
+   the second button lands on top of the first at the same 50% and the row
+   renders as one button with another hidden underneath it. The animation FAB
+   was reset when the range row was built; the media FAB only started sharing
+   a row when lottie cards gained a Background CTA. */
+.split-left-cta-row .add-animation-fab,
+.split-left-cta-row .add-media-fab {
   position: static;
   transform: none;
 }

@@ -108,7 +108,31 @@
           <span><%= t("editor.change_background", default: "Background") %></span>
         </button>
       </div>
-    <% elsif has_media || has_lottie %>
+    <% elsif has_lottie %>
+      <%# A Lottie is the one medium that can be TRANSPARENT, so what sits
+          behind it is a real design decision rather than nothing — and this
+          panel offered no way to make it ("I need the Change Background
+          option here for when we upload transparent lottie files"). Only the
+          entry point was missing: media-picker#_cardAnimates already returns
+          true for any card carrying a lottie, not just for range, so the
+          Animation background section has been in that modal all along with
+          nothing on this panel calling it.
+          Scoped to lotties deliberately. A photo or a video is opaque; a
+          background behind one is a control that does nothing. %>
+      <div class="split-left-cta-row">
+        <button type="button" class="add-media-fab"
+                data-action="click->media-picker#open"
+                title="<%= t("editor.change_media_title") %>">
+          <span class="add-media-fab-plus">＋</span>
+          <span><%= t("editor.change_media") %></span>
+        </button>
+        <button type="button" class="add-bg-fab"
+                data-action="click->media-picker#open"
+                title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
+          <span><%= t("editor.change_background", default: "Background") %></span>
+        </button>
+      </div>
+    <% elsif has_media %>
       <button type="button" class="add-media-fab"
               data-action="click->media-picker#open"
               title="<%= t("editor.change_media_title") %>">
