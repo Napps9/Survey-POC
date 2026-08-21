@@ -5252,17 +5252,68 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .mini-rating-star  { font-size: 14px; line-height: 1; }
 
 /* ── Rating component ────────────────────────────── */
-.rating-wrap   { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; }
-.rating-stars  { display: flex; gap: 8px; position: relative; }
+/* The star's box is a TOKEN, not a font-size, because three things have to
+   agree on it: the star itself, the gap between stars, and the caption grid
+   underneath (see .rating-labels). Sized as a box rather than type so the
+   captions can be laid out on the same tracks as the stars — which is what
+   puts the end captions under the end stars instead of at the panel's edges. */
+.rating-wrap {
+  --rating-star-size: 52px;
+  --rating-star-gap: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding-top: 20px;
+}
+.rating-stars  {
+  display: flex; gap: var(--rating-star-gap); position: relative;
+  /* The celebration confetti must not be able to scroll the card.
+     .rating-burst's pieces are absolutely positioned against THIS box and fly
+     outward past it — measured 60px below the answer scroller's bottom edge —
+     and an abspos descendant whose containing block sits inside a scroller
+     counts toward that scroller's scrollHeight. So tapping a star grew the
+     scrollable area by ~62px and a scrollbar appeared for the ~700ms the
+     animation ran, then vanished ("also a weird scrollbar appear right hand
+     side when you tap a star"). It was the celebration, not the card's height.
+
+     `clip` rather than `hidden`: hidden would make this a scroll container of
+     its own and still reserve the area. clip removes it from the overflow
+     calculation outright, and overflow-clip-margin then lets the pieces keep
+     painting outside the box. Where a browser has clip but not the margin the
+     confetti is simply clipped to the star row — quieter, still correct. */
+  overflow: clip;
+  overflow-clip-margin: 80px;
+}
 .rating-star {
-  font-size: 40px;
+  width: var(--rating-star-size); height: var(--rating-star-size);
+  font-size: calc(var(--rating-star-size) * 0.86);
   cursor: pointer;
   color: #D1D5DB;
-  transition: color 0.1s, transform 0.12s;
+  transition: color 0.1s, transform 0.12s, background-color 0.1s;
   user-select: none;
   line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+/* Softened points, for the STAR kind only.
+   The glyph is a text character (★ / ☆, swapped by rating_controller), and a
+   font's star has needle-sharp points that no CSS can round. So for this kind
+   the glyph is hidden and the shape is painted as a MASK instead: the same
+   five-point star drawn with a round-joined stroke, which blunts every point
+   by the stroke's radius. The mask carries only alpha, so the colour still
+   comes from a normal property and .active keeps working exactly as before —
+   it just tints background-color rather than color.
+   Deliberately not applied to .rating-kind-emoji: that path swaps the star for
+   a themed emoji, and masking an emoji would erase it to a silhouette. */
+.rating-kind-star .rating-star {
+  font-size: 0;
+  background-color: #D1D5DB;
+  -webkit-mask: var(--rating-star-shape) center / contain no-repeat;
+  mask: var(--rating-star-shape) center / contain no-repeat;
+}
+.rating-wrap {
+  --rating-star-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.1 14.85 8.87 21.2 9.79 16.6 14.28 17.69 20.6 12 17.62 6.31 20.6 7.4 14.28 2.8 9.79 9.15 8.87Z' fill='%23000' stroke='%23000' stroke-width='2.4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 .rating-star.active { color: #FFCC00; }
+.rating-kind-star .rating-star.active { background-color: #FFCC00; }
 .rating-star:hover  { transform: scale(1.18); }
 /* Emoji icons ignore CSS `color`, so a themed (non-star) rating shows the
    chosen state by colour vs greyscale + dim instead of a gold fill. */
@@ -5305,11 +5356,24 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
     opacity: 0;
   }
 }
+/* The captions ride the STARS' grid, not the panel's width.
+   This was `width: 100%` with space-between, which pins the two end captions
+   to the outer edges of the answer panel — and the star row is a centred flex
+   line that is narrower than the panel, so the end captions sat well outside
+   the stars they name ("bring in the opposite ends answer to sit underneath
+   the first and last star"). Same five tracks and the same gap as
+   .rating-stars, so caption 1 lands under star 1 and caption 5 under star 5 by
+   construction rather than by luck; the middles span what is between them. */
 .rating-labels {
-  display: flex; justify-content: space-between;
-  align-items: flex-start; gap: 8px;
-  width: 100%; padding: 0 4px;
+  display: grid;
+  grid-template-columns: repeat(5, var(--rating-star-size));
+  gap: var(--rating-star-gap);
+  align-items: start;
+  justify-content: center;
+  padding: 0;
 }
+.rating-labels > .rating-label { text-align: center; }
+.rating-labels > .rating-mid-labels { grid-column: 2 / 5; }
 /* The middle captions share one centred slot between the two end captions, so
    the row reads as a two-ended scale until a star in between is touched. They
    are stacked on top of each other rather than laid out in a line: only one is
@@ -6666,8 +6730,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
   input[type="password"] { font-size: max(1rem, 16px); }
   .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
   .pick-item { padding: 12px 14px; }
-  .rating-star { font-size: 36px; padding: 4px; }
-  .rating-stars { gap: 6px; }
+  /* Retune the TOKENS, not the star. This used to set font-size and padding
+     directly, which now says nothing (the star is a fixed box carrying a mask)
+     and actively breaks it — padding shrinks the box the mask is sized
+     against. Bigger than the 36px it replaces, per "stars - lets make these
+     bigger globally": a rating answer is five taps and nothing else, so the
+     one control on the card can afford to be the size of a real target. */
+  .rating-wrap {
+    --rating-star-size: 56px;
+    --rating-star-gap: 8px;
+  }
   .slider-track { width: 100%; height: 44px; }
   .slider-thumb { width: 52px; height: 52px; }
 
