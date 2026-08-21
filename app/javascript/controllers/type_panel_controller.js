@@ -107,8 +107,8 @@ const COMPATIBILITY = {
   tap_card: [
     { type: "tap_card",         score: 100, note: "Quick, gamified gut reactions — perfect for testing several short statements without survey fatigue." },
     { type: "range",            score: 60,  note: "Replaces speed with nuance — use if you'd rather see how strongly people agree than how fast." },
-    { type: "rating",           score: 55,  note: "Stars give a familiar scale, but you lose the rapid-fire feel of swipe." },
-    { type: "select_one_grid",  score: 40,  note: "Removes the playful swipe mechanic — only swap if the question really is a single static choice." },
+    { type: "rating",           score: 55,  note: "Stars give a familiar scale, but you lose the rapid-fire feel of tapping." },
+    { type: "select_one_grid",  score: 40,  note: "Removes the playful tap mechanic — only swap if the question really is a single static choice." },
   ],
   scenario: [
     { type: "scenario",         score: 100, note: "A short story respondents turn through page by page, then a 2–3 option choice on the last page — best for longer, situational prompts that would overwhelm a single card." },

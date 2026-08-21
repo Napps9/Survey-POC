@@ -52,6 +52,50 @@ class ChoiceListDensityTest < ApplicationSystemTestCase
     assert_in_delta DENSE_TILE, tile_width, 2, "10 options must trigger the dense tier"
   end
 
+  # The dense tier shrank the tile to 40px but inherited the base rule's 72px
+  # min-height, which was sized around a 56px one — so the icon floated with
+  # 6px to the row's stroke on the left and 15px above and below. Reported from
+  # the live editor; measured here because the asymmetry is a computed
+  # consequence of two rules that each look reasonable alone.
+  def icon_gaps
+    page.evaluate_script(<<~JS)
+      (() => {
+        const tile = document.querySelector(".preview-card.active .choice-list-tile")
+        if (!tile) return null
+        const row = tile.closest(".choice-list-item")
+        const t = tile.getBoundingClientRect(), r = row.getBoundingClientRect()
+        return { left: Math.round(t.left - r.left),
+                 top: Math.round(t.top - r.top),
+                 bottom: Math.round(r.bottom - t.bottom),
+                 row: Math.round(r.height) }
+      })()
+    JS
+  end
+
+  test "a dense row's icon sits the same distance from every edge" do
+    open(survey_with(10))
+    g = icon_gaps
+    assert g, "no tile found on the dense list"
+
+    assert_in_delta g["left"], g["top"], 2,
+                    "top gap #{g['top']}px vs left #{g['left']}px — the dense tier is back to " \
+                    "inheriting a min-height sized for the 56px tile"
+    assert_in_delta g["left"], g["bottom"], 2,
+                    "bottom gap #{g['bottom']}px vs left #{g['left']}px"
+    # The shorter row is the point, not a side effect: it is what stops a long
+    # list running off the card.
+    assert_operator g["row"], :<=, 60,
+                    "a dense row is #{g['row']}px — the whole reason for the tier is that ten " \
+                    "options fit without the list becoming a scroll marathon"
+  end
+
+  test "a normal-density row keeps its own symmetry" do
+    open(survey_with(5))
+    g = icon_gaps
+    assert_in_delta g["left"], g["top"], 2, "the base tier's own gaps drifted"
+    assert_in_delta g["left"], g["bottom"], 2
+  end
+
   test "the tenth option is present and reachable by scrolling" do
     open(survey_with(10))
     assert_selector ".preview-card.active .choice-list-item", count: 10

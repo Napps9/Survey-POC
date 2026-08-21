@@ -742,7 +742,23 @@
    Every shape that can outgrow the card is on the list now; a type is here
    because its widget has a natural height the card cannot always afford, not
    because it happens to be a list. */
-.split-right > .q-header { flex: 0 0 auto; }
+.split-right > .q-header {
+  flex: 0 0 auto;
+  /* The header had no styling at all beyond that flex line: not a flex
+     container, no gap, and none of its three children (.q-eyebrow, .q-title,
+     .q-subtitle) carries a margin. Both internal gaps measured literally 0px
+     — every bit of apparent separation was line-height leading, which is why
+     the instruction read as glued to the question. This is a change from
+     zero, not a retune.
+
+     A column gap sets BOTH gaps at once, which is the right reading: the
+     eyebrow (the per-type instruction, "Drag the slider") sits above the
+     title and the description sits below it, and the enterprise reference
+     spaces the three evenly. */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .split-right > .mt-2:has(> .choice-list),
 .split-right > .mt-2:has(> .choice-grid),
 .split-right > .mt-2:has(> .prioritise-list),
@@ -751,7 +767,24 @@
 .split-right > .mt-2:has(> .nps-slider),
 .split-right > .mt-2:has(> .rating-wrap),
 .split-right > .mt-2:has(> .freeform-wrap) {
-  flex: 1 1 auto;
+  /* grow 0, NOT 1. This box is the panel's only growable child, so with a
+     grow factor it swallowed every spare pixel and left .split-right's
+     `justify-content: safe center` nothing to centre: the question sat flush
+     against the top of the panel while the answer was auto-margin-centred in
+     an inflated box below it, painting as question → white → answer → white.
+     Content-sized, the panel's own centring does the work and the pair reads
+     as one block ("large bits of white in between", measured at 260px on an
+     iPhone 15).
+
+     shrink stays 1, and that is what keeps _fitCard honest. over() is
+     scrollHeight - clientHeight on THIS box: when the content fits it is 0
+     either way, and when it overflows this box is still the only shrinkable
+     child, so it absorbs the identical deficit and reports the identical
+     number. Every rung verdict and the is-scrollable toggle are unchanged.
+     Take the shrink away too and over() reads 0 forever — the shed ladder
+     would then buy artwork it cannot afford and .split-right's
+     overflow: hidden would CUT the surplus rather than scroll it. */
+  flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -759,6 +792,17 @@
   display: flex;
   flex-direction: column;
 }
+/* The tap card is the carve-out, and it is a silent one. .rotate-card-stack
+   GROWS to fill this scroller (its .rotate-card children are position:
+   absolute, so its own content height is ~0) — break the growth chain and the
+   stack drops straight to its min-height floor (260px on a phone) and stays
+   there: measured at 259px on both a tall phone and a short one, i.e. the
+   card stops responding to the viewport entirely.
+   _fitCard cannot see this happen: over() reads 0 whether the stack is fluid
+   or collapsed, so the app reports a perfectly fitting card either way. The
+   only thing standing between this line and a silent regression is
+   test/system/tap_card_fits_test.rb. */
+.split-right > .mt-2:has(> .rotate-wrap) { flex-grow: 1; }
 /* Vertical centring for short lists that still fit without scrolling, via
    auto margins on the list itself rather than `justify-content: center` on
    the scroll container: when content overflows, auto margins resolve to 0
@@ -1074,6 +1118,47 @@
   background: rgba(255,255,255,0.04);
 }
 .media-library-add:hover { color: #01EACB; }
+/* A brand tile and its remove ×. The tile IS a <button>, so the × cannot be
+   nested inside it — this cell is the positioned parent of both, and it is the
+   cell (not the tile) that the grid lays out.
+
+   The hover lift moves up here with it. Left on the tile, the artwork slides
+   2px out from under a × that stays put, so the button you are aiming at drifts
+   off the thing it belongs to at the exact moment you reach for it. */
+.media-library-cell {
+  position: relative;
+  display: grid;
+  transition: transform 0.15s;
+}
+.media-library-cell:hover { transform: translateY(-2px); }
+.media-library-cell .media-library-item:hover { transform: none; }
+.media-library-del {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(12,15,26,0.82);
+  color: #fff;
+  font-family: "Alata", sans-serif;
+  font-size: 15px; line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+}
+/* Revealed on hover so a wall of thumbnails isn't a wall of delete buttons —
+   but reachable by keyboard regardless, and always drawn where there is no
+   pointer to hover with. An affordance that exists only under a mouse doesn't
+   exist on a tablet. */
+.media-library-cell:hover .media-library-del,
+.media-library-del:focus-visible { opacity: 1; }
+@media (hover: none) {
+  .media-library-del { opacity: 1; }
+}
+.media-library-del:hover { background: #B3123B; border-color: #B3123B; }
+.media-library-del[disabled] { opacity: 0.45; cursor: default; }
 .media-library-empty {
   text-align: center;
   padding: 40px 16px;
@@ -2224,11 +2309,22 @@
    Pure CSS keyed on live child count — no markup change, so it tracks edits
    in the editor and stays correct in the player. Reuses the numbers already
    proven at `.phone-bottom .choice-list-item` below; this is the desktop (and
-   under-7-options-on-mobile) case that had no equivalent until now. */
+   under-7-options-on-mobile) case that had no equivalent until now.
+   (Those .phone-bottom rules still carry the missing-min-height bug fixed
+   here, but the whole .phone-bottom family is dead — no ERB or JS applies the
+   class — so it is left alone rather than half-tidied.) */
 .choice-list:has(> .choice-list-item:nth-child(7)) { gap: 4px; }
 .choice-list:has(> .choice-list-item:nth-child(7)) > .choice-list-item {
   padding: 6px 10px 6px 6px;
   border-radius: 10px;
+  /* The base rule's 72px was sized around a 56px tile (56 + 8 + 8). This tier
+     shrinks the tile to 40px but inherited that floor, so the row stayed 72px
+     tall and the 40px icon floated in it: 6px to the grey stroke on the left,
+     15px above and below. Reported as "the left hand side is thin gap, and
+     above and below is bigger". Sizing the floor to THIS tier's tile makes the
+     gap 6px all round — and, as the report predicted, takes ~18px off every
+     row, so a long list stops being quite so long. */
+  min-height: 52px;
 }
 .choice-list:has(> .choice-list-item:nth-child(7)) .choice-list-tile {
   width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 25px;
@@ -2878,7 +2974,6 @@
    anything not here is decoration and must let clicks through to the statement
    text and the image/delete chips underneath. */
 .rotate-actions--fan .rotate-action,
-.rotate-actions--fan .tap-response-add,
 .rotate-card-controls--fan .rotate-dots {
   pointer-events: auto;
 }
@@ -2969,19 +3064,6 @@
 .rotate-action-label[contenteditable]:focus {
   outline: 2px solid rgba(1,234,203,0.8); outline-offset: 2px; border-radius: 4px;
 }
-/* In the fan there is no "after the last pill" to sit in, so the add button
-   takes the one corner the arc never reaches. */
-.rotate-actions--fan .tap-response-add { position: absolute; right: 10px; bottom: 12px; }
-.tap-response-add {
-  width: 34px; height: 34px; align-self: center; flex-shrink: 0;
-  border-radius: 50%;
-  border: 1.5px dashed rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.14);
-  color: #fff; font-size: 15px; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
-}
-.tap-response-add:hover { background: rgba(255,255,255,0.28); border-color: #fff; }
 .swipe-indicator {
   display: flex; gap: 8px; align-items: center; justify-content: center;
   font-family: "ABeeZee", sans-serif;
@@ -5498,15 +5580,22 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .rotate-card:hover .tap-card-image-btn,
 .rotate-card:focus-within .tap-card-image-btn { opacity: 1; }
 .tap-card-image-btn:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
+/* Takes the Verto's own brand rather than a fixed teal, so the one "add" the
+   card still offers reads as part of that Verto. The fallback is the default
+   palette's primary — brand_palette_style_attr emits nothing at all when a
+   Verto is unbranded, so the fallback IS the colour there. */
 .tap-add-btn {
   background: transparent;
   border: 1px dashed rgba(0,0,0,0.15); border-radius: 12px;
   padding: 7px 18px; cursor: pointer;
-  color: rgba(1,234,203,0.75);
+  color: var(--brand-primary, var(--color-green-500));
   font-family: "ABeeZee", sans-serif; font-size: 12px;
   transition: all 0.15s;
 }
-.tap-add-btn:hover { background: rgba(1,234,203,0.05); border-color: rgba(1,234,203,0.3); }
+.tap-add-btn:hover {
+  background: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 8%, transparent);
+  border-color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 35%, transparent);
+}
 
 /* ══ Preview Verto overlay ════════════════════════════════════════════
    Full-screen card-by-card preview. Opens over the editor, closes back
@@ -6755,7 +6844,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
      floor propagates as the strip's intrinsic contribution and .preview-body
      scrolls — the same escape every other card uses. */
   .preview-overlay .split-card:has(.nps-lottie) .split-left {
-    flex: 1 1 auto;
+    /* 1000 is a PRIORITY, not a proportion. The panel below now grows too
+       (it has to — see its rule for the 189px of white that forced it), and
+       flex splits free space in proportion to the factors, so two 1s handed
+       the panel half the surplus and took the hero from 341px down to 259px
+       on an iPhone 15 — quietly undoing "spare height goes to the PICTURE".
+       A dominant factor restores the intended order: the hero absorbs the
+       surplus until it hits its --play-hero-h ceiling, freezes there, and
+       flex redistributes what it could not take to the only item still able
+       to grow. The panel therefore gets exactly the leftover the picture was
+       never allowed to use, and not one pixel the picture wanted. */
+    flex: 1000 1 auto;
     height: auto;
     min-height: var(--play-hero-min);
     /* …uncapped was the one thing a respondent noticed. "Every pixel the
@@ -6787,7 +6886,28 @@ body.generating-overlay-active .bottom-bar { display: none; }
      nothing scrollable). An answer may cost a scroll; it may never cost a
      control. */
   .preview-overlay .split-card:has(.nps-lottie) .split-right {
-    flex: 0 0 auto;
+    /* grow 1, shrink 0. The hero above is capped at --play-hero-h, so once it
+       reaches that cap it freezes and the leftover height has nowhere to go:
+       it stacked up under the panel as .split-card's own white background —
+       189px on an iPhone 15 range card, 260px on a rating card, which is the
+       band the owner photographed. Growing the panel into it gives
+       `justify-content: safe center` something to centre and puts the answer
+       in the middle of the card instead of hard against the picture.
+
+       The hero does not pay for it, but only because its rule carries a
+       dominant grow factor to say so. Two equal factors split the surplus
+       and cost the hero 82px (measured); with the priority in place the
+       hero fills to its --play-hero-h ceiling first, freezes there, and flex
+       hands the remainder to the one item still able to grow — this one.
+       The two declarations are a pair: change either alone and the hero
+       silently starts paying for the panel's centring.
+
+       flex-shrink stays 0, which is the invariant player_hero_css_test
+       exists to protect: .split-right is overflow: hidden, and that zeroes
+       its automatic minimum, so a shrinkable panel does not degrade
+       gracefully — it clips the slider invisibly. An answer may cost a
+       scroll; it may never cost a control. Only the grow factor moved. */
+    flex: 1 0 auto;
     min-height: 0;
   }
   /* The escape hatch, made real. The scroll story this file tells — "the
@@ -6847,7 +6967,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
      _fitCard's ladder needs the panel's stage to measure against. */
   .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
     .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-left {
-    flex: 1 1 auto;
+    /* 1000 is a PRIORITY, not a proportion — the same pairing as the range
+       rule above, for the same reason. The panel below now grows (it had
+       260px of white stacked under it on an iPhone 15), and flex splits free
+       space in PROPORTION to the factors, so two 1s handed the panel a share
+       and took this hero from 341px down to 298px — quietly undoing "spare
+       height goes to the PICTURE" a few rules up. A dominant factor restores
+       the intended order: the hero fills to its --play-hero-h ceiling,
+       freezes there, and flex hands what it could not take to the only item
+       still able to grow. The panel gets exactly the leftover the picture was
+       never allowed to use, and not one pixel the picture wanted. */
+    flex: 1000 1 auto;
     height: auto;               /* same load-bearing auto as the range rule above */
     min-height: var(--play-hero-min);
     /* …and the same cap, for the same reason: five stars cost almost nothing,
@@ -6858,7 +6988,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
     .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
-    flex: 0 0 auto;
+    /* grow 1, shrink 0 — the range rule above, applied to the two other
+       types whose answer cannot grow. The hero is capped at --play-hero-h,
+       so once it reaches that cap the leftover height has nowhere to go: it
+       stacked up under the panel as .split-card's own white background, 260px
+       of it on an iPhone 15 rating card. Growing the panel into it gives
+       `justify-content: safe center` something to centre and puts the answer
+       in the middle of the card instead of hard against the picture.
+
+       The hero does not pay for it, but only because its rule carries a
+       dominant grow factor to say so (43px measured, here). The two
+       declarations are a pair: change either alone and the hero silently
+       starts paying for the panel's centring.
+
+       flex-shrink stays 0, for the reason the range rule spells out: the
+       panel is overflow: hidden, which zeroes its automatic minimum, so a
+       shrinkable panel does not degrade gracefully — it clips the stars
+       invisibly. Only the grow factor moved. */
+    flex: 1 0 auto;
     min-height: 0;
   }
   /* The same two companions the range inversion needed, for the same
@@ -7041,15 +7188,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* ── The answer widget is the card's scroll container ──────────────────
      Mirrors the desktop rule (search ".split-right > .mt-2:has") and is
      scoped to the same shapes — which is now every shape that can outgrow
-     the card, the swipe/slider/rating/NPS/freeform widgets included. They
+     the card, the tap/slider/rating/NPS/freeform widgets included. They
      used to be left out on the grounds that they "keep their own sizing";
      what that meant in practice was having no scroll path, so their
      overflow was cut rather than scrolled. The book layout is still out,
      because .split-right--book opts out of centring entirely and paginates
      instead. The desktop rule already supplies overflow-y; what mobile adds
-     is the flex-grow that lets the container claim the panel's spare
-     height, plus momentum scrolling and scroll containment so a flick
-     through the options doesn't drag the page behind it. */
+     is momentum scrolling and scroll containment, so a flick through the
+     options doesn't drag the page behind it.
+
+     This rule used to add a flex-grow as well, "to claim the panel's spare
+     height" — and claiming it is exactly what went wrong. It is the panel's
+     only growable child, so it took every spare pixel and left
+     .split-right's `justify-content: safe center` nothing to work with: the
+     question pinned to the top of the panel, the answer auto-margin-centred
+     in the inflated box beneath it, and the slack painted as two bands of
+     white in between. See the desktop rule for why shrink stays 1 and what
+     depends on it. */
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-list),
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-grid),
   .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list),
@@ -7058,10 +7213,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card .split-right > .mt-2:has(> .nps-slider),
   .preview-overlay .split-card .split-right > .mt-2:has(> .rating-wrap),
   .preview-overlay .split-card .split-right > .mt-2:has(> .freeform-wrap) {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-height: 0;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+  }
+  /* Same carve-out as desktop, same silent failure if it goes: the tap
+     card's .rotate-card-stack grows to fill this box rather than sitting in
+     it, and _fitCard's over() reads 0 whether the stack is fluid or
+     collapsed to its floor. tap_card_fits_test is the only guard. */
+  .preview-overlay .split-card .split-right > .mt-2:has(> .rotate-wrap) {
+    flex-grow: 1;
   }
   /* "There are more options below" affordance. The usual pure-CSS trick —
      background-attachment: local/scroll shadow layers on the scroll

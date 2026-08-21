@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-# Adding and removing a swipe card's ANSWERS in the editor, across the point
+# Growing and shrinking a tap card's ANSWERS in the editor, across the point
 # where the strip changes shape.
 #
 # tap_card_scale_test covers the shipped five-point card in the player; this
@@ -13,9 +13,9 @@ require "application_system_test_case"
 # render the pair together; card_editor rewrites only the strip, so nothing but
 # a test holds the second half in place.
 #
-# What it looked like when the second half was missing: click ＋ on a four-point
-# scale, and the parent — still the short bar it is in row mode, and now with no
-# in-flow children at all — collapsed to its own padding. Every pill's
+# What it looked like when the second half was missing: grow a four-point
+# scale, and the parent — still the short bar it is in row mode, and now with
+# no in-flow children at all — collapsed to its own padding. Every pill's
 # --tap-x/--tap-y then resolved against ~49px instead of the card's 430, so the
 # five answers landed in a heap on top of each other at the foot of the card.
 # Hence the overlap assertion: the classes agreeing is the mechanism, but pills
@@ -51,10 +51,30 @@ class TapResponseAddTest < ApplicationSystemTestCase
     assert_selector "[data-card-cid='t1'] [data-tap-response]", count: 3
   end
 
+  # Selecting the card opens the settings panel. A first click opens it and the
+  # second selects the card; the wrap's centre lands on the tap card, whose
+  # own handler stops propagation, so both go to a corner.
+  def select_card
+    return if @card_selected
+    wrap = find("[data-card-cid='t1'] .rotate-wrap")
+    2.times { wrap.click(x: 4, y: 4) }
+    assert_selector ".response-scale-btn.is-active"
+    @card_selected = true
+  end
+
+  # The strip's own ＋ is gone: "Answers per statement" in the settings panel is
+  # now the single control for how many answers a statement is judged on. The
+  # layout claims below are unchanged — a scale still has to fan, keep its dots
+  # inside the card and size its pills alike — only the way a creator gets
+  # there has moved.
+  def set_scale(n)
+    select_card
+    find(".response-scale-btn[data-response-count='#{n}']").click
+    assert_selector "[data-card-cid='t1'] [data-tap-response]", count: n
+  end
+
   def add_response
-    before = page.all("[data-card-cid='t1'] [data-tap-response]").size
-    find("[data-card-cid='t1'] .tap-response-add").click
-    assert_selector "[data-card-cid='t1'] [data-tap-response]", count: before + 1
+    set_scale(page.all("[data-card-cid='t1'] [data-tap-response]").size + 1)
   end
 
   def remove_last_response
@@ -167,25 +187,36 @@ class TapResponseAddTest < ApplicationSystemTestCase
   #
   # Whole pixels: a fixed percentage of a 320px card lands on a fraction, and
   # two pills can differ in the sub-pixel without differing to anyone looking.
+  # WIDTH only. Height is deliberately allowed to vary: the fan pill is sized
+  # `min-height: var(--tap-pill-h)`, and that rule's own comment says why —
+  # "min-height rather than height so a label that needs a third line still
+  # gets one instead of being clipped — uniform is the intent, hiding an answer
+  # is not." The six-point preset ships two labels that wrap ("Strongly
+  # disagree", "Strongly agree"), so those pills are legitimately taller.
+  #
+  # This assertion used to include height and passed only by accident: it built
+  # scales with the strip's ＋, which appended a short "New answer" label that
+  # never wrapped. Growing the scale from the settings panel brings the real
+  # preset labels with it, which is what a creator actually sees.
   def pill_boxes
     evaluate_script(<<~JS)
       (() => {
         const pills = [...document.querySelectorAll("[data-card-cid='t1'] [data-tap-response]")]
-        return pills.map((p) => `${Math.round(p.offsetWidth)}x${Math.round(p.offsetHeight)}`)
+        return pills.map((p) => Math.round(p.offsetWidth))
       })()
     JS
   end
 
-  test "every answer on a fanned card is the same size" do
+  test "every answer on a fanned card is the same width" do
     open_editor
 
     2.times { add_response }   # 3 -> 5, the first size that fans
     assert_equal 1, pill_boxes.uniq.size,
-                 "five answers came out in #{pill_boxes.uniq.size} different sizes: #{pill_boxes.tally.inspect}"
+                 "five answers came out #{pill_boxes.uniq.size} different widths: #{pill_boxes.tally.inspect}"
 
     add_response               # -> 6
     assert_equal 1, pill_boxes.uniq.size,
-                 "six answers came out in #{pill_boxes.uniq.size} different sizes: #{pill_boxes.tally.inspect}"
+                 "six answers came out #{pill_boxes.uniq.size} different widths: #{pill_boxes.tally.inspect}"
 
     # Not the same size at BOTH counts, and deliberately so: the six-answer arc
     # brings its middle pair within 28.5% of the card of each other where the
@@ -211,16 +242,13 @@ class TapResponseAddTest < ApplicationSystemTestCase
     end
   end
 
-  # The panel's 2-6 picker reports the same number the ＋ and × change, so it has
-  # to follow them. It used to update only when a card was selected: add two to a
-  # three-point scale and the panel went on claiming 3 beside a card showing 5.
+  # The panel's 2-6 picker is now the way UP and the × is the way down, so it has
+  # to follow the strip either way. It used to update only when a card was
+  # selected: grow a three-point scale by two and the panel went on claiming 3
+  # beside a card showing 5.
   test "the answers-per-statement picker follows the strip" do
     open_editor
-    # A first click opens the panel; the second selects the card. The wrap's
-    # centre lands on the swipe card, whose own handler stops propagation, so
-    # both go to a corner.
-    wrap = find("[data-card-cid='t1'] .rotate-wrap")
-    2.times { wrap.click(x: 4, y: 4) }
+    select_card
     assert_selector ".response-scale-btn.is-active", text: "3"
 
     add_response
@@ -234,5 +262,60 @@ class TapResponseAddTest < ApplicationSystemTestCase
 
     remove_last_response
     assert_selector ".response-scale-btn.is-active", text: "4"
+  end
+
+  # The reason the ＋ could be removed at all.
+  #
+  # Growing a scale from the panel used to hand back the preset verbatim, so a
+  # creator who had written their own answers lost every one of them to add a
+  # fifth. That was survivable while the strip's ＋ could grow a scale without
+  # touching the labels; with the ＋ gone this is the only way up, and a
+  # resize that eats your wording is data loss, not a preference.
+  #
+  # Matched by KEY, not position: config/tap_scales.yml is explicit that
+  # "labels are content; keys are identity", and 4 → 5 keeps
+  # strongly_disagree/disagree/agree/strongly_agree while inserting "neutral"
+  # in the middle. Position would hand "disagree"'s wording to "neutral".
+  def label_at(index)
+    page.all("[data-card-cid='t1'] [data-tap-response] [data-tap-response-label]")[index]&.text&.strip
+  end
+
+  def rewrite_label(index, text)
+    el = page.all("[data-card-cid='t1'] [data-tap-response] [data-tap-response-label]")[index]
+    execute_script("arguments[0].textContent = arguments[1]", el, text)
+    el.click # blur/commit through the editor's own input path
+  end
+
+  test "growing a scale keeps the wording the creator wrote" do
+    open_editor
+    set_scale(4)
+
+    rewrite_label(0, "Not for me at all")
+    rewrite_label(3, "Absolutely yes")
+    assert_equal "Not for me at all", label_at(0)
+
+    set_scale(5)
+
+    labels = page.all("[data-card-cid='t1'] [data-tap-response] [data-tap-response-label]").map { |e| e.text.strip }
+    assert_includes labels, "Not for me at all",
+                    "the creator's own wording for strongly_disagree was reseeded away by the " \
+                    "preset — with no ＋ on the strip this is the only way to resize, so that " \
+                    "is straightforward data loss. Got: #{labels.inspect}"
+    assert_includes labels, "Absolutely yes",
+                    "strongly_agree's wording was lost on the way to five. Got: #{labels.inspect}"
+    # The slot that genuinely has no equivalent at four takes the preset's.
+    assert_equal 5, labels.size
+  end
+
+  test "shrinking a scale keeps the wording of the answers that survive" do
+    open_editor
+    set_scale(5)
+    rewrite_label(0, "Really not")
+    set_scale(4)
+
+    labels = page.all("[data-card-cid='t1'] [data-tap-response] [data-tap-response-label]").map { |e| e.text.strip }
+    assert_includes labels, "Really not",
+                    "strongly_disagree exists at both four and five, so its wording should " \
+                    "survive the trip down. Got: #{labels.inspect}"
   end
 end

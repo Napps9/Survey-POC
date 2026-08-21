@@ -14,7 +14,7 @@
 // keep those hooks on any markup change.
 import { t } from "lib/i18n"
 import { iconMap, emojiFor } from "lib/option_icons"
-import { fans, MAX_TAP_RESPONSES } from "lib/tap_scales"
+import { fans } from "lib/tap_scales"
 
 // Local rather than imported from lib/choice_templates: option_styles.js needs
 // tapGlyphSvg from here, choice_templates already imports option_styles, and
@@ -94,18 +94,17 @@ export function tapResponseHtml(response, index) {
 }
 
 // The whole strip, from a resolved TapScales list (lib/tap_scales.js#resolveResponses).
+//
+// This is the twin of shared/_tap_responses.html.erb and has to agree with it:
+// the server renders the strip once and this rebuilds it on every type switch
+// and scale change, so an affordance left here reappears the moment a creator
+// touches the card. The ＋ was removed from both together — "Answers per
+// statement" in the settings panel is the one control for how many there are.
 export function tapResponseStripHtml(responses) {
-  const addBtn = responses.length < MAX_TAP_RESPONSES
-    ? `<button type="button" class="tap-response-add"
-               data-action="click->card-editor#addResponse"
-               title="${esc(t("card.add_response", { default: "Add an answer" }))}"
-               aria-label="${esc(t("card.add_response", { default: "Add an answer" }))}">＋</button>`
-    : ""
   return `
     <div class="rotate-actions${fans(responses.length) ? " rotate-actions--fan" : ""}"
          data-tap-responses
          data-response-count="${responses.length}">
       ${responses.map((r, i) => tapResponseHtml(r, i)).join("")}
-      ${addBtn}
     </div>`
 }

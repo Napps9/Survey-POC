@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { choiceListItemHtml, prioritiseItemHtml, esc } from "lib/choice_templates"
 import { tapResponseStripHtml } from "lib/tap_response_templates"
-import { resolveResponses, presetFor, MIN_TAP_RESPONSES, MAX_TAP_RESPONSES } from "lib/tap_scales"
+import { resolveResponses, presetFor, MIN_TAP_RESPONSES } from "lib/tap_scales"
 import { t } from "lib/i18n"
 
 const SWIPE_FILLS = [
@@ -138,25 +138,13 @@ export default class extends Controller {
   // bookkeeping beyond rewriting the markup. Every change rebuilds the whole
   // strip rather than splicing one node, because a response's swipe direction
   // and the circles-versus-pills shape are both functions of how many there
-  // are — add a fifth by hand and the other four would still claim the layout
-  // and the directions they had when there were four.
-
-  addResponse(event) {
-    event.stopPropagation() // don't also select/apply the type underneath
-    const strip = event.currentTarget.closest("[data-tap-responses]")
-    if (!strip) return
-    const list = this._responsesFromDom(strip)
-    if (list.length >= MAX_TAP_RESPONSES) return
-    // Appended at the positive end: the scale reads most-negative first, so the
-    // new answer is the strongest agreement until the creator says otherwise —
-    // which is also why it starts on the positive glyph rather than falling
-    // through to a keyword emoji, where it would be the one circle in the strip
-    // not wearing the strip's own artwork.
-    list.push({ key: `r_${this._randomKey()}`,
-                label: t("card.new_response", { default: "New answer" }),
-                glyph: "yes" })
-    this._rewriteStrip(strip, list)
-  }
+  // are — grow to a fifth and the other four would otherwise still claim the
+  // layout and the directions they had when there were four.
+  //
+  // There is no addResponse: the strip's ＋ was removed in favour of the
+  // settings panel's "Answers per statement", which is the same decision asked
+  // once instead of one-more-at-a-time. deleteResponse stays, because removing
+  // a particular answer is a different question from how many there are.
 
   deleteResponse(event) {
     event.stopPropagation()
@@ -173,13 +161,51 @@ export default class extends Controller {
     this._rewriteStrip(strip, list)
   }
 
-  // Reseed from a preset, keeping nothing — the point of picking "5" is to get
-  // the five-point scale, not to have last scale's words survive into it.
+  // Reseed from a preset, keeping the creator's own words. This used to keep
+  // nothing, on the reasoning that picking "5" means wanting the five-point
+  // scale rather than last scale's wording — fair while the strip's own ＋
+  // could grow a scale without touching the labels. That ＋ is gone, so this
+  // is the only way to resize, and discarding here would mean a creator who
+  // wrote their own four answers loses all four to reach five.
   setResponsePreset(count) {
     const strip = this.element.querySelector("[data-tap-responses]")
     if (!strip) return
     const preset = presetFor(count)
-    if (preset.length) this._rewriteStrip(strip, preset)
+    if (!preset.length) return
+    this._rewriteStrip(strip, this._keepCreatorContent(strip, preset))
+  }
+
+  // Resizing a scale used to hand back the preset verbatim, wiping whatever the
+  // creator had written. That was survivable while the strip carried its own ＋
+  // to add one answer without disturbing the rest; now that the ＋ is gone and
+  // this picker is the only way to grow a scale, dropping their wording here
+  // would be plain data loss.
+  //
+  // Matched BY KEY, never by position. config/tap_scales.yml puts it plainly —
+  // "labels are content; keys are identity" — and the scales genuinely disagree
+  // about position: going 3 → 4 the middle slot changes from "unsure" to
+  // "disagree", so a positional carry-over would hand one answer's wording to a
+  // different answer, which is worse than losing it. A key present in both
+  // scales keeps the creator's label and their 🎨 marks; a key with no
+  // equivalent in the new scale (3's "unsure" has none at 4) takes the preset's,
+  // because that answer no longer exists.
+  //
+  // Structure always comes from the preset: `key`, `glyph` and `strong` carry
+  // the scale's meaning and its swipe directions, and the glyph/emoji split is
+  // sized to the count (circles below five, text pills at five and six).
+  _keepCreatorContent(strip, preset) {
+    const existing = new Map(this._responsesFromDom(strip).map((r) => [ r.key, r ]))
+    return preset.map((slot) => {
+      const was = existing.get(slot.key)
+      if (!was) return slot
+      const kept = { ...slot }
+      if (was.label) kept.label = was.label
+      // The three the 🎨 popover writes — the creator's, not the preset's.
+      if (was.icon)  kept.icon  = was.icon
+      if (was.emoji) kept.emoji = was.emoji
+      if (was.color) kept.color = was.color
+      return kept
+    })
   }
 
   _responsesFromDom(strip) {

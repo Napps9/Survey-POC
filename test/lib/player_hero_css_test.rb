@@ -20,9 +20,9 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
     css.scan(/#{Regexp.escape(selector)}\s*\{([^}]*)\}/).flatten
   end
 
-  test "the range strip grows from an auto height" do
+  test "the range strip grows from an auto height, and outranks the panel while doing it" do
     body = rule_bodies(".preview-overlay .split-card:has(.nps-lottie) .split-left")
-             .find { |b| b.include?("flex: 1 1 auto") }
+             .find { |b| b =~ /flex:\s*\d+ 1 auto/ }
 
     assert body, "the range strip's grow rule is gone — the animation is back on a fixed clamp"
     assert_match(/height:\s*auto/, body,
@@ -30,17 +30,43 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
                  "absolutely positioned, so only with an auto height does its flex base stay " \
                  "out of the card's intrinsic-height math. Put a fixed height back and short " \
                  "viewports scroll under a tall hero instead of shrinking it.")
+
+    # The grow factor used to be a plain 1 and had nothing to compete with,
+    # because the answer panel was flex-grow: 0. The panel grows now (the 189px
+    # of white beneath it had to go somewhere), and flex divides free space in
+    # PROPORTION to the factors — so two 1s handed the panel half the surplus
+    # and took the hero from 341px to 259px on an iPhone 15. Measured, not
+    # feared: that was the first attempt at this fix.
+    #
+    # A dominant factor is what restores the intended order — hero to its
+    # --play-hero-h ceiling first, then the leftover to the panel. The number
+    # is a priority, not a proportion, so pin that it is LARGE rather than
+    # pinning a particular value.
+    grow = body[/flex:\s*(\d+) 1 auto/, 1].to_i
+    assert_operator grow, :>=, 100,
+                    "the range strip's grow factor is #{grow}, close enough to the answer " \
+                    "panel's 1 that they now share the surplus. The picture is supposed to " \
+                    "have first claim on it and the panel is supposed to get only what the " \
+                    "picture's ceiling won't let it take."
   end
 
-  test "the range answer panel is content-sized and unshrinkable" do
+  # Deliberately updated when the panel started growing (2026-08-21). What this
+  # test protects is flex-SHRINK, and that has not moved; the grow factor is
+  # the part that changed, on purpose, and is asserted here in its own right so
+  # the pair can't drift apart unnoticed.
+  test "the range answer panel grows into the leftover but never shrinks" do
     bodies = rule_bodies(".preview-overlay .split-card:has(.nps-lottie) .split-right")
-    body = bodies.find { |b| b.include?("flex") }
+    body = bodies.find { |b| b.include?("flex:") }
 
     assert body, "the range answer panel's rule is gone"
-    assert_match(/flex:\s*0 0 auto/, body,
+    assert_match(/flex:\s*1 0 auto/, body,
                  "flex-shrink must stay 0: .split-right is overflow:hidden, which zeroes its " \
                  "automatic minimum, so a shrinkable panel doesn't degrade — it clips the " \
-                 "slider invisibly. An answer may cost a scroll; it may never cost a control.")
+                 "slider invisibly. An answer may cost a scroll; it may never cost a control. " \
+                 "flex-grow must stay 1: at 0 the panel hugs its content and the height the " \
+                 "hero's ceiling won't let it take is painted as .split-card's white " \
+                 "background under the answer — 189px of it on an iPhone 15, which is the " \
+                 "band the owner photographed on page 18 of the feedback sheet.")
     assert_match(/min-height:\s*0/, body,
                  "without min-height: 0 the base rule's --play-right-min (a 300-520px claim " \
                  "written for answers that scroll) still applies, and the blank void this " \

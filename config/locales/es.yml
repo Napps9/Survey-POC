@@ -31,8 +31,6 @@ es:
     add_option: Agregar opción
     new_option: Nueva opción
     style_option: Estilizar esta respuesta
-    new_response: "Nueva respuesta"
-    add_response: "Añadir una respuesta"
     remove_response: "Eliminar esta respuesta"
     remove_option: "Eliminar tarjeta"
     response_scale: "Respuestas por afirmación"
@@ -69,7 +67,7 @@ es:
     mark_correct: "Marca la respuesta correcta"
     rating_star: "%{number} de %{total}"
     correct_pick_hint: "Toca la opción u opciones que los jugadores deben elegir para acertar."
-    correct_tap_hint: "Define el deslizamiento correcto para cada afirmación."
+    correct_tap_hint: "Define la respuesta correcta para cada afirmación."
     correct_scale_hint: "Elige el valor que cuenta como correcto."
     accepted_answers: "Respuestas aceptadas"
     accepted_answers_hint: "Una por línea — cualquier coincidencia (sin distinguir mayúsculas) es correcta."
@@ -86,11 +84,11 @@ es:
       nps: "Arrastra el líquido"
       multiple_choice: "Elige una opción"
       select_many: "Elige todas las que correspondan"
-      prioritise: "Haz clic y arrastra para ordenar por prioridad"
+      prioritise: "Ordena por prioridad"
       yes_no: "Elige una opción"
       select_one_grid: "Elige una opción"
       select_many_grid: "Elige todas las que correspondan"
-      tap_card: "Arrastra para responder"
+      tap_card: "Toca para responder"
       open_ended: "Escribe tu respuesta"
       contact_form: "Comparte tus datos"
       scenario: "Sigue leyendo y luego elige"
@@ -104,7 +102,7 @@ es:
       yes_no: "SÍ / NO"
       select_one_grid: "CUADRÍCULA DE IMÁGENES"
       select_many_grid: "CUADRÍCULA DE IMÁGENES"
-      tap_card: "DESLIZAR"
+      tap_card: "TOCAR"
       scenario: "ESCENARIO"
       open_ended: "TEXTO LIBRE"
       contact_form: "CONTACTO"
@@ -121,7 +119,7 @@ es:
       yes_no: "ELIGE UNA OPCIÓN"
       select_one_grid: "ELIGE UNA OPCIÓN"
       select_many_grid: "ELIGE TODAS LAS QUE CORRESPONDAN"
-      tap_card: "DESLIZA PARA RESPONDER"
+      tap_card: "TOCA PARA RESPONDER"
       scenario: "SIGUE LEYENDO Y LUEGO ELIGE"
       open_ended: "ESCRIBE TU RESPUESTA"
       contact_form: "COMPARTE TUS DATOS"
@@ -130,7 +128,7 @@ es:
       select_many: "Elegir varios (lista)"
       select_one_grid: "Elegir uno (cuadrícula)"
       select_many_grid: "Elegir varios (cuadrícula)"
-      tap_card: "Deslizar"
+      tap_card: "Tocar"
       range: "Escala"
       rating: "Valoración"
       nps: "NPS"
@@ -385,6 +383,9 @@ es:
       add_to_library: "Agregar a la biblioteca"
       library_saving: "Guardando…"
       library_save_failed: "No se pudo guardar en la biblioteca"
+      remove_from_library: "Quitar de la biblioteca"
+      library_remove_confirm: "¿Quitar esta imagen de tu biblioteca de marca? Cualquier tarjeta que ya la use la perderá."
+      library_remove_failed: "No se pudo quitar de la biblioteca"
       confirm_delete: "¿Eliminar de verdad?"
       unsaved: Cambios sin guardar
       undo_restored: 'Tarjeta restaurada'
@@ -553,8 +554,8 @@ es:
         tap_card:
           tap_card: "Reacciones viscerales rápidas y gamificadas — perfecto para probar varias afirmaciones cortas sin fatigar la encuesta."
           range: "Cambia velocidad por matices — úsalo si prefieres ver cuánto está de acuerdo la gente en lugar de qué tan rápido."
-          rating: "Las estrellas dan una escala familiar, pero pierdes la agilidad del deslizar."
-          select_one_grid: "Elimina la mecánica lúdica de deslizar — cambia solo si la pregunta es realmente una elección única y estática."
+          rating: "Las estrellas dan una escala familiar, pero pierdes la agilidad del toque."
+          select_one_grid: "Elimina la mecánica lúdica del toque — cambia solo si la pregunta es realmente una elección única y estática."
         scenario:
           scenario: "Una historia corta que los encuestados pasan página a página, con una elección de 2–3 opciones en la última — ideal para planteamientos largos y situacionales que saturarían una sola tarjeta."
           multiple_choice: "Renuncia a la construcción narrativa por una lista simple de elección única — cambia si el contexto de la historia no aporta nada."
@@ -1356,7 +1357,7 @@ es:
     s7_perks_label: Qué obtienes al rellenar contenido
     s7_perks:
     - Un fondo de encuesta acorde a tu temática
-    - Imágenes en cada tarjeta, incluidas las tarjetas deslizables
+    - Imágenes en cada tarjeta, incluidas las tarjetas de toque
     - Mezcla en el editor hasta que te convenza
     s7_title: "¿Cómo te gustaría empezar?"
     s7_sub: Podrás cambiar cualquier cosa en el editor.

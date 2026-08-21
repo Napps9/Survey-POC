@@ -31,8 +31,6 @@ it:
     add_option: Aggiungi opzione
     new_option: Nuova opzione
     style_option: Personalizza questa risposta
-    new_response: "Nuova risposta"
-    add_response: "Aggiungi una risposta"
     remove_response: "Rimuovi questa risposta"
     remove_option: "Elimina scheda"
     response_scale: "Risposte per affermazione"
@@ -69,7 +67,7 @@ it:
     mark_correct: "Indica la risposta corretta"
     rating_star: "%{number} su %{total}"
     correct_pick_hint: "Tocca le opzioni che i giocatori devono scegliere per indovinare."
-    correct_tap_hint: "Imposta lo swipe corretto per ogni affermazione."
+    correct_tap_hint: "Imposta la risposta corretta per ogni affermazione."
     correct_scale_hint: "Scegli il valore che conta come corretto."
     accepted_answers: "Risposte accettate"
     accepted_answers_hint: "Una per riga — qualsiasi corrispondenza (senza distinzione tra maiuscole e minuscole) è corretta."
@@ -86,11 +84,11 @@ it:
       nps: "Trascina il liquido"
       multiple_choice: "Scegli un'opzione"
       select_many: "Scegli tutte le opzioni pertinenti"
-      prioritise: "Clicca e trascina per ordinare in base alla priorità"
+      prioritise: "Ordina in base alla priorità"
       yes_no: "Scegli un'opzione"
       select_one_grid: "Scegli un'opzione"
       select_many_grid: "Scegli tutte le opzioni pertinenti"
-      tap_card: "Scorri per rispondere"
+      tap_card: "Tocca per rispondere"
       open_ended: "Scrivi la tua risposta"
       contact_form: "Condividi i tuoi dati"
       scenario: "Continua a leggere, poi scegli"
@@ -104,7 +102,7 @@ it:
       yes_no: "SÌ / NO"
       select_one_grid: "GRIGLIA DI IMMAGINI"
       select_many_grid: "GRIGLIA DI IMMAGINI"
-      tap_card: "SCORRI"
+      tap_card: "TOCCA"
       scenario: "SCENARIO"
       open_ended: "TESTO LIBERO"
       contact_form: "CONTATTO"
@@ -121,7 +119,7 @@ it:
       yes_no: "SCEGLI UN'OPZIONE"
       select_one_grid: "SCEGLI UN'OPZIONE"
       select_many_grid: "SCEGLI TUTTE LE OPZIONI PERTINENTI"
-      tap_card: "SCORRI PER RISPONDERE"
+      tap_card: "TOCCA PER RISPONDERE"
       scenario: "CONTINUA A LEGGERE, POI SCEGLI"
       open_ended: "SCRIVI LA TUA RISPOSTA"
       contact_form: "CONDIVIDI I TUOI DATI"
@@ -130,7 +128,7 @@ it:
       select_many: "Scegli più (elenco)"
       select_one_grid: "Scegli uno (griglia)"
       select_many_grid: "Scegli più (griglia)"
-      tap_card: "Scorri"
+      tap_card: "Tocca"
       range: "Scala"
       rating: "Valutazione"
       nps: "NPS"
@@ -385,6 +383,9 @@ it:
       add_to_library: "Aggiungi alla libreria"
       library_saving: "Salvataggio…"
       library_save_failed: "Impossibile salvare nella libreria"
+      remove_from_library: "Rimuovi dalla libreria"
+      library_remove_confirm: "Rimuovere questa immagine dalla libreria del tuo brand? Ogni scheda che la usa già la perderà."
+      library_remove_failed: "Impossibile rimuoverla dalla libreria"
       confirm_delete: "Eliminare davvero?"
       unsaved: Modifiche non salvate
       undo_restored: 'Scheda ripristinata'
@@ -553,8 +554,8 @@ it:
         tap_card:
           tap_card: "Reazioni istintive, rapide e giocose — perfetto per testare più affermazioni brevi senza stancare."
           range: "Sostituisce la velocità con le sfumature — usalo se preferisci vedere quanto le persone sono d'accordo piuttosto che quanto in fretta."
-          rating: "Le stelle danno una scala familiare, ma perdi il ritmo incalzante dello swipe."
-          select_one_grid: "Elimina la meccanica giocosa dello swipe — cambia solo se la domanda è davvero un'unica scelta statica."
+          rating: "Le stelle danno una scala familiare, ma perdi il ritmo incalzante del tocco."
+          select_one_grid: "Elimina la meccanica giocosa del tocco — cambia solo se la domanda è davvero un'unica scelta statica."
         scenario:
           scenario: "Una breve storia che i rispondenti sfogliano pagina per pagina, poi una scelta a 2–3 opzioni sull'ultima pagina — al meglio per spunti lunghi e situazionali che sommergerebbero una sola scheda."
           multiple_choice: "Abbandona il crescendo narrativo per una semplice lista a scelta singola — passa a questa se il contesto della storia non aggiunge nulla."
@@ -1356,7 +1357,7 @@ it:
     s7_perks_label: Cosa ottieni con il popolamento automatico
     s7_perks:
     - Uno sfondo abbinato al tema del sondaggio
-    - Un'immagine su ogni scheda, incluse le swipe card
+    - Un'immagine su ogni scheda, incluse le tap card
     - Rimescola nell'editor finché non ti convince
     s7_title: Come vorresti iniziare?
     s7_sub: Potrai comunque modificare tutto nell'editor.

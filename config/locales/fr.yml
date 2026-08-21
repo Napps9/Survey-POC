@@ -31,8 +31,6 @@ fr:
     add_option: Ajouter une option
     new_option: Nouvelle option
     style_option: Styliser cette réponse
-    new_response: "Nouvelle réponse"
-    add_response: "Ajouter une réponse"
     remove_response: "Supprimer cette réponse"
     remove_option: "Supprimer la carte"
     response_scale: "Réponses par affirmation"
@@ -69,7 +67,7 @@ fr:
     mark_correct: "Indiquer la bonne réponse"
     rating_star: "%{number} sur %{total}"
     correct_pick_hint: "Touchez la ou les options que les joueurs doivent choisir pour avoir raison."
-    correct_tap_hint: "Définissez le bon glissement pour chaque affirmation."
+    correct_tap_hint: "Définissez la bonne réponse pour chaque affirmation."
     correct_scale_hint: "Choisissez la valeur considérée comme correcte."
     accepted_answers: "Réponses acceptées"
     accepted_answers_hint: "Une par ligne — toute correspondance (insensible à la casse) est correcte."
@@ -86,11 +84,11 @@ fr:
       nps: "Faites glisser le liquide"
       multiple_choice: "Choisissez une réponse"
       select_many: "Sélectionnez toutes les réponses qui s'appliquent"
-      prioritise: "Cliquez et faites glisser pour classer par ordre de priorité"
+      prioritise: "Classez par ordre de priorité"
       yes_no: "Choisissez une réponse"
       select_one_grid: "Choisissez une réponse"
       select_many_grid: "Sélectionnez toutes les réponses qui s'appliquent"
-      tap_card: "Glissez pour répondre"
+      tap_card: "Touchez pour répondre"
       open_ended: "Saisissez votre réponse"
       contact_form: "Partagez vos coordonnées"
       scenario: "Lisez, puis choisissez"
@@ -104,7 +102,7 @@ fr:
       yes_no: "OUI / NON"
       select_one_grid: "GRILLE D'IMAGES"
       select_many_grid: "GRILLE D'IMAGES"
-      tap_card: "GLISSER"
+      tap_card: "TOUCHER"
       scenario: "SCÉNARIO"
       open_ended: "TEXTE LIBRE"
       contact_form: "CONTACT"
@@ -121,7 +119,7 @@ fr:
       yes_no: "CHOISISSEZ UNE RÉPONSE"
       select_one_grid: "CHOISISSEZ UNE RÉPONSE"
       select_many_grid: "SÉLECTIONNEZ TOUTES LES RÉPONSES QUI S'APPLIQUENT"
-      tap_card: "GLISSEZ POUR RÉPONDRE"
+      tap_card: "TOUCHEZ POUR RÉPONDRE"
       scenario: "LISEZ, PUIS CHOISISSEZ"
       open_ended: "SAISISSEZ VOTRE RÉPONSE"
       contact_form: "PARTAGEZ VOS COORDONNÉES"
@@ -130,7 +128,7 @@ fr:
       select_many: "Choix multiple (liste)"
       select_one_grid: "Choix unique (grille)"
       select_many_grid: "Choix multiple (grille)"
-      tap_card: "Glisser"
+      tap_card: "Toucher"
       range: "Échelle"
       rating: "Note"
       nps: "NPS"
@@ -385,6 +383,9 @@ fr:
       add_to_library: "Ajouter à la bibliothèque"
       library_saving: "Enregistrement…"
       library_save_failed: "Échec de l'enregistrement dans la bibliothèque"
+      remove_from_library: "Retirer de la bibliothèque"
+      library_remove_confirm: "Retirer cette image de votre bibliothèque de marque ? Toute carte qui l'utilise déjà la perdra."
+      library_remove_failed: "Impossible de la retirer de la bibliothèque"
       confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
       undo_restored: 'Carte restaurée'
@@ -553,8 +554,8 @@ fr:
         tap_card:
           tap_card: "Des réactions instinctives, rapides et ludiques — parfait pour tester plusieurs affirmations courtes sans lassitude du sondage."
           range: "Remplace la vitesse par la nuance — utilisez-le si vous préférez mesurer la force de l'accord plutôt que la rapidité."
-          rating: "Les étoiles offrent une échelle familière, mais vous perdez le rythme effréné du glissement."
-          select_one_grid: "Supprime la mécanique ludique du glissement — ne changez que si la question est vraiment un choix statique unique."
+          rating: "Les étoiles offrent une échelle familière, mais vous perdez le rythme effréné du toucher."
+          select_one_grid: "Supprime la mécanique ludique du toucher — ne changez que si la question est vraiment un choix statique unique."
         scenario:
           scenario: "Une courte histoire que les répondants tournent page après page, puis un choix de 2–3 options sur la dernière page — idéal pour les mises en situation longues qui surchargeraient une seule carte."
           multiple_choice: "Abandonne la montée narrative pour une simple liste à choix unique — changez si le contexte de l'histoire n'apporte rien."
@@ -1356,7 +1357,7 @@ fr:
     s7_perks_label: Les avantages du remplissage automatique
     s7_perks:
     - Un arrière-plan assorti au thème de votre sondage
-    - Une image sur chaque carte, y compris les cartes à glisser
+    - Une image sur chaque carte, y compris les cartes à toucher
     - Mélangez dans l'éditeur jusqu'à trouver le rendu idéal
     s7_title: Comment souhaitez-vous démarrer ?
     s7_sub: Vous pourrez tout modifier dans l'éditeur.

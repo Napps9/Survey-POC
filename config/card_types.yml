@@ -80,7 +80,7 @@ prioritise:
   badge_css:    "sb-rank"
   accent:       "#8B85FF"
   panel_label:  "DRAG INTO ORDER"
-  eyebrow:      "Click and drag to arrange in order of priority"
+  eyebrow:      "Arrange in order of priority"
   picker_name:  "Prioritise"
   picker_desc:  "Drag to rank in order"
   explainer:    "A list respondents drag into an order of priority (highest to lowest). Richer than select one/many — you learn the ORDER of preference, not just the picks. Best with about 5 options so analysis can surface a clear top three."
@@ -124,14 +124,20 @@ select_many_grid:
   pickable:     true
 
 tap_card:
-  badge:        "SWIPE"
+  # These four are the ENGLISH FALLBACK only — card.badge/panel_label/eyebrow.tap_card
+  # in the locale files win when present (see CardTypes.badge). picker_name and
+  # picker_desc below are NOT localised and are read straight from here.
+  # badge_css stays "sb-swipe": it is an internal colour class shared with
+  # another type, nobody sees it, and renaming it would touch that type for
+  # no gain.
+  badge:        "TAP"
   badge_css:    "sb-swipe"
   accent:       "#0CA7FF"
-  panel_label:  "SWIPE TO RESPOND"
-  eyebrow:      "Swipe to respond"
-  picker_name:  "Swipe Cards"
-  picker_desc:  "Swipe to agree / disagree"
-  explainer:    "A small deck respondents swipe to agree or disagree with, one statement at a time. Engaging for a quick gut take across a few related items."
+  panel_label:  "TAP TO RESPOND"
+  eyebrow:      "Tap to respond"
+  picker_name:  "Tap Cards"
+  picker_desc:  "Tap to agree / disagree"
+  explainer:    "A small deck respondents tap through to agree or disagree with, one statement at a time. Engaging for a quick gut take across a few related items."
   picker_icon:  "⇄"
   pickable:     true
 

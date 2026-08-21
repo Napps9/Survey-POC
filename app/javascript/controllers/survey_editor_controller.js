@@ -1789,7 +1789,7 @@ export default class extends Controller {
       } catch (_) { /* ignore malformed */ }
 
       // tap_card response scale — the 2-6 answers each statement is judged on.
-      // Read off the strip, which is the record (see card_editor#addResponse),
+      // Read off the strip, which is the record (see card_editor#_rewriteStrip),
       // and mirrored back onto the row so a type switch away and back rebuilds
       // the creator's scale instead of the default three. Only emitted while
       // the card IS a tap card: `responses` is meaningless on any other type

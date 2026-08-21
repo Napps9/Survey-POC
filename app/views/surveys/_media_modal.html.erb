@@ -161,15 +161,31 @@
                   <% end %>
                   <% brand_assets.each do |att| %>
                     <%# Tile shows a small variant; the FULL-size original is
-                        what data-url applies to the card when picked. %>
-                    <button type="button"
-                            class="media-library-item"
-                            title="<%= att.blob.filename %>"
-                            style="background-image:url('<%= as_thumb_path(att) %>');"
-                            data-url="<%= rails_blob_path(att.blob, only_path: true) %>"
-                            data-media-picker-target="libraryItem"
-                            data-action="click->media-picker#pickLibraryItem"
-                            aria-selected="false"></button>
+                        what data-url applies to the card when picked.
+
+                        The tile IS a <button>, so the remove × cannot live
+                        inside it — it gets a positioned cell of its own around
+                        both. The cell is what the grid lays out and what lifts
+                        on hover; see .media-library-cell in application.css. %>
+                    <div class="media-library-cell">
+                      <button type="button"
+                              class="media-library-item"
+                              title="<%= att.blob.filename %>"
+                              style="background-image:url('<%= as_thumb_path(att) %>');"
+                              data-url="<%= rails_blob_path(att.blob, only_path: true) %>"
+                              data-asset-id="<%= att.id %>"
+                              data-media-picker-target="libraryItem"
+                              data-action="click->media-picker#pickLibraryItem"
+                              aria-selected="false"></button>
+                      <% if library_admin %>
+                        <button type="button"
+                                class="media-library-del"
+                                title="<%= t("js.editor.remove_from_library") %>"
+                                aria-label="<%= t("js.editor.remove_from_library") %>"
+                                data-delete-url="<%= organisation_asset_path(current_organisation, att.id, format: :json) %>"
+                                data-action="click->media-picker#deleteBrandAsset">×</button>
+                      <% end %>
+                    </div>
                   <% end %>
                 </div>
               </section>

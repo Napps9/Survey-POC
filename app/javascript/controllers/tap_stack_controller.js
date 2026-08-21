@@ -24,7 +24,7 @@ export default class extends Controller {
 
   pick(event) {
     if (event.target.isContentEditable) return
-    if (event.target.closest(".option-style-btn, .tap-response-delete, .tap-response-add")) return
+    if (event.target.closest(".option-style-btn, .tap-response-delete")) return
     event.stopPropagation() // don't also select/apply the type underneath
     const el = event.currentTarget
     this._commit(el.dataset.tapStackKey, el.dataset.tapStackDirection || "right")

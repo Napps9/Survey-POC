@@ -1154,18 +1154,103 @@ export default class extends Controller {
     }
   }
 
-  _prependBrandTile({ url, thumb }) {
+  // Builds the same shape the server renders (see _media_modal.html.erb): a
+  // positioned cell wrapping the tile and its remove ×. The tile is a
+  // <button>, so the × can't be nested inside it.
+  //
+  // `id` and `deleteUrl` come off the create response and used to be dropped
+  // on the floor here — which made a tile you had just uploaded the one tile
+  // you could not remove without leaving the editor and reloading it.
+  _prependBrandTile({ url, thumb, id, delete_url: deleteUrl }) {
     if (!this.hasBrandGridTarget || !url) return
+    const cell = document.createElement("div")
+    cell.className = "media-library-cell"
+
     const btn = document.createElement("button")
     btn.type = "button"
     btn.className = "media-library-item"
     btn.style.backgroundImage = `url('${thumb || url}')`
     btn.dataset.url = url
+    if (id) btn.dataset.assetId = String(id)
     btn.dataset.mediaPickerTarget = "libraryItem"
     btn.dataset.action = "click->media-picker#pickLibraryItem"
     btn.setAttribute("aria-selected", "false")
+    cell.appendChild(btn)
+
+    // Only ever reachable by an admin: this path runs off the add-to-library
+    // tile, which is itself admin-only, and the endpoint gates again server
+    // side. Absent deleteUrl, the tile is simply not removable until reload.
+    if (deleteUrl) cell.appendChild(this._brandDeleteButton(deleteUrl))
+
     const addTile = this.brandGridTarget.querySelector(".media-library-add")
-    addTile ? addTile.after(btn) : this.brandGridTarget.prepend(btn)
+    addTile ? addTile.after(cell) : this.brandGridTarget.prepend(cell)
+  }
+
+  _brandDeleteButton(deleteUrl) {
+    const del = document.createElement("button")
+    del.type = "button"
+    del.className = "media-library-del"
+    del.title = t("editor.remove_from_library")
+    del.setAttribute("aria-label", del.title)
+    del.dataset.deleteUrl = deleteUrl
+    del.dataset.action = "click->media-picker#deleteBrandAsset"
+    del.textContent = "\u00D7"
+    return del
+  }
+
+  // Remove a brand asset from inside the picker. The affordance already
+  // existed on Settings → Brand; the grid a creator is actually looking at
+  // when they decide an image was a mistake is this one.
+  //
+  // The endpoint answers JSON here rather than redirecting, because this runs
+  // inside a modal over an editor that may hold unsaved cards — a redirect
+  // would navigate them away to make a thumbnail disappear.
+  async deleteBrandAsset(event) {
+    // The × sits ON the tile, and the tile is a picker button. Without this
+    // the removal would also select the image it is removing.
+    event.preventDefault()
+    event.stopPropagation()
+
+    const del  = event.currentTarget
+    const cell = del.closest(".media-library-cell")
+    const url  = del.dataset.deleteUrl
+    if (!url || del.disabled) return
+    if (!window.confirm(t("editor.library_remove_confirm"))) return
+
+    del.disabled = true
+    try {
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content || ""
+        }
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!data.ok) {
+        del.disabled = false
+        this._brandStatus(data.error || t("editor.library_remove_failed"))
+        return
+      }
+      this._brandStatus("")
+      this._forgetPickIfRemoved(cell)
+      cell?.remove()
+    } catch (_) {
+      del.disabled = false
+      this._brandStatus(t("editor.library_remove_failed"))
+    }
+  }
+
+  // Apply is armed by a pending URL, not by what is on screen. Delete the tile
+  // that armed it and Apply would still be lit, pointing at a blob that has
+  // just been purged — the card would take a 404 for an image.
+  _forgetPickIfRemoved(cell) {
+    const tile = cell?.querySelector(".media-library-item")
+    if (!tile || this._pendingUrl !== tile.dataset.url) return
+    this._pendingUrl       = null
+    this._pendingCredit    = ""
+    this._pendingCreditUrl = ""
+    this._setApplyEnabled(false)
   }
 
   _brandStatus(message) {

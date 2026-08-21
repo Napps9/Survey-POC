@@ -31,8 +31,6 @@ ko:
     add_option: 옵션 추가
     new_option: 새 옵션
     style_option: 이 답변 스타일
-    new_response: "새 답변"
-    add_response: "답변 추가"
     remove_response: "이 답변 삭제"
     remove_option: "카드 삭제"
     response_scale: "문항당 답변 수"
@@ -69,7 +67,7 @@ ko:
     mark_correct: "정답 표시하기"
     rating_star: "%{total}점 중 %{number}점"
     correct_pick_hint: "플레이어가 맞히려면 선택해야 하는 옵션을 탭하세요."
-    correct_tap_hint: "각 문장에 대한 올바른 스와이프를 설정하세요."
+    correct_tap_hint: "각 문장에 대한 올바른 답변을 설정하세요."
     correct_scale_hint: "정답으로 인정할 값을 선택하세요."
     accepted_answers: "허용되는 답변"
     accepted_answers_hint: "한 줄에 하나씩 — 대소문자 구분 없이 하나라도 일치하면 정답입니다."
@@ -86,11 +84,11 @@ ko:
       nps: "액체를 드래그하세요"
       multiple_choice: "하나를 선택하세요"
       select_many: "해당하는 항목을 모두 선택하세요"
-      prioritise: "드래그해서 우선순위 순서대로 정렬하세요"
+      prioritise: "우선순위 순서대로 정렬하세요"
       yes_no: "하나를 선택하세요"
       select_one_grid: "하나를 선택하세요"
       select_many_grid: "해당하는 항목을 모두 선택하세요"
-      tap_card: "스와이프해서 답변하세요"
+      tap_card: "탭해서 답변하세요"
       open_ended: "답변을 입력하세요"
       contact_form: "연락처를 알려주세요"
       scenario: "계속 읽고 나서 선택하세요"
@@ -104,7 +102,7 @@ ko:
       yes_no: "예 / 아니요"
       select_one_grid: "이미지 그리드"
       select_many_grid: "이미지 그리드"
-      tap_card: "스와이프"
+      tap_card: "탭"
       scenario: "시나리오"
       open_ended: "자유 서술"
       contact_form: "연락처"
@@ -121,7 +119,7 @@ ko:
       yes_no: "하나를 선택하세요"
       select_one_grid: "하나를 선택하세요"
       select_many_grid: "해당하는 항목을 모두 선택하세요"
-      tap_card: "스와이프해서 답변하세요"
+      tap_card: "탭해서 답변하세요"
       scenario: "계속 읽고 나서 선택하세요"
       open_ended: "답변을 입력하세요"
       contact_form: "연락처를 알려주세요"
@@ -130,7 +128,7 @@ ko:
       select_many: "여러 개 선택 (목록)"
       select_one_grid: "하나 선택 (그리드)"
       select_many_grid: "여러 개 선택 (그리드)"
-      tap_card: "스와이프"
+      tap_card: "탭"
       range: "범위"
       rating: "평점"
       nps: "NPS"
@@ -385,6 +383,9 @@ ko:
       add_to_library: "라이브러리에 추가"
       library_saving: "저장 중…"
       library_save_failed: "라이브러리에 저장하지 못했습니다"
+      remove_from_library: "라이브러리에서 제거"
+      library_remove_confirm: "이 이미지를 브랜드 라이브러리에서 제거할까요? 이미 사용 중인 카드에서도 사라집니다."
+      library_remove_failed: "라이브러리에서 제거하지 못했습니다"
       confirm_delete: "정말 삭제할까요?"
       unsaved: 저장되지 않은 변경사항
       undo_restored: '카드를 복원했습니다'
@@ -553,8 +554,8 @@ ko:
         tap_card:
           tap_card: "빠르고 게임 같은 직관적 반응 — 설문 피로 없이 짧은 문장 여러 개를 시험하기에 완벽합니다."
           range: "속도 대신 뉘앙스를 얻습니다 — 얼마나 빨리보다 얼마나 강하게 동의하는지 보고 싶을 때 사용하세요."
-          rating: "별점은 익숙한 척도를 주지만 스와이프의 속도감은 사라집니다."
-          select_one_grid: "놀이 같은 스와이프 방식을 없앱니다 — 질문이 정말 정적인 단일 선택일 때만 바꾸세요."
+          rating: "별점은 익숙한 척도를 주지만 탭의 속도감은 사라집니다."
+          select_one_grid: "놀이 같은 탭 방식을 없앱니다 — 질문이 정말 정적인 단일 선택일 때만 바꾸세요."
         scenario:
           scenario: "응답자가 페이지를 넘기며 읽는 짧은 이야기 뒤에, 마지막 페이지에서 2–3개 선택지를 고릅니다 — 카드 한 장에 담기엔 부담스러운 길고 상황적인 질문에 가장 좋습니다."
           multiple_choice: "서사의 몰입 없이 평범한 단일 선택 목록으로 바꿉니다 — 이야기라는 맥락이 별 도움이 안 될 때 전환하세요."
@@ -1356,7 +1357,7 @@ ko:
     s7_perks_label: 콘텐츠 채우기의 장점
     s7_perks:
     - 테마에 맞는 설문 배경
-    - 스와이프 카드를 포함한 모든 카드에 이미지 적용
+    - 탭 카드를 포함한 모든 카드에 이미지 적용
     - 마음에 들 때까지 에디터에서 셔플 가능
     s7_title: 어떻게 시작하시겠어요?
     s7_sub: 에디터에서 언제든지 수정할 수 있습니다.
