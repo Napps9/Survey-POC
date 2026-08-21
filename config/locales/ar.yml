@@ -1094,6 +1094,14 @@ ar:
     shuffle: خلط
     shuffle_title: إعادة اختيار الصور من مكتبة Verto
     shuffle_confirm: هل تريد خلط الصور؟ سيتم استبدال صورك الحالية باختيار جديد من المكتبة.
+    shuffle_direction_toggle_title: "أضف توجيهًا لهذا الخلط"
+    shuffle_direction_active: "تم تعيين توجيه لهذا الخلط"
+    shuffle_direction_heading: "وجّه هذا الخلط"
+    shuffle_direction_hint: "اختياري. أخبر Verto بما تبحث عنه في الصور والرسوم المتحركة — الأجواء أو المكان أو ما تريد استبعاده."
+    shuffle_direction_label: "التوجيه"
+    shuffle_direction_placeholder: "مثال: ضوء طبيعي دافئ، في الهواء الطلق، مجموعات صغيرة، بدون مكاتب"
+    shuffle_direction_clear: "مسح"
+    shuffle_direction_apply: "اخلط بهذا"
     publish_share: نشر ومشاركة ←
     answer_type: نوع الإجابة
     select_card: اختر بطاقة لتغيير نوعها

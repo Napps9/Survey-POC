@@ -843,6 +843,15 @@ class SurveysController < ApplicationController
     if survey.editing_locked?
       return redirect_to survey_path(survey), alert: editing_locked_message
     end
+    # The optional direction prompt travels with the click but LIVES on the
+    # Verto: the box stays filled in for the next shuffle, and every later
+    # re-population (the picker's Recommended rail, AssetPopulator anywhere)
+    # reads the same steer. Submitting it empty is how a creator clears it,
+    # so an absent key means "unchanged" and a blank one means "drop it" —
+    # which is why this writes only when the form actually sent the field.
+    if params.key?(:direction)
+      survey.update!(shuffle_direction: Survey.sanitize_shuffle_direction(params[:direction]))
+    end
     AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
     redirect_to survey_path(survey)
   rescue => e

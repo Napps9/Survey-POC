@@ -1094,6 +1094,14 @@ vi:
     shuffle: Xáo trộn
     shuffle_title: Chọn lại hình ảnh từ thư viện Verto
     shuffle_confirm: Xáo trộn hình ảnh? Các hình ảnh hiện tại của bạn sẽ được thay thế bằng bộ ảnh mới từ thư viện.
+    shuffle_direction_toggle_title: "Thêm định hướng cho lần xáo trộn này"
+    shuffle_direction_active: "Đã đặt định hướng cho lần xáo trộn này"
+    shuffle_direction_heading: "Định hướng lần xáo trộn này"
+    shuffle_direction_hint: "Không bắt buộc. Hãy cho Verto biết bạn muốn gì ở hình ảnh và hoạt ảnh — một không khí, một bối cảnh, hoặc điều cần tránh."
+    shuffle_direction_label: "Định hướng"
+    shuffle_direction_placeholder: "vd. ánh sáng tự nhiên ấm, ngoài trời, nhóm nhỏ, không văn phòng"
+    shuffle_direction_clear: "Xóa"
+    shuffle_direction_apply: "Xáo trộn theo cách này"
     publish_share: Xuất bản & chia sẻ →
     answer_type: Loại câu trả lời
     select_card: Chọn một thẻ để thay đổi loại của nó

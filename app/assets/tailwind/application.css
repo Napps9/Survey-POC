@@ -3883,6 +3883,87 @@
    where the finalize bar used to be. */
 .editor-float-bottom { top: auto; bottom: 14px; justify-content: center; }
 .editor-float-bottom form { display: inline-flex; margin: 0; }
+
+/* ── Shuffle split pill + direction prompt ──────────────────────────────────
+   Shuffle re-rolls the Verto's imagery; the caret beside it opens an optional
+   free-text "direction" (what the creator wants from the content and imagery)
+   that posts with the same form. The panel floats ABOVE the bar because the
+   bar itself sits at the bottom of the feed. */
+.shuffle-form { position: relative; }
+.shuffle-pill {
+  display: inline-flex; align-items: stretch;
+  border-radius: 100px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.22); background: #2A2D3A;
+}
+.shuffle-pill-go, .shuffle-pill-caret {
+  background: transparent; border: none; color: #fff; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-md);
+  transition: background 0.15s;
+}
+.shuffle-pill-go { padding: 10px 16px 10px 22px; }
+.shuffle-pill-caret {
+  padding: 10px 14px; position: relative;
+  border-inline-start: 1px solid rgba(255,255,255,0.18);
+  line-height: 1;
+}
+.shuffle-pill-go:hover, .shuffle-pill-caret:hover { background: #383D4E; }
+/* A dot on the caret when a direction is already stored, so the creator can
+   see the next shuffle is steered without opening the panel. */
+.shuffle-pill-caret.is-set::after {
+  content: ""; position: absolute; top: 6px; inset-inline-end: 7px;
+  width: 6px; height: 6px; border-radius: 50%; background: #01EACB;
+}
+
+.shuffle-direction {
+  position: absolute; bottom: calc(100% + 10px); inset-inline-start: 0;
+  width: 320px; max-width: 78vw; z-index: 50;
+  padding: 14px; border-radius: 14px;
+  background: #1C2034; border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  text-align: start;
+}
+.shuffle-direction[hidden] { display: none; }
+.shuffle-direction-head {
+  font-family: "Alata", sans-serif; font-size: 14px; color: #fff; margin-bottom: 4px;
+}
+.shuffle-direction-hint {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.45;
+  color: rgba(255,255,255,0.6); margin: 0 0 10px;
+}
+.shuffle-direction-label {
+  display: block; font-family: "ABeeZee", sans-serif; font-size: 11px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 5px;
+}
+.shuffle-direction-input {
+  width: 100%; resize: vertical; padding: 9px 11px;
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06); color: #fff;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; line-height: 1.4;
+}
+.shuffle-direction-input::placeholder { color: rgba(255,255,255,0.35); }
+.shuffle-direction-input:focus {
+  outline: none; border-color: rgba(1,234,203,0.6);
+  background: rgba(255,255,255,0.09);
+}
+.shuffle-direction-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 10px;
+}
+.shuffle-direction-clear, .shuffle-direction-apply {
+  padding: 8px 16px; border-radius: 100px; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+  transition: background 0.15s;
+}
+.shuffle-direction-clear {
+  background: transparent; color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.shuffle-direction-clear:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.shuffle-direction-apply {
+  background: #01EACB; color: #1C2034; border: none;
+}
+.shuffle-direction-apply:hover { background: #00C4AB; }
 .editor-leave-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 7px 13px;

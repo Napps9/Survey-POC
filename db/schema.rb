@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_21_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -877,6 +877,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_150000) do
     t.json "sdgs", default: [], null: false
     t.boolean "share_enabled", default: true, null: false
     t.boolean "show_results_comparison", default: false, null: false
+    t.string "shuffle_direction"
     t.string "slug"
     t.string "test_token"
     t.text "thankyou_body"
