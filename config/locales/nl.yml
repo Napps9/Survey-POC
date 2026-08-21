@@ -1100,6 +1100,8 @@ nl:
     shuffle_direction_hint: "Optioneel. Vertel Verto wat je zoekt in de beelden en animaties — een sfeer, een omgeving of iets wat weg moet blijven."
     shuffle_direction_label: "Richting"
     shuffle_direction_placeholder: "bijv. warm natuurlijk licht, buiten, kleine groepen, geen kantoren"
+    shuffle_direction_toward: "Zoeken naar: %{terms}"
+    shuffle_direction_avoiding: "Uitgesloten: %{terms}"
     shuffle_direction_clear: "Wissen"
     shuffle_direction_apply: "Hiermee vernieuwen"
     publish_share: Publiceren & delen →

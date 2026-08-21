@@ -1122,6 +1122,8 @@ xh:
     shuffle_direction_hint: "Akunyanzelekanga. Xelela iVerto oko ukufunayo kwimifanekiso nakwimifanekiso enyakazayo — imeko-bume, indawo, okanye into omawuyishiye ngaphandle."
     shuffle_direction_label: "Isikhokelo"
     shuffle_direction_placeholder: "umz. ukukhanya kwendalo okufudumeleyo, ngaphandle, amaqela amancinci, akukho ma-ofisi"
+    shuffle_direction_toward: "Sikhangela: %{terms}"
+    shuffle_direction_avoiding: "Sishiya ngaphandle: %{terms}"
     shuffle_direction_clear: "Cima"
     shuffle_direction_apply: "Xuba ngale ndlela"
     publish_share: "Papasha uze wabelane →"

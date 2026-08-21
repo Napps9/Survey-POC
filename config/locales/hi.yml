@@ -1100,6 +1100,8 @@ hi:
     shuffle_direction_hint: "वैकल्पिक। Verto को बताएं कि आप तस्वीरों और एनिमेशन में क्या चाहते हैं — कोई मूड, कोई जगह, या जो नहीं चाहिए।"
     shuffle_direction_label: "दिशा"
     shuffle_direction_placeholder: "उदा. गर्म प्राकृतिक रोशनी, बाहर, छोटे समूह, ऑफ़िस नहीं"
+    shuffle_direction_toward: "खोज रहे हैं: %{terms}"
+    shuffle_direction_avoiding: "बाहर रख रहे हैं: %{terms}"
     shuffle_direction_clear: "साफ़ करें"
     shuffle_direction_apply: "इसी से शफ़ल करें"
     publish_share: प्रकाशित करें और साझा करें →

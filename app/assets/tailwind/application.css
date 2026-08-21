@@ -3946,6 +3946,15 @@
   outline: none; border-color: rgba(1,234,203,0.6);
   background: rgba(255,255,255,0.09);
 }
+/* What the populator read out of the prompt — printed so a misparse shows up
+   here instead of only in the pictures that come back. */
+.shuffle-direction-reading {
+  display: flex; flex-wrap: wrap; gap: 4px 10px;
+  margin: 8px 0 0;
+  font-family: "ABeeZee", sans-serif; font-size: 11px; line-height: 1.4;
+  color: rgba(255,255,255,0.5);
+}
+.shuffle-direction-reading span { white-space: nowrap; }
 .shuffle-direction-actions {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   margin-top: 10px;

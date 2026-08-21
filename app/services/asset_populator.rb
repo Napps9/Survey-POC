@@ -132,10 +132,37 @@ class AssetPopulator
 
   # Words that flip the rest of their clause from "want" to "don't want".
   # Without this a direction reading "no offices" would put `offices` INTO the
-  # search — the exact opposite of what was typed.
+  # search — the exact opposite of what was typed. "less"/"fewer" count: in an
+  # imagery note "less corporate" is a veto, not a quantity.
   NEGATION_CUES = %w[
-    no not never none nothing avoid avoiding without exclude excluding
-    omit omitting skip skipping minus dont doesnt isnt arent
+    no not never none nothing avoid avoiding without exclude excluding except
+    omit omitting skip skipping minus less fewer dont doesnt isnt arent
+  ].to_set.freeze
+
+  # Instruction scaffolding — the words people wrap a direction in, plus the
+  # nouns they use to refer to the Verto and its pictures. None of them names
+  # anything depictable, and leaving them in is not harmless: they are usually
+  # at the FRONT of the sentence, so they crowded out the actual instruction in
+  # the bounded slice sent to Pexels. "We want to make this verto professional
+  # and corporate" reduced to `make verto` — a generic verb and our own product
+  # name — and searched for that while "professional corporate" sat unused.
+  #
+  # STYLE vocabulary is deliberately absent: "photo" is filler in "make the
+  # photos warm" but is the whole instruction in "photos, not illustrations",
+  # and DIRECTION_STYLES needs to still see it. The near-synonyms that carry no
+  # style meaning (picture/image/visual) are filtered instead.
+  DIRECTION_FILLER = %w[
+    make makes making made keep keeps keeping give gives giving
+    look looks looking show shows showing use uses using put puts putting
+    try tries trying get gets getting turn turns
+    vibe vibes aesthetic feeling feelings mood moods tone
+    bit lot lots kind sort type way
+    something anything everything
+    image images imagery picture pictures visual visuals
+    verto vertos deck decks survey surveys questionnaire
+    card cards question questions
+    theme themes style styles
+    thing things stuff
   ].to_set.freeze
 
   # Direction word → manifest `mood:` value. The manifest vocabulary is small
@@ -249,7 +276,7 @@ class AssetPopulator
     # us to keep out.
     def direction_buckets(text)
       wanted, unwanted = [], []
-      text.to_s.downcase.split(%r{[,;./\n|•]+}).each do |clause|
+      text.to_s.downcase.split(%r{[,;./\n|•—–]+}).each do |clause|
         words = clause.scan(/[a-z']+/).map { |w| w.delete("'") }
         cue   = words.index { |w| NEGATION_CUES.include?(w) }
         if cue
@@ -259,13 +286,20 @@ class AssetPopulator
           wanted.concat(words)
         end
       end
-      [ salient_tokens(wanted).uniq, salient_tokens(unwanted).uniq ]
+      [ direction_tokens(wanted), direction_tokens(unwanted) ]
     end
 
     # Filler removal shared with the instance-level salient_words: what's left
     # is what a word actually depicts.
     def salient_tokens(words)
       words.reject { |w| w.length < 3 || STOP_WORDS.include?(w) || QUESTION_FILLER.include?(w) }
+    end
+
+    # The same, plus the instruction scaffolding people wrap a DIRECTION in.
+    # A direction is prose aimed at us ("we want to make this verto…"), not
+    # question copy, so it carries a layer of filler question text never does.
+    def direction_tokens(words)
+      salient_tokens(words).reject { |w| DIRECTION_FILLER.include?(w) }.uniq
     end
 
     # True when a manifest asset is described by any vetoed word — matched
@@ -315,6 +349,18 @@ class AssetPopulator
     # "no offices" in a query string asks Pexels FOR offices.
     def search_hint_for(survey)
       new(survey).send(:direction_terms).join(" ")
+    end
+
+    # What the populator actually TOOK from the direction prompt: the terms it
+    # will search on, and the words it will keep out. The editor prints this
+    # under the box, because the alternative is what happened the first time
+    # this shipped — a direction that reduced to `make verto` searched for that
+    # instead of the "professional and corporate" the creator wrote, the
+    # pictures came back unchanged in character, and nothing anywhere said why.
+    # A parse the creator can see is a parse they can correct.
+    def direction_reading_for(survey)
+      pop = new(survey)
+      { toward: pop.send(:direction_terms), avoiding: pop.send(:direction_vetoes) }
     end
 
     def recommended_paths(survey, context:, card: nil, limit: 8)

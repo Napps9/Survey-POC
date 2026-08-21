@@ -1100,6 +1100,8 @@ ar:
     shuffle_direction_hint: "اختياري. أخبر Verto بما تبحث عنه في الصور والرسوم المتحركة — الأجواء أو المكان أو ما تريد استبعاده."
     shuffle_direction_label: "التوجيه"
     shuffle_direction_placeholder: "مثال: ضوء طبيعي دافئ، في الهواء الطلق، مجموعات صغيرة، بدون مكاتب"
+    shuffle_direction_toward: "البحث عن: %{terms}"
+    shuffle_direction_avoiding: "الاستبعاد: %{terms}"
     shuffle_direction_clear: "مسح"
     shuffle_direction_apply: "اخلط بهذا"
     publish_share: نشر ومشاركة ←

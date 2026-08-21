@@ -1100,6 +1100,8 @@ vi:
     shuffle_direction_hint: "Không bắt buộc. Hãy cho Verto biết bạn muốn gì ở hình ảnh và hoạt ảnh — một không khí, một bối cảnh, hoặc điều cần tránh."
     shuffle_direction_label: "Định hướng"
     shuffle_direction_placeholder: "vd. ánh sáng tự nhiên ấm, ngoài trời, nhóm nhỏ, không văn phòng"
+    shuffle_direction_toward: "Đang tìm: %{terms}"
+    shuffle_direction_avoiding: "Loại trừ: %{terms}"
     shuffle_direction_clear: "Xóa"
     shuffle_direction_apply: "Xáo trộn theo cách này"
     publish_share: Xuất bản & chia sẻ →

@@ -1102,6 +1102,8 @@ pl:
     shuffle_direction_hint: "Opcjonalnie. Powiedz Verto, czego oczekujesz od zdjęć i animacji — nastroju, otoczenia albo tego, czego ma unikać."
     shuffle_direction_label: "Wskazówka"
     shuffle_direction_placeholder: "np. ciepłe naturalne światło, na zewnątrz, małe grupy, bez biur"
+    shuffle_direction_toward: "Szukamy: %{terms}"
+    shuffle_direction_avoiding: "Pomijamy: %{terms}"
     shuffle_direction_clear: "Wyczyść"
     shuffle_direction_apply: "Losuj według tego"
     publish_share: Opublikuj i udostępnij →

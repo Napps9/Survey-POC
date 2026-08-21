@@ -1102,6 +1102,8 @@ uk:
     shuffle_direction_hint: "Необов'язково. Розкажіть Verto, що ви хочете бачити на зображеннях та в анімаціях — настрій, оточення або те, чого варто уникати."
     shuffle_direction_label: "Напрям"
     shuffle_direction_placeholder: "напр. тепле природне світло, надворі, невеликі групи, без офісів"
+    shuffle_direction_toward: "Шукаємо: %{terms}"
+    shuffle_direction_avoiding: "Виключаємо: %{terms}"
     shuffle_direction_clear: "Очистити"
     shuffle_direction_apply: "Перемішати з цим"
     publish_share: Опублікувати й поділитися →

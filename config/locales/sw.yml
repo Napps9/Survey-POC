@@ -1100,6 +1100,8 @@ sw:
     shuffle_direction_hint: "Si lazima. Mwambie Verto unachotaka kwenye picha na uhuishaji — hisia, mandhari, au kitu cha kuepuka."
     shuffle_direction_label: "Mwelekeo"
     shuffle_direction_placeholder: "mf. mwanga wa asili wa joto, nje, vikundi vidogo, bila ofisi"
+    shuffle_direction_toward: "Kutafuta: %{terms}"
+    shuffle_direction_avoiding: "Kuepuka: %{terms}"
     shuffle_direction_clear: "Futa"
     shuffle_direction_apply: "Changanya kwa hili"
     publish_share: Chapisha na shiriki →

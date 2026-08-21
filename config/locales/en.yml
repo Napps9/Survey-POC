@@ -1122,6 +1122,8 @@ en:
     shuffle_direction_hint: "Optional. Tell Verto what you're after in the pictures and animations — a mood, a setting, anything to leave out."
     shuffle_direction_label: "Direction"
     shuffle_direction_placeholder: "e.g. warm natural light, outdoors, small groups, no offices"
+    shuffle_direction_toward: "Searching for: %{terms}"
+    shuffle_direction_avoiding: "Keeping out: %{terms}"
     shuffle_direction_clear: "Clear"
     shuffle_direction_apply: "Shuffle with this"
     publish_share: "Publish & share →"

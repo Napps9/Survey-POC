@@ -1100,6 +1100,8 @@ it:
     shuffle_direction_hint: "Facoltativo. Di' a Verto cosa cerchi nelle immagini e nelle animazioni: un'atmosfera, un contesto o qualcosa da escludere."
     shuffle_direction_label: "Indicazione"
     shuffle_direction_placeholder: "es. luce naturale calda, all'aperto, piccoli gruppi, niente uffici"
+    shuffle_direction_toward: "Ricerca: %{terms}"
+    shuffle_direction_avoiding: "Esclusi: %{terms}"
     shuffle_direction_clear: "Cancella"
     shuffle_direction_apply: "Rimescola con questo"
     publish_share: Pubblica e condividi →

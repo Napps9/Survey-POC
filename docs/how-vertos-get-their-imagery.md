@@ -181,6 +181,25 @@ background and the range animation (which falls back to the neutral General
 set rather than playing the vetoed one). A card panel is allowed to come back
 blank: a clean panel is a better answer to "no offices" than an office.
 
+**What it takes from your words.** A direction is prose aimed at us, so the
+scaffolding people wrap it in — *make, keep, look, give, a bit, the images,
+this verto* — is stripped along with ordinary filler, and only the words that
+name something visual survive. What's left keeps the order it was written in,
+and the first two ride along on the search. The editor prints the result under
+the box (*"Searching for: professional, corporate"*), because a prompt that
+parses to something you didn't mean is otherwise invisible until the pictures
+come back looking untouched. That is exactly how this shipped broken the first
+time: *"We want to make this verto professional and corporate"* reduced to
+`make verto` and searched for that.
+
+**It shades; it doesn't override.** The query stays theme-anchored, so a
+direction changes *how* the Verto's subject is depicted, not *what* is
+depicted. "Professional and corporate" on a community-safety Verto biases the
+results toward the more formal community photos — it will not return
+boardrooms, because the relevance floor still requires a picture to depict the
+subject. A direction that names a subject of its own ("city, glass buildings")
+moves the imagery much further than one that names only a treatment.
+
 **Safety is not negotiable by it.** The direction goes through the same
 age-aware content-safety scrub as every other search term, and a charged
 protest-visual word in it is stripped exactly as it would be in a theme — the

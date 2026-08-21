@@ -1107,6 +1107,8 @@ af:
     shuffle_direction_hint: "Opsioneel. Sê vir Verto wat jy in die prente en animasies soek — 'n stemming, 'n omgewing, of enigiets om weg te laat."
     shuffle_direction_label: "Riglyn"
     shuffle_direction_placeholder: "bv. warm natuurlike lig, buite, klein groepe, geen kantore nie"
+    shuffle_direction_toward: "Soek na: %{terms}"
+    shuffle_direction_avoiding: "Hou uit: %{terms}"
     shuffle_direction_clear: "Maak skoon"
     shuffle_direction_apply: "Skommel hiermee"
     publish_share: "Publiseer & deel →"

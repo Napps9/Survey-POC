@@ -1100,6 +1100,8 @@ tr:
     shuffle_direction_hint: "İsteğe bağlı. Görsellerde ve animasyonlarda ne aradığınızı Verto'ya söyleyin — bir hava, bir ortam ya da dışarıda bırakılacak bir şey."
     shuffle_direction_label: "Yön"
     shuffle_direction_placeholder: "örn. sıcak doğal ışık, açık hava, küçük gruplar, ofis olmasın"
+    shuffle_direction_toward: "Aranıyor: %{terms}"
+    shuffle_direction_avoiding: "Hariç tutuluyor: %{terms}"
     shuffle_direction_clear: "Temizle"
     shuffle_direction_apply: "Bununla karıştır"
     publish_share: Yayınla ve paylaş →

@@ -1122,6 +1122,8 @@ st:
     shuffle_direction_hint: "Ha ho tlamo. Bolella Verto seo o se batlang ditshwantshong le diaenimeishene — moya, sebaka, kapa seo o sa se batleng."
     shuffle_direction_label: "Tataiso"
     shuffle_direction_placeholder: "mohlala: leseli le futhumetseng la tlhaho, ka ntle, dihlopha tse nyane, ha ho diofisi"
+    shuffle_direction_toward: "Re batla: %{terms}"
+    shuffle_direction_avoiding: "Re tlosa: %{terms}"
     shuffle_direction_clear: "Hlakola"
     shuffle_direction_apply: "Ferekanya ka sena"
     publish_share: "Phatlalatsa mme o arolelane →"

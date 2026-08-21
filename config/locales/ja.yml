@@ -1100,6 +1100,8 @@ ja:
     shuffle_direction_hint: "任意。画像やアニメーションに求めるもの（雰囲気、場面、避けたいもの）をVertoに伝えてください。"
     shuffle_direction_label: "方向性"
     shuffle_direction_placeholder: "例：温かい自然光、屋外、少人数、オフィスなし"
+    shuffle_direction_toward: "検索中：%{terms}"
+    shuffle_direction_avoiding: "除外：%{terms}"
     shuffle_direction_clear: "クリア"
     shuffle_direction_apply: "これでシャッフル"
     publish_share: 公開・共有 →

@@ -1100,6 +1100,8 @@ fr:
     shuffle_direction_hint: "Facultatif. Dites à Verto ce que vous attendez des images et des animations : une ambiance, un décor, ou ce qu'il faut éviter."
     shuffle_direction_label: "Orientation"
     shuffle_direction_placeholder: "ex. lumière naturelle chaude, en extérieur, petits groupes, pas de bureaux"
+    shuffle_direction_toward: "Recherche : %{terms}"
+    shuffle_direction_avoiding: "Exclu : %{terms}"
     shuffle_direction_clear: "Effacer"
     shuffle_direction_apply: "Mélanger avec ceci"
     publish_share: Publier & partager →

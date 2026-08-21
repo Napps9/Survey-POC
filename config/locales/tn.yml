@@ -1122,6 +1122,8 @@ tn:
     shuffle_direction_hint: "Ga go patelesege. Bolelela Verto se o se batlang mo ditshwantshong le mo dianimeishening — maikutlo, lefelo, kgotsa se o sa se batleng."
     shuffle_direction_label: "Kaelo"
     shuffle_direction_placeholder: "sekai: lesedi le le bothitho la tlholego, kwa ntle, ditlhopha tse dinnye, go se na dikantoro"
+    shuffle_direction_toward: "Re batla: %{terms}"
+    shuffle_direction_avoiding: "Re tlosa: %{terms}"
     shuffle_direction_clear: "Phimola"
     shuffle_direction_apply: "Tswakanya ka se"
     publish_share: "Phasaladitsa & abelana →"

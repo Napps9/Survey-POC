@@ -1110,6 +1110,8 @@ sn:
     shuffle_direction_hint: "Hazvimanikidzwe. Udza Verto zvaunoda pamifananidzo neanimeshoni — mamiriro, nzvimbo, kana zvausingadi."
     shuffle_direction_label: "Nhungamiro"
     shuffle_direction_placeholder: "semuenzaniso: chiedza chinodziya chechisikigo, kunze, mapoka madiki, pasina mahofisi"
+    shuffle_direction_toward: "Kutsvaga: %{terms}"
+    shuffle_direction_avoiding: "Kusiya kunze: %{terms}"
     shuffle_direction_clear: "Bvisa"
     shuffle_direction_apply: "Sanganisa nezvizvi"
     publish_share: "Buritsa & Govana →"

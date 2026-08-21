@@ -525,6 +525,21 @@
                           maxlength="<%= Survey::MAX_SHUFFLE_DIRECTION %>"
                           data-shuffle-target="input"
                           placeholder="<%= t("editor.shuffle_direction_placeholder") %>"><%= @survey.shuffle_direction %></textarea>
+                <%# What the populator actually took from the stored direction.
+                    Shown so a prompt that parsed to something the creator
+                    didn't mean is visible here rather than only in the
+                    pictures. See AssetPopulator.direction_reading_for. %>
+                <% reading = AssetPopulator.direction_reading_for(@survey) %>
+                <% if reading[:toward].any? || reading[:avoiding].any? %>
+                  <p class="shuffle-direction-reading">
+                    <% if reading[:toward].any? %>
+                      <span><%= t("editor.shuffle_direction_toward", terms: reading[:toward].join(", ")) %></span>
+                    <% end %>
+                    <% if reading[:avoiding].any? %>
+                      <span><%= t("editor.shuffle_direction_avoiding", terms: reading[:avoiding].join(", ")) %></span>
+                    <% end %>
+                  </p>
+                <% end %>
                 <div class="shuffle-direction-actions">
                   <button type="button" class="shuffle-direction-clear"
                           data-action="click->shuffle#clear"><%= t("editor.shuffle_direction_clear") %></button>

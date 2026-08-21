@@ -1120,6 +1120,8 @@ zu:
     shuffle_direction_hint: "Akuphoqelekile. Tshela i-Verto ukuthi ufunani ezithombeni nasekunyakazeni kwezithombe — umoya, indawo, noma into okufanele ishiywe ngaphandle."
     shuffle_direction_label: "Isiqondiso"
     shuffle_direction_placeholder: "isb. ukukhanya kwemvelo okufudumele, ngaphandle, amaqembu amancane, awekho amahhovisi"
+    shuffle_direction_toward: "Sifuna: %{terms}"
+    shuffle_direction_avoiding: "Sishiya ngaphandle: %{terms}"
     shuffle_direction_clear: "Sula"
     shuffle_direction_apply: "Xuba ngalokhu"
     publish_share: "Shicilela bese wabelana →"

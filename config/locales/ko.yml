@@ -1100,6 +1100,8 @@ ko:
     shuffle_direction_hint: "선택 사항. 이미지와 애니메이션에서 원하는 분위기, 장소, 빼고 싶은 것을 Verto에 알려 주세요."
     shuffle_direction_label: "방향"
     shuffle_direction_placeholder: "예: 따뜻한 자연광, 야외, 소규모 그룹, 사무실 제외"
+    shuffle_direction_toward: "검색 중: %{terms}"
+    shuffle_direction_avoiding: "제외: %{terms}"
     shuffle_direction_clear: "지우기"
     shuffle_direction_apply: "이대로 셔플"
     publish_share: 게시 및 공유 →

@@ -162,4 +162,22 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
     assert_equal Survey::MAX_SHUFFLE_DIRECTION,
                  Survey.sanitize_shuffle_direction("a" * 500).length
   end
+
+  test "the panel shows what the direction was actually read as" do
+    s = draft(direction: "warm natural light, no offices")
+    get survey_path(s)
+    assert_response :success
+
+    assert_match "Searching for: warm, natural", response.body,
+      "the creator can see which words reach the search"
+    assert_match "Keeping out: offices", response.body
+
+    # Nothing to report on a Verto with no direction.
+    refute_match "Searching for:", body_for(draft)
+  end
+
+  def body_for(survey)
+    get survey_path(survey)
+    response.body
+  end
 end

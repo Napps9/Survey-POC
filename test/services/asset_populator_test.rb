@@ -745,6 +745,57 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert_equal [ [], [] ], AssetPopulator.direction_buckets("   ")
   end
 
+  test "instruction scaffolding never crowds out the instruction" do
+    # The shipped bug, verbatim: this reduced to ["make", "verto"] — a generic
+    # verb and our own product name — and searched Pexels for THAT while the
+    # two words carrying the whole instruction went unused. The pictures came
+    # back re-rolled but identical in character, which reads as the feature
+    # simply not working.
+    wanted, vetoed = AssetPopulator.direction_buckets(
+      "We want to make this verto professional and corporate")
+    assert_equal %w[professional corporate], wanted
+    assert_empty vetoed
+
+    s = make_survey(theme: "Community and belonging", audience_age: "all", cards: [])
+    pop = steer(s, "We want to make this verto professional and corporate")
+    assert_equal %w[professional corporate], pop.send(:direction_terms),
+      "the words that reach Pexels must be the ones the creator actually wrote"
+    assert_equal [ "serious" ], pop.send(:direction_moods)
+    assert_includes pop.send(:background_query).split, "corporate"
+  end
+
+  test "a wordy instruction keeps its subject words, in the order written" do
+    wanted, = AssetPopulator.direction_buckets(
+      "Please can you make the images feel much more professional for our board")
+    assert_equal %w[professional board], wanted,
+      "please/can/make/images/feel/much/more are all scaffolding"
+
+    # Filler removal must not reorder: a direction that leads with its subject
+    # still leads with its subject.
+    wanted, = AssetPopulator.direction_buckets("for a bank client - serious, city, glass buildings")
+    assert_equal %w[bank client serious city glass buildings], wanted
+  end
+
+  test "less and fewer read as vetoes, and an em dash separates clauses" do
+    assert_equal [ %w[warm], %w[corporate] ],
+      AssetPopulator.direction_buckets("warm and less corporate")
+    assert_equal [ %w[bank client serious city], %w[glass] ],
+      AssetPopulator.direction_buckets("for a bank client \u2014 serious, city \u2014 no glass")
+  end
+
+  test "direction_reading_for reports what was actually taken from the prompt" do
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: [])
+    s.update!(shuffle_direction: "warm natural light, outdoors, no offices")
+
+    reading = AssetPopulator.direction_reading_for(s)
+    assert_equal %w[warm natural], reading[:toward], "exactly what goes to the search"
+    assert_equal %w[offices],      reading[:avoiding]
+
+    blank = AssetPopulator.direction_reading_for(make_survey(theme: "Mountains", cards: []))
+    assert_empty blank[:toward]
+    assert_empty blank[:avoiding]
+  end
+
   test "the direction rides along on the card and background queries, behind the theme" do
     s   = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
     pop = steer(s, "golden hour")

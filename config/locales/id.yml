@@ -1100,6 +1100,8 @@ id:
     shuffle_direction_hint: "Opsional. Beri tahu Verto apa yang Anda inginkan dari gambar dan animasinya — suasana, latar, atau hal yang ingin dihindari."
     shuffle_direction_label: "Arahan"
     shuffle_direction_placeholder: "mis. cahaya alami hangat, di luar ruangan, kelompok kecil, tanpa kantor"
+    shuffle_direction_toward: "Mencari: %{terms}"
+    shuffle_direction_avoiding: "Mengecualikan: %{terms}"
     shuffle_direction_clear: "Hapus"
     shuffle_direction_apply: "Acak dengan ini"
     publish_share: Publikasikan & bagikan →

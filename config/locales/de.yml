@@ -1100,6 +1100,8 @@ de:
     shuffle_direction_hint: "Optional. Sag Verto, was du dir von den Bildern und Animationen wünschst — eine Stimmung, ein Umfeld oder etwas, das weggelassen werden soll."
     shuffle_direction_label: "Vorgabe"
     shuffle_direction_placeholder: "z. B. warmes natürliches Licht, draußen, kleine Gruppen, keine Büros"
+    shuffle_direction_toward: "Suche nach: %{terms}"
+    shuffle_direction_avoiding: "Ausgeschlossen: %{terms}"
     shuffle_direction_clear: "Leeren"
     shuffle_direction_apply: "Damit mischen"
     publish_share: Veröffentlichen & teilen →
