@@ -499,7 +499,14 @@ export default class extends Controller {
       const visible = window.visualViewport ? window.visualViewport.height : window.innerHeight
       const floor   = Math.min(box.getBoundingClientRect().bottom, visible) - 8
       const over    = el.getBoundingClientRect().bottom - floor
-      if (over > 0) box.scrollTop += over
+      if (over <= 0) return
+      // Smooth, because by the time this fires the overlay has already ridden
+      // the keyboard up (see viewport_height.js) and stopped. An instant
+      // scrollTop here lands as a SECOND, separate movement a third of a
+      // second after the first — the two together are what reads as "flashed
+      // into place" rather than either one alone.
+      if (box.scrollTo) box.scrollTo({ top: box.scrollTop + over, behavior: "smooth" })
+      else box.scrollTop += over
     }, 300)
   }
 

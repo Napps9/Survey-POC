@@ -6720,6 +6720,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
        height-driven size and, used as a cap, letterboxed anything squarer
        than a wordmark down to a third of the width it was asked for. */
     --play-logo-h:     clamp(28px, 6svh, 52px);
+    /* How far the answer panel rides UP over the hero's lower edge, so the two
+       stop reading as two separate things. A token because it is not one
+       number — it is the panel's negative margin, the radius of the corners it
+       rounds over, AND the strip of hero it hides. That last one was written
+       independently and got it wrong: the photo credit sits 12px off the
+       hero's bottom, 12 is inside 22, so on every mobile photo card the credit
+       was painted over by the panel and sheared off mid-word. Anything
+       positioned against the hero's bottom edge has to clear this. */
+    --play-lip:        22px;
 
     --play-eyebrow:    0.75rem;    /* 12px — desktop's, no smaller */
     --play-title:      1.625rem;   /* 26px — the question. Above desktop's 22 on purpose */
@@ -7153,9 +7162,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.split-left-video) .split-right,
   .preview-overlay .split-card:has(.card-lottie)      .split-right,
   .preview-overlay .split-card:has(.nps-lottie)       .split-right {
-    margin-top: -22px;
-    border-radius: 22px 22px 0 0;
+    margin-top: calc(-1 * var(--play-lip));
+    border-radius: var(--play-lip) var(--play-lip) 0 0;
     z-index: 1;
+  }
+  /* ...and the credit clears it. Not a z-index fight — the credit is z-index 2
+     against the panel's 1 — the panel simply paints its background over the
+     10px of hero the credit was occupying. Stated in terms of the lip so a
+     retune moves both together, which is the whole failure this had. */
+  .preview-overlay .split-left-credit {
+    bottom: calc(12px + var(--play-lip));
   }
 
   /* Player right pane on white — matches desktop colours. Content is

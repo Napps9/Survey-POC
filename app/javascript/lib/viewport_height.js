@@ -157,15 +157,59 @@ const vpDebug = () => {
 const drawDebug = vpDebug()
 const syncViewport = () => { pinOverlay(); if (drawDebug) drawDebug() }
 
+// The keyboard MOVES, and these events do not describe the movement — they
+// report where it got to. iOS animates the keyboard in over ~250ms and fires
+// visualViewport `resize` only a handful of times across it, in practice often
+// once, at the end. Pinning on those events alone therefore holds the
+// pre-keyboard geometry for the whole animation and then corrects it in one
+// step: right answer, arrived at visibly. That step is the "flashed into
+// place".
+//
+// So for a short window after anything that can move the viewport, re-pin
+// every frame. The overlay then rides the keyboard up instead of catching up
+// with it.
+//
+// Deliberately a DEADLINE rather than a nested loop: pinning changes layout,
+// layout can fire more resize events, and a loop that started a second loop
+// each time would multiply per event and never wind down. `settle()` only ever
+// pushes the finish line back; at most one rAF chain exists at a time, and it
+// ends on a wall clock whatever else happens. 700ms covers the slowest
+// keyboard transition measured with room to spare, and outside these windows
+// nothing runs at all.
+const SETTLE_MS = 700
+let settleUntil = 0
+let settleFrame = null
+
+const step = () => {
+  syncViewport()
+  if (Date.now() < settleUntil) {
+    settleFrame = requestAnimationFrame(step)
+  } else {
+    settleFrame = null
+  }
+}
+
+const settle = () => {
+  // This module is imported by application.js, so it loads on every page — but
+  // there is only something to track on a page carrying a player overlay.
+  // Without this guard, every focusin in the EDITOR (a creator clicking into
+  // any card's contenteditable, which is most of what editing is) would arm a
+  // 700ms 60fps chain of calls that early-return, all day, on a laptop that is
+  // also rendering the designer.
+  if (!document.querySelector(".preview-overlay")) return
+  settleUntil = Date.now() + SETTLE_MS
+  if (settleFrame === null) settleFrame = requestAnimationFrame(step)
+}
+
 syncViewport()
-window.addEventListener("resize", syncViewport)
-window.addEventListener("orientationchange", () => requestAnimationFrame(syncViewport))
-document.addEventListener("focusin", () => requestAnimationFrame(syncViewport), true)
-document.addEventListener("focusout", () => requestAnimationFrame(syncViewport), true)
+window.addEventListener("resize", settle)
+window.addEventListener("orientationchange", settle)
+document.addEventListener("focusin", settle, true)
+document.addEventListener("focusout", settle, true)
 if (window.visualViewport) {
   // scroll as well as resize: offsetTop changes when the browser scrolls the
   // visual viewport to reveal a field, and that scroll is the half of this
   // that a height-only fix could never see.
-  window.visualViewport.addEventListener("resize", syncViewport)
+  window.visualViewport.addEventListener("resize", settle)
   window.visualViewport.addEventListener("scroll", syncViewport)
 }
