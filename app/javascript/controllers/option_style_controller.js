@@ -47,8 +47,11 @@ export default class extends Controller {
     if (this.hasHexInputTarget) this.hexInputTarget.value = this.colorInputTarget.value
     this.emojiInputTarget.value = style.emoji || ""
     this._markIcon(style.icon || "")
-    this._position(event.currentTarget)
+    // Unhide BEFORE positioning: a hidden element measures zero, and _position
+    // now measures rather than assumes. Nothing paints between these two
+    // statements, so there's no flash at the old spot.
     this.popoverTarget.hidden = false
+    this._position(event.currentTarget)
   }
 
   close() {
@@ -118,11 +121,20 @@ export default class extends Controller {
     this.dispatch("changed")
   }
 
+  // Keep the whole popover on screen. The old version assumed 320×300 while
+  // the box is up to 340 tall and 272 wide, so the Reset/Done footer could sit
+  // just below the viewport edge — a picker that looks cut off reads as one
+  // that's broken. Measured, and clamped at both ends so a row near the top of
+  // the screen can't push it off the other way.
   _position(button) {
     const rect = button.getBoundingClientRect()
     const pop = this.popoverTarget
-    pop.style.top = `${Math.min(rect.bottom + 8, window.innerHeight - 320)}px`
-    pop.style.left = `${Math.max(12, Math.min(rect.left - 120, window.innerWidth - 300))}px`
+    const { width, height } = pop.getBoundingClientRect()
+    const m = 12
+    const top = Math.min(rect.bottom + 8, window.innerHeight - height - m)
+    const left = Math.min(rect.left - 120, window.innerWidth - width - m)
+    pop.style.top = `${Math.max(m, top)}px`
+    pop.style.left = `${Math.max(m, left)}px`
   }
 
   _buildIconGrid() {

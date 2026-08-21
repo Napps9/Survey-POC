@@ -1985,8 +1985,15 @@
                 aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">☺</button>
       </span>
     </div>
+    <%# The icon library is 48 sport SVGs and nothing else, so on a card about
+        cost or safety the grid is a wall of things that mean nothing — which
+        reads as a broken picker rather than a library that stops at sport.
+        The heading names its actual scope and the note points at the control
+        that DOES cover every subject, two rows up. Delete both when a general
+        icon set lands. %>
     <div class="option-style-row option-style-row--icons">
       <span><%= t("js.editor.option_icon") %></span>
+      <p class="option-style-icon-note"><%= t("js.editor.option_icon_note") %></p>
       <div class="option-style-icon-grid" data-option-style-target="iconGrid"></div>
     </div>
     <div class="option-style-popover-foot">
