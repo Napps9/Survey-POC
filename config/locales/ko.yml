@@ -1094,6 +1094,14 @@ ko:
     shuffle: 셔플
     shuffle_title: Verto 라이브러리에서 이미지를 다시 선택합니다
     shuffle_confirm: 이미지를 섞을까요? 현재 사진이 라이브러리에서 새로 선택한 사진으로 교체됩니다.
+    shuffle_direction_toggle_title: "이 셔플에 방향 추가"
+    shuffle_direction_active: "이 셔플에 방향이 설정되어 있습니다"
+    shuffle_direction_heading: "셔플 방향 정하기"
+    shuffle_direction_hint: "선택 사항. 이미지와 애니메이션에서 원하는 분위기, 장소, 빼고 싶은 것을 Verto에 알려 주세요."
+    shuffle_direction_label: "방향"
+    shuffle_direction_placeholder: "예: 따뜻한 자연광, 야외, 소규모 그룹, 사무실 제외"
+    shuffle_direction_clear: "지우기"
+    shuffle_direction_apply: "이대로 셔플"
     publish_share: 게시 및 공유 →
     answer_type: 답변 유형
     select_card: 카드를 선택해 유형을 변경하세요

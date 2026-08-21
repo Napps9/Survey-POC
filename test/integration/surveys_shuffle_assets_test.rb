@@ -82,4 +82,84 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
       assert_match "data-slug=\"#{slug}\"", response.body, "picker should offer the #{slug} animation"
     end
   end
+
+  # ── Direction prompt ─────────────────────────────────────────────────────
+
+  def draft(direction: nil)
+    @org.surveys.create!(
+      title: "S", theme: "Football fans", audience_age: "18-24", key_insight: "k",
+      default_locale: "en", locales: [ "en" ], shuffle_direction: direction,
+      cards: [ { "type" => "multiple_choice", "text" => "Favourite team?", "options" => %w[A B] } ]
+    )
+  end
+
+  test "shuffle_assets stores the direction, keeps it, and clears it on an empty submit" do
+    s = draft
+
+    post shuffle_survey_assets_path(s), params: { direction: "  warm  natural light,\n no offices " }
+    assert_response :redirect
+    assert_equal "warm natural light, no offices", s.reload.shuffle_direction,
+      "whitespace is collapsed, the words are left alone"
+
+    # A shuffle that doesn't send the field at all leaves the stored steer be.
+    post shuffle_survey_assets_path(s)
+    assert_equal "warm natural light, no offices", s.reload.shuffle_direction
+
+    # Submitting the box empty is how a creator clears it.
+    post shuffle_survey_assets_path(s), params: { direction: "" }
+    assert_nil s.reload.shuffle_direction
+  end
+
+  test "a stored direction is length-capped" do
+    s = draft
+    post shuffle_survey_assets_path(s), params: { direction: "seaside " * 200 }
+    assert_equal Survey::MAX_SHUFFLE_DIRECTION, s.reload.shuffle_direction.length
+  end
+
+  test "a live Verto's direction can't be changed by a shuffle post" do
+    s = draft(direction: "warm, outdoors")
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    post shuffle_survey_assets_path(s), params: { direction: "cold, indoors" }
+    assert_redirected_to survey_path(s)
+    assert_equal "warm, outdoors", s.reload.shuffle_direction
+  end
+
+  test "the direction actually steers the shuffle it was submitted with" do
+    s = draft
+    post shuffle_survey_assets_path(s), params: { direction: "no sport" }
+    assert_response :redirect
+
+    s.reload
+    assert_equal "no sport", s.shuffle_direction
+    refute_includes s.background_image, "backgrounds/sport-",
+      "the veto submitted with the click applies to that same shuffle"
+  end
+
+  test "the editor renders the direction prompt beside Shuffle, pre-filled" do
+    s = draft(direction: "warm natural light, no offices")
+    get survey_path(s)
+    assert_response :success
+
+    assert_match 'name="direction"', response.body, "the prompt posts with the shuffle form"
+    assert_match "warm natural light, no offices", response.body, "and is pre-filled with the stored steer"
+    assert_match "shuffle-pill-caret is-set", response.body, "the pill shows a direction is set"
+    assert_match 'data-controller="shuffle"', response.body
+  end
+
+  test "the direction prompt is empty and unmarked on a Verto that has none" do
+    get survey_path(draft)
+    assert_response :success
+
+    assert_match 'name="direction"', response.body
+    refute_match "shuffle-pill-caret is-set", response.body
+  end
+
+  test "Survey.sanitize_shuffle_direction collapses, caps and blanks to nil" do
+    assert_equal "warm outdoors", Survey.sanitize_shuffle_direction("  warm\n\t outdoors  ")
+    assert_nil   Survey.sanitize_shuffle_direction("   ")
+    assert_nil   Survey.sanitize_shuffle_direction(nil)
+    assert_equal Survey::MAX_SHUFFLE_DIRECTION,
+                 Survey.sanitize_shuffle_direction("a" * 500).length
+  end
 end

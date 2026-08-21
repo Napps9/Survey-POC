@@ -719,4 +719,195 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     assert(img.include?("/photos/2/") || img.include?("verto-library/"),
       "the demographic card gets a theme photo or a clean curated fallback, got #{img.inspect}")
   end
+
+  # ── Shuffle direction prompt (survey.shuffle_direction) ──────────────────
+  # The creator's optional steer for what they want out of the content and
+  # imagery. A PREFERENCE: it colours every pick without displacing the theme,
+  # the card's subject, safety or relevance.
+
+  def steer(survey, direction)
+    survey.update!(shuffle_direction: direction)
+    AssetPopulator.new(survey)
+  end
+
+  MOUNTAIN_CARD = { "type" => "multiple_choice", "text" => "Favourite peak?" }.freeze
+
+  test "direction_buckets separates what the creator wants from what they vetoed" do
+    assert_equal [ %w[warm light outdoors], %w[offices] ],
+      AssetPopulator.direction_buckets("warm light, outdoors, no offices")
+
+    # Within one clause the cue flips only what follows it, so the wanted half
+    # of a mixed clause survives and the vetoed half never reaches a query.
+    assert_equal [ %w[warm], %w[offices suits] ],
+      AssetPopulator.direction_buckets("warm and no offices and suits")
+
+    assert_equal [ [], [] ], AssetPopulator.direction_buckets(nil)
+    assert_equal [ [], [] ], AssetPopulator.direction_buckets("   ")
+  end
+
+  test "the direction rides along on the card and background queries, behind the theme" do
+    s   = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
+    pop = steer(s, "golden hour")
+
+    card_q = pop.send(:card_query, s.cards[0]).split
+    assert_equal "mountains", card_q.first, "the theme still leads the query"
+    assert_includes card_q, "peak",   "the card's own subject is still in it"
+    assert_includes card_q, "golden", "and the direction colours it"
+    assert_includes pop.send(:background_query).split, "golden"
+  end
+
+  test "no direction means no change: directed and undirected queries are identical" do
+    s   = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
+    pop = AssetPopulator.new(s)
+
+    assert_equal pop.send(:card_query, s.cards[0], directed: false),
+                 pop.send(:card_query, s.cards[0])
+    assert_equal [ pop.send(:background_query) ], pop.send(:background_queries),
+      "with nothing to drop there is only one query, so only one API call"
+    assert_equal [ pop.send(:card_query, s.cards[0]) ],
+                 pop.send(:card_queries, s.cards[0], pop.send(:card_query, s.cards[0]))
+  end
+
+  test "a negated clause is vetoed, never searched for" do
+    s = make_survey(theme: "Team morale", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "How is the week going?" } ])
+    q = steer(s, "warm light, no offices").send(:card_query, s.cards[0]).split
+
+    assert_includes q, "warm", "the wanted half of the direction is in the query"
+    refute_includes q, "offices", "searching for the vetoed word would invert the instruction"
+    refute_includes q, "office"
+  end
+
+  test "a vetoed subject is filtered out of the Pexels results" do
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
+    s.update!(shuffle_direction: "no snow")
+
+    photos = [ pexels_photo(1, "Snow on a mountain peak in winter"),
+               pexels_photo(2, "Green mountain peak in summer") ]
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    img = s.reload.cards[0]["image"].to_s
+    refute_includes img, "/photos/1/", "the vetoed photo must never be applied"
+    assert_includes img, "/photos/2/", "the one that isn't vetoed still is"
+  end
+
+  test "the direction narrows the curated library's mood and style" do
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: [])
+
+    tags = steer(s, "calm, minimal").send(:survey_query_tags)
+    assert_equal [ "calm" ],    tags[:mood],  "a stated mood replaces the default spread"
+    assert_equal [ "minimal" ], tags[:style], "a stated style is scored where nothing was before"
+
+    plain = AssetPopulator.new(make_survey(theme: "Mountains", audience_age: "all", cards: []))
+                          .send(:survey_query_tags)
+    assert_equal AssetPopulator::DEFAULT_MOODS, plain[:mood]
+    assert_empty plain[:style]
+  end
+
+  test "the direction widens the themes the curated library is scored against" do
+    s    = make_survey(theme: "Coffee culture", audience_age: "all", cards: [])
+    tags = steer(s, "mountains and hiking").send(:survey_query_tags)
+
+    assert_includes tags[:themes], "hiking", "the direction's own words count as themes"
+    assert_includes tags[:themes], "travel", "and expand through the same clusters a theme does"
+    assert_includes tags[:themes], "coffee", "without displacing the Verto's own theme"
+  end
+
+  test "a veto keeps a matching curated asset out of the pick" do
+    cards = [ { "type" => "multiple_choice", "text" => "Favourite team?", "options" => %w[Arsenal Chelsea] } ]
+
+    plain = make_survey(theme: "Football fans", audience_age: "18-24", cards: cards.map(&:dup))
+    AssetPopulator.new(plain, seed: "veto").populate!
+    plain.reload
+    assert_includes plain.background_image, "backgrounds/sport-"
+    assert_includes plain.cards[0]["image"], "left-panel/"
+
+    vetoed = make_survey(theme: "Football fans", audience_age: "18-24", cards: cards.map(&:dup))
+    vetoed.update!(shuffle_direction: "no sport")
+    AssetPopulator.new(vetoed, seed: "veto").populate!
+    vetoed.reload
+    refute_includes vetoed.background_image, "backgrounds/sport-",
+      "the sport backdrop carries the vetoed tag"
+    assert vetoed.background_image.present?,
+      "but the backdrop is still filled — never-blank outranks a preference"
+    refute_includes vetoed.cards[0]["image"], "left-panel/",
+      "the sports-people panel art carries it too, so the card falls to type art"
+  end
+
+  test "the direction steers a range card's reaction animation" do
+    cards = [ { "type" => "range", "text" => "How was it?", "options" => %w[Low High] } ]
+
+    plain = make_survey(theme: "Weekly check-in", audience_age: "all", cards: cards.map(&:dup))
+    AssetPopulator.new(plain, seed: "anim").populate!
+    assert_includes NpsHelper::RANGE_THEME_FALLBACK, plain.reload.cards[0]["range_theme"],
+      "an off-theme Verto still lands in the neutral General group"
+
+    steered = make_survey(theme: "Weekly check-in", audience_age: "all", cards: cards.map(&:dup))
+    steered.update!(shuffle_direction: "recycling")
+    AssetPopulator.new(steered, seed: "anim").populate!
+
+    picked = steered.reload.cards[0]["range_theme"]
+    refute_includes NpsHelper::RANGE_THEME_FALLBACK, picked, "the direction moved it off the fallback"
+    assert_includes NpsHelper.range_themes_for("recycling"), picked
+  end
+
+  test "a vetoed animation is not played even when the theme asks for it" do
+    s = make_survey(theme: "Football fans", audience_age: "all",
+                    cards: [ { "type" => "range", "text" => "How was the match?", "options" => %w[Low High] } ])
+    s.update!(shuffle_direction: "no football")
+
+    AssetPopulator.new(s, seed: "anim").populate!
+
+    picked = s.reload.cards[0]["range_theme"]
+    refute_includes %w[football football_goal], picked
+    assert_includes NpsHelper::RANGE_THEMES, picked, "a range card always plays SOMETHING"
+  end
+
+  test "a directed query that finds nothing relaxes back to the undirected one" do
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: [ MOUNTAIN_CARD.dup ])
+    s.update!(shuffle_direction: "brutalist concrete")
+
+    pop        = AssetPopulator.new(s)
+    directed   = pop.send(:card_query, s.cards[0])
+    undirected = pop.send(:card_query, s.cards[0], directed: false)
+    assert_not_equal directed, undirected, "the fixture must exercise two different queries"
+
+    # Nothing for the directed query; a relevant photo only for the query with
+    # the direction dropped.
+    photo = pexels_photo(1, "Snowy mountain peak and alpine landscape")
+    with_pexels_by_query(undirected => [ photo ]) { AssetPopulator.new(s).populate! }
+
+    assert_includes s.reload.cards[0]["image"].to_s, "/photos/1/",
+      "a preference that finds nothing must not cost the card its picture"
+  end
+
+  test "the direction is content-safety scrubbed for the audience" do
+    s = make_survey(theme: "Student life", audience_age: "13-16",
+                    cards: [ { "type" => "multiple_choice", "text" => "Best night out?" } ])
+    q = steer(s, "beer garden, sunshine").send(:background_query).split
+
+    refute_includes q, "beer", "a term blocked for this audience never reaches the search"
+    assert_includes q, "garden", "the rest of the direction still applies"
+  end
+
+  test "search_hint_for gives the picker the wanted words only, never a veto" do
+    s = make_survey(theme: "Community and belonging", audience_age: "all", cards: [])
+    s.update!(shuffle_direction: "warm natural light, outdoors, small groups, no offices")
+
+    hint = AssetPopulator.search_hint_for(s)
+    assert_equal "warm natural", hint, "capped to the same slice the populator sends"
+    refute_includes hint, "offices", "a veto in a search box asks for the thing it vetoes"
+
+    assert_equal "", AssetPopulator.search_hint_for(make_survey(theme: "T", cards: [])),
+      "no direction, no hint — the picker seeds on the theme alone as before"
+  end
+
+  test "a charged word in the direction is stripped, as it is from a theme" do
+    s = make_survey(theme: "Student life", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "Best night out?" } ])
+    q = steer(s, "protest crowds, banners").send(:background_query).split
+
+    refute_includes q, "protest",
+      "the imagery box is not the place a Verto declares a charged topic — its theme is"
+  end
 end

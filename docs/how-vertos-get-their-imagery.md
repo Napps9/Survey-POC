@@ -24,6 +24,10 @@ this covers visuals).*
 4. **Picks are stable, not random.** The same Verto always populates with the
    same imagery. The editor's **Shuffle** button is the only thing that
    re-rolls the picks (and it's disabled once a Verto is live).
+5. **A shuffle can be steered.** An optional **direction prompt** beside
+   Shuffle lets the creator say what they're after — a mood, a setting, or
+   something to keep out — and that preference colours every pick from then on
+   (see §4a).
 
 ---
 
@@ -53,7 +57,9 @@ than the whole thing failing).
 After that:
 
 - **Shuffle assets** (editor toolbar) re-rolls every automatic pick with a
-  fresh random seed — a one-click "show me a different look".
+  fresh random seed — a one-click "show me a different look". Its caret opens
+  an optional **direction prompt** that steers what it re-rolls *toward* (see
+  §4a).
 - Editing a card never silently changes its imagery; only Shuffle or the
   media picker do.
 - **Live Vertos are locked** — Shuffle is blocked once a Verto is published,
@@ -144,6 +150,41 @@ the seed — that's all it does.
 
 **No visual déjà vu.** An asset already used on one card is avoided on the
 next; repeats are allowed only once a pool is exhausted.
+
+## 4a. The direction prompt (steering a shuffle)
+
+Beside the editor's **Shuffle** button is an optional free-text box — the
+**direction prompt** — where a creator says what they want out of the Verto's
+content and imagery: *"warm natural light, outdoors, small groups, no
+offices."* It is saved on the Verto, so the box stays filled in, the next
+shuffle leans the same way, and so does anything else that re-populates (the
+picker's Recommended rail, the picker's first search).
+
+It is a **preference layered over** everything above, never a replacement for
+it. The theme still anchors the search, a card still names its own subject,
+and safety and relevance still decide what may actually be applied.
+
+| Where it lands | What it does |
+|---|---|
+| Pexels queries | Up to two of its words are appended to every query, *after* the theme and the card's subject. If the narrowed query finds nothing relevant, the direction is the first thing dropped and the query is re-run without it. |
+| Library scoring | Its words count as theme keywords (and expand through the same clusters), so an asset the creator asked for can clear the theme gate. A mood or style it names (*calm, minimal*) replaces the default spread instead of adding to it. |
+| Range animations | Its words join the theme's when matching the reaction-animation set, so a Verto steered toward "recycling" reacts with recycling. |
+| Mobile backdrop | Widens the themes that backdrop is matched on. |
+
+**Vetoes.** A negated clause — *"no offices", "avoid corporate stock"* — is
+never searched for; it is filtered *out* of both the Pexels results and the
+curated pool. Getting this backwards would be worse than ignoring it, so the
+parser splits on clauses and flips only what follows the negation word: *"warm
+and no offices"* wants warmth and vetoes offices. A veto that would leave a
+slot with nothing gives way only where the slot cannot be empty — the
+background and the range animation (which falls back to the neutral General
+set rather than playing the vetoed one). A card panel is allowed to come back
+blank: a clean panel is a better answer to "no offices" than an office.
+
+**Safety is not negotiable by it.** The direction goes through the same
+age-aware content-safety scrub as every other search term, and a charged
+protest-visual word in it is stripped exactly as it would be in a theme — the
+imagery box is not where a Verto declares a charged topic; its theme is.
 
 ## 5. The Verto library
 
@@ -350,6 +391,11 @@ drop onto any card or background from the editor's media picker.
 - `app/javascript/controllers/media_picker_controller.js` — the editor's
   picker; `SurveysController#pexels_search` / `#shuffle_assets` — its
   endpoints.
+- The direction prompt (§4a): stored as `Survey#shuffle_direction`, parsed by
+  `AssetPopulator.direction_buckets` (wants vs. vetoes) and applied through the
+  populator's `direction_*` helpers; `AssetPopulator.search_hint_for` is the
+  search-box-safe slice the media picker seeds with;
+  `app/javascript/controllers/shuffle_controller.js` opens the panel.
 - `Organisation#assets` + `OrganisationAssetsController` — the per-account brand
   asset library; surfaced in `surveys/_media_modal` ("Your brand library") and
   managed on `memberships/index`; `Survey::ACTIVE_STORAGE_IMAGE_URL` allows its

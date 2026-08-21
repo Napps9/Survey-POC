@@ -62,6 +62,9 @@
      data-media-picker-appeal-create-url-value="<%= image_appeal_survey_path(@survey) %>"
      data-media-picker-appeals-list-url-value="<%= image_appeals_survey_path(@survey) %>"
      data-media-picker-theme-value="<%= @survey.theme %>"
+     <%# The search-safe slice of the Shuffle direction, NOT the raw prompt —
+         see AssetPopulator.search_hint_for. %>
+     data-media-picker-direction-value="<%= AssetPopulator.search_hint_for(@survey) %>"
      data-rating-icon-on="<%= rating_icon(@survey)[:on] %>"
      data-rating-icon-off="<%= rating_icon(@survey)[:off] %>"
      data-rating-icon-kind="<%= rating_icon(@survey)[:kind] %>"
@@ -490,13 +493,46 @@
                     data-action="click->journey#open">⤢ Journey</button>
           <% end %>
           <% unless live_locked %>
-            <%= button_to t("editor.shuffle"), shuffle_survey_assets_path(@survey),
-                  method: :post,
-                  form: { data: { turbo_confirm: t("editor.shuffle_confirm") } },
-                  title: t("editor.shuffle_title"),
-                  style: "padding:10px 22px;border-radius:100px;background:#2A2D3A;color:#fff;border:1px solid rgba(255,255,255,0.22);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
-                  onmouseover: "this.style.background='#383D4E'",
-                  onmouseout:  "this.style.background='#2A2D3A'" %>
+            <%# Shuffle is a split pill: the left half re-rolls the imagery as
+                it always has, the caret opens the optional DIRECTION prompt —
+                a line of free text telling Verto what the creator wants out of
+                the content and imagery ("warm, outdoors, no offices"). The
+                textarea lives inside the same form, so either submit button
+                carries it, and it is stored on the Verto (see
+                SurveysController#shuffle_assets) so the box stays filled in. %>
+            <%= form_with url: shuffle_survey_assets_path(@survey), method: :post,
+                          data: { controller: "shuffle", action: "keydown.esc->shuffle#close" },
+                          class: "shuffle-form" do %>
+              <div class="shuffle-pill">
+                <button type="submit" class="shuffle-pill-go"
+                        title="<%= t("editor.shuffle_title") %>"
+                        data-turbo-confirm="<%= t("editor.shuffle_confirm") %>"><%= t("editor.shuffle") %></button>
+                <button type="button" class="shuffle-pill-caret<%= " is-set" if @survey.shuffle_direction.present? %>"
+                        aria-expanded="false" aria-haspopup="true"
+                        title="<%= @survey.shuffle_direction.present? ? t("editor.shuffle_direction_active") : t("editor.shuffle_direction_toggle_title") %>"
+                        data-shuffle-target="toggle"
+                        data-action="click->shuffle#toggle">▾</button>
+              </div>
+
+              <div class="shuffle-direction" hidden data-shuffle-target="panel">
+                <div class="shuffle-direction-head"><%= t("editor.shuffle_direction_heading") %></div>
+                <p class="shuffle-direction-hint"><%= t("editor.shuffle_direction_hint") %></p>
+                <label class="shuffle-direction-label" for="shuffle-direction">
+                  <%= t("editor.shuffle_direction_label") %>
+                </label>
+                <textarea id="shuffle-direction" name="direction" rows="3"
+                          class="shuffle-direction-input"
+                          maxlength="<%= Survey::MAX_SHUFFLE_DIRECTION %>"
+                          data-shuffle-target="input"
+                          placeholder="<%= t("editor.shuffle_direction_placeholder") %>"><%= @survey.shuffle_direction %></textarea>
+                <div class="shuffle-direction-actions">
+                  <button type="button" class="shuffle-direction-clear"
+                          data-action="click->shuffle#clear"><%= t("editor.shuffle_direction_clear") %></button>
+                  <button type="submit" class="shuffle-direction-apply"
+                          data-turbo-confirm="<%= t("editor.shuffle_confirm") %>"><%= t("editor.shuffle_direction_apply") %></button>
+                </div>
+              </div>
+            <% end %>
             <button type="button"
                     style="padding:10px 22px;border-radius:100px;background:#2A2D3A;color:#fff;border:1px solid rgba(255,255,255,0.22);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
                     onmouseover="this.style.background='#383D4E'"

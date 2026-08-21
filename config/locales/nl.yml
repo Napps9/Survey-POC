@@ -1094,6 +1094,14 @@ nl:
     shuffle: Vernieuwen
     shuffle_title: Kies nieuwe afbeeldingen uit de Verto-bibliotheek
     shuffle_confirm: Afbeeldingen vernieuwen? Je huidige afbeeldingen worden vervangen door een nieuwe selectie uit de bibliotheek.
+    shuffle_direction_toggle_title: "Voeg een richting toe voor dit vernieuwen"
+    shuffle_direction_active: "Er is een richting ingesteld voor dit vernieuwen"
+    shuffle_direction_heading: "Stuur dit vernieuwen"
+    shuffle_direction_hint: "Optioneel. Vertel Verto wat je zoekt in de beelden en animaties — een sfeer, een omgeving of iets wat weg moet blijven."
+    shuffle_direction_label: "Richting"
+    shuffle_direction_placeholder: "bijv. warm natuurlijk licht, buiten, kleine groepen, geen kantoren"
+    shuffle_direction_clear: "Wissen"
+    shuffle_direction_apply: "Hiermee vernieuwen"
     publish_share: Publiceren & delen →
     answer_type: Antwoordtype
     select_card: Selecteer een kaart om het type te wijzigen
