@@ -2307,12 +2307,10 @@
    it. `.prioritise-list` is always the same element as `.choice-list` (see
    _card_component.html.erb) so this reaches both without a second selector.
    Pure CSS keyed on live child count — no markup change, so it tracks edits
-   in the editor and stays correct in the player. Reuses the numbers already
-   proven at `.phone-bottom .choice-list-item` below; this is the desktop (and
-   under-7-options-on-mobile) case that had no equivalent until now.
-   (Those .phone-bottom rules still carry the missing-min-height bug fixed
-   here, but the whole .phone-bottom family is dead — no ERB or JS applies the
-   class — so it is left alone rather than half-tidied.) */
+   in the editor and stays correct in the player. The numbers come from the
+   dashboard's old phone mockups, which drew this same markup small; that
+   family has since been deleted (nothing rendered it), but its sizes were
+   right and are kept here. */
 .choice-list:has(> .choice-list-item:nth-child(7)) { gap: 4px; }
 .choice-list:has(> .choice-list-item:nth-child(7)) > .choice-list-item {
   padding: 6px 10px 6px 6px;
@@ -2396,7 +2394,6 @@
   cursor: grab;
   padding: 0 2px;
 }
-.phone-bottom .prioritise-rank { width: 20px; height: 20px; font-size: 11px; }
 
 /* ── MCQ grid ───────────────────────────────────── */
 /* grid-auto-rows + full-height cards: every row sizes to the tallest card and
@@ -2474,12 +2471,9 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   background-size: cover; background-position: center;
 }
-/* The mini phone mockups on the dashboard draw the same markup at a size the
-   bounds above were not written for; they keep their own fixed tile. */
-.phone-bottom .choice-card-bg { min-height: 0; max-height: none; }
 /* Per-option icon (OptionIconLibrary) — sits centred on top of the
-   choice-bg-N gradient, sized as a share of the tile so it auto-scales at
-   the .phone-bottom breakpoint with no extra rules. */
+   choice-bg-N gradient, sized as a SHARE of the tile rather than in pixels,
+   so it follows the tile to every size it is drawn at with no extra rules. */
 .choice-icon-svg {
   width: 42%; height: 42%;
   max-width: 34px; max-height: 34px;
@@ -2857,7 +2851,6 @@
 /* Inline SVG response icons (see ApplicationHelper#tap_response_mark) — sized
    to the circular button and tinted by the button's currentColor. */
 .rotate-action-icon { display: block; width: 22px; height: 22px; }
-.phone-bottom .rotate-action-icon { width: 19px; height: 19px; }
 .rotate-action /* Every tile emoji is sized from this ONE property — which is the whole reason
    it exists, and why "increase emoji size by, maybe 30%?" (18 Aug) is a set of
    value changes rather than a hunt through the stylesheet. The glyph now takes
@@ -3009,19 +3002,6 @@
 .rotate-actions--fan .rotate-action:hover .rotate-action-btn { transform: none; }
 .rotate-actions--fan .rotate-action.is-intent { transform: translate(-50%, -50%) scale(1.13); }
 .rotate-actions--fan .rotate-action.is-intent .rotate-action-btn { transform: none; }
-/* The editor's phone-preview chrome draws the same card smaller. Set the
-   tokens rather than the pill, so the one-size-per-card rule above still holds
-   here — overriding padding directly would leave the width behind and put the
-   pills back out of step. */
-.phone-bottom .rotate-actions--fan {
-  --tap-pill-h: 36px;
-  --tap-pill-pad: 4px 9px 4px 8px;
-}
-.phone-bottom .rotate-actions--fan[data-response-count="6"] {
-  --tap-pill-pad: 4px 7px 4px 6px;
-}
-.phone-bottom .rotate-actions--fan .rotate-action-label { font-size: 10px; }
-
 /* ── Editor-only response chrome ──────────────────────────────────────────
    The 🎨 popover and the × sit on the response itself, exactly as they do on a
    choice option row, so a creator styles an answer where they read it. Both
@@ -3883,137 +3863,6 @@ button.editor-leave-btn { cursor: pointer; }
   background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
   border-color: rgba(255,255,255,0.14);
 }
-
-/* ── Phone-shaped survey card (vertical, iPhone-ratio) ── */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 28px 22px;
-  justify-items: center;
-  align-items: start;
-}
-.phone-wrap {
-  width: 300px;
-  display: flex; flex-direction: column; gap: 8px;
-  cursor: pointer;
-}
-.phone-chrome {
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 6px;
-}
-.phone-card {
-  width: 300px;
-  height: 612px;                    /* 300 / 612 ≈ 9 / 18.4, iPhone-like */
-  background: #1C2034;
-  border-radius: 38px;
-  padding: 7px;                     /* bezel */
-  box-shadow: 0 16px 36px rgba(0,0,0,0.4),
-              inset 0 0 0 1px rgba(255,255,255,0.08);
-  border: 2px solid transparent;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-  flex-shrink: 0;
-}
-.phone-wrap:hover .phone-card { transform: translateY(-2px); }
-.phone-wrap.selected .phone-card {
-  border-color: #FF1E6F;
-  box-shadow: 0 0 0 3px rgba(255,30,111,0.25),
-              0 16px 36px rgba(0,0,0,0.4),
-              inset 0 0 0 1px rgba(255,255,255,0.08);
-}
-.phone-screen {
-  width: 100%; height: 100%;
-  background: #fff;
-  border-radius: 32px;
-  overflow: hidden;
-  display: flex; flex-direction: column;
-  position: relative;
-}
-.phone-top {
-  height: 33%;
-  position: relative;
-  background: linear-gradient(135deg, #01EACB 0%, #1C2034 75%);
-  flex-shrink: 0;
-}
-.phone-top-dark { background: var(--color-navy-750); }
-.phone-top-icon {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 44px;
-  color: rgba(255,255,255,0.18);
-  pointer-events: none;
-}
-.phone-top-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(transparent 60%, rgba(0,0,0,0.3));
-}
-.phone-progress {
-  position: absolute;
-  top: 12px; left: 12px; right: 12px;
-  height: 6px;
-  background: rgba(0,0,0,0.35);
-  border-radius: 6px; overflow: hidden;
-  z-index: 2;
-}
-.phone-progress-fill { height: 100%; background: #fff; border-radius: 6px; }
-.phone-tagline {
-  position: absolute;
-  top: 26px; left: 0; right: 0;
-  text-align: center;
-  font-family: "Alata", sans-serif;
-  font-size: 11px; font-weight: 700;
-  color: rgba(255,255,255,0.7);
-  letter-spacing: 0.05em;
-  z-index: 2;
-}
-.phone-bottom {
-  flex: 1;
-  padding: 16px 18px 18px;
-  display: flex; flex-direction: column;
-  gap: 8px;
-  color: #000;
-  overflow: hidden;
-}
-.phone-bottom .q-eyebrow { font-size: 10px; }
-.phone-bottom .q-title   { font-size: 15px; line-height: 1.3; }
-.phone-bottom .q-subtitle{ font-size: 12px; line-height: 1.4; }
-
-/* Shrink interactive components for the smaller phone screen */
-.phone-bottom .pick-list { gap: 5px; }
-.phone-bottom .pick-item { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
-.phone-bottom .pick-dot, .phone-bottom .pick-square { width: 14px; height: 14px; font-size: 9px; }
-.phone-bottom .pick-text { font-size: 12px; }
-
-.phone-bottom .choice-list { gap: 4px; }
-.phone-bottom .choice-list-item { padding: 6px 10px 6px 6px; border-radius: 10px; }
-.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 25px; }
-
-.phone-bottom .choice-grid { gap: 6px; }
-.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; --tile-emoji: 30px; }
-.phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
-
-.phone-bottom .slider-wrap { gap: 8px; padding-top: 8px; }
-.phone-bottom .slider-track { height: 38px; }
-.phone-bottom .slider-thumb { width: 44px; height: 44px; }
-.phone-bottom .slider-label-text { font-size: 11px; }
-
-.phone-bottom .freeform-wrap { padding: 8px; }
-.phone-bottom .freeform-textarea { font-size: 12px; min-height: 70px; }
-.phone-bottom .freeform-counter  { font-size: 10px; }
-
-.phone-bottom .rotate-wrap { gap: 8px; }
-.phone-bottom .rotate-card-stack { width: 100%; max-width: 300px; height: 56vh; max-height: 420px; min-height: 320px; }
-.phone-bottom .rotate-action-btn { width: 40px; height: 40px; font-size: 16px; }
-.phone-bottom .rotate-card-controls { padding: 24px 12px 12px; gap: 7px; }
-
-.phone-bottom .split-right--book { padding: 20px 18px 16px; }
-.phone-bottom .book-stack { min-height: 45vh; }
-.phone-bottom .book-page-text { font-size: 14px; line-height: 1.55; }
-
-.phone-bottom .activity-tag {
-  font-size: 9px; padding: 2px 8px;
-}
-.phone-bottom .activity-title { font-size: 14px; }
-.phone-bottom .activity-desc  { font-size: 11px; }
 
 /* Survey card wrapper (for the results show page) */
 .survey-card-wrap {
@@ -8978,11 +8827,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
    on .preview-overlay. Deliberately qualified as
    ".preview-overlay[data-font-scale=…] SELECTOR" rather than just
    "[data-font-scale=…] SELECTOR": that extra class of specificity (0,3,0)
-   beats every existing pin on these same selectors — the .phone-bottom
-   compact tier (0,2,0), and the ones inside the narrow-viewport @media
-   blocks (0,1,0–0,2,0) — regardless of source order, so this one block
-   covers every breakpoint without having to be duplicated inside each of
-   them or kept below all of them in the file. ── */
+   beats every existing pin on these same selectors — the ones inside the
+   narrow-viewport @media blocks (0,1,0–0,2,0) — regardless of source order,
+   so this one block covers every breakpoint without having to be duplicated
+   inside each of them or kept below all of them in the file. ── */
 .preview-overlay[data-font-scale="large"] .q-title           { font-size: 25px; }
 .preview-overlay[data-font-scale="larger"] .q-title          { font-size: 28px; }
 .preview-overlay[data-font-scale="large"] .pick-text         { font-size: 17px; }
