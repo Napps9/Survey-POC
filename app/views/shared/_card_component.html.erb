@@ -143,14 +143,14 @@
       the editor DOM, so without the editor branch the promised "your logo on
       every preview" never appeared), and only when a logo is uploaded.
       Dashboard mini-previews (:preview) stay logo-free on purpose. %>
-  <% if (mode == :player || mode == :editor) && type == "welcome_card" && @survey&.organisation&.logo&.attached? %>
+  <% if (mode == :player || mode == :editor) && type == "welcome_card" && brand_logo_for(@survey&.organisation, :light) %>
     <div class="split-right-logo">
       <%# Sized by WIDTH, not height: "about 30% of the card" is how the brief
           reads and how a logo actually scales against a panel. The max-height
           is the guard for a square or portrait mark, which at 30% width would
           otherwise tower over the title it sits above; object-fit (added by
           brand_logo_tag) keeps either shape undistorted inside that box. %>
-      <%= brand_logo_tag @survey.organisation, style: "width:30%;height:auto;max-height:72px;" %>
+      <%= brand_logo_tag @survey.organisation, style: "width:30%;height:auto;max-height:72px;", on: :light %>
     </div>
   <% end %>
 

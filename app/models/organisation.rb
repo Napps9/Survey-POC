@@ -26,6 +26,18 @@ class Organisation < ApplicationRecord
 
   has_one_attached :logo
 
+  # A second logo, for LIGHT surfaces. Named for the surface it goes ON rather
+  # than for its own colour, because "logo_light" reads both ways and the wrong
+  # reading picks the invisible one: a light logo is what you use on a DARK
+  # background. Everything the platform draws is dark chrome — the masthead,
+  # the thank-you card, the editor, settings — except one thing, and it is the
+  # first thing a respondent ever sees: the welcome card's logo sits on the
+  # white answer panel. An account whose only mark is a white wordmark (the
+  # normal case, since the rest of the platform is dark) had it disappear
+  # there. Optional; brand_logo_tag falls back to :logo, so an account that
+  # uploads one logo behaves exactly as it did.
+  has_one_attached :logo_on_light
+
   # The organisation's own brand-asset library — images the org uploads once and
   # can then drop onto any card/background from the editor's media picker, the
   # same way the shared Verto Library works but scoped to this account only.

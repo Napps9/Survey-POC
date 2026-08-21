@@ -475,16 +475,36 @@ module ApplicationHelper
   # `brand-logo` is the backstop. A blob whose bytes are genuinely gone can't
   # be rescued by any URL scheme, and a respondent should get no logo rather
   # than a broken-image glyph on someone's Verto.
-  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil)
+  # `on:` names the SURFACE the logo will be drawn on, not the logo's colour.
+  # :dark is the default because almost everything the platform draws is dark
+  # chrome; :light is the welcome card's white answer panel, and picks the
+  # alternate upload when there is one. Falling back to :logo rather than
+  # rendering nothing is deliberate — an account with one logo keeps behaving
+  # exactly as it did, and a missing alternate is a worse-looking logo rather
+  # than no logo at all.
+  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil, on: :dark)
     css_class = binding.local_variable_get(:class)
-    if organisation&.logo&.attached?
+    logo = brand_logo_for(organisation, on)
+    if logo
       image_tag(
-        rails_storage_proxy_path(organisation.logo, only_path: true),
+        rails_storage_proxy_path(logo, only_path: true),
         style: "#{style};object-fit:contain;",
         alt:   alt || "#{organisation.name} logo",
         class: css_class,
         data:  { controller: "brand-logo", action: "error->brand-logo#failed" }
       )
+    end
+  end
+
+  # The attachment to draw for a surface, or nil if the account has no logo at
+  # all. Only :light has an alternate; every other surface is dark chrome.
+  def brand_logo_for(organisation, surface)
+    return nil unless organisation
+
+    if surface == :light && organisation.logo_on_light.attached?
+      organisation.logo_on_light
+    elsif organisation.logo.attached?
+      organisation.logo
     end
   end
 
