@@ -128,6 +128,11 @@
          there twice over — the partial isn't rendered, and the controller has
          nowhere to send anyone. Blank is also what Test Mode's "no live endpoint
          may reach this page" test already asserts of every *-url-value. %>
+     <%# The survey-level consent gate renders as a bottom banner over the
+         first question (player/_consent_banner). This attribute is the whole
+         state machine: while present the deck is inert and dimmed and the
+         footer nav is hidden (CSS keys off it); agreeing removes it. %>
+     <%= "data-consent-pending".html_safe if @survey.show_consent_gate? %>
      data-player-test-mode-url-value="<%= preview_mode ? "" : live_test_survey_url(play_token) %>">
 
   <% if @test_mode %>
@@ -178,70 +183,24 @@
     <%= render "player/font_scale_control" %>
   </div>
 
-  <div class="preview-body">
-    <%# Consent gate as the first card in the deck (reuses the creator's consent
-        text). It carries NO data-card-index, so it's never captured as an answer
-        and never shifts the answer keys, which align to the @survey.cards index. %>
-    <%# show_consent_gate? rather than consent_required?: a Verto that collects
-        personal data (the auto-appended birth date / location / gender tail)
-        but has no creator-authored gate still gets one, with default wording.
-        See Survey#default_consent_gate? for why this is enforced here rather
-        than at publish. %>
-    <% if @survey.show_consent_gate? %>
-      <div class="preview-card"
-           data-player-target="card"
-           data-card-type="consent_card">
-        <%# Rendered as the standard split-card so consent is in keeping with the
-            question-card design (branded left panel — with the creator's chosen
-            design image when one is set — + content on the right). %>
-        <div class="split-card">
-          <div class="split-left">
-            <% if @survey.consent_image.present? %>
-              <div class="split-left-img" style="background-image:url('<%= @survey.consent_image %>');"></div>
-              <div class="split-left-overlay"></div>
-              <% if @survey.consent_image_credit.present? %>
-                <div class="split-left-credit">
-                  <% if @survey.consent_image_credit_url.present? %>
-                    <a href="<%= @survey.consent_image_credit_url %>" target="_blank" rel="noopener nofollow">Photo by <%= @survey.consent_image_credit %></a>
-                  <% else %>
-                    Photo by <%= @survey.consent_image_credit %>
-                  <% end %>
-                </div>
-              <% end %>
-            <% end %>
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
-          </div>
-          <div class="split-right">
-            <div data-player-target="consentMain" class="play-consent-main">
-              <div class="q-header">
-                <div class="q-title"><%= t("player.consent_title") %></div>
-              </div>
-              <div class="play-consent-body"><%= safe_join(@survey.effective_consent_text.to_s.split("\n"), tag.br) %></div>
-              <%# The privacy policy is linked from every consent gate, not just
-                  the default one — agreeing to share a birth date and a location
-                  should always be one tap from how that data is handled. %>
-              <div class="play-consent-legal">
-                <%= link_to t("player.consent_privacy_link"), privacy_path,
-                            target: "_blank", rel: "noopener" %>
-              </div>
-              <div class="play-consent-actions">
-                <button type="button" class="play-consent-agree"
-                        data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
-                <button type="button" class="play-consent-decline"
-                        data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
-              </div>
-            </div>
-            <div class="play-consent-declined hidden" data-player-target="consentDeclined">
-              <%= t("player.consent_declined") %>
-            </div>
-          </div>
-        </div>
-      </div>
-    <% end %>
+  <%# inert while the consent banner is pending: the first question is VISIBLE
+      from the first paint — that is the point of the banner — but nothing in
+      the deck may be answerable, focusable or read by AT until a choice is
+      made. The player controller removes it together with the attribute. %>
+  <div class="preview-body"<%= " inert".html_safe if @survey.show_consent_gate? %>>
+    <%# The survey-level consent gate is NOT a card any more. It used to be a
+        full-screen pseudo-card pinned here, ahead of the deck; it is now the
+        bottom banner rendered after the footer (player/_consent_banner), so
+        the respondent lands straight on the first question. show_consent_gate?
+        rather than consent_required?: a Verto that collects personal data (the
+        auto-appended birth date / location / gender tail) but has no
+        creator-authored gate still gets one, with default wording. See
+        Survey#default_consent_gate? for why this is enforced here rather than
+        at publish. %>
 
-    <%# Respondent-code gate — after consent, before the first question. Like the
-        consent card it carries NO data-card-index, so it never becomes an answer
-        and never shifts the answer keys, which align to @survey.cards positions.
+    <%# Respondent-code gate — under the consent banner when both are on, before
+        the first question. It carries NO data-card-index, so it never becomes an
+        answer and never shifts the answer keys, which align to @survey.cards positions.
         The code is sent with the next save and immediately hashed; the plaintext
         is never stored, logged, or returned. %>
     <% if @survey.respondent_code_enabled? %>
@@ -518,5 +477,9 @@
             data-player-target="finishBtn"
             data-action="click->player#finish"><%= t("player.submit") %></button>
   </div>
+
+  <% if @survey.show_consent_gate? %>
+    <%= render "player/consent_banner" %>
+  <% end %>
 
 </div>

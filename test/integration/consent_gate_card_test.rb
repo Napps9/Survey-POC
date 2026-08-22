@@ -118,7 +118,7 @@ class ConsentGateCardTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_select "[data-card-type='consent_card']", false, "the pseudo-card must not render"
+    assert_select ".play-consent-banner", false, "the survey-level banner must not render"
     assert_select "[data-card-type='consent_gate']"
     assert_no_match "Old single-screen consent.", response.body
   end

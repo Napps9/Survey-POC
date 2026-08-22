@@ -64,7 +64,8 @@ class DefaultConsentGateTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(survey.publish_token)
     assert_response :success
-    assert_select "[data-card-type=consent_card]", 1
+    assert_select ".play-consent-banner", 1
+    assert_select ".preview-overlay[data-consent-pending]"
     assert_select ".play-consent-body", text: /birth date/
   end
 
@@ -83,7 +84,8 @@ class DefaultConsentGateTest < ActionDispatch::IntegrationTest
   test "no gate is rendered when nothing personal is collected" do
     get play_survey_path(published([ PLAIN ]).publish_token)
     assert_response :success
-    assert_select "[data-card-type=consent_card]", 0
+    assert_select ".play-consent-banner", 0
+    assert_select ".preview-overlay[data-consent-pending]", 0
   end
 
   test "the default gate does not stack on top of a consent_gate card" do
@@ -91,7 +93,7 @@ class DefaultConsentGateTest < ActionDispatch::IntegrationTest
     survey = published([ card, DEMOGRAPHIC ])
 
     get play_survey_path(survey.publish_token)
-    assert_select "[data-card-type=consent_card]", 0, "the card gate is the only gate"
+    assert_select ".play-consent-banner", 0, "the card gate is the only gate"
     assert_select "[data-card-type=consent_gate]", 1
   end
 

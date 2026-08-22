@@ -1,0 +1,50 @@
+<%# The survey-level consent gate, as a banner along the bottom of the player —
+    "I really feel like this should be a banner along the bottom, that sits
+    over the top of the first question - so we are straight into the verto and
+    not needing a card beforehand." The respondent lands on question one,
+    dimmed and inert (the overlay's data-consent-pending attribute owns both),
+    and this strip carries the copy, the privacy link and the choice.
+
+    The multi-page consent_gate CARD keeps its card — a document with page
+    turns can't live in a strip — and a Verto has one gate or the other
+    (Survey#consent_required? goes false once a consent_gate card exists), so
+    the consentMain/consentDeclined targets never collide with the card's.
+
+    Absolute against .preview-overlay rather than fixed on purpose: the
+    overlay is the fixed box (inset: 0), and the visual-viewport pin resizes
+    and translates it when a keyboard is up — an absolute bottom rides that
+    pin exactly as the deck does, where a fixed descendant would re-anchor
+    against the transformed overlay by accident rather than by choice (see
+    lib/viewport_height.js). The cookie banner is viewport-fixed above this
+    on a first visit; two prompts, dismissed in the order they appeared.
+
+    Same endpoint, same recording, same decline purge as the card had — only
+    the furniture moved. Declining swaps this panel's message in place and
+    the deck underneath stays inert; it is the same terminal state the card
+    presented, one strip lower. %>
+<div class="play-consent-banner" role="dialog" aria-modal="false" tabindex="-1"
+     aria-label="<%= t("player.consent_title") %>"
+     data-player-target="consentBanner">
+  <div class="play-consent-panel">
+    <div data-player-target="consentMain">
+      <div class="play-consent-banner-title"><%= t("player.consent_title") %></div>
+      <div class="play-consent-body"><%= safe_join(@survey.effective_consent_text.to_s.split("\n"), tag.br) %></div>
+      <%# The privacy policy is linked from every consent gate, not just the
+          default one — agreeing to share a birth date and a location should
+          always be one tap from how that data is handled. %>
+      <div class="play-consent-legal">
+        <%= link_to t("player.consent_privacy_link"), privacy_path,
+                    target: "_blank", rel: "noopener" %>
+      </div>
+      <div class="play-consent-actions">
+        <button type="button" class="play-consent-agree"
+                data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
+        <button type="button" class="play-consent-decline"
+                data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
+      </div>
+    </div>
+    <div class="play-consent-declined hidden" data-player-target="consentDeclined" aria-live="polite">
+      <%= t("player.consent_declined") %>
+    </div>
+  </div>
+</div>

@@ -181,7 +181,11 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
     assert_nil s.consent_image_credit_url
   end
 
-  test "editor consent card offers Add design, then Change design once an image is set" do
+  test "editor consent replica no longer offers a design image — the banner shows none" do
+    # The player renders the simple gate as a bottom banner, text and buttons
+    # only, so offering a design picker here would be editing a field nothing
+    # displays. The consent_image data stays (snapshots were recorded against
+    # it); the offer goes.
     org = sign_in_org("consent-fab")
     s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
                             default_locale: "en", locales: [ "en" ], cards: CARDS,
@@ -189,15 +193,15 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
 
     get survey_path(s)
     assert_response :success
-    assert_select "[data-gate-cards-target='consentLeft'] button.split-left-design-prompt[data-action='click->media-picker#openConsent']"
+    assert_select "[data-gate-cards-target='consentLeft'] button.split-left-design-prompt", false
 
     s.update!(consent_image: "https://images.pexels.com/photos/12/race.jpg")
     get survey_path(s)
-    assert_select "[data-gate-cards-target='consentLeft'] .split-left-img[data-consent-media]"
-    assert_select "[data-gate-cards-target='consentLeft'] button.add-media-fab[data-action='click->media-picker#openConsent']"
+    assert_select "[data-gate-cards-target='consentLeft'] .split-left-img[data-consent-media]", false
+    assert_select "[data-gate-cards-target='consentLeft'] button.add-media-fab", false
   end
 
-  test "player consent card shows the creator's design image with its credit" do
+  test "the banner shows no design image even when one is stored" do
     s = published_survey(consent: "Agree to continue.")
     s.update!(consent_image: "https://images.pexels.com/photos/12/race.jpg",
               consent_image_credit: "Jane Doe",
@@ -205,32 +209,38 @@ class ConsentGateTest < ActionDispatch::IntegrationTest
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_select ".preview-card[data-card-type='consent_card'] .split-left .split-left-img"
-    assert_select ".preview-card[data-card-type='consent_card'] .split-left-credit a[href=?]",
-                  "https://www.pexels.com/@janedoe", text: /Jane Doe/
+    assert_select ".play-consent-banner", 1
+    assert_select ".play-consent-banner .split-left-img", false
+    assert_select ".play-consent-banner .split-left-credit", false
   end
 
-  test "consent shows as the first card when consent text is set" do
+  test "consent shows as a bottom banner over the first question" do
     s = published_survey(consent: "You agree your anonymous answers may be used for research.")
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    # It's a real card in the deck, with agree/decline actions.
-    assert_select ".preview-card[data-card-type='consent_card']"
-    assert_select ".play-consent-body", /anonymous answers/
-    assert_select "button[data-action='click->player#agreeConsent']"
-    assert_select "button[data-action='click->player#declineConsent']"
-    # Critically it carries NO data-card-index, so it never shifts answer keys
-    # (which align to the @survey.cards index).
-    assert_select ".preview-card[data-card-type='consent_card'][data-card-index]", false
+    # The banner is the gate — no card stands in front of the deck any more.
+    assert_select ".preview-card[data-card-type='consent_card']", false
+    assert_select ".play-consent-banner .play-consent-body", /anonymous answers/
+    assert_select ".play-consent-banner button[data-action='click->player#agreeConsent']"
+    assert_select ".play-consent-banner button[data-action='click->player#declineConsent']"
+    # The pending state is server-rendered so a reload lands the same way:
+    # the overlay carries the attribute and the deck is inert beneath it.
+    assert_select ".preview-overlay[data-consent-pending]"
+    assert_select ".preview-body[inert]"
+    # And the FIRST deck card is a real position — nothing index-less eats
+    # slot 0, so answer keys still align to the @survey.cards index.
+    assert_select ".preview-card[data-player-target='card']:first-of-type[data-card-index]"
   end
 
-  test "no consent card when consent text is blank" do
+  test "no consent banner when consent text is blank" do
     s = published_survey(consent: nil)
 
     get play_survey_path(s.publish_token)
     assert_response :success
-    assert_select ".preview-card[data-card-type='consent_card']", false
+    assert_select ".play-consent-banner", false
+    assert_select ".preview-overlay[data-consent-pending]", false
+    assert_select ".preview-body[inert]", false
   end
 
   def json_post(path, payload)

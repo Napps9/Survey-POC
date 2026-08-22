@@ -334,46 +334,16 @@
             <% end %>
           </div>
           <div class="split-card">
-            <%# Left panel mirrors _split_left's editor mode: current design
-                image (if any) + the Add/Change design CTA. media-picker's
-                "consent" mode dispatches the pick to gate-cards, which
-                repaints the [data-consent-media] elements and persists
-                consent_image via update_settings. %>
+            <%# The player shows this gate as a bottom BANNER over the first
+                question now (player/_consent_banner) — text and buttons only,
+                no design image. The consent_image* fields are dormant, kept
+                for the snapshots already recorded against them; the picker's
+                "consent" mode and gate-cards' setConsentImage stay wired but
+                nothing offers them for the simple gate any more. This replica
+                keeps the card shape as a familiar text-editing surface, not
+                as a preview of the player. %>
             <div class="split-left" data-gate-cards-target="consentLeft">
-              <% if @survey.consent_image.present? %>
-                <div class="split-left-img" data-consent-media style="background-image:url('<%= @survey.consent_image %>');"></div>
-                <div class="split-left-overlay" data-consent-media></div>
-                <% if @survey.consent_image_credit.present? %>
-                  <div class="split-left-credit" data-consent-media>
-                    <% if @survey.consent_image_credit_url.present? %>
-                      <a href="<%= @survey.consent_image_credit_url %>" target="_blank" rel="noopener nofollow">Photo by <%= @survey.consent_image_credit %></a>
-                    <% else %>
-                      Photo by <%= @survey.consent_image_credit %>
-                    <% end %>
-                  </div>
-                <% end %>
-              <% end %>
               <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
-              <%# The design image saves through the same locked consent_image
-                  field, so the picker goes away with the rest of the editing. %>
-              <% unless live_locked %>
-                <% if @survey.consent_image.present? %>
-                  <button type="button" class="add-media-fab"
-                          data-action="click->media-picker#openConsent"
-                          title="<%= t("editor.change_media_title") %>">
-                    <span class="add-media-fab-plus">＋</span>
-                    <span><%= t("editor.change_media") %></span>
-                  </button>
-                <% else %>
-                  <button type="button" class="split-left-design-prompt"
-                          data-action="click->media-picker#openConsent"
-                          title="<%= t("editor.add_design_title") %>">
-                    <span class="split-left-design-prompt-icon">＋</span>
-                    <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
-                    <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
-                  </button>
-                <% end %>
-              <% end %>
             </div>
             <div class="split-right">
               <div class="play-consent-main">

@@ -6165,6 +6165,80 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .play-consent-declined.hidden { display: none; }
 
+/* ── Survey-level consent, as a bottom banner ──────────────────────────────
+   "I really feel like this should be a banner along the bottom, that sits
+   over the top of the first question." The gate used to be a full-screen
+   pseudo-card in front of the deck; it is a strip now, and the state lives
+   on ONE attribute — data-consent-pending on .preview-overlay — which dims
+   the deck, hides the footer nav, and shows this banner. The deck's
+   interaction lock is the `inert` attribute on .preview-body (focus, AT and
+   clicks all blocked by the platform, not by pointer-events games).
+
+   Absolute, not fixed: the overlay is the fixed box, and the visual-viewport
+   pin resizes/translates it under a keyboard — absolute bottom rides that
+   exactly as the deck does. z-index 40 sits over the floating mobile pills
+   (30) and under everything that must outrank consent (the cookie banner is
+   viewport-fixed far above; two prompts on a first visit, dismissed in
+   order).
+
+   The shared .play-consent-* pieces (body, legal, actions, buttons) keep
+   their base rules — they also dress the editor replica, the type-picker
+   preview and the respondent-code card — and are re-coloured here only
+   under the banner's own container, for its dark panel. */
+.play-consent-banner {
+  position: absolute; inset-inline: 0; bottom: 0;
+  z-index: 40;
+  display: flex; justify-content: center; align-items: flex-end;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+.play-consent-panel {
+  pointer-events: auto;
+  width: 100%; max-width: 640px;
+  background: #1C2034; color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  padding: 16px 20px;
+}
+.play-consent-banner-title {
+  font-family: "Alata", sans-serif; font-size: 15px; margin-bottom: 6px;
+}
+.play-consent-banner .play-consent-body {
+  color: rgba(255,255,255,0.85); font-size: 13.5px;
+  /* The card gave the copy 300px; a strip must never grow into a wall in
+     front of the question it exists to reveal. Long consent scrolls here. */
+  max-height: 30svh;
+}
+.play-consent-banner .play-consent-legal { margin-top: 6px; }
+.play-consent-banner .play-consent-legal a { color: rgba(255,255,255,0.65); }
+.play-consent-banner .play-consent-legal a:hover { color: rgba(255,255,255,0.9); }
+.play-consent-banner .play-consent-actions {
+  flex-direction: row; flex-wrap: wrap; margin-top: 12px;
+}
+.play-consent-banner .play-consent-agree { flex: 1 1 200px; }
+.play-consent-banner .play-consent-decline {
+  flex: 1 1 140px;
+  color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.45);
+}
+.play-consent-banner .play-consent-declined {
+  color: rgba(255,255,255,0.85); padding: 4px 0;
+}
+/* The banner exists only while the choice is open (or was declined —
+   declining swaps the message inside the same panel and the attribute
+   stays). Once agreed the attribute goes and the banner with it; no exit
+   animation, so reduced-motion needs no carve-out. */
+.preview-overlay:not([data-consent-pending]) .play-consent-banner { display: none; }
+/* While pending, the deck underneath is scenery: nav and score chrome hidden
+   outright, the question dimmed but readable — seeing what you are agreeing
+   to answer is the point of the banner over a blank scrim. `inert` on
+   .preview-body (server-rendered, controller-removed) does the interaction
+   half. */
+.preview-overlay[data-consent-pending] .preview-btn,
+.preview-overlay[data-consent-pending] .preview-progress-text,
+.preview-overlay[data-consent-pending] .quiz-score-chip,
+.preview-overlay[data-consent-pending] .token-score-chip { display: none; }
+.preview-overlay[data-consent-pending] .preview-body { opacity: 0.55; }
+
 .preview-footer {
   flex-shrink: 0; height: 80px;
   display: flex; align-items: center; justify-content: center;

@@ -8,12 +8,15 @@ const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
 
 // Cards that ask for agreement rather than an answer, and drive their own
-// navigation. "consent_card" is the survey-level gate rendered as a pseudo-card
-// before the deck (from consent_text); "consent_gate" is the multi-page card
-// type a creator can place and reorder like any other. A Verto has one or the
-// other — Survey#consent_required? goes false once a consent_gate card exists,
-// so the pseudo-card stops rendering rather than stacking two gates.
-const CONSENT_TYPES = [ "consent_card", "consent_gate" ]
+// navigation. "consent_gate" is the multi-page card type a creator can place
+// and reorder like any other. The survey-level gate (from consent_text) is no
+// longer a card at all — it renders as the bottom banner in
+// player/_consent_banner, whose whole state is the overlay's
+// data-consent-pending attribute. A Verto has one gate or the other —
+// Survey#consent_required? goes false once a consent_gate card exists — which
+// is also why the banner and the card can share the consentMain/
+// consentDeclined targets and the agreeConsent action without colliding.
+const CONSENT_TYPES = [ "consent_gate" ]
 
 // Cards that drive their own navigation, so the deck's Back/Next/Finish are
 // hidden while one is showing. The consent shapes above, plus the
@@ -54,7 +57,7 @@ export default class extends Controller {
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionsMapViewport", "regionsMapStage",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
-                    "consentMain", "consentDeclined", "respondentCode",
+                    "consentBanner", "consentMain", "consentDeclined", "respondentCode",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "testConfirm"]
@@ -183,6 +186,10 @@ export default class extends Controller {
     // aggregation ignoring extra runs is the real enforcement.
     if (this.leaderboardValue && this.leaderboardUrlValue &&
         this.retakePolicyValue === "no_redo" && this._playedBefore()) {
+      // The board, not the questions — there is nothing left to consent to,
+      // and a banner over the standings would shadow them for no one's
+      // benefit. Cleared without recording anything.
+      this._clearConsentPending()
       this._showAlreadyPlayed()
       return
     }
@@ -195,6 +202,13 @@ export default class extends Controller {
     // is laid out, not corrected after it.
     this._fitCardHeight()
     this._update()
+    // The survey-level consent banner (player/_consent_banner). The state was
+    // server-rendered — data-consent-pending on the overlay, inert on the deck
+    // — so a reload lands exactly where the first paint did; all that is left
+    // to JS is to start keyboard users in the one live surface.
+    if (this.element.hasAttribute("data-consent-pending") && this.hasConsentBannerTarget) {
+      this.consentBannerTarget.focus()
+    }
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
     if (this.hasRegionsMapViewportTarget) this._setupMapPanZoom()
@@ -713,7 +727,35 @@ export default class extends Controller {
   agreeConsent() {
     this._buzz()
     this._recordConsent(true)
+    // Two gates share this action and never coexist. The survey-level BANNER
+    // has no card to advance past — dismissing it hands back the deck that
+    // was under it all along. The multi-page consent_gate CARD is a deck
+    // position, so agreement there still means "move on".
+    if (this.element.hasAttribute("data-consent-pending")) {
+      this._dismissConsentBanner()
+      return
+    }
     this.next()
+  }
+
+  _dismissConsentBanner() {
+    this._clearConsentPending()
+    // The banner never occupied layout, but the nav buttons just appeared and
+    // the deck just became live — re-measure on the next frame and put focus
+    // where the respondent's next act is.
+    requestAnimationFrame(() => { this._fitCardHeight(); this._fitCard() })
+    const btn = this.nextBtnTarget.classList.contains("hidden") ? this.finishBtnTarget : this.nextBtnTarget
+    btn?.focus()
+  }
+
+  // Remove the pending state without recording anything — the shared teardown
+  // for agreement (which records first) and for paths where consent is moot
+  // (the already-played board). Declining deliberately does NOT come here:
+  // the attribute stays, the deck stays inert, and the banner shows its
+  // declined message in place.
+  _clearConsentPending() {
+    this.element.removeAttribute("data-consent-pending")
+    this.element.querySelector(".preview-body")?.removeAttribute("inert")
   }
 
   declineConsent() {
@@ -1878,17 +1920,21 @@ export default class extends Controller {
     cards.forEach((c, i) => c.classList.toggle("active", i === idx))
     this._animateCardEntry(cards[idx], idx)
 
-    // Two gate shapes: "consent_card" is the survey-level pseudo-card pinned
-    // first, "consent_gate" is a real multi-page card the creator placed in the
-    // deck. Both drive themselves, so both suppress the deck nav; only a gate
-    // sitting FIRST is held out of the progress count, the same way a mid-deck
-    // welcome card or checkpoint is counted where it stands.
-    // Leading pseudo-cards (the consent gate rendered from consent_text, the
-    // respondent-code gate) carry no data-card-index, because they're not
-    // positions in @survey.cards and must never shift the answer keys. Counting
-    // them is also how they stay out of the progress the respondent sees —
-    // derived from the absence of an index rather than a hardcoded 1, so adding a
-    // second gate didn't silently make "Card 1 of N" wrong.
+    // Self-driving shapes: "consent_gate" is a real multi-page card the
+    // creator placed in the deck, and the respondent-code gate is a leading
+    // pseudo-card. Both drive themselves, so both suppress the deck nav; only
+    // a gate sitting FIRST is held out of the progress count, the same way a
+    // mid-deck welcome card or checkpoint is counted where it stands. (The
+    // survey-level consent gate is not in the deck at all any more — it is
+    // the bottom banner, and its nav suppression is CSS keyed off
+    // data-consent-pending, not this branch.)
+    // Leading pseudo-cards (today only the respondent-code gate) carry no
+    // data-card-index, because they're not positions in @survey.cards and
+    // must never shift the answer keys. Counting them is also how they stay
+    // out of the progress the respondent sees — derived from the absence of
+    // an index rather than a hardcoded 1, which is why the consent card's
+    // removal changed nothing here: offset simply reads 0 (or 1 with the
+    // code gate) and every formula below still holds.
     let offset = 0
     while (offset < cards.length && cards[offset].dataset.cardIndex == null) offset++
     const onConsent = SELF_DRIVING_TYPES.includes(cards[idx]?.dataset.cardType)
@@ -1918,8 +1964,8 @@ export default class extends Controller {
     this.progressTarget.textContent = t("player.progress", { n, total })
     this.element.style.setProperty("--player-progress", `${Math.min(100, Math.round((n / total) * 100))}%`)
     this.backBtnTarget.classList.remove("hidden")
-    // Don't allow stepping back onto the consent gate once agreed (or off the
-    // start of the visited path under logic).
+    // Don't allow stepping back onto a leading gate once past it (the
+    // respondent-code card), or off the start of the visited path under logic.
     this.backBtnTarget.classList.toggle("invisible", this.logicValue ? this._path.length <= 1 : idx === offset)
     // Under logic, "last" depends on the graph, not the array position.
     const isLast = this.logicValue ? (this._staticNext(idx).end != null) : (idx === cards.length - 1)

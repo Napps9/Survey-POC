@@ -1674,10 +1674,11 @@ class Survey < ApplicationRecord
 
   # ── Consent ────────────────────────────────────────────────────────────────
   # Two shapes, one respondent-facing promise. The survey-level gate
-  # (consent_text) is a single pseudo-card pinned before the welcome card; a
-  # consent_gate CARD is an ordinary deck card that can span several pages and
-  # be reordered. A Verto uses one or the other — never both, or a respondent
-  # would be asked to agree twice.
+  # (consent_text) renders as a bottom BANNER over the first question
+  # (player/_consent_banner — it used to be a pseudo-card pinned before the
+  # deck); a consent_gate CARD is an ordinary deck card that can span several
+  # pages and be reordered. A Verto uses one or the other — never both, or a
+  # respondent would be asked to agree twice.
 
   # The multi-page consent card, if the deck has one.
   def consent_gate_card
@@ -1689,8 +1690,8 @@ class Survey < ApplicationRecord
   end
 
   # The survey-level gate. False once a consent card is in the deck, so the
-  # pseudo-card stops rendering rather than stacking a second gate in front of
-  # the first — the card wins, being the more specific thing the creator built.
+  # banner stops rendering rather than stacking a second gate on top of the
+  # first — the card wins, being the more specific thing the creator built.
   def consent_required?
     consent_text.present? && !consent_gate_card?
   end
@@ -1716,8 +1717,8 @@ class Survey < ApplicationRecord
     collects_personal_data? && consent_text.blank? && !consent_gate_card?
   end
 
-  # Whether the player renders the survey-level pseudo-card before the deck,
-  # from either the creator's own consent_text or the default above.
+  # Whether the player renders the survey-level consent banner over the first
+  # question, from either the creator's own consent_text or the default above.
   def show_consent_gate?
     consent_required? || default_consent_gate?
   end
