@@ -78,7 +78,12 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
     # element then positioned against the whole .split-card — the Lottie
     # (z-index 1) covering the card, the video (z-index auto) hiding behind
     # the white panel and playing to nobody.
-    strip_selector_block = css[/([^{}]*)\{[^}]*flex:\s*0 1 auto;\s*height:\s*var\(--play-hero-h\)[^}]*\}/m, 1]
+    # flex is 0 0 auto, not 0 1 auto: the strip stopped being shrinkable when the
+    # header became a promise. Retiring the shed ladder alone did not deliver
+    # that — the answer panel simply squeezed the hero instead, measured at 27.9%
+    # of an iPhone 15 with no hero-off in sight. The shrink factor is the half
+    # that makes 45% mean 45%.
+    strip_selector_block = css[/([^{}]*)\{[^}]*flex:\s*0 0 auto;\s*height:\s*var\(--play-hero-h\)[^}]*\}/m, 1]
 
     assert strip_selector_block, "the hero-strip rule is gone or reshaped past recognition"
     %w[.split-left-img .split-left-video .card-lottie .nps-lottie].each do |cls|
@@ -111,18 +116,13 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
     end
   end
 
-  # The ladder's middle rung. Without it the hero's only verdicts are "45% of
-  # the card" and "gone", and once the hero grew to 45% a handful of answers
-  # started trading their picture away entirely to buy back a few dozen pixels
-  # — measured, not hypothesised: a six-tile grid and a free-text card both
-  # crossed that line on an iPhone 15.
-  test "the shed ladder can slim the hero, not only remove it" do
-    assert_match(/\.preview-card\.hero-slim .*\.split-left\s*\{[^}]*max-height:\s*var\(--play-hero-min\)/m,
-                 css,
-                 "hero-slim is gone or no longer caps the strip at --play-hero-min — the ladder " \
-                 "is back to all-or-nothing and image cards with long answers lose their art " \
-                 "outright instead of keeping a band of it.")
-  end
+  # The hero-slim test that used to sit here went with the class. It pinned the
+  # shed ladder's middle rung — the band the hero shrank to before being given
+  # up entirely — and there is no ladder to have a middle of any more: the
+  # header holds its share and a long answer scrolls instead. hero-off survives
+  # this, but for a different owner (see the test below and _watchTyping): it
+  # is what drops the hero while a text field has focus, so the keyboard has
+  # somewhere to go.
 
   test "hero-off hides the range animation too" do
     hide_rule = css[/\.preview-overlay \.preview-card\.hero-off[^{]*\.card-lottie[^{]*\{[^}]*\}/m]

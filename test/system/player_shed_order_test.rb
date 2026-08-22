@@ -1,26 +1,36 @@
 require "application_system_test_case"
 
-# What the player can afford, and what it gives up when it can't.
+# What the player guarantees when it runs out of room — and it is a different
+# promise now, which is why this file's name is the last thing left of the shed
+# order.
 #
-# The rule is a priority, not a fallback: a respondent can answer a question
-# with no artwork on it and cannot answer one whose options are off the bottom
-# of the screen. So the pictures are what go, and the answer widget and the
-# footer are never touched.
+# There used to be a ladder. _fitCard priced the undecorated answer as a debt
+# and bought back the option artwork and then the hero, each only while it
+# stayed free, so a card that could not afford its picture gave it up. That
+# made the same Verto render differently on two phones, which is what got
+# reported: "everything else can have a header I think — even long lists,
+# because players should know to scroll."
 #
-# _fitCard budgets UP rather than stripping down — it starts from the
-# undecorated answer, prices that as the debt, and buys back the option
-# artwork and then the hero only while neither adds to it. What this file
-# asserts is the outcome, which is the same either way and is the part worth
-# pinning: the artwork goes before the options do, every option survives, the
-# footer survives, and the card climbs again when the room comes back.
+# So the trade is off, and BOTH rungs went. What the ladder was protecting is
+# still protected, just not out of the pictures any more:
 #
-#   .art-off   — the option tiles go, the grid becomes the option list
-#   .hero-off  — the card image goes
-#   then whatever is still too tall scrolls
+#   the header holds its share    — on every card that can carry one
+#   every option survives         — the tiles keep their artwork too
+#   Back and Next stay reachable  — never negotiable, at any size
+#   whatever is left over scrolls — with the "more below" cue to say so
+#
+# The three tests that asserted the ladder's rungs are gone. They were not
+# wrong, they were about a mechanism that no longer exists — and the priority
+# they encoded is asserted directly below instead, which is what they were
+# really for.
+#
+# Two card types still hide their strip, and always did it in CSS rather than
+# through the ladder: the tap matrix and NPS, whose answers cannot shrink.
 class PlayerShedOrderTest < ApplicationSystemTestCase
   DESKTOP = [ 1280, 900 ].freeze
   ROOMY   = [ 1024, 1290 ].freeze  # iPad Pro upright — everything fits
   TIGHT   = [ 844,  390 ].freeze   # a phone turned sideways
+  PHONE   = [ 393,  852 ].freeze   # iPhone 15 upright — where the header promise is measured
 
   SIX    = [ "AI and automation", "Brand building", "Measurement",
              "Creative craft", "Leadership", "Sustainability" ].freeze
@@ -59,14 +69,25 @@ class PlayerShedOrderTest < ApplicationSystemTestCase
     sleep 0.4
   end
 
-  def rung
+  # What the card is actually showing, now that there are no rungs to count.
+  def card_state
     page.evaluate_script(<<~JS)
       (() => {
         const c = document.querySelector(".preview-card.active")
-        const g = c.querySelector(".choice-grid")
-        if (c.classList.contains("hero-off")) return 3
-        if (g && g.classList.contains("art-off")) return 2
-        return 1
+        const box = c.querySelector(".split-right > .mt-2")
+        const sl = c.querySelector(".split-left")
+        const sc = c.querySelector(".split-card")
+        const shown = sl && getComputedStyle(sl).display !== "none" &&
+                            getComputedStyle(sl).display !== "contents"
+        return {
+          heroShown: !!shown,
+          heroPx: shown ? +sl.getBoundingClientRect().height.toFixed(1) : 0,
+          cardPx: +sc.getBoundingClientRect().height.toFixed(1),
+          options: c.querySelectorAll(".choice-card, .choice-list-item").length,
+          tiles: c.querySelectorAll(".choice-card-bg").length,
+          scrolls: box ? box.scrollHeight - box.clientHeight > 1 : false,
+          cue: box ? box.classList.contains("is-scrollable") : false
+        }
       })()
     JS
   end
@@ -88,54 +109,85 @@ class PlayerShedOrderTest < ApplicationSystemTestCase
     JS
   end
 
-  test "a card that fits gives up nothing" do
+  test "a card that fits shows everything" do
     open_at(*ROOMY)
+    st = card_state
 
-    assert_equal 1, rung, "there was room for the artwork — it should still be there"
+    assert st["heroShown"], "there was room for the picture — it should be there"
+    assert_equal st["options"], st["tiles"],
+                 "every option should still be carrying its artwork"
+    assert_not st["scrolls"], "this card fits; nothing should be scrolling"
   end
 
-  # Six options with short labels now fit a sideways phone as drawn, since a
-  # wide panel gets three columns rather than the phone's two. Twelve is the
-  # case that still cannot: 390px of height, and no arrangement of twelve
-  # image tiles fits in it.
-  test "a sideways phone loses the pictures rather than the options" do
+  # The case the ladder was built for, and the one the new promise is really
+  # about: twelve image tiles cannot fit a phone, and they no longer have to.
+  # Measured before this change the same card shed to 27.9% of the screen on an
+  # iPhone 15 and 23.5% on an SE; the tiles went too.
+  test "twelve options keep their header and their artwork, and scroll" do
+    open_at(*PHONE, card: 2)
+    st = card_state
+
+    assert st["heroShown"], "the header is a promise now — a long list does not get to revoke it"
+    assert_equal 12, st["options"], "no option may be dropped, whatever else happens"
+    assert_equal 12, st["tiles"],   "the option artwork stays too — scrolling is the answer, not shedding"
+    assert st["scrolls"], "twelve tiles cannot fit a phone; this should be scrolling"
+    assert st["cue"],
+           "it scrolls but is not saying so — is-scrollable draws the 'more below' fade, and it " \
+           "matters more now than it did when the card would shed until it fitted"
+  end
+
+  # The header's share is the point, not merely its presence: a hero squeezed
+  # to a sliver is the same failure the ladder used to cause outright. The
+  # strip is flex-shrink 0 for exactly this reason — retiring the ladder alone
+  # left the answer panel quietly squeezing it instead.
+  test "the header holds its share even against a long answer" do
+    open_at(*PHONE, card: 2)
+    st = card_state
+
+    share = st["heroPx"] / st["cardPx"]
+    assert_operator share, :>, 0.38,
+                    "the header is #{(share * 100).round(1)}% of the card against a twelve-option " \
+                    "list. It is meant to hold ~45% (--play-hero-h against --play-right-min); " \
+                    "anything much under that means something is shrinking it again."
+  end
+
+  # A sideways phone is the tightest real case — and the one where shedding
+  # used to be most aggressive.
+  test "a sideways phone keeps the options and scrolls rather than stripping the card" do
     open_at(*TIGHT, card: 2)
+    st = card_state
 
-    assert_operator rung, :>=, 2, "twelve image tiles do not fit here; the pictures should have gone"
-    assert_equal 12, page.all(".preview-card.active .choice-card", visible: :all).length,
-                 "every option must survive — it is the artwork that is expendable"
+    assert_equal 12, st["options"], "every option survives, at every size"
+    assert_equal 12, st["tiles"],   "and so does its artwork"
   end
 
-  test "twelve options on a phone shed both the tiles and the hero" do
-    open_at(375, 553, card: 2)
-
-    assert_equal 3, rung, "twelve options need everything the card can give them"
-    assert page.has_no_css?(".preview-card.active .split-left-img", visible: true),
-           "the hero image should be gone, not merely small"
-  end
-
-  # The whole point of the ordering. Whatever else is given up, these are not.
+  # Never negotiable, and the one assertion in this file that predates the
+  # ladder, outlives it, and did not need rewriting.
   [ ROOMY, TIGHT, [ 375, 553 ], [ 280, 653 ] ].each do |w, h|
     test "Back and Next stay on screen and usable at #{w}x#{h}" do
       open_at(w, h, card: 2)
+      st = card_state
 
       assert controls_usable?,
-             "the footer is never on the list of things to give up (rung #{rung})"
+             "the footer is never on the list of things to give up (card #{st['cardPx']}px, " \
+             "hero #{st['heroPx']}px, #{st['scrolls'] ? 'scrolling' : 'not scrolling'})"
     end
   end
 
-  # Shedding is not a one-way door: rotate back and the artwork returns. The
-  # assertion is that it climbs, not that it reaches any particular rung —
-  # where it lands is a matter of how much room the bigger screen actually has.
-  test "the artwork comes back when the room does" do
+  # Nothing is shed any more, so there is nothing to come back — but the card
+  # must still re-lay-out on rotation rather than keeping the narrow geometry.
+  test "the card re-lays-out when the room changes" do
     open_at(*TIGHT, card: 2)
-    stripped = rung
-    assert_operator stripped, :>=, 2
+    sideways = card_state
 
     page.driver.browser.resize(width: ROOMY[0], height: ROOMY[1])
-    sleep 0.6
+    sleep 0.5
+    roomy = card_state
 
-    assert_operator rung, :<, stripped,
-                    "a card stripped for space should give some of it back when the room returns"
+    assert_equal 12, sideways["options"]
+    assert_equal 12, roomy["options"]
+    assert_operator roomy["cardPx"], :>, sideways["cardPx"],
+                    "the card did not grow into the taller viewport — it is still laid out for " \
+                    "the old one."
   end
 end

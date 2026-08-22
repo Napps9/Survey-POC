@@ -381,60 +381,48 @@ export default class extends Controller {
   //
   // The widget, the question and the footer are never on the list.
   _fitCard() {
-    // Typing layout is a policy, not a measurement. While a text control has
-    // focus the hero is off because the field IS the card (see _watchTyping),
-    // and the ladder must not buy it back on top of the keyboard. It must not
-    // run at all here either: with interactive-widget=resizes-content the
-    // layout viewport shrinks on keyboard open, which resizes the footer,
-    // which fires _watchFooterFit's observer — so without this guard the
-    // ladder would re-price the card between keystrokes.
+    // Not while someone is typing. The guard outlived the ladder it was written
+    // for — there is no longer anything here that could buy the hero back on
+    // top of the keyboard — but it still earns its place: with
+    // interactive-widget=resizes-content the layout viewport shrinks on
+    // keyboard open, which resizes the footer, which fires _watchFooterFit's
+    // observer. Unguarded, the scroll cue would be recomputed against a
+    // half-open keyboard between keystrokes.
+    // _watchTyping's blur branch clears kbd-open BEFORE calling back in here,
+    // so the cue is still re-decided once the answer has its room again.
     if (document.documentElement.classList.contains("kbd-open")) return
     const card = this.cardTargets[this.currentValue]
     if (!card) return
     const box = card.querySelector(".split-right > .mt-2")
     if (!box) return
-    const grid = box.querySelector(".choice-grid")
 
-    // A pixel of slack throughout: these are sub-pixel layout figures and an
-    // enhancement that rounds to "costs 0.4px" is free.
-    const over = () => box.scrollHeight - box.clientHeight
+    // This used to be a shed ladder. It priced the undecorated answer as a
+    // debt, then bought back the option artwork and then the hero, each only
+    // while it stayed free — so a card that could not afford its picture gave
+    // it up rather than scroll.
+    //
+    // That trade is off. The header is now a promise: 45% of the screen, on
+    // every card that can carry one, and the answer scrolls if it must
+    // ("everything else can have a header I think — even long lists, because
+    // players should know to scroll"). A guarantee a long list can revoke is
+    // not a guarantee, and the same Verto rendering differently on two phones
+    // was the thing being complained about.
+    //
+    // The two exceptions are not decided here and never were: the tap matrix
+    // and NPS hide their strip in CSS (:has(.rotate-wrap) and
+    // :has(.nps-slider) in the mobile block), because their answers cannot
+    // shrink. And a focused text field still drops the hero — see
+    // _watchTyping, which sets hero-off for the keyboard and is the reason
+    // that class survives this change while hero-slim and art-off do not.
+    //
+    // What is left is the one thing a scrolling answer needs more than a
+    // shedding one ever did: telling the respondent there is more below.
+    const over = box.scrollHeight - box.clientHeight
 
-    // The floor: the answer, undecorated.
-    card.classList.add("hero-off")
-    card.classList.remove("hero-slim")
-    grid?.classList.add("art-off")
-    let owed = over()
-
-    // Rung 1 — the option artwork. It can come out CHEAPER than the floor as
-    // well as dearer: dropping tiles turns the grid into full-width rows, and
-    // on a narrow phone that is taller than the two-column grid it replaced.
-    // Hence re-reading the debt rather than assuming it only ever grows.
-    if (grid) {
-      grid.classList.remove("art-off")
-      if (over() > owed + 1) grid.classList.add("art-off")
-      else owed = over()
-    }
-
-    // Rung 2 — the hero, against whatever rung 1 settled on. Two sizes, dearest
-    // first: the full 45% strip, then the slim band it is always allowed to
-    // shrink to (--play-hero-min). The second offer exists because the verdict
-    // used to be all-or-nothing, and once the hero grew to 45% that meant a
-    // handful of answers traded their picture away entirely to buy back a few
-    // dozen pixels. The PRICE is unchanged — still "free or not at all",
-    // still `over() > owed + 1`, still nothing allowed to overflow.
-    card.classList.remove("hero-off")
-    if (over() > owed + 1) {
-      card.classList.add("hero-slim")
-      if (over() > owed + 1) {
-        card.classList.remove("hero-slim")
-        card.classList.add("hero-off")
-      }
-    }
-
-    // The "more below" fade is drawn over the last of the content, so it has
-    // to know whether there IS anything below — left unconditional it greys
-    // out the final row's label on an answer that fits perfectly well.
-    box.classList.toggle("is-scrollable", over() > 1)
+    // The fade is drawn over the last of the content, so it has to know
+    // whether there IS anything below — left unconditional it greys out the
+    // final row's label on an answer that fits perfectly well.
+    box.classList.toggle("is-scrollable", over > 1)
   }
 
   _watchFooterFit() {
@@ -471,10 +459,16 @@ export default class extends Controller {
         card?.classList.add("hero-off")
         this._revealField(el)
       } else {
-        // Not classList.remove: _fitCard may have set hero-off for its own
-        // reasons. It starts from the floor every time, so re-running it is
-        // the correct restore — and it is now unguarded again, because
-        // kbd-open has just come off.
+        // Take it off HERE, explicitly. This used to hand the restore to
+        // _fitCard, which was correct while _fitCard owned hero-off and
+        // recomputed it from scratch on every run — it does not any more (the
+        // shed ladder is gone), so leaving the restore to it would have left
+        // the hero off for the rest of the deck the moment anyone typed. The
+        // class now has exactly one owner, which is this branch's pair.
+        card?.classList.remove("hero-off")
+        // Still re-run it: the answer's height changed while the keyboard was
+        // up, so whether the "more below" fade belongs has to be re-decided.
+        // Unguarded again too, because kbd-open has just come off.
         this._fitCard()
       }
     }

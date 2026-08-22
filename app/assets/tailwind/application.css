@@ -6947,7 +6947,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     display: block;
     position: relative;
     width: 100%;
-    flex: 0 1 auto;
+    /* shrink 0, and this is the half of "45% always" that retiring the shed
+       ladder does not deliver on its own. With shrink 1 the answer panel
+       simply squeezed the strip instead of scrolling: measured right after the
+       ladder came out, a twelve-option grid still pushed the hero down to
+       27.9% of the card on an iPhone 15 and 23.5% on an SE, with no
+       hero-off/hero-slim in sight. The ladder was the visible mechanism; flex
+       was doing the same thing quietly underneath it.
+       The pair still adds up — 40svh here against --play-right-min's 50svh on
+       a card that measures ~90.8svh — so the panel gets its stage and the
+       overflow goes where it now belongs, into the answer's own scroller. */
+    flex: 0 0 auto;
     height: var(--play-hero-h);
     min-height: var(--play-hero-min);
     padding: 0;
@@ -7681,90 +7691,44 @@ body.generating-overlay-active .bottom-bar { display: none; }
     max-height: none;
   }
 
-  /* ── Running out of room: shed the pictures, never the controls ─────────
-     The order is fixed and it is a priority, not a fallback: a respondent
-     can answer a question with no artwork on it and cannot answer one whose
-     options are off the bottom of the screen. player_controller#_fitCard
-     measures the answer area and walks down this list only as far as it has
-     to — most cards never leave the first rung.
+  /* ── Running out of room: the answer scrolls ───────────────────────────
+     There used to be a ladder here. _fitCard priced the undecorated answer as
+     a debt and bought back the option artwork and then the hero, each only
+     while it stayed free, so a card that could not afford its picture gave it
+     up rather than scroll.
 
-       1. the hero shrinks to its floor          (flex, always on)
-       2. .hero-off  — the card image goes       (below)
-       3. .art-off   — the option tiles go       (this rule)
-       4. the answer area scrolls                (last resort)
+     That trade is off. The header is a promise now — 45% of the screen on
+     every card that can carry one — and a long answer scrolls ("everything
+     else can have a header I think, even long lists, because players should
+     know to scroll"). A guarantee a long list can revoke is not a guarantee,
+     and the same Verto rendering differently on two phones was the complaint.
 
-     The card image goes first because it is the only purely decorative thing
-     on the card, and because it buys more room than step 3 does — a tile that
-     loses its artwork becomes a full-width row, which on a narrow phone is
-     taller than the two-column grid it replaced.
+     So the priority this block used to encode still holds, it is just no
+     longer paid for out of the pictures: a respondent can answer a question
+     with no artwork on it and cannot answer one whose options are off the
+     bottom of the screen. Back, Next and the answer widget are still never
+     touched. What used to be the last resort is now the only one.
 
-     Back, Next and the answer widget itself are never on the list.
-
-     Step 2 turns the image grid into the option LIST — the same component
-     the other pick types already use, so nothing here is a new design: a
-     colour swatch keeps each option's identity, the label gets the width it
-     was short of, and the tick is where a tick goes. Six options that were
-     scrolling now fit. */
+     Two card types still hide their strip, and always did it here rather than
+     in the ladder: the tap matrix (:has(.rotate-wrap)) and NPS
+     (:has(.nps-slider)), because neither answer can shrink to make room.
+     .hero-off survives too, with one owner — _watchTyping, which drops the
+     hero while a text field has focus so the keyboard has somewhere to go.
+     .art-off and .hero-slim were the ladder's own and went with it. */
   /* Written against the same specificity as the two-column rule above, which
      would otherwise win. Rows without artwork want width for their label, not
      a fixed column count: one column on a phone panel, three across a tablet
      or a sideways phone, decided by the panel rather than by a breakpoint. */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid.art-off,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid.art-off {
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: clamp(6px, 1.1svh, 9px);
-  }
-  .preview-overlay .choice-grid.art-off .choice-card {
-    flex-direction: row;
-    align-items: center;
-    gap: 11px;
-    height: auto;
-    /* The tick is absolutely positioned, so the row has to keep its lane
-       clear by hand — without this a two-line label runs underneath it. */
-    padding: clamp(7px, 1.1svh, 11px) 40px clamp(7px, 1.1svh, 11px) 12px;
-    background: rgba(0,0,0,0.03);
-    border: 1.5px solid rgba(0,0,0,0.07);
-    border-radius: 13px;
-  }
   /* Degraded to rows, this IS a .choice-list row in everything but class
      name, so it selects like one: border + tint + a brand-coloured label
      (.choice-label above), and no ring — the tile is a 34px swatch here and
      the swatch rule below already zeroes its box-shadow at a higher
      specificity, which is what keeps the two families looking identical. */
-  .preview-overlay .choice-grid.art-off .choice-card[data-selected="true"] {
-    background: var(--brand-primary-soft, rgba(1,234,203,0.08));
-    border-color: var(--brand-primary, var(--color-green-500));
-  }
   /* The swatch keeps the tile's colour and icon at a size that suits a row.
      `position: static` hands the tick back to the card, which is what it
      should be pinned to now — it used to sit in the corner of the artwork. */
-  .preview-overlay .choice-grid.art-off .choice-card-bg {
-    position: static;
-    flex: 0 0 auto;
-    width: 34px; height: 34px;
-    min-height: 0; max-height: none;
-    border-radius: 9px;
-    box-shadow: none;
-    --tile-emoji: 23px;
-  }
-  .preview-overlay .choice-grid.art-off .choice-icon-svg {
-    width: 19px; height: 19px; min-width: 0; min-height: 0;
-  }
   /* Its job was tinting artwork that is no longer there; left alone it would
      paint the whole row instead. */
-  .preview-overlay .choice-grid.art-off .choice-overlay { display: none; }
-  .preview-overlay .choice-grid.art-off .choice-label {
-    margin: 0;
-    min-height: 0;
-    flex: 1 1 auto;
-    text-align: start;
-    font-size: var(--play-label);
-  }
-  .preview-overlay .choice-grid.art-off .choice-tick {
-    top: 50%; right: 12px; bottom: auto;
-    transform: translateY(-50%);
-    width: 20px; height: 20px;
-  }
 
   /* Step 3. `display: contents` rather than `display: none` so the progress
      bar living inside the panel still renders — it is the one thing in there
@@ -7789,25 +7753,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-radius: 0;
   }
 
-  /* Rung 1.5 of the ladder: the hero SLIMMED rather than shed.
-     Raising the hero to 45% of the card (see --play-hero-h) meant a few
-     answers that used to fit alongside it no longer did — a six-tile grid and
-     a free-text card among them — and the ladder's only verdict was binary,
-     so a photo that was 30% of the screen yesterday became no photo at all.
-     Losing the picture entirely to gain 50px is a bad trade and a visible
-     one: a card either has art or it doesn't, and the jump is the thing a
-     respondent notices.
-     So before giving up on the hero, _fitCard tries it at the floor it was
-     always allowed to shrink to. Note this is NOT a loosened threshold — the
-     rule is still "the hero is free or not at all", `over() > owed + 1` is
-     untouched, and nothing is allowed to overflow. It is a cheaper thing to
-     offer, not a cheaper price. max-height as well as height, because the
-     range and rating variants set `height: auto` and are capped from above. */
-  .preview-overlay .preview-card.hero-slim .split-card .split-left {
-    flex: 0 0 auto;
-    height: var(--play-hero-min);
-    max-height: var(--play-hero-min);
-  }
+  /* hero-slim was the shed ladder's middle rung — the band the hero was allowed
+     to shrink to before being given up entirely. The ladder is gone (the header
+     is a promise now, and a long answer scrolls instead of buying room), so
+     nothing sets the class and the rule was unreachable. Removed rather than
+     left as dead code a test still guards, which is the trap `.phone-bottom`
+     turned out to be. Git has it if the trade is ever wanted back. */
   /* The selected-tile border-colour rule that used to live here went with the
      border. It was also outranking .art-off's own selected rule (same
      specificity, later in the file), which repainted a brand-coloured row in
