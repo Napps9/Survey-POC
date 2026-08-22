@@ -5265,20 +5265,18 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .rating-stars  {
   display: flex; gap: var(--rating-star-gap); position: relative;
-  /* The celebration confetti must not be able to scroll the card.
-     .rating-burst's pieces are absolutely positioned against THIS box and fly
-     outward past it — measured 60px below the answer scroller's bottom edge —
-     and an abspos descendant whose containing block sits inside a scroller
-     counts toward that scroller's scrollHeight. So tapping a star grew the
-     scrollable area by ~62px and a scrollbar appeared for the ~700ms the
-     animation ran, then vanished ("also a weird scrollbar appear right hand
-     side when you tap a star"). It was the celebration, not the card's height.
+  /* Contains the star's own :hover and .pop scale (1.18 and 1.4 of a 56px
+     box), which would otherwise poke a few pixels past this row and into the
+     answer scroller's overflow. The confetti used to be the real reason for
+     this rule and no longer lives here at all — .rating-burst is parented on
+     the overlay in viewport space now, because clipping only removed what
+     landed beyond the margin: enough for a ★, and not for a themed emoji,
+     which cleared 80px on every single tap. See rating_controller#_burst.
 
      `clip` rather than `hidden`: hidden would make this a scroll container of
      its own and still reserve the area. clip removes it from the overflow
-     calculation outright, and overflow-clip-margin then lets the pieces keep
-     painting outside the box. Where a browser has clip but not the margin the
-     confetti is simply clipped to the star row — quieter, still correct. */
+     calculation outright, and overflow-clip-margin lets the scaled star keep
+     painting outside the box. */
   overflow: clip;
   overflow-clip-margin: 80px;
 }
@@ -5333,14 +5331,23 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   40%  { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
+/* A zero-size anchor point in VIEWPORT space, parented on the overlay rather
+   than on the star row — see rating_controller#_burst for why. `fixed` is
+   load-bearing twice over: it takes the layer out of the answer scroller's
+   overflow calculation entirely (which is the bug), and it means the pieces'
+   coordinates are the star's own getBoundingClientRect, with no offset
+   arithmetic against a moving parent. Width and height stay 0 so the layer
+   itself can never be the thing that grows anything. */
 .rating-burst {
-  position: absolute; inset: 0;
+  position: fixed;
+  width: 0; height: 0;
   pointer-events: none;
   overflow: visible;
   z-index: 20;
 }
 .rating-burst-piece {
   position: absolute;
+  left: 0; top: 0;
   font-size: 22px;
   line-height: 1;
   color: #FFCC00;

@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { haptic } from "lib/haptics"
 import { presetFor, DEFAULT_TAP_COUNT } from "lib/tap_scales"
+import { visibleBandEnd } from "lib/visible_band"
 
 const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
@@ -490,8 +491,12 @@ export default class extends Controller {
     // The keyboard animates in (~250ms on iOS). Measuring before it lands
     // reads the pre-keyboard visible height and under-scrolls.
     this._revealTimer = setTimeout(() => {
-      const visible = window.visualViewport ? window.visualViewport.height : window.innerHeight
-      const floor   = Math.min(box.getBoundingClientRect().bottom, visible) - 8
+      // The floor is the lower edge of what the respondent can SEE, which is
+      // not the same number as visualViewport.height — see lib/visible_band for
+      // why, and for what comparing against the bare height costs on iOS. This
+      // used to read `Math.min(box…bottom, visualViewport.height)`, which is
+      // correct only where offsetTop is 0.
+      const floor = Math.min(box.getBoundingClientRect().bottom, visibleBandEnd()) - 8
       const over    = el.getBoundingClientRect().bottom - floor
       if (over <= 0) return
       // Smooth, because by the time this fires the overlay has already ridden

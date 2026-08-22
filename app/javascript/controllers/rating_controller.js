@@ -78,13 +78,43 @@ export default class extends Controller {
     })
   }
 
+  // Tidy up a burst still in flight when the card goes away, so a navigation
+  // mid-animation cannot leave a layer parented to the overlay forever.
+  disconnect() {
+    this._burstLayer?.remove()
+    this._burstLayer = null
+    clearTimeout(this._burstTimer)
+  }
+
   // Confetti: when a rating is picked the tapped icon "explodes" into a burst
   // of little copies of itself that fly out and fade. The pieces use the
   // card's own icon (★ or the themed emoji), so it always matches the Verto.
+  //
+  // THE LAYER LIVES OUTSIDE THE ANSWER SCROLLER, and that is the whole reason
+  // this is more than four lines. The pieces fly 38–90px outward plus 22px of
+  // gravity — up to ~112px from the star, plus their own half-height — and any
+  // element that reaches past a scroll container counts toward what that
+  // container can scroll. Parented inside the card, tapping a star therefore
+  // grew the answer scroller and a scrollbar appeared for the two-thirds of a
+  // second the animation ran, then vanished. That is the owner's "weird
+  // scrollbar appear right hand side when you tap a star", and it is the
+  // celebration, not the card's height.
+  //
+  // `overflow: clip` on .rating-stars was the first attempt and it is not
+  // enough: it only removes what lands BEYOND the clip margin, so the fix held
+  // for a ★ (whose pieces mostly stay inside 80px) and failed on every single
+  // tap of a themed emoji card, whose glyphs render taller and clear it every
+  // time. Measured, 8 taps per configuration: star 1/8 at up to 10px, emoji
+  // 8/8 at 17–47px.
+  //
+  // So the layer is hosted on the overlay — a sibling of the scrolling
+  // .preview-body, not a descendant — and positioned in viewport coordinates.
+  // A fixed-position element outside the scroller cannot contribute to it, for
+  // any glyph, at any size. Falls back to <body> in the editor feed, which has
+  // no overlay.
   _burst(originStar) {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
-    const stars = this.element.querySelector(".rating-stars")
-    if (!stars || !originStar) return
+    if (!originStar) return
 
     originStar.classList.remove("pop")
     void originStar.offsetWidth // restart the pop animation if re-tapped
@@ -92,12 +122,15 @@ export default class extends Controller {
 
     const glyph = originStar.dataset.ratingOn || originStar.textContent || "★"
     const sRect = originStar.getBoundingClientRect()
-    const cRect = stars.getBoundingClientRect()
-    const cx = sRect.left - cRect.left + sRect.width / 2
-    const cy = sRect.top - cRect.top + sRect.height / 2
 
+    // Anchor the layer on the tapped star, in viewport space, and give the
+    // pieces a common origin of 0,0 within it — so the layer itself is a
+    // zero-size point and only the pieces' own transforms move anything.
     const layer = document.createElement("div")
     layer.className = "rating-burst"
+    layer.style.left = `${sRect.left + sRect.width / 2}px`
+    layer.style.top  = `${sRect.top + sRect.height / 2}px`
+
     const pieces = 14
     for (let i = 0; i < pieces; i++) {
       const angle = (Math.PI * 2 * i) / pieces + (Math.random() - 0.5) * 0.6
@@ -105,8 +138,6 @@ export default class extends Controller {
       const p = document.createElement("span")
       p.className = "rating-burst-piece"
       p.textContent = glyph
-      p.style.left = `${cx}px`
-      p.style.top  = `${cy}px`
       // Fly radially, then a touch of gravity pulls the end point down.
       p.style.setProperty("--tx", `${Math.cos(angle) * dist}px`)
       p.style.setProperty("--ty", `${Math.sin(angle) * dist + 22}px`)
@@ -115,7 +146,15 @@ export default class extends Controller {
       p.style.setProperty("--d",  `${560 + Math.random() * 360}ms`)
       layer.appendChild(p)
     }
-    stars.appendChild(layer)
-    setTimeout(() => layer.remove(), 1100)
+
+    this._burstLayer?.remove()
+    clearTimeout(this._burstTimer)
+    this._burstLayer = layer
+    const host = this.element.closest(".preview-overlay") || document.body
+    host.appendChild(layer)
+    this._burstTimer = setTimeout(() => {
+      layer.remove()
+      if (this._burstLayer === layer) this._burstLayer = null
+    }, 1100)
   }
 }
