@@ -130,7 +130,9 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
         return {
           wrapper: getComputedStyle(li).boxShadow,
           tile:    getComputedStyle(bg).boxShadow,
-          label:   getComputedStyle(li.querySelector(".choice-label")).color
+          wash:    getComputedStyle(li.querySelector(".choice-overlay")).backgroundColor,
+          label:   getComputedStyle(li.querySelector(".choice-label")).color,
+          stroke:  getComputedStyle(li.querySelector(".choice-label")).webkitTextStrokeWidth
         }
       })()
     JS
@@ -139,6 +141,12 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
     assert_equal "none", shadows["wrapper"],
                  "the selection ring is still on the <li>, which encloses the caption text — " \
                  "'can the selection be just the box, and not the text as well?'"
+    assert_includes shadows["wash"], "0.42",
+                    "the wash over a selected tile's artwork is #{shadows['wash']}. It used " \
+                    "to be a hardcoded dark green — a colour from no palette, on a card that " \
+                    "is otherwise entirely brand-driven, so a magenta Verto tinted its chosen " \
+                    "answers green. It is derived from the brand's readable ink now, which is " \
+                    "the tone that darkens rather than washes out."
     assert_includes shadows["tile"], "rgb(1, 234, 203)",
                     "the tile itself should carry the brand ring — the RING is chrome and " \
                     "takes the raw brand colour; only the text had to move (see below)"
@@ -179,6 +187,44 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
                     "the selected caption reads at #{ratio.round(2)}:1 against #{surface}. " \
                     "Whatever colour selection turns the label, a respondent has to be able " \
                     "to read the answer they just chose."
+  end
+
+  # The other half of "just the box, and not the text as well", and the half
+  # that was left behind. The grid moved its ring onto the artwork; the LIST row
+  # went on drawing a brand border around the whole row — swatch, label and tick
+  # — which is the shape the note was describing. The ring is on the row's own
+  # 56px swatch now, matching the tile exactly, and the row keeps only its
+  # resting border and the soft tint that fills the box.
+  test "a selected list row rings its swatch, not the row around the words" do
+    open_player
+    3.times { click_button "Next"; sleep 0.4 } # → the bare multiple-choice list
+    assert_equal "multiple_choice", find(".preview-card.active")["data-card-type"]
+
+    first(".preview-card.active .choice-list-item").click
+    sleep 0.4
+
+    row = page.evaluate_script(<<~JS)
+      (() => {
+        const li = document.querySelector('.preview-card.active .choice-list-item[data-selected="true"]')
+        if (!li) return null
+        const unsel = document.querySelector('.preview-card.active .choice-list-item[data-selected="false"]')
+        const tile  = li.querySelector(".choice-list-tile")
+        return {
+          border:       getComputedStyle(li).borderColor,
+          restingBorder: unsel ? getComputedStyle(unsel).borderColor : null,
+          tint:         getComputedStyle(li).backgroundColor,
+          tileShadow:   tile ? getComputedStyle(tile).boxShadow : null
+        }
+      })()
+    JS
+
+    assert row, "no selected list row found"
+    assert_equal row["restingBorder"], row["border"],
+                 "the row's border still turns brand when it is chosen, so the selection is "                  "drawn around the label as well as the box — which is the thing row 4 asked "                  "about. The border is resting chrome; the mark belongs on the swatch."
+    assert_includes row["tileShadow"].to_s, "rgb(1, 234, 203)",
+                    "the row's 56px swatch carries no brand ring, so nothing marks the box at "                     "all now that the border does not. It should match the grid tile: the same "                     "lift, the same 2px ring, the same glow."
+    assert_not_equal "rgba(0, 0, 0, 0)", row["tint"],
+                     "the row lost its soft brand tint too. The tint fills the box, which is "                      "the box — without it a chosen row in a long list is hard to find."
   end
 
   # On a phone the CARD IS THE SCREEN, so the footer belongs to the card rather

@@ -2351,9 +2351,27 @@
    Magenta here meant an unbranded Verto drew a pink row tint under a teal
    label (.pick-text, below, has always fallen back teal) — two halves of one
    selected row disagreeing about the brand. */
+/* THE MARK GOES ON THE ARTWORK, NOT AROUND THE WORDS.
+   The grid moved its ring off the <li> and onto the tile so the selection box
+   stops enclosing the caption; this row is the other half of that, and it was
+   left behind. Its border runs around the whole row — swatch, label and tick —
+   which is precisely "the text as well".
+   So the border stays the row's resting chrome and no longer turns brand, and
+   the ring moves onto the 56px swatch, matching .choice-card-bg's treatment
+   exactly (same lift, same 2px ring, same 55% glow). The soft tint stays: it
+   fills the box, which is the box, and without it a chosen row in a long list
+   is hard to pick out at a glance. */
 .choice-list-item[data-selected="true"] {
   background: var(--brand-primary-soft, rgba(1,234,203,0.06));
-  border-color: var(--brand-primary, var(--color-green-500));
+}
+.choice-list-item[data-selected="true"] .choice-list-tile {
+  /* The resting lift is restated for the reason the grid's rule spells out:
+     box-shadow is one property, so naming the ring alone would drop the
+     drop-shadow and flatten the swatch at the moment it is picked. */
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.08),
+    0 0 0 2px var(--brand-primary, var(--color-green-500)),
+    0 0 16px 4px color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 55%, transparent);
 }
 .choice-list-tile {
   position: relative;
@@ -2583,8 +2601,16 @@
   background: transparent;
   transition: background 0.15s;
 }
+/* The wash that darkens the artwork so the white tick and the ring read on top
+   of it. It was a hardcoded dark green — a colour from no palette, on a card
+   that is otherwise entirely brand-driven, so a magenta Verto tinted its chosen
+   answers green and nobody had noticed.
+   --brand-primary-ink rather than --brand-primary, because this has to DARKEN:
+   the ink is the brand hue already taken down far enough to read as text, which
+   is exactly the tone that works as a scrim. A light brand therefore still
+   darkens its own artwork instead of washing it out. */
 .choice-card[data-selected="true"] .choice-overlay {
-  background: rgba(0,100,40,0.28);
+  background: color-mix(in srgb, var(--brand-primary-ink, #017E6E) 42%, transparent);
 }
 .choice-tick {
   display: none;
@@ -2635,9 +2661,15 @@
    around-the-words problem. Colour here, ring on the tile: two families, one
    vocabulary. Same legible derivation as the list row — see the note there;
    this caption sits on plain white rather than a tint, which is the easier of
-   the two surfaces, so the one variable serves both. */
+   the two surfaces, so the one variable serves both.
+   And the same stroke, which the list label had and this one did not: two
+   families with one vocabulary should thicken the same way when chosen. Safe
+   on either — text-stroke paints wider without touching a single advance
+   width, which is the whole reason it is used here instead of a weight. */
 .choice-card[data-selected="true"] .choice-label {
   color: var(--brand-primary-ink, #017E6E);
+  -webkit-text-stroke: 0.4px currentColor;
+  paint-order: stroke fill;
 }
 
 /* ── Rich-text toolbar (editor chrome) ───────────── */
@@ -5758,6 +5790,17 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    to the design view. No edit chrome (contenteditable, delete/add btns).
    ══════════════════════════════════════════════════════════════════ */
 .preview-overlay {
+  /* THE CARD'S HEIGHT, defined unconditionally so the three mobile tiers can
+     each take their 45/55 share of it. The footer's min-height is a border-box
+     measurement and already contains its 1px rule, so there is nothing further
+     to subtract — taking it off again cost 0.9px and landed the split on 44.9%
+     rather than 45.0. Kept out here rather than inside the
+     phone media block on purpose: every tier that reads it sits on this same
+     element, but a var() that resolves to nothing makes the whole calc
+     invalid, which would void --play-hero-h and collapse the layout rather
+     than degrade it. A token that load-bearing should not depend on which
+     media query happened to match. */
+  --play-card-h: calc(100svh - clamp(56px, 9svh, 80px));
   position: fixed; inset: 0; z-index: 60;
   background-color: var(--brand-bg, #1C2034);
   background-image: var(--brand-bg-image, none);
@@ -6875,9 +6918,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
        The clamp bounds are set so neither ever binds on a real phone: 40svh
        reaches 400px only at a 1000px-tall viewport, and 140px only below
        350px. */
-    --play-hero-h:     clamp(140px, 40svh, 400px);
+    /* THE CARD, named once, so 45/55 can be said literally.
+       The card is the overlay less the footer, and the footer is
+       clamp(56px, 9svh, 80px) plus its 1px rule. Deriving the two shares from
+       THAT rather than from the viewport is what finally makes the split the
+       number it claims to be: the pair used to be 40svh and 50svh against a
+       ~90.8svh card, which is 44.0% / 55.0%, and the missing 0.9 was supposed
+       to reach the hero through the flex-grow inversion below. It never did —
+       the hero is capped at --play-hero-h, so it stops at the cap and the
+       slack lands elsewhere. Measured 44.0% on every image card at every
+       phone size before this.
+       It also fixes the short viewports, which were further out than the tall
+       ones and in the other direction: where the footer hits its 56px floor,
+       45% of the card is 39.7svh, not 40.9. A viewport-fraction token cannot
+       express that and this one does not have to.
+       The clamp bounds are unchanged and still never bind on a real phone. */
+    --play-hero-h:     clamp(140px, calc(var(--play-card-h) * 0.45), 400px);
     --play-hero-min:   96px;
-    --play-right-min:  clamp(240px, 50svh, 500px);
+    --play-right-min:  clamp(240px, calc(var(--play-card-h) * 0.55), 500px);
     --play-pad-x:      clamp(16px, 5vw, 26px);
     --play-pad-y:      clamp(14px, 2.4svh, 22px);
     --play-gap:        clamp(8px, 1.6svh, 14px);
@@ -7644,10 +7702,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .pick-text { font-size: var(--play-label); line-height: 1.3; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { color: #1C2034; }
+  /* Tint only, same as the desktop rule — the ring lives on the swatch now, so
+     restating border-color here would put the box back around the words on
+     exactly the surface the note was written about. */
   .preview-overlay .pick-item[data-selected="true"],
   .preview-overlay .choice-list-item[data-selected="true"] {
     background: var(--brand-primary-soft, rgba(1,234,203,0.08));
-    border-color: var(--brand-primary, var(--color-green-500));
   }
   .preview-overlay .freeform-wrap {
     display: flex;
@@ -8370,8 +8430,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
        masthead no longer competes for room here — its media query is now the
        complement of the mobile one, so a portrait tablet gets the stacked
        card WITHOUT a masthead above it. */
-    --play-hero-h:     clamp(200px, 40svh, 560px);
-    --play-right-min:  clamp(360px, 50svh, 700px);
+    /* Same 45/55 of the same card — only the clamp bounds are this tier's. */
+    --play-hero-h:     clamp(200px, calc(var(--play-card-h) * 0.45), 560px);
+    --play-right-min:  clamp(360px, calc(var(--play-card-h) * 0.55), 700px);
     --play-title:      clamp(1.625rem, 3.4vw, 2rem);
     --play-subtitle:   clamp(0.9375rem, 2vw, 1.0625rem);
     --play-pad-x:      clamp(26px, 4vw, 44px);
@@ -8399,9 +8460,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
        44.3%. A sideways phone (844x390) lands nearer 41%, because there the
        answer's floor wins the tie-break — which is the priority this file has
        always stated and the one place the split is allowed to give. */
-    --play-hero-h:    clamp(96px, 40svh, 224px);
+    --play-hero-h:    clamp(96px, calc(var(--play-card-h) * 0.45), 224px);
     --play-hero-min:  60px;
-    --play-right-min: clamp(170px, 50svh, 280px);
+    --play-right-min: clamp(170px, calc(var(--play-card-h) * 0.55), 280px);
     --play-pad-y:     clamp(10px, 2svh, 16px);
     /* --play-title used to drop to clamp(17px, 4.8vw, 22px) here. This tier is
        the least room on the card and the question was paying for it: an iPhone

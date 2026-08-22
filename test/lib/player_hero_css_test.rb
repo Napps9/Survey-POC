@@ -98,22 +98,67 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
   # the failure is invisible because each token on its own still reads as a
   # sensible number. So pin the RATIO, not the values — every mobile tier is
   # free to state it at whatever absolutes that tier can afford.
+  #
+  # The tiers used to state the pair as viewport fractions, 40svh against
+  # 50svh, and that ratio is 44.4 rather than 45 — the difference was supposed
+  # to reach the hero through the flex-grow inversion and never did, because the
+  # hero stops at its own cap. Measured 44.0% on every image card. Worse on the
+  # short viewports, and in the other direction: where the footer hits its 56px
+  # floor, 45% of the card is 39.7svh, which no single viewport fraction can
+  # say. So the shares are now taken from --play-card-h, which is the card
+  # itself, and 45/55 is stated literally instead of approximated.
   test "the hero and the answer panel state one ratio, in every tier" do
     pairs = css.scan(
-      /--play-hero-h:\s*clamp\([^,]+,\s*([\d.]+)svh.*?--play-right-min:\s*clamp\([^,]+,\s*([\d.]+)svh/m
+      /--play-hero-h:\s*clamp\([^,]+,\s*calc\(var\(--play-card-h\)\s*\*\s*([\d.]+)\).*?
+       --play-right-min:\s*clamp\([^,]+,\s*calc\(var\(--play-card-h\)\s*\*\s*([\d.]+)\)/mx
     )
 
     assert_operator pairs.size, :>=, 3,
                     "expected the base, tablet-portrait and short-viewport tiers each to state " \
-                    "the pair — found #{pairs.size}"
+                    "the pair as shares of --play-card-h — found #{pairs.size}"
     pairs.each do |hero, right|
-      share = hero.to_f / (hero.to_f + right.to_f)
-      assert_in_delta 0.45, share, 0.01,
-                      "a mobile tier splits the card #{(share * 100).round(1)}/" \
-                      "#{((1 - share) * 100).round(1)}. The hero and the answer panel are tuned " \
-                      "as a PAIR to 45/55 (the split the owner asked for); moving one without " \
-                      "the other is the whole failure mode this pins."
+      assert_in_delta 0.45, hero.to_f, 0.001,
+                      "a mobile tier gives the hero #{hero} of the card, not 0.45"
+      assert_in_delta 1.0, hero.to_f + right.to_f, 0.001,
+                      "a tier's two shares come to #{hero.to_f + right.to_f}, not 1. They are " \
+                      "halves of one card; anything else means the pair has been retuned apart, " \
+                      "which is the failure mode this pins."
     end
+  end
+
+  # The token those shares are taken from has to be defined whatever matched.
+  # It lives on .preview-overlay OUTSIDE the phone media queries deliberately:
+  # every tier that reads it sits on that same element, but a var() resolving to
+  # nothing makes the whole calc invalid — which would void --play-hero-h and
+  # collapse the card rather than degrade it. Cheap to state, expensive to
+  # discover.
+  test "the card height is defined outside any media query" do
+    # Brace depth, not "before the first @media" — a top-level rule sits after
+    # plenty of earlier media blocks, and the naive version of this test failed
+    # on correct CSS for exactly that reason. Depth 1 is a bare rule; anything
+    # deeper is nested inside an at-rule.
+    stripped = css.gsub(%r{/\*.*?\*/}m, "")
+    depth = 0
+    depths = []
+    stripped.each_line do |line|
+      depths << depth if line.include?("--play-card-h:")
+      depth += line.count("{") - line.count("}")
+    end
+
+    assert_includes depths, 1,
+                    "--play-card-h is only declared inside an at-rule (found at brace " \
+                    "depth #{depths.inspect}). Every tier's hero and answer-panel size is " \
+                    "calc()'d from it, and an unresolved var() in a calc invalidates the " \
+                    "whole declaration — so a viewport that misses that query gets no card " \
+                    "layout at all, rather than a degraded one."
+    assert_match(/--play-card-h:\s*calc\(100svh\s*-\s*clamp\(/, css,
+                 "--play-card-h is no longer the viewport less the footer, which is the " \
+                 "definition the 45/55 shares are taken against")
+
+    refute_match(/--play-card-h:\s*calc\([^)]*\)\s*-\s*1px/, css,
+                 "the footer's 1px rule is being subtracted twice — its min-height is a " \
+                 "border-box measurement and already contains it. That cost 0.9px and landed " \
+                 "the split on 44.9% instead of 45.0.")
   end
 
   # The hero-slim test that used to sit here went with the class. It pinned the
