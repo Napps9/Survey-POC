@@ -819,12 +819,26 @@
   margin-top: auto;
   margin-bottom: auto;
 }
-/* The swipe card is the exception: it does not centre inside the scroller, it
-   GROWS to fill it (see .rotate-card-stack), so auto margins would fight the
-   flex growth for the space. */
+/* The swipe card is the exception: it does not centre with auto margins, it
+   GROWS to fill the scroller (see .rotate-card-stack), and auto margins would
+   fight that growth for the space.
+   It still has to centre once it STOPS growing, which is what the height cap
+   made possible and what the cap alone did not deliver. Measured A/B against
+   the old uncapped height: the 112px the cap handed back went entirely BELOW
+   the card — 89px above it and 238px under it on an iPhone 15 — because a
+   column flex container packs at flex-start by default, so free space falls
+   past the last child. The card read bottom-heavy, and "gives more room above
+   and below" got half of what it asked for.
+   `safe` centring, not plain: when a long question leaves the stack at its
+   floor and the scroller genuinely overflows, plain `center` would split the
+   overflow and put the top of the card at a negative scroll position nobody
+   can reach. `safe` falls back to flex-start exactly then. Same reasoning as
+   the auto-margin note above, same reasoning as .split-right's own
+   justify-content. */
 .split-right > .mt-2:has(> .rotate-wrap) > .rotate-wrap {
   flex: 1 1 auto;
   min-height: 0;
+  justify-content: safe center;
 }
 /* A scroll container clips at its padding box on BOTH axes (overflow-y: auto
    forces overflow-x to auto too), and the selection glow on .choice-card
@@ -7232,6 +7246,36 @@ body.generating-overlay-active .bottom-bar { display: none; }
      before this rule existed, because its scroller could not afford the cap.
      So this makes every phone agree with the one that was already right. */
   .preview-overlay .rotate-card-stack { min-height: 260px; max-height: 448px; }
+  /* 448 is an absolute, and "squarer" is a RATIO — so on a phone narrow enough
+     that the stack cannot reach 320px wide, the same cap draws a taller card
+     than the one it was written to replace. Measured on a folded phone (280px,
+     giving the stack 248px): 248×448 is 1.81, against the 1.75 that prompted
+     the note in the first place. Uncapped it is 1.89, so the cap does help
+     there — it just does not arrive at squarer.
+     A second, narrower tier rather than an aspect-ratio: the stack takes its
+     height from flex growth, not from its contents, and aspect-ratio loses to
+     a definite flex height.
+
+     380 rather than the 340 that would match a wide phone's 1.4, because the
+     arc pays for every pixel taken off this card and a narrow one has no
+     horizontal room to spare. Swept on a Fold with a six-point scale, which is
+     the tightest case there is — the closest pair of answers, by cap:
+
+       340 → 1.37, 2px apart     400 → 1.61,  8px
+       360 → 1.45, 4px           420 → 1.69, 10px
+       380 → 1.53, 6px           448 → 1.81, 12px
+
+     Twenty pixels of card buys two pixels of clearance, all the way down. 340
+     drew the squarest card and left the answers 2px apart, under the 3px floor
+     tap_card_fits_test holds — squarer is not worth answers that look joined.
+     380 is 1.53: clearly squarer than the 1.81 this tier replaces and than the
+     1.75 that prompted the request, with double the minimum clearance.
+     A wider phone is unaffected either way — an SE measures 13-14px between
+     the same six answers at every cap in that table, because the arc has the
+     width it needs. This is a narrowness problem, not a height one. */
+  @media (max-width: 340px) {
+    .preview-overlay .rotate-card-stack { max-height: 380px; }
+  }
   /* The vessel scales with the phone instead of assuming the smallest one.
      232px was chosen so the liquid column fits a short viewport, and then
      applied to every viewport — so a tall phone drew the same small vessel
@@ -7609,8 +7653,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
      off the scroll container instead, sticky to the bottom edge and last in
      DOM order so it paints over the row sliding under it. On a grid that
      fits, it is white fading into white and disappears. */
+  /* The tap card belongs on this list too, and was the one answer type with no
+     cue at all. Its stack normally grows to fill the scroller and nothing
+     overflows — but give a card a long enough question and the header takes
+     the room the stack needs, the stack stops at its 260px floor, and the
+     scroller genuinely does scroll: measured 104px over on a 320×480 phone
+     with a 24-word stem, 10px on a folded one. _fitCard sets .is-scrollable
+     for it exactly as it does for a list; there was simply no rule listening,
+     so the only signal was the bare scrollbar — which is the thing the owner
+     objected to in the first place. Same construction as the grids: the wrap
+     is a flex column and an ::after on it would be a sibling the 12px gap
+     pushes around, so it hangs off the scroll container instead. */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2.is-scrollable::after,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2.is-scrollable::after {
+  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2.is-scrollable::after,
+  .preview-overlay .preview-card[data-card-type="tap_card"] .mt-2.is-scrollable::after {
     content: "";
     flex: 0 0 auto;
     position: sticky;
