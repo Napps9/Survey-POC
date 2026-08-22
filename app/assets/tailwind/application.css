@@ -2297,10 +2297,21 @@
    text-stroke thickens the strokes without touching a single advance width,
    so the line breaks exactly where it did unselected. Same paint as a heavier
    weight; none of the layout. */
+/* …and it must not become unreadable either. The label used to take the RAW
+   brand primary, which is a rule that works for some brands and silently fails
+   for others: on the Playverto default (#01EACB) this measured 1.47:1 against
+   the row's own tint, down from 15.1:1 the moment you chose the answer. A dark
+   brand hides the problem; a teal, lime, yellow or pale pink does not, and a
+   client can pick any of them.
+   --brand-primary-ink is the same hue taken down only as far as 4.5:1 requires
+   (BrandPalette#readable_ink) — a mid blue or a navy comes through untouched.
+   The fallback is that derivation applied to the default palette, which emits
+   no variables at all: #01EACB against #E1FCF9 resolves to #017E6E, 4.63:1.
+   The stroke rides currentColor, so it follows. */
 .pick-item[data-selected="true"] .pick-text {
   -webkit-text-stroke: 0.4px currentColor;
   paint-order: stroke fill;
-  color: var(--brand-primary, var(--color-green-500));
+  color: var(--brand-primary-ink, #017E6E);
 }
 
 /* ── Image list (single + multi) ────────────────── */
@@ -2608,9 +2619,11 @@
    this the grid had no selected style for its caption at all, so the wrapper
    ring was the only thing marking the text, which is exactly the box-drawn-
    around-the-words problem. Colour here, ring on the tile: two families, one
-   vocabulary. */
+   vocabulary. Same legible derivation as the list row — see the note there;
+   this caption sits on plain white rather than a tint, which is the easier of
+   the two surfaces, so the one variable serves both. */
 .choice-card[data-selected="true"] .choice-label {
-  color: var(--brand-primary, var(--color-green-500));
+  color: var(--brand-primary-ink, #017E6E);
 }
 
 /* ── Rich-text toolbar (editor chrome) ───────────── */

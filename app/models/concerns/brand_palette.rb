@@ -55,7 +55,12 @@ module BrandPalette
       "text"         => contrast_text(p["bg"]),
       "surface"      => lighten(p["bg"], 0.08),
       "surface_2"    => lighten(p["bg"], 0.13),
-      "primary_soft" => rgba(p["primary"], 0.12)
+      "primary_soft" => rgba(p["primary"], 0.12),
+      # Measured against the surface it actually lands on: the selected row is
+      # primary_soft over white, and compositing rgba(P, 0.12) onto white is
+      # exactly lighten(P, 0.88). Deriving against plain white would be a
+      # slightly easier test than the real one.
+      "primary_ink"  => readable_ink(p["primary"], on: lighten(p["primary"], 0.88))
     )
   end
 
@@ -86,6 +91,45 @@ module BrandPalette
     contrast_white = 1.05 / (l + 0.05)
     contrast_dark  = (l + 0.05) / 0.05
     contrast_dark >= contrast_white ? "#1C2034" : "#FFFFFF"
+  end
+
+  def contrast_ratio(a, b)
+    la, lb = luminance(a), luminance(b)
+    hi, lo = [ la, lb ].max, [ la, lb ].min
+    (hi + 0.05) / (lo + 0.05)
+  end
+
+  # The brand colour, made legible AS TEXT on a light surface — same hue, taken
+  # down only as far as it has to go.
+  #
+  # This exists because "the selected option turns brand colour" is a rule that
+  # works for some brands and not others, and nothing was checking which. The
+  # Playverto default primary is #01EACB: as 16px text on the selected row's own
+  # near-white tint that measures 1.47:1, against 15.1:1 for the same label
+  # unselected. Choosing an answer made it almost disappear. A dark brand hides
+  # the problem entirely, which is why it went unnoticed — it is the light
+  # brands (a teal, a lime, a yellow, a pale pink) that break, and a client can
+  # pick any of them.
+  #
+  # contrast_text can't do this job: it answers "black or white?", and the point
+  # here is to STAY the brand colour. So darken in place until the ratio clears,
+  # which preserves the hue (darken multiplies all three channels) and stops at
+  # the first step that passes rather than going as dark as it can.
+  #
+  # 4.5:1 is the WCAG AA floor for text this size. Black clears it against any
+  # light surface, so the loop always terminates; the final fallback is only
+  # there so a malformed colour cannot return nil into a CSS variable.
+  def readable_ink(hex, on:, min_ratio: 4.5)
+    return hex unless valid_hex?(hex.to_s) && valid_hex?(on.to_s)
+    return hex if contrast_ratio(hex, on) >= min_ratio
+
+    step = 0.0
+    while step < 1.0
+      step += 0.02
+      candidate = darken(hex, step)
+      return candidate if contrast_ratio(candidate, on) >= min_ratio
+    end
+    "#1C2034"
   end
 
   def darken(hex, amount)

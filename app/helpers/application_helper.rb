@@ -583,7 +583,8 @@ module ApplicationHelper
       "--brand-text"         => r["text"],
       "--brand-surface"      => r["surface"],
       "--brand-surface-2"    => r["surface_2"],
-      "--brand-primary-soft" => r["primary_soft"]
+      "--brand-primary-soft" => r["primary_soft"],
+      "--brand-primary-ink"  => r["primary_ink"]
     }.map { |k, v| "#{k}:#{v}" }.join(";")
   end
 
