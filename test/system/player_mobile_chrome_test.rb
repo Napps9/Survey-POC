@@ -140,10 +140,45 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
                  "the selection ring is still on the <li>, which encloses the caption text — " \
                  "'can the selection be just the box, and not the text as well?'"
     assert_includes shadows["tile"], "rgb(1, 234, 203)",
-                    "the tile itself should carry the brand ring"
-    assert_equal "rgb(1, 234, 203)", shadows["label"],
-                 "the caption should turn brand when selected, the way a .choice-list row's " \
-                 "label already does"
+                    "the tile itself should carry the brand ring — the RING is chrome and " \
+                    "takes the raw brand colour; only the text had to move (see below)"
+
+    # This used to assert the raw brand primary, rgb(1, 234, 203), and it was
+    # wrong in a way a colour-equality test cannot notice: on the default
+    # palette that is 1.54:1 against the white caption row. Choosing an answer
+    # took its label from 16:1 to almost invisible, and the assertion held the
+    # bug in place because it only ever asked "is it the brand colour?".
+    #
+    # It is now the brand colour made legible — same hue, darkened only as far
+    # as 4.5:1 requires (BrandPalette#readable_ink). So this asserts the
+    # PROPERTY rather than the constant: a future brand, or a retuned
+    # derivation, should be free to land on a different value and still pass —
+    # what must never come back is a caption nobody can read.
+    ink = BrandPalette.resolve(BrandPalette::DEFAULT)["primary_ink"]
+    expected = "rgb(%d, %d, %d)" % BrandPalette.rgb(ink)
+    assert_equal expected, shadows["label"],
+                 "the caption should turn the READABLE brand colour when selected. The raw " \
+                 "primary is #{BrandPalette.contrast_ratio(BrandPalette::DEFAULT['primary'],
+                    BrandPalette.lighten(BrandPalette::DEFAULT['primary'], 0.88)).round(2)}:1 " \
+                 "on this surface, which is why it is not what lands here any more."
+
+    surface = page.evaluate_script(<<~JS)
+      (() => {
+        const li = document.querySelector('.preview-card.active .choice-card[data-selected="true"]')
+        let n = li.querySelector(".choice-label")
+        while (n) {
+          const bg = getComputedStyle(n).backgroundColor
+          if (bg && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(bg)) return bg
+          n = n.parentElement
+        }
+        return "rgb(255, 255, 255)"
+      })()
+    JS
+    ratio = BrandPalette.contrast_ratio(ink, "#%02X%02X%02X" % surface.scan(/\d+/).first(3).map(&:to_i))
+    assert_operator ratio, :>=, 4.5,
+                    "the selected caption reads at #{ratio.round(2)}:1 against #{surface}. " \
+                    "Whatever colour selection turns the label, a respondent has to be able " \
+                    "to read the answer they just chose."
   end
 
   # On a phone the CARD IS THE SCREEN, so the footer belongs to the card rather
