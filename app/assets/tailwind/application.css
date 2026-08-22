@@ -3222,8 +3222,13 @@
 .book-page {
   position: absolute; inset: 0;
   border-radius: 18px;
-  background: white;
-  box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+  /* Warm paper, not white: the page floats on a white panel on phones, and
+     white-on-white read as a box inside a box ("the scenario question type
+     card ... not good"). The hairline plus a two-layer shadow makes it a
+     thing LYING ON the card rather than a second card. */
+  background: #FDFCF7;
+  border: 1px solid rgba(28,32,52,0.06);
+  box-shadow: 0 12px 30px rgba(28,32,52,0.14), 0 2px 6px rgba(28,32,52,0.06);
   overflow: hidden;
   transform-origin: left center;
   /* Arriving page: opacity resolves well inside the transform so the page is
@@ -3241,6 +3246,26 @@
   transition: transform 0.52s cubic-bezier(.4,0,.2,1), opacity 0.3s ease 0.22s;
 }
 .forms-mode .book-page { transition: none; }
+/* The stacked page-edges behind the current page stay — they are the
+   "there's more" affordance — but as PAPER edges, not readable content:
+   the answer page's last option ("Not for me", on a green tile) was legible
+   through the stack under the story, quietly spoiling the choices.
+   layout() stamps aria-hidden on every non-current page, so that state is
+   the hook.
+
+   The delay is the animation's, not decoration. A page being turned away
+   gets aria-hidden at turn START; an instant visibility flip would blank it
+   mid-rotation and the turn would read as a card flipping over empty. The
+   rotation runs 0.52s, so the content stays for 0.55 and vanishes once the
+   page is edge-on. The base state carries no delay, so an ARRIVING page's
+   content appears the moment it becomes current. Forms mode needs no carve-
+   out: its pages snap to opacity 0 instantly, and a delayed visibility flip
+   on an invisible page changes nothing. */
+.book-page[aria-hidden="true"] .book-page-scroll,
+.book-page[aria-hidden="true"] .book-page-corner {
+  visibility: hidden;
+  transition: visibility 0s 0.55s;
+}
 /* Scrolls when a page runs long, but never shows a scrollbar — it should
    read as a page, not a textarea. Overflow is cued by .book-page-fade
    instead of a visible bar (see .book-page.has-more below). */
@@ -3341,6 +3366,33 @@
    this much bolder — on page 1 of 2 the back chevron is the first thing a
    respondent sees and it looked like a rendering fault. */
 .preview-overlay .book-chevron:disabled { opacity: 0.3; }
+/* ── The pager capsule ────────────────────────────────────────────────────
+   In the player the row IS the control: chevrons and dots merge into one
+   brand-tinted capsule — ‹ · · · › — because two bare grey circles under a
+   dot strip were an unlabelled duplicate of the footer's Next (which turns
+   pages itself via _scenarioTurn) and the card stacked two rows of round
+   controls with nothing saying which "next" was which. One capsule, one
+   obvious job, a shape plainly different from the footer's pills.
+
+   The markup puts the dots between the chevrons in player mode only (see
+   _card_component's book branches); these rules are what fuse the three
+   into one instrument. The chevrons lose their own borders and fills — the
+   capsule is the surface now — but keep their 44px: that is the touch
+   floor, and the reasons on the sizing rule above have not moved. */
+.preview-overlay .book-nav-row {
+  align-self: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--brand-primary, #01EACB) 10%, #fff);
+  border: 1px solid color-mix(in srgb, var(--brand-primary, #01EACB) 22%, #fff);
+}
+.preview-overlay .book-nav-row .book-chevron {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+.preview-overlay .book-nav-row .book-dots { gap: 7px; padding: 0 4px; }
 
 .book-nav-row .next-btn {
   font-family: "Alata", sans-serif; font-size: 13px; letter-spacing: 0.03em;

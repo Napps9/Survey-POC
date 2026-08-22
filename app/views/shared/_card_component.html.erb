@@ -495,7 +495,15 @@
           </div>
         <% end %>
 
-        <div class="book-dots" data-scenario-target="dots"></div>
+        <%# In the player the dots live INSIDE the nav row, between the two
+            chevrons, so the three read as ONE pager capsule (‹ · · · ›)
+            rather than a dot strip floating above a pair of anonymous
+            circles — the owner's pick from the three mocked treatments. The
+            editor keeps the dots above the row: its row carries the
+            full-width "Next page ›" button, which a capsule cannot hold. %>
+        <% if editable %>
+          <div class="book-dots" data-scenario-target="dots"></div>
+        <% end %>
 
         <div class="book-nav-row">
           <button type="button" class="book-chevron" data-scenario-target="prevBtn"
@@ -504,6 +512,7 @@
             <button type="button" class="next-btn" data-scenario-target="nextBtn"
                     data-action="click->scenario#next"><%= t("js.editor.scenario.next_page_btn", default: "Next page ›") %></button>
           <% else %>
+            <div class="book-dots" data-scenario-target="dots"></div>
             <button type="button" class="book-chevron" data-scenario-target="nextBtn"
                     data-action="click->scenario#next" aria-label="<%= t('js.editor.scenario.next_page', default: 'Next page') %>">›</button>
           <% end %>
@@ -576,7 +585,15 @@
           </div>
         <% end %>
 
-        <div class="book-dots" data-scenario-target="dots"></div>
+        <%# In the player the dots live INSIDE the nav row, between the two
+            chevrons, so the three read as ONE pager capsule (‹ · · · ›)
+            rather than a dot strip floating above a pair of anonymous
+            circles — the owner's pick from the three mocked treatments. The
+            editor keeps the dots above the row: its row carries the
+            full-width "Next page ›" button, which a capsule cannot hold. %>
+        <% if editable %>
+          <div class="book-dots" data-scenario-target="dots"></div>
+        <% end %>
 
         <div class="book-nav-row">
           <button type="button" class="book-chevron" data-scenario-target="prevBtn"
@@ -585,6 +602,7 @@
             <button type="button" class="next-btn" data-scenario-target="nextBtn"
                     data-action="click->scenario#next"><%= t("js.editor.scenario.next_page_btn", default: "Next page ›") %></button>
           <% else %>
+            <div class="book-dots" data-scenario-target="dots"></div>
             <button type="button" class="book-chevron" data-scenario-target="nextBtn"
                     data-action="click->scenario#next" aria-label="<%= t('js.editor.scenario.next_page', default: 'Next page') %>">›</button>
           <% end %>
