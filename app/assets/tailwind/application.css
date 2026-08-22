@@ -6169,7 +6169,12 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   flex-shrink: 0; height: 80px;
   display: flex; align-items: center; justify-content: center;
   gap: 16px; padding: 0 32px;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  /* No border-top. The bar used to draw a faint hairline the full width of
+     the overlay, directly under the card — "remove the boarder between the
+     CTA's and the card, have the games CTA's floating". The separation is
+     space now: the desktop player block below pads .preview-body's bottom so
+     the pills float clear of the card. (On a phone the footer is lifted out
+     of flow entirely — its own media block owns that.) */
 }
 .preview-progress-text {
   font-family: "Alata", sans-serif; font-size: 12px;
@@ -8240,11 +8245,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
     box-shadow: 0 6px 18px rgba(0,0,0,0.18);
   }
   /* The points counter never renders here — it is display: none earlier in
-     this same block. What does sit on the white bar is the quiz/token score
-     chips, whose --brand-cta fill reads as shape-on-white the same way Next
-     does: their labels are dark-on-teal and legible, the pill outline is
-     chrome. Left alone. Back is inverted where it is actually defined,
-     further down this block. */
+     this same block. What does ride the floating strip is the quiz/token
+     score chips, whose --brand-cta fill reads as a shape on the white card
+     beneath them the same way Next does: their labels are dark-on-teal and
+     legible, the pill outline is chrome. Left alone. Back is inverted where
+     it is actually defined, further down this block. */
   .preview-overlay .preview-btn {
     flex: 1 1 0;
     max-width: var(--play-btn-max-w);
@@ -9408,6 +9413,50 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* The masthead already covers the thank-you card at this width — a second
      copy inside the card itself would double up. */
   .player-thankyou-logo { display: none; }
+
+  /* ── Desktop player: the card fits its box, and the CTAs float ──────────
+     The 850x680 card was a fixed fact inside a centred, overflow:hidden
+     .preview-body — so on any window shorter than the card plus its chrome
+     (lang bar, an org masthead, a Test Mode strip, the 80px footer) the
+     overflow split evenly and the TOP half vanished with no scroll path.
+     The top of a card is its instruction eyebrow: "the 'how to play' prompt
+     for users is being cut off at the top of the card". A 1280x800 laptop
+     lost ~43px, an iPad mini in landscape ~86px, and card_header_pinned_test
+     couldn't see it because it measures the header against .split-card's own
+     rect, which moves with the card when the body clips it.
+
+     Three rules, one mechanism. The card's height consumes --play-card-h —
+     the player controller's own measurement of .preview-body, written as an
+     inline style by a ResizeObserver (see player_card_box_test for that
+     half) — less this box's 28px top and 24px bottom padding, clamped to the
+     classic 680 above and a 520 floor below, under which five answer pills
+     stop fitting. The bottom padding is also the CTA float: with the base
+     footer hairline gone, 24px of backdrop is what separates the card from
+     the pills ("if the bottom of the card hits the CTAs move the card height
+     to avoid the cta and the cards overlapping or touching"). And below the
+     floor the auto margins collapse (same idiom as the answer scroller's
+     centring, further up this file) so the body scrolls flush-top instead of
+     hiding the question.
+
+     Scoped to the PLAYER overlay: the editor's inline preview and the device
+     frames share these class names but not the player controller, and the
+     create wizard already opts its card out of the fixed height. Consume
+     --play-card-h, never redeclare it — the inline style would win anyway
+     (player_hero_css_test pins the one CSS declaration this falls back to).
+     No --play-hero-h/--play-right-min pair here on purpose: those tokens are
+     the mobile tiers' 45/55 contract and the test that holds them sums the
+     pairs it finds. */
+  .preview-overlay[data-controller~="player"] .preview-body {
+    padding-bottom: 24px;
+    overflow-y: auto;
+  }
+  .preview-overlay[data-controller~="player"] .preview-body > .preview-card,
+  .preview-overlay[data-controller~="player"] .preview-body > .preview-thankyou {
+    margin-top: auto; margin-bottom: auto;
+  }
+  .preview-overlay[data-controller~="player"] .split-card {
+    height: clamp(520px, calc(var(--play-card-h) - 52px), 680px);
+  }
 }
 
 /* Player: slim language switcher bar (replaces the old logo+title nav).
