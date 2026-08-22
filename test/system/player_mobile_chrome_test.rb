@@ -227,21 +227,52 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
                      "the row lost its soft brand tint too. The tint fills the box, which is "                      "the box — without it a chosen row in a long list is hard to find."
   end
 
-  # On a phone the CARD IS THE SCREEN, so the footer belongs to the card rather
-  # than to the backdrop behind it. It never had a background of its own — it
-  # was transparent and the Verto's brand backdrop showed through — so the
-  # white card ran to the footer's top edge and the bar read as a dark strip
-  # pasted underneath it ("weird black bit at the bottom is still there, should
-  # be white"). Desktop is deliberately unchanged: there the card floats ON the
-  # backdrop and the bar belongs to the backdrop.
-  test "the mobile footer continues the card rather than showing the backdrop" do
+  # On a phone the CARD IS THE SCREEN, so no band of backdrop may show beneath
+  # it — "weird black bit at the bottom is still there, should be white".
+  #
+  # This test used to pin the fix rather than the requirement. The footer never
+  # had a background of its own: it was transparent, the Verto's brand backdrop
+  # showed through, and the white card stopped at the bar's top edge, so the
+  # bar read as a dark strip pasted underneath. Painting the bar white closed
+  # the gap, and this asserted rgb(255,255,255) — which was the mechanism, not
+  # the ask.
+  #
+  # The controls float now (see "THE CONTROLS FLOAT" in application.css), so
+  # the bar is transparent AGAIN and there is still no strip, because there is
+  # no longer anything below the card for a strip to be: the card runs to the
+  # bottom of the screen and the pills sit on top of it. Pinning white would
+  # now fail on a correct player.
+  #
+  # So pin the requirement both ways round. The card must reach the bottom —
+  # that kills the strip whatever the bar is doing — and the bar must be out of
+  # flow, because an IN-FLOW transparent bar is exactly how the strip came back
+  # the first time.
+  test "no band of backdrop shows beneath the card" do
     open_player
-    bg = page.evaluate_script(
-      "getComputedStyle(document.querySelector('.preview-footer')).backgroundColor"
-    )
-    assert_equal "rgb(255, 255, 255)", bg,
-                 "the footer is #{bg}. Transparent (rgba(0,0,0,0)) means the brand backdrop is " \
-                 "showing through it again, which is the dark strip this fixed."
+    m = page.evaluate_script(<<~JS)
+      (() => {
+        const ov   = document.querySelector(".preview-overlay")
+        const card = document.querySelector(".preview-card.active .split-card")
+        const foot = document.querySelector(".preview-footer")
+        const b = (el) => Math.round(el.getBoundingClientRect().bottom)
+        return {
+          gap: b(ov) - b(card),
+          position: getComputedStyle(foot).position,
+          footerBg: getComputedStyle(foot).backgroundColor,
+          overlayBg: getComputedStyle(document.querySelector(".preview-body")).backgroundColor
+        }
+      })()
+    JS
+
+    assert_operator m["gap"], :<=, 1,
+                    "there are #{m['gap']}px between the bottom of the card and the bottom of " \
+                    "the screen, and #{m['overlayBg']} is what shows in them. That is the dark " \
+                    "strip, back again."
+    assert_equal "absolute", m["position"],
+                 "the footer is back in flow (#{m['position']}). In flow it takes its height " \
+                 "out of the card, so unless it also paints itself the same colour as the card " \
+                 "the strip returns — which is the trap this fell into once already. Out of " \
+                 "flow it cannot, whatever colour it is."
   end
 
   # The half of that change that is easy to miss, and did get missed: the

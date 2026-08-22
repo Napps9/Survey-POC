@@ -424,6 +424,15 @@ export default class extends Controller {
     //
     // What is left is the one thing a scrolling answer needs more than a
     // shedding one ever did: telling the respondent there is more below.
+    // No need to measure with is-scrollable cleared first, and it was worth
+    // checking rather than assuming, because the class is no longer passive —
+    // the floating controls hang the answer's runway off it. It cancels: the
+    // class adds a negative bottom margin to the box (clientHeight up by the
+    // pill zone) and the same padding to its content (scrollHeight up by the
+    // pill zone), so the difference is unchanged and the state cannot latch.
+    // Tried it both ways against a grid taken from overflowing to fitting;
+    // identical. What keeps that true is the reach guard in
+    // floating_footer_test — remove the margin and it fails there.
     const over = box.scrollHeight - box.clientHeight
 
     // The fade is drawn over the last of the content, so it has to know

@@ -5848,6 +5848,17 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
      than degrade it. A token that load-bearing should not depend on which
      media query happened to match. */
   --play-card-h: calc(100svh - clamp(56px, 9svh, 80px));
+  /* THE STRIP THE FLOATING CONTROLS OWN. Back and Next are lifted out of flow
+     on a phone (search "the controls float"), so the bottom of the card is no
+     longer the bottom of the answer — this is how much of it is spoken for.
+     Its first term is the footer's own min-height, stated once here and read
+     there, so the two cannot drift; the safe-area inset because the bar asks
+     for it too; and 12px of air, because landing a respondent's last option
+     exactly on the pill's edge measured as "clear" and read as touching.
+     Defined out here for the same reason --play-card-h is: every rule that
+     reads it sits on this element, and a var() that resolves to nothing voids
+     the whole calc rather than degrading it. */
+  --play-pill-zone: calc(clamp(56px, 9svh, 80px) + env(safe-area-inset-bottom, 0px) + 12px);
   position: fixed; inset: 0; z-index: 60;
   background-color: var(--brand-bg, #1C2034);
   background-image: var(--brand-bg-image, none);
@@ -7647,6 +7658,92 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding-left: 32px;
     padding-right: 32px;
   }
+  /* The required-answer nudge was the other thing standing on the bar's roof.
+     It is a sibling of the footer, so with the footer out of flow it became
+     the last in-flow element and landed squarely behind the pills — measured
+     69px behind on an iPhone 15, 56 on a 320, i.e. entirely invisible at every
+     size. It is the message a respondent gets for pressing Next without
+     answering, so invisible is the worst possible outcome: they press again.
+
+     Absolute rather than a margin, so it costs the card no height when it is
+     not showing. And it needs its own surface now: #FFC24B was chosen against
+     the brand backdrop the old bar let through, and the card that now runs to
+     the bottom of the screen is WHITE — amber on white measures 1.7:1. Same
+     self-backing dark pill .preview-progress-text already uses for exactly
+     this reason. */
+  .preview-overlay .preview-required-hint {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: var(--play-pill-zone);
+    z-index: 31;
+    max-width: calc(100% - 32px);
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(20,23,38,0.66);
+    backdrop-filter: blur(6px);
+    color: #FFD98A;
+    pointer-events: none;
+  }
+
+  /* ── Keeping the answer out from under the floating controls ──────────
+     The controls no longer take their height out of the card, so the panel
+     runs all the way to the bottom of the screen and whatever sits at the
+     foot of it lands behind the pills. Measured across every answer type on
+     an iPhone 15, with the controls floating and nothing else changed:
+
+       welcome pills          51px behind      consent chevrons  51px behind
+       "+ Other" CTA          51px behind      last list option  51px behind
+       prioritise last row    50px behind      grid last tile    39px behind
+       tap card's Reset       17px behind
+
+     Note the grid: 39px behind while its answer does not scroll at all. This
+     is not only a scrolling problem, so a scrolling fix alone would have left
+     six of those seven still broken. Two rules, with different jobs.
+
+     ONE — everything that is LAID OUT keeps clear. Padding the panel moves its
+     bottom edge above the pills, so `justify-content: safe center` centres
+     against the room that actually exists and every non-scrolling shape — the
+     grid that fits, the tap card's Reset, the book's page-turn chevrons, the
+     "+ Other" CTA that sits outside the scroller — comes up with it. */
+  .preview-overlay .split-card .split-right {
+    padding-bottom: var(--play-pill-zone);
+  }
+  /* TWO — the answer alone is allowed back under them, because that is what
+     floating controls are FOR: options passing beneath the pills as you scroll
+     is the whole difference between this and a bar. The negative margin
+     returns the strip the padding above just took, and the runway on the
+     content restores the reach, so the last option can still be brought clear
+     of the controls instead of stopping behind them.
+
+     `flex: 0 0 auto` is not tidiness and the runway does not work without it.
+     These children are shrinkable flex items that have already been squeezed
+     BELOW their own content — the grid measured 725px tall with its own rows
+     painting to 761 — so padding lands above the spill and changes nothing
+     visible. Measured: with padding alone the last tile stayed 62px behind the
+     pills; with the shrink stopped first it cleared by 32.
+
+     Scoped to .is-scrollable, which is the state _fitCard sets when the answer
+     genuinely overflows. An answer that fits has nothing to bring clear and
+     the padding above has already lifted it.
+
+     And to :last-child, which is not belt-and-braces — it is the fix for a
+     regression this caused. A negative margin does not shorten the box, it
+     lets the box OVERLAP whatever follows it, and on a card with "+ Other"
+     what follows it is the CTA: the scroller ran 88px past its own layout box
+     and an option row landed on top of the button. elementFromPoint at the
+     button's centre returned .choice-list-item, and player_reveal_field_test
+     could not click it. So the answer may only bleed under the controls when
+     it is the last thing in the panel; where a CTA sits below it, the panel's
+     padding is the whole answer and nothing overlaps. */
+  .preview-overlay .split-card .split-right > .mt-2.is-scrollable:last-child {
+    margin-bottom: calc(var(--play-pill-zone) * -1);
+  }
+  .preview-overlay .split-card .split-right > .mt-2.is-scrollable:last-child > * {
+    flex: 0 0 auto;
+    padding-bottom: var(--play-pill-zone);
+  }
+
   /* ...and the pad that inset creates has to belong to the PAGE, or the inset
      only moves the problem. touch-action: none is on .slider-track (:2101),
      which now starts 32px in; the 32px either side of it is .slider-track-wrap
@@ -8107,20 +8204,39 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-btn-h:      44px;      /* desktop is 40; this is the touch floor */
     --play-btn-fs:     0.9375rem; /* 15px — desktop's, raised from 13 to match */
 
-    /* White, because on a phone the CARD IS THE SCREEN.
-       The footer has never had a background of its own — it is transparent and
-       the Verto's brand backdrop shows through it. On desktop that is right:
-       the card floats on the backdrop and the bar belongs to the backdrop. Full
-       bleed it is not, because the white card runs to the footer's top edge and
-       the bar reads as a dark strip pasted under it ("weird black bit at the
-       bottom is still there, should be white").
-       Mobile only, deliberately. Painting the desktop footer white would put a
-       white bar across a branded backdrop the card is only floating on. */
-    background: #fff;
-    /* The hairline was rgba(255,255,255,0.07) — a white line for a dark bar,
-       invisible the moment the bar turns white. Inverted so the seam between
-       the answer and the controls still reads. */
-    border-top: 1px solid rgba(0,0,0,0.08);
+    /* THE CONTROLS FLOAT. There is no bar on a phone any more — Back and Next
+       are lifted out of flow and sit on the card itself.
+
+       This is the third answer to the same question and the history is the
+       argument. The footer originally had no background at all, which on
+       desktop is right (the card floats ON the backdrop, so the bar belongs to
+       the backdrop) and on a phone was wrong, because there the card IS the
+       screen and a transparent bar read as a dark strip pasted under the white
+       card ("weird black bit at the bottom is still there, should be white").
+       So it was painted white. That worked, and cost 69px — 9% of a 768px
+       screen — taken out of every card before the hero and the answer divided
+       what was left.
+
+       Out of flow, that 69px goes back to the card: measured 609 -> 679 on an
+       iPhone 15 in Test Mode, and the 45/55 split re-derived itself with
+       nothing retuned, because _fitCardHeight measures .preview-body rather
+       than trusting a viewport calc. The strip the pills stand on is
+       --play-pill-zone, and what keeps the answer out of it is the padding and
+       runway further down this block.
+
+       Mobile only. On desktop the bar still belongs to the backdrop. */
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 30;
+    background: transparent;
+    border-top: none;
+  }
+  /* The pills are now the only thing separating the controls from whatever is
+     behind them, which on an option grid is a full-bleed gradient tile. Back
+     gets a near-opaque surface rather than the 5% wash it wore against a white
+     bar — at 5% over a saturated tile it is not a button, it is a smudge. */
+  .preview-overlay .preview-btn {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
   }
   /* The points counter carries its own dark backing pill so it can sit on any
      backdrop — still true, still correct on white. Left alone.
@@ -8147,13 +8263,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
      present, visible and opacity 1, and could not be seen at all. A reminder
      that "visible" in the DOM is not the same as legible on screen. */
   .preview-overlay .preview-btn-back {
-    background: rgba(0,0,0,0.05);
+    background: rgba(255,255,255,0.94);
     backdrop-filter: none;
     color: #1C2034;
-    border: 1px solid rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.10);
   }
   .preview-overlay .preview-btn-back:hover {
-    background: rgba(0,0,0,0.09);
+    background: #fff;
     color: #1C2034;
   }
   .preview-overlay .preview-btn-back.invisible {
