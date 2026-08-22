@@ -166,4 +166,75 @@ class BrandLogoOnLightTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "light-only.png",
                     "the welcome card rendered no logo for an account that has one"
   end
+
+  # ── The second slot inherits the first slot's manners ──
+  #
+  # It shipped without them. The size and content-type guard named `logo`
+  # directly, so a 3 MB PDF attached to the light slot and the record validated
+  # clean — a second upload with none of the first one's checks. The scrubber in
+  # the controller had already been written as a loop over both, for the same
+  # class of reason, which makes the omission here the odd one out rather than a
+  # deliberate difference.
+  #
+  # The fields are LISTED HERE, not read from Organisation::LOGO_ATTACHMENTS.
+  # Driving the loop off the constant looked tidier and was a test that could
+  # not fail: dropping a field from the constant is exactly the regression, and
+  # it would also have deleted the test for it — the suite went from 15 runs to
+  # 12 and reported one failure instead of three. The constant is asserted
+  # separately below so a new slot still cannot arrive unguarded.
+  %i[logo logo_on_light].each do |field|
+    test "#{field} refuses a file that is not a supported image" do
+      login
+      patch organisation_path(@org),
+            params: { organisation: { field => upload("brochure.pdf", "application/pdf", "%PDF-1.4") } },
+            headers: { "Accept" => "application/json" }
+
+      assert_response :unprocessable_entity
+      assert_match(/PNG|image/i, JSON.parse(response.body)["error"].to_s,
+                   "#{field} accepted a PDF, or refused it without saying why")
+      refute @org.reload.public_send(field).attached?,
+             "#{field} stored a PDF"
+    end
+
+    test "#{field} refuses a file over the size cap" do
+      login
+      oversized = upload("huge.png", "image/png", "a" * (Organisation::LOGO_MAX_BYTES + 1))
+      patch organisation_path(@org),
+            params: { organisation: { field => oversized } },
+            headers: { "Accept" => "application/json" }
+
+      assert_response :unprocessable_entity
+      assert_match(/MB/, JSON.parse(response.body)["error"].to_s,
+                   "#{field} accepted an oversized file, or refused it without a readable reason")
+      refute @org.reload.public_send(field).attached?, "#{field} stored an oversized file"
+    end
+  end
+
+  test "every attached logo slot is covered by the guard" do
+    # The other half of the pair above: that loop pins the two slots that exist
+    # today, and this pins that no THIRD one appears without them. Read off the
+    # model's own attachment reflection rather than a list someone has to
+    # remember to update.
+    attached = Organisation.reflect_on_all_attachments.map(&:name)
+                           .select { |n| n.to_s.include?("logo") }.sort
+
+    assert_equal attached, Organisation::LOGO_ATTACHMENTS.sort,
+                 "these logo attachments are not in LOGO_ATTACHMENTS, so nothing checks " \
+                 "their type or size: #{(attached - Organisation::LOGO_ATTACHMENTS).inspect}"
+  end
+
+  test "the guard names the field that was wrong, not just 'logo'" do
+    # An account uploading a bad light logo should not be told its main logo is
+    # the problem — there are two slots on that page and only one of them is.
+    @org.logo_on_light.attach(io: StringIO.new("%PDF-1.4"), filename: "b.pdf",
+                              content_type: "application/pdf")
+
+    refute @org.valid?
+    assert @org.errors[:logo_on_light].any?,
+           "the error was filed against the wrong attachment, so the settings page cannot " \
+           "point at the field the creator actually needs to fix"
+    assert_empty @org.errors[:logo],
+                 "a bad light logo raised an error against the main logo, which is attached " \
+                 "and fine"
+  end
 end

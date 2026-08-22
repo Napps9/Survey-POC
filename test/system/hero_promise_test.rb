@@ -114,6 +114,46 @@ class HeroPromiseTest < ApplicationSystemTestCase
     assert_not h["shown"], "NPS was given a header; its scale cannot give the room back."
   end
 
+  # Dropping the header must not drop what was PARKED INSIDE it.
+  #
+  # .panel-progress is markup inside .split-left, so `display: none` on the two
+  # excepted types took the progress bar out with the picture — measured across
+  # all eight card types on a phone, these were the only two with no bar at all.
+  # A respondent lost their sense of how far through they were on exactly the
+  # cards that take longest to answer.
+  #
+  # The fix is `display: contents`, which is a narrow line to walk: too far and
+  # the hero comes back (the two tests above catch that), not far enough and the
+  # bar stays gone (this one does). Both halves have to hold at once, which is
+  # why they are neighbours in this file.
+  [ [ 3, "tap_card" ], [ 4, "nps" ] ].each do |index, type|
+    test "#{type} keeps its progress bar even though it has no header" do
+      open_at(index)
+      bar = page.evaluate_script(<<~JS)
+        (() => {
+          const card = document.querySelector(".preview-card.active")
+          const el   = card.querySelector(".panel-progress")
+          const fill = card.querySelector(".panel-progress-fill")
+          if (!el) return { present: false }
+          const r = el.getBoundingClientRect()
+          return { present: true,
+                   laidOut: el.getClientRects().length > 0 && r.width > 1,
+                   width: Math.round(r.width),
+                   fill: fill ? getComputedStyle(fill).backgroundColor : null }
+        })()
+      JS
+
+      assert bar["present"], "#{type} has no .panel-progress in the DOM at all"
+      assert bar["laidOut"],
+             "#{type}'s progress bar is in the tree but not drawn (#{bar['width']}px wide). " \
+             "The bar lives inside .split-left; hiding that panel with `display: none` " \
+             "hides the bar with it, and `contents` is what keeps the children while " \
+             "dropping the box."
+      assert_equal "rgb(1, 234, 203)", bar["fill"],
+                   "#{type}'s progress bar is drawn but not in the brand colour"
+    end
+  end
+
   # The exception that matters most, because breaking it would silently undo
   # the keyboard work rather than look wrong on a screenshot: a focused text
   # field still takes the hero's room. _watchTyping owns hero-off now that

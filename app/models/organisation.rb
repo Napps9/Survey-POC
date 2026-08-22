@@ -87,14 +87,26 @@ class Organisation < ApplicationRecord
   # Reject logo uploads that aren't a reasonably-sized image. Keeps junk/oversized
   # files (and surprising content types) out of storage; the controller surfaces
   # the error. Active Storage already serves SVGs as a download rather than inline.
-  def logo_must_be_a_supported_image
-    return unless logo.attached?
+  #
+  # BOTH SLOTS, over a list rather than as two copies. The light-surface logo
+  # shipped without this and a 3 MB PDF attached to it and validated clean —
+  # a second upload with none of the first one's manners. The controller's SVG
+  # scrubber already loops the same pair for the same reason (an unsanitised SVG
+  # served same-origin is stored XSS), so a slot added here and forgotten there,
+  # or the reverse, is the failure this shape is guarding against.
+  LOGO_ATTACHMENTS = %i[logo logo_on_light].freeze
 
-    unless LOGO_CONTENT_TYPES.include?(logo.blob.content_type)
-      errors.add(:logo, "must be a PNG, JPEG, GIF, WebP or SVG image")
-    end
-    if logo.blob.byte_size > LOGO_MAX_BYTES
-      errors.add(:logo, "must be smaller than 2 MB")
+  def logo_must_be_a_supported_image
+    LOGO_ATTACHMENTS.each do |field|
+      attachment = public_send(field)
+      next unless attachment.attached?
+
+      unless LOGO_CONTENT_TYPES.include?(attachment.blob.content_type)
+        errors.add(field, "must be a PNG, JPEG, GIF, WebP or SVG image")
+      end
+      if attachment.blob.byte_size > LOGO_MAX_BYTES
+        errors.add(field, "must be smaller than #{LOGO_MAX_BYTES / 1.megabyte} MB")
+      end
     end
   end
 

@@ -21,7 +21,15 @@ require "application_system_test_case"
 # So the test that matters here measures the scroller ACROSS the animation,
 # not before and after it — the window in between is the entire bug.
 class RatingStarsTest < ApplicationSystemTestCase
-  PHONES  = { "iPhone 15" => [ 393, 852 ], "iPhone SE" => [ 375, 667 ] }.freeze
+  # 320 and 280 were added after the stars were made bigger: five 56px stars
+  # plus their gaps are a hard 312px (.rating-star is flex-shrink: 0), which is
+  # wider than either of those phones' answer panels — and the row is centred,
+  # so the overflow went off both edges where it cannot be scrolled back to. On
+  # a Fold the first star started at x = -16, i.e. a respondent could not
+  # reliably give a one-star rating. Neither width was in this matrix, which is
+  # why making the stars bigger looked free.
+  PHONES  = { "iPhone 15" => [ 393, 852 ], "iPhone SE" => [ 375, 667 ],
+              "small phone" => [ 320, 568 ], "Galaxy Fold" => [ 280, 653 ] }.freeze
   DESKTOP = [ 1280, 900 ].freeze
 
   CARDS = [
@@ -75,11 +83,17 @@ class RatingStarsTest < ApplicationSystemTestCase
         const labs  = Array.from(card.querySelectorAll(".rating-labels > .rating-label"))
         if (!stars.length || labs.length < 2) return null
         const mid = (el) => { const r = el.getBoundingClientRect(); return r.left + r.width / 2 }
+        const row = card.querySelector(".rating-stars").getBoundingClientRect()
+        const box = card.querySelector(".split-right > .mt-2")
         return {
           size:      +stars[0].getBoundingClientRect().width.toFixed(1),
           masked:    getComputedStyle(stars[0]).maskImage !== "none",
           firstDrift: +Math.abs(mid(stars[0]) - mid(labs[0])).toFixed(1),
-          lastDrift:  +Math.abs(mid(stars[stars.length - 1]) - mid(labs[labs.length - 1])).toFixed(1)
+          lastDrift:  +Math.abs(mid(stars[stars.length - 1]) - mid(labs[labs.length - 1])).toFixed(1),
+          rowWidth:  Math.round(row.width),
+          panelWidth: box ? box.clientWidth : null,
+          overflowX: box ? box.scrollWidth - box.clientWidth : null,
+          firstStarLeft: Math.round(stars[0].getBoundingClientRect().left)
         }
       })()
     JS
@@ -99,6 +113,21 @@ class RatingStarsTest < ApplicationSystemTestCase
              "the star is being painted as a font glyph again. A glyph's points cannot be " \
              "rounded by CSS, which is the whole reason this kind is drawn as a mask " \
              "('could we have stars where the points arent sharp?')."
+    end
+
+    test "on an #{name} the whole row of stars is reachable" do
+      open_rating(width: w, height: h)
+      g = geometry
+
+      assert_equal 0, g["overflowX"],
+                   "#{name}: the star row is #{g['rowWidth']}px inside a #{g['panelWidth']}px " \
+                   "panel, so it overflows sideways by #{g['overflowX']}px. The row is CENTRED, " \
+                   "which means that overflow goes off both edges at once and no amount of " \
+                   "scrolling reaches it — the first star sits at x=#{g['firstStarLeft']}. " \
+                   "A respondent who cannot tap star one cannot give the lowest rating."
+      assert_operator g["firstStarLeft"], :>=, 0,
+                      "#{name}: the first star starts at x=#{g['firstStarLeft']}, off the " \
+                      "left of the screen"
     end
 
     test "on an #{name} the end captions sit under the end stars" do

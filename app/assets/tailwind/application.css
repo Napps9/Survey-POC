@@ -2138,8 +2138,22 @@
 .slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
 .slider-label-text {
   font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75);
-  /* Equal shares of the track, so every stop's label sits under its own dot
-     and one long one can't take width off its neighbours. */
+  /* Equal shares of the row, so one long label can't take width off its
+     neighbours.
+     It does NOT put every label exactly under its own dot, and the comment
+     here used to claim it did. Equal columns centre at (i+0.5)/n of the row
+     while the dots sit at i/(n-1) of the TRACK, and those two only coincide if
+     the row is 1.25x the track's width and overhangs it by an eighth each side
+     — which for a five-stop slider on a phone is wider than the panel. So the
+     end labels always sit a little inboard of their dots, and the middle one
+     is always exact.
+     Measured on an iPhone 15: 38.6px of drift before the track was inset at
+     all, 12.6 at a 26px inset, 6.6 at today's 32 (4.9 on an SE) — the inset
+     that keeps the thumb out of the back-swipe strip happens to walk the row
+     toward the geometry it wants. Under a label's own width now, so it reads
+     as centred. Aligning it exactly means positioning each label on its dot
+     like .s-dot does, which costs the column wrapping that keeps a long label
+     off its neighbours; not worth it for single-figure pixels. */
   flex: 1 1 0; min-width: 0;
   text-align: center; outline: none;
   /* A capped label still wraps inside its column, and on a narrow phone a wide
@@ -6774,6 +6788,28 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --rating-star-size: 56px;
     --rating-star-gap: 8px;
   }
+  /* …but the row is FIVE of them plus four gaps, and .rating-star is
+     flex-shrink: 0, so at 56/8 it is a hard 312px whatever it is given. That
+     is wider than a narrow phone's answer panel, and the row is centred, so
+     the overflow goes off BOTH edges where centred overflow cannot be scrolled
+     back to. Measured: 12px over on a 320px screen, and 32px over on a folded
+     one with the first star starting at x = -16 — a third of the one-star
+     option unreachable, which is a respondent who cannot give the lowest
+     rating at all, not a cosmetic clip.
+     Sized off the panel rather than guessed: the panel is the viewport less
+     2x --play-pad-x, which bottoms out at 16px, so 288px at 320 and 248px at
+     280. 48/8 makes a 272px row; 44/4 makes 236 — 6px of gap still measured 1px over, because the
+     scroller carries its own padding on top of the panel's.
+     44 is the floor and it is the iOS touch minimum, not a taste — below it
+     these stop being reliable targets, and rating_stars_test holds that line.
+     If a phone ever arrives that cannot fit five 44px stars, the answer is to
+     wrap or shrink the SCALE, not the target. */
+  @media (max-width: 340px) {
+    .rating-wrap { --rating-star-size: 48px; --rating-star-gap: 8px; }
+  }
+  @media (max-width: 300px) {
+    .rating-wrap { --rating-star-size: 44px; --rating-star-gap: 4px; }
+  }
   .slider-track { width: 100%; height: 44px; }
   .slider-thumb { width: 52px; height: 52px; }
 
@@ -7217,8 +7253,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
 
   /* NPS on mobile: drop the media "header" panel entirely and give the liquid
-     container the whole card, centred; shrink it to fit a phone viewport. */
-  .preview-overlay .split-card:has(.nps-slider) .split-left { display: none; }
+     container the whole card, centred; shrink it to fit a phone viewport.
+     `contents` rather than `none`, and this is not a nicety: .panel-progress is
+     MARKUP INSIDE .split-left (shared/_split_left.html.erb), so hiding the box
+     took the progress bar with it. Walked all eight card types on a phone and
+     these two were the only ones with no bar at all — a respondent loses their
+     sense of how far through they are on exactly the cards that take longest.
+     `contents` removes the box from layout while leaving its children in the
+     tree, which is what media-less cards already do a few rules up for this
+     same reason; the bar is absolutely positioned against .split-card, so it
+     lands in the right place either way. The hero is still gone — there is no
+     media element in this branch to draw. */
+  .preview-overlay .split-card:has(.nps-slider) .split-left { display: contents; }
   .preview-overlay .split-card:has(.nps-slider) .split-right {
     flex: 1 1 auto;
     height: auto;
@@ -7228,7 +7274,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
      imagery, so a card-level hero image behind it just duplicated the photo
      and read as torn/double imagery. Drop the hero strip and let the stack
      fill the card, same treatment as NPS above. */
-  .preview-overlay .split-card:has(.rotate-wrap) .split-left { display: none; }
+  .preview-overlay .split-card:has(.rotate-wrap) .split-left { display: contents; }
   .preview-overlay .split-card:has(.rotate-wrap) .split-right {
     flex: 1 1 auto;
     height: auto;
@@ -7476,10 +7522,22 @@ body.generating-overlay-active .bottom-bar { display: none; }
      claim. The only fix available is to stop putting a control there.
 
      Horizontal only — the vertical variant's travel is up/down, its track is
-     48px wide and centred, and it sets its own wrap padding. */
+     48px wide and centred, and it sets its own wrap padding.
+
+     32, not the 26 this shipped as, because 26 protected the WRONG POINT. The
+     thumb is 52px and translate(-50%), so at either extreme its centre is on
+     the track's end and its outer edge is 26px further out — landing at
+     exactly the panel's own --play-pad-x. That clamp bottoms out at 16px below
+     a 375px screen, so measured: the edge sat at 20px on an iPhone 15, 19 on
+     an SE, 16 on a 320 and 16 on a folded phone. A finger reaching the visible
+     left of the thumb was still starting its drag inside the strip.
+     The inset has to cover the thumb's radius plus real clearance against the
+     WORST padding: 26 + 22 - 16 = 32. That puts the edge at pad + 6, so 22px
+     at the narrowest and more everywhere else, and costs each side 6px of
+     travel — 188px of track still left on a 280px phone. */
   .preview-overlay .slider-wrap:not([data-slider-axis-value="vertical"]) .slider-track-wrap {
-    padding-left: 26px;
-    padding-right: 26px;
+    padding-left: 32px;
+    padding-right: 32px;
   }
   /* "There are more options below" affordance. The usual pure-CSS trick —
      background-attachment: local/scroll shadow layers on the scroll
@@ -9069,6 +9127,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
   position: relative; z-index: 1;
   margin-top: -18px;
   border-radius: 18px 18px 0 0;
+}
+/* …and the welcome logo has to come out of the float here for the same reason
+   it does on a real phone: the panel is whatever the hero left behind, not a
+   680px desktop column, so an absolutely-positioned logo lands ON TOP of the
+   question title. The player's fix is scoped to .preview-overlay and gated on
+   a phone-width media query, and this frame is neither — it is a desktop-width
+   page pretending to be a phone. So the creator was still judging the card in
+   a preview that showed the bug the live player no longer has, which is the
+   worst way round for a preview to be wrong.
+   Kept as its own rule rather than added to the overlay's selector list: the
+   two share the symptom, not the mechanism, and merging them would put a
+   media-query-gated rule and a class-gated one in one place where the next
+   person has to work out which half applies. */
+.device-tablet .split-right-logo,
+.device-mobile .split-right-logo {
+  position: static;
+  flex: 0 0 auto;
 }
 .device-tablet .split-right { padding: 32px 40px; }
 .device-mobile .split-right { padding: 24px 22px; }
