@@ -190,11 +190,16 @@ export default class extends Controller {
     // remembered size instead of flashing default-size and then jumping.
     this._applyFontScale(this._loadFontScale())
     this._clearRetiredLiteMode()
+    // Same reason, one layer down: --play-card-h is what every tier's hero and
+    // answer panel is a share of, so it has to be right before the first card
+    // is laid out, not corrected after it.
+    this._fitCardHeight()
     this._update()
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
     if (this.hasRegionsMapViewportTarget) this._setupMapPanZoom()
     this._watchFooterFit()
+    this._watchCardHeight()
     this._watchTyping()
 
     // Live answered-state for the Next button. Delegated on the deck rather
@@ -255,6 +260,7 @@ export default class extends Controller {
 
   disconnect() {
     this._footerObserver?.disconnect()
+    this._bodyObserver?.disconnect()
     if (this._answeredFrame) cancelAnimationFrame(this._answeredFrame)
     clearTimeout(this._revealTimer)
     // kbd-open lives on <html>, outside this controller's element, so it does
@@ -424,6 +430,53 @@ export default class extends Controller {
     // whether there IS anything below — left unconditional it greys out the
     // final row's label on an answer that fits perfectly well.
     box.classList.toggle("is-scrollable", over > 1)
+  }
+
+  // ── The card's real height ──────────────────────────────────────────────
+  //
+  // --play-card-h is the token every mobile tier takes its hero and answer
+  // panel from, and its CSS definition — 100svh less the footer — is an
+  // ESTIMATE of the deck's box rather than a measurement of it. What it
+  // cannot see is anything stacked ABOVE the card inside the overlay: the
+  // Test Mode banner, and on a notched iPhone the strip the safe area holds
+  // open. Both are real and both are common — the owner's device photos are
+  // all Test Mode on an iPhone with a dynamic island, so both were in play at
+  // once.
+  //
+  // Reproduced at 393x768 with a 55px spacer standing in for the inset: the
+  // card is 609px and the token says 699. The hero is `flex: 0 0 auto` at 45%
+  // OF 699, so it takes 314 — 51% of the card it is actually in — and
+  // .split-right's min-height then claims 384 of the 295 that are left. The
+  // panel overflows the card by 67px and its bottom is cut. On most types
+  // what falls off is padding. On a scenario it is .book-nav-row: the two
+  // chevrons that are the ONLY way to turn a page, with no swipe fallback
+  // ("its unclear in the scenario question type how to go to the next one").
+  //
+  // .preview-body IS the box the card lives in, so measure that and say so.
+  // The CSS declaration stays, as the value in force before this runs. There
+  // is no feedback loop to guard against: the body's height comes from flex
+  // against the overlay, not from the card inside it, so writing the token
+  // cannot move what was just measured — but the 1px gate keeps a
+  // sub-pixel wobble from writing on every observer tick anyway.
+  _fitCardHeight() {
+    const body = this._bodyEl ||= this.element.querySelector(".preview-body")
+    if (!body) return
+    const h = body.clientHeight
+    if (!h) return
+    if (this._cardH != null && Math.abs(h - this._cardH) < 1) return
+    this._cardH = h
+    this.element.style.setProperty("--play-card-h", `${h}px`)
+  }
+
+  _watchCardHeight() {
+    this._fitCardHeight()
+    const body = this._bodyEl
+    if (!body || typeof ResizeObserver === "undefined") return
+    // Rotation, the iOS toolbar collapsing, the keyboard, and the banner
+    // being dismissed all change this box without changing the viewport the
+    // CSS fallback is written against.
+    this._bodyObserver = new ResizeObserver(() => this._fitCardHeight())
+    this._bodyObserver.observe(body)
   }
 
   _watchFooterFit() {

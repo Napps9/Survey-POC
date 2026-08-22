@@ -283,7 +283,7 @@ const COMPONENTS = {
         <div class="book-page-fade"></div>
       </div>`
     return `
-      <div class="book-wrap" data-controller="scenario card-editor" data-scenario-editable-value="true">
+      <div class="book-wrap book-wrap--scenario" data-controller="scenario card-editor" data-scenario-editable-value="true">
         <div class="book-stack" data-scenario-target="stack">${pagesHtml}${answerHtml}</div>
         <div class="book-edit-tools" data-scenario-target="editTools">
           <button type="button" class="book-tool-btn danger" data-scenario-target="delPageBtn" data-action="click->scenario#deletePage">${esc(t("editor.scenario.delete_page"))}</button>
@@ -299,8 +299,10 @@ const COMPONENTS = {
   },
 
   // Mirrors the "when consent_gate" branch in _card_component.html.erb — the
-  // same book as a scenario, but the last page is Agree / Decline instead of a
-  // choice list, and in the editor it is an inert replica (aria-hidden, no
+  // same book as a scenario, WITHOUT the --scenario modifier the branch above
+  // carries: that class is what centres a page's text, and a story reads
+  // better centred while an information sheet reads worse. The last page is
+  // Agree / Decline instead of a choice list, and in the editor it is an inert replica (aria-hidden, no
   // actions, not tabbable) so a creator can see where the sheet lands without
   // consenting on a respondent's behalf.
   //

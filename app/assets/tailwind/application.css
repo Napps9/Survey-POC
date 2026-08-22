@@ -766,7 +766,20 @@
 .split-right > .mt-2:has(> .slider-wrap),
 .split-right > .mt-2:has(> .nps-slider),
 .split-right > .mt-2:has(> .rating-wrap),
-.split-right > .mt-2:has(> .freeform-wrap) {
+.split-right > .mt-2:has(> .freeform-wrap),
+/* The welcome card is not an answer widget and that is exactly how it fell
+   off this list — it carries .welcome-intake instead, which is the compare
+   promise, the points note, the token pills and the leaderboard tease, four
+   pill boxes whose number the CREATOR decides. Without min-height: 0 the box
+   refuses to shrink past its min-content height, so it overflows .split-right
+   and its overflow: hidden cuts the last pill in half; without overflow-y
+   there is nowhere to scroll to read it. Measured at 393x700: 44.6px past the
+   panel. At 375x600: 91.7px, which is the whole tease and most of the pills.
+   And it reports NOTHING — the box's scrollHeight equals its clientHeight
+   because it is the box itself that overflows, not its content, so _fitCard's
+   over() reads 0 and the scroll cue never appears either. "i cant read or
+   scroll the boxees on the first card." */
+.split-right > .mt-2:has(> .welcome-intake) {
   /* grow 0, NOT 1. This box is the panel's only growable child, so with a
      grow factor it swallowed every spare pixel and left .split-right's
      `justify-content: safe center` nothing to centre: the question sat flush
@@ -864,21 +877,38 @@
   margin-left: -30px;
   margin-right: -30px;
 }
-/* "There are more options below" — the desktop counterpart of the mobile
-   .is-scrollable::after cue further down (search "is-scrollable .choice-list"
-   for the full rationale: a sticky last child, not a background-attachment
-   shadow, because the option pills paint over that). is-scrollable is set by
-   _fitCard regardless of viewport; only this visual cue was mobile-only. */
-.split-right > .mt-2.is-scrollable .choice-list::after,
-.split-right > .mt-2.is-scrollable .prioritise-list::after {
-  content: "";
-  flex: 0 0 auto;
-  position: sticky;
-  bottom: 0;
-  height: 22px;
-  margin-top: -22px;
-  background: linear-gradient(rgba(255,255,255,0), #fff 78%);
-  pointer-events: none;
+/* "There are more options below", said by fading the scroll box's own bottom
+   edge instead of painting something over it. is-scrollable is set by
+   _fitCard, at every viewport.
+
+   This replaces three near-identical rules that each hung a sticky last child
+   inside the scroller and filled it with linear-gradient(transparent, #fff).
+   Two things were wrong with that, and both of them only showed on a phone.
+
+   It painted WHITE. Over a list of white rows the cue is invisible until it
+   is needed, which is why it read as correct for so long; over the option
+   grid's full-bleed gradient tiles it is a white bar across the artwork. The
+   owner photographed it: sampled down the pink tile, 255,55,127 to
+   255,255,255 and back to 255,50,124 over 50 device px, straight across both
+   tiles and the gutter between them. "scroll line leaves a blur effect on the
+   options."
+
+   And it DRIFTED. In that same photo the bar is 63 CSS px above the bottom of
+   the scrollport, in the middle of a tile, which is nowhere sticky is
+   supposed to put it: iOS does not reposition a sticky child of a momentum
+   scroller while the fling is running, so a screenshot mid-flick catches it
+   stranded wherever the last main-thread frame left it. Nothing inside the
+   scrolling content can fix that — the fix is to stop being inside it.
+
+   A mask on the box is neither. It is anchored to the element rather than to
+   a scroll offset, so it cannot lag; and it fades the content OUT instead of
+   laying white over it, so a saturated tile dissolves toward the panel behind
+   it. 24px of the border box, which on the grids (12px of padding) is about
+   half padding and half content — the same reach the sticky bar had, since
+   bottom: 0 put that on the padding-box edge too. */
+.split-right > .mt-2.is-scrollable {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+          mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
 }
 
 /* ── "Add media" / "Change animation" floating CTA on left panel ── */
@@ -3239,6 +3269,23 @@
   text-align: left; outline: none;
 }
 .book-page-text[contenteditable]:empty::before { content: attr(data-placeholder); color: rgba(0,0,0,0.32); }
+/* A scenario's page is sized by the card, not by the story, so a short story
+   sat in the top-left corner of a tall white rectangle with the rest of it
+   empty — "the text isn't vertically or horizontally centralised". Measured
+   on an iPhone 15: 133px of text in a 314px page.
+
+   safe center, not center. The page scrolls (.book-page-scroll is overflow-y:
+   auto) and plain centring on a scroll container puts the overflow of a LONG
+   page above scroll position zero, where nothing can reach it — the same trap
+   .split-right's own centring is written around. safe falls back to
+   flex-start the moment the content stops fitting, so the long page keeps its
+   first line and the short page gets its centring.
+
+   Scoped to --scenario: consent_gate renders this same book and its pages are
+   an information sheet, which is worse centred, not better. */
+.book-wrap--scenario .book-page-scroll { justify-content: safe center; }
+.book-wrap--scenario .book-page-kicker,
+.book-wrap--scenario .book-page-text { text-align: center; }
 .book-page-corner {
   position: absolute; bottom: 10px; right: 14px;
   font-family: "Alata", sans-serif; font-size: 18px; color: rgba(0,0,0,0.09);
@@ -7528,15 +7575,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
   /* ── The answer widget is the card's scroll container ──────────────────
      Mirrors the desktop rule (search ".split-right > .mt-2:has") and is
-     scoped to the same shapes — which is now every shape that can outgrow
-     the card, the tap/slider/rating/NPS/freeform widgets included. They
-     used to be left out on the grounds that they "keep their own sizing";
-     what that meant in practice was having no scroll path, so their
-     overflow was cut rather than scrolled. The book layout is still out,
-     because .split-right--book opts out of centring entirely and paginates
-     instead. The desktop rule already supplies overflow-y; what mobile adds
-     is momentum scrolling and scroll containment, so a flick through the
-     options doesn't drag the page behind it.
+     scoped to the same shapes. That list used to say it was "every shape
+     that can outgrow the card" and it was not: it is a list of ANSWER
+     widgets, and the welcome card's .welcome-intake is not one, so the one
+     card every respondent sees first was the one card with no scroll path.
+     It is on the list now. The book layout is still out, because
+     .split-right--book opts out of centring entirely and paginates
+     instead — its overflow is fixed by measuring the card (see
+     player_controller#_fitCardHeight) rather than by a scrollbar. The
+     desktop rule already supplies overflow-y; what mobile adds is momentum
+     scrolling and scroll containment, so a flick through the options
+     doesn't drag the page behind it.
 
      This rule used to add a flex-grow as well, "to claim the panel's spare
      height" — and claiming it is exactly what went wrong. It is the panel's
@@ -7553,7 +7602,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card .split-right > .mt-2:has(> .slider-wrap),
   .preview-overlay .split-card .split-right > .mt-2:has(> .nps-slider),
   .preview-overlay .split-card .split-right > .mt-2:has(> .rating-wrap),
-  .preview-overlay .split-card .split-right > .mt-2:has(> .freeform-wrap) {
+  .preview-overlay .split-card .split-right > .mt-2:has(> .freeform-wrap),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .welcome-intake) {
     flex: 0 1 auto;
     min-height: 0;
     -webkit-overflow-scrolling: touch;
@@ -7597,27 +7647,37 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding-left: 32px;
     padding-right: 32px;
   }
-  /* "There are more options below" affordance. The usual pure-CSS trick —
-     background-attachment: local/scroll shadow layers on the scroll
-     container — is useless here because the option pills have backgrounds
-     of their own and paint straight over it. A sticky last child does work:
-     it pins to the bottom edge of the scrollport, and being last in DOM
-     order it paints ON TOP of the rows sliding under it. The negative
-     margin means it overlays the final rows instead of adding height, and
-     over a fully-scrolled (or short, non-scrolling) list it fades white
-     into white and disappears on its own — no scroll listener, no
-     false "more below" on a list that has no more. */
-  .preview-overlay .mt-2.is-scrollable .choice-list::after,
-  .preview-overlay .mt-2.is-scrollable .prioritise-list::after {
-    content: "";
-    flex: 0 0 auto;
-    position: sticky;
-    bottom: 0;
-    height: 22px;
-    margin-top: -22px;
-    background: linear-gradient(rgba(255,255,255,0), #fff 78%);
-    pointer-events: none;
+  /* ...and the pad that inset creates has to belong to the PAGE, or the inset
+     only moves the problem. touch-action: none is on .slider-track (:2101),
+     which now starts 32px in; the 32px either side of it is .slider-track-wrap
+     padding at touch-action: auto, so a finger reaching for the thumb at an
+     extreme lands on a strip the page does not claim and iOS takes the
+     gesture as its edge swipe. The owner photographed the result: the whole
+     web view peeled ~17 CSS px to the right, rounded corner and drop shadow
+     on its left edge, a previous page showing through underneath. "when I
+     slide the scale the screen moves."
+
+     Claiming a touch is the only lever a page has here — the swipe is a
+     SYSTEM gesture and cannot be preventDefault()ed after the fact, but
+     WebKit does defer its recogniser over an element that declares it handles
+     touches itself. Costs nothing: the range answer does not scroll (measured
+     over: 0 at every viewport from 393x852 down to 375x600), so there is no
+     pan being taken away. Both axes — the vertical variant sets its own wrap
+     padding and has the same edge to defend. */
+  .preview-overlay .slider-track-wrap { touch-action: none; }
+  /* The "more options below" cue is one rule now and it lives on the scroll
+     box (search "-webkit-mask-image"), so there is nothing type-specific to
+     mirror here. What IS mobile-only is the scrollbar. The owner has
+     objected to a bare bar on the answer twice, and with a cue that reads
+     there is nothing left for it to be the only signal of. Same call
+     .book-page-scroll already made, for the same reason — it should read as
+     a card, not a textarea. Desktop keeps its thin bar: a pointer has no
+     other way to learn the box is grabbable. */
+  .preview-overlay .split-right > .mt-2 {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .preview-overlay .split-right > .mt-2::-webkit-scrollbar { display: none; }
   /* "+ Other" sits under the options rather than inside the scroller, so it
      must not be squeezed out when the list is long. */
   .preview-overlay .split-card .split-right > .other-block {
@@ -7779,34 +7839,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding: 12px;
     margin: -12px;
   }
-  /* The same "there is more below" fade the option lists get. A grid can't
-     carry it on itself — a ::after inside a grid becomes a cell — so it hangs
-     off the scroll container instead, sticky to the bottom edge and last in
-     DOM order so it paints over the row sliding under it. On a grid that
-     fits, it is white fading into white and disappears. */
-  /* The tap card belongs on this list too, and was the one answer type with no
-     cue at all. Its stack normally grows to fill the scroller and nothing
-     overflows — but give a card a long enough question and the header takes
-     the room the stack needs, the stack stops at its 260px floor, and the
-     scroller genuinely does scroll: measured 104px over on a 320×480 phone
-     with a 24-word stem, 10px on a folded one. _fitCard sets .is-scrollable
-     for it exactly as it does for a list; there was simply no rule listening,
-     so the only signal was the bare scrollbar — which is the thing the owner
-     objected to in the first place. Same construction as the grids: the wrap
-     is a flex column and an ::after on it would be a sibling the 12px gap
-     pushes around, so it hangs off the scroll container instead. */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2.is-scrollable::after,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2.is-scrollable::after,
-  .preview-overlay .preview-card[data-card-type="tap_card"] .mt-2.is-scrollable::after {
-    content: "";
-    flex: 0 0 auto;
-    position: sticky;
-    bottom: 0;
-    height: 22px;
-    margin-top: -22px;
-    background: linear-gradient(rgba(255,255,255,0), #fff 78%);
-    pointer-events: none;
-  }
+  /* The grid and tap-card fades used to be spelled out here, one selector per
+     card type, because a ::after inside a grid becomes a CELL and a ::after
+     inside the tap wrap becomes a flex sibling the 12px gap pushes around —
+     both had to hang off the scroll container instead. Masking the box needs
+     no such exceptions: the cue belongs to the box, not to whatever the box
+     happens to contain, so the three type selectors collapse into the single
+     rule above and every scrolling answer is covered, including the ones
+     nobody remembered to add (the welcome card's pills, most recently). */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);

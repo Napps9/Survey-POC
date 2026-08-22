@@ -411,7 +411,11 @@
       <% pages = Array(display["pages"]) %>
       <% pages = [{}] if pages.empty? %>
       <% items = Array(display["options"]) %>
-      <div class="book-wrap"
+      <%# --scenario, because consent_gate renders the same book and must NOT
+          get the scenario's centring: a story is a few lines and reads better
+          centred in its page, an information sheet is a wall of terms and
+          reads worse. Nothing else distinguishes the two wraps. %>
+      <div class="book-wrap book-wrap--scenario"
            data-controller="<%= editable ? 'scenario card-editor' : 'scenario' %>"
            data-scenario-editable-value="<%= editable %>">
         <div class="book-stack" data-scenario-target="stack">

@@ -251,10 +251,20 @@ class TapCardFitsTest < ApplicationSystemTestCase
   end
 
   # And when a long question genuinely does leave the card no room, the card
-  # scrolls — that part is honest — but it has to SAY so. Every other answer
-  # type paints a fade at the bottom edge; the tap card was on none of those
-  # selector lists, so the only signal was the bare scrollbar the owner
-  # objected to in the first place.
+  # scrolls — that part is honest — but it has to SAY so. The only signal used
+  # to be the bare scrollbar the owner objected to in the first place, because
+  # the fade was written per card type and the tap card was on none of the
+  # lists.
+  #
+  # The cue is one rule now and it belongs to the scroll BOX rather than to
+  # anything inside it — a mask on the element, not a sticky child. Two
+  # reasons, both from the owner's device photos: a sticky child painted white
+  # (fine over a list of white rows, a bar across the artwork over full-bleed
+  # tiles) and, on iOS, a sticky child of a momentum scroller is not
+  # repositioned during a fling, so a photo mid-flick caught it stranded 63px
+  # up in the middle of a tile. See PlayerCardBoxTest for both. What this test
+  # still owns is the tap card specifically: that its stack overflowing is
+  # noticed and cued at all.
   test "a card that has to scroll shows the more-below fade" do
     long = @org.surveys.create!(
       title: "Long stem", theme: "Th", audience_age: "adults", key_insight: "k",
@@ -273,11 +283,10 @@ class TapCardFitsTest < ApplicationSystemTestCase
     cue = evaluate_script(<<~JS)
       (() => {
         const box = document.querySelector(".preview-card.active .split-right > .mt-2")
-        const after = getComputedStyle(box, "::after")
+        const cs = getComputedStyle(box)
         return { over: Math.round(box.scrollHeight - box.clientHeight),
                  flagged: box.classList.contains("is-scrollable"),
-                 fadeHeight: after.height,
-                 fadeBg: after.backgroundImage }
+                 mask: cs.webkitMaskImage || cs.maskImage }
       })()
     JS
 
@@ -285,11 +294,10 @@ class TapCardFitsTest < ApplicationSystemTestCase
                     "this fixture no longer overflows, so it cannot test the cue. Pick a " \
                     "longer question or a smaller phone rather than deleting the test."
     assert cue["flagged"], "_fitCard did not mark the scroller — the cue has nothing to hang on"
-    assert_equal "22px", cue["fadeHeight"],
-                 "the tap card scrolls with no fade at the bottom edge. .is-scrollable::after " \
-                 "is written per card type and tap_card was on none of the lists, so a " \
-                 "respondent gets a bare scrollbar and no hint that the card continues."
-    assert_includes cue["fadeBg"], "gradient",
-                    "the fade is present but is not a gradient, so it will read as a hard band"
+    assert_includes cue["mask"].to_s, "gradient",
+                    "the tap card scrolls with no fade at the bottom edge. It was left off the " \
+                    "per-type fade lists once already; the cue is on the scroll box now, which " \
+                    "is meant to make that impossible — so this failing means the box rule " \
+                    "itself has gone, and every other answer type has lost its cue too."
   end
 end
