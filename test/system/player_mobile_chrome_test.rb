@@ -119,6 +119,15 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
     2.times { click_button "Next"; sleep 0.4 } # → the grid card
     assert_equal "select_one_grid", find(".preview-card.active")["data-card-type"]
 
+    before = page.evaluate_script(<<~JS)
+      (() => {
+        const label = document.querySelector(".preview-card.active .choice-card .choice-label")
+        const cs = getComputedStyle(label)
+        return { w: label.offsetWidth, h: label.offsetHeight,
+                 family: cs.fontFamily, stroke: cs.webkitTextStrokeWidth }
+      })()
+    JS
+
     first(".preview-card.active .choice-card").click
     sleep 0.3
 
@@ -187,6 +196,36 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
                     "the selected caption reads at #{ratio.round(2)}:1 against #{surface}. " \
                     "Whatever colour selection turns the label, a respondent has to be able " \
                     "to read the answer they just chose."
+
+    # Selecting used to swap the label's font FAMILY, which re-typeset the
+    # caption — "the font size actually reduces slightly … 'zero' drops onto
+    # 2 lines". The bold now comes from a text stroke, the one emphasis that
+    # cannot move a glyph. The stroke was collected above from the day this
+    # test was written and never asserted, so reverting the family swap kept
+    # the whole suite green — these four close that door.
+    # offsetWidth/Height, not getBoundingClientRect: selecting a tile lifts it
+    # with a scale transform, which moves the RECT of everything inside without
+    # re-typesetting a glyph. Layout metrics see through the lift; a real
+    # re-typeset (the family swap dropped 'zero' onto a second line) moves them
+    # by a full line-height.
+    after = page.evaluate_script(<<~JS)
+      (() => {
+        const label = document.querySelector('.preview-card.active .choice-card[data-selected="true"] .choice-label')
+        return { w: label.offsetWidth, h: label.offsetHeight,
+                 family: getComputedStyle(label).fontFamily }
+      })()
+    JS
+    assert_equal before["family"], after["family"],
+                 "selection swapped the caption's font family — the reflow this card was reported for"
+    assert_equal before["w"], after["w"],
+                 "the caption changed width on selection — selection must not re-typeset the label"
+    assert_equal before["h"], after["h"],
+                 "the caption changed height on selection — 'it would be good if the font size " \
+                 "doesnt change at all - just applies a bold format'"
+    assert_equal "0px", before["stroke"], "the resting caption should carry no text stroke"
+    refute_equal "0px", shadows["stroke"],
+                 "the selected caption's bold should come from -webkit-text-stroke — the " \
+                 "mechanism that thickens without reflowing"
   end
 
   # The other half of "just the box, and not the text as well", and the half

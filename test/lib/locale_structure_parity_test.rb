@@ -1,6 +1,6 @@
 require "test_helper"
 
-# The 19 locale files are documented as mirroring en.yml's structure, but
+# The 25 locale files are documented as mirroring en.yml's structure, but
 # nothing enforced it — which is how the `welcome_mailer` and new `js.*`
 # namespaces could drift (a review finding). A key missing from one locale
 # doesn't raise; it silently falls back to English (or renders a raw dotted
@@ -9,7 +9,7 @@ require "test_helper"
 # Scoped to the namespaces the browser depends on — `js` (window.I18N),
 # `defaults` (placeholder card content, resolved per Verto locale) and `card`
 # (curated into window.I18N by _i18n_js) — plus `ask`, whose 45 server-rendered
-# strings were complete in all 19 files only by discipline until they were
+# strings were complete in every locale file only by discipline until they were
 # guarded here. A hole in any of these is user-visible English in a
 # non-English UI, the exact defect this pass removed. Widening it to every
 # namespace is desirable but needs the backfill done first.

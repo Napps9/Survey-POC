@@ -793,9 +793,9 @@
      scrollHeight - clientHeight on THIS box: when the content fits it is 0
      either way, and when it overflows this box is still the only shrinkable
      child, so it absorbs the identical deficit and reports the identical
-     number. Every rung verdict and the is-scrollable toggle are unchanged.
-     Take the shrink away too and over() reads 0 forever — the shed ladder
-     would then buy artwork it cannot afford and .split-right's
+     number. The is-scrollable toggle is unchanged either way.
+     Take the shrink away too and over() reads 0 forever — _fitCard would
+     then read every card as fitting and .split-right's
      overflow: hidden would CUT the surplus rather than scroll it. */
   flex: 0 1 auto;
   min-height: 0;
@@ -7275,8 +7275,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
      instead. Nothing else moves: the panel still opens at its
      --play-right-min stage (grow:0 does not touch min-height), the shrink
      phase is untouched so a long answer still pins the panel at its floor and
-     scrolls inside .mt-2, and the shed ladder still prices the hero exactly
-     as before. The one visible change is where the SURPLUS lands — and a
+     scrolls inside .mt-2, and the hero is still priced exactly as before by
+     its --play-hero-h preferred height and flex-shrink: 0 (the strip rule
+     above). The one visible change is where the SURPLUS lands — and a
      respondent given a taller cover-fit photo sees more of it, which is the
      entire request. */
   .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-left {
@@ -8122,9 +8123,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
        the answer and the controls still reads. */
     border-top: 1px solid rgba(0,0,0,0.08);
   }
-  /* The points counter carries its own dark backing pill so it can sit on any
-     backdrop — still true, still correct on white. Left alone.
-     Back is inverted where it is actually defined, further down this block. */
+  /* The points counter never renders here — it is display: none earlier in
+     this same block. What does sit on the white bar is the quiz/token score
+     chips, whose --brand-cta fill reads as shape-on-white the same way Next
+     does: their labels are dark-on-teal and legible, the pill outline is
+     chrome. Left alone. Back is inverted where it is actually defined,
+     further down this block. */
   .preview-overlay .preview-btn {
     flex: 1 1 0;
     max-width: var(--play-btn-max-w);
