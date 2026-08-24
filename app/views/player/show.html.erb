@@ -203,8 +203,15 @@
         answer and never shifts the answer keys, which align to @survey.cards positions.
         The code is sent with the next save and immediately hashed; the plaintext
         is never stored, logged, or returned. %>
+    <%# The FIRST card target ships .active from the server. Cards are
+        display:none until .active, and the class used to be applied only by
+        the player controller's first _update() — so on a cold cache over slow
+        wifi the respondent stared at an empty brand background for the whole
+        module waterfall (measured 6.5s at 400ms RTT) and read it as broken.
+        The controller re-runs the toggle at boot, so this is purely the
+        first paint arriving with the HTML; JS still owns navigation. %>
     <% if @survey.respondent_code_enabled? %>
-      <div class="preview-card"
+      <div class="preview-card active"
            data-player-target="card"
            data-card-type="respondent_code_card">
         <div class="split-card">
@@ -234,6 +241,7 @@
       </div>
     <% end %>
 
+    <% first_deck_card = !@survey.respondent_code_enabled? %>
     <% cards.each do |card, idx| %>
       <%
         type    = card["type"].to_s
@@ -243,6 +251,8 @@
         prev_q += 1 if is_q
         prog   = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
         prog   = 5 unless is_q
+        server_active = first_deck_card
+        first_deck_card = false
       %>
       <%# A graded card carries only a boolean flag in the live player — never
           its correct answer (that's revealed by the server after answering).
@@ -250,7 +260,7 @@
           A card's token config is NOT secret (unlike a quiz's correct answer)
           — it's public config the creator set, so it rides along even live,
           letting the player compute a running total client-side. %>
-      <div class="preview-card"
+      <div class="preview-card<%= " active" if server_active %>"
            data-player-target="card"
            data-card-index="<%= idx %>"
            data-card-cid="<%= card['cid'].to_s %>"

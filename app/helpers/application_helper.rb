@@ -560,6 +560,49 @@ module ApplicationHelper
       .to_blob
   end
 
+  # Every module the /play player must have before a tap can do anything,
+  # preloaded from the <head> (see layouts/_head) so a cold cache fetches them
+  # in one wave alongside application.js instead of a four-deep lazy-import
+  # waterfall. The list is the closure of what player pages actually mount:
+  # the Stimulus registry pair, every controller a player-rendered view can
+  # carry in data-controller, and the lib modules those controllers import.
+  # lottie-web is deliberately absent — it's ~300KB, only NPS/range cards
+  # animate with it, and the interactive part of those cards (the slider) is
+  # in the list; the animation may arrive a beat later.
+  # PlayerPreloadClosureTest keeps this list honest against the source tree.
+  PLAYER_PRELOAD_MODULES = %w[
+    controllers/index
+    controllers/application
+    controllers/player_controller
+    controllers/picker_controller
+    controllers/tap_stack_controller
+    controllers/nps_slider_controller
+    controllers/rating_controller
+    controllers/slider_controller
+    controllers/freeform_controller
+    controllers/prioritise_controller
+    controllers/scenario_controller
+    controllers/autogrow_controller
+    controllers/month_year_controller
+    controllers/location_search_controller
+    controllers/other_controller
+    controllers/locale_switcher_controller
+    controllers/cookie_consent_controller
+    controllers/bg_image_healer_controller
+    controllers/autoplay_video_controller
+    controllers/lottie_player_controller
+    lib/haptics
+    lib/i18n
+    lib/tap_scales
+    lib/visible_band
+    lib/page_limits
+    lib/viewport_height
+  ].freeze
+
+  def player_module_preload_paths
+    PLAYER_PRELOAD_MODULES.map { |m| asset_path("#{m}.js") }
+  end
+
   # A small same-origin thumbnail path for a brand-library image — used by the
   # library tiles (media picker + branding page) so a tile loads a ~400px variant
   # instead of the full-size original. Display only: the full-size blob path is

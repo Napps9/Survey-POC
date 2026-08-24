@@ -41,3 +41,17 @@
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <%= render "layouts/i18n_js" %>
 <%= javascript_importmap_tags %>
+<%# The player's interactive modules, fetched WITH the page instead of after
+    it. Controllers are pinned preload: false and lazy-loaded (right for the
+    dashboard, where 60+ files up front dominated first paint) — but on /play
+    that lazy chain is a four-deep waterfall (application → controllers/index
+    → each controller → its lib imports), and on a cold cache over venue wifi
+    the respondent had a painted, dead card for the duration: "having to
+    refresh the page to be able to select an answer" — the refresh worked
+    because the second load hit warm caches. These hints flatten the chain to
+    one parallel wave; the lazy loader then resolves instantly from the module
+    map. Scoped to the player (and the owner's chromeless preview of it) so
+    every other page keeps the deliberate lazy behaviour. %>
+<% if controller_name == "player" || @chromeless %>
+  <%= javascript_module_preload_tag(*player_module_preload_paths) %>
+<% end %>
