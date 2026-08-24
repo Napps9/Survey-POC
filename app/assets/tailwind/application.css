@@ -7128,6 +7128,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-pad-x:      clamp(16px, 5vw, 26px);
     --play-pad-y:      clamp(14px, 2.4svh, 22px);
     --play-gap:        clamp(8px, 1.6svh, 14px);
+    /* THE STRIP THE PROGRESS BAR OWNS. On a card with no hero, .split-left is
+       display: contents and the bar (top: 10px + 6px tall, further down this
+       block) paints straight onto the white panel — the same panel whose
+       --play-pad-y above can clamp as low as 14px, which put "TAP TO RESPOND"
+       *behind* the bar (photographed on an iPhone: the eyebrow sheared
+       mid-letter by the fill). Stated as the bar's own numbers plus air so a
+       bar retune moves this with it; read by the panel's padding-top below. */
+    --play-bar-clear:  calc(10px + 6px + 12px);
     /* A CEILING now, not a size: the welcome logo is sized by width (30% of
        the panel) and this only stops a square or portrait mark towering over
        the title beneath it. Raised from 4.6svh/34px, which was the old
@@ -7673,6 +7681,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
        Padding for a bezel two boxes away cost ~34px of card interior while
        leaving the buttons that actually touch the indicator unprotected. */
     padding: var(--play-pad-y) var(--play-pad-x);
+    /* Clear the progress bar. The bar is absolutely positioned against
+       .split-card, and on every card whose .split-left is display: contents —
+       the no-hero default, NPS, the tap stack — that means it rides THIS
+       panel's top edge, where --play-pad-y alone left the eyebrow underneath
+       it. Hero cards reset this a few rules down: there the bar rides the
+       photo and the panel starts 45% down the screen. */
+    padding-top: var(--play-bar-clear);
     background: #fff;
     color: #1C2034;
     text-align: center;
@@ -7688,6 +7703,19 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow: hidden;
     position: relative;
   }
+  /* ...the reset for cards where the bar does NOT ride the panel: a hero
+     strip above means the bar sits on the photo, so the panel keeps its
+     ordinary pad. Then the two contents-branches (tap stack, NPS) re-assert
+     the clearance — they drop the hero strip even when the card carries
+     media, so their bar is back on the panel. Order matters: all three are
+     (0,4,0) against the base rule's (0,3,0), and tap/NPS must land last. */
+  .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
+    padding-top: var(--play-pad-y);
+  }
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider) .split-right {
+    padding-top: var(--play-bar-clear);
+  }
+
   /* The question never shrinks — it is the point of the card. Sizing it in
      vw as well as px means a long title wraps to the same number of lines
      on a 320px phone as on a 430px one instead of gaining two. */
@@ -8362,7 +8390,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
     z-index: 30;
     background: transparent;
     border-top: none;
+    /* The band is AIR, not glass. Out of flow it still spanned the full card
+       width at z-index 30, and the transparent stretch between the pills ate
+       every tap meant for the option scrolling beneath it — a respondent saw
+       an answer in plain view and could not select it ("I can't select the
+       select one answers", the bottom rows of a 12-option list). Only the
+       pills themselves may take a touch; the children restore their own
+       pointer-events below. */
+    pointer-events: none;
   }
+  .preview-overlay .preview-footer > * { pointer-events: auto; }
   /* The pills are now the only thing separating the controls from whatever is
      behind them, which on an option grid is a full-bleed gradient tile. Back
      gets a near-opaque surface rather than the 5% wash it wore against a white
