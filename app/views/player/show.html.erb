@@ -119,6 +119,7 @@
      data-player-token-back-nav-value="<%= @survey.token_back_nav_enabled? %>"
      data-player-leaderboard-value="<%= leaderboard_mode %>"
      data-player-leaderboard-url-value="<%= leaderboard_url %>"
+     data-player-contact-value="<%= @survey.contact_form_enabled? %>"
      data-player-retake-policy-value="<%= @survey.leaderboard_retake_policy %>"
      data-player-logic-value="<%= logic_mode %>"
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
@@ -210,8 +211,66 @@
         module waterfall (measured 6.5s at 400ms RTT) and read it as broken.
         The controller re-runs the toggle at boot, so this is purely the
         first paint arriving with the HTML; JS still owns navigation. %>
-    <% if @survey.respondent_code_enabled? %>
+
+    <%# Contact gate — a leading pseudo-card like the respondent-code gate
+        below: it carries NO data-card-index, so what's typed here can never
+        become an answer or shift the answer keys. The details ride the
+        ordinary saves into their own table (ContactDetail), keyed by the same
+        per-survey digest that names this device on the leaderboard — that
+        digest is the only link between the volunteered identity and the
+        pseudonymous responses. First visit only: submitting OR skipping
+        marks the device done and return visits start past it. A Verto with
+        this gate cannot also ask demographic questions
+        (Survey#contact_form_excludes_demographics). %>
+    <% if @survey.contact_form_enabled? %>
       <div class="preview-card active"
+           data-player-target="card"
+           data-card-type="contact_gate_card">
+        <div class="split-card">
+          <div class="split-left"><div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div></div>
+          <div class="split-right">
+            <div class="play-consent-main">
+              <div class="q-header">
+                <div class="q-title"><%= t("player.contact_title") %></div>
+              </div>
+              <div class="play-consent-body contact-gate-body"><%= t("player.contact_body") %></div>
+              <%# One flex child, not four: .play-consent-main's 16px gap
+                  between every input plus each input's own 14px margin made
+                  the gate a tower. Inside a wrapper the inputs space
+                  themselves and the gap is paid once. %>
+              <div class="contact-gate-fields">
+                <input type="text" class="respondent-code-input" data-player-target="contactName"
+                       autocomplete="name" maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_name") %>" placeholder="<%= t("player.contact_name") %>" />
+                <input type="email" class="respondent-code-input" data-player-target="contactEmail"
+                       autocomplete="email" inputmode="email" maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_email") %>" placeholder="<%= t("player.contact_email") %>" />
+                <input type="text" class="respondent-code-input" data-player-target="contactCompany"
+                       autocomplete="organization" maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_company") %>" placeholder="<%= t("player.contact_company") %>" />
+                <input type="text" class="respondent-code-input" data-player-target="contactIndustry"
+                       maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_industry") %>" placeholder="<%= t("player.contact_industry") %>" />
+              </div>
+              <div class="respondent-code-note"><%= t("player.contact_note") %></div>
+              <div class="play-consent-legal">
+                <%= link_to t("player.consent_privacy_link"), privacy_path,
+                            target: "_blank", rel: "noopener" %>
+              </div>
+              <div class="play-consent-actions">
+                <button type="button" class="play-consent-agree"
+                        data-action="click->player#submitContactDetails"><%= t("player.contact_continue") %></button>
+                <button type="button" class="play-consent-decline"
+                        data-action="click->player#skipContactDetails"><%= t("player.contact_skip") %></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @survey.respondent_code_enabled? %>
+      <div class="preview-card<%= " active" unless @survey.contact_form_enabled? %>"
            data-player-target="card"
            data-card-type="respondent_code_card">
         <div class="split-card">
@@ -241,7 +300,7 @@
       </div>
     <% end %>
 
-    <% first_deck_card = !@survey.respondent_code_enabled? %>
+    <% first_deck_card = !@survey.respondent_code_enabled? && !@survey.contact_form_enabled? %>
     <% cards.each do |card, idx| %>
       <%
         type    = card["type"].to_s

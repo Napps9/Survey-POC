@@ -113,8 +113,8 @@ class SurveysController < ApplicationController
 
   def settings_locked_message = t("flash.surveys.settings_locked")
 
-  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr ]
+  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy, :contacts ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr, :contacts ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -447,6 +447,12 @@ class SurveysController < ApplicationController
     PortfolioCommonQuestionSync.ensure_cards_for_survey(survey) if payload.key?("cards")
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at, warnings: warnings.uniq }
+  rescue ActiveRecord::RecordInvalid => e
+    # Validation text is model-authored and creator-facing — the contact-form /
+    # demographics wall in particular has to say WHY the save was refused, or
+    # the add-question modal's Demographics tile just looks broken.
+    render json: { ok: false, error: e.record.errors.full_messages.to_sentence },
+           status: :unprocessable_entity
   rescue => e
     # Generic to the client, specific to Sentry (P1-16): a raw exception message
     # can carry a SQL fragment, a column name or a file path, and none of that
@@ -689,6 +695,35 @@ class SurveysController < ApplicationController
     end
   end
 
+  # GET /surveys/:id/contacts.csv
+  # The contact register, for the creator. Admin-only (require_admin!) because
+  # unlike every results view this returns named individuals. Each row carries
+  # the leaderboard alias for the same identity — contacts and standings are
+  # two views of one key_digest — with the alias minted lazily here exactly the
+  # way the results page mints them (a contact who registered but never made
+  # the board still gets their name).
+  def contacts
+    rows = @survey.contact_details.order(:created_at)
+    aliases =
+      if @survey.leaderboard_active?
+        rows.each { |c| PlayerAlias.ensure_for!(survey: @survey, key_digest: c.key_digest) }
+        @survey.player_aliases.where(key_digest: rows.map(&:key_digest)).index_by(&:key_digest)
+      else
+        {}
+      end
+
+    csv = CSV.generate do |out|
+      out << [ "leaderboard_name", *ContactDetail::FIELDS, "added" ]
+      rows.each do |c|
+        out << [ aliases[c.key_digest]&.anon_name,
+                 *ContactDetail::FIELDS.map { |f| c[f] },
+                 c.created_at.iso8601 ]
+      end
+    end
+    send_data csv, type: "text/csv", disposition: "attachment",
+              filename: "verto-#{@survey.id}-contacts.csv"
+  end
+
   # POST /surveys/:id/languages
   # The editor's Language block: which languages this Verto exists in and which
   # is primary, submitted as the full desired state (default_locale +
@@ -766,7 +801,7 @@ class SurveysController < ApplicationController
     # so the toggle only shows or hides them.
     %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
-       chrome_follows_verto_language auto_detect_language].each do |flag|
+       chrome_follows_verto_language auto_detect_language contact_form_enabled].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end
@@ -855,7 +890,17 @@ class SurveysController < ApplicationController
       return
     end
 
-    @survey.update!(attrs) if attrs.any?
+    if attrs.any?
+      begin
+        @survey.update!(attrs)
+      rescue ActiveRecord::RecordInvalid
+        # The one validation a settings form can trip is the contact-form /
+        # demographics wall; surface it the way the panel's other refusals
+        # surface (slug_error / language_error), not as a 500.
+        raise unless attrs.key?(:contact_form_enabled)
+        return redirect_to survey_path(@survey, panel: "publish", contact_error: "demographics")
+      end
+    end
     respond_to do |format|
       # The settings forms are plain full-page POSTs; the in-feed
       # consent/thank-you gate cards save the same fields via fetch + JSON.

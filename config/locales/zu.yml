@@ -262,6 +262,15 @@ zu:
     respondent_code_note: 'Asisoze siyibone — ilondolozwa njenge-hash yendlela eyodwa, kuphela ukuze izimpendulo zakho zifaniswe nezakho ngokuzayo.'
     respondent_code_continue: 'Qhubeka'
     respondent_code_skip: 'Yeqa lokhu'
+    contact_title: "Shiya imininingwane yakho"
+    contact_body: "Uma ufuna sihlale sixhumana, sitshele ukuthi ungubani. Akuphoqiwe — futhi igcinwa ngokwehlukile ezimpendulweni zakho."
+    contact_name: "Igama"
+    contact_email: "I-imeyili"
+    contact_company: "Inkampani"
+    contact_industry: "Imboni"
+    contact_note: "Kubuzwa kanye kuphela kule divayisi. Imininingwane yakho igcinwa ngokwehlukile ezimpendulweni, ixhunywe kuphela egameni lakho lomdlali."
+    contact_continue: "Qhubeka"
+    contact_skip: "Qhubeka ngaphandle kwemininingwane"
     comparison_title: "Izimpendulo zakho maqondana nabo bonke"
     back: "← Emuva"
     next: "Okulandelayo →"

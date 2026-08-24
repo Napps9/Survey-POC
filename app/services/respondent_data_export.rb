@@ -51,8 +51,25 @@ class RespondentDataExport
         "Answers are keyed by the question they were given, in the order shown.",
         "A respondent code is stored only as a one-way hash and cannot be reversed."
       ],
-      "responses"  => @responses.map { |r| response_hash(r) }
-    }
+      "responses"  => @responses.map { |r| response_hash(r) },
+      # The contact register entry for the same identity, when the Verto
+      # collects one. Article 15 asks for EVERYTHING held about the person —
+      # the contact row lives apart from the responses precisely so answers
+      # stay pseudonymous, but it is still their data and belongs in their
+      # export. Reached the same way the leaderboard alias is: through the
+      # responses' player_key_digest.
+      "contact_details" => contact_hashes.presence
+    }.compact
+  end
+
+  def contact_hashes
+    digests = @responses.map(&:player_key_digest).compact.uniq
+    return [] if digests.empty?
+
+    @survey.contact_details.where(key_digest: digests).map do |c|
+      ContactDetail::FIELDS.index_with { |f| c[f] }.compact
+        .merge("added_at" => c.created_at.utc.iso8601)
+    end
   end
 
   private

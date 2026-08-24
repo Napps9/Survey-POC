@@ -21,7 +21,7 @@ const CONSENT_TYPES = [ "consent_gate" ]
 // Cards that drive their own navigation, so the deck's Back/Next/Finish are
 // hidden while one is showing. The consent shapes above, plus the
 // respondent-code gate.
-const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card" ]
+const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card", "contact_gate_card" ]
 
 // Respondent-local text-size preference (the "Aa" pill) — a person's own
 // reading accessibility need, not a per-Verto setting, so it's one fixed key
@@ -58,6 +58,7 @@ export default class extends Controller {
                     "regionsMapViewport", "regionsMapStage",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
                     "consentBanner", "consentMain", "consentDeclined", "respondentCode",
+                    "contactName", "contactEmail", "contactCompany", "contactIndustry",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "testConfirm"]
@@ -75,6 +76,9 @@ export default class extends Controller {
     quizStateUrl: { type: String, default: "" },
     scoresUrl: { type: String, default: "" },
     tokenisation: { type: Boolean, default: false },
+    // The contact gate is on (Survey#contact_form_enabled) — mints the durable
+    // player key and sends the gate's details with the ordinary saves.
+    contact: { type: Boolean, default: false },
     tokenTypes: { type: Array, default: [] },
     // Show each answer's own award as the respondent leaves the card, on top of
     // the running total (see _revealTokenEarn).
@@ -172,9 +176,16 @@ export default class extends Controller {
     }
 
     this._sessionToken = this._ensureToken()
-    if (this.leaderboardValue) this._playerKey = this._ensurePlayerKey()
+    // The durable identity is minted for the leaderboard OR the contact gate —
+    // for contacts it is the only bridge between the volunteered details and
+    // the pseudonymous responses (Survey#player_identity_active?).
+    if (this.leaderboardValue || this.contactValue) this._playerKey = this._ensurePlayerKey()
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
+    // A device that already went through the contact gate (submitted or
+    // skipped) starts past it: the gate is a first-visit register, not a toll
+    // on every replay. Before _path so the taken path never contains it.
+    this._skipContactGateIfDone()
     this._path = [this.currentValue]
     this._hops = 0
     if (this.logicValue) {
@@ -770,6 +781,58 @@ export default class extends Controller {
     if (this.hasConsentDeclinedTarget) this.consentDeclinedTarget.classList.remove("hidden")
   }
 
+  // The contact gate. Details are held in memory and ride the ordinary saves
+  // (see _payload) — they are never part of answers. What IS written locally is
+  // a done-marker, so the gate is a first-visit register: a replay or return
+  // visit starts past it (_skipContactGateIfDone), which is also why skipping
+  // marks done — declining to register is an answer to the gate, not a snooze.
+  submitContactDetails() {
+    const contact = {}
+    for (const [field, has, target] of [
+      ["name",     this.hasContactNameTarget,     () => this.contactNameTarget],
+      ["email",    this.hasContactEmailTarget,    () => this.contactEmailTarget],
+      ["company",  this.hasContactCompanyTarget,  () => this.contactCompanyTarget],
+      ["industry", this.hasContactIndustryTarget, () => this.contactIndustryTarget]
+    ]) {
+      const value = has ? target().value.trim() : ""
+      if (value) contact[field] = value
+    }
+    if (Object.keys(contact).length) {
+      this._contact = contact
+      this._buzz()
+    }
+    this._markContactDone()
+    this.next()
+  }
+
+  skipContactDetails() {
+    this._markContactDone()
+    this.next()
+  }
+
+  _markContactDone() {
+    try { localStorage.setItem(`verto_contact_${this.submitUrlValue}`, "1") } catch (_) { /* storage blocked */ }
+  }
+
+  _contactDone() {
+    try {
+      return !!localStorage.getItem(`verto_contact_${this.submitUrlValue}`)
+    } catch (_) {
+      return false
+    }
+  }
+
+  // Advance the starting card past an already-done contact gate, before the
+  // first _update paints. Bounded walk rather than a single step, so it stays
+  // correct if another leading gate ever lands beside it.
+  _skipContactGateIfDone() {
+    if (!this._contactDone()) return
+    while (this.cardTargets[this.currentValue]?.dataset.cardType === "contact_gate_card" &&
+           this.currentValue < this.cardTargets.length - 1) {
+      this.currentValue++
+    }
+  }
+
   // The respondent-code gate. The code is held in memory only until the next
   // save carries it; nothing writes it to storage on this side either, so a
   // reload genuinely forgets it (the digest already recorded on the response is
@@ -880,6 +943,12 @@ export default class extends Controller {
     // The leaderboard identity rides the same way, under the same discipline:
     // hashed server-side, set once per response, ignored while the board is off.
     if (this._playerKey) payload.player_key = this._playerKey
+    // Contact details too — which is what puts them through the service
+    // worker's offline submit queue without an endpoint of their own. The
+    // server files them in their own table (never in answers) keyed by the
+    // player key's digest; the write is idempotent, so riding every save
+    // costs nothing.
+    if (this._contact && this._playerKey) payload.contact = this._contact
     return payload
   }
 

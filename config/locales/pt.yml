@@ -254,6 +254,15 @@ pt:
     respondent_code_note: 'Nunca o vemos — é guardado como um hash unidirecional, apenas para que as suas respostas possam ser associadas às suas na próxima vez.'
     respondent_code_continue: 'Continuar'
     respondent_code_skip: 'Ignorar'
+    contact_title: "Deixe os seus dados"
+    contact_body: "Se quiser manter o contacto, diga-nos quem é. Opcional — e guardado à parte das suas respostas."
+    contact_name: "Nome"
+    contact_email: "Email"
+    contact_company: "Empresa"
+    contact_industry: "Setor"
+    contact_note: "Pedido apenas uma vez neste dispositivo. Os seus dados ficam guardados à parte das respostas, ligados apenas ao seu nome de jogador."
+    contact_continue: "Continuar"
+    contact_skip: "Continuar sem dados"
     comparison_title: As suas respostas vs todos
     back: "← Voltar"
     next: Seguinte →

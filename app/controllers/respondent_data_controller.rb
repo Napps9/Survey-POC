@@ -52,6 +52,16 @@ class RespondentDataController < ApplicationController
                          alert: t("respondent_data.not_found")
     end
 
+    # Everything the same person left behind goes together: their contact
+    # register entry and leaderboard alias hang off the responses'
+    # player_key_digest, and erasing the rows while keeping a named contact
+    # would gut the erasure it claims to be.
+    digests = responses.map(&:player_key_digest).compact.uniq
+    if digests.any?
+      @survey.contact_details.where(key_digest: digests).delete_all
+      @survey.player_aliases.where(key_digest: digests).delete_all
+    end
+
     responses.destroy_all
     redirect_to survey_respondent_data_path(@survey),
                 notice: t("respondent_data.erased", count: count)

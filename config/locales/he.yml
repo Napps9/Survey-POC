@@ -254,6 +254,15 @@ he:
     respondent_code_note: 'אנחנו לא רואים אותו — הוא נשמר כגיבוב חד-כיווני, רק כדי שנוכל להתאים את התשובות שלכם לשלכם בפעם הבאה.'
     respondent_code_continue: 'המשך'
     respondent_code_skip: 'דלגו'
+    contact_title: "השאירו את הפרטים שלכם"
+    contact_body: "אם תרצו להישאר בקשר, ספרו לנו מי אתם. לא חובה — והפרטים נשמרים בנפרד מהתשובות שלכם."
+    contact_name: "שם"
+    contact_email: "אימייל"
+    contact_company: "חברה"
+    contact_industry: "תחום"
+    contact_note: "נשאל פעם אחת במכשיר הזה. הפרטים נשמרים בנפרד מהתשובות, ומקושרים רק לשם השחקן שלכם."
+    contact_continue: "המשך"
+    contact_skip: "המשך בלי פרטים"
     comparison_title: התשובות שלך מול כולם
     back: "← חזרה"
     next: הבא →

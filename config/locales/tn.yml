@@ -264,6 +264,15 @@ tn:
     respondent_code_note: 'Ga re ke re e bone — e bolokwa jaaka khoutu e e sa kgonweng go bulwa gape, e le gore fela dikarabo tsa gago di kgone go tsamaisanngwa le tsa gago lekgetlho le le latelang.'
     respondent_code_continue: 'Tswelela'
     respondent_code_skip: 'Tlolela se'
+    contact_title: "Tlogela dintlha tsa gago"
+    contact_body: "Fa o batla gore re nne re golagane, re bolelele gore o mang. Ga go pateletse — e bile di bolokwa kwa thoko ga dikarabo tsa gago."
+    contact_name: "Leina"
+    contact_email: "Imeile"
+    contact_company: "Khampani"
+    contact_industry: "Indaseteri"
+    contact_note: "Go bodiwa gangwe fela mo sedirisweng seno. Dintlha tsa gago di bolokwa kwa thoko ga dikarabo, di golagantswe fela le leina la gago la motshameki."
+    contact_continue: "Tswelela"
+    contact_skip: "Tswelela kwantle ga dintlha"
     comparison_title: "Dikarabo tsa gago go bapisiwa le tsa botlhe"
     back: "← Morago"
     next: "Latelang →"

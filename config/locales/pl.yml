@@ -254,6 +254,15 @@ pl:
     respondent_code_note: 'Nigdy go nie widzimy — jest zapisywany jako jednokierunkowy skrót, tylko po to, aby następnym razem powiązać Twoje odpowiedzi z Twoimi.'
     respondent_code_continue: 'Kontynuuj'
     respondent_code_skip: 'Pomiń'
+    contact_title: "Zostaw swoje dane"
+    contact_body: "Jeśli chcesz pozostać w kontakcie, powiedz nam, kim jesteś. Opcjonalne — przechowywane osobno od Twoich odpowiedzi."
+    contact_name: "Imię i nazwisko"
+    contact_email: "E-mail"
+    contact_company: "Firma"
+    contact_industry: "Branża"
+    contact_note: "Pytamy tylko raz na tym urządzeniu. Twoje dane są przechowywane osobno od odpowiedzi, powiązane wyłącznie z Twoją nazwą gracza."
+    contact_continue: "Kontynuuj"
+    contact_skip: "Kontynuuj bez danych"
     comparison_title: Twoje odpowiedzi vs wszyscy
     back: "← Wstecz"
     next: Dalej →

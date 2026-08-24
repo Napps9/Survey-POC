@@ -254,6 +254,15 @@ nl:
     respondent_code_note: 'Wij zien deze nooit — hij wordt als eenrichtingshash opgeslagen, alleen zodat je antwoorden volgende keer aan die van jou gekoppeld kunnen worden.'
     respondent_code_continue: 'Doorgaan'
     respondent_code_skip: 'Overslaan'
+    contact_title: "Laat je gegevens achter"
+    contact_body: "Wil je in contact blijven, vertel ons dan wie je bent. Optioneel — en apart van je antwoorden bewaard."
+    contact_name: "Naam"
+    contact_email: "E-mail"
+    contact_company: "Bedrijf"
+    contact_industry: "Branche"
+    contact_note: "Wordt op dit apparaat maar één keer gevraagd. Je gegevens worden apart van je antwoorden bewaard, alleen gekoppeld aan je spelersnaam."
+    contact_continue: "Doorgaan"
+    contact_skip: "Doorgaan zonder gegevens"
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →

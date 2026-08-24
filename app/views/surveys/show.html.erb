@@ -1356,6 +1356,45 @@
           <% end %>
         </details>
 
+        <%# Contact details — the identified register, deliberately NOT a card:
+            respondents meet it as a first-visit gate ahead of the deck, what
+            they type lands in its own table keyed by the same identity as
+            their leaderboard name, and it can never coexist with demographic
+            questions (the model refuses either side while the other is on). %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Contact details <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="contact_form_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="contact_form_enabled" value="1"
+                     <%= "checked" if @survey.contact_form_enabled? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Ask for contact details (name, email, company, industry) the first time someone opens this Verto. Optional for them, asked once per device, and stored apart from their answers — linked only to their leaderboard name.</span>
+            </label>
+          <% end %>
+          <% if params[:contact_error] == "demographics" %>
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;line-height:1.45;">
+              A Verto can collect contact details or ask demographic questions — never both.
+              Delete the demographic questions from the deck first, then turn this on.
+            </div>
+          <% else %>
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+              For GDPR, a Verto with a contact form can't also ask demographic questions — and the other way round.
+            </div>
+          <% end %>
+          <% if @survey.contact_form_enabled? && current_membership&.admin? %>
+            <% contact_count = @survey.contact_details.count %>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);"><%= pluralize(contact_count, "contact") %> collected</span>
+              <% if contact_count.positive? %>
+                <%= link_to "Download CSV", survey_contacts_path(@survey, format: :csv),
+                      style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#01EACB;text-decoration:underline;text-underline-offset:3px;" %>
+              <% end %>
+            </div>
+          <% end %>
+        </details>
+
         <%# Who this Verto is for. One setting today — the country — and it
             feeds one thing: whether the opt-in Heritage question asks in the
             global nine categories or the ones this country's own census uses.

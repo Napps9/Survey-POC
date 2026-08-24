@@ -256,6 +256,15 @@ sn:
     respondent_code_note: 'Hatimboiona ino — inochengetwa sehashi yenzira imwe chete, kuti chete mhinduro dzako dzigone kuenzaniswa nedzako nguva inotevera.'
     respondent_code_continue: 'Enderera'
     respondent_code_skip: 'Pfuura Izvi'
+    contact_title: "Siyai ruzivo rwenyu"
+    contact_body: "Kana muchida kuramba tichikurukurirana, tiudzei kuti ndimi ani. Hazvimanikidzwi — uye zvinochengetwa zvakaparadzana nemhinduro dzenyu."
+    contact_name: "Zita"
+    contact_email: "Email"
+    contact_company: "Kambani"
+    contact_industry: "Indasitiri"
+    contact_note: "Zvinobvunzwa kamwe chete pamudziyo uyu. Ruzivo rwenyu runochengetwa rwakaparadzana nemhinduro, rwakabatana chete nezita renyu remutambi."
+    contact_continue: "Enderera mberi"
+    contact_skip: "Enderera mberi musina ruzivo"
     comparison_title: "Mhinduro Dzako pamwe Nedzevose"
     back: "← Dzokera"
     next: "Enderera →"

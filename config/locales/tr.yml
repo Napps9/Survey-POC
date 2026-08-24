@@ -254,6 +254,15 @@ tr:
     respondent_code_note: 'Bunu hiç görmüyoruz — tek yönlü bir özet olarak saklanır, yalnızca yanıtlarınız bir sonraki kez kendi yanıtlarınızla eşleştirilebilsin diye.'
     respondent_code_continue: 'Devam'
     respondent_code_skip: 'Atla'
+    contact_title: "Bilgilerinizi bırakın"
+    contact_body: "İletişimde kalmak isterseniz bize kim olduğunuzu söyleyin. İsteğe bağlı — ve yanıtlarınızdan ayrı saklanır."
+    contact_name: "Ad"
+    contact_email: "E-posta"
+    contact_company: "Şirket"
+    contact_industry: "Sektör"
+    contact_note: "Bu cihazda yalnızca bir kez sorulur. Bilgileriniz yanıtlarınızdan ayrı saklanır ve yalnızca oyuncu adınıza bağlanır."
+    contact_continue: "Devam et"
+    contact_skip: "Bilgi vermeden devam et"
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →

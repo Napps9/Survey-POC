@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_24_104927) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_121556) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -144,6 +144,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_104927) do
     t.datetime "updated_at", null: false
     t.index ["common_question_set_id", "position"], name: "index_common_questions_on_common_question_set_id_and_position"
     t.index ["common_question_set_id"], name: "index_common_questions_on_common_question_set_id"
+  end
+
+  create_table "contact_details", force: :cascade do |t|
+    t.string "company"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "industry"
+    t.string "key_digest", null: false
+    t.string "name"
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "key_digest"], name: "index_contact_details_on_survey_id_and_key_digest", unique: true
+    t.index ["survey_id"], name: "index_contact_details_on_survey_id"
   end
 
   create_table "corpus_entries", force: :cascade do |t|
@@ -845,6 +858,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_104927) do
     t.string "consent_image_credit"
     t.string "consent_image_credit_url"
     t.text "consent_text"
+    t.boolean "contact_form_enabled", default: false, null: false
     t.datetime "created_at", null: false
     t.string "default_locale", default: "en", null: false
     t.datetime "deleted_at"
@@ -956,6 +970,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_104927) do
   add_foreign_key "ask_threads", "users"
   add_foreign_key "common_question_sets", "organisations"
   add_foreign_key "common_questions", "common_question_sets"
+  add_foreign_key "contact_details", "surveys"
   add_foreign_key "corpus_entries", "organisations"
   add_foreign_key "corpus_entries", "surveys"
   add_foreign_key "corpus_entries", "users", column: "opted_in_by_id"

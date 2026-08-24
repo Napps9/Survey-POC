@@ -264,6 +264,15 @@ en:
     respondent_code_note: 'We never see this — it''s stored as a one-way hash, only so your answers can be matched to your own next time.'
     respondent_code_continue: 'Continue'
     respondent_code_skip: 'Skip this'
+    contact_title: "Leave your details"
+    contact_body: "If you'd like to stay in touch, tell us who you are. Optional — and kept apart from your answers."
+    contact_name: "Name"
+    contact_email: "Email"
+    contact_company: "Company"
+    contact_industry: "Industry"
+    contact_note: "Asked once on this device. Your details are stored separately from your answers, linked only to your player name."
+    contact_continue: "Continue"
+    contact_skip: "Continue without details"
     comparison_title: "Your answers vs everyone"
     back: "← Back"
     next: "Next →"

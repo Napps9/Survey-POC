@@ -254,6 +254,15 @@ ar:
     respondent_code_note: 'لا نرى هذا أبدًا — يُخزَّن كتجزئة أحادية الاتجاه، فقط لمطابقة إجاباتك بإجاباتك في المرة القادمة.'
     respondent_code_continue: 'متابعة'
     respondent_code_skip: 'تخطٍّ'
+    contact_title: "اترك بياناتك"
+    contact_body: "إذا أردت البقاء على تواصل، أخبرنا من أنت. اختياري — ويُحفظ بمعزل عن إجاباتك."
+    contact_name: "الاسم"
+    contact_email: "البريد الإلكتروني"
+    contact_company: "الشركة"
+    contact_industry: "المجال"
+    contact_note: "يُطلب مرة واحدة على هذا الجهاز. تُحفظ بياناتك بمعزل عن إجاباتك، ولا تُربط إلا باسم اللاعب الخاص بك."
+    contact_continue: "متابعة"
+    contact_skip: "متابعة من دون بيانات"
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←

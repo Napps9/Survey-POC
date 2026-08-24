@@ -254,6 +254,15 @@ sw:
     respondent_code_note: 'Hatuuoni kamwe — huhifadhiwa kama hashi ya njia moja, ili majibu yako yalinganishwe na yako mwenyewe wakati ujao.'
     respondent_code_continue: 'Endelea'
     respondent_code_skip: 'Ruka'
+    contact_title: "Acha maelezo yako"
+    contact_body: "Ukipenda tuendelee kuwasiliana, tuambie wewe ni nani. Si lazima — na huhifadhiwa mbali na majibu yako."
+    contact_name: "Jina"
+    contact_email: "Barua pepe"
+    contact_company: "Kampuni"
+    contact_industry: "Sekta"
+    contact_note: "Huulizwa mara moja tu kwenye kifaa hiki. Maelezo yako huhifadhiwa mbali na majibu yako, yakiunganishwa tu na jina lako la mchezaji."
+    contact_continue: "Endelea"
+    contact_skip: "Endelea bila maelezo"
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →

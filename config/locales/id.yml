@@ -254,6 +254,15 @@ id:
     respondent_code_note: 'Kami tidak pernah melihatnya — disimpan sebagai hash satu arah, hanya agar jawaban Anda dapat dicocokkan dengan jawaban Anda sendiri berikutnya.'
     respondent_code_continue: 'Lanjutkan'
     respondent_code_skip: 'Lewati'
+    contact_title: "Tinggalkan data Anda"
+    contact_body: "Jika ingin tetap terhubung, beri tahu kami siapa Anda. Opsional — dan disimpan terpisah dari jawaban Anda."
+    contact_name: "Nama"
+    contact_email: "Email"
+    contact_company: "Perusahaan"
+    contact_industry: "Industri"
+    contact_note: "Hanya ditanyakan sekali di perangkat ini. Data Anda disimpan terpisah dari jawaban, hanya terhubung ke nama pemain Anda."
+    contact_continue: "Lanjutkan"
+    contact_skip: "Lanjutkan tanpa data"
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →

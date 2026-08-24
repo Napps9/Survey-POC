@@ -254,6 +254,15 @@ fr:
     respondent_code_note: 'Nous ne le voyons jamais : il est stocké sous forme de hachage à sens unique, uniquement pour relier vos réponses aux vôtres la prochaine fois.'
     respondent_code_continue: 'Continuer'
     respondent_code_skip: 'Passer'
+    contact_title: "Laissez vos coordonnées"
+    contact_body: "Si vous souhaitez rester en contact, dites-nous qui vous êtes. Facultatif — et conservé à part de vos réponses."
+    contact_name: "Nom"
+    contact_email: "E-mail"
+    contact_company: "Entreprise"
+    contact_industry: "Secteur"
+    contact_note: "Demandé une seule fois sur cet appareil. Vos coordonnées sont conservées à part de vos réponses, liées uniquement à votre nom de joueur."
+    contact_continue: "Continuer"
+    contact_skip: "Continuer sans coordonnées"
     comparison_title: Vos réponses vs tout le monde
     back: "← Retour"
     next: Suivant →

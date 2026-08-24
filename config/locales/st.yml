@@ -264,6 +264,15 @@ st:
     respondent_code_note: 'Ha re e bone le ka mohla — e bolokwa e le "hash" e sa kgutleng, feela e le hore dikarabo tsa hao di kgone ho tshwaiswa le tsa hao lekgetlong le latelang.'
     respondent_code_continue: 'Tswela pele'
     respondent_code_skip: 'Tlola sena'
+    contact_title: "Siea lintlha tsa hau"
+    contact_body: "Haeba u batla ho lula u hokahane, re bolelle hore na u mang. Ha ho tlame — li bolokoa ka thōko ho likarabo tsa hau."
+    contact_name: "Lebitso"
+    contact_email: "Imeile"
+    contact_company: "Khamphani"
+    contact_industry: "Indasteri"
+    contact_note: "E botsoa hang feela sesebelisoeng sena. Lintlha tsa hau li bolokoa ka thōko ho likarabo, li hokahantsoe feela le lebitso la hau la sebapali."
+    contact_continue: "Tsoela pele"
+    contact_skip: "Tsoela pele ntle le lintlha"
     comparison_title: "Dikarabo tsa hao vs bohle"
     back: "← Morao"
     next: "E latelang →"

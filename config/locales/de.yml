@@ -254,6 +254,15 @@ de:
     respondent_code_note: 'Wir sehen ihn nie — er wird als Einweg-Hash gespeichert, nur damit Ihre Antworten beim nächsten Mal Ihren eigenen zugeordnet werden können.'
     respondent_code_continue: 'Weiter'
     respondent_code_skip: 'Überspringen'
+    contact_title: "Deine Kontaktdaten"
+    contact_body: "Wenn du in Kontakt bleiben möchtest, sag uns, wer du bist. Optional — und getrennt von deinen Antworten aufbewahrt."
+    contact_name: "Name"
+    contact_email: "E-Mail"
+    contact_company: "Unternehmen"
+    contact_industry: "Branche"
+    contact_note: "Wird auf diesem Gerät nur einmal gefragt. Deine Daten werden getrennt von deinen Antworten gespeichert und nur mit deinem Spielernamen verknüpft."
+    contact_continue: "Weiter"
+    contact_skip: "Ohne Angaben fortfahren"
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →

@@ -1968,6 +1968,17 @@
   color: rgba(0,0,0,0.55);
 }
 
+/* ── Contact gate (player) ─────────────────────────────────────────────────
+   The gate builds its interior out of .play-consent-main like the code gate
+   does, and on a phone that panel is the scroller (flex + overflow-y). The
+   intro paragraph inherits .play-consent-body's own max-height + overflow,
+   which makes it the panel's only SHRINKABLE child — flex squeezed it to 0px
+   and the wording vanished while every rigid input kept its box. The gate's
+   body opts out: the panel scrolls, its children keep their height. */
+.contact-gate-body { flex-shrink: 0; max-height: none; overflow: visible; }
+.contact-gate-fields { flex-shrink: 0; }
+.contact-gate-fields .respondent-code-input:first-child { margin-top: 0; }
+
 /* Creator's answer-length control, under the free-text counter in the editor. */
 .freeform-limit-row {
   display: flex; align-items: center; gap: 8px; margin-top: 8px;

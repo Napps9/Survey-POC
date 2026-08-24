@@ -263,6 +263,15 @@ xh:
     respondent_code_note: 'Asikaze siyibone — igcinwa njengomtya ongenakubuyiselwa umva, ukuze iimpendulo zakho zifaniswe nezakho ngexesha elizayo.'
     respondent_code_continue: 'Qhubeka'
     respondent_code_skip: 'Yeka oku'
+    contact_title: "Shiya iinkcukacha zakho"
+    contact_body: "Ukuba ufuna sihlale sinxibelelana, sixelele ukuba ungubani. Akunyanzelekanga — kwaye zigcinwa zodwa kwiimpendulo zakho."
+    contact_name: "Igama"
+    contact_email: "I-imeyile"
+    contact_company: "Inkampani"
+    contact_industry: "Ishishini"
+    contact_note: "Kubuzwa kanye kuphela kwesi sixhobo. Iinkcukacha zakho zigcinwa zodwa kwiimpendulo, zinxulunyaniswa kuphela negama lakho lomdlali."
+    contact_continue: "Qhubeka"
+    contact_skip: "Qhubeka ngaphandle kweenkcukacha"
     comparison_title: "Iimpendulo zakho kubo bonke"
     back: "← Emva"
     next: "Kwelandelayo →"

@@ -28,6 +28,7 @@ class Survey < ApplicationRecord
   # The leaderboard's anonymous names. Scoped to the Verto (a name is an
   # identity on ONE board) and gone with it.
   has_many :player_aliases, dependent: :destroy
+  has_many :contact_details, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in
   # the `cards` JSON as base64 data-URLs, which meant every render of a Verto
@@ -1892,6 +1893,22 @@ class Survey < ApplicationRecord
   # database exception.
   validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
 
+  # THE GDPR WALL. A Verto may collect contact details or ask demographic
+  # questions — never both. Contact details make a respondent identified;
+  # demographics next to an identity is special-category adjacency nobody
+  # here wants to hold. Enforced at the data layer so every path in — the
+  # settings toggle, the card autosave, the add-question modal's Demographics
+  # tiles, an import — hits the same wall, whichever side moved second. The
+  # message is creator-facing: surveys#update relays RecordInvalid text.
+  validate :contact_form_excludes_demographics, if: :contact_form_enabled?
+
+  def contact_form_excludes_demographics
+    return unless demographic_cards?
+
+    errors.add(:base, "A Verto can collect contact details or ask demographic questions, never both — " \
+                      "remove the demographic questions to keep the contact form, or turn the contact form off.")
+  end
+
   def self.normalize_leaderboard_retake_policy(value)
     LEADERBOARD_RETAKE_POLICIES.include?(value.to_s) ? value.to_s : "accumulate"
   end
@@ -1901,6 +1918,21 @@ class Survey < ApplicationRecord
   # pre-live tokenisation switch-off, but nothing renders or records).
   def leaderboard_active?
     tokenisation_enabled? && leaderboard_enabled?
+  end
+
+  # Whether the player should mint/record the durable per-device identity
+  # (player_key → per-survey digest). The leaderboard needs it for its alias;
+  # the contact gate needs it because the digest is the ONLY bridge between a
+  # contact row and the pseudonymous responses.
+  def player_identity_active?
+    leaderboard_active? || contact_form_enabled?
+  end
+
+  # Any card in the deck flagged as a demographic question — the auto-appended
+  # birth/location/gender tail and the opt-in heritage/neurodiversity cards
+  # all carry "demographic" => true (DemographicQuestions).
+  def demographic_cards?
+    Array(cards).any? { |c| c.is_a?(Hash) && c["demographic"] }
   end
 
   def leaderboard_no_redo?
