@@ -76,10 +76,49 @@ module DemographicQuestions
     }
   }.freeze
 
-  # Every key Survey.sanitize_cards_images! will accept. "gender" is reserved
-  # so a future migration can tag the legacy tail card without another
-  # allowlist change.
-  DEMOGRAPHIC_KEYS = (OPTIONAL_CARDS.keys + [ "gender" ]).freeze
+  # The core tail trio, addable one at a time from the add-question modal's
+  # Demographics tiles — for a creator who deleted one and wants it back, or
+  # who removed the tail for the contact form and later flipped back. Keys map
+  # into CARDS positionally; cards inserted this way CARRY their key, while
+  # the auto-appended tail predates keys and stays keyless — key_for below is
+  # the one place that reads both generations.
+  CORE_KEYS = { "age" => 0, "location" => 1, "gender" => 2 }.freeze
+
+  # One core tail card, localised, tagged with its key. Same shape as
+  # optional_card so the modal's insert endpoint can serve either.
+  def self.core_card(key, locale: nil)
+    idx = CORE_KEYS[key.to_s]
+    return nil unless idx
+
+    cards(locale: locale)[idx].merge("demographic_key" => key.to_s)
+  end
+
+  # The registry card behind any Demographics tile — opt-in or core.
+  def self.card_for_key(key, locale: nil)
+    optional_card(key, locale: locale) || core_card(key, locale: locale)
+  end
+
+  # The demographic identity of a card, across both generations: an explicit
+  # demographic_key where one is stored, else inferred the way the answer sync
+  # infers (PlayerController#sync_demographics_from_answers! matches birth by
+  # input "month" and gender as the keyless demographic multiple_choice —
+  # sync_region_from_answers! matches location by input). Nil for a card that
+  # isn't a demographic question at all.
+  def self.key_for(card)
+    return nil unless card.is_a?(Hash) && card["demographic"]
+    return card["demographic_key"].to_s if card["demographic_key"].to_s.strip.present?
+
+    case
+    when card["input"] == "month"            then "age"
+    when card["input"] == "location"         then "location"
+    when card["type"] == "multiple_choice"   then "gender"
+    end
+  end
+
+  # Every key Survey.sanitize_cards_images! will accept. CORE_KEYS supplies
+  # "gender" — the reservation the old comment promised — plus "age" and
+  # "location" now that the tail trio is insertable from the modal.
+  DEMOGRAPHIC_KEYS = (OPTIONAL_CARDS.keys + CORE_KEYS.keys).freeze
 
   # Registry entries the card no longer OFFERS. They stay in the list because
   # the list is the translated vocabulary, not the card:

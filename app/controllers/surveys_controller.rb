@@ -1258,8 +1258,15 @@ class SurveysController < ApplicationController
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
+    # The contact wall, at the door rather than at the autosave: letting the
+    # card into the feed and failing the save later reads as a broken editor.
+    if survey.contact_form_enabled?
+      return render json: { ok: false, error: "A Verto can collect contact details or ask demographic questions, never both — turn the contact form off first." },
+                    status: :unprocessable_entity
+    end
+
     key  = params[:key].to_s
-    card = DemographicQuestions.optional_card(key, locale: survey.default_locale)
+    card = DemographicQuestions.card_for_key(key, locale: survey.default_locale)
     unless card
       return render json: { ok: false, error: "Unknown demographic question." }, status: :unprocessable_entity
     end
@@ -1279,7 +1286,10 @@ class SurveysController < ApplicationController
     end
     # Belt-and-braces behind the tile grey-out (which reads the live DOM):
     # one of each per deck, or the answer sync's first-match would be arbitrary.
-    if Array(survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key }
+    # key_for, not demographic_key: the auto-appended tail predates keys, and a
+    # second birth-date card next to a keyless one is exactly the duplicate
+    # this exists to stop.
+    if Array(survey.cards).any? { |c| DemographicQuestions.key_for(c) == key }
       return render json: { ok: false, error: "This Verto already asks that." }, status: :unprocessable_entity
     end
 
@@ -1295,7 +1305,7 @@ class SurveysController < ApplicationController
       # so a multilingual Verto's next autosave doesn't persist the card
       # monolingual. No Claude call needed, unlike generate_card.
       (Array(survey.locales) - [ survey.default_locale ]).each do |loc|
-        tr = DemographicQuestions.optional_card(key, locale: loc)
+        tr = DemographicQuestions.card_for_key(key, locale: loc)
         (card["i18n"] ||= {})[loc] =
           { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
       end
