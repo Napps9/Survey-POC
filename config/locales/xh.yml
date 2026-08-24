@@ -62,6 +62,7 @@ xh:
     char_limit_option: 'Iimpawu ezingu-%{n}'
     allow_other: "Vumela impendulo yamahala engaphantsi kwe-“Enye”"
     required: "Umbuzo oyimfuneko"
+    ask_once: "Buza kanye — iyatsitywa xa kudlalwa kwakhona emva kokuphendulwa"
     other: "Enye"
     other_placeholder: "Sixelele ngamazwi akho…"
     mark_correct: "Phawula impendulo echanekileyo"

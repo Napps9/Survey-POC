@@ -64,6 +64,7 @@ st:
     char_limit_option: 'Ditlhaku tse %{n}'
     allow_other: 'Dumella karabo ya mongolo o mahala wa "E nngwe"'
     required: "Potso e hlokahalang"
+    ask_once: "Botsa hang feela — e tlolwa ha ho bapaloa hape ka mor'a hore e arajoe"
     other: "E nngwe"
     other_placeholder: "Re bolelle ka mantswe a hao…"
     mark_correct: "Tshwaya karabo e nepahetseng"

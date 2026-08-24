@@ -64,6 +64,7 @@ en:
     char_limit_option: '%{n} characters'
     allow_other: "Allow “Other” free-text answer"
     required: "Required question"
+    ask_once: "Ask once — skipped on repeat plays after it's answered"
     other: "Other"
     other_placeholder: "Tell us in your own words…"
     mark_correct: "Mark the correct answer"

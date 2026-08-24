@@ -330,7 +330,8 @@
            <% if preview_mode && graded %>data-card-correct="<%= QuizGrading.correct_display(card).to_json %>" data-card-explanation="<%= card['explanation'] %>"<% end %>
            data-card-awards-tokens="<%= awards_tokens %>"
            <% if awards_tokens %>data-card-tokens="<%= card['tokens'].to_json %>" data-card-token-award="<%= card['token_award'].to_json %>" data-card-token-award-mode="<%= card['token_award_mode'] %>"<% end %>
-           data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>">
+           data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>"
+           data-card-ask-once="<%= (is_q && card['ask_once']) ? 'true' : 'false' %>">
         <%= render "player/play_card", card: card, progress: prog, card_index: idx,
               locale: @display_locale, default_locale: @survey.default_locale %>
       </div>

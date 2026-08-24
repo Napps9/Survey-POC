@@ -64,6 +64,7 @@ tn:
     char_limit_option: 'Ditlhaka tse %{n}'
     allow_other: 'Letla karabo ya mahala ya "E Sele"'
     required: "Potso e e tlhokegang"
+    ask_once: "Botsa gangwe fela — e tlolwa fa go tshamekwa gape morago ga go arabiwa"
     other: "E Sele"
     other_placeholder: "Re bolelele ka mafoko a gago…"
     mark_correct: "Tshwaya karabo e e nepagetseng"

@@ -62,6 +62,7 @@ tr:
     char_limit_option: '%{n} karakter'
     allow_other: '"Diğer" serbest metin yanıtına izin ver'
     required: "Zorunlu soru"
+    ask_once: "Bir kez sor — yanıtlandıktan sonra tekrar oynanışlarda atlanır"
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
     mark_correct: "Doğru cevabı işaretle"

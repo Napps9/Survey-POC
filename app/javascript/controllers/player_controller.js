@@ -176,16 +176,28 @@ export default class extends Controller {
     }
 
     this._sessionToken = this._ensureToken()
-    // The durable identity is minted for the leaderboard OR the contact gate —
-    // for contacts it is the only bridge between the volunteered details and
-    // the pseudonymous responses (Survey#player_identity_active?).
-    if (this.leaderboardValue || this.contactValue) this._playerKey = this._ensurePlayerKey()
+    // The durable identity is minted for the leaderboard, the contact gate,
+    // or any ask-once question — for contacts it is the only bridge between
+    // the volunteered details and the pseudonymous responses, and for
+    // ask-once it is the identity the "asked once" promise is made to
+    // (Survey#player_identity_active? mirrors this server-side).
+    this._hasAskOnce = this.cardTargets.some(c => c.dataset.cardAskOnce === "true")
+    if (this.leaderboardValue || this.contactValue || this._hasAskOnce) {
+      this._playerKey = this._ensurePlayerKey()
+    }
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
     // A device that already went through the contact gate (submitted or
     // skipped) starts past it: the gate is a first-visit register, not a toll
     // on every replay. Before _path so the taken path never contains it.
     this._skipContactGateIfDone()
+    // Remembered ask-once answers seed this run before the first paint, and
+    // the starting card walks past any leading remembered questions.
+    this._seedOnceAnswers()
+    while (this._isOnceSkipped(this.currentValue) &&
+           this.currentValue < this.cardTargets.length - 1) {
+      this.currentValue++
+    }
     this._path = [this.currentValue]
     this._hops = 0
     if (this.logicValue) {
@@ -810,6 +822,65 @@ export default class extends Controller {
     this.next()
   }
 
+  // ── Ask-once questions ────────────────────────────────────────────────────
+  // A question the creator marked "ask once per person": the first run that
+  // answers it writes the answer here (see _capture), and every later run
+  // seeds it back into _answers and navigates past the card. The store shares
+  // localStorage with the durable player key, so the remembered answer and
+  // the identity it belongs to are one fate — and the seeded answer rides
+  // each run's ordinary payload, keeping every response row complete under
+  // that identity's digest.
+
+  _onceStoreKey() {
+    return `verto_once_${this.submitUrlValue}`
+  }
+
+  _readOnceStore() {
+    try {
+      return JSON.parse(localStorage.getItem(this._onceStoreKey()) || "{}") || {}
+    } catch (_) {
+      return {}
+    }
+  }
+
+  _writeOnceStore(cardIndex, answer) {
+    try {
+      const store = this._readOnceStore()
+      store[cardIndex] = answer
+      localStorage.setItem(this._onceStoreKey(), JSON.stringify(store))
+    } catch (_) { /* storage blocked — the question simply asks again next run */ }
+  }
+
+  // Seed remembered answers into this run. Only for cards still marked
+  // ask-once (the creator may have untoggled since) with a genuinely given
+  // answer — and record which card indexes are skippable this run.
+  _seedOnceAnswers() {
+    this._onceSkip = new Set()
+    const store = this._readOnceStore()
+    this.cardTargets.forEach((card, i) => {
+      if (card.dataset.cardAskOnce !== "true") return
+      const key = card.dataset.cardIndex
+      if (key === undefined || key === "") return
+      const remembered = store[key]
+      if (remembered === undefined || !this._isAnswerGiven(remembered)) return
+      this._answers[key] = remembered
+      this._onceSkip.add(i)
+    })
+  }
+
+  _isOnceSkipped(i) {
+    return !!this._onceSkip && this._onceSkip.has(i)
+  }
+
+  // The last card a respondent will actually SEE — trailing remembered cards
+  // don't count, so the button before them says Finish, not Next.
+  _lastInteractiveIndex() {
+    for (let i = this.cardTargets.length - 1; i >= 0; i--) {
+      if (!this._isOnceSkipped(i)) return i
+    }
+    return this.cardTargets.length - 1
+  }
+
   _markContactDone() {
     try { localStorage.setItem(`verto_contact_${this.submitUrlValue}`, "1") } catch (_) { /* storage blocked */ }
   }
@@ -892,6 +963,14 @@ export default class extends Controller {
     if (this.currentValue < this.cardTargets.length - 1) {
       this._buzz()
       this.currentValue++
+      // Ask-once: remembered questions are not re-asked — walk past them to
+      // the next card this respondent still owes an answer. Bounded by the
+      // deck end; _lastInteractiveIndex keeps Finish on the last REAL card,
+      // so this never strands anyone on a skipped tail.
+      while (this._isOnceSkipped(this.currentValue) &&
+             this.currentValue < this.cardTargets.length - 1) {
+        this.currentValue++
+      }
       this._update()
     }
   }
@@ -908,17 +987,26 @@ export default class extends Controller {
     this._saveProgress()
     if (this.logicValue) {
       // Retrace the taken path — a plain currentValue-- could land on a card
-      // this respondent skipped by branching.
+      // this respondent skipped by branching. Remembered ask-once cards sit
+      // in the path (their seeded answers rode the routing), so pop through
+      // them too: Back means "the previous card I SAW".
       if (this._path.length > 1) {
-        this._path.pop()
-        this.currentValue = this._path[this._path.length - 1]
-        this._hops = Math.max(0, this._hops - 1)
+        do {
+          this._path.pop()
+          this.currentValue = this._path[this._path.length - 1]
+          this._hops = Math.max(0, this._hops - 1)
+        } while (this._path.length > 1 && this._isOnceSkipped(this.currentValue))
         this._update()
       }
       return
     }
     if (this.currentValue > 0) {
-      this.currentValue--
+      // Mirror of _advance's walk: Back lands on the previous card the
+      // respondent actually saw. If everything earlier is remembered, stay.
+      let dest = this.currentValue - 1
+      while (dest > 0 && this._isOnceSkipped(dest)) dest--
+      if (this._isOnceSkipped(dest)) return
+      this.currentValue = dest
       this._update()
     }
   }
@@ -1049,6 +1137,12 @@ export default class extends Controller {
       this._buzz()
       this._path.push(dest.index)
       this.currentValue = dest.index
+      // Ask-once under logic: a remembered card is landed on (its seeded
+      // answer must drive its own routing) and immediately left — the
+      // recursion resolves the NEXT step from this card exactly as if the
+      // respondent had just answered it. The hop budget above still bounds
+      // the walk.
+      if (this._isOnceSkipped(dest.index)) { await this._advanceLogic(); return }
       this._update()
       return
     }
@@ -1323,6 +1417,14 @@ export default class extends Controller {
     const key = card.dataset.cardIndex
     if (key === undefined || key === "") return
     this._answers[key] = this._answerOf(card)
+    // Ask-once questions remember their answer on the device the moment it is
+    // given, alongside the identity that gave it — the durable player key in
+    // this same storage — so the next run seeds and skips (see
+    // _seedOnceAnswers). Storage and identity live or die together: clearing
+    // one clears both, which is what keeps "asked once PER PERSON" honest.
+    if (card.dataset.cardAskOnce === "true" && this._isAnswerGiven(this._answers[key])) {
+      this._writeOnceStore(key, this._answers[key])
+    }
   }
 
   // What this card holds right now, in the shape _isAnswerGiven reads.
@@ -2037,7 +2139,7 @@ export default class extends Controller {
     // respondent-code card), or off the start of the visited path under logic.
     this.backBtnTarget.classList.toggle("invisible", this.logicValue ? this._path.length <= 1 : idx === offset)
     // Under logic, "last" depends on the graph, not the array position.
-    const isLast = this.logicValue ? (this._staticNext(idx).end != null) : (idx === cards.length - 1)
+    const isLast = this.logicValue ? (this._staticNext(idx).end != null) : (idx >= this._lastInteractiveIndex())
     this.nextBtnTarget.classList.toggle("hidden", isLast)
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
     if (this.quizValue) this._labelQuizNav()

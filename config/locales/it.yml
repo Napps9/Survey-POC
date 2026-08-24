@@ -62,6 +62,7 @@ it:
     char_limit_option: '%{n} caratteri'
     allow_other: Consenti risposta libera “Altro”
     required: "Domanda obbligatoria"
+    ask_once: "Chiedi una volta — saltata alle ripetizioni una volta risposta"
     other: Altro
     other_placeholder: Raccontacelo con parole tue…
     mark_correct: "Indica la risposta corretta"

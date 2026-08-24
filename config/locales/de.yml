@@ -62,6 +62,7 @@ de:
     char_limit_option: '%{n} Zeichen'
     allow_other: "„Andere“-Freitextantwort erlauben"
     required: "Pflichtfrage"
+    ask_once: "Einmal fragen — bei erneutem Spielen nach Beantwortung übersprungen"
     other: Andere
     other_placeholder: Sag es uns in eigenen Worten…
     mark_correct: "Richtige Antwort markieren"

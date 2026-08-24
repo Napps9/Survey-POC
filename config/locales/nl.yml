@@ -62,6 +62,7 @@ nl:
     char_limit_option: '%{n} tekens'
     allow_other: Sta een vrij tekstantwoord “Anders” toe
     required: "Verplichte vraag"
+    ask_once: "Eén keer vragen — overgeslagen bij opnieuw spelen na beantwoording"
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
     mark_correct: "Markeer het juiste antwoord"

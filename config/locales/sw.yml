@@ -62,6 +62,7 @@ sw:
     char_limit_option: 'Herufi %{n}'
     allow_other: Ruhusu jibu huru la "Nyingine"
     required: "Swali la lazima"
+    ask_once: "Uliza mara moja — huruka unapocheza tena baada ya kujibiwa"
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
     mark_correct: "Weka jibu sahihi"

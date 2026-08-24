@@ -62,6 +62,7 @@ id:
     char_limit_option: '%{n} karakter'
     allow_other: Izinkan jawaban teks bebas "Lainnya"
     required: "Pertanyaan wajib"
+    ask_once: "Tanya sekali — dilewati saat main ulang setelah dijawab"
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
     mark_correct: "Tandai jawaban yang benar"

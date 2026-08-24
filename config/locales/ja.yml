@@ -62,6 +62,7 @@ ja:
     char_limit_option: '%{n} 文字'
     allow_other: "「その他」の自由記述回答を許可"
     required: "必須の質問"
+    ask_once: "一度だけ質問 — 回答後の再プレイではスキップ"
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
     mark_correct: "正解をマークする"

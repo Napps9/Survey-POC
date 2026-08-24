@@ -61,6 +61,7 @@ sn:
     char_limit_option: 'Mavara %{n}'
     allow_other: "Bvumira mhinduro yakasununguka ye\"Zvimwe\""
     required: "Mubvunzo Unodikanwa"
+    ask_once: "Bvunza kamwe chete — inodarikwa pakutamba zvakare mushure mekupindurwa"
     other: "Zvimwe"
     other_placeholder: "Tiudze nemazwi ako…"
     mark_correct: "Ratidza Mhinduro Chaiyo"

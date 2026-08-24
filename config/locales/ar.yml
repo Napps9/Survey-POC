@@ -62,6 +62,7 @@ ar:
     char_limit_option: '%{n} حرفًا'
     allow_other: السماح بإجابة "أخرى" بنص حر
     required: "سؤال إلزامي"
+    ask_once: "يُسأل مرة واحدة — يُتخطى في المرات التالية بعد الإجابة عنه"
     other: أخرى
     other_placeholder: أخبرنا بكلماتك الخاصة…
     mark_correct: "حدِّد الإجابة الصحيحة"

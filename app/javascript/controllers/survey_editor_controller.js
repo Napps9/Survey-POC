@@ -43,7 +43,7 @@ const OPTION_LABEL_SELECTORS = {
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
-    "cardFlags", "panelOther", "panelRequired", "responseScale", "vertoTitle", "undoBtn"]
+    "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -1440,6 +1440,7 @@ export default class extends Controller {
     if (!isQ) return
     if (this.hasPanelOtherTarget)    this.panelOtherTarget.checked    = card.dataset.cardAllowOther === "true"
     if (this.hasPanelRequiredTarget) this.panelRequiredTarget.checked = card.dataset.cardRequired === "true"
+    if (this.hasPanelAskOnceTarget)  this.panelAskOnceTarget.checked  = card.dataset.cardAskOnce === "true"
     this._syncResponseScale(card)
   }
 
@@ -1503,6 +1504,17 @@ export default class extends Controller {
     card.dataset.cardRequired = on ? "true" : "false"
     const chip = card.querySelector("[data-role='required-chip']")
     if (chip) chip.hidden = !on
+    this.markDirty()
+  }
+
+  // Ask-once: on a repeat play by the same device identity, this question is
+  // skipped once it has an answer (player_controller seeds the remembered
+  // answer and navigation passes over the card). Same write-to-dataset shape
+  // as Required above; serialize() reads it back as `ask_once`.
+  togglePanelAskOnce(event) {
+    const card = this._selectedCard()
+    if (!card) return
+    card.dataset.cardAskOnce = event.currentTarget.checked ? "true" : "false"
     this.markDirty()
   }
 
@@ -1651,6 +1663,7 @@ export default class extends Controller {
       }
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
       if (card.dataset.cardRequired === "true") out.required = true
+      if (card.dataset.cardAskOnce === "true") out.ask_once = true
 
       // Structural flags the DOM never re-derives — an open_ended input
       // flavour (e.g. the birth-date "month" picker) and the demographic

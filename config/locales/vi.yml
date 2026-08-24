@@ -62,6 +62,7 @@ vi:
     char_limit_option: '%{n} ký tự'
     allow_other: Cho phép câu trả lời tự do "Khác"
     required: "Câu hỏi bắt buộc"
+    ask_once: "Hỏi một lần — bỏ qua khi chơi lại sau khi đã trả lời"
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
     mark_correct: "Đánh dấu câu trả lời đúng"

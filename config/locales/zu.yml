@@ -62,6 +62,7 @@ zu:
     char_limit_option: 'Izinhlamvu ezingu-%{n}'
     allow_other: "Vumela impendulo yamahhala ye-“Okunye”"
     required: "Umbuzo odingekayo"
+    ask_once: "Buza kanye — iyeqiwa uma kudlalwa futhi ngemva kokuphendulwa"
     other: "Okunye"
     other_placeholder: "Sitshele ngamazwi akho…"
     mark_correct: "Maka impendulo eqondile"

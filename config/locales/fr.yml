@@ -62,6 +62,7 @@ fr:
     char_limit_option: '%{n} caractères'
     allow_other: Autoriser une réponse libre « Autre »
     required: "Question obligatoire"
+    ask_once: "Poser une seule fois — passée aux relectures une fois répondue"
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
     mark_correct: "Indiquer la bonne réponse"

@@ -1928,9 +1928,18 @@ class Survey < ApplicationRecord
   # Whether the player should mint/record the durable per-device identity
   # (player_key → per-survey digest). The leaderboard needs it for its alias;
   # the contact gate needs it because the digest is the ONLY bridge between a
-  # contact row and the pseudonymous responses.
+  # contact row and the pseudonymous responses; ask-once questions need it
+  # because "asked once" is a promise made to an identity, and each run's
+  # response carries the remembered answer under that identity's digest.
   def player_identity_active?
-    leaderboard_active? || contact_form_enabled?
+    leaderboard_active? || contact_form_enabled? || ask_once_cards?
+  end
+
+  # Any question the creator marked "ask once per person" — skipped on repeat
+  # plays once the identity has answered it (the player seeds the remembered
+  # answer into each new run, so every response row stays complete).
+  def ask_once_cards?
+    Array(cards).any? { |c| c.is_a?(Hash) && c["ask_once"] }
   end
 
   # Any card in the deck flagged as a demographic question — the auto-appended

@@ -62,6 +62,7 @@ he:
     char_limit_option: '%{n} תווים'
     allow_other: אפשר תשובה חופשית מסוג ״אחר״
     required: "שאלת חובה"
+    ask_once: "לשאול פעם אחת — מדולג במשחקים חוזרים לאחר שנענתה"
     other: אחר
     other_placeholder: ספר לנו במילים שלך…
     mark_correct: "סמן את התשובה הנכונה"

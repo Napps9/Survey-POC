@@ -62,6 +62,7 @@ ko:
     char_limit_option: '%{n}자'
     allow_other: '"기타" 자유 입력 답변 허용'
     required: "필수 질문"
+    ask_once: "한 번만 질문 — 답변 후 재플레이 시 건너뜀"
     other: 기타
     other_placeholder: 직접 입력해 주세요…
     mark_correct: "정답 표시하기"

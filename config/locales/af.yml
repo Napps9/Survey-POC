@@ -63,6 +63,7 @@ af:
     char_limit_option: "%{n} karakters"
     allow_other: "Laat 'n vrye teksantwoord vir “Ander” toe"
     required: "Verpligte vraag"
+    ask_once: "Vra een keer — oorgeslaan by herhaalde speel nadat dit beantwoord is"
     other: "Ander"
     other_placeholder: "Vertel ons in jou eie woorde…"
     mark_correct: "Merk die korrekte antwoord"

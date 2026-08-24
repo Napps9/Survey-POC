@@ -62,6 +62,7 @@ pl:
     char_limit_option: '%{n} znaków'
     allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
     required: "Pytanie obowiązkowe"
+    ask_once: "Pytaj raz — pomijane przy kolejnych podejściach po udzieleniu odpowiedzi"
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
     mark_correct: "Zaznacz poprawną odpowiedź"

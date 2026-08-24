@@ -676,6 +676,15 @@
             <span class="card-flag-track" aria-hidden="true"></span>
             <span class="card-flag-label"><%= t("card.required") %></span>
           </label>
+          <%# Ask once per person: on repeat plays by the same device identity
+              the question is skipped once answered, the stored answer riding
+              each new run (player_controller.js _seedOnceAnswers). %>
+          <label class="card-flag">
+            <input type="checkbox" data-survey-editor-target="panelAskOnce"
+                   data-action="change->survey-editor#togglePanelAskOnce">
+            <span class="card-flag-track" aria-hidden="true"></span>
+            <span class="card-flag-label"><%= t("card.ask_once") %></span>
+          </label>
 
           <%# Tap cards only: how many answers each swipe statement is judged on.
               A shortcut, not the only way in — the strip itself carries ＋ and ×
