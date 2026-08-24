@@ -190,6 +190,12 @@ export default class extends Controller {
 
   reset(event) {
     if (event) event.preventDefault()
+    // Cancels the player's pending auto-advance: Reset on the all-answered
+    // face means "I want to change something", the opposite of moving on.
+    // "cleared", not "reset" — the stack LISTENS for tap-stack:reset as an
+    // external command (the card wrap re-dispatches it), so announcing under
+    // the same name would re-trigger this method forever.
+    this.dispatch("cleared")
     this.position = 0
     this.swipeResults = {}
     this.element.dataset.swipeResults = "{}"

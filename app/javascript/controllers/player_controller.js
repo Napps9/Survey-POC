@@ -935,6 +935,53 @@ export default class extends Controller {
     }).catch(() => { /* best-effort — nothing to retry from here */ })
   }
 
+  // The tap stack's last statement was just answered ("tap-stack:complete",
+  // routed via the overlay's data-action). There is nothing left to do on the
+  // card, so the deck moves on for the respondent — after a beat long enough
+  // to read as "done", not as being yanked: the throw animation (350ms) plus
+  // a breath on the all-answered face.
+  //
+  // Three deliberate refusals. A stale event (the stack isn't the current
+  // card — Back mid-throw) is ignored. A GRADED tap card keeps its reveal
+  // respondent-driven — auto-running next() would flash right/wrong at
+  // someone who wasn't looking yet. And the deck's last step never
+  // auto-advances: Finish (which submits) stays an explicit act, whether
+  // that's the linear last card, the last interactive card before an
+  // ask-once tail, or a logic route whose resolved answer leads to an end.
+  AUTO_ADVANCE_DELAY = 900
+
+  tapStackCompleted(event) {
+    const card = event.target.closest("[data-player-target='card']")
+    if (!card || this.cardTargets[this.currentValue] !== card) return
+    if (card.dataset.cardGraded === "true") return
+    if (this.hasFinishBtnTarget && !this.finishBtnTarget.classList.contains("hidden")) return
+    if (this.logicValue) {
+      this._capture(this.currentValue)
+      if (this._resolveNext(this.currentValue).end != null) return
+    }
+    this._cancelAutoAdvance()
+    this._autoAdvanceTimer = setTimeout(() => {
+      this._autoAdvanceTimer = null
+      // Belt behind the cancel event: if the stack is no longer complete when
+      // the beat lands (Reset raced the timer), stay put.
+      const stack = this.cardTargets[this.currentValue]?.querySelector("[data-controller~='tap-stack']")
+      if (stack && !stack.classList.contains("is-complete")) return
+      this.next()
+    }, this.AUTO_ADVANCE_DELAY)
+  }
+
+  // Public twin for the Reset hook ("tap-stack:reset"); _update clears the
+  // timer too, so a manual Next or Back during the beat never double-fires.
+  cancelAutoAdvance() {
+    this._cancelAutoAdvance()
+  }
+
+  _cancelAutoAdvance() {
+    if (!this._autoAdvanceTimer) return
+    clearTimeout(this._autoAdvanceTimer)
+    this._autoAdvanceTimer = null
+  }
+
   next() {
     // Scenario: the deck's Next means "turn the page" until the book's own
     // answer page is showing — otherwise one tap could skip the whole story
@@ -2086,6 +2133,9 @@ export default class extends Controller {
 
   _update() {
     this._clearRequiredHint()
+    // Any navigation invalidates a pending tap-stack auto-advance — the
+    // respondent got there first (or the timer itself did; next() lands here).
+    this._cancelAutoAdvance()
     const cards = this.cardTargets
     const idx   = this.currentValue
     cards.forEach((c, i) => c.classList.toggle("active", i === idx))

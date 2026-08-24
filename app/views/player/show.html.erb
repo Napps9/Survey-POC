@@ -100,6 +100,11 @@
      style="<%= verto_backdrop_style_attr(@survey) %>"
      dir="<%= SupportedLocales.dir(@display_locale) %>"
      data-controller="player"
+     <%# The tap stack announces its last statement (tap-stack:complete) and
+         its Reset; the player answers with a paced auto-advance — the
+         respondent has nothing left to do on the card, so after a natural
+         beat the deck moves on for them (guards live in tapStackCompleted). %>
+     data-action="tap-stack:complete->player#tapStackCompleted tap-stack:cleared->player#cancelAutoAdvance"
      data-player-forms-value="<%= @survey.forms_mode? %>"
      data-player-progress-url-value="<%= progress_url %>"
      data-player-submit-url-value="<%= submit_url %>"
