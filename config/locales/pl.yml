@@ -1184,7 +1184,7 @@ pl:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Zeskanuj, aby otworzyć to Verto. Pobierz kod na plakaty i slajdy."
-    download_qr: "Pobierz QR (SVG)"
+    download_qr: "Pobierz QR (%{file_format})"
     download_qr_short: "Kod QR"
     custom_url: "Własny adres URL"
     custom_url_placeholder: "summer-feedback-2026"

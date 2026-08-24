@@ -1202,7 +1202,7 @@ zu:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Skena ukuze uvule le-Verto. Landa ikhodi yamaphosta neziboniso."
-    download_qr: "Landa i-QR (SVG)"
+    download_qr: "Landa i-QR (%{file_format})"
     download_qr_short: "Ikhodi ye-QR"
     custom_url: "I-URL ekhethekile"
     custom_url_placeholder: "summer-feedback-2026"

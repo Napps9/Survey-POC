@@ -1182,7 +1182,7 @@ tr:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Bu Verto'yu açmak için tarayın. Afiş ve sunumlar için kodu indirin."
-    download_qr: "QR indir (SVG)"
+    download_qr: "QR indir (%{file_format})"
     download_qr_short: "QR kodu"
     custom_url: "Özel URL"
     custom_url_placeholder: "summer-feedback-2026"

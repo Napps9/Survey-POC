@@ -661,11 +661,12 @@ class SurveysController < ApplicationController
     render json: { ok: false, error: "That animation couldn't be stored." }, status: :unprocessable_entity
   end
 
-  # GET /surveys/:id/qr
+  # GET /surveys/:id/qr(.png)
   # The share panel's QR as a downloadable file, for posters, flyers and slide
   # decks — the panel itself renders the same SVG inline for scanning off a
-  # screen. 404s for a draft: there is no public link to encode yet, and a QR
-  # pointing at a dead URL is worse than no QR.
+  # screen. SVG by default (crisp at any print size); `.png` for the many
+  # tools that won't place an SVG. 404s for a draft: there is no public link
+  # to encode yet, and a QR pointing at a dead URL is worse than no QR.
   def qr
     # ?link_id= asks for a named share link's own code, so an audience with its
     # own address gets its own printable QR rather than the Verto's. Still
@@ -674,10 +675,18 @@ class SurveysController < ApplicationController
     key  = @survey.published? && link ? link.play_key : @survey.public_link_key
     return head :not_found if key.blank?
 
-    send_data helpers.verto_qr_svg_document(play_survey_url(key)),
-              type:        "image/svg+xml",
-              disposition: "attachment",
-              filename:    "#{key.parameterize}-qr.svg"
+    url = play_survey_url(key)
+    if params[:format] == "png"
+      send_data helpers.verto_qr_png(url),
+                type:        "image/png",
+                disposition: "attachment",
+                filename:    "#{key.parameterize}-qr.png"
+    else
+      send_data helpers.verto_qr_svg_document(url),
+                type:        "image/svg+xml",
+                disposition: "attachment",
+                filename:    "#{key.parameterize}-qr.svg"
+    end
   end
 
   # POST /surveys/:id/duplicate

@@ -1182,7 +1182,7 @@ fr:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scannez pour ouvrir ce Verto. Téléchargez le code pour vos affiches et diapositives."
-    download_qr: "Télécharger le QR (SVG)"
+    download_qr: "Télécharger le QR (%{file_format})"
     download_qr_short: "Code QR"
     custom_url: "URL personnalisée"
     custom_url_placeholder: "summer-feedback-2026"

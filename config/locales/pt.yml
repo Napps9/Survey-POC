@@ -1182,7 +1182,7 @@ pt:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Digitalize para abrir este Verto. Descarregue o código para cartazes e diapositivos."
-    download_qr: "Descarregar QR (SVG)"
+    download_qr: "Descarregar QR (%{file_format})"
     download_qr_short: "Código QR"
     custom_url: "URL personalizado"
     custom_url_placeholder: "summer-feedback-2026"

@@ -1108,8 +1108,14 @@
                   Scan to open this Verto. Point a phone camera at it, or download
                   the code for posters and slides.
                 </div>
-                <%= link_to "Download QR (SVG)", qr_survey_path(@survey),
-                      style: "display:inline-block;margin-top:8px;padding:6px 10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+                <%# PNG first — slides/Canva/chat apps take a PNG anywhere;
+                    SVG stays for print shops, where it scales losslessly. %>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                  <%= link_to "Download QR (PNG)", qr_survey_path(@survey, format: :png),
+                        style: "display:inline-block;padding:6px 10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+                  <%= link_to "Download QR (SVG)", qr_survey_path(@survey),
+                        style: "display:inline-block;padding:6px 10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+                </div>
               </div>
             </div>
 

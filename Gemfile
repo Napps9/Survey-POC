@@ -70,7 +70,8 @@ gem "rubyzip", "~> 2.3", require: "zip" # bulk brand-asset import (extract a zip
 # Scannable QR for a published Verto's share panel. Pure Ruby (no native
 # extension, nothing to install in the Docker image) and renders SVG markup
 # directly, so the QR goes inline into the page rather than as a data-URL
-# <img> — one less thing fighting the CSP.
+# <img> — one less thing fighting the CSP. Its chunky_png dependency (also
+# pure Ruby) drives the PNG download for tools that won't place an SVG.
 gem "rqrcode", "~> 3.0"
 
 # Active Storage image analysis + variants (brand-library thumbnails). The

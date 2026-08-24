@@ -1204,7 +1204,7 @@ xh:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Skena ukuvula le Verto. Khuphela ikhowudi yamaposta neeslayidi."
-    download_qr: "Khuphela iQR (SVG)"
+    download_qr: "Khuphela iQR (%{file_format})"
     download_qr_short: "Ikhowudi yeQR"
     custom_url: "I-URL ekhethekileyo"
     custom_url_placeholder: "summer-feedback-2026"

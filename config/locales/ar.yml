@@ -1182,7 +1182,7 @@ ar:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "امسح الرمز لفتح هذا الفيرتو. نزّل الرمز للملصقات والشرائح."
-    download_qr: "تنزيل رمز QR (SVG)"
+    download_qr: "تنزيل رمز QR (%{file_format})"
     download_qr_short: "رمز QR"
     custom_url: "رابط مخصّص"
     custom_url_placeholder: "summer-feedback-2026"

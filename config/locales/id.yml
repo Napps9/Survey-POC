@@ -1182,7 +1182,7 @@ id:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Pindai untuk membuka Verto ini. Unduh kodenya untuk poster dan slide."
-    download_qr: "Unduh QR (SVG)"
+    download_qr: "Unduh QR (%{file_format})"
     download_qr_short: "Kode QR"
     custom_url: "URL khusus"
     custom_url_placeholder: "summer-feedback-2026"

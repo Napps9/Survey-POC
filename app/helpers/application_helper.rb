@@ -541,6 +541,25 @@ module ApplicationHelper
       .html_safe # rubocop:disable Rails/OutputSafety -- markup comes from rqrcode, not user input
   end
 
+  # The same QR as a PNG download, for tools that won't place an SVG — Google
+  # Slides, Canva, Word, most chat apps. 2048px is ~17cm at print resolution,
+  # poster headroom, yet the two-colour image indexes down to a few KB.
+  #
+  # `size:` selects rqrcode's exact-canvas algorithm: the module size is
+  # floored to fit and the leftover pixels join the margin, so the quiet zone
+  # is always at least the 4-module spec minimum (`border_modules`) and the
+  # canvas is exactly square. Fill is opaque white, not transparent: a PNG gets
+  # dropped onto slides of any colour, and dark modules on a dark deck don't
+  # scan.
+  QR_PNG_SIZE = 2048
+  private_constant :QR_PNG_SIZE
+
+  def verto_qr_png(url)
+    RQRCode::QRCode.new(url.to_s, level: :m)
+      .as_png(color: "#1C2034", fill: "white", size: QR_PNG_SIZE, border_modules: 4)
+      .to_blob
+  end
+
   # A small same-origin thumbnail path for a brand-library image — used by the
   # library tiles (media picker + branding page) so a tile loads a ~400px variant
   # instead of the full-size original. Display only: the full-size blob path is

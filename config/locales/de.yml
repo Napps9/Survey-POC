@@ -1182,7 +1182,7 @@ de:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scannen, um dieses Verto zu öffnen. Code für Plakate und Folien herunterladen."
-    download_qr: "QR herunterladen (SVG)"
+    download_qr: "QR herunterladen (%{file_format})"
     download_qr_short: "QR-Code"
     custom_url: "Eigene URL"
     custom_url_placeholder: "summer-feedback-2026"

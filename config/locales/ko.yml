@@ -1182,7 +1182,7 @@ ko:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "스캔하면 이 Verto가 열립니다. 포스터와 슬라이드용으로 코드를 내려받으세요."
-    download_qr: "QR 내려받기 (SVG)"
+    download_qr: "QR 내려받기 (%{file_format})"
     download_qr_short: "QR 코드"
     custom_url: "맞춤 URL"
     custom_url_placeholder: "summer-feedback-2026"

@@ -1204,7 +1204,7 @@ st:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Fenya ho bula Verto ena. Jarolla khoutu bakeng sa diphosto le diswaipo."
-    download_qr: "Jarolla QR (SVG)"
+    download_qr: "Jarolla QR (%{file_format})"
     download_qr_short: "Khoutu ya QR"
     custom_url: "URL e Ikgethang"
     custom_url_placeholder: "summer-feedback-2026"

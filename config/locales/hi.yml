@@ -1182,7 +1182,7 @@ hi:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "यह Verto खोलने के लिए स्कैन करें। पोस्टर और स्लाइड के लिए कोड डाउनलोड करें।"
-    download_qr: "QR डाउनलोड करें (SVG)"
+    download_qr: "QR डाउनलोड करें (%{file_format})"
     download_qr_short: "QR कोड"
     custom_url: "कस्टम URL"
     custom_url_placeholder: "summer-feedback-2026"

@@ -1182,7 +1182,7 @@ vi:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Quét để mở Verto này. Tải mã về để dùng cho áp phích và slide."
-    download_qr: "Tải QR (SVG)"
+    download_qr: "Tải QR (%{file_format})"
     download_qr_short: "Mã QR"
     custom_url: "URL tùy chỉnh"
     custom_url_placeholder: "summer-feedback-2026"

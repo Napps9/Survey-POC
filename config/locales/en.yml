@@ -1204,7 +1204,7 @@ en:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scan to open this Verto. Download the code for posters and slides."
-    download_qr: "Download QR (SVG)"
+    download_qr: "Download QR (%{file_format})"
     download_qr_short: "QR code"
     custom_url: "Custom URL"
     custom_url_placeholder: "summer-feedback-2026"

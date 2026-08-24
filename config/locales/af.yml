@@ -1189,7 +1189,7 @@ af:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Skandeer om hierdie Verto oop te maak. Laai die kode af vir plakkate en skyfies."
-    download_qr: "Laai QR af (SVG)"
+    download_qr: "Laai QR af (%{file_format})"
     download_qr_short: "QR-kode"
     custom_url: "Pasgemaakte URL"
     custom_url_placeholder: "somer-terugvoer-2026"

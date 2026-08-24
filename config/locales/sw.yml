@@ -1182,7 +1182,7 @@ sw:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Changanua ili kufungua Verto hii. Pakua msimbo kwa mabango na slaidi."
-    download_qr: "Pakua QR (SVG)"
+    download_qr: "Pakua QR (%{file_format})"
     download_qr_short: "Msimbo QR"
     custom_url: "URL maalum"
     custom_url_placeholder: "summer-feedback-2026"

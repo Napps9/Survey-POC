@@ -1182,7 +1182,7 @@ he:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "סרקו כדי לפתוח את ה-Verto. הורידו את הקוד לפוסטרים ולמצגות."
-    download_qr: "הורדת QR (SVG)"
+    download_qr: "הורדת QR (%{file_format})"
     download_qr_short: "קוד QR"
     custom_url: "כתובת מותאמת"
     custom_url_placeholder: "summer-feedback-2026"

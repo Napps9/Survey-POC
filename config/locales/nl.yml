@@ -1182,7 +1182,7 @@ nl:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scan om deze Verto te openen. Download de code voor posters en slides."
-    download_qr: "QR downloaden (SVG)"
+    download_qr: "QR downloaden (%{file_format})"
     download_qr_short: "QR-code"
     custom_url: "Eigen URL"
     custom_url_placeholder: "summer-feedback-2026"

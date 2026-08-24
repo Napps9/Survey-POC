@@ -1192,7 +1192,7 @@ sn:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Skena kuti uvhure Verto iyi. Dhawunirodha kodhi yemapositi neslides."
-    download_qr: "Dhawunirodha QR (SVG)"
+    download_qr: "Dhawunirodha QR (%{file_format})"
     download_qr_short: "Kodhi yeQR"
     custom_url: "URL Yakasarudzika"
     custom_url_placeholder: "summer-feedback-2026"

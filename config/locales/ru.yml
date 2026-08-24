@@ -1184,7 +1184,7 @@ ru:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Отсканируйте, чтобы открыть это Verto. Скачайте код для плакатов и слайдов."
-    download_qr: "Скачать QR (SVG)"
+    download_qr: "Скачать QR (%{file_format})"
     download_qr_short: "QR-код"
     custom_url: "Свой адрес"
     custom_url_placeholder: "summer-feedback-2026"

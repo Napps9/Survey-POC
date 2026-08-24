@@ -1204,7 +1204,7 @@ tn:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Sekaseka go bula Verto e. Laisa khoutu bakeng sa dipoustara le dislaete."
-    download_qr: "Laisa QR (SVG)"
+    download_qr: "Laisa QR (%{file_format})"
     download_qr_short: "Khoutu ya QR"
     custom_url: "URL e e ikgethileng"
     custom_url_placeholder: "summer-feedback-2026"
