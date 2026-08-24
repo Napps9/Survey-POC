@@ -1613,6 +1613,17 @@ class Survey < ApplicationRecord
     compare_note.presence || I18n.t("player.compare_promise")
   end
 
+  # The two tokenomics lines on the points intro, per-Verto with the locale
+  # default as the fallback — same contract as compare_note above and the
+  # thank-you copy below: nil means "say the usual thing".
+  def tokens_note_text
+    tokens_note.presence || I18n.t("player.tokens_welcome_note")
+  end
+
+  def leaderboard_note_text
+    leaderboard_note.presence || I18n.t("player.leaderboard_teaser")
+  end
+
   # ── What a respondent is offered after they finish ────────────────────────
   # SurveyLink answers these same three questions, overriding them per link
   # (see SurveyLink#compare_results?). Anything rendering the player asks

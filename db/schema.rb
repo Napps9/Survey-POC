@@ -870,6 +870,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_121556) do
     t.string "forward_url"
     t.text "key_insight"
     t.boolean "leaderboard_enabled", default: false, null: false
+    t.string "leaderboard_note"
     t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false
@@ -905,6 +906,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_121556) do
     t.boolean "token_reveal_enabled", default: false, null: false
     t.json "token_types", default: [], null: false
     t.boolean "tokenisation_enabled", default: false, null: false
+    t.string "tokens_note"
     t.datetime "unpublished_at"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"

@@ -823,6 +823,14 @@ class SurveysController < ApplicationController
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
     end
+    # The two tokenomics lines on the points intro — presentation copy, same
+    # trust level as compare_note. Blank restores the locale default.
+    if params.key?(:tokens_note)
+      attrs[:tokens_note] = params[:tokens_note].to_s.strip.first(200).presence
+    end
+    if params.key?(:leaderboard_note)
+      attrs[:leaderboard_note] = params[:leaderboard_note].to_s.strip.first(200).presence
+    end
     if params.key?(:thankyou_title)
       attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence
     end

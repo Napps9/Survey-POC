@@ -741,8 +741,19 @@ export default class extends Controller {
     const descEl  = cardEl.querySelector(".q-subtitle, .activity-desc")
     const optEls  = this._optionEls(cardEl)
     return {
-      text: titleEl?.textContent.trim() || "",
-      description: descEl?.textContent.trim() || "",
+      // innerText, NOT textContent, for the two fields a creator writes
+      // paragraphs into. Enter in a contenteditable wraps each line in a
+      // <div>, and textContent joins block boundaries with NOTHING — a
+      // welcome card written as three paragraphs came back from reload as
+      // one lump ("ideally need it to remember the spacing/line breaks",
+      // Feedback 17). innerText yields \n at those boundaries, the stored
+      // text keeps it, and white-space: pre-line on .q-title/.q-subtitle
+      // renders it — a stable round-trip, because _writeCard's textContent
+      // write puts the \n straight back and innerText re-reads it.
+      // Options and response labels stay on textContent on purpose: they are
+      // single-line by design and a stray Enter should not become a break.
+      text: this._readPlain(titleEl),
+      description: this._readPlain(descEl),
       options: optEls.map(el => el.textContent.trim()),
       responses: this._responseLabelEls(cardEl).map(el => el.textContent.trim()),
       pages: this._pageEls(cardEl).map(el => ({
@@ -756,11 +767,34 @@ export default class extends Controller {
     }
   }
 
+  // Line-break-preserving plain text. trim() only cuts the ends; interior
+  // newlines survive. The collapse handles how engines count an EMPTY line:
+  // <div><br></div> contributes the block boundary's newline AND the <br>'s,
+  // so one blank line read back as two. Two newlines — one blank line — is
+  // what the creator saw; runs beyond that are the double-count, not intent.
+  _readPlain(el) {
+    return (el?.innerText || "").replace(/\n{3,}/g, "\n\n").trim()
+  }
+
   // The rich-text layer of an editable region — innerHTML, but ONLY when
   // formatting elements are actually present, so a deck nobody has formatted
   // reads (and therefore serialises) byte-identically to the plain-text era.
+  //
+  // The div normalisation is the formatted half of the line-break fix above:
+  // when a creator bolds a word AND breaks lines, this layer engages, and the
+  // sanitiser strips <div> (not in the allowlist) while KEEPING its content —
+  // which joins the lines exactly like textContent did. <br> is allowed, so
+  // block boundaries become <br> before storing. A leading <div> is the first
+  // line rather than a break, hence the strip of one leading <br>; trailing
+  // empty divs would render as blank lines the plain layer trims, hence the
+  // trailing strip.
   _readHtml(el) {
-    return el && hasFormatting(el) ? el.innerHTML : null
+    if (!el || !hasFormatting(el)) return null
+    return el.innerHTML
+      .replace(/<div[^>]*>/gi, "<br>")
+      .replace(/<\/div>/gi, "")
+      .replace(/^<br>/i, "")
+      .replace(/(<br>)+$/i, "")
   }
 
   _writeCard(cardEl, content, fallback, locale) {

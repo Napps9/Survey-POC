@@ -2127,6 +2127,14 @@
   line-height: 1.35;
   color: #000;
   outline: none;
+  /* pre-line is the render half of the serialiser's innerText capture: a
+     creator's Enter is stored as \n in the card text, and without this the
+     browser collapses it to a space and the paragraphs read as one lump.
+     Base rule, so the editor, the desktop player and the phone all agree —
+     and _writeCard's plain textContent write shows its breaks in the editor
+     for the same reason. (text-wrap: balance elsewhere is compatible: it
+     sets the wrap STYLE, this preserves the break COLLAPSE.) */
+  white-space: pre-line;
 }
 .q-subtitle {
   font-family: var(--verto-font, "ABeeZee", sans-serif);
@@ -2134,6 +2142,7 @@
   line-height: 1.5;
   color: rgba(0,0,0,0.6);
   outline: none;
+  white-space: pre-line; /* same contract as .q-title above */
 }
 
 /* ── Slider ─────────────────────────────────────── */

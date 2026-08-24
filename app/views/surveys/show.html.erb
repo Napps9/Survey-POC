@@ -934,6 +934,23 @@
                        style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
                 <span>Show the running points total in the footer while playing. Checkpoints and the final tally still work either way — this only hides the live number.</span>
               </label>
+
+              <%# The two tokenomics lines on the points intro — editable per
+                  Verto, blank restores the locale default (Feedback 17). Same
+                  save-on-change convention as compare_note. %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Points note on the intro:</div>
+              <input type="text" name="tokens_note" maxlength="200"
+                     value="<%= @survey.tokens_note_text %>"
+                     onchange="this.form.requestSubmit()"
+                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+
+              <% if @survey.leaderboard_enabled? %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:10px 0 5px;">Leaderboard teaser on the intro:</div>
+                <input type="text" name="leaderboard_note" maxlength="200"
+                       value="<%= @survey.leaderboard_note_text %>"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <% end %>
             <% end %>
           <% end %>
 

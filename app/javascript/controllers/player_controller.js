@@ -521,7 +521,16 @@ export default class extends Controller {
     // Rotation, the iOS toolbar collapsing, the keyboard, and the banner
     // being dismissed all change this box without changing the viewport the
     // CSS fallback is written against.
-    this._bodyObserver = new ResizeObserver(() => this._fitCardHeight())
+    //
+    // And when the box changes, how much of the answer sits below the fold
+    // changes with it — so the scroll cue is re-decided here too, not only on
+    // the footer's observer. The footer does not resize when something above
+    // the card does (a banner appearing, the safe-area strip): an intake that
+    // fit at load and was pushed under the fold kept a stale "fits" verdict
+    // until the next card advance. No loop: the body's height comes from flex
+    // against the overlay, so nothing _fitCard toggles can move what
+    // _fitCardHeight just measured.
+    this._bodyObserver = new ResizeObserver(() => { this._fitCardHeight(); this._fitCard() })
     this._bodyObserver.observe(body)
   }
 
