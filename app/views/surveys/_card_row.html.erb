@@ -20,6 +20,12 @@
      data-card-cid="<%= card['cid'].to_s %>"
      data-card-num="<%= idx + 1 %>"
      data-card-image="<%= card['image'].to_s %>"
+     <%# The pre-crop original and the crop taken from it — what "Adjust crop"
+         reopens, so a creator can zoom OUT past the first crop. Autosave
+         rebuilds every card from this DOM, so like common_question_id these
+         must survive the round-trip or one reload-and-save would drop them. %>
+     <% if card['image_source'].present? %>data-card-image-source="<%= card['image_source'] %>"<% end %>
+     <% if card['image_crop'].is_a?(Hash) %>data-card-image-crop="<%= card['image_crop'].to_json %>"<% end %>
      data-card-lottie="<%= card['lottie'].to_s %>"
      data-card-video="<%= card['video'].to_s %>"
      data-card-video-poster="<%= card['video_poster'].to_s %>"

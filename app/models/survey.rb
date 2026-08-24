@@ -525,6 +525,25 @@ class Survey < ApplicationRecord
     sanitize_image_url(value)
   end
 
+  # A card's re-crop record: where its image was cut from image_source, as
+  # fractions of the source's natural size — x/y the top-left, w/h the
+  # extent, all 0..1 with a real area. Fractions rather than pixels so the
+  # record survives any resize of the stored source. Anything else is a
+  # value we don't understand — nil, and the caller drops the key (the same
+  # posture as focal_y: junk must not quietly become 0.0 and crop a corner).
+  def self.sanitize_image_crop(value)
+    return nil unless value.is_a?(Hash)
+    vals = %w[x y w h].map do |k|
+      raw = value[k] || value[k.to_sym]
+      numeric = raw.is_a?(Numeric) || raw.to_s.strip.match?(/\A-?\d+(?:\.\d+)?\z/)
+      numeric ? raw.to_f.clamp(0, 1) : nil
+    end
+    return nil if vals.any?(&:nil?)
+    x, y, w, h = vals
+    return nil if w <= 0 || h <= 0
+    { "x" => x.round(4), "y" => y.round(4), "w" => w.round(4), "h" => h.round(4) }
+  end
+
   # The Shuffle direction prompt — the creator's optional free-text steer for
   # what they want out of the Verto's content and imagery ("warm, outdoors,
   # small groups, no offices"). It belongs to one shuffle and is NOT persisted;
@@ -997,6 +1016,21 @@ class Survey < ApplicationRecord
           c.delete("image_credit")
           c.delete("image_credit_url")
         end
+      end
+
+      # The re-crop record: the pre-crop original a card image was cut from
+      # (image_source, same allowlist as any image value) and the crop as
+      # fractions of it (image_crop) — what lets the editor's "Adjust crop"
+      # zoom back OUT of the shipped crop. Editor-only metadata: the player
+      # renders `image` and never reads either. A source without the image
+      # it explains is dead data; a crop without its source describes
+      # nothing — both dropped rather than kept, no warning (losing them
+      # degrades a card to remove-and-reupload, it doesn't lose the image).
+      if c.key?("image_source") || c.key?("image_crop")
+        c["image_source"] = c["image"].present? ? sanitize_image_url(c["image_source"]) : nil
+        c.delete("image_source") if c["image_source"].blank?
+        crop = c["image_source"].present? ? sanitize_image_crop(c["image_crop"]) : nil
+        crop ? c["image_crop"] = crop : c.delete("image_crop")
       end
 
       # CardSubjectExtractor's photographable-noun-phrase stamp, read by

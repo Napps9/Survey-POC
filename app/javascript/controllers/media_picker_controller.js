@@ -19,6 +19,7 @@ export default class extends Controller {
     "animateAssetSection", "animateAssetToggle",
     "focalSection", "focalFrame", "focalImg",
     "cropStage", "cropFrame", "cropImg", "cropZoom",
+    "cropHint", "cropHintLegacy", "cropSkipBtn",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
   static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array, appealCreateUrl: String, appealsListUrl: String }
@@ -64,6 +65,18 @@ export default class extends Controller {
     this._escListener = (e) => { if (e.key === "Escape") this.close() }
     this._cropImgEl = null
     this._pendingAppeal = null
+    // The re-crop record riding with a cropped upload: the uncropped original
+    // and the crop rect taken from it, stashed by cropApply and consumed by
+    // the card-image branch of applyImage. Null everywhere else — a pick with
+    // no record stamps none onto the card.
+    this._pendingSource = null
+    this._pendingCrop = null
+    // The Adjust flow: true while the crop stage is re-editing a card's
+    // existing photo (opened by openAdjustCrop rather than an upload), with
+    // _adjustSource holding the stored original's URL so apply doesn't
+    // re-persist bytes the server already has.
+    this._adjustMode = false
+    this._adjustSource = null
   }
 
   open(event) {
@@ -77,6 +90,8 @@ export default class extends Controller {
     this._activeCard = card
     this._pendingUrl = null
     this._pendingVideo = null
+    this._pendingSource = null
+    this._pendingCrop = null
     this._setApplyEnabled(false)
 
     // A range card has no photo/video/lottie slot of its own — its reaction
@@ -252,6 +267,8 @@ export default class extends Controller {
     this._activeCard = null
     this._pendingUrl = null
     this._pendingVideo = null
+    this._pendingSource = null
+    this._pendingCrop = null
     this._setApplyEnabled(false)
     // Reset to shown: only open()'s range-card branch ever hides these, and
     // every other entry point (openBackground/openConsent/openComms/
@@ -562,18 +579,148 @@ export default class extends Controller {
     canvas.height = outH
     canvas.getContext("2d").drawImage(this._cropImgEl, srcX, srcY, srcW, srcH, 0, 0, outW, outH)
     const dataUrl = this._encodeCanvas(canvas)
+
+    // What re-cropping later needs, and the single encode above destroys: the
+    // uncropped original (bounded by the same MAX_EDGE downscale as any plain
+    // upload — an Adjust pass reuses the stored path instead of re-encoding
+    // bytes the server already has) and where this crop sits in it, as
+    // fractions of the natural size so the record survives any resize of the
+    // stored source. Card heroes only for now: a tap option or background has
+    // no Adjust entry point yet, and an unconsumed record on those modes
+    // would be a stale thing waiting for a code path to trip over it.
+    let source = null
+    let crop = null
+    if (this._mode === "card") {
+      const nw = this._cropImgEl.naturalWidth
+      const nh = this._cropImgEl.naturalHeight
+      const clamp01 = (v) => Math.min(1, Math.max(0, v))
+      crop = { x: clamp01(srcX / nw), y: clamp01(srcY / nh),
+               w: clamp01(srcW / nw), h: clamp01(srcH / nh) }
+      source = this._adjustSource || this._downscaledDataUrl(this._cropImgEl)
+    }
+    const adjusting = this._adjustMode
     this._closeCropStage()
-    this._stashPending(dataUrl)
+    this._stashPending(dataUrl, source, crop)
+    // The Adjust flow opened the stage directly — the picker's tabs and its
+    // Apply button were never on screen — so confirming the crop IS the apply.
+    if (adjusting) this.applyImage()
   }
 
   // "Skip" — today's behaviour, unchanged: the plain MAX_EDGE-capped
   // downscale of the whole original image, no fixed ratio forced on it.
+  // No re-crop record either: the stored image IS the whole original, so a
+  // later Adjust has everything it needs through the legacy path already.
+  //
+  // In the Adjust flow this button reads "Cancel" (relabelled at open):
+  // the stage is re-editing a photo already on the card, nothing is
+  // pending, and the card must leave exactly as it came.
   cropSkip(event) {
     event?.preventDefault()
     if (!this._cropImgEl) return
+    if (this._adjustMode) {
+      this._closeCropStage()
+      this.close()
+      return
+    }
     const dataUrl = this._downscaledDataUrl(this._cropImgEl)
     this._closeCropStage()
     this._stashPending(dataUrl)
+  }
+
+  // "Adjust crop" on a card that already carries a photo: reopen the crop
+  // stage seeded from the kept original (image_source) and the stored rect
+  // (image_crop), so the frame can move AND widen — the owner's ask was
+  // exactly that you shouldn't have to remove and re-upload to re-frame.
+  // On a legacy card (nothing kept — pre-feature uploads, Skip'd uploads)
+  // the current image stands in as the source: reposition and zoom IN are
+  // real, zoom OUT has no pixels to reach, and the hint says so. Applying
+  // from that state promotes the current image to the kept source, so the
+  // NEXT adjust has the full record.
+  //
+  // The stage opens directly — no tabs, no Library, no modal Apply button —
+  // so "Use this crop" applies immediately and "Skip" reads Cancel.
+  openAdjustCrop(event) {
+    event?.preventDefault()
+    event?.stopPropagation()
+    const trigger = event?.currentTarget
+    const card    = trigger?.closest("[data-survey-editor-target='card']")
+                 || trigger?.closest(".survey-card-wrap")
+    if (!card) return
+    const source = card.dataset.cardImageSource || card.dataset.cardImage
+    // Same-origin only (a stored path or inline data URL): drawing a
+    // cross-origin image taints the canvas and the final encode throws.
+    // The fab is hidden for such cards; this is the belt to that brace.
+    if (!source || !(source.startsWith("/") || source.startsWith("data:"))) return
+    const legacy = !card.dataset.cardImageSource
+
+    this._mode = "card"
+    this._activeCard = card
+    this._pendingUrl = null
+    this._pendingVideo = null
+    this._pendingSource = null
+    this._pendingCrop = null
+    // The picture doesn't change identity when its framing does — keep the
+    // credit it already carries rather than wiping it with a stale pending.
+    this._pendingCredit    = card.dataset.cardImageCredit || ""
+    this._pendingCreditUrl = card.dataset.cardImageCreditUrl || ""
+    this._setApplyEnabled(false)
+    this._adjustMode = true
+    this._adjustSource = source
+
+    let rect = null
+    if (!legacy && card.dataset.cardImageCrop) {
+      try { rect = JSON.parse(card.dataset.cardImageCrop) } catch (_e) { rect = null }
+    }
+
+    if (this.hasCropHintTarget) this.cropHintTarget.hidden = legacy
+    if (this.hasCropHintLegacyTarget) this.cropHintLegacyTarget.hidden = !legacy
+    if (this.hasCropSkipBtnTarget && this.cropSkipBtnTarget.dataset.cancelLabel) {
+      this.cropSkipBtnTarget.textContent = this.cropSkipBtnTarget.dataset.cancelLabel
+    }
+
+    // Stage up immediately (empty), THEN decode — opening on image load
+    // would flash the picker's tabs for however long the decode takes.
+    this._showCropStage(true)
+    this.backdropTarget.hidden = false
+    document.addEventListener("keydown", this._escListener)
+
+    const img = new Image()
+    img.onload = () => {
+      if (!this._adjustMode) return // closed while decoding
+      this._cropImgEl = img
+      if (this.hasCropImgTarget) this.cropImgTarget.src = source
+      const [ rw, rh ] = this.constructor.CROP_RATIO[this._mode]
+      if (this.hasCropFrameTarget) this.cropFrameTarget.style.aspectRatio = `${rw} / ${rh}`
+      requestAnimationFrame(() => {
+        this._layoutCrop()
+        if (rect) this._seedCrop(rect)
+      })
+    }
+    // The stored source didn't decode — there is nothing to adjust against,
+    // and an empty stuck stage would read as broken.
+    img.onerror = () => this.close()
+    img.src = source
+  }
+
+  // Reproduce a stored crop in the stage: scale so the rect's width fills
+  // the frame, offsets so its top-left sits on the frame's origin. Clamped
+  // to the slider's own range, so a rect that maths outside it (rounding,
+  // a source swapped underneath) lands on the nearest legal state instead
+  // of a broken transform. Runs after _layoutCrop, which owns the frame
+  // measurements and the min scale this builds on.
+  _seedCrop(rect) {
+    const w = parseFloat(rect?.w)
+    if (!this._cropImgEl || !(w > 0)) return
+    const nw = this._cropImgEl.naturalWidth
+    const nh = this._cropImgEl.naturalHeight
+    const max = this._cropMinScale * this.constructor.CROP_ZOOM_MAX
+    this._cropScale = Math.min(max, Math.max(this._cropMinScale, this._cropFrameW / (w * nw)))
+    this._cropZoomFactor = this._cropScale / this._cropMinScale
+    if (this.hasCropZoomTarget) this.cropZoomTarget.value = String(this._cropZoomFactor)
+    this._setCropOffset(
+      -(parseFloat(rect?.x) || 0) * nw * this._cropScale,
+      -(parseFloat(rect?.y) || 0) * nh * this._cropScale
+    )
   }
 
   _showCropStage(show) {
@@ -593,6 +740,15 @@ export default class extends Controller {
     if (this._cropObjectUrl) URL.revokeObjectURL(this._cropObjectUrl)
     this._cropObjectUrl = null
     this._cropImgEl = null
+    this._adjustMode = false
+    this._adjustSource = null
+    // Restore the stage's ordinary copy — the Adjust flow may have swapped
+    // the hint (legacy zoom-in-only note) and relabelled Skip as Cancel.
+    if (this.hasCropHintTarget) this.cropHintTarget.hidden = false
+    if (this.hasCropHintLegacyTarget) this.cropHintLegacyTarget.hidden = true
+    if (this.hasCropSkipBtnTarget && this.cropSkipBtnTarget.dataset.skipLabel) {
+      this.cropSkipBtnTarget.textContent = this.cropSkipBtnTarget.dataset.skipLabel
+    }
     if (this.hasCropImgTarget) {
       this.cropImgTarget.removeAttribute("src")
       this.cropImgTarget.style.transform = ""
@@ -605,8 +761,13 @@ export default class extends Controller {
     reader.readAsDataURL(file)
   }
 
-  _stashPending(dataUrl) {
+  _stashPending(dataUrl, source = null, crop = null) {
     this._pendingUrl = dataUrl
+    // Only cropApply passes these; every other stash — Skip's plain
+    // downscale, a decode fallback, a brand-library upload — carries no
+    // re-crop record and clears whatever an earlier crop left behind.
+    this._pendingSource = source
+    this._pendingCrop = crop
     this._setApplyEnabled(true)
   }
 
@@ -640,6 +801,12 @@ export default class extends Controller {
       this._pendingUrl = item.dataset.url
       this._pendingVideo = null
     }
+    // A tile pick replaces whatever a crop stashed — including its re-crop
+    // record. Left set, a Library pick made AFTER cropping an upload would
+    // carry the upload's original and rect onto a picture they belong to
+    // not at all.
+    this._pendingSource = null
+    this._pendingCrop = null
     // Pexels results carry a creator credit; curated/recommended tiles don't
     // (these stay empty so the credit is cleared on apply).
     this._pendingCredit    = item.dataset.credit || ""
@@ -929,7 +1096,24 @@ export default class extends Controller {
       this._setCardVideo(this._activeCard, this._pendingVideo.video, this._pendingVideo.poster,
         this._pendingCredit, this._pendingCreditUrl)
     } else {
-      this._setCardImage(this._activeCard, this._pendingUrl, this._pendingCredit, this._pendingCreditUrl)
+      // The crop stage's re-crop record: persist the uncropped original too,
+      // so "Adjust crop" can zoom back OUT of this crop later (an Adjust
+      // re-crop arrives holding the already-stored path — nothing to do).
+      // Its moderation is QUIET: the crop that actually ships was checked
+      // above; a source that fails is simply not kept, and the card degrades
+      // to the legacy remove-and-reupload behaviour instead of blocking an
+      // apply whose visible image already passed.
+      let source = this._pendingSource
+      if (source && source.startsWith("data:")) {
+        if (await this._moderateUpload(source, { quiet: true })) {
+          source = await this._persistUpload(source)
+        } else {
+          source = null
+        }
+      }
+      const crop = source ? this._pendingCrop : null
+      this._setCardImage(this._activeCard, this._pendingUrl, this._pendingCredit, this._pendingCreditUrl,
+        { source, crop })
     }
     this._notifyDirty()
     this.close()
@@ -962,10 +1146,16 @@ export default class extends Controller {
   // POST the uploaded image for a content-safety verdict. Returns true to
   // allow. Fails safe: with no endpoint wired we don't block; a call that
   // errors or comes back unsafe blocks the upload with a message.
-  async _moderateUpload(dataUrl) {
+  //
+  // `quiet` is for checks whose failure only degrades a feature rather than
+  // blocking the visible apply (the re-crop source): no error banner, no
+  // appeal offer, no Apply-button churn — just the verdict.
+  async _moderateUpload(dataUrl, { quiet = false } = {}) {
     if (!this.hasModerateUrlValue) return true
-    this._clearUploadError()
-    this._setApplyEnabled(false)
+    if (!quiet) {
+      this._clearUploadError()
+      this._setApplyEnabled(false)
+    }
     try {
       const res = await fetch(this.moderateUrlValue, {
         method: "POST",
@@ -978,6 +1168,7 @@ export default class extends Controller {
       })
       const data = await res.json().catch(() => ({}))
       if (data.ok) return true
+      if (quiet) return false
       this._showUploadError(data.reason || "That image can’t be used — it isn’t PG or age-appropriate for this Verto.")
       // Offer the appeal escape hatch only when the server marked this
       // particular verdict appealable AND this page has somewhere to send
@@ -989,10 +1180,10 @@ export default class extends Controller {
       }
       return false
     } catch (_) {
-      this._showUploadError("We couldn’t check that image — please try again.")
+      if (!quiet) this._showUploadError("We couldn’t check that image — please try again.")
       return false
     } finally {
-      this._setApplyEnabled(true)
+      if (!quiet) this._setApplyEnabled(true)
     }
   }
 
@@ -1366,7 +1557,7 @@ export default class extends Controller {
     }
   }
 
-  _setCardImage(card, url, credit = "", creditUrl = "") {
+  _setCardImage(card, url, credit = "", creditUrl = "", media = {}) {
     // A different picture has a different subject, so an old mobile-header
     // focal point is meaningless against it — back to centre.
     if (card) delete card.dataset.cardFocalY
@@ -1376,6 +1567,19 @@ export default class extends Controller {
     if (card && !url) delete card.dataset.cardAnimateAsset
 
     card.dataset.cardImage = url || ""
+    // The re-crop record rides with the picture it belongs to: stamped when
+    // this apply carries one (a cropped upload, an Adjust re-crop), cleared
+    // by any other change — a different photo has a different original, and
+    // no record means the legacy remove-and-reupload behaviour.
+    if (url && media.source) {
+      card.dataset.cardImageSource = media.source
+      if (media.crop) card.dataset.cardImageCrop = JSON.stringify(media.crop)
+      else delete card.dataset.cardImageCrop
+    } else {
+      delete card.dataset.cardImageSource
+      delete card.dataset.cardImageCrop
+    }
+    this._syncAdjustFab(card)
     card.dataset.cardImageCredit = url ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = url ? (creditUrl || "") : ""
     // Picking/clearing a photo replaces any auto-populated video or pasted
@@ -1412,12 +1616,29 @@ export default class extends Controller {
     }
   }
 
+  // The "Adjust crop" fab is server-rendered on photo-capable cards and
+  // shown only while the card carries a photo the crop stage can actually
+  // reopen — same-origin (a stored path or data URL), because drawing a
+  // cross-origin image (a Pexels pick) taints the canvas and the final
+  // encode throws. Kept in sync here so a just-applied upload gets its fab
+  // without waiting for the next server render.
+  _syncAdjustFab(card) {
+    const fab = card?.querySelector(".adjust-crop-fab")
+    if (!fab) return
+    const url = card.dataset.cardImage || ""
+    fab.hidden = !(url.startsWith("/") || url.startsWith("data:"))
+  }
+
   // Swap a card's left panel to an autoplaying video, mirroring the server
   // render (the autoplay-video controller handles play/pause + lazy loading).
   _setCardVideo(card, video, poster, credit = "", creditUrl = "") {
     card.dataset.cardVideo = video || ""
     card.dataset.cardVideoPoster = poster || ""
     card.dataset.cardImage = ""
+    // No photo, no re-crop record — see _setCardImage.
+    delete card.dataset.cardImageSource
+    delete card.dataset.cardImageCrop
+    this._syncAdjustFab(card)
     card.dataset.cardImageCredit = video ? (credit || "") : ""
     card.dataset.cardImageCreditUrl = video ? (creditUrl || "") : ""
     card.dataset.cardLottie = ""
@@ -1686,6 +1907,10 @@ export default class extends Controller {
   _setCardLottie(card, url) {
     card.dataset.cardLottie = url || ""
     card.dataset.cardImage = ""
+    // No photo, no re-crop record — see _setCardImage.
+    delete card.dataset.cardImageSource
+    delete card.dataset.cardImageCrop
+    this._syncAdjustFab(card)
     card.dataset.cardImageCredit = ""
     card.dataset.cardImageCreditUrl = ""
     card.dataset.cardVideo = ""

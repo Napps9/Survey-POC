@@ -436,6 +436,12 @@ class AssetPopulator
   # the other so a re-populate/shuffle can switch a card between the two. The
   # credit fields are shared (the renderer labels them "Photo by"/"Video by").
   def apply_card_media(card, picked)
+    # A populate/shuffle puts a DIFFERENT picture on the card, so the editor's
+    # re-crop record (the pre-crop original of the old upload, and the crop
+    # taken from it) describes pixels that are no longer there. Left behind,
+    # "Adjust crop" would reopen the previous photo underneath the new one.
+    card.delete("image_source")
+    card.delete("image_crop")
     if picked["video"].present?
       card["video"]        = picked["video"]
       card["video_poster"] = picked["video_poster"]

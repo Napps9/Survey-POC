@@ -1675,6 +1675,17 @@ export default class extends Controller {
         // been moved off centre — the server drops a 50 anyway.
         const focal = parseInt(card.dataset.cardFocalY, 10)
         if (Number.isFinite(focal) && focal !== 50) out.focal_y = focal
+        // The re-crop record: the pre-crop original and where this crop sits
+        // in it — what lets "Adjust crop" zoom back OUT later. Rides the
+        // card's dataset the same way the image itself does, so it has to be
+        // re-serialised here or one autosave would silently strip it.
+        if (card.dataset.cardImageSource) {
+          out.image_source = card.dataset.cardImageSource
+          const cropRaw = card.dataset.cardImageCrop
+          if (cropRaw) {
+            try { out.image_crop = JSON.parse(cropRaw) } catch (_e) { /* junk rect — dropped */ }
+          }
+        }
       }
       // Slow push-in/out on the card's own imagery — meaningless for video,
       // so only carried alongside a photo or animation.

@@ -990,6 +990,17 @@
   color: #1C2034;
   border-color: rgba(1,234,203,1);
 }
+/* The Adjust-crop fab toggles with the `hidden` attribute (server-rendered
+   for photo cards, media_picker#_syncAdjustFab as photos come and go), and
+   .add-bg-fab's own display:inline-flex would beat the UA's [hidden] rule —
+   author display always wins over that default. Same for the cta-row that
+   exists only to hold it on the no-media prompt panel. */
+.adjust-crop-fab[hidden] {
+  display: none;
+}
+.split-left-cta-row:not(:has(> :not([hidden]))) {
+  display: none;
+}
 
 /* ── Animation picker grid (reuses the .media-modal-* chrome) ── */
 .anim-modal-sub {

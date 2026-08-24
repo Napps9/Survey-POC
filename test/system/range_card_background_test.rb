@@ -148,7 +148,10 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
 
     within(find(".survey-card-wrap[data-card-cid='img1']")) do
       assert_selector ".add-media-fab"
-      assert_no_selector ".add-bg-fab"
+      # By its label, the way this file's own lottie test identifies it — the
+      # .add-bg-fab CLASS is shared styling that "Adjust crop" (a control a
+      # photo card is SUPPOSED to have) borrows too.
+      assert_no_selector ".add-bg-fab", text: "Background"
     end
   end
 
