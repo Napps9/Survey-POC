@@ -1273,15 +1273,77 @@
           <% end %>
         </details>
 
-        <%# Card content has always followed the Verto's own language
-            (default_locale / ?lang=); the surrounding chrome — Back/Next,
-            consent, the required hint, the thank-you screen — has always
-            followed the visitor's own browser/account locale instead, so a
-            Spanish-language Verto opened by an English-browser visitor shows
-            Spanish questions against English buttons. This is the one
-            override for that, off by default. %>
+        <%# Everything language: which languages this Verto exists in and which
+            is primary (surveys#update_languages), whether the player opens in
+            the respondent's own language automatically, and whether the
+            player chrome follows the Verto's language. Card content has
+            always followed the Verto's own language (default_locale /
+            ?lang=); the chrome override remains off by default. %>
         <details class="publish-block">
           <summary class="publish-block-title">Language <span class="pub-chev">⌄</span></summary>
+
+          <% primary_locked = live_locked || @survey.responses.exists? %>
+          <%= form_with url: survey_languages_path(@survey), method: :post, local: true, style: "margin:0 0 12px;" do %>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:6px;">Primary language</div>
+            <select name="default_locale" onchange="this.form.requestSubmit()"
+                    <%= "disabled" if primary_locked %>
+                    style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
+              <% @survey.verto_locales.each do |code| %>
+                <% loc = SupportedLocales.find(code) %>
+                <option value="<%= code %>" <%= "selected" if code == @survey.default_locale %>><%= loc&.flag %> <%= loc&.english_name || code %></option>
+              <% end %>
+            </select>
+            <% if primary_locked %>
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+                The primary language is fixed once a Verto is live or has answers — it's the language the results are recorded in.
+              </div>
+            <% end %>
+            <% if params[:language_error] == "primary" %>
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;">That couldn't become the primary language — a Verto that is live or already has answers keeps the one it was built in.</div>
+            <% end %>
+
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin:12px 0 6px;">Languages</div>
+            <%# With every secondary unticked no locales[] field would submit at
+                all and the deselection would be silently ignored — the classic
+                checkbox-array absence. The blank sentinel always submits and
+                sanitize_list drops it. %>
+            <input type="hidden" name="locales[]" value="" />
+            <div style="max-height:190px;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px 10px;">
+              <% verto_set = @survey.verto_locales %>
+              <% SupportedLocales.all.each do |loc| %>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;padding:4px 0;">
+                  <input type="checkbox" name="locales[]" value="<%= loc.code %>"
+                         <%= "checked" if verto_set.include?(loc.code) %>
+                         <%= "disabled" if loc.code == @survey.default_locale %>
+                         onchange="this.form.requestSubmit()"
+                         style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" />
+                  <span style="flex-shrink:0;"><%= loc.flag %></span>
+                  <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= loc.native_name %> <span style="color:rgba(255,255,255,0.45);">· <%= loc.english_name %></span></span>
+                  <% if loc.code == @survey.default_locale %>
+                    <span style="margin-left:auto;flex-shrink:0;font-family:'Alata',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#01EACB;">Primary</span>
+                  <% end %>
+                </label>
+              <% end %>
+            </div>
+            <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+              Tick a language and the Verto translates itself into it in the background — give it a minute, then reload. Unticking keeps the translation stored, so re-ticking is instant.
+            </div>
+          <% end %>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0 0 10px;" do %>
+            <input type="hidden" name="auto_detect_language" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="auto_detect_language" value="1"
+                     <%= "checked" if @survey.auto_detect_language? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Open in each respondent's own language when this Verto has it. Off: everyone starts in the primary language and picks another by hand.</span>
+            </label>
+          <% end %>
+
+          <%# The chrome — Back/Next, consent, the required hint, the thank-you
+              screen — has always followed the visitor's own browser/account
+              locale; this is the one override for that, off by default. %>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <input type="hidden" name="chrome_follows_verto_language" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">

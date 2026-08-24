@@ -1012,10 +1012,17 @@ class PlayerController < ApplicationController
     resp.demographic_neurodiversity = chosen.compact.any? ? "|#{chosen.compact.sort.join('|')}|" : nil
   end
 
-  # The Verto content language to render: an explicit ?lang=, else the
-  # respondent's UI locale if the Verto has it, else the Verto's primary.
+  # The Verto content language to render: an explicit ?lang= always wins (it's
+  # the respondent's own choice, made in the player's language switcher); after
+  # that, the respondent's browser/system locale — but only while the creator
+  # has auto-detection on. With it off, a multilingual Verto opens in its
+  # primary language for everyone, and the switcher is how a respondent opts
+  # into another ("today when a Verto is opened it will revert to the system
+  # language — this needs to be controlled by the creator").
   def resolve_play_locale
-    @survey.display_locale_for(params[:lang], Current.locale)
+    preferred = [ params[:lang] ]
+    preferred << Current.locale if @survey.auto_detect_language?
+    @survey.display_locale_for(*preferred)
   end
 
   # ApplicationController#switch_locale already wraps this whole request in

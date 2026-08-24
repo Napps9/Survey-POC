@@ -114,7 +114,7 @@ class SurveysController < ApplicationController
   def settings_locked_message = t("flash.surveys.settings_locked")
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_audience_country, :qr ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -689,6 +689,35 @@ class SurveysController < ApplicationController
     end
   end
 
+  # POST /surveys/:id/languages
+  # The editor's Language block: which languages this Verto exists in and which
+  # is primary, submitted as the full desired state (default_locale +
+  # locales[]). Ticking a NEW language queues a translation pass for just that
+  # language; unticking one only deselects it — the i18n entries stay on the
+  # cards, so re-ticking is instant and lossless. Changing the primary runs
+  # Survey#switch_primary_locale!, which self-guards (draft only, no responses,
+  # target must already be one of the Verto's languages) — the guard surfaces
+  # back to the panel as a query param, same pattern as slug_error.
+  def update_languages
+    if (desired_primary = params[:default_locale].presence&.to_s) && desired_primary != @survey.default_locale
+      begin
+        @survey.switch_primary_locale!(desired_primary)
+      rescue ArgumentError
+        return redirect_to survey_path(@survey, panel: "publish", language_error: "primary")
+      end
+    end
+
+    if params.key?(:locales)
+      primary = @survey.default_locale
+      desired = ([ primary ] + SupportedLocales.sanitize_list(params[:locales], fallback: [])).uniq
+      added   = desired - @survey.verto_locales
+      @survey.update!(locales: desired)
+      TranslateLocalesJob.perform_later(@survey.id, added) if added.any?
+    end
+
+    redirect_to survey_path(@survey, panel: "publish")
+  end
+
   # POST /surveys/:id/duplicate
   # Copies a Verto — draft or live — into a brand-new draft under the same
   # organisation, then opens it in the editor. See Survey#duplicate! for what
@@ -737,7 +766,7 @@ class SurveysController < ApplicationController
     # so the toggle only shows or hides them.
     %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
-       chrome_follows_verto_language].each do |flag|
+       chrome_follows_verto_language auto_detect_language].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end

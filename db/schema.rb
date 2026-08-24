@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_21_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_104927) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -831,6 +831,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_21_120000) do
   create_table "surveys", force: :cascade do |t|
     t.string "audience_age"
     t.string "audience_country"
+    t.boolean "auto_detect_language", default: true, null: false
     t.text "background_image"
     t.boolean "brand_answer_tint", default: false, null: false
     t.string "brand_font"

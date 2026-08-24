@@ -109,6 +109,100 @@ class Survey < ApplicationRecord
     preferred.flatten.compact.map(&:to_s).find { |l| verto_locales.include?(l) } || default_locale
   end
 
+  # Re-point the Verto at a different primary language, swapping canonical and
+  # translated text so nothing is lost: today's canonical fields move into
+  # i18n[old primary], and i18n[new primary] becomes the canonical text.
+  #
+  # Guarded hard, because the canonical text is more than words. Stored answers
+  # carry canonical option labels, and quiz `correct` and the token map are
+  # KEYED by them — so the swap is only legal while nobody has answered and the
+  # deck is still editable, and label-keyed structures are remapped positionally
+  # (option order is the identity, exactly the invariant SurveyTranslator
+  # preserves). A card whose translation is missing or misaligned keeps its
+  # canonical text for that field — visible in the editor, never corrupting.
+  def switch_primary_locale!(new_locale)
+    new_locale = new_locale.to_s
+    return false if new_locale == default_locale
+    raise ArgumentError, "not one of this Verto's languages" unless verto_locales.include?(new_locale)
+    raise ArgumentError, "questions are locked" if editing_locked?
+    raise ArgumentError, "already has responses" if responses.exists?
+
+    old_locale = default_locale
+    swapped = Array(cards).map { |c| self.class.swap_card_primary(c, old_locale, new_locale) }
+    update!(
+      cards:          swapped,
+      default_locale: new_locale,
+      locales:        ([ new_locale ] + (verto_locales - [ new_locale ])).uniq
+    )
+    true
+  end
+
+  # One card's half of the swap above. Class method so it is testable on a bare
+  # hash; returns a new hash, never mutates.
+  def self.swap_card_primary(card, old_locale, new_locale)
+    return card unless card.is_a?(Hash)
+
+    entry = card.dig("i18n", new_locale)
+    out = card.dup
+    old_entry = {
+      "text"        => card["text"].to_s,
+      "description" => card["description"].presence,
+      "options"     => (card["options"].presence if card["options"].is_a?(Array)),
+      "pages"       => (Array(card["pages"]).map { |p| p.slice("id", "text") }.presence if card["pages"].is_a?(Array)),
+      "explanation" => card["explanation"].presence,
+      "responses"   => (Array(card["responses"]).map { |r| r["label"].to_s }.presence if card["responses"].is_a?(Array))
+    }.compact
+
+    if entry.is_a?(Hash)
+      out["text"]        = entry["text"] if entry["text"].present?
+      out["description"] = entry["description"] if entry["description"].present?
+      out["explanation"] = entry["explanation"] if entry["explanation"].present?
+
+      # Pages swap by id — the id is the page's identity across languages.
+      if out["pages"].is_a?(Array) && entry["pages"].is_a?(Array)
+        by_id = entry["pages"].each_with_object({}) { |p, h| h[p["id"].to_s] = p["text"] if p.is_a?(Hash) }
+        out["pages"] = out["pages"].map do |p|
+          t = p.is_a?(Hash) ? by_id[p["id"].to_s] : nil
+          t.present? ? p.merge("text" => t) : p
+        end
+      end
+
+      # Options swap positionally — and only when the counts agree, because a
+      # short translation would silently shear labels off the end. When they
+      # swap, everything keyed by the old canonical labels moves with them.
+      old_options = Array(card["options"])
+      new_options = Array(entry["options"])
+      if old_options.any? && new_options.length == old_options.length
+        mapping = old_options.map.with_index { |o, i| [ o.to_s, new_options[i].to_s ] }.to_h
+        out["options"] = new_options
+        out["correct"] = remap_canonical_labels(card["correct"], mapping) if card.key?("correct")
+        out["tokens"]  = card["tokens"].transform_keys { |k| mapping.fetch(k.to_s, k) } if card["tokens"].is_a?(Hash)
+      end
+
+      # Tap scale labels are positional too, alongside stable keys.
+      resp_labels = Array(entry["responses"])
+      if out["responses"].is_a?(Array) && resp_labels.length == out["responses"].length
+        out["responses"] = out["responses"].each_with_index.map do |r, i|
+          resp_labels[i].to_s.strip.present? ? r.merge("label" => resp_labels[i].to_s.strip) : r
+        end
+      end
+    end
+
+    i18n = (card["i18n"] || {}).except(new_locale).merge(old_locale => old_entry)
+    out.merge("i18n" => i18n)
+  end
+
+  # `correct` is a canonical label (choice), an array of them (select-many), or
+  # a {statement => response_key} hash (tap) — statements are the labels there.
+  def self.remap_canonical_labels(correct, mapping)
+    case correct
+    when String then mapping.fetch(correct, correct)
+    when Array  then correct.map { |c| mapping.fetch(c.to_s, c) }
+    when Hash   then correct.transform_keys { |k| mapping.fetch(k.to_s, k) }
+    else correct
+    end
+  end
+
   # Returns a copy of `cards` with `translated` (an array, aligned per-card, of
   # { "text", "description", "options" }) merged into each card's i18n[locale].
   # Structural fields are untouched, so positional answer alignment is preserved.
