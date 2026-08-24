@@ -52,7 +52,16 @@
            data-tap-stack-key="<%= key %>"
            data-tap-stack-direction="<%= response["direction"] %>"
            <%= option_style_data_attrs(response) %>>
-        <span class="rotate-action-btn" aria-hidden="true"><%= tap_response_mark(response, index: i) %></span>
+        <%# The mark itself opens the style popover: "users want to be able to
+            update the icons", and the icon is what they click — the hover-only
+            17px 🎨 beside it was never found. The span stays aria-hidden
+            (decorative to AT); keyboard and AT users have the focusable 🎨
+            button below, which reveals itself on focus-within. option-style#open
+            stops propagation, so this no longer falls through to the row's
+            tap-stack#pick preview. %>
+        <span class="rotate-action-btn rotate-action-btn--editable" aria-hidden="true"
+              data-action="click->option-style#open"
+              title="<%= t("card.style_option") %>"><%= tap_response_mark(response, index: i) %></span>
         <span class="rotate-action-label" contenteditable="true"
               data-tap-response-label><%= label %></span>
         <button type="button" class="option-style-btn tap-response-style-btn"

@@ -81,7 +81,9 @@ export function tapResponseHtml(response, index) {
          data-action="click->tap-stack#pick"
          data-tap-stack-key="${esc(response.key)}"
          data-tap-stack-direction="${esc(response.direction)}"${styleAttrs(response)}>
-      <span class="rotate-action-btn" aria-hidden="true">${markHtml(response, index)}</span>
+      <span class="rotate-action-btn rotate-action-btn--editable" aria-hidden="true"
+            data-action="click->option-style#open"
+            title="${esc(t("card.style_option"))}">${markHtml(response, index)}</span>
       <span class="rotate-action-label" contenteditable="true" data-tap-response-label>${esc(response.label)}</span>
       <button type="button" class="option-style-btn tap-response-style-btn"
               data-action="click->option-style#open"

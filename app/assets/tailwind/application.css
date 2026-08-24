@@ -2986,6 +2986,13 @@
 }
 .rotate-actions[data-response-count="4"] .rotate-action-btn { width: 44px; height: 44px; }
 .rotate-action:hover .rotate-action-btn { transform: scale(1.1); }
+/* Editor only (the player's marks never carry the class): the mark opens the
+   🎨 popover directly — it is the thing a creator wants to change, and the
+   hover-only 17px button beside it was never found. The ring on hover is the
+   "this is a control" cue the plain circle lacked. */
+.rotate-action-btn--editable:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12), 0 0 0 3px rgba(1,234,203,0.55);
+}
 /* A four-point scale has no middle, so "strongly" is carried by weight rather
    than by a glyph that doesn't exist: the extremes fill their ring instead of
    outlining it. Same artwork, read louder. */

@@ -148,7 +148,9 @@ class JsConstantParityTest < ActiveSupport::TestCase
     # The wrapper's own class is interpolated (it varies with `strong`), so the
     # markers are the two fixed classes inside it plus the hook the serializer
     # finds the strip by — between them nothing can build a strip elsewhere.
-    [ %(class="rotate-action-btn"), %(class="rotate-action-label"), "data-tap-response-label>" ].each do |marker|
+    # The mark's marker is an unclosed prefix: the editor flavour appends
+    # `rotate-action-btn--editable` (the mark is the 🎨 popover's click target).
+    [ %(class="rotate-action-btn), %(class="rotate-action-label"), "data-tap-response-label>" ].each do |marker|
       definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
         File.read(path).include?(marker)
       end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
