@@ -68,15 +68,16 @@
             of the deck (the demographics convention). One of each per Verto:
             tiles grey out once the deck has the key (key_for reads keyless
             legacy tail cards too) — server-rendered for first paint,
-            re-synced client-side on open. All disabled while the contact
-            form is on: the GDPR wall, said here rather than discovered at
-            the save. %>
+            re-synced client-side on open. The GDPR wall is scoped to
+            NEURODIVERSITY: age, location, gender and heritage may sit beside
+            a contact form; the health-adjacent question may not — said here
+            rather than discovered at the save. %>
         <div class="aq-section-label">Demographics</div>
         <% contact_wall = @survey.contact_form_enabled? %>
         <% if contact_wall %>
           <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F5A623;line-height:1.45;margin:0 0 10px;">
-            This Verto collects contact details, so it can't also ask demographic
-            questions — turn the contact form off in Publish &amp; share first.
+            This Verto collects contact details, so it can't also ask the
+            neurodiversity question — turn the contact form off in Publish &amp; share first.
           </div>
         <% end %>
         <div class="aq-choice-grid">
@@ -99,13 +100,14 @@
               ["heritage", "👥", "Heritage", heritage_desc],
               ["neurodiversity", "🧠", "Neurodiversity",
                "How people think and process information — optional, never framed around disability"]].each do |key, icon, name, desc| %>
+            <% walled = contact_wall && key == "neurodiversity" %>
             <button type="button"
                     class="aq-choice-card aq-demographic-tile"
                     data-add-question-target="demographicTile"
                     data-demographic-key="<%= key %>"
-                    data-contact-wall="<%= contact_wall %>"
+                    data-contact-wall="<%= walled %>"
                     data-action="click->add-question#addDemographic"
-                    <%= "disabled" if contact_wall || deck_keys.include?(key) %>>
+                    <%= "disabled" if walled || deck_keys.include?(key) %>>
               <div class="aq-choice-icon"><%= icon %></div>
               <div class="aq-choice-name"><%= name %></div>
               <div class="aq-choice-desc"><%= desc %></div>

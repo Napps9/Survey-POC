@@ -1893,20 +1893,25 @@ class Survey < ApplicationRecord
   # database exception.
   validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
 
-  # THE GDPR WALL. A Verto may collect contact details or ask demographic
-  # questions — never both. Contact details make a respondent identified;
-  # demographics next to an identity is special-category adjacency nobody
-  # here wants to hold. Enforced at the data layer so every path in — the
-  # settings toggle, the card autosave, the add-question modal's Demographics
-  # tiles, an import — hits the same wall, whichever side moved second. The
-  # message is creator-facing: surveys#update relays RecordInvalid text.
-  validate :contact_form_excludes_demographics, if: :contact_form_enabled?
+  # THE GDPR WALL, scoped to where it bites (owner's call, 2026-08-24): a
+  # contact form may sit alongside age, location, gender and heritage, but
+  # never the NEURODIVERSITY question — health-adjacent special-category data
+  # next to a name and an email is the adjacency nobody here wants to hold.
+  # Enforced at the data layer so every path in — the settings toggle, the
+  # card autosave, the add-question modal's Demographics tiles, an import —
+  # hits the same wall, whichever side moved second. The message is
+  # creator-facing: surveys#update relays RecordInvalid text.
+  validate :contact_form_excludes_neurodiversity, if: :contact_form_enabled?
 
-  def contact_form_excludes_demographics
-    return unless demographic_cards?
+  def contact_form_excludes_neurodiversity
+    return unless neurodiversity_cards?
 
-    errors.add(:base, "A Verto can collect contact details or ask demographic questions, never both — " \
-                      "remove the demographic questions to keep the contact form, or turn the contact form off.")
+    errors.add(:base, "A Verto can collect contact details or ask the neurodiversity question, never both — " \
+                      "remove the neurodiversity question to keep the contact form, or turn the contact form off.")
+  end
+
+  def neurodiversity_cards?
+    Array(cards).any? { |c| DemographicQuestions.key_for(c) == "neurodiversity" }
   end
 
   def self.normalize_leaderboard_retake_policy(value)

@@ -895,10 +895,10 @@ class SurveysController < ApplicationController
         @survey.update!(attrs)
       rescue ActiveRecord::RecordInvalid
         # The one validation a settings form can trip is the contact-form /
-        # demographics wall; surface it the way the panel's other refusals
+        # neurodiversity wall; surface it the way the panel's other refusals
         # surface (slug_error / language_error), not as a 500.
         raise unless attrs.key?(:contact_form_enabled)
-        return redirect_to survey_path(@survey, panel: "publish", contact_error: "demographics")
+        return redirect_to survey_path(@survey, panel: "publish", contact_error: "neurodiversity")
       end
     end
     respond_to do |format|
@@ -1258,14 +1258,15 @@ class SurveysController < ApplicationController
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
+    key  = params[:key].to_s
     # The contact wall, at the door rather than at the autosave: letting the
     # card into the feed and failing the save later reads as a broken editor.
-    if survey.contact_form_enabled?
-      return render json: { ok: false, error: "A Verto can collect contact details or ask demographic questions, never both — turn the contact form off first." },
+    # Scoped to neurodiversity — age, location, gender and heritage may sit
+    # beside a contact form (Survey#contact_form_excludes_neurodiversity).
+    if survey.contact_form_enabled? && key == "neurodiversity"
+      return render json: { ok: false, error: "A Verto can collect contact details or ask the neurodiversity question, never both — turn the contact form off first." },
                     status: :unprocessable_entity
     end
-
-    key  = params[:key].to_s
     card = DemographicQuestions.card_for_key(key, locale: survey.default_locale)
     unless card
       return render json: { ok: false, error: "Unknown demographic question." }, status: :unprocessable_entity

@@ -82,22 +82,32 @@ class ContactGateTest < ActionDispatch::IntegrationTest
     assert_equal 0, on.contact_details.count, "no player key, no identity, no row"
   end
 
-  test "the settings toggle is refused while the deck asks demographics" do
+  NEURO_CARD = { "type" => "select_many", "text" => "N", "options" => [ "A", "B" ],
+                 "demographic" => true, "demographic_key" => "neurodiversity" }.freeze
+
+  test "the settings toggle is refused while the deck asks neurodiversity — and allowed beside the rest of the tail" do
     org = Organisation.create!(name: "O", slug: "cg-set-#{SecureRandom.hex(3)}")
     sign_in_admin(org)
     s = org.surveys.create!(
       title: "T", theme: "T", audience_age: "all", key_insight: "x",
       default_locale: "en", locales: [ "en" ],
-      cards: CARDS.map(&:dup) + [ { "type" => "multiple_choice", "text" => "Gender",
-                                    "options" => [ "A", "B" ], "demographic" => true } ]
+      cards: CARDS.map(&:dup) + [ NEURO_CARD.dup ]
     )
 
     post survey_settings_path(s), params: { contact_form_enabled: "1" }
-    assert_redirected_to survey_path(s, panel: "publish", contact_error: "demographics")
+    assert_redirected_to survey_path(s, panel: "publish", contact_error: "neurodiversity")
     assert_not s.reload.contact_form_enabled?
+
+    tail_only = org.surveys.create!(
+      title: "T", theme: "T", audience_age: "all", key_insight: "x",
+      default_locale: "en", locales: [ "en" ],
+      cards: DemographicQuestions.append_to(CARDS.map(&:dup))
+    )
+    post survey_settings_path(tail_only), params: { contact_form_enabled: "1" }
+    assert tail_only.reload.contact_form_enabled?, "age/location/gender beside a contact form is allowed"
   end
 
-  test "the card autosave relays the wall's message when demographics try to join a contact Verto" do
+  test "the card autosave relays the wall's message when neurodiversity tries to join a contact Verto" do
     org = Organisation.create!(name: "O", slug: "cg-auto-#{SecureRandom.hex(3)}")
     sign_in_admin(org)
     s = org.surveys.create!(
@@ -107,13 +117,20 @@ class ContactGateTest < ActionDispatch::IntegrationTest
     )
 
     patch survey_path(s),
-          params: { cards: s.cards + [ { "type" => "multiple_choice", "text" => "Gender",
-                                         "options" => [ "A", "B" ], "demographic" => true } ] }.to_json,
+          params: { cards: s.cards + [ NEURO_CARD.dup ] }.to_json,
           headers: { "Content-Type" => "application/json" }
     assert_response :unprocessable_entity
     body = JSON.parse(response.body)
     assert_match(/never both/, body["error"])
-    assert_not s.reload.demographic_cards?
+    assert_not s.reload.neurodiversity_cards?
+
+    # The scoped wall lets the ordinary tail through the same door.
+    patch survey_path(s),
+          params: { cards: s.cards + [ { "type" => "multiple_choice", "text" => "Gender",
+                                         "options" => [ "A", "B" ], "demographic" => true } ] }.to_json,
+          headers: { "Content-Type" => "application/json" }
+    assert_response :success
+    assert s.reload.demographic_cards?
   end
 
   test "the contacts CSV is admin-only and carries the leaderboard name for the same identity" do

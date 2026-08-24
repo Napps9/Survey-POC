@@ -6,9 +6,11 @@
 # per-survey on purpose: contacts, like aliases, cannot be joined across
 # Vertos.
 #
-# Survey#contact_form_excludes_demographics is the other half of the GDPR
-# posture: a Verto may hold this table's rows or ask demographic questions,
-# never both, so age/heritage/etc can never sit next to a name and an email.
+# Survey#contact_form_excludes_neurodiversity is the other half of the GDPR
+# posture: a Verto may hold this table's rows or ask the neurodiversity
+# question, never both — health-adjacent special-category answers never sit
+# next to a name and an email. Age, location, gender and heritage may coexist
+# with a contact form (owner's call, 2026-08-24).
 class ContactDetail < ApplicationRecord
   belongs_to :survey
 

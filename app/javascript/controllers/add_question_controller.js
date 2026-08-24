@@ -155,9 +155,9 @@ export default class extends Controller {
   // One of each per Verto: a tile greys out while the deck holds a card with
   // its demographic_key. Recomputed from the live feed on every open, so a
   // client-side delete re-enables the tile without a reload. The contact wall
-  // outranks the recompute — while the Verto collects contact details every
-  // demographic tile stays off, whatever the feed holds (the flag is
-  // server-rendered; flipping the contact form reloads the page).
+  // outranks the recompute — while the Verto collects contact details the
+  // NEURODIVERSITY tile stays off whatever the feed holds (the flag is
+  // server-rendered per tile; flipping the contact form reloads the page).
   _syncDemographicTiles() {
     this.demographicTileTargets.forEach(tile => {
       if (tile.dataset.contactWall === "true") { tile.disabled = true; return }

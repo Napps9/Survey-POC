@@ -58,14 +58,19 @@ class DemographicTilesTest < ActionDispatch::IntegrationTest
     assert_match(/already asks/, JSON.parse(response.body)["error"])
   end
 
-  test "the contact wall refuses every demographic insert at the door" do
+  test "the contact wall refuses only the neurodiversity insert at the door" do
     org = sign_in_org("wall")
     s = survey_for(org, contact: true)
 
-    post demographic_survey_card_path(s), params: { key: "gender" }.to_json,
+    post demographic_survey_card_path(s), params: { key: "neurodiversity" }.to_json,
          headers: { "Content-Type" => "application/json" }
     assert_response :unprocessable_entity
     assert_match(/never both/, JSON.parse(response.body)["error"])
+
+    post demographic_survey_card_path(s), params: { key: "gender" }.to_json,
+         headers: { "Content-Type" => "application/json" }
+    assert_response :success, "gender beside a contact form is allowed"
+    assert_equal "gender", JSON.parse(response.body)["card"]["demographic_key"]
   end
 
   test "the modal renders five tiles, greyed by deck state and by the wall" do
@@ -83,8 +88,9 @@ class DemographicTilesTest < ActionDispatch::IntegrationTest
 
     walled = survey_for(org, contact: true)
     get survey_path(walled)
-    assert_select ".aq-demographic-tile[disabled]", 5
-    assert_match "can't also ask demographic", response.body
+    assert_select ".aq-demographic-tile[disabled]", 1
+    assert_select ".aq-demographic-tile[data-demographic-key=neurodiversity][disabled]", 1
+    assert_match "can't also ask the", response.body
   end
 
   test "a multilingual insert arrives with its translations prefilled" do

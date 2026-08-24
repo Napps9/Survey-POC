@@ -39,20 +39,30 @@ class ContactDetailTest < ActiveSupport::TestCase
     assert_equal ContactDetail::MAX_FIELD, c.email.length
   end
 
-  test "the GDPR wall: a contact form cannot join demographic questions, whichever side moves second" do
-    demo_cards = [ { "type" => "yes_no", "text" => "Q", "options" => [ "Yes", "No" ] },
-                   { "type" => "multiple_choice", "text" => "Gender", "options" => [ "A", "B" ], "demographic" => true } ]
+  test "the GDPR wall: a contact form cannot join the neurodiversity question, whichever side moves second" do
+    neuro_cards = [ { "type" => "yes_no", "text" => "Q", "options" => [ "Yes", "No" ] },
+                    { "type" => "select_many", "text" => "N", "options" => [ "A", "B" ],
+                      "demographic" => true, "demographic_key" => "neurodiversity" } ]
 
-    # Demographics first, contact second: the toggle is refused.
-    s = survey(cards: demo_cards, contact: false)
+    # Neurodiversity first, contact second: the toggle is refused.
+    s = survey(cards: neuro_cards, contact: false)
     s.contact_form_enabled = true
     assert_not s.valid?
     assert_match(/never both/, s.errors.full_messages.to_sentence)
 
-    # Contact first, demographics second: the card save is refused.
+    # Contact first, neurodiversity second: the card save is refused.
     s2 = survey
-    s2.cards = demo_cards
+    s2.cards = neuro_cards
     assert_not s2.valid?
+  end
+
+  test "the wall is scoped: age, location, gender and heritage may sit beside a contact form" do
+    cards = DemographicQuestions.append_to([ { "type" => "yes_no", "text" => "Q", "options" => [ "Yes", "No" ] } ]) +
+            [ DemographicQuestions.optional_card("heritage").merge("cid" => "c_h1") ]
+    s = survey(cards: cards, contact: true)
+    assert s.valid?, s.errors.full_messages.to_sentence
+    assert s.demographic_cards?
+    assert_not s.neurodiversity_cards?
   end
 
   test "player_identity_active? covers the leaderboard and the contact gate" do
