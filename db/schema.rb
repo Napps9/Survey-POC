@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_24_121556) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_25_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -852,7 +852,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_121556) do
     t.json "brand_palette"
     t.boolean "capture_postcode", default: false, null: false
     t.json "cards"
-    t.boolean "chrome_follows_verto_language", default: false, null: false
+    t.boolean "chrome_follows_verto_language", default: true, null: false
     t.string "compare_note"
     t.text "consent_image"
     t.string "consent_image_credit"

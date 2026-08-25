@@ -1373,8 +1373,10 @@
           <% end %>
 
           <%# The chrome — Back/Next, consent, the required hint, the thank-you
-              screen — has always followed the visitor's own browser/account
-              locale; this is the one override for that, off by default. %>
+              screen — follows the Verto's own language, ON by default since a
+              browser set to a language the Verto does not speak was getting a
+              consent box in it over questions it could not match. Unticking
+              hands the chrome back to each respondent's own browser locale. %>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <input type="hidden" name="chrome_follows_verto_language" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
@@ -1382,7 +1384,7 @@
                      <%= "checked" if @survey.chrome_follows_verto_language? %>
                      onchange="this.form.requestSubmit()"
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-              <span>Show Back, Next and the other player controls in the Verto's own language, not the respondent's.</span>
+              <span>Show Back, Next, the consent box and the other player controls in the Verto's own language. Off: each respondent sees them in their own browser's language instead, even if this Verto isn't offered in it.</span>
             </label>
           <% end %>
         </details>
