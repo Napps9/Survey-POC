@@ -452,10 +452,11 @@ export default class extends Controller {
     // not a guarantee, and the same Verto rendering differently on two phones
     // was the thing being complained about.
     //
-    // The two exceptions are not decided here and never were: the tap matrix
-    // and NPS hide their strip in CSS (:has(.rotate-wrap) and
-    // :has(.nps-slider) in the mobile block), because their answers cannot
-    // shrink. And a focused text field still drops the hero — see
+    // The three exceptions are not decided here and never were: the tap
+    // matrix, NPS and prioritise hide their strip in CSS (:has(.rotate-wrap),
+    // :has(.nps-slider) and :has(.prioritise-list) in the mobile block),
+    // because their answers cannot shrink — and prioritise's cannot scroll
+    // either, its rows being drag targets rather than a scrollable list. And a focused text field still drops the hero — see
     // _watchTyping, which sets hero-off for the keyboard and is the reason
     // that class survives this change while hero-slim and art-off do not.
     //
@@ -483,11 +484,15 @@ export default class extends Controller {
   // --play-card-h is the token every mobile tier takes its hero and answer
   // panel from, and its CSS definition — 100svh less the footer — is an
   // ESTIMATE of the deck's box rather than a measurement of it. What it
-  // cannot see is anything stacked ABOVE the card inside the overlay: the
-  // Test Mode banner, and on a notched iPhone the strip the safe area holds
-  // open. Both are real and both are common — the owner's device photos are
-  // all Test Mode on an iPhone with a dynamic island, so both were in play at
-  // once.
+  // cannot see is anything stacked ABOVE the card inside the overlay: an org
+  // masthead, and on a notched iPhone the strip the safe area holds open.
+  // The Test Mode banner used to be the third and worst of them — the owner's
+  // device photos were all Test Mode on an iPhone with a dynamic island, so
+  // two were in play at once — and Test Mode is a ring around the viewport
+  // now (.play-test-frame), out of flow, costing the card nothing. That
+  // narrows what this has to catch; it does not retire it. Anything an
+  // overlay stacks above the deck does the same thing, which is why the
+  // measurement is the fix rather than a subtraction of known offenders.
   //
   // Reproduced at 393x768 with a 55px spacer standing in for the inset: the
   // card is 609px and the token says 699. The hero is `flex: 0 0 auto` at 45%

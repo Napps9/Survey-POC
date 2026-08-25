@@ -107,6 +107,53 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
   # floor, 45% of the card is 39.7svh, which no single viewport fraction can
   # say. So the shares are now taken from --play-card-h, which is the card
   # itself, and 45/55 is stated literally instead of approximated.
+  # The three types that drop their mobile hero strip — tap matrix, NPS and
+  # prioritise — all do it with `display: contents`, and the value is the whole
+  # trick. .panel-progress is markup INSIDE .split-left, so `none` takes the
+  # progress bar out with the picture, and a respondent loses their sense of
+  # how far through they are on exactly the cards that take longest.
+  # `contents` drops the box and keeps the children.
+  #
+  # hero_promise_test holds both halves in a browser. This names the value,
+  # because `none` is what anyone tidying up would write and the symptom — a
+  # missing 4px bar — is easy to miss on a screenshot.
+  test "every type that drops its hero strip drops it with contents, not none" do
+    [ ".rotate-wrap", ".nps-slider", ".prioritise-list" ].each do |hook|
+      bodies = rule_bodies(".preview-overlay .split-card:has(#{hook}) .split-left")
+
+      assert bodies.any?, "no rule drops the hero strip for #{hook} at all"
+      assert bodies.any? { |b| b =~ /display:\s*contents/ },
+             "#{hook} drops its hero strip with something other than `display: contents` " \
+             "(#{bodies.map(&:strip).inspect}). Any of none/height:0/visibility:hidden hides " \
+             ".panel-progress along with the picture, because the bar is markup inside the " \
+             "panel being hidden."
+    end
+  end
+
+  # Specificity is equal here, so SOURCE ORDER is the only thing deciding it.
+  # The media reset gives a card with a photo its ordinary top pad, because the
+  # bar rides the photo. The contents-branches then take it back, because they
+  # drop the photo's strip even when the card carries one — so their bar is on
+  # the panel after all. Both selectors are (0,4,0); put them the wrong way
+  # round and a prioritise or NPS card WITH an image gets its progress bar
+  # under the eyebrow, on that card type only, in the mobile block only.
+  test "the bar clearance is re-asserted after the media reset, not before it" do
+    media = css.index(".preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right")
+    clear = css.index(".preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right")
+
+    assert media, "the media pad reset is gone"
+    assert clear, "the bar-clearance re-assert is gone, or a type has dropped off its list — " \
+                  "every contents-branch type has to be on it"
+    assert_operator clear, :>, media,
+                    "the bar-clearance rule now sits ABOVE the media reset in the file. They " \
+                    "are the same specificity, so the reset wins and every hero-less card " \
+                    "carrying an image loses its progress-bar clearance."
+
+    body = rule_bodies(".preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right").first
+    assert_match(/padding-top:\s*var\(--play-bar-clear\)/, body,
+                 "the re-assert no longer sets --play-bar-clear, so it is a no-op rule")
+  end
+
   test "the hero and the answer panel state one ratio, in every tier" do
     pairs = css.scan(
       /--play-hero-h:\s*clamp\([^,]+,\s*calc\(var\(--play-card-h\)\s*\*\s*([\d.]+)\).*?

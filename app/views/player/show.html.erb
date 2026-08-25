@@ -142,18 +142,18 @@
      data-player-test-mode-url-value="<%= preview_mode ? "" : live_test_survey_url(play_token) %>">
 
   <% if @test_mode %>
-    <%# Test Mode strip: viewers are unauthenticated testers, so no exit link
-        into the studio — just what this link is and that nothing is saved.
-        The one exception is @live_test (PlayerController#live_test_show): that
-        person arrived from a real play link and params[:token] still IS it, so
-        there is somewhere honest to send them back to. %>
-    <div class="play-banner play-banner-test">
-      <span class="play-banner-text">⚗ <%= t("player.test_mode_banner") %></span>
-      <% if @live_test %>
-        <%= link_to t("player.exit_test_mode"), play_survey_path(params[:token]),
-                    class: "play-banner-link" %>
-      <% end %>
-    </div>
+    <%# Test Mode used to be a strip across the top, and a strip is height:
+        ~31px off every card, on the one surface where the card is already
+        competing with a notch. It is a yellow ring around the whole viewport
+        now, drawn by .play-test-frame at the foot of this overlay — out of
+        flow, so it costs the card nothing.
+        The sentence survives here, clipped. A ring says "something is
+        different"; it cannot say "nothing you enter is saved", and that is
+        the only place a tester is told so. Visually hidden rather than
+        deleted, and rather than `display: none`, which would take it from a
+        screen reader too. The ⚗ glyph is gone with the strip: it was never
+        aria-hidden, so it was being announced as a word. %>
+    <p class="play-test-note"><%= t("player.test_mode_banner") %></p>
   <% elsif preview_mode %>
     <div class="play-banner play-banner-preview">
       <span class="play-banner-text">▶ <%= t("player.preview_banner") %></span>
@@ -555,6 +555,27 @@
 
   <% if @survey.show_consent_gate? %>
     <%= render "player/consent_banner" %>
+  <% end %>
+
+  <%# The Test Mode ring. Last child so it paints over everything it has to
+      outline — the footer, the required-answer hint, the consent banner — and
+      absolutely positioned so it takes no height from the card (see
+      .play-test-frame; a border on the overlay itself would be inside its
+      border-box and eat exactly the pixels this change is giving back).
+      pointer-events: none, or it swallows every tap meant for the card
+      underneath; the exit link opts back in.
+      Viewers are unauthenticated testers, so there is normally nowhere to
+      send them. The exception is @live_test (PlayerController#live_test_show):
+      that person arrived from a real play link and params[:token] still IS
+      it, so there is somewhere honest to go back to — and with the strip gone
+      this pill is the only way. %>
+  <% if @test_mode %>
+    <div class="play-test-frame">
+      <% if @live_test %>
+        <%= link_to t("player.exit_test_mode"), play_survey_path(params[:token]),
+                    class: "play-test-exit" %>
+      <% end %>
+    </div>
   <% end %>
 
 </div>

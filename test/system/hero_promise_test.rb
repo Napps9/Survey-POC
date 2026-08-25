@@ -6,15 +6,18 @@ require "application_system_test_case"
 # the same Verto rendered differently on two phones depending on how many
 # options a creator had typed.
 #
-# There are exactly three ways the promise is allowed to be broken, and this
+# There are exactly four ways the promise is allowed to be broken, and this
 # file is mostly about them, because a guarantee is only worth what its
 # exceptions are:
 #
 #   tap matrix — its card stack cannot shrink
 #   NPS        — its scale cannot shrink either
+#   prioritise — its rows are drag targets (touch-action: none), so a list
+#                past the fold cannot even be scrolled to; an option off the
+#                bottom is unreachable, not merely hidden
 #   typing     — a focused text field takes the hero's room for the keyboard
 #
-# The third is the one that would quietly un-fix something already signed off.
+# The last is the one that would quietly un-fix something already signed off.
 class HeroPromiseTest < ApplicationSystemTestCase
   PHONE   = [ 393, 852 ].freeze
   DESKTOP = [ 1280, 900 ].freeze
@@ -39,7 +42,12 @@ class HeroPromiseTest < ApplicationSystemTestCase
                                        "text" => "How did it land?",
                                        "options" => [ "It was worth it", "The dates worked" ] },
                                      { "type" => "nps", "cid" => "n", "image" => "/nope.jpg",
-                                       "text" => "How likely?" }
+                                       "text" => "How likely?" },
+                                     { "type" => "prioritise", "cid" => "p", "image" => "/nope.jpg",
+                                       "text" => "Drag these into the order that matters to you.",
+                                       "options" => [ "Cheaper sessions", "More times to choose",
+                                                      "Friendlier clubs", "Better facilities",
+                                                      "Closer to home" ] }
                                    ])
     @survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
   end
@@ -94,7 +102,7 @@ class HeroPromiseTest < ApplicationSystemTestCase
     assert_operator h["share"], :>, 0.38
   end
 
-  # ── The three exceptions ──
+  # ── The four exceptions ──
 
   test "the tap matrix has no header, because its stack cannot shrink" do
     open_at(3)
@@ -103,7 +111,7 @@ class HeroPromiseTest < ApplicationSystemTestCase
     assert_equal "tap_card", h["type"]
     assert_not h["shown"],
                "the tap matrix was given a header. Its card stack grows to fill the panel and " \
-               "has nowhere to shrink to, which is why it is one of the two types excluded."
+               "has nowhere to shrink to, which is why it is one of the excluded types."
   end
 
   test "NPS has no header, for the same reason" do
@@ -114,19 +122,35 @@ class HeroPromiseTest < ApplicationSystemTestCase
     assert_not h["shown"], "NPS was given a header; its scale cannot give the room back."
   end
 
+  # Prioritise is the exception with teeth. The other two merely look wrong
+  # when squeezed; this one stops working. The whole row is the drag handle,
+  # so .prioritise-item is touch-action: none — a finger cannot scroll the
+  # list, only drag a row. An option below the fold therefore cannot be
+  # reached at all, and a ranking submitted without it ranks the wrong set.
+  test "prioritise has no header, because a row it cannot reach is a row it cannot rank" do
+    open_at(5)
+    h = hero
+
+    assert_equal "prioritise", h["type"]
+    assert_not h["shown"],
+               "prioritise was given a header. That is 45% of the card taken from a list whose " \
+               "rows cannot be scrolled to — the last options end up behind the floating " \
+               "controls with no gesture that reaches them."
+  end
+
   # Dropping the header must not drop what was PARKED INSIDE it.
   #
-  # .panel-progress is markup inside .split-left, so `display: none` on the two
+  # .panel-progress is markup inside .split-left, so `display: none` on the
   # excepted types took the progress bar out with the picture — measured across
-  # all eight card types on a phone, these were the only two with no bar at all.
+  # all eight card types on a phone, those were the only ones with no bar at all.
   # A respondent lost their sense of how far through they were on exactly the
   # cards that take longest to answer.
   #
   # The fix is `display: contents`, which is a narrow line to walk: too far and
-  # the hero comes back (the two tests above catch that), not far enough and the
+  # the hero comes back (the tests above catch that), not far enough and the
   # bar stays gone (this one does). Both halves have to hold at once, which is
   # why they are neighbours in this file.
-  [ [ 3, "tap_card" ], [ 4, "nps" ] ].each do |index, type|
+  [ [ 3, "tap_card" ], [ 4, "nps" ], [ 5, "prioritise" ] ].each do |index, type|
     test "#{type} keeps its progress bar even though it has no header" do
       open_at(index)
       bar = page.evaluate_script(<<~JS)

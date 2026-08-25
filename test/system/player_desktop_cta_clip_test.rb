@@ -65,9 +65,11 @@ class PlayerDesktopCtaClipTest < ApplicationSystemTestCase
     sleep 0.4
   end
 
-  # Anything stacked between the top of the overlay and the deck — a Test Mode
-  # strip, an org masthead — shortens the card's box. Same mechanism as
-  # player_card_box_test: injecting the strip IS the condition, not a stand-in.
+  # Anything stacked between the top of the overlay and the deck — an org
+  # masthead, a consent or announcement row — shortens the card's box. Same
+  # mechanism as player_card_box_test: injecting the strip IS the condition,
+  # not a stand-in. (Test Mode used to be the stock example and no longer
+  # qualifies: it is a ring out of flow now.)
   def add_inset(px)
     page.execute_script(<<~JS)
       const ov = document.querySelector(".preview-overlay")
@@ -121,7 +123,10 @@ class PlayerDesktopCtaClipTest < ApplicationSystemTestCase
   end
 
   test "chrome stacked above the deck shrinks the card instead of clipping it" do
-    # A Test Mode strip (31px) plus an org masthead (54px), by mechanism.
+    # An org masthead (54px) plus another 31px of stacked chrome, by
+    # mechanism — historically a Test Mode strip, which is a ring out of flow
+    # now; the arithmetic is about anything the overlay stacks, not about that
+    # particular element.
     open_player(1280, 900, inset: 85)
     box = box_report
     assert_operator box["cardTop"], :>=, 0,

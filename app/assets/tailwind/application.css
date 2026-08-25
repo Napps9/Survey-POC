@@ -6116,10 +6116,52 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 0.8125rem;
 }
 .play-banner-link { color: rgba(255,255,255,0.85); text-decoration: underline; text-underline-offset: 3px; }
-.play-banner-test    { background: rgba(255,250,119,0.1); border-bottom: 1px solid rgba(255,250,119,0.3); }
-.play-banner-test    .play-banner-text { color: #FFFA77; }
 .play-banner-preview { background: rgba(1,234,203,0.1);   border-bottom: 1px solid rgba(1,234,203,0.25); }
 .play-banner-preview .play-banner-text { color: #01EACB; }
+
+/* ── Test Mode: a ring, not a strip ──────────────────
+   The strip was ~31px off the top of every card, in the one mode where the
+   card is already fighting a notch and a shorter viewport. What a tester
+   needs from it is "this is not the real thing", which a border says without
+   spending any height.
+
+   The sentence it also carried — nothing you enter is saved — has nowhere
+   visual left to go, so it is clipped rather than deleted: `display: none`
+   would take it from a screen reader as well, and then nothing anywhere says
+   it. Same idiom as .book-live. */
+.play-test-note {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.play-test-frame {
+  /* absolute, NOT fixed: lib/viewport_height puts a transform on the overlay
+     while the keyboard is up, which would make it the containing block for a
+     fixed child and move the ring's reference frame mid-session.
+     .play-consent-banner is absolute for the same reason.
+     box-shadow rather than a border, because a border on this element would
+     be inside its own border-box and shrink the card by exactly the height
+     the strip used to take — which would make this change do nothing. */
+  position: absolute; inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 3px #FFFA77;
+}
+/* A transparent layer over the whole card eats every tap aimed at what is
+   under it — the bug the floating-controls block records further down. The
+   ring opts out; anything real inside it opts back in. */
+.play-test-frame > * { pointer-events: auto; }
+.play-test-exit {
+  position: absolute; top: 8px; left: 10px;
+  display: inline-flex; align-items: center; height: 26px; padding: 0 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,250,119,0.45);
+  background: rgba(20,23,38,0.66);
+  backdrop-filter: blur(6px);
+  color: #FFFA77;
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; line-height: 1;
+  text-decoration: none;
+}
 
 .play-end-actions {
   display: flex; flex-direction: column; align-items: center;
@@ -7573,6 +7615,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex: 1 1 auto;
     height: auto;
   }
+
+  /* Prioritise on mobile: every option has to be on screen AT ONCE, and for
+     this one type that is not a matter of tidiness. The whole row is the drag
+     handle, so .prioritise-item is `touch-action: none` (search "Prioritise
+     (drag-to-rank list)") — which means a list that runs past the fold cannot
+     be scrolled by a finger at all. An off-screen option is not merely below
+     the fold, it is unreachable, and a ranking taken without it is a ranking
+     of the wrong set. "The user needs to be able to see all answers, make
+     this question type the same size as the NPS score."
+
+     So: the same treatment as NPS and the tap matrix above, and `contents`
+     for the same reason they use it — .panel-progress is markup inside
+     .split-left, and `none` would take the progress bar with it. */
+  .preview-overlay .split-card:has(.prioritise-list) .split-left { display: contents; }
+  .preview-overlay .split-card:has(.prioritise-list) .split-right {
+    flex: 1 1 auto;
+    height: auto;
+  }
   /* The card fits the phone rather than the phone scrolling the card. Scrolling
      a swipe card is the wrong verb — you swipe it — and the desktop floor of
      430px was forcing exactly that: 73px of scroll on an iPhone SE, 143px on a
@@ -7743,14 +7803,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   /* ...the reset for cards where the bar does NOT ride the panel: a hero
      strip above means the bar sits on the photo, so the panel keeps its
-     ordinary pad. Then the two contents-branches (tap stack, NPS) re-assert
-     the clearance — they drop the hero strip even when the card carries
-     media, so their bar is back on the panel. Order matters: all three are
-     (0,4,0) against the base rule's (0,3,0), and tap/NPS must land last. */
+     ordinary pad. Then the three contents-branches (tap stack, NPS,
+     prioritise) re-assert the clearance — they drop the hero strip even when
+     the card carries media, so their bar is back on the panel. Order matters:
+     all of them are (0,4,0) against the base rule's (0,3,0), and the
+     contents-branches must land last. */
   .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
     padding-top: var(--play-pad-y);
   }
-  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider) .split-right {
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right {
     padding-top: var(--play-bar-clear);
   }
 
@@ -8238,9 +8299,11 @@ body.generating-overlay-active .bottom-bar { display: none; }
      bottom of the screen. Back, Next and the answer widget are still never
      touched. What used to be the last resort is now the only one.
 
-     Two card types still hide their strip, and always did it here rather than
-     in the ladder: the tap matrix (:has(.rotate-wrap)) and NPS
-     (:has(.nps-slider)), because neither answer can shrink to make room.
+     Three card types still hide their strip, and always did it here rather
+     than in the ladder: the tap matrix (:has(.rotate-wrap)), NPS
+     (:has(.nps-slider)) and prioritise (:has(.prioritise-list)), because none
+     of those answers can shrink to make room — and prioritise cannot even
+     scroll, its rows being drag targets.
      .hero-off survives too, with one owner — _watchTyping, which drops the
      hero while a text field has focus so the keyboard has somewhere to go.
      .art-off and .hero-slim were the ladder's own and went with it. */
@@ -9764,7 +9827,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   top: -9px; bottom: -9px; left: -5px; right: -5px;
 }
 /* Armed. The player's standard 26px control pill, in the Test Mode yellow of
-   .play-banner-test — the chip looks like where it is about to take you. */
+   .play-test-frame — the chip looks like where it is about to take you. */
 .test-hatch-confirm {
   display: inline-flex; align-items: center;
   height: 26px; padding: 0 11px; border-radius: 100px;

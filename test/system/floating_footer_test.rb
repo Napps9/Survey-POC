@@ -79,7 +79,17 @@ class FloatingFooterTest < ApplicationSystemTestCase
           "options" => [ "The sessions were well run", "I would come back", "I'd recommend it" ] },
         { "type" => "range", "cid" => "r", "image" => "/nope.jpg",
           "text" => "How much does sport belong in your week?",
-          "options" => [ "Not at all", "A little", "Some", "A lot", "Totally" ] }
+          "options" => [ "Not at all", "A little", "Some", "A lot", "Totally" ] },
+        # Prioritise was in the measured list above from the beginning and was
+        # NOT in this deck — .prioritise-item sat in REACHABLE claiming a
+        # coverage nothing exercised. It is also the one type for which
+        # "behind the pills" is fatal rather than untidy: the rows are drag
+        # targets at touch-action: none, so what is behind them cannot be
+        # scrolled into view by any gesture.
+        { "type" => "prioritise", "cid" => "p", "image" => "/nope.jpg",
+          "text" => "Drag these into the order that matters to you.",
+          "options" => [ "Cheaper sessions", "More times to choose", "Friendlier clubs",
+                         "Better facilities", "Closer to home" ] }
       ]
     )
     @survey.update_columns(
@@ -241,16 +251,24 @@ class FloatingFooterTest < ApplicationSystemTestCase
     open_player
     checked = {}
 
-    8.times do
+    9.times do
       r = reach_report
       checked[r["type"]] = r unless checked.key?(r["type"])
       advance
-      break if checked.size >= 6
+      break if checked.size >= 7
     end
 
-    assert_operator checked.size, :>=, 5,
+    assert_operator checked.size, :>=, 6,
                     "only walked #{checked.size} card types (#{checked.keys.inspect}); the deck " \
-                    "carries six and each one is here because it measured behind the pills."
+                    "carries seven and each one is here because it measured behind the pills."
+
+    # Named, not just counted. Prioritise is last in the deck, so a walk that
+    # stops early drops exactly the type whose rows cannot be scrolled to —
+    # and the count above would still pass.
+    assert_includes checked.keys, "prioritise",
+                    "the walk never reached the prioritise card (#{checked.keys.inspect}). " \
+                    ".prioritise-item is in REACHABLE, so without it this file claims a " \
+                    "coverage it does not have."
 
     # Collected rather than asserted one at a time. Seven elements in seven
     # containers broke together and they will break together again — a report

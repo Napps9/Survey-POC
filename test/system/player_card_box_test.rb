@@ -5,11 +5,15 @@ require "application_system_test_case"
 # THE CAUSE. --play-card-h is the token every mobile tier takes its hero and
 # its answer panel from, and its CSS definition — 100svh less the footer — is
 # an estimate of the deck's box rather than a measurement of it. What it
-# cannot see is anything stacked ABOVE the card inside .preview-overlay: the
-# Test Mode banner, and on a notched iPhone the strip the safe area holds
-# open. The owner's screenshots are all Test Mode on a phone with a dynamic
-# island, so both were in play at once and the card was ~90px shorter than the
-# token believed. The hero is `flex: 0 0 auto` at 45% of the WRONG number, and
+# cannot see is anything stacked ABOVE the card inside .preview-overlay: an
+# org masthead, and on a notched iPhone the strip the safe area holds open.
+# The Test Mode banner was the third, and when these tests were written the
+# owner's screenshots were all Test Mode on a phone with a dynamic island —
+# two at once, and the card ~90px shorter than the token believed. Test Mode
+# is a ring now (.play-test-frame, out of flow, see test_mode_frame_test), so
+# that particular 31px is gone. The mechanism is not: the INSET below stands
+# for ANY element between the top of the overlay and the deck, and the
+# measurement is what makes all of them harmless. The hero is `flex: 0 0 auto` at 45% of the WRONG number, and
 # .split-right's min-height claims 55% of it on top, so the panel overflowed
 # the card and its bottom was cut.
 #
