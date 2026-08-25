@@ -203,7 +203,7 @@ export default class extends Controller {
   // rejection that leaves _loading stuck true and the composer dead.
   async _stream(question, body) {
     let steps = null
-    const state = { terminal: false, contentful: false, text: "" }
+    const state = { terminal: false, contentful: false, errored: false, text: "" }
 
     try {
       // The answer bubble IS a .summary-card: is-generating switches on the 3px
@@ -293,7 +293,9 @@ export default class extends Controller {
 
   // `state` is _stream's ledger of what actually arrived: `contentful` once any
   // of the answer itself has been shown, `terminal` once the server closed the
-  // turn deliberately — the difference between a finished stream and a killed one.
+  // turn deliberately — the difference between a finished stream and a killed one
+  // — and `errored` once the failure has been put on the page, so the close
+  // below doesn't say it twice.
   _handle(event, body, steps, state) {
     switch (event.t) {
       case "status":
@@ -338,6 +340,7 @@ export default class extends Controller {
 
       case "error":
         state.terminal = true
+        state.errored = true
         this._settle(body, steps)
         body.appendChild(document.createTextNode(event.text))
         break
@@ -345,6 +348,15 @@ export default class extends Controller {
       case "done":
         state.terminal = true
         body.classList.remove("is-streaming")
+        // A turn that closed cleanly having shown nothing is not an answer.
+        // The server says so when it can see it (an error event, which sets
+        // `errored`), but a stream can also finish empty without one — and an
+        // answer bubble holding only a source pill reads as the app having
+        // lost the answer, with nothing to tell the reader to ask again.
+        if (!state.contentful && !state.errored) {
+          this._settle(body, steps)
+          body.appendChild(document.createTextNode(t("ask.error")))
+        }
         if (this._sources.size) body.appendChild(this._jumpPill())
         if (state.text.trim()) body.appendChild(this._answerTools(state.text))
         break
