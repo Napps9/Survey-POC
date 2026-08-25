@@ -118,7 +118,14 @@ class MobileStudioShellTest < ApplicationSystemTestCase
     # Replace the whole name, then commit with Enter as a phone keyboard would.
     pill.send_keys([ :control, "a" ], "Pocket Verto Renamed", :enter)
 
+    # The save state must be VISIBLE on a phone. It used to be written into
+    # the float bar's pill, which the phone layout hides — the words existed,
+    # off screen, which is the same as no feedback at all. assert_text only
+    # sees visible text, so this is the assertion that catches that.
     assert_text "Saved", wait: 10
+    assert_selector ".m-save-chip", text: "Saved"
+
+    # And it reached the database, not just the chip.
     assert_equal "Pocket Verto Renamed", @survey.reload.title
   end
 

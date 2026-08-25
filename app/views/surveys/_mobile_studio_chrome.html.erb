@@ -43,6 +43,14 @@
     </button>
   </div>
 
+  <%# Save state. The class list on the inner span is rewritten by
+      survey-editor#flash, so the chip's own styling lives on the wrapper —
+      the same split the desktop pill uses. %>
+  <div class="m-save-chip">
+    <span class="text-xs text-aquamarine" role="status"
+          data-survey-editor-target="status"><%= t("editor.all_saved", default: "Saved") %></span>
+  </div>
+
   <%# ── Overflow menu ── %>
   <div class="m-menu" hidden data-mobile-studio-target="menu">
     <button type="button" class="m-menu-item" disabled

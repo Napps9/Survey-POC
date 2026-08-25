@@ -2780,10 +2780,16 @@ export default class extends Controller {
     }
   }
 
+  // Plural, like undoBtnTargets: the mobile studio hides the float bar this
+  // pill lives in, so a creator typing on a phone had no save state at all —
+  // the words were written, to an element CSS had taken off the screen. The
+  // chrome carries its own chip; both are fed from here so there is still one
+  // sentence about saving, said in two places.
   flash(text, klass) {
-    if (!this.hasStatusTarget) return
-    this.statusTarget.textContent = text
-    this.statusTarget.className = `text-xs ${klass}`
+    this.statusTargets.forEach((el) => {
+      el.textContent = text
+      el.className = `text-xs ${klass}`
+    })
   }
 
   // Save-status relay for the in-feed consent/thank-you gate cards —

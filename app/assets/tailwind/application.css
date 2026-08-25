@@ -12074,6 +12074,28 @@ body.generating-overlay-active .bottom-bar { display: none; }
     box-shadow: 0 0 0 2px rgba(1,234,203,0.65);
   }
 
+  /* Small, quiet, and on the trailing edge under the top bar — it is the one
+     thing on this screen that is neither the card nor a control, so it says
+     its word and takes no more room than that. */
+  .m-save-chip {
+    position: fixed;
+    z-index: 70;
+    top: calc(max(10px, env(safe-area-inset-top, 0px)) + 46px);
+    /* Leading edge, under the back button: the trailing edge belongs to the
+       overflow menu, which drops from the ⋯ directly onto this spot. */
+    inset-inline-start: 12px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(15,19,36,0.55);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(8px);
+    font-family: "ABeeZee", sans-serif;
+    line-height: 1.5;
+    white-space: nowrap;
+    transition: opacity 0.18s ease;
+  }
+  .m-studio-on.m-typing .m-save-chip { opacity: 0.55; }
+
   .m-menu {
     top: calc(max(10px, env(safe-area-inset-top, 0px)) + 48px);
     inset-inline-end: 12px;
