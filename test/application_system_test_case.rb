@@ -80,9 +80,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # reached: under tmp/ it's visited over file:// (the cross-origin case), under
   # public/ the app serves it (same origin, so the frame can be introspected).
   def one_pager_copy(source, origin:, token:, dest:)
+    # Matched by shape, not by the literal token: the pages point at different
+    # demo Vertos and a token is changed whenever the demo is re-cut. A literal
+    # that stops matching leaves the copy aimed at production, where the frame
+    # is cross-origin and every measurement in these tests raises — loud, but a
+    # long way from what actually broke.
     html = Rails.root.join("public", source).read
-      .sub('const DEMO_ORIGIN = "https://app.playverto.com";', %(const DEMO_ORIGIN = "#{origin}";))
-      .sub('const DEMO_PATH   = "/play/KcwFrqUdXqFCfcmKapJH_JrO";', %(const DEMO_PATH   = "/play/#{token}";))
+    { /(const DEMO_ORIGIN\s*=\s*")[^"]+(")/ => "\\1#{origin}\\2",
+      /(const DEMO_PATH\s*=\s*")\/play\/[\w-]+(")/ => "\\1/play/#{token}\\2" }.each do |pattern, with|
+      raise "#{source}: #{pattern.source} matched nothing — the copy would still point at production" unless html.sub!(pattern, with)
+    end
 
     path = Rails.root.join(dest)
     path.write(html)
