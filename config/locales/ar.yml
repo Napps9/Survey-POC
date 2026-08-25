@@ -31,8 +31,6 @@ ar:
     add_option: إضافة خيار
     new_option: خيار جديد
     style_option: تنسيق هذه الإجابة
-    new_response: "إجابة جديدة"
-    add_response: "إضافة إجابة"
     remove_response: "حذف هذه الإجابة"
     remove_option: "حذف البطاقة"
     response_scale: "عدد الإجابات لكل عبارة"
@@ -64,12 +62,13 @@ ar:
     char_limit_option: '%{n} حرفًا'
     allow_other: السماح بإجابة "أخرى" بنص حر
     required: "سؤال إلزامي"
+    ask_once: "يُسأل مرة واحدة — يُتخطى في المرات التالية بعد الإجابة عنه"
     other: أخرى
     other_placeholder: أخبرنا بكلماتك الخاصة…
     mark_correct: "حدِّد الإجابة الصحيحة"
     rating_star: "%{number} من %{total}"
     correct_pick_hint: "اضغط على الخيار/الخيارات التي يجب على اللاعبين اختيارها ليكونوا على صواب."
-    correct_tap_hint: "حدِّد السحب الصحيح لكل عبارة."
+    correct_tap_hint: "حدِّد الإجابة الصحيحة لكل عبارة."
     correct_scale_hint: "اختر القيمة التي تُحتسب صحيحة."
     accepted_answers: "الإجابات المقبولة"
     accepted_answers_hint: "واحدة في كل سطر — أي تطابق (بغضّ النظر عن حالة الأحرف) يُعد صحيحًا."
@@ -86,11 +85,11 @@ ar:
       nps: "اسحب السائل"
       multiple_choice: "اختر خيارًا واحدًا"
       select_many: "اختر كل ما ينطبق"
-      prioritise: "اضغط واسحب لترتيبها حسب الأولوية"
+      prioritise: "رتّبها حسب الأولوية"
       yes_no: "اختر خيارًا واحدًا"
       select_one_grid: "اختر خيارًا واحدًا"
       select_many_grid: "اختر كل ما ينطبق"
-      tap_card: "اسحب للإجابة"
+      tap_card: "اضغط للإجابة"
       open_ended: "اكتب إجابتك"
       contact_form: "شارك بياناتك"
       scenario: "اقرأ ثم اختر"
@@ -104,7 +103,7 @@ ar:
       yes_no: "نعم / لا"
       select_one_grid: "شبكة صور"
       select_many_grid: "شبكة صور"
-      tap_card: "اسحب"
+      tap_card: "اضغط"
       scenario: "سيناريو"
       open_ended: "نص مفتوح"
       contact_form: "تواصل"
@@ -121,7 +120,7 @@ ar:
       yes_no: "اختر خيارًا واحدًا"
       select_one_grid: "اختر خيارًا واحدًا"
       select_many_grid: "اختر كل ما ينطبق"
-      tap_card: "اسحب للإجابة"
+      tap_card: "اضغط للإجابة"
       scenario: "تابع القراءة، ثم اختر"
       open_ended: "اكتب إجابتك"
       contact_form: "شارك بياناتك"
@@ -130,7 +129,7 @@ ar:
       select_many: "اختر عدة (قائمة)"
       select_one_grid: "اختر واحدًا (شبكة)"
       select_many_grid: "اختر عدة (شبكة)"
-      tap_card: "اسحب"
+      tap_card: "اضغط"
       range: "مقياس"
       rating: "تقييم"
       nps: "مؤشر الترشيح"
@@ -256,6 +255,15 @@ ar:
     respondent_code_note: 'لا نرى هذا أبدًا — يُخزَّن كتجزئة أحادية الاتجاه، فقط لمطابقة إجاباتك بإجاباتك في المرة القادمة.'
     respondent_code_continue: 'متابعة'
     respondent_code_skip: 'تخطٍّ'
+    contact_title: "اترك بياناتك"
+    contact_body: "إذا أردت البقاء على تواصل، أخبرنا من أنت. اختياري — ويُحفظ بمعزل عن إجاباتك."
+    contact_name: "الاسم"
+    contact_email: "البريد الإلكتروني"
+    contact_company: "الشركة"
+    contact_industry: "المجال"
+    contact_note: "يُطلب مرة واحدة على هذا الجهاز. تُحفظ بياناتك بمعزل عن إجاباتك، ولا تُربط إلا باسم اللاعب الخاص بك."
+    contact_continue: "متابعة"
+    contact_skip: "متابعة من دون بيانات"
     comparison_title: إجاباتك مقابل الجميع
     back: "← رجوع"
     next: التالي ←
@@ -379,12 +387,16 @@ ar:
       option_color: "اللون"
       option_color_hex: "رمز سادس عشري"
       option_emoji: "إيموجي"
-      option_icon: "أيقونة"
+      option_icon: "أيقونات رياضية"
+      option_icon_note: "المكتبة تغطي الرياضة فقط. لأي موضوع آخر، استخدم رمزًا تعبيريًا أعلاه."
       option_style_reset: "إعادة تعيين"
       option_style_done: "تم"
       add_to_library: "إضافة إلى المكتبة"
       library_saving: "جارٍ الحفظ…"
       library_save_failed: "تعذّر الحفظ في المكتبة"
+      remove_from_library: "إزالة من المكتبة"
+      library_remove_confirm: "هل تريد إزالة هذه الصورة من مكتبة علامتك التجارية؟ ستفقدها أي بطاقة تستخدمها بالفعل."
+      library_remove_failed: "تعذّرت إزالتها من المكتبة"
       confirm_delete: "حذف فعلاً؟"
       unsaved: تغييرات غير محفوظة
       undo_restored: 'تمت استعادة البطاقة'
@@ -997,6 +1009,10 @@ ar:
     all_saved: 'تم الحفظ'
     leave_editor: 'مغادرة المحرر'
     undo: 'تراجع'
+    m_back_to_dashboard: "العودة إلى Vertos الخاصة بي"
+    m_preview: "معاينة كمشارك"
+    m_more: "المزيد"
+    m_delete_card: "حذف هذه البطاقة"
     duplicate_card: 'تكرار'
     emoji_pick: "اختر رمزًا تعبيريًا"
     brand_font: "نوع الخط"
@@ -1093,6 +1109,15 @@ ar:
     shuffle: خلط
     shuffle_title: إعادة اختيار الصور من مكتبة Verto
     shuffle_confirm: هل تريد خلط الصور؟ سيتم استبدال صورك الحالية باختيار جديد من المكتبة.
+    shuffle_direction_toggle_title: "أضف توجيهًا لهذا الخلط"
+    shuffle_direction_heading: "وجّه هذا الخلط"
+    shuffle_direction_hint: "اختياري. أخبر Verto بما تبحث عنه في الصور والرسوم المتحركة — الأجواء أو المكان أو ما تريد استبعاده."
+    shuffle_direction_label: "التوجيه"
+    shuffle_direction_placeholder: "مثال: ضوء طبيعي دافئ، في الهواء الطلق، مجموعات صغيرة، بدون مكاتب"
+    shuffle_direction_toward: "بحث الخلط الأخير عن: %{terms}"
+    shuffle_direction_avoiding: "واستبعد: %{terms}"
+    shuffle_direction_clear: "مسح"
+    shuffle_direction_apply: "اخلط بهذا"
     publish_share: نشر ومشاركة ←
     answer_type: نوع الإجابة
     select_card: اختر بطاقة لتغيير نوعها
@@ -1171,7 +1196,7 @@ ar:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "امسح الرمز لفتح هذا الفيرتو. نزّل الرمز للملصقات والشرائح."
-    download_qr: "تنزيل رمز QR (SVG)"
+    download_qr: "تنزيل رمز QR (%{file_format})"
     download_qr_short: "رمز QR"
     custom_url: "رابط مخصّص"
     custom_url_placeholder: "summer-feedback-2026"

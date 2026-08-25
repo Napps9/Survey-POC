@@ -59,6 +59,56 @@
           PNG, JPG, GIF, SVG or WebP · transparent backgrounds work best.
           Also editable from any Verto's Design panel, under Branding.
         </div>
+
+        <%# ── The same logo again, for light surfaces ──
+            Everything the platform draws is dark chrome except one thing, and
+            it is the first thing a respondent sees: the welcome card's logo
+            sits on the WHITE answer panel. A white wordmark — which is what
+            most accounts upload, because the rest of the platform is dark —
+            vanishes there. Optional: with nothing here the logo above is used
+            on both, exactly as before.
+            The preview swatch is deliberately WHITE, so what a creator judges
+            the upload against is the surface it will actually be drawn on. %>
+        <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:18px;padding-top:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:14px;">
+            <div>
+              <div style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#F7F7F7;">Logo for light backgrounds</div>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.45);margin-top:3px;line-height:1.5;">
+                Optional. Your welcome card sits on white — if the logo above is white, upload a dark or colour version here. Without one, the logo above is used everywhere.
+              </div>
+            </div>
+            <div style="height:44px;min-width:120px;display:flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:10px;background:#fff;border:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+              <% if (light = brand_logo_for(current_organisation, :light)) %>
+                <%= image_tag rails_storage_proxy_path(light, only_path: true),
+                      style: "height:32px;width:auto;max-width:160px;object-fit:contain;" %>
+              <% else %>
+                <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(0,0,0,0.35);">No logo</span>
+              <% end %>
+            </div>
+          </div>
+
+          <%= form_with model: current_organisation,
+                url: organisation_path(current_organisation),
+                method: :patch,
+                multipart: true,
+                data: { turbo: false },
+                html: { style: "display:flex;flex-wrap:wrap;align-items:center;gap:10px;" } do |f| %>
+            <%= f.file_field :logo_on_light,
+                  accept: Organisation::LOGO_CONTENT_TYPES.join(","),
+                  style: "flex:1;min-width:200px;padding:10px 12px;border-radius:10px;background:#272D4A;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);" %>
+            <%= f.submit "Upload",
+                  style: "padding:10px 20px;border-radius:10px;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;border:none;cursor:pointer;" %>
+            <% if current_organisation.logo_on_light.attached? %>
+              <%= button_to "Remove",
+                    organisation_path(current_organisation),
+                    method: :patch,
+                    params: { organisation: { remove_logo_on_light: "1" } },
+                    data: { turbo_confirm: "Remove the light-background logo? Your welcome cards will use your main logo instead." },
+                    form: { style: "display:inline;margin:0;" },
+                    style: "padding:10px 16px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;" %>
+            <% end %>
+          <% end %>
+        </div>
       </div>
 
       <%# ── Brand asset library ── %>

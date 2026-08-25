@@ -31,8 +31,6 @@ sw:
     add_option: Ongeza chaguo
     new_option: Chaguo jipya
     style_option: Panga mtindo wa jibu hili
-    new_response: "Jibu jipya"
-    add_response: "Ongeza jibu"
     remove_response: "Ondoa jibu hili"
     remove_option: "Futa kadi"
     response_scale: "Majibu kwa kila kauli"
@@ -64,12 +62,13 @@ sw:
     char_limit_option: 'Herufi %{n}'
     allow_other: Ruhusu jibu huru la "Nyingine"
     required: "Swali la lazima"
+    ask_once: "Uliza mara moja — huruka unapocheza tena baada ya kujibiwa"
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
     mark_correct: "Weka jibu sahihi"
     rating_star: "%{number} kati ya %{total}"
     correct_pick_hint: "Gusa chaguo ambalo wachezaji lazima walichague ili wawe sahihi."
-    correct_tap_hint: "Weka uteleshaji sahihi kwa kila kauli."
+    correct_tap_hint: "Weka jibu sahihi kwa kila kauli."
     correct_scale_hint: "Chagua thamani inayohesabiwa kuwa sahihi."
     accepted_answers: "Majibu yanayokubaliwa"
     accepted_answers_hint: "Moja kwa kila mstari — kufanana kwoyote (bila kujali herufi kubwa/ndogo) ni sahihi."
@@ -86,11 +85,11 @@ sw:
       nps: "Buruta kimiminika"
       multiple_choice: "Chagua moja"
       select_many: "Chagua zote zinazofaa"
-      prioritise: "Bofya na buruta ili kupanga kwa vipaumbele"
+      prioritise: "Panga kwa vipaumbele"
       yes_no: "Chagua moja"
       select_one_grid: "Chagua moja"
       select_many_grid: "Chagua zote zinazofaa"
-      tap_card: "Buruta ili kujibu"
+      tap_card: "Gusa ili kujibu"
       open_ended: "Andika jibu lako"
       contact_form: "Shiriki maelezo yako"
       scenario: "Endelea kusoma, kisha chagua"
@@ -104,7 +103,7 @@ sw:
       yes_no: "NDIYO / HAPANA"
       select_one_grid: "GRIDI YA PICHA"
       select_many_grid: "GRIDI YA PICHA"
-      tap_card: "BURUTA"
+      tap_card: "GUSA"
       scenario: "HALI"
       open_ended: "MAANDISHI HURU"
       contact_form: "MAWASILIANO"
@@ -121,7 +120,7 @@ sw:
       yes_no: "CHAGUA CHAGUO MOJA"
       select_one_grid: "CHAGUA CHAGUO MOJA"
       select_many_grid: "CHAGUA ZOTE ZINAZOFAA"
-      tap_card: "BURUTA ILI KUJIBU"
+      tap_card: "GUSA ILI KUJIBU"
       scenario: "ENDELEA KUSOMA, KISHA CHAGUA"
       open_ended: "ANDIKA JIBU LAKO"
       contact_form: "SHIRIKI MAELEZO YAKO"
@@ -130,7 +129,7 @@ sw:
       select_many: "Chagua nyingi (orodha)"
       select_one_grid: "Chagua moja (gridi)"
       select_many_grid: "Chagua nyingi (gridi)"
-      tap_card: "Buruta"
+      tap_card: "Gusa"
       range: "Masafa"
       rating: "Ukadiriaji"
       nps: "NPS"
@@ -256,6 +255,15 @@ sw:
     respondent_code_note: 'Hatuuoni kamwe — huhifadhiwa kama hashi ya njia moja, ili majibu yako yalinganishwe na yako mwenyewe wakati ujao.'
     respondent_code_continue: 'Endelea'
     respondent_code_skip: 'Ruka'
+    contact_title: "Acha maelezo yako"
+    contact_body: "Ukipenda tuendelee kuwasiliana, tuambie wewe ni nani. Si lazima — na huhifadhiwa mbali na majibu yako."
+    contact_name: "Jina"
+    contact_email: "Barua pepe"
+    contact_company: "Kampuni"
+    contact_industry: "Sekta"
+    contact_note: "Huulizwa mara moja tu kwenye kifaa hiki. Maelezo yako huhifadhiwa mbali na majibu yako, yakiunganishwa tu na jina lako la mchezaji."
+    contact_continue: "Endelea"
+    contact_skip: "Endelea bila maelezo"
     comparison_title: Majibu yako dhidi ya kila mtu
     back: "← Rudi"
     next: Endelea →
@@ -379,12 +387,16 @@ sw:
       option_color: "Rangi"
       option_color_hex: "Msimbo wa hex"
       option_emoji: "Emoji"
-      option_icon: "Ikoni"
+      option_icon: "Aikoni za michezo"
+      option_icon_note: "Maktaba inashughulikia michezo pekee. Kwa mada nyingine yoyote, tumia emoji hapo juu."
       option_style_reset: "Weka upya"
       option_style_done: "Imekamilika"
       add_to_library: "Ongeza kwenye maktaba"
       library_saving: "Inahifadhi…"
       library_save_failed: "Imeshindwa kuhifadhi kwenye maktaba"
+      remove_from_library: "Ondoa kwenye maktaba"
+      library_remove_confirm: "Ondoa picha hii kwenye maktaba ya chapa yako? Kadi yoyote inayoitumia tayari itaipoteza."
+      library_remove_failed: "Imeshindwa kuiondoa kwenye maktaba"
       confirm_delete: "Ufute kweli?"
       unsaved: Mabadiliko hayajahifadhiwa
       undo_restored: 'Kadi imerejeshwa'
@@ -997,6 +1009,10 @@ sw:
     all_saved: 'Imehifadhiwa'
     leave_editor: 'Ondoka kwenye kihariri'
     undo: 'Tendua'
+    m_back_to_dashboard: "Rudi kwenye Vertos Zangu"
+    m_preview: "Hakiki kama mjibu"
+    m_more: "Zaidi"
+    m_delete_card: "Futa kadi hii"
     duplicate_card: 'Nakili'
     emoji_pick: "Chagua emoji"
     brand_font: "Aina ya herufi"
@@ -1093,6 +1109,15 @@ sw:
     shuffle: Changanya
     shuffle_title: Chagua upya picha kutoka maktaba ya verto
     shuffle_confirm: Changanya picha? Picha zako za sasa zitabadilishwa na chaguo jipya kutoka maktabani.
+    shuffle_direction_toggle_title: "Ongeza mwelekeo kwa uchanganyaji huu"
+    shuffle_direction_heading: "Elekeza uchanganyaji huu"
+    shuffle_direction_hint: "Si lazima. Mwambie Verto unachotaka kwenye picha na uhuishaji — hisia, mandhari, au kitu cha kuepuka."
+    shuffle_direction_label: "Mwelekeo"
+    shuffle_direction_placeholder: "mf. mwanga wa asili wa joto, nje, vikundi vidogo, bila ofisi"
+    shuffle_direction_toward: "Uchanganyaji uliopita ulitafuta: %{terms}"
+    shuffle_direction_avoiding: "na kuepuka: %{terms}"
+    shuffle_direction_clear: "Futa"
+    shuffle_direction_apply: "Changanya kwa hili"
     publish_share: Chapisha na shiriki →
     answer_type: Aina ya Jibu
     select_card: Chagua kadi ili kubadilisha aina yake
@@ -1171,7 +1196,7 @@ sw:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Changanua ili kufungua Verto hii. Pakua msimbo kwa mabango na slaidi."
-    download_qr: "Pakua QR (SVG)"
+    download_qr: "Pakua QR (%{file_format})"
     download_qr_short: "Msimbo QR"
     custom_url: "URL maalum"
     custom_url_placeholder: "summer-feedback-2026"

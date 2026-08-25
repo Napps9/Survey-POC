@@ -82,4 +82,95 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
       assert_match "data-slug=\"#{slug}\"", response.body, "picker should offer the #{slug} animation"
     end
   end
+
+  # ── Direction prompt (one shuffle, never stored) ─────────────────────────
+
+  def draft
+    @org.surveys.create!(
+      title: "S", theme: "Football fans", audience_age: "18-24", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [ { "type" => "multiple_choice", "text" => "Favourite team?", "options" => %w[A B] } ]
+    )
+  end
+
+  test "the direction steers the shuffle it was submitted with" do
+    s = draft
+    post shuffle_survey_assets_path(s), params: { direction: "no sport" }
+    assert_response :redirect
+
+    refute_includes s.reload.background_image, "backgrounds/sport-",
+      "the veto submitted with the click applies to that same shuffle"
+  end
+
+  test "a direction is never stored, so the next shuffle starts clean" do
+    s = draft
+    post shuffle_survey_assets_path(s), params: { direction: "no sport" }
+    steered = s.reload.background_image
+
+    # Nothing was kept, so an undirected shuffle is free to land back on the
+    # sport backdrop the veto had ruled out. Same seed space, no memory.
+    20.times do
+      post shuffle_survey_assets_path(s)
+      break if s.reload.background_image.include?("backgrounds/sport-")
+    end
+    assert_includes s.reload.background_image, "backgrounds/sport-",
+      "a steer typed once must not go on deciding shuffles it wasn't typed for"
+    assert_not_equal steered, s.background_image
+  end
+
+  test "the editor's direction box always starts empty" do
+    s = draft
+    # Deliberately not wording from the placeholder, which would match anyway.
+    post shuffle_survey_assets_path(s), params: { direction: "harbour cranes" }
+    follow_redirect!
+
+    get survey_path(s)
+    assert_response :success
+    assert_match 'name="direction"', response.body, "the prompt still posts with the shuffle form"
+    assert_match %r{<textarea[^>]*id="shuffle-direction"[^>]*></textarea>}, response.body,
+      "and comes back empty rather than pre-filled with the last steer"
+    refute_match "harbour", response.body
+  end
+
+  test "the shuffle reports back what the direction was read as, once" do
+    s = draft
+    post shuffle_survey_assets_path(s), params: { direction: "warm natural light, no offices" }
+    follow_redirect!
+
+    assert_match "Last shuffle searched for: warm, natural, light", response.body,
+      "a misparse has to be visible here, not only in the pictures"
+    assert_match "kept out: offices", response.body
+
+    # Flash, not state: gone on the next view of the same page.
+    get survey_path(s)
+    refute_match "Last shuffle searched for", response.body
+  end
+
+  test "a live Verto ignores the direction along with the shuffle" do
+    s = draft
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    before = s.reload.cards
+
+    post shuffle_survey_assets_path(s), params: { direction: "no sport" }
+    assert_redirected_to survey_path(s)
+    assert_equal before, s.reload.cards, "a locked Verto's imagery is untouched"
+  end
+
+  test "an over-long direction is capped before it reaches the search" do
+    s = draft
+    long = "seaside " * 200
+    terms = AssetPopulator.direction_reading(s, long)[:toward]
+
+    assert_equal Survey::MAX_SHUFFLE_DIRECTION,
+                 Survey.sanitize_shuffle_direction(long).length
+    assert_equal %w[seaside], terms, "and still parses to something sane"
+  end
+
+  test "Survey.sanitize_shuffle_direction collapses, caps and blanks to nil" do
+    assert_equal "warm outdoors", Survey.sanitize_shuffle_direction("  warm\n\t outdoors  ")
+    assert_nil   Survey.sanitize_shuffle_direction("   ")
+    assert_nil   Survey.sanitize_shuffle_direction(nil)
+    assert_equal Survey::MAX_SHUFFLE_DIRECTION,
+                 Survey.sanitize_shuffle_direction("a" * 500).length
+  end
 end

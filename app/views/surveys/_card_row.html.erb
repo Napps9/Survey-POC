@@ -20,6 +20,12 @@
      data-card-cid="<%= card['cid'].to_s %>"
      data-card-num="<%= idx + 1 %>"
      data-card-image="<%= card['image'].to_s %>"
+     <%# The pre-crop original and the crop taken from it — what "Adjust crop"
+         reopens, so a creator can zoom OUT past the first crop. Autosave
+         rebuilds every card from this DOM, so like common_question_id these
+         must survive the round-trip or one reload-and-save would drop them. %>
+     <% if card['image_source'].present? %>data-card-image-source="<%= card['image_source'] %>"<% end %>
+     <% if card['image_crop'].is_a?(Hash) %>data-card-image-crop="<%= card['image_crop'].to_json %>"<% end %>
      data-card-lottie="<%= card['lottie'].to_s %>"
      data-card-video="<%= card['video'].to_s %>"
      data-card-video-poster="<%= card['video_poster'].to_s %>"
@@ -27,9 +33,13 @@
      data-card-image-credit-url="<%= card['image_credit_url'].to_s %>"
      data-card-allow-other="<%= card['allow_other'] ? 'true' : 'false' %>"
      data-card-required="<%= card['required'] ? 'true' : 'false' %>"
+     data-card-ask-once="<%= card['ask_once'] ? 'true' : 'false' %>"
      data-card-input="<%= card['input'].to_s %>"
      data-card-demographic="<%= card['demographic'] ? 'true' : 'false' %>"
-     <% if card['demographic_key'].present? %>data-card-demographic-key="<%= card['demographic_key'] %>"<% end %>
+     <%# key_for, not the stored key: the auto-appended tail predates
+         demographic_key, and this attribute is what greys the modal's
+         Demographics tiles — a keyless birth-date card must still grey Age. %>
+     <% if (dk = DemographicQuestions.key_for(card)) %>data-card-demographic-key="<%= dk %>"<% end %>
      <% if card['heritage_country'].present? %>data-card-heritage-country="<%= card['heritage_country'] %>"<% end %>
      data-card-options="<%= Array(card['options']).to_json %>"
      data-card-pages="<%= Array(card['pages']).to_json %>"

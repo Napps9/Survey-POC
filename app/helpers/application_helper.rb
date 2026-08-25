@@ -475,16 +475,36 @@ module ApplicationHelper
   # `brand-logo` is the backstop. A blob whose bytes are genuinely gone can't
   # be rescued by any URL scheme, and a respondent should get no logo rather
   # than a broken-image glyph on someone's Verto.
-  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil)
+  # `on:` names the SURFACE the logo will be drawn on, not the logo's colour.
+  # :dark is the default because almost everything the platform draws is dark
+  # chrome; :light is the welcome card's white answer panel, and picks the
+  # alternate upload when there is one. Falling back to :logo rather than
+  # rendering nothing is deliberate — an account with one logo keeps behaving
+  # exactly as it did, and a missing alternate is a worse-looking logo rather
+  # than no logo at all.
+  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil, on: :dark)
     css_class = binding.local_variable_get(:class)
-    if organisation&.logo&.attached?
+    logo = brand_logo_for(organisation, on)
+    if logo
       image_tag(
-        rails_storage_proxy_path(organisation.logo, only_path: true),
+        rails_storage_proxy_path(logo, only_path: true),
         style: "#{style};object-fit:contain;",
         alt:   alt || "#{organisation.name} logo",
         class: css_class,
         data:  { controller: "brand-logo", action: "error->brand-logo#failed" }
       )
+    end
+  end
+
+  # The attachment to draw for a surface, or nil if the account has no logo at
+  # all. Only :light has an alternate; every other surface is dark chrome.
+  def brand_logo_for(organisation, surface)
+    return nil unless organisation
+
+    if surface == :light && organisation.logo_on_light.attached?
+      organisation.logo_on_light
+    elsif organisation.logo.attached?
+      organisation.logo
     end
   end
 
@@ -519,6 +539,68 @@ module ApplicationHelper
     verto_qr_svg_document(url)
       .sub(/\A<\?xml.*?\?>/, "")
       .html_safe # rubocop:disable Rails/OutputSafety -- markup comes from rqrcode, not user input
+  end
+
+  # The same QR as a PNG download, for tools that won't place an SVG — Google
+  # Slides, Canva, Word, most chat apps. 2048px is ~17cm at print resolution,
+  # poster headroom, yet the two-colour image indexes down to a few KB.
+  #
+  # `size:` selects rqrcode's exact-canvas algorithm: the module size is
+  # floored to fit and the leftover pixels join the margin, so the quiet zone
+  # is always at least the 4-module spec minimum (`border_modules`) and the
+  # canvas is exactly square. Fill is opaque white, not transparent: a PNG gets
+  # dropped onto slides of any colour, and dark modules on a dark deck don't
+  # scan.
+  QR_PNG_SIZE = 2048
+  private_constant :QR_PNG_SIZE
+
+  def verto_qr_png(url)
+    RQRCode::QRCode.new(url.to_s, level: :m)
+      .as_png(color: "#1C2034", fill: "white", size: QR_PNG_SIZE, border_modules: 4)
+      .to_blob
+  end
+
+  # Every module the /play player must have before a tap can do anything,
+  # preloaded from the <head> (see layouts/_head) so a cold cache fetches them
+  # in one wave alongside application.js instead of a four-deep lazy-import
+  # waterfall. The list is the closure of what player pages actually mount:
+  # the Stimulus registry pair, every controller a player-rendered view can
+  # carry in data-controller, and the lib modules those controllers import.
+  # lottie-web is deliberately absent — it's ~300KB, only NPS/range cards
+  # animate with it, and the interactive part of those cards (the slider) is
+  # in the list; the animation may arrive a beat later.
+  # PlayerPreloadClosureTest keeps this list honest against the source tree.
+  PLAYER_PRELOAD_MODULES = %w[
+    controllers/index
+    controllers/application
+    controllers/player_controller
+    controllers/picker_controller
+    controllers/tap_stack_controller
+    controllers/nps_slider_controller
+    controllers/rating_controller
+    controllers/slider_controller
+    controllers/freeform_controller
+    controllers/prioritise_controller
+    controllers/scenario_controller
+    controllers/autogrow_controller
+    controllers/month_year_controller
+    controllers/location_search_controller
+    controllers/other_controller
+    controllers/locale_switcher_controller
+    controllers/cookie_consent_controller
+    controllers/bg_image_healer_controller
+    controllers/autoplay_video_controller
+    controllers/lottie_player_controller
+    lib/haptics
+    lib/i18n
+    lib/tap_scales
+    lib/visible_band
+    lib/page_limits
+    lib/viewport_height
+  ].freeze
+
+  def player_module_preload_paths
+    PLAYER_PRELOAD_MODULES.map { |m| asset_path("#{m}.js") }
   end
 
   # A small same-origin thumbnail path for a brand-library image — used by the
@@ -563,7 +645,8 @@ module ApplicationHelper
       "--brand-text"         => r["text"],
       "--brand-surface"      => r["surface"],
       "--brand-surface-2"    => r["surface_2"],
-      "--brand-primary-soft" => r["primary_soft"]
+      "--brand-primary-soft" => r["primary_soft"],
+      "--brand-primary-ink"  => r["primary_ink"]
     }.map { |k, v| "#{k}:#{v}" }.join(";")
   end
 

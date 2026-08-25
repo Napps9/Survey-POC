@@ -742,7 +742,23 @@
    Every shape that can outgrow the card is on the list now; a type is here
    because its widget has a natural height the card cannot always afford, not
    because it happens to be a list. */
-.split-right > .q-header { flex: 0 0 auto; }
+.split-right > .q-header {
+  flex: 0 0 auto;
+  /* The header had no styling at all beyond that flex line: not a flex
+     container, no gap, and none of its three children (.q-eyebrow, .q-title,
+     .q-subtitle) carries a margin. Both internal gaps measured literally 0px
+     — every bit of apparent separation was line-height leading, which is why
+     the instruction read as glued to the question. This is a change from
+     zero, not a retune.
+
+     A column gap sets BOTH gaps at once, which is the right reading: the
+     eyebrow (the per-type instruction, "Drag the slider") sits above the
+     title and the description sits below it, and the enterprise reference
+     spaces the three evenly. */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .split-right > .mt-2:has(> .choice-list),
 .split-right > .mt-2:has(> .choice-grid),
 .split-right > .mt-2:has(> .prioritise-list),
@@ -750,8 +766,38 @@
 .split-right > .mt-2:has(> .slider-wrap),
 .split-right > .mt-2:has(> .nps-slider),
 .split-right > .mt-2:has(> .rating-wrap),
-.split-right > .mt-2:has(> .freeform-wrap) {
-  flex: 1 1 auto;
+.split-right > .mt-2:has(> .freeform-wrap),
+/* The welcome card is not an answer widget and that is exactly how it fell
+   off this list — it carries .welcome-intake instead, which is the compare
+   promise, the points note, the token pills and the leaderboard tease, four
+   pill boxes whose number the CREATOR decides. Without min-height: 0 the box
+   refuses to shrink past its min-content height, so it overflows .split-right
+   and its overflow: hidden cuts the last pill in half; without overflow-y
+   there is nowhere to scroll to read it. Measured at 393x700: 44.6px past the
+   panel. At 375x600: 91.7px, which is the whole tease and most of the pills.
+   And it reports NOTHING — the box's scrollHeight equals its clientHeight
+   because it is the box itself that overflows, not its content, so _fitCard's
+   over() reads 0 and the scroll cue never appears either. "i cant read or
+   scroll the boxees on the first card." */
+.split-right > .mt-2:has(> .welcome-intake) {
+  /* grow 0, NOT 1. This box is the panel's only growable child, so with a
+     grow factor it swallowed every spare pixel and left .split-right's
+     `justify-content: safe center` nothing to centre: the question sat flush
+     against the top of the panel while the answer was auto-margin-centred in
+     an inflated box below it, painting as question → white → answer → white.
+     Content-sized, the panel's own centring does the work and the pair reads
+     as one block ("large bits of white in between", measured at 260px on an
+     iPhone 15).
+
+     shrink stays 1, and that is what keeps _fitCard honest. over() is
+     scrollHeight - clientHeight on THIS box: when the content fits it is 0
+     either way, and when it overflows this box is still the only shrinkable
+     child, so it absorbs the identical deficit and reports the identical
+     number. The is-scrollable toggle is unchanged either way.
+     Take the shrink away too and over() reads 0 forever — _fitCard would
+     then read every card as fitting and .split-right's
+     overflow: hidden would CUT the surplus rather than scroll it. */
+  flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -759,6 +805,17 @@
   display: flex;
   flex-direction: column;
 }
+/* The tap card is the carve-out, and it is a silent one. .rotate-card-stack
+   GROWS to fill this scroller (its .rotate-card children are position:
+   absolute, so its own content height is ~0) — break the growth chain and the
+   stack drops straight to its min-height floor (260px on a phone) and stays
+   there: measured at 259px on both a tall phone and a short one, i.e. the
+   card stops responding to the viewport entirely.
+   _fitCard cannot see this happen: over() reads 0 whether the stack is fluid
+   or collapsed, so the app reports a perfectly fitting card either way. The
+   only thing standing between this line and a silent regression is
+   test/system/tap_card_fits_test.rb. */
+.split-right > .mt-2:has(> .rotate-wrap) { flex-grow: 1; }
 /* Vertical centring for short lists that still fit without scrolling, via
    auto margins on the list itself rather than `justify-content: center` on
    the scroll container: when content overflows, auto margins resolve to 0
@@ -775,12 +832,26 @@
   margin-top: auto;
   margin-bottom: auto;
 }
-/* The swipe card is the exception: it does not centre inside the scroller, it
-   GROWS to fill it (see .rotate-card-stack), so auto margins would fight the
-   flex growth for the space. */
+/* The swipe card is the exception: it does not centre with auto margins, it
+   GROWS to fill the scroller (see .rotate-card-stack), and auto margins would
+   fight that growth for the space.
+   It still has to centre once it STOPS growing, which is what the height cap
+   made possible and what the cap alone did not deliver. Measured A/B against
+   the old uncapped height: the 112px the cap handed back went entirely BELOW
+   the card — 89px above it and 238px under it on an iPhone 15 — because a
+   column flex container packs at flex-start by default, so free space falls
+   past the last child. The card read bottom-heavy, and "gives more room above
+   and below" got half of what it asked for.
+   `safe` centring, not plain: when a long question leaves the stack at its
+   floor and the scroller genuinely overflows, plain `center` would split the
+   overflow and put the top of the card at a negative scroll position nobody
+   can reach. `safe` falls back to flex-start exactly then. Same reasoning as
+   the auto-margin note above, same reasoning as .split-right's own
+   justify-content. */
 .split-right > .mt-2:has(> .rotate-wrap) > .rotate-wrap {
   flex: 1 1 auto;
   min-height: 0;
+  justify-content: safe center;
 }
 /* A scroll container clips at its padding box on BOTH axes (overflow-y: auto
    forces overflow-x to auto too), and the selection glow on .choice-card
@@ -806,21 +877,38 @@
   margin-left: -30px;
   margin-right: -30px;
 }
-/* "There are more options below" — the desktop counterpart of the mobile
-   .is-scrollable::after cue further down (search "is-scrollable .choice-list"
-   for the full rationale: a sticky last child, not a background-attachment
-   shadow, because the option pills paint over that). is-scrollable is set by
-   _fitCard regardless of viewport; only this visual cue was mobile-only. */
-.split-right > .mt-2.is-scrollable .choice-list::after,
-.split-right > .mt-2.is-scrollable .prioritise-list::after {
-  content: "";
-  flex: 0 0 auto;
-  position: sticky;
-  bottom: 0;
-  height: 22px;
-  margin-top: -22px;
-  background: linear-gradient(rgba(255,255,255,0), #fff 78%);
-  pointer-events: none;
+/* "There are more options below", said by fading the scroll box's own bottom
+   edge instead of painting something over it. is-scrollable is set by
+   _fitCard, at every viewport.
+
+   This replaces three near-identical rules that each hung a sticky last child
+   inside the scroller and filled it with linear-gradient(transparent, #fff).
+   Two things were wrong with that, and both of them only showed on a phone.
+
+   It painted WHITE. Over a list of white rows the cue is invisible until it
+   is needed, which is why it read as correct for so long; over the option
+   grid's full-bleed gradient tiles it is a white bar across the artwork. The
+   owner photographed it: sampled down the pink tile, 255,55,127 to
+   255,255,255 and back to 255,50,124 over 50 device px, straight across both
+   tiles and the gutter between them. "scroll line leaves a blur effect on the
+   options."
+
+   And it DRIFTED. In that same photo the bar is 63 CSS px above the bottom of
+   the scrollport, in the middle of a tile, which is nowhere sticky is
+   supposed to put it: iOS does not reposition a sticky child of a momentum
+   scroller while the fling is running, so a screenshot mid-flick catches it
+   stranded wherever the last main-thread frame left it. Nothing inside the
+   scrolling content can fix that — the fix is to stop being inside it.
+
+   A mask on the box is neither. It is anchored to the element rather than to
+   a scroll offset, so it cannot lag; and it fades the content OUT instead of
+   laying white over it, so a saturated tile dissolves toward the panel behind
+   it. 24px of the border box, which on the grids (12px of padding) is about
+   half padding and half content — the same reach the sticky bar had, since
+   bottom: 0 put that on the padding-box edge too. */
+.split-right > .mt-2.is-scrollable {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+          mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
 }
 
 /* ── "Add media" / "Change animation" floating CTA on left panel ── */
@@ -871,7 +959,15 @@
   gap: 8px;
   z-index: 4;
 }
-.split-left-cta-row .add-animation-fab {
+/* Both FABs, not just the animation one. Each is `position: absolute` with a
+   `left: 50%; translateX(-50%)` of its own, which is right when it is the
+   panel's only control and wrong the moment it shares a row: left unreset,
+   the second button lands on top of the first at the same 50% and the row
+   renders as one button with another hidden underneath it. The animation FAB
+   was reset when the range row was built; the media FAB only started sharing
+   a row when lottie cards gained a Background CTA. */
+.split-left-cta-row .add-animation-fab,
+.split-left-cta-row .add-media-fab {
   position: static;
   transform: none;
 }
@@ -893,6 +989,17 @@
   background: rgba(1,234,203,0.85);
   color: #1C2034;
   border-color: rgba(1,234,203,1);
+}
+/* The Adjust-crop fab toggles with the `hidden` attribute (server-rendered
+   for photo cards, media_picker#_syncAdjustFab as photos come and go), and
+   .add-bg-fab's own display:inline-flex would beat the UA's [hidden] rule —
+   author display always wins over that default. Same for the cta-row that
+   exists only to hold it on the no-media prompt panel. */
+.adjust-crop-fab[hidden] {
+  display: none;
+}
+.split-left-cta-row:not(:has(> :not([hidden]))) {
+  display: none;
 }
 
 /* ── Animation picker grid (reuses the .media-modal-* chrome) ── */
@@ -1074,6 +1181,47 @@
   background: rgba(255,255,255,0.04);
 }
 .media-library-add:hover { color: #01EACB; }
+/* A brand tile and its remove ×. The tile IS a <button>, so the × cannot be
+   nested inside it — this cell is the positioned parent of both, and it is the
+   cell (not the tile) that the grid lays out.
+
+   The hover lift moves up here with it. Left on the tile, the artwork slides
+   2px out from under a × that stays put, so the button you are aiming at drifts
+   off the thing it belongs to at the exact moment you reach for it. */
+.media-library-cell {
+  position: relative;
+  display: grid;
+  transition: transform 0.15s;
+}
+.media-library-cell:hover { transform: translateY(-2px); }
+.media-library-cell .media-library-item:hover { transform: none; }
+.media-library-del {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.22);
+  background: rgba(12,15,26,0.82);
+  color: #fff;
+  font-family: "Alata", sans-serif;
+  font-size: 15px; line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+}
+/* Revealed on hover so a wall of thumbnails isn't a wall of delete buttons —
+   but reachable by keyboard regardless, and always drawn where there is no
+   pointer to hover with. An affordance that exists only under a mouse doesn't
+   exist on a tablet. */
+.media-library-cell:hover .media-library-del,
+.media-library-del:focus-visible { opacity: 1; }
+@media (hover: none) {
+  .media-library-del { opacity: 1; }
+}
+.media-library-del:hover { background: #B3123B; border-color: #B3123B; }
+.media-library-del[disabled] { opacity: 0.45; cursor: default; }
 .media-library-empty {
   text-align: center;
   padding: 40px 16px;
@@ -1831,6 +1979,17 @@
   color: rgba(0,0,0,0.55);
 }
 
+/* ── Contact gate (player) ─────────────────────────────────────────────────
+   The gate builds its interior out of .play-consent-main like the code gate
+   does, and on a phone that panel is the scroller (flex + overflow-y). The
+   intro paragraph inherits .play-consent-body's own max-height + overflow,
+   which makes it the panel's only SHRINKABLE child — flex squeezed it to 0px
+   and the wording vanished while every rigid input kept its box. The gate's
+   body opts out: the panel scrolls, its children keep their height. */
+.contact-gate-body { flex-shrink: 0; max-height: none; overflow: visible; }
+.contact-gate-fields { flex-shrink: 0; }
+.contact-gate-fields .respondent-code-input:first-child { margin-top: 0; }
+
 /* Creator's answer-length control, under the free-text counter in the editor. */
 .freeform-limit-row {
   display: flex; align-items: center; gap: 8px; margin-top: 8px;
@@ -1979,6 +2138,14 @@
   line-height: 1.35;
   color: #000;
   outline: none;
+  /* pre-line is the render half of the serialiser's innerText capture: a
+     creator's Enter is stored as \n in the card text, and without this the
+     browser collapses it to a space and the paragraphs read as one lump.
+     Base rule, so the editor, the desktop player and the phone all agree —
+     and _writeCard's plain textContent write shows its breaks in the editor
+     for the same reason. (text-wrap: balance elsewhere is compatible: it
+     sets the wrap STYLE, this preserves the break COLLAPSE.) */
+  white-space: pre-line;
 }
 .q-subtitle {
   font-family: var(--verto-font, "ABeeZee", sans-serif);
@@ -1986,6 +2153,7 @@
   line-height: 1.5;
   color: rgba(0,0,0,0.6);
   outline: none;
+  white-space: pre-line; /* same contract as .q-title above */
 }
 
 /* ── Slider ─────────────────────────────────────── */
@@ -2031,8 +2199,22 @@
 .slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
 .slider-label-text {
   font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75);
-  /* Equal shares of the track, so every stop's label sits under its own dot
-     and one long one can't take width off its neighbours. */
+  /* Equal shares of the row, so one long label can't take width off its
+     neighbours.
+     It does NOT put every label exactly under its own dot, and the comment
+     here used to claim it did. Equal columns centre at (i+0.5)/n of the row
+     while the dots sit at i/(n-1) of the TRACK, and those two only coincide if
+     the row is 1.25x the track's width and overhangs it by an eighth each side
+     — which for a five-stop slider on a phone is wider than the panel. So the
+     end labels always sit a little inboard of their dots, and the middle one
+     is always exact.
+     Measured on an iPhone 15: 38.6px of drift before the track was inset at
+     all, 12.6 at a 26px inset, 6.6 at today's 32 (4.9 on an SE) — the inset
+     that keeps the thumb out of the back-swipe strip happens to walk the row
+     toward the geometry it wants. Under a label's own width now, so it reads
+     as centred. Aligning it exactly means positioning each label on its dot
+     like .s-dot does, which costs the column wrapping that keeps a long label
+     off its neighbours; not worth it for single-figure pixels. */
   flex: 1 1 0; min-width: 0;
   text-align: center; outline: none;
   /* A capped label still wraps inside its column, and on a narrow phone a wide
@@ -2173,10 +2355,38 @@
   color: #111;
   outline: none;
 }
+/* Selecting an option must not re-typeset it. This used to swap the font
+   FAMILY — ABeeZee to Alata — which is two metric changes at once: Alata sits
+   on a taller line box and its glyphs are narrower, so a long label visibly
+   re-wrapped the moment you chose it (measured on a three-line option: text
+   height 57px → 66px, widest line 224.6px → 214.7px). Reported as "the font
+   size actually reduces slightly... it would be good if the font size doesnt
+   change at all - just applies a bold format".
+
+   A bold format is exactly what it cannot get from font-weight either:
+   ABeeZee and Alata are both self-hosted at weight 400 ONLY (see the
+   @font-face block at the top of this file), so any weight above that is
+   SYNTHESISED by the browser — which widens every glyph and re-wraps the line
+   just the same, only less.
+
+   text-stroke thickens the strokes without touching a single advance width,
+   so the line breaks exactly where it did unselected. Same paint as a heavier
+   weight; none of the layout. */
+/* …and it must not become unreadable either. The label used to take the RAW
+   brand primary, which is a rule that works for some brands and silently fails
+   for others: on the Playverto default (#01EACB) this measured 1.47:1 against
+   the row's own tint, down from 15.1:1 the moment you chose the answer. A dark
+   brand hides the problem; a teal, lime, yellow or pale pink does not, and a
+   client can pick any of them.
+   --brand-primary-ink is the same hue taken down only as far as 4.5:1 requires
+   (BrandPalette#readable_ink) — a mid blue or a navy comes through untouched.
+   The fallback is that derivation applied to the default palette, which emits
+   no variables at all: #01EACB against #E1FCF9 resolves to #017E6E, 4.63:1.
+   The stroke rides currentColor, so it follows. */
 .pick-item[data-selected="true"] .pick-text {
-  font-family: "Alata", sans-serif;
-  font-weight: 600;
-  color: var(--brand-primary, var(--color-green-500));
+  -webkit-text-stroke: 0.4px currentColor;
+  paint-order: stroke fill;
+  color: var(--brand-primary-ink, #017E6E);
 }
 
 /* ── Image list (single + multi) ────────────────── */
@@ -2202,9 +2412,27 @@
    Magenta here meant an unbranded Verto drew a pink row tint under a teal
    label (.pick-text, below, has always fallen back teal) — two halves of one
    selected row disagreeing about the brand. */
+/* THE MARK GOES ON THE ARTWORK, NOT AROUND THE WORDS.
+   The grid moved its ring off the <li> and onto the tile so the selection box
+   stops enclosing the caption; this row is the other half of that, and it was
+   left behind. Its border runs around the whole row — swatch, label and tick —
+   which is precisely "the text as well".
+   So the border stays the row's resting chrome and no longer turns brand, and
+   the ring moves onto the 56px swatch, matching .choice-card-bg's treatment
+   exactly (same lift, same 2px ring, same 55% glow). The soft tint stays: it
+   fills the box, which is the box, and without it a chosen row in a long list
+   is hard to pick out at a glance. */
 .choice-list-item[data-selected="true"] {
   background: var(--brand-primary-soft, rgba(1,234,203,0.06));
-  border-color: var(--brand-primary, var(--color-green-500));
+}
+.choice-list-item[data-selected="true"] .choice-list-tile {
+  /* The resting lift is restated for the reason the grid's rule spells out:
+     box-shadow is one property, so naming the ring alone would drop the
+     drop-shadow and flatten the swatch at the moment it is picked. */
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.08),
+    0 0 0 2px var(--brand-primary, var(--color-green-500)),
+    0 0 16px 4px color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 55%, transparent);
 }
 .choice-list-tile {
   position: relative;
@@ -2222,13 +2450,22 @@
    it. `.prioritise-list` is always the same element as `.choice-list` (see
    _card_component.html.erb) so this reaches both without a second selector.
    Pure CSS keyed on live child count — no markup change, so it tracks edits
-   in the editor and stays correct in the player. Reuses the numbers already
-   proven at `.phone-bottom .choice-list-item` below; this is the desktop (and
-   under-7-options-on-mobile) case that had no equivalent until now. */
+   in the editor and stays correct in the player. The numbers come from the
+   dashboard's old phone mockups, which drew this same markup small; that
+   family has since been deleted (nothing rendered it), but its sizes were
+   right and are kept here. */
 .choice-list:has(> .choice-list-item:nth-child(7)) { gap: 4px; }
 .choice-list:has(> .choice-list-item:nth-child(7)) > .choice-list-item {
   padding: 6px 10px 6px 6px;
   border-radius: 10px;
+  /* The base rule's 72px was sized around a 56px tile (56 + 8 + 8). This tier
+     shrinks the tile to 40px but inherited that floor, so the row stayed 72px
+     tall and the 40px icon floated in it: 6px to the grey stroke on the left,
+     15px above and below. Reported as "the left hand side is thin gap, and
+     above and below is bigger". Sizing the floor to THIS tier's tile makes the
+     gap 6px all round — and, as the report predicted, takes ~18px off every
+     row, so a long list stops being quite so long. */
+  min-height: 52px;
 }
 .choice-list:has(> .choice-list-item:nth-child(7)) .choice-list-tile {
   width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 25px;
@@ -2292,15 +2529,36 @@
   z-index: 1;
   box-shadow: 0 0 0 2px #fff;
 }
+/* The drag affordance on a prioritise row. Drawn rather than typed: the glyph
+   this used to render (⋮⋮, rotated with writing-mode) is hairline in every
+   weight the font offers, and at rgba(0,0,0,0.28) on its own light row it
+   measured about 2.5:1 — legible as texture, not as a control, which is
+   exactly how it was read ("needs to be bolder and more obvious"). Dots make
+   the weight a RADIUS, so it can be as heavy as it needs to be.
+
+   Decoration only, and deliberately so: the span is aria-hidden and
+   prioritise_controller starts a drag from anywhere on the row that isn't a
+   button (:23). Nothing here is a hit target, so none of it can shrink one. */
 .prioritise-grip {
   margin-left: auto;
-  color: rgba(0,0,0,0.28);
-  font-size: 16px; letter-spacing: -3px;
-  writing-mode: vertical-rl;
+  flex-shrink: 0;
   cursor: grab;
-  padding: 0 2px;
+  /* Padding is the grabbable-looking zone, not the hit area. */
+  padding: 6px 5px;
+  font-size: 0; line-height: 0;
 }
-.phone-bottom .prioritise-rank { width: 20px; height: 20px; font-size: 11px; }
+.prioritise-grip::before {
+  content: "";
+  display: block;
+  width: 11px; height: 17px;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.5) 1.7px, transparent 1.8px);
+  background-size: 6px 6px;
+}
+/* Under the finger it commits to the brand — the row is already lifting and
+   the handle should look like the thing doing the lifting. */
+.prioritise-item.is-dragging .prioritise-grip::before {
+  background-image: radial-gradient(circle, var(--brand-primary, #615BF5) 1.7px, transparent 1.8px);
+}
 
 /* ── MCQ grid ───────────────────────────────────── */
 /* grid-auto-rows + full-height cards: every row sizes to the tallest card and
@@ -2378,12 +2636,9 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   background-size: cover; background-position: center;
 }
-/* The mini phone mockups on the dashboard draw the same markup at a size the
-   bounds above were not written for; they keep their own fixed tile. */
-.phone-bottom .choice-card-bg { min-height: 0; max-height: none; }
 /* Per-option icon (OptionIconLibrary) — sits centred on top of the
-   choice-bg-N gradient, sized as a share of the tile so it auto-scales at
-   the .phone-bottom breakpoint with no extra rules. */
+   choice-bg-N gradient, sized as a SHARE of the tile rather than in pixels,
+   so it follows the tile to every size it is drawn at with no extra rules. */
 .choice-icon-svg {
   width: 42%; height: 42%;
   max-width: 34px; max-height: 34px;
@@ -2407,8 +2662,16 @@
   background: transparent;
   transition: background 0.15s;
 }
+/* The wash that darkens the artwork so the white tick and the ring read on top
+   of it. It was a hardcoded dark green — a colour from no palette, on a card
+   that is otherwise entirely brand-driven, so a magenta Verto tinted its chosen
+   answers green and nobody had noticed.
+   --brand-primary-ink rather than --brand-primary, because this has to DARKEN:
+   the ink is the brand hue already taken down far enough to read as text, which
+   is exactly the tone that works as a scrim. A light brand therefore still
+   darkens its own artwork instead of washing it out. */
 .choice-card[data-selected="true"] .choice-overlay {
-  background: rgba(0,100,40,0.28);
+  background: color-mix(in srgb, var(--brand-primary-ink, #017E6E) 42%, transparent);
 }
 .choice-tick {
   display: none;
@@ -2457,9 +2720,17 @@
    this the grid had no selected style for its caption at all, so the wrapper
    ring was the only thing marking the text, which is exactly the box-drawn-
    around-the-words problem. Colour here, ring on the tile: two families, one
-   vocabulary. */
+   vocabulary. Same legible derivation as the list row — see the note there;
+   this caption sits on plain white rather than a tint, which is the easier of
+   the two surfaces, so the one variable serves both.
+   And the same stroke, which the list label had and this one did not: two
+   families with one vocabulary should thicken the same way when chosen. Safe
+   on either — text-stroke paints wider without touching a single advance
+   width, which is the whole reason it is used here instead of a weight. */
 .choice-card[data-selected="true"] .choice-label {
-  color: var(--brand-primary, var(--color-green-500));
+  color: var(--brand-primary-ink, #017E6E);
+  -webkit-text-stroke: 0.4px currentColor;
+  paint-order: stroke fill;
 }
 
 /* ── Rich-text toolbar (editor chrome) ───────────── */
@@ -2746,6 +3017,13 @@
 }
 .rotate-actions[data-response-count="4"] .rotate-action-btn { width: 44px; height: 44px; }
 .rotate-action:hover .rotate-action-btn { transform: scale(1.1); }
+/* Editor only (the player's marks never carry the class): the mark opens the
+   🎨 popover directly — it is the thing a creator wants to change, and the
+   hover-only 17px button beside it was never found. The ring on hover is the
+   "this is a control" cue the plain circle lacked. */
+.rotate-action-btn--editable:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12), 0 0 0 3px rgba(1,234,203,0.55);
+}
 /* A four-point scale has no middle, so "strongly" is carried by weight rather
    than by a glyph that doesn't exist: the extremes fill their ring instead of
    outlining it. Same artwork, read louder. */
@@ -2761,7 +3039,6 @@
 /* Inline SVG response icons (see ApplicationHelper#tap_response_mark) — sized
    to the circular button and tinted by the button's currentColor. */
 .rotate-action-icon { display: block; width: 22px; height: 22px; }
-.phone-bottom .rotate-action-icon { width: 19px; height: 19px; }
 .rotate-action /* Every tile emoji is sized from this ONE property — which is the whole reason
    it exists, and why "increase emoji size by, maybe 30%?" (18 Aug) is a set of
    value changes rather than a hunt through the stylesheet. The glyph now takes
@@ -2878,7 +3155,6 @@
    anything not here is decoration and must let clicks through to the statement
    text and the image/delete chips underneath. */
 .rotate-actions--fan .rotate-action,
-.rotate-actions--fan .tap-response-add,
 .rotate-card-controls--fan .rotate-dots {
   pointer-events: auto;
 }
@@ -2914,19 +3190,6 @@
 .rotate-actions--fan .rotate-action:hover .rotate-action-btn { transform: none; }
 .rotate-actions--fan .rotate-action.is-intent { transform: translate(-50%, -50%) scale(1.13); }
 .rotate-actions--fan .rotate-action.is-intent .rotate-action-btn { transform: none; }
-/* The editor's phone-preview chrome draws the same card smaller. Set the
-   tokens rather than the pill, so the one-size-per-card rule above still holds
-   here — overriding padding directly would leave the width behind and put the
-   pills back out of step. */
-.phone-bottom .rotate-actions--fan {
-  --tap-pill-h: 36px;
-  --tap-pill-pad: 4px 9px 4px 8px;
-}
-.phone-bottom .rotate-actions--fan[data-response-count="6"] {
-  --tap-pill-pad: 4px 7px 4px 6px;
-}
-.phone-bottom .rotate-actions--fan .rotate-action-label { font-size: 10px; }
-
 /* ── Editor-only response chrome ──────────────────────────────────────────
    The 🎨 popover and the × sit on the response itself, exactly as they do on a
    choice option row, so a creator styles an answer where they read it. Both
@@ -2969,19 +3232,6 @@
 .rotate-action-label[contenteditable]:focus {
   outline: 2px solid rgba(1,234,203,0.8); outline-offset: 2px; border-radius: 4px;
 }
-/* In the fan there is no "after the last pill" to sit in, so the add button
-   takes the one corner the arc never reaches. */
-.rotate-actions--fan .tap-response-add { position: absolute; right: 10px; bottom: 12px; }
-.tap-response-add {
-  width: 34px; height: 34px; align-self: center; flex-shrink: 0;
-  border-radius: 50%;
-  border: 1.5px dashed rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.14);
-  color: #fff; font-size: 15px; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
-}
-.tap-response-add:hover { background: rgba(255,255,255,0.28); border-color: #fff; }
 .swipe-indicator {
   display: flex; gap: 8px; align-items: center; justify-content: center;
   font-family: "ABeeZee", sans-serif;
@@ -3010,8 +3260,13 @@
 .book-page {
   position: absolute; inset: 0;
   border-radius: 18px;
-  background: white;
-  box-shadow: 0 14px 34px rgba(0,0,0,0.18);
+  /* Warm paper, not white: the page floats on a white panel on phones, and
+     white-on-white read as a box inside a box ("the scenario question type
+     card ... not good"). The hairline plus a two-layer shadow makes it a
+     thing LYING ON the card rather than a second card. */
+  background: #FDFCF7;
+  border: 1px solid rgba(28,32,52,0.06);
+  box-shadow: 0 12px 30px rgba(28,32,52,0.14), 0 2px 6px rgba(28,32,52,0.06);
   overflow: hidden;
   transform-origin: left center;
   /* Arriving page: opacity resolves well inside the transform so the page is
@@ -3029,6 +3284,26 @@
   transition: transform 0.52s cubic-bezier(.4,0,.2,1), opacity 0.3s ease 0.22s;
 }
 .forms-mode .book-page { transition: none; }
+/* The stacked page-edges behind the current page stay — they are the
+   "there's more" affordance — but as PAPER edges, not readable content:
+   the answer page's last option ("Not for me", on a green tile) was legible
+   through the stack under the story, quietly spoiling the choices.
+   layout() stamps aria-hidden on every non-current page, so that state is
+   the hook.
+
+   The delay is the animation's, not decoration. A page being turned away
+   gets aria-hidden at turn START; an instant visibility flip would blank it
+   mid-rotation and the turn would read as a card flipping over empty. The
+   rotation runs 0.52s, so the content stays for 0.55 and vanishes once the
+   page is edge-on. The base state carries no delay, so an ARRIVING page's
+   content appears the moment it becomes current. Forms mode needs no carve-
+   out: its pages snap to opacity 0 instantly, and a delayed visibility flip
+   on an invisible page changes nothing. */
+.book-page[aria-hidden="true"] .book-page-scroll,
+.book-page[aria-hidden="true"] .book-page-corner {
+  visibility: hidden;
+  transition: visibility 0s 0.55s;
+}
 /* Scrolls when a page runs long, but never shows a scrollbar — it should
    read as a page, not a textarea. Overflow is cued by .book-page-fade
    instead of a visible bar (see .book-page.has-more below). */
@@ -3057,6 +3332,23 @@
   text-align: left; outline: none;
 }
 .book-page-text[contenteditable]:empty::before { content: attr(data-placeholder); color: rgba(0,0,0,0.32); }
+/* A scenario's page is sized by the card, not by the story, so a short story
+   sat in the top-left corner of a tall white rectangle with the rest of it
+   empty — "the text isn't vertically or horizontally centralised". Measured
+   on an iPhone 15: 133px of text in a 314px page.
+
+   safe center, not center. The page scrolls (.book-page-scroll is overflow-y:
+   auto) and plain centring on a scroll container puts the overflow of a LONG
+   page above scroll position zero, where nothing can reach it — the same trap
+   .split-right's own centring is written around. safe falls back to
+   flex-start the moment the content stops fitting, so the long page keeps its
+   first line and the short page gets its centring.
+
+   Scoped to --scenario: consent_gate renders this same book and its pages are
+   an information sheet, which is worse centred, not better. */
+.book-wrap--scenario .book-page-scroll { justify-content: safe center; }
+.book-wrap--scenario .book-page-kicker,
+.book-wrap--scenario .book-page-text { text-align: center; }
 .book-page-corner {
   position: absolute; bottom: 10px; right: 14px;
   font-family: "Alata", sans-serif; font-size: 18px; color: rgba(0,0,0,0.09);
@@ -3080,15 +3372,65 @@
 
 .book-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-.book-nav-row { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+/* justify-content is load-bearing, and its absence only showed on the PLAYER.
+   In the editor this row's second child is .next-btn with `flex: 1` (below),
+   which fills the row and makes the layout look intentional. The respondent
+   gets two bare chevrons with no grow item between them, so they collapsed
+   flush LEFT under a centred page-dot strip — "the arrows need to be central
+   to the card". Centring is right for both: the editor's grow button still
+   fills the row, so nothing moves there. */
+.book-nav-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-shrink: 0;
+}
 .book-chevron {
-  width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.14);
-  background: white; color: rgba(0,0,0,0.55); font-size: 15px;
+  width: 34px; height: 34px; border-radius: 50%;
+  /* Was rgba(0,0,0,0.14) on a 15px glyph at 0.55 — a hairline ring around a
+     grey mark, on the only control that turns a scenario's page. */
+  border: 1.5px solid rgba(0,0,0,0.28);
+  background: white; color: rgba(0,0,0,0.75);
+  font-size: 19px; font-weight: 700; line-height: 1;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.12s, opacity 0.12s, transform 0.12s; flex-shrink: 0;
 }
 .book-chevron:hover:not(:disabled) { background: rgba(1,234,203,0.1); color: #007A66; transform: scale(1.06); }
 .book-chevron:disabled { opacity: 0.22; cursor: default; }
+/* 44px on the respondent side. 34 is under the iOS minimum touch target, and
+   on a scenario card these two circles are the ONLY way to turn a page —
+   there is no swipe fallback. The editor keeps 34: it has a pointer, and its
+   row also carries the full-width "Next page" button. */
+.preview-overlay .book-chevron { width: 44px; height: 44px; font-size: 22px; }
+/* 0.22 reads as "broken" rather than "not yet available" once the control is
+   this much bolder — on page 1 of 2 the back chevron is the first thing a
+   respondent sees and it looked like a rendering fault. */
+.preview-overlay .book-chevron:disabled { opacity: 0.3; }
+/* ── The pager capsule ────────────────────────────────────────────────────
+   In the player the row IS the control: chevrons and dots merge into one
+   brand-tinted capsule — ‹ · · · › — because two bare grey circles under a
+   dot strip were an unlabelled duplicate of the footer's Next (which turns
+   pages itself via _scenarioTurn) and the card stacked two rows of round
+   controls with nothing saying which "next" was which. One capsule, one
+   obvious job, a shape plainly different from the footer's pills.
+
+   The markup puts the dots between the chevrons in player mode only (see
+   _card_component's book branches); these rules are what fuse the three
+   into one instrument. The chevrons lose their own borders and fills — the
+   capsule is the surface now — but keep their 44px: that is the touch
+   floor, and the reasons on the sizing rule above have not moved. */
+.preview-overlay .book-nav-row {
+  align-self: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--brand-primary, #01EACB) 10%, #fff);
+  border: 1px solid color-mix(in srgb, var(--brand-primary, #01EACB) 22%, #fff);
+}
+.preview-overlay .book-nav-row .book-chevron {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+.preview-overlay .book-nav-row .book-dots { gap: 7px; padding: 0 4px; }
 
 .book-nav-row .next-btn {
   font-family: "Alata", sans-serif; font-size: 13px; letter-spacing: 0.03em;
@@ -3327,23 +3669,51 @@
 @media (prefers-reduced-motion: reduce) {
   .card-flag-track, .card-flag-track::after { transition: none; }
 }
+/* A respondent control, drawn as one. It used to be a 13px grey label inside a
+   1px DASHED ring — which is this stylesheet's vocabulary for editor
+   affordances (see .tap-add-btn, .media-library-add, .split-left-design-prompt,
+   all dashed, all creator-side). On the player it was the only respondent CTA
+   drawn that way, so it read as chrome that had leaked out of the editor and
+   was reported as exactly that. Solid ring, tinted fill, brand colour.
+
+   Brand primary rather than the fixed PV pink it used to turn on hover: this
+   adds an ANSWER, so it belongs to the same family as the option rows and the
+   selected-state label, not to the footer's CTA colour. Same call as the tap
+   card's "Add statement".
+
+   min-height 44px is the iOS touch minimum; the old 8px padding on a 13px
+   label came to 33px. */
 .other-cta-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; border-radius: 100px;
-  background: transparent; border: 1px dashed rgba(0,0,0,0.2);
-  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(0,0,0,0.55);
-  cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; padding: 10px 20px; border-radius: 100px;
+  background: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 12%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 45%, transparent);
+  font-family: "ABeeZee", sans-serif; font-size: 14px; font-weight: 600;
+  /* Mixed toward black: the brand primary is a light teal by default and sets
+     no readable text colour on a white card on its own. */
+  color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 70%, #000);
+  cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.other-cta-btn:hover:not(:disabled) { border-color: #FF1E6F; color: #FF1E6F; }
-.other-cta-btn.is-active { background: rgba(255,30,111,0.1); border-style: solid; border-color: #FF1E6F; color: #FF1E6F; }
-.other-cta-btn:disabled { opacity: 0.6; cursor: default; }
+.other-cta-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 20%, transparent);
+  border-color: var(--brand-primary, var(--color-green-500));
+}
+.other-cta-btn.is-active {
+  background: var(--brand-primary, var(--color-green-500));
+  border-color: var(--brand-primary, var(--color-green-500));
+  color: #06281F;
+}
+/* Disabled ONLY in the editor, where the card is a preview and the box below
+   is not a real answer surface (_card_component.html.erb:1128). */
+.other-cta-btn:disabled { opacity: 0.55; cursor: default; }
 .other-panel { margin-top: 10px; }
 /* While "Other" is active, dim the normal answer to signal it's overridden. */
 .split-card.other-active .mt-2 { opacity: 0.4; pointer-events: none; }
 
-/* Player-overlay variants (light card on dark bg) */
-.preview-overlay .other-cta-btn { border-color: rgba(0,0,0,0.18); color: rgba(0,0,0,0.55); }
-.preview-overlay .other-cta-btn.is-active { background: rgba(255,30,111,0.12); border-color: #FF1E6F; color: #FF1E6F; }
+/* No player-overlay override any more. These two rules restated the grey ring
+   and the pink active state, and being (0,2,0) they would beat the base rule
+   above and put the editor look straight back on the one surface this change
+   is for. The base rule is already correct on a light card. */
 
 /* ── Editor chrome (per-card row above split-card) ─ */
 .edit-chrome {
@@ -3748,6 +4118,90 @@
    where the finalize bar used to be. */
 .editor-float-bottom { top: auto; bottom: 14px; justify-content: center; }
 .editor-float-bottom form { display: inline-flex; margin: 0; }
+
+/* ── Shuffle split pill + direction prompt ──────────────────────────────────
+   Shuffle re-rolls the Verto's imagery; the caret beside it opens an optional
+   free-text "direction" (what the creator wants from the content and imagery)
+   that posts with the same form. The panel floats ABOVE the bar because the
+   bar itself sits at the bottom of the feed. */
+.shuffle-form { position: relative; }
+.shuffle-pill {
+  display: inline-flex; align-items: stretch;
+  border-radius: 100px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.22); background: #2A2D3A;
+}
+.shuffle-pill-go, .shuffle-pill-caret {
+  background: transparent; border: none; color: #fff; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-md);
+  transition: background 0.15s;
+}
+.shuffle-pill-go { padding: 10px 16px 10px 22px; }
+.shuffle-pill-caret {
+  padding: 10px 14px; position: relative;
+  border-inline-start: 1px solid rgba(255,255,255,0.18);
+  line-height: 1;
+}
+.shuffle-pill-go:hover, .shuffle-pill-caret:hover { background: #383D4E; }
+
+.shuffle-direction {
+  position: absolute; bottom: calc(100% + 10px); inset-inline-start: 0;
+  width: 320px; max-width: 78vw; z-index: 50;
+  padding: 14px; border-radius: 14px;
+  background: #1C2034; border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+  text-align: start;
+}
+.shuffle-direction[hidden] { display: none; }
+.shuffle-direction-head {
+  font-family: "Alata", sans-serif; font-size: 14px; color: #fff; margin-bottom: 4px;
+}
+.shuffle-direction-hint {
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.45;
+  color: rgba(255,255,255,0.6); margin: 0 0 10px;
+}
+.shuffle-direction-label {
+  display: block; font-family: "ABeeZee", sans-serif; font-size: 11px;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 5px;
+}
+.shuffle-direction-input {
+  width: 100%; resize: vertical; padding: 9px 11px;
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06); color: #fff;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; line-height: 1.4;
+}
+.shuffle-direction-input::placeholder { color: rgba(255,255,255,0.35); }
+.shuffle-direction-input:focus {
+  outline: none; border-color: rgba(1,234,203,0.6);
+  background: rgba(255,255,255,0.09);
+}
+/* What the populator read out of the prompt — printed so a misparse shows up
+   here instead of only in the pictures that come back. */
+.shuffle-direction-reading {
+  display: flex; flex-wrap: wrap; gap: 4px 10px;
+  margin: 8px 0 0;
+  font-family: "ABeeZee", sans-serif; font-size: 11px; line-height: 1.4;
+  color: rgba(255,255,255,0.5);
+}
+.shuffle-direction-reading span { white-space: nowrap; }
+.shuffle-direction-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: 10px;
+}
+.shuffle-direction-clear, .shuffle-direction-apply {
+  padding: 8px 16px; border-radius: 100px; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 13px;
+  transition: background 0.15s;
+}
+.shuffle-direction-clear {
+  background: transparent; color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.shuffle-direction-clear:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.shuffle-direction-apply {
+  background: #01EACB; color: #1C2034; border: none;
+}
+.shuffle-direction-apply:hover { background: #00C4AB; }
 .editor-leave-btn {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 7px 13px;
@@ -3801,137 +4255,6 @@ button.editor-leave-btn { cursor: pointer; }
   background: rgba(20,23,38,0.6); backdrop-filter: blur(8px);
   border-color: rgba(255,255,255,0.14);
 }
-
-/* ── Phone-shaped survey card (vertical, iPhone-ratio) ── */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 28px 22px;
-  justify-items: center;
-  align-items: start;
-}
-.phone-wrap {
-  width: 300px;
-  display: flex; flex-direction: column; gap: 8px;
-  cursor: pointer;
-}
-.phone-chrome {
-  display: flex; align-items: center; gap: 8px;
-  padding: 0 6px;
-}
-.phone-card {
-  width: 300px;
-  height: 612px;                    /* 300 / 612 ≈ 9 / 18.4, iPhone-like */
-  background: #1C2034;
-  border-radius: 38px;
-  padding: 7px;                     /* bezel */
-  box-shadow: 0 16px 36px rgba(0,0,0,0.4),
-              inset 0 0 0 1px rgba(255,255,255,0.08);
-  border: 2px solid transparent;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
-  flex-shrink: 0;
-}
-.phone-wrap:hover .phone-card { transform: translateY(-2px); }
-.phone-wrap.selected .phone-card {
-  border-color: #FF1E6F;
-  box-shadow: 0 0 0 3px rgba(255,30,111,0.25),
-              0 16px 36px rgba(0,0,0,0.4),
-              inset 0 0 0 1px rgba(255,255,255,0.08);
-}
-.phone-screen {
-  width: 100%; height: 100%;
-  background: #fff;
-  border-radius: 32px;
-  overflow: hidden;
-  display: flex; flex-direction: column;
-  position: relative;
-}
-.phone-top {
-  height: 33%;
-  position: relative;
-  background: linear-gradient(135deg, #01EACB 0%, #1C2034 75%);
-  flex-shrink: 0;
-}
-.phone-top-dark { background: var(--color-navy-750); }
-.phone-top-icon {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 44px;
-  color: rgba(255,255,255,0.18);
-  pointer-events: none;
-}
-.phone-top-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(transparent 60%, rgba(0,0,0,0.3));
-}
-.phone-progress {
-  position: absolute;
-  top: 12px; left: 12px; right: 12px;
-  height: 6px;
-  background: rgba(0,0,0,0.35);
-  border-radius: 6px; overflow: hidden;
-  z-index: 2;
-}
-.phone-progress-fill { height: 100%; background: #fff; border-radius: 6px; }
-.phone-tagline {
-  position: absolute;
-  top: 26px; left: 0; right: 0;
-  text-align: center;
-  font-family: "Alata", sans-serif;
-  font-size: 11px; font-weight: 700;
-  color: rgba(255,255,255,0.7);
-  letter-spacing: 0.05em;
-  z-index: 2;
-}
-.phone-bottom {
-  flex: 1;
-  padding: 16px 18px 18px;
-  display: flex; flex-direction: column;
-  gap: 8px;
-  color: #000;
-  overflow: hidden;
-}
-.phone-bottom .q-eyebrow { font-size: 10px; }
-.phone-bottom .q-title   { font-size: 15px; line-height: 1.3; }
-.phone-bottom .q-subtitle{ font-size: 12px; line-height: 1.4; }
-
-/* Shrink interactive components for the smaller phone screen */
-.phone-bottom .pick-list { gap: 5px; }
-.phone-bottom .pick-item { padding: 8px 10px; font-size: 12px; border-radius: 10px; }
-.phone-bottom .pick-dot, .phone-bottom .pick-square { width: 14px; height: 14px; font-size: 9px; }
-.phone-bottom .pick-text { font-size: 12px; }
-
-.phone-bottom .choice-list { gap: 4px; }
-.phone-bottom .choice-list-item { padding: 6px 10px 6px 6px; border-radius: 10px; }
-.phone-bottom .choice-list-tile { width: 40px; height: 40px; border-radius: 8px; --tile-emoji: 25px; }
-
-.phone-bottom .choice-grid { gap: 6px; }
-.phone-bottom .choice-card-bg { height: 56px; border-radius: 10px; --tile-emoji: 30px; }
-.phone-bottom .choice-label { font-size: 10px; padding: 2px 4px; margin-top: 4px; }
-
-.phone-bottom .slider-wrap { gap: 8px; padding-top: 8px; }
-.phone-bottom .slider-track { height: 38px; }
-.phone-bottom .slider-thumb { width: 44px; height: 44px; }
-.phone-bottom .slider-label-text { font-size: 11px; }
-
-.phone-bottom .freeform-wrap { padding: 8px; }
-.phone-bottom .freeform-textarea { font-size: 12px; min-height: 70px; }
-.phone-bottom .freeform-counter  { font-size: 10px; }
-
-.phone-bottom .rotate-wrap { gap: 8px; }
-.phone-bottom .rotate-card-stack { width: 100%; max-width: 300px; height: 56vh; max-height: 420px; min-height: 320px; }
-.phone-bottom .rotate-action-btn { width: 40px; height: 40px; font-size: 16px; }
-.phone-bottom .rotate-card-controls { padding: 24px 12px 12px; gap: 7px; }
-
-.phone-bottom .split-right--book { padding: 20px 18px 16px; }
-.phone-bottom .book-stack { min-height: 45vh; }
-.phone-bottom .book-page-text { font-size: 14px; line-height: 1.55; }
-
-.phone-bottom .activity-tag {
-  font-size: 9px; padding: 2px 8px;
-}
-.phone-bottom .activity-title { font-size: 14px; }
-.phone-bottom .activity-desc  { font-size: 11px; }
 
 /* Survey card wrapper (for the results show page) */
 .survey-card-wrap {
@@ -5139,17 +5462,66 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .mini-rating-star  { font-size: 14px; line-height: 1; }
 
 /* ── Rating component ────────────────────────────── */
-.rating-wrap   { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 20px; }
-.rating-stars  { display: flex; gap: 8px; position: relative; }
+/* The star's box is a TOKEN, not a font-size, because three things have to
+   agree on it: the star itself, the gap between stars, and the caption grid
+   underneath (see .rating-labels). Sized as a box rather than type so the
+   captions can be laid out on the same tracks as the stars — which is what
+   puts the end captions under the end stars instead of at the panel's edges. */
+.rating-wrap {
+  --rating-star-size: 52px;
+  --rating-star-gap: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding-top: 20px;
+}
+.rating-stars  {
+  display: flex; gap: var(--rating-star-gap); position: relative;
+  /* Contains the star's own :hover and .pop scale (1.18 and 1.4 of a 56px
+     box), which would otherwise poke a few pixels past this row and into the
+     answer scroller's overflow. The confetti used to be the real reason for
+     this rule and no longer lives here at all — .rating-burst is parented on
+     the overlay in viewport space now, because clipping only removed what
+     landed beyond the margin: enough for a ★, and not for a themed emoji,
+     which cleared 80px on every single tap. See rating_controller#_burst.
+
+     `clip` rather than `hidden`: hidden would make this a scroll container of
+     its own and still reserve the area. clip removes it from the overflow
+     calculation outright, and overflow-clip-margin lets the scaled star keep
+     painting outside the box. */
+  overflow: clip;
+  overflow-clip-margin: 80px;
+}
 .rating-star {
-  font-size: 40px;
+  width: var(--rating-star-size); height: var(--rating-star-size);
+  font-size: calc(var(--rating-star-size) * 0.86);
   cursor: pointer;
   color: #D1D5DB;
-  transition: color 0.1s, transform 0.12s;
+  transition: color 0.1s, transform 0.12s, background-color 0.1s;
   user-select: none;
   line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+/* Softened points, for the STAR kind only.
+   The glyph is a text character (★ / ☆, swapped by rating_controller), and a
+   font's star has needle-sharp points that no CSS can round. So for this kind
+   the glyph is hidden and the shape is painted as a MASK instead: the same
+   five-point star drawn with a round-joined stroke, which blunts every point
+   by the stroke's radius. The mask carries only alpha, so the colour still
+   comes from a normal property and .active keeps working exactly as before —
+   it just tints background-color rather than color.
+   Deliberately not applied to .rating-kind-emoji: that path swaps the star for
+   a themed emoji, and masking an emoji would erase it to a silhouette. */
+.rating-kind-star .rating-star {
+  font-size: 0;
+  background-color: #D1D5DB;
+  -webkit-mask: var(--rating-star-shape) center / contain no-repeat;
+  mask: var(--rating-star-shape) center / contain no-repeat;
+}
+.rating-wrap {
+  --rating-star-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.1 14.85 8.87 21.2 9.79 16.6 14.28 17.69 20.6 12 17.62 6.31 20.6 7.4 14.28 2.8 9.79 9.15 8.87Z' fill='%23000' stroke='%23000' stroke-width='2.4' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 .rating-star.active { color: #FFCC00; }
+.rating-kind-star .rating-star.active { background-color: #FFCC00; }
 .rating-star:hover  { transform: scale(1.18); }
 /* Emoji icons ignore CSS `color`, so a themed (non-star) rating shows the
    chosen state by colour vs greyscale + dim instead of a gold fill. */
@@ -5169,14 +5541,23 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   40%  { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
+/* A zero-size anchor point in VIEWPORT space, parented on the overlay rather
+   than on the star row — see rating_controller#_burst for why. `fixed` is
+   load-bearing twice over: it takes the layer out of the answer scroller's
+   overflow calculation entirely (which is the bug), and it means the pieces'
+   coordinates are the star's own getBoundingClientRect, with no offset
+   arithmetic against a moving parent. Width and height stay 0 so the layer
+   itself can never be the thing that grows anything. */
 .rating-burst {
-  position: absolute; inset: 0;
+  position: fixed;
+  width: 0; height: 0;
   pointer-events: none;
   overflow: visible;
   z-index: 20;
 }
 .rating-burst-piece {
   position: absolute;
+  left: 0; top: 0;
   font-size: 22px;
   line-height: 1;
   color: #FFCC00;
@@ -5192,11 +5573,24 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
     opacity: 0;
   }
 }
+/* The captions ride the STARS' grid, not the panel's width.
+   This was `width: 100%` with space-between, which pins the two end captions
+   to the outer edges of the answer panel — and the star row is a centred flex
+   line that is narrower than the panel, so the end captions sat well outside
+   the stars they name ("bring in the opposite ends answer to sit underneath
+   the first and last star"). Same five tracks and the same gap as
+   .rating-stars, so caption 1 lands under star 1 and caption 5 under star 5 by
+   construction rather than by luck; the middles span what is between them. */
 .rating-labels {
-  display: flex; justify-content: space-between;
-  align-items: flex-start; gap: 8px;
-  width: 100%; padding: 0 4px;
+  display: grid;
+  grid-template-columns: repeat(5, var(--rating-star-size));
+  gap: var(--rating-star-gap);
+  align-items: start;
+  justify-content: center;
+  padding: 0;
 }
+.rating-labels > .rating-label { text-align: center; }
+.rating-labels > .rating-mid-labels { grid-column: 2 / 5; }
 /* The middle captions share one centred slot between the two end captions, so
    the row reads as a two-ended scale until a star in between is touched. They
    are stacked on top of each other rather than laid out in a line: only one is
@@ -5427,6 +5821,12 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .option-color-field { display: flex; align-items: center; gap: 8px; }
 .option-color-hex { width: 84px !important; text-transform: uppercase; }
 .option-style-row--icons { flex-direction: column; align-items: flex-start; }
+/* Says what the icon library actually covers, so a grid of sport gear on a
+   cost-of-living card reads as a limit rather than a fault. */
+.option-style-icon-note {
+  margin: 2px 0 8px; font-size: 11px; line-height: 1.45;
+  color: rgba(255,255,255,0.45);
+}
 .option-style-icon-grid {
   display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; width: 100%;
 }
@@ -5437,8 +5837,15 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .option-style-icon img { width: 100%; height: 100%; }
 .option-style-icon:hover { border-color: rgba(1,234,203,0.5); }
 .option-style-icon.is-active { border-color: #01EACB; background: rgba(1,234,203,0.15); }
+/* Pinned to the popover's own scroll box. The 48-icon grid is taller than the
+   340px max-height, so Reset/Done sat below the fold and you had to scroll
+   past every icon to find them — on a picker already suspected of being
+   broken. The negative offset cancels the popover's 14px padding so it sits
+   flush, and the background stops icons showing through as they pass under. */
 .option-style-popover-foot {
   display: flex; justify-content: space-between; margin-top: 4px;
+  position: sticky; bottom: -14px;
+  padding: 10px 0; background: #1C2034;
 }
 .option-style-reset, .option-style-done {
   border: none; border-radius: 8px; padding: 7px 12px; cursor: pointer;
@@ -5498,21 +5905,50 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .rotate-card:hover .tap-card-image-btn,
 .rotate-card:focus-within .tap-card-image-btn { opacity: 1; }
 .tap-card-image-btn:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
+/* Takes the Verto's own brand rather than a fixed teal, so the one "add" the
+   card still offers reads as part of that Verto. The fallback is the default
+   palette's primary — brand_palette_style_attr emits nothing at all when a
+   Verto is unbranded, so the fallback IS the colour there. */
 .tap-add-btn {
   background: transparent;
   border: 1px dashed rgba(0,0,0,0.15); border-radius: 12px;
   padding: 7px 18px; cursor: pointer;
-  color: rgba(1,234,203,0.75);
+  color: var(--brand-primary, var(--color-green-500));
   font-family: "ABeeZee", sans-serif; font-size: 12px;
   transition: all 0.15s;
 }
-.tap-add-btn:hover { background: rgba(1,234,203,0.05); border-color: rgba(1,234,203,0.3); }
+.tap-add-btn:hover {
+  background: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 8%, transparent);
+  border-color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 35%, transparent);
+}
 
 /* ══ Preview Verto overlay ════════════════════════════════════════════
    Full-screen card-by-card preview. Opens over the editor, closes back
    to the design view. No edit chrome (contenteditable, delete/add btns).
    ══════════════════════════════════════════════════════════════════ */
 .preview-overlay {
+  /* THE CARD'S HEIGHT, defined unconditionally so the three mobile tiers can
+     each take their 45/55 share of it. The footer's min-height is a border-box
+     measurement and already contains its 1px rule, so there is nothing further
+     to subtract — taking it off again cost 0.9px and landed the split on 44.9%
+     rather than 45.0. Kept out here rather than inside the
+     phone media block on purpose: every tier that reads it sits on this same
+     element, but a var() that resolves to nothing makes the whole calc
+     invalid, which would void --play-hero-h and collapse the layout rather
+     than degrade it. A token that load-bearing should not depend on which
+     media query happened to match. */
+  --play-card-h: calc(100svh - clamp(56px, 9svh, 80px));
+  /* THE STRIP THE FLOATING CONTROLS OWN. Back and Next are lifted out of flow
+     on a phone (search "the controls float"), so the bottom of the card is no
+     longer the bottom of the answer — this is how much of it is spoken for.
+     Its first term is the footer's own min-height, stated once here and read
+     there, so the two cannot drift; the safe-area inset because the bar asks
+     for it too; and 12px of air, because landing a respondent's last option
+     exactly on the pill's edge measured as "clear" and read as touching.
+     Defined out here for the same reason --play-card-h is: every rule that
+     reads it sits on this element, and a var() that resolves to nothing voids
+     the whole calc rather than degrading it. */
+  --play-pill-zone: calc(clamp(56px, 9svh, 80px) + env(safe-area-inset-bottom, 0px) + 12px);
   position: fixed; inset: 0; z-index: 60;
   background-color: var(--brand-bg, #1C2034);
   background-image: var(--brand-bg-image, none);
@@ -5680,10 +6116,52 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 0.8125rem;
 }
 .play-banner-link { color: rgba(255,255,255,0.85); text-decoration: underline; text-underline-offset: 3px; }
-.play-banner-test    { background: rgba(255,250,119,0.1); border-bottom: 1px solid rgba(255,250,119,0.3); }
-.play-banner-test    .play-banner-text { color: #FFFA77; }
 .play-banner-preview { background: rgba(1,234,203,0.1);   border-bottom: 1px solid rgba(1,234,203,0.25); }
 .play-banner-preview .play-banner-text { color: #01EACB; }
+
+/* ── Test Mode: a ring, not a strip ──────────────────
+   The strip was ~31px off the top of every card, in the one mode where the
+   card is already fighting a notch and a shorter viewport. What a tester
+   needs from it is "this is not the real thing", which a border says without
+   spending any height.
+
+   The sentence it also carried — nothing you enter is saved — has nowhere
+   visual left to go, so it is clipped rather than deleted: `display: none`
+   would take it from a screen reader as well, and then nothing anywhere says
+   it. Same idiom as .book-live. */
+.play-test-note {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.play-test-frame {
+  /* absolute, NOT fixed: lib/viewport_height puts a transform on the overlay
+     while the keyboard is up, which would make it the containing block for a
+     fixed child and move the ring's reference frame mid-session.
+     .play-consent-banner is absolute for the same reason.
+     box-shadow rather than a border, because a border on this element would
+     be inside its own border-box and shrink the card by exactly the height
+     the strip used to take — which would make this change do nothing. */
+  position: absolute; inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 3px #FFFA77;
+}
+/* A transparent layer over the whole card eats every tap aimed at what is
+   under it — the bug the floating-controls block records further down. The
+   ring opts out; anything real inside it opts back in. */
+.play-test-frame > * { pointer-events: auto; }
+.play-test-exit {
+  position: absolute; top: 8px; left: 10px;
+  display: inline-flex; align-items: center; height: 26px; padding: 0 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,250,119,0.45);
+  background: rgba(20,23,38,0.66);
+  backdrop-filter: blur(6px);
+  color: #FFFA77;
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; line-height: 1;
+  text-decoration: none;
+}
 
 .play-end-actions {
   display: flex; flex-direction: column; align-items: center;
@@ -5819,11 +6297,90 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .play-consent-declined.hidden { display: none; }
 
+/* ── Survey-level consent, as a bottom banner ──────────────────────────────
+   "I really feel like this should be a banner along the bottom, that sits
+   over the top of the first question." The gate used to be a full-screen
+   pseudo-card in front of the deck; it is a strip now, and the state lives
+   on ONE attribute — data-consent-pending on .preview-overlay — which dims
+   the deck, hides the footer nav, and shows this banner. The deck's
+   interaction lock is the `inert` attribute on .preview-body (focus, AT and
+   clicks all blocked by the platform, not by pointer-events games).
+
+   Absolute, not fixed: the overlay is the fixed box, and the visual-viewport
+   pin resizes/translates it under a keyboard — absolute bottom rides that
+   exactly as the deck does. z-index 40 sits over the floating mobile pills
+   (30) and under everything that must outrank consent (the cookie banner is
+   viewport-fixed far above; two prompts on a first visit, dismissed in
+   order).
+
+   The shared .play-consent-* pieces (body, legal, actions, buttons) keep
+   their base rules — they also dress the editor replica, the type-picker
+   preview and the respondent-code card — and are re-coloured here only
+   under the banner's own container, for its dark panel. */
+.play-consent-banner {
+  position: absolute; inset-inline: 0; bottom: 0;
+  z-index: 40;
+  display: flex; justify-content: center; align-items: flex-end;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+}
+.play-consent-panel {
+  pointer-events: auto;
+  width: 100%; max-width: 640px;
+  background: #1C2034; color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  padding: 16px 20px;
+}
+.play-consent-banner-title {
+  font-family: "Alata", sans-serif; font-size: 15px; margin-bottom: 6px;
+}
+.play-consent-banner .play-consent-body {
+  color: rgba(255,255,255,0.85); font-size: 13.5px;
+  /* The card gave the copy 300px; a strip must never grow into a wall in
+     front of the question it exists to reveal. Long consent scrolls here. */
+  max-height: 30svh;
+}
+.play-consent-banner .play-consent-legal { margin-top: 6px; }
+.play-consent-banner .play-consent-legal a { color: rgba(255,255,255,0.65); }
+.play-consent-banner .play-consent-legal a:hover { color: rgba(255,255,255,0.9); }
+.play-consent-banner .play-consent-actions {
+  flex-direction: row; flex-wrap: wrap; margin-top: 12px;
+}
+.play-consent-banner .play-consent-agree { flex: 1 1 200px; }
+.play-consent-banner .play-consent-decline {
+  flex: 1 1 140px;
+  color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.45);
+}
+.play-consent-banner .play-consent-declined {
+  color: rgba(255,255,255,0.85); padding: 4px 0;
+}
+/* The banner exists only while the choice is open (or was declined —
+   declining swaps the message inside the same panel and the attribute
+   stays). Once agreed the attribute goes and the banner with it; no exit
+   animation, so reduced-motion needs no carve-out. */
+.preview-overlay:not([data-consent-pending]) .play-consent-banner { display: none; }
+/* While pending, the deck underneath is scenery: nav and score chrome hidden
+   outright, the question dimmed but readable — seeing what you are agreeing
+   to answer is the point of the banner over a blank scrim. `inert` on
+   .preview-body (server-rendered, controller-removed) does the interaction
+   half. */
+.preview-overlay[data-consent-pending] .preview-btn,
+.preview-overlay[data-consent-pending] .preview-progress-text,
+.preview-overlay[data-consent-pending] .quiz-score-chip,
+.preview-overlay[data-consent-pending] .token-score-chip { display: none; }
+.preview-overlay[data-consent-pending] .preview-body { opacity: 0.55; }
+
 .preview-footer {
   flex-shrink: 0; height: 80px;
   display: flex; align-items: center; justify-content: center;
   gap: 16px; padding: 0 32px;
-  border-top: 1px solid rgba(255,255,255,0.07);
+  /* No border-top. The bar used to draw a faint hairline the full width of
+     the overlay, directly under the card — "remove the boarder between the
+     CTA's and the card, have the games CTA's floating". The separation is
+     space now: the desktop player block below pads .preview-body's bottom so
+     the pills float clear of the card. (On a phone the footer is lifted out
+     of flow entirely — its own media block owns that.) */
 }
 .preview-progress-text {
   font-family: "Alata", sans-serif; font-size: 12px;
@@ -6506,14 +7063,65 @@ body.generating-overlay-active .bottom-bar { display: none; }
        (max-width: 1024px) and (max-height: 600px) {
 
   /* ── Universal touch + form ergonomics ── */
+  /* This is the rule that actually holds the iOS zoom line, and it holds it
+     for more fields than the --play-input-fs list above suggests: an
+     attribute selector like input[type="text"] is (0,1,1) and outranks a bare
+     class like .respondent-code-input (0,1,0), so a field's own smaller
+     font-size loses here without anyone having to add it to a list. Only
+     `textarea` is a bare element (0,0,1), which is why the textarea-flavoured
+     controls DO need --play-input-fs and the inputs do not.
+
+     max(1rem, 16px) rather than a flat 16px: 16 CSS px is a FLOOR against the
+     zoom, not a target. Pinned flat, a respondent who has enlarged their
+     browser text got every other word on the card bigger and their own answer
+     box left behind at 16.
+
+     The type list is every control that raises a text keyboard. search/tel/
+     url/password were missing — none is reachable on a card today, but the
+     omission is the kind that only shows up as a bug once someone adds the
+     field, and by then it looks like a layout fault rather than a list. */
   textarea,
   input[type="text"],
   input[type="email"],
-  input[type="number"] { font-size: 16px; }
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"] { font-size: max(1rem, 16px); }
   .pick-item, .choice-card, .rotate-action-btn { min-height: 44px; }
   .pick-item { padding: 12px 14px; }
-  .rating-star { font-size: 36px; padding: 4px; }
-  .rating-stars { gap: 6px; }
+  /* Retune the TOKENS, not the star. This used to set font-size and padding
+     directly, which now says nothing (the star is a fixed box carrying a mask)
+     and actively breaks it — padding shrinks the box the mask is sized
+     against. Bigger than the 36px it replaces, per "stars - lets make these
+     bigger globally": a rating answer is five taps and nothing else, so the
+     one control on the card can afford to be the size of a real target. */
+  .rating-wrap {
+    --rating-star-size: 56px;
+    --rating-star-gap: 8px;
+  }
+  /* …but the row is FIVE of them plus four gaps, and .rating-star is
+     flex-shrink: 0, so at 56/8 it is a hard 312px whatever it is given. That
+     is wider than a narrow phone's answer panel, and the row is centred, so
+     the overflow goes off BOTH edges where centred overflow cannot be scrolled
+     back to. Measured: 12px over on a 320px screen, and 32px over on a folded
+     one with the first star starting at x = -16 — a third of the one-star
+     option unreachable, which is a respondent who cannot give the lowest
+     rating at all, not a cosmetic clip.
+     Sized off the panel rather than guessed: the panel is the viewport less
+     2x --play-pad-x, which bottoms out at 16px, so 288px at 320 and 248px at
+     280. 48/8 makes a 272px row; 44/4 makes 236 — 6px of gap still measured 1px over, because the
+     scroller carries its own padding on top of the panel's.
+     44 is the floor and it is the iOS touch minimum, not a taste — below it
+     these stop being reliable targets, and rating_stars_test holds that line.
+     If a phone ever arrives that cannot fit five 44px stars, the answer is to
+     wrap or shrink the SCALE, not the target. */
+  @media (max-width: 340px) {
+    .rating-wrap { --rating-star-size: 48px; --rating-star-gap: 8px; }
+  }
+  @media (max-width: 300px) {
+    .rating-wrap { --rating-star-size: 44px; --rating-star-gap: 4px; }
+  }
   .slider-track { width: 100%; height: 44px; }
   .slider-thumb { width: 52px; height: 52px; }
 
@@ -6579,18 +7187,50 @@ body.generating-overlay-active .bottom-bar { display: none; }
        The clamp bounds are set so neither ever binds on a real phone: 40svh
        reaches 400px only at a 1000px-tall viewport, and 140px only below
        350px. */
-    --play-hero-h:     clamp(140px, 40svh, 400px);
+    /* THE CARD, named once, so 45/55 can be said literally.
+       The card is the overlay less the footer, and the footer is
+       clamp(56px, 9svh, 80px) plus its 1px rule. Deriving the two shares from
+       THAT rather than from the viewport is what finally makes the split the
+       number it claims to be: the pair used to be 40svh and 50svh against a
+       ~90.8svh card, which is 44.0% / 55.0%, and the missing 0.9 was supposed
+       to reach the hero through the flex-grow inversion below. It never did —
+       the hero is capped at --play-hero-h, so it stops at the cap and the
+       slack lands elsewhere. Measured 44.0% on every image card at every
+       phone size before this.
+       It also fixes the short viewports, which were further out than the tall
+       ones and in the other direction: where the footer hits its 56px floor,
+       45% of the card is 39.7svh, not 40.9. A viewport-fraction token cannot
+       express that and this one does not have to.
+       The clamp bounds are unchanged and still never bind on a real phone. */
+    --play-hero-h:     clamp(140px, calc(var(--play-card-h) * 0.45), 400px);
     --play-hero-min:   96px;
-    --play-right-min:  clamp(240px, 50svh, 500px);
+    --play-right-min:  clamp(240px, calc(var(--play-card-h) * 0.55), 500px);
     --play-pad-x:      clamp(16px, 5vw, 26px);
     --play-pad-y:      clamp(14px, 2.4svh, 22px);
     --play-gap:        clamp(8px, 1.6svh, 14px);
+    /* THE STRIP THE PROGRESS BAR OWNS. On a card with no hero, .split-left is
+       display: contents and the bar (top: 10px + 6px tall, further down this
+       block) paints straight onto the white panel — the same panel whose
+       --play-pad-y above can clamp as low as 14px, which put "TAP TO RESPOND"
+       *behind* the bar (photographed on an iPhone: the eyebrow sheared
+       mid-letter by the fill). Stated as the bar's own numbers plus air so a
+       bar retune moves this with it; read by the panel's padding-top below. */
+    --play-bar-clear:  calc(10px + 6px + 12px);
     /* A CEILING now, not a size: the welcome logo is sized by width (30% of
        the panel) and this only stops a square or portrait mark towering over
        the title beneath it. Raised from 4.6svh/34px, which was the old
        height-driven size and, used as a cap, letterboxed anything squarer
        than a wordmark down to a third of the width it was asked for. */
     --play-logo-h:     clamp(28px, 6svh, 52px);
+    /* How far the answer panel rides UP over the hero's lower edge, so the two
+       stop reading as two separate things. A token because it is not one
+       number — it is the panel's negative margin, the radius of the corners it
+       rounds over, AND the strip of hero it hides. That last one was written
+       independently and got it wrong: the photo credit sits 12px off the
+       hero's bottom, 12 is inside 22, so on every mobile photo card the credit
+       was painted over by the panel and sheared off mid-word. Anything
+       positioned against the hero's bottom edge has to clear this. */
+    --play-lip:        22px;
 
     --play-eyebrow:    0.75rem;    /* 12px — desktop's, no smaller */
     --play-title:      1.625rem;   /* 26px — the question. Above desktop's 22 on purpose */
@@ -6712,7 +7352,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     display: block;
     position: relative;
     width: 100%;
-    flex: 0 1 auto;
+    /* shrink 0, and this is the half of "45% always" that retiring the shed
+       ladder does not deliver on its own. With shrink 1 the answer panel
+       simply squeezed the strip instead of scrolling: measured right after the
+       ladder came out, a twelve-option grid still pushed the hero down to
+       27.9% of the card on an iPhone 15 and 23.5% on an SE, with no
+       hero-off/hero-slim in sight. The ladder was the visible mechanism; flex
+       was doing the same thing quietly underneath it.
+       The pair still adds up — 40svh here against --play-right-min's 50svh on
+       a card that measures ~90.8svh — so the panel gets its stage and the
+       overflow goes where it now belongs, into the answer's own scroller. */
+    flex: 0 0 auto;
     height: var(--play-hero-h);
     min-height: var(--play-hero-min);
     padding: 0;
@@ -6755,7 +7405,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
      floor propagates as the strip's intrinsic contribution and .preview-body
      scrolls — the same escape every other card uses. */
   .preview-overlay .split-card:has(.nps-lottie) .split-left {
-    flex: 1 1 auto;
+    /* 1000 is a PRIORITY, not a proportion. The panel below now grows too
+       (it has to — see its rule for the 189px of white that forced it), and
+       flex splits free space in proportion to the factors, so two 1s handed
+       the panel half the surplus and took the hero from 341px down to 259px
+       on an iPhone 15 — quietly undoing "spare height goes to the PICTURE".
+       A dominant factor restores the intended order: the hero absorbs the
+       surplus until it hits its --play-hero-h ceiling, freezes there, and
+       flex redistributes what it could not take to the only item still able
+       to grow. The panel therefore gets exactly the leftover the picture was
+       never allowed to use, and not one pixel the picture wanted. */
+    flex: 1000 1 auto;
     height: auto;
     min-height: var(--play-hero-min);
     /* …uncapped was the one thing a respondent noticed. "Every pixel the
@@ -6787,7 +7447,28 @@ body.generating-overlay-active .bottom-bar { display: none; }
      nothing scrollable). An answer may cost a scroll; it may never cost a
      control. */
   .preview-overlay .split-card:has(.nps-lottie) .split-right {
-    flex: 0 0 auto;
+    /* grow 1, shrink 0. The hero above is capped at --play-hero-h, so once it
+       reaches that cap it freezes and the leftover height has nowhere to go:
+       it stacked up under the panel as .split-card's own white background —
+       189px on an iPhone 15 range card, 260px on a rating card, which is the
+       band the owner photographed. Growing the panel into it gives
+       `justify-content: safe center` something to centre and puts the answer
+       in the middle of the card instead of hard against the picture.
+
+       The hero does not pay for it, but only because its rule carries a
+       dominant grow factor to say so. Two equal factors split the surplus
+       and cost the hero 82px (measured); with the priority in place the
+       hero fills to its --play-hero-h ceiling first, freezes there, and flex
+       hands the remainder to the one item still able to grow — this one.
+       The two declarations are a pair: change either alone and the hero
+       silently starts paying for the panel's centring.
+
+       flex-shrink stays 0, which is the invariant player_hero_css_test
+       exists to protect: .split-right is overflow: hidden, and that zeroes
+       its automatic minimum, so a shrinkable panel does not degrade
+       gracefully — it clips the slider invisibly. An answer may cost a
+       scroll; it may never cost a control. Only the grow factor moved. */
+    flex: 1 0 auto;
     min-height: 0;
   }
   /* The escape hatch, made real. The scroll story this file tells — "the
@@ -6824,8 +7505,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
      instead. Nothing else moves: the panel still opens at its
      --play-right-min stage (grow:0 does not touch min-height), the shrink
      phase is untouched so a long answer still pins the panel at its floor and
-     scrolls inside .mt-2, and the shed ladder still prices the hero exactly
-     as before. The one visible change is where the SURPLUS lands — and a
+     scrolls inside .mt-2, and the hero is still priced exactly as before by
+     its --play-hero-h preferred height and flex-shrink: 0 (the strip rule
+     above). The one visible change is where the SURPLUS lands — and a
      respondent given a taller cover-fit photo sees more of it, which is the
      entire request. */
   .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-left {
@@ -6847,7 +7529,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
      _fitCard's ladder needs the panel's stage to measure against. */
   .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
     .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-left {
-    flex: 1 1 auto;
+    /* 1000 is a PRIORITY, not a proportion — the same pairing as the range
+       rule above, for the same reason. The panel below now grows (it had
+       260px of white stacked under it on an iPhone 15), and flex splits free
+       space in PROPORTION to the factors, so two 1s handed the panel a share
+       and took this hero from 341px down to 298px — quietly undoing "spare
+       height goes to the PICTURE" a few rules up. A dominant factor restores
+       the intended order: the hero fills to its --play-hero-h ceiling,
+       freezes there, and flex hands what it could not take to the only item
+       still able to grow. The panel gets exactly the leftover the picture was
+       never allowed to use, and not one pixel the picture wanted. */
+    flex: 1000 1 auto;
     height: auto;               /* same load-bearing auto as the range rule above */
     min-height: var(--play-hero-min);
     /* …and the same cap, for the same reason: five stars cost almost nothing,
@@ -6858,7 +7550,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   .preview-overlay .preview-card:is([data-card-type="rating"], [data-card-type="yes_no"])
     .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
-    flex: 0 0 auto;
+    /* grow 1, shrink 0 — the range rule above, applied to the two other
+       types whose answer cannot grow. The hero is capped at --play-hero-h,
+       so once it reaches that cap the leftover height has nowhere to go: it
+       stacked up under the panel as .split-card's own white background, 260px
+       of it on an iPhone 15 rating card. Growing the panel into it gives
+       `justify-content: safe center` something to centre and puts the answer
+       in the middle of the card instead of hard against the picture.
+
+       The hero does not pay for it, but only because its rule carries a
+       dominant grow factor to say so (43px measured, here). The two
+       declarations are a pair: change either alone and the hero silently
+       starts paying for the panel's centring.
+
+       flex-shrink stays 0, for the reason the range rule spells out: the
+       panel is overflow: hidden, which zeroes its automatic minimum, so a
+       shrinkable panel does not degrade gracefully — it clips the stars
+       invisibly. Only the grow factor moved. */
+    flex: 1 0 auto;
     min-height: 0;
   }
   /* The same two companions the range inversion needed, for the same
@@ -6880,8 +7589,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
 
   /* NPS on mobile: drop the media "header" panel entirely and give the liquid
-     container the whole card, centred; shrink it to fit a phone viewport. */
-  .preview-overlay .split-card:has(.nps-slider) .split-left { display: none; }
+     container the whole card, centred; shrink it to fit a phone viewport.
+     `contents` rather than `none`, and this is not a nicety: .panel-progress is
+     MARKUP INSIDE .split-left (shared/_split_left.html.erb), so hiding the box
+     took the progress bar with it. Walked all eight card types on a phone and
+     these two were the only ones with no bar at all — a respondent loses their
+     sense of how far through they are on exactly the cards that take longest.
+     `contents` removes the box from layout while leaving its children in the
+     tree, which is what media-less cards already do a few rules up for this
+     same reason; the bar is absolutely positioned against .split-card, so it
+     lands in the right place either way. The hero is still gone — there is no
+     media element in this branch to draw. */
+  .preview-overlay .split-card:has(.nps-slider) .split-left { display: contents; }
   .preview-overlay .split-card:has(.nps-slider) .split-right {
     flex: 1 1 auto;
     height: auto;
@@ -6891,8 +7610,26 @@ body.generating-overlay-active .bottom-bar { display: none; }
      imagery, so a card-level hero image behind it just duplicated the photo
      and read as torn/double imagery. Drop the hero strip and let the stack
      fill the card, same treatment as NPS above. */
-  .preview-overlay .split-card:has(.rotate-wrap) .split-left { display: none; }
+  .preview-overlay .split-card:has(.rotate-wrap) .split-left { display: contents; }
   .preview-overlay .split-card:has(.rotate-wrap) .split-right {
+    flex: 1 1 auto;
+    height: auto;
+  }
+
+  /* Prioritise on mobile: every option has to be on screen AT ONCE, and for
+     this one type that is not a matter of tidiness. The whole row is the drag
+     handle, so .prioritise-item is `touch-action: none` (search "Prioritise
+     (drag-to-rank list)") — which means a list that runs past the fold cannot
+     be scrolled by a finger at all. An off-screen option is not merely below
+     the fold, it is unreachable, and a ranking taken without it is a ranking
+     of the wrong set. "The user needs to be able to see all answers, make
+     this question type the same size as the NPS score."
+
+     So: the same treatment as NPS and the tap matrix above, and `contents`
+     for the same reason they use it — .panel-progress is markup inside
+     .split-left, and `none` would take the progress bar with it. */
+  .preview-overlay .split-card:has(.prioritise-list) .split-left { display: contents; }
+  .preview-overlay .split-card:has(.prioritise-list) .split-right {
     flex: 1 1 auto;
     height: auto;
   }
@@ -6911,7 +7648,47 @@ body.generating-overlay-active .bottom-bar { display: none; }
      The one viewport that still scrolls is a landscape phone — 844×390 offers
      the card 228px, less than five answers can be drawn in — and it now scrolls
      32px instead of the ~200 the fixed floor cost it. */
-  .preview-overlay .rotate-card-stack { min-height: 260px; }
+  /* Squarer, and lower. The stack is 320px wide and used to run to the base
+     rule's 560px cap, which on an iPhone 15 is exactly what it reached — a
+     1.75 ratio, and the card filled its scroller with nothing left over
+     ("while I love the cards on mobile, it feels a bit squashed... reduce
+     overall card height a touch, gives more room above and below").
+     448px is 1.4 — near enough square to read as a card rather than a column,
+     and it hands 112px back to the space above and below. It is also what a
+     shorter phone was already choosing for itself: an SE measured 449px here
+     before this rule existed, because its scroller could not afford the cap.
+     So this makes every phone agree with the one that was already right. */
+  .preview-overlay .rotate-card-stack { min-height: 260px; max-height: 448px; }
+  /* 448 is an absolute, and "squarer" is a RATIO — so on a phone narrow enough
+     that the stack cannot reach 320px wide, the same cap draws a taller card
+     than the one it was written to replace. Measured on a folded phone (280px,
+     giving the stack 248px): 248×448 is 1.81, against the 1.75 that prompted
+     the note in the first place. Uncapped it is 1.89, so the cap does help
+     there — it just does not arrive at squarer.
+     A second, narrower tier rather than an aspect-ratio: the stack takes its
+     height from flex growth, not from its contents, and aspect-ratio loses to
+     a definite flex height.
+
+     380 rather than the 340 that would match a wide phone's 1.4, because the
+     arc pays for every pixel taken off this card and a narrow one has no
+     horizontal room to spare. Swept on a Fold with a six-point scale, which is
+     the tightest case there is — the closest pair of answers, by cap:
+
+       340 → 1.37, 2px apart     400 → 1.61,  8px
+       360 → 1.45, 4px           420 → 1.69, 10px
+       380 → 1.53, 6px           448 → 1.81, 12px
+
+     Twenty pixels of card buys two pixels of clearance, all the way down. 340
+     drew the squarest card and left the answers 2px apart, under the 3px floor
+     tap_card_fits_test holds — squarer is not worth answers that look joined.
+     380 is 1.53: clearly squarer than the 1.81 this tier replaces and than the
+     1.75 that prompted the request, with double the minimum clearance.
+     A wider phone is unaffected either way — an SE measures 13-14px between
+     the same six answers at every cap in that table, because the arc has the
+     width it needs. This is a narrowness problem, not a height one. */
+  @media (max-width: 340px) {
+    .preview-overlay .rotate-card-stack { max-height: 380px; }
+  }
   /* The vessel scales with the phone instead of assuming the smallest one.
      232px was chosen so the liquid column fits a short viewport, and then
      applied to every viewport — so a tall phone drew the same small vessel
@@ -6966,9 +7743,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.split-left-video) .split-right,
   .preview-overlay .split-card:has(.card-lottie)      .split-right,
   .preview-overlay .split-card:has(.nps-lottie)       .split-right {
-    margin-top: -22px;
-    border-radius: 22px 22px 0 0;
+    margin-top: calc(-1 * var(--play-lip));
+    border-radius: var(--play-lip) var(--play-lip) 0 0;
     z-index: 1;
+  }
+  /* ...and the credit clears it. Not a z-index fight — the credit is z-index 2
+     against the panel's 1 — the panel simply paints its background over the
+     10px of hero the credit was occupying. Stated in terms of the lip so a
+     retune moves both together, which is the whole failure this had. */
+  .preview-overlay .split-left-credit {
+    bottom: calc(12px + var(--play-lip));
   }
 
   /* Player right pane on white — matches desktop colours. Content is
@@ -6995,6 +7779,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
        Padding for a bezel two boxes away cost ~34px of card interior while
        leaving the buttons that actually touch the indicator unprotected. */
     padding: var(--play-pad-y) var(--play-pad-x);
+    /* Clear the progress bar. The bar is absolutely positioned against
+       .split-card, and on every card whose .split-left is display: contents —
+       the no-hero default, NPS, the tap stack — that means it rides THIS
+       panel's top edge, where --play-pad-y alone left the eyebrow underneath
+       it. Hero cards reset this a few rules down: there the bar rides the
+       photo and the panel starts 45% down the screen. */
+    padding-top: var(--play-bar-clear);
     background: #fff;
     color: #1C2034;
     text-align: center;
@@ -7010,6 +7801,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow: hidden;
     position: relative;
   }
+  /* ...the reset for cards where the bar does NOT ride the panel: a hero
+     strip above means the bar sits on the photo, so the panel keeps its
+     ordinary pad. Then the three contents-branches (tap stack, NPS,
+     prioritise) re-assert the clearance — they drop the hero strip even when
+     the card carries media, so their bar is back on the panel. Order matters:
+     all of them are (0,4,0) against the base rule's (0,3,0), and the
+     contents-branches must land last. */
+  .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
+    padding-top: var(--play-pad-y);
+  }
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right {
+    padding-top: var(--play-bar-clear);
+  }
+
   /* The question never shrinks — it is the point of the card. Sizing it in
      vw as well as px means a long title wraps to the same number of lines
      on a 320px phone as on a 430px one instead of gaining two. */
@@ -7040,16 +7845,26 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
   /* ── The answer widget is the card's scroll container ──────────────────
      Mirrors the desktop rule (search ".split-right > .mt-2:has") and is
-     scoped to the same shapes — which is now every shape that can outgrow
-     the card, the swipe/slider/rating/NPS/freeform widgets included. They
-     used to be left out on the grounds that they "keep their own sizing";
-     what that meant in practice was having no scroll path, so their
-     overflow was cut rather than scrolled. The book layout is still out,
-     because .split-right--book opts out of centring entirely and paginates
-     instead. The desktop rule already supplies overflow-y; what mobile adds
-     is the flex-grow that lets the container claim the panel's spare
-     height, plus momentum scrolling and scroll containment so a flick
-     through the options doesn't drag the page behind it. */
+     scoped to the same shapes. That list used to say it was "every shape
+     that can outgrow the card" and it was not: it is a list of ANSWER
+     widgets, and the welcome card's .welcome-intake is not one, so the one
+     card every respondent sees first was the one card with no scroll path.
+     It is on the list now. The book layout is still out, because
+     .split-right--book opts out of centring entirely and paginates
+     instead — its overflow is fixed by measuring the card (see
+     player_controller#_fitCardHeight) rather than by a scrollbar. The
+     desktop rule already supplies overflow-y; what mobile adds is momentum
+     scrolling and scroll containment, so a flick through the options
+     doesn't drag the page behind it.
+
+     This rule used to add a flex-grow as well, "to claim the panel's spare
+     height" — and claiming it is exactly what went wrong. It is the panel's
+     only growable child, so it took every spare pixel and left
+     .split-right's `justify-content: safe center` nothing to work with: the
+     question pinned to the top of the panel, the answer auto-margin-centred
+     in the inflated box beneath it, and the slack painted as two bands of
+     white in between. See the desktop rule for why shrink stays 1 and what
+     depends on it. */
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-list),
   .preview-overlay .split-card .split-right > .mt-2:has(> .choice-grid),
   .preview-overlay .split-card .split-right > .mt-2:has(> .prioritise-list),
@@ -7057,33 +7872,168 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card .split-right > .mt-2:has(> .slider-wrap),
   .preview-overlay .split-card .split-right > .mt-2:has(> .nps-slider),
   .preview-overlay .split-card .split-right > .mt-2:has(> .rating-wrap),
-  .preview-overlay .split-card .split-right > .mt-2:has(> .freeform-wrap) {
-    flex: 1 1 auto;
+  .preview-overlay .split-card .split-right > .mt-2:has(> .freeform-wrap),
+  .preview-overlay .split-card .split-right > .mt-2:has(> .welcome-intake) {
+    flex: 0 1 auto;
     min-height: 0;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
-  /* "There are more options below" affordance. The usual pure-CSS trick —
-     background-attachment: local/scroll shadow layers on the scroll
-     container — is useless here because the option pills have backgrounds
-     of their own and paint straight over it. A sticky last child does work:
-     it pins to the bottom edge of the scrollport, and being last in DOM
-     order it paints ON TOP of the rows sliding under it. The negative
-     margin means it overlays the final rows instead of adding height, and
-     over a fully-scrolled (or short, non-scrolling) list it fades white
-     into white and disappears on its own — no scroll listener, no
-     false "more below" on a list that has no more. */
-  .preview-overlay .mt-2.is-scrollable .choice-list::after,
-  .preview-overlay .mt-2.is-scrollable .prioritise-list::after {
-    content: "";
-    flex: 0 0 auto;
-    position: sticky;
-    bottom: 0;
-    height: 22px;
-    margin-top: -22px;
-    background: linear-gradient(rgba(255,255,255,0), #fff 78%);
+  /* Same carve-out as desktop, same silent failure if it goes: the tap
+     card's .rotate-card-stack grows to fill this box rather than sitting in
+     it, and _fitCard's over() reads 0 whether the stack is fluid or
+     collapsed to its floor. tap_card_fits_test is the only guard. */
+  .preview-overlay .split-card .split-right > .mt-2:has(> .rotate-wrap) {
+    flex-grow: 1;
+  }
+
+  /* Keep the slider's travel out of the browser's edge back-swipe zone.
+     Measured before: the track ran to within 19.6px of each screen edge on an
+     iPhone 15 (18.8 on an SE), and the thumb CENTRES on the track's end at 0%
+     and 100% — so reaching for it at either extreme put a finger inside the
+     ~20px the OS reserves for "go back", and the drag navigated away instead
+     of moving the slider ("it's making me go back a page on the browser, and
+     not scroll").
+
+     `touch-action: none` is already on the track (:2086) and cannot help
+     here: the edge swipe is a SYSTEM gesture, not one a page is allowed to
+     claim. The only fix available is to stop putting a control there.
+
+     Horizontal only — the vertical variant's travel is up/down, its track is
+     48px wide and centred, and it sets its own wrap padding.
+
+     32, not the 26 this shipped as, because 26 protected the WRONG POINT. The
+     thumb is 52px and translate(-50%), so at either extreme its centre is on
+     the track's end and its outer edge is 26px further out — landing at
+     exactly the panel's own --play-pad-x. That clamp bottoms out at 16px below
+     a 375px screen, so measured: the edge sat at 20px on an iPhone 15, 19 on
+     an SE, 16 on a 320 and 16 on a folded phone. A finger reaching the visible
+     left of the thumb was still starting its drag inside the strip.
+     The inset has to cover the thumb's radius plus real clearance against the
+     WORST padding: 26 + 22 - 16 = 32. That puts the edge at pad + 6, so 22px
+     at the narrowest and more everywhere else, and costs each side 6px of
+     travel — 188px of track still left on a 280px phone. */
+  .preview-overlay .slider-wrap:not([data-slider-axis-value="vertical"]) .slider-track-wrap {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+  /* The required-answer nudge was the other thing standing on the bar's roof.
+     It is a sibling of the footer, so with the footer out of flow it became
+     the last in-flow element and landed squarely behind the pills — measured
+     69px behind on an iPhone 15, 56 on a 320, i.e. entirely invisible at every
+     size. It is the message a respondent gets for pressing Next without
+     answering, so invisible is the worst possible outcome: they press again.
+
+     Absolute rather than a margin, so it costs the card no height when it is
+     not showing. And it needs its own surface now: #FFC24B was chosen against
+     the brand backdrop the old bar let through, and the card that now runs to
+     the bottom of the screen is WHITE — amber on white measures 1.7:1. Same
+     self-backing dark pill .preview-progress-text already uses for exactly
+     this reason. */
+  .preview-overlay .preview-required-hint {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: var(--play-pill-zone);
+    z-index: 31;
+    max-width: calc(100% - 32px);
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: rgba(20,23,38,0.66);
+    backdrop-filter: blur(6px);
+    color: #FFD98A;
     pointer-events: none;
   }
+
+  /* ── Keeping the answer out from under the floating controls ──────────
+     The controls no longer take their height out of the card, so the panel
+     runs all the way to the bottom of the screen and whatever sits at the
+     foot of it lands behind the pills. Measured across every answer type on
+     an iPhone 15, with the controls floating and nothing else changed:
+
+       welcome pills          51px behind      consent chevrons  51px behind
+       "+ Other" CTA          51px behind      last list option  51px behind
+       prioritise last row    50px behind      grid last tile    39px behind
+       tap card's Reset       17px behind
+
+     Note the grid: 39px behind while its answer does not scroll at all. This
+     is not only a scrolling problem, so a scrolling fix alone would have left
+     six of those seven still broken. Two rules, with different jobs.
+
+     ONE — everything that is LAID OUT keeps clear. Padding the panel moves its
+     bottom edge above the pills, so `justify-content: safe center` centres
+     against the room that actually exists and every non-scrolling shape — the
+     grid that fits, the tap card's Reset, the book's page-turn chevrons, the
+     "+ Other" CTA that sits outside the scroller — comes up with it. */
+  .preview-overlay .split-card .split-right {
+    padding-bottom: var(--play-pill-zone);
+  }
+  /* TWO — the answer alone is allowed back under them, because that is what
+     floating controls are FOR: options passing beneath the pills as you scroll
+     is the whole difference between this and a bar. The negative margin
+     returns the strip the padding above just took, and the runway on the
+     content restores the reach, so the last option can still be brought clear
+     of the controls instead of stopping behind them.
+
+     `flex: 0 0 auto` is not tidiness and the runway does not work without it.
+     These children are shrinkable flex items that have already been squeezed
+     BELOW their own content — the grid measured 725px tall with its own rows
+     painting to 761 — so padding lands above the spill and changes nothing
+     visible. Measured: with padding alone the last tile stayed 62px behind the
+     pills; with the shrink stopped first it cleared by 32.
+
+     Scoped to .is-scrollable, which is the state _fitCard sets when the answer
+     genuinely overflows. An answer that fits has nothing to bring clear and
+     the padding above has already lifted it.
+
+     And to :last-child, which is not belt-and-braces — it is the fix for a
+     regression this caused. A negative margin does not shorten the box, it
+     lets the box OVERLAP whatever follows it, and on a card with "+ Other"
+     what follows it is the CTA: the scroller ran 88px past its own layout box
+     and an option row landed on top of the button. elementFromPoint at the
+     button's centre returned .choice-list-item, and player_reveal_field_test
+     could not click it. So the answer may only bleed under the controls when
+     it is the last thing in the panel; where a CTA sits below it, the panel's
+     padding is the whole answer and nothing overlaps. */
+  .preview-overlay .split-card .split-right > .mt-2.is-scrollable:last-child {
+    margin-bottom: calc(var(--play-pill-zone) * -1);
+  }
+  .preview-overlay .split-card .split-right > .mt-2.is-scrollable:last-child > * {
+    flex: 0 0 auto;
+    padding-bottom: var(--play-pill-zone);
+  }
+
+  /* ...and the pad that inset creates has to belong to the PAGE, or the inset
+     only moves the problem. touch-action: none is on .slider-track (:2101),
+     which now starts 32px in; the 32px either side of it is .slider-track-wrap
+     padding at touch-action: auto, so a finger reaching for the thumb at an
+     extreme lands on a strip the page does not claim and iOS takes the
+     gesture as its edge swipe. The owner photographed the result: the whole
+     web view peeled ~17 CSS px to the right, rounded corner and drop shadow
+     on its left edge, a previous page showing through underneath. "when I
+     slide the scale the screen moves."
+
+     Claiming a touch is the only lever a page has here — the swipe is a
+     SYSTEM gesture and cannot be preventDefault()ed after the fact, but
+     WebKit does defer its recogniser over an element that declares it handles
+     touches itself. Costs nothing: the range answer does not scroll (measured
+     over: 0 at every viewport from 393x852 down to 375x600), so there is no
+     pan being taken away. Both axes — the vertical variant sets its own wrap
+     padding and has the same edge to defend. */
+  .preview-overlay .slider-track-wrap { touch-action: none; }
+  /* The "more options below" cue is one rule now and it lives on the scroll
+     box (search "-webkit-mask-image"), so there is nothing type-specific to
+     mirror here. What IS mobile-only is the scrollbar. The owner has
+     objected to a bare bar on the answer twice, and with a cue that reads
+     there is nothing left for it to be the only signal of. Same call
+     .book-page-scroll already made, for the same reason — it should read as
+     a card, not a textarea. Desktop keeps its thin bar: a pointer has no
+     other way to learn the box is grabbable. */
+  .preview-overlay .split-right > .mt-2 {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .preview-overlay .split-right > .mt-2::-webkit-scrollbar { display: none; }
   /* "+ Other" sits under the options rather than inside the scroller, so it
      must not be squeezed out when the list is long. */
   .preview-overlay .split-card .split-right > .other-block {
@@ -7159,15 +8109,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
      is a px of option text on a 393px phone. */
   .preview-overlay .prioritise-item { gap: clamp(6px, 1.8vw, 10px); }
   .preview-overlay .prioritise-rank { width: 20px; height: 20px; font-size: 11px; }
-  .preview-overlay .prioritise-grip { font-size: 14px; letter-spacing: -2px; padding: 0; }
+  /* The grip is drawn, not typed (see .prioritise-grip). font-size/
+     letter-spacing here used to slim the old ⋮⋮ glyph; left in place they
+     would un-collapse the span's text and paint it ON TOP of the dots. Narrow
+     the padding instead — that is the px this tier was actually buying. */
+  .preview-overlay .prioritise-grip { padding: 6px 2px; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { font-size: var(--play-label); line-height: 1.3; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { color: #1C2034; }
+  /* Tint only, same as the desktop rule — the ring lives on the swatch now, so
+     restating border-color here would put the box back around the words on
+     exactly the surface the note was written about. */
   .preview-overlay .pick-item[data-selected="true"],
   .preview-overlay .choice-list-item[data-selected="true"] {
     background: var(--brand-primary-soft, rgba(1,234,203,0.08));
-    border-color: var(--brand-primary, var(--color-green-500));
   }
   .preview-overlay .freeform-wrap {
     display: flex;
@@ -7239,22 +8195,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding: 12px;
     margin: -12px;
   }
-  /* The same "there is more below" fade the option lists get. A grid can't
-     carry it on itself — a ::after inside a grid becomes a cell — so it hangs
-     off the scroll container instead, sticky to the bottom edge and last in
-     DOM order so it paints over the row sliding under it. On a grid that
-     fits, it is white fading into white and disappears. */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .mt-2.is-scrollable::after,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .mt-2.is-scrollable::after {
-    content: "";
-    flex: 0 0 auto;
-    position: sticky;
-    bottom: 0;
-    height: 22px;
-    margin-top: -22px;
-    background: linear-gradient(rgba(255,255,255,0), #fff 78%);
-    pointer-events: none;
-  }
+  /* The grid and tap-card fades used to be spelled out here, one selector per
+     card type, because a ::after inside a grid becomes a CELL and a ::after
+     inside the tap wrap becomes a flex sibling the 12px gap pushes around —
+     both had to hang off the scroll container instead. Masking the box needs
+     no such exceptions: the cue belongs to the box, not to whatever the box
+     happens to contain, so the three type selectors collapse into the single
+     rule above and every scrolling answer is covered, including the ones
+     nobody remembered to add (the welcome card's pills, most recently). */
   .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid,
   .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -7333,90 +8281,46 @@ body.generating-overlay-active .bottom-bar { display: none; }
     max-height: none;
   }
 
-  /* ── Running out of room: shed the pictures, never the controls ─────────
-     The order is fixed and it is a priority, not a fallback: a respondent
-     can answer a question with no artwork on it and cannot answer one whose
-     options are off the bottom of the screen. player_controller#_fitCard
-     measures the answer area and walks down this list only as far as it has
-     to — most cards never leave the first rung.
+  /* ── Running out of room: the answer scrolls ───────────────────────────
+     There used to be a ladder here. _fitCard priced the undecorated answer as
+     a debt and bought back the option artwork and then the hero, each only
+     while it stayed free, so a card that could not afford its picture gave it
+     up rather than scroll.
 
-       1. the hero shrinks to its floor          (flex, always on)
-       2. .hero-off  — the card image goes       (below)
-       3. .art-off   — the option tiles go       (this rule)
-       4. the answer area scrolls                (last resort)
+     That trade is off. The header is a promise now — 45% of the screen on
+     every card that can carry one — and a long answer scrolls ("everything
+     else can have a header I think, even long lists, because players should
+     know to scroll"). A guarantee a long list can revoke is not a guarantee,
+     and the same Verto rendering differently on two phones was the complaint.
 
-     The card image goes first because it is the only purely decorative thing
-     on the card, and because it buys more room than step 3 does — a tile that
-     loses its artwork becomes a full-width row, which on a narrow phone is
-     taller than the two-column grid it replaced.
+     So the priority this block used to encode still holds, it is just no
+     longer paid for out of the pictures: a respondent can answer a question
+     with no artwork on it and cannot answer one whose options are off the
+     bottom of the screen. Back, Next and the answer widget are still never
+     touched. What used to be the last resort is now the only one.
 
-     Back, Next and the answer widget itself are never on the list.
-
-     Step 2 turns the image grid into the option LIST — the same component
-     the other pick types already use, so nothing here is a new design: a
-     colour swatch keeps each option's identity, the label gets the width it
-     was short of, and the tick is where a tick goes. Six options that were
-     scrolling now fit. */
+     Three card types still hide their strip, and always did it here rather
+     than in the ladder: the tap matrix (:has(.rotate-wrap)), NPS
+     (:has(.nps-slider)) and prioritise (:has(.prioritise-list)), because none
+     of those answers can shrink to make room — and prioritise cannot even
+     scroll, its rows being drag targets.
+     .hero-off survives too, with one owner — _watchTyping, which drops the
+     hero while a text field has focus so the keyboard has somewhere to go.
+     .art-off and .hero-slim were the ladder's own and went with it. */
   /* Written against the same specificity as the two-column rule above, which
      would otherwise win. Rows without artwork want width for their label, not
      a fixed column count: one column on a phone panel, three across a tablet
      or a sideways phone, decided by the panel rather than by a breakpoint. */
-  .preview-overlay .preview-card[data-card-type="select_one_grid"] .choice-grid.art-off,
-  .preview-overlay .preview-card[data-card-type="select_many_grid"] .choice-grid.art-off {
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: clamp(6px, 1.1svh, 9px);
-  }
-  .preview-overlay .choice-grid.art-off .choice-card {
-    flex-direction: row;
-    align-items: center;
-    gap: 11px;
-    height: auto;
-    /* The tick is absolutely positioned, so the row has to keep its lane
-       clear by hand — without this a two-line label runs underneath it. */
-    padding: clamp(7px, 1.1svh, 11px) 40px clamp(7px, 1.1svh, 11px) 12px;
-    background: rgba(0,0,0,0.03);
-    border: 1.5px solid rgba(0,0,0,0.07);
-    border-radius: 13px;
-  }
   /* Degraded to rows, this IS a .choice-list row in everything but class
      name, so it selects like one: border + tint + a brand-coloured label
      (.choice-label above), and no ring — the tile is a 34px swatch here and
      the swatch rule below already zeroes its box-shadow at a higher
      specificity, which is what keeps the two families looking identical. */
-  .preview-overlay .choice-grid.art-off .choice-card[data-selected="true"] {
-    background: var(--brand-primary-soft, rgba(1,234,203,0.08));
-    border-color: var(--brand-primary, var(--color-green-500));
-  }
   /* The swatch keeps the tile's colour and icon at a size that suits a row.
      `position: static` hands the tick back to the card, which is what it
      should be pinned to now — it used to sit in the corner of the artwork. */
-  .preview-overlay .choice-grid.art-off .choice-card-bg {
-    position: static;
-    flex: 0 0 auto;
-    width: 34px; height: 34px;
-    min-height: 0; max-height: none;
-    border-radius: 9px;
-    box-shadow: none;
-    --tile-emoji: 23px;
-  }
-  .preview-overlay .choice-grid.art-off .choice-icon-svg {
-    width: 19px; height: 19px; min-width: 0; min-height: 0;
-  }
   /* Its job was tinting artwork that is no longer there; left alone it would
      paint the whole row instead. */
-  .preview-overlay .choice-grid.art-off .choice-overlay { display: none; }
-  .preview-overlay .choice-grid.art-off .choice-label {
-    margin: 0;
-    min-height: 0;
-    flex: 1 1 auto;
-    text-align: start;
-    font-size: var(--play-label);
-  }
-  .preview-overlay .choice-grid.art-off .choice-tick {
-    top: 50%; right: 12px; bottom: auto;
-    transform: translateY(-50%);
-    width: 20px; height: 20px;
-  }
 
   /* Step 3. `display: contents` rather than `display: none` so the progress
      bar living inside the panel still renders — it is the one thing in there
@@ -7441,25 +8345,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
     border-radius: 0;
   }
 
-  /* Rung 1.5 of the ladder: the hero SLIMMED rather than shed.
-     Raising the hero to 45% of the card (see --play-hero-h) meant a few
-     answers that used to fit alongside it no longer did — a six-tile grid and
-     a free-text card among them — and the ladder's only verdict was binary,
-     so a photo that was 30% of the screen yesterday became no photo at all.
-     Losing the picture entirely to gain 50px is a bad trade and a visible
-     one: a card either has art or it doesn't, and the jump is the thing a
-     respondent notices.
-     So before giving up on the hero, _fitCard tries it at the floor it was
-     always allowed to shrink to. Note this is NOT a loosened threshold — the
-     rule is still "the hero is free or not at all", `over() > owed + 1` is
-     untouched, and nothing is allowed to overflow. It is a cheaper thing to
-     offer, not a cheaper price. max-height as well as height, because the
-     range and rating variants set `height: auto` and are capped from above. */
-  .preview-overlay .preview-card.hero-slim .split-card .split-left {
-    flex: 0 0 auto;
-    height: var(--play-hero-min);
-    max-height: var(--play-hero-min);
-  }
+  /* hero-slim was the shed ladder's middle rung — the band the hero was allowed
+     to shrink to before being given up entirely. The ladder is gone (the header
+     is a promise now, and a long answer scrolls instead of buying room), so
+     nothing sets the class and the rule was unreachable. Removed rather than
+     left as dead code a test still guards, which is the trap `.phone-bottom`
+     turned out to be. Git has it if the trade is ever wanted back. */
   /* The selected-tile border-colour rule that used to live here went with the
      border. It was also outranking .art-off's own selected rule (same
      specificity, later in the file), which repainted a brand-coloured row in
@@ -7492,12 +8383,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
     overflow-wrap: anywhere;
   }
 
-  /* "+ Other" carries the desktop card's flat 8/16px padding into a panel
-     where everything else is fluid, and it sits below the scroller so its
-     height comes straight off the options. */
+  /* "+ Other" carries the desktop card's flat padding into a panel where
+     everything else is fluid, and it sits below the scroller so its height
+     comes straight off the options.
+     The base rule's 44px min-height is NOT relaxed here: that is a touch
+     minimum rather than a look, and this is the tier where a finger is the
+     only input. Only the horizontal padding and the label scale.
+     The label now rides --play-label, the same token the option rows use —
+     it sits with the options and should read at their size, not at the
+     desktop chrome's 13px. */
   .preview-overlay .other-cta-btn {
-    padding: clamp(6px, 1.1svh, 8px) clamp(12px, 3.6vw, 16px);
-    font-size: 0.8125rem;   /* desktop's 13, in rem so preference reaches it */
+    padding: clamp(6px, 1.1svh, 8px) clamp(14px, 4vw, 20px);
+    font-size: var(--play-label, 0.875rem);
   }
 
   /* A range card's scale words ARE its answer options, and they were the one
@@ -7567,7 +8464,56 @@ body.generating-overlay-active .bottom-bar { display: none; }
     --play-btn-max-w: 110px;      /* desktop's .preview-btn min-width */
     --play-btn-h:      44px;      /* desktop is 40; this is the touch floor */
     --play-btn-fs:     0.9375rem; /* 15px — desktop's, raised from 13 to match */
+
+    /* THE CONTROLS FLOAT. There is no bar on a phone any more — Back and Next
+       are lifted out of flow and sit on the card itself.
+
+       This is the third answer to the same question and the history is the
+       argument. The footer originally had no background at all, which on
+       desktop is right (the card floats ON the backdrop, so the bar belongs to
+       the backdrop) and on a phone was wrong, because there the card IS the
+       screen and a transparent bar read as a dark strip pasted under the white
+       card ("weird black bit at the bottom is still there, should be white").
+       So it was painted white. That worked, and cost 69px — 9% of a 768px
+       screen — taken out of every card before the hero and the answer divided
+       what was left.
+
+       Out of flow, that 69px goes back to the card: measured 609 -> 679 on an
+       iPhone 15 in Test Mode, and the 45/55 split re-derived itself with
+       nothing retuned, because _fitCardHeight measures .preview-body rather
+       than trusting a viewport calc. The strip the pills stand on is
+       --play-pill-zone, and what keeps the answer out of it is the padding and
+       runway further down this block.
+
+       Mobile only. On desktop the bar still belongs to the backdrop. */
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 30;
+    background: transparent;
+    border-top: none;
+    /* The band is AIR, not glass. Out of flow it still spanned the full card
+       width at z-index 30, and the transparent stretch between the pills ate
+       every tap meant for the option scrolling beneath it — a respondent saw
+       an answer in plain view and could not select it ("I can't select the
+       select one answers", the bottom rows of a 12-option list). Only the
+       pills themselves may take a touch; the children restore their own
+       pointer-events below. */
+    pointer-events: none;
   }
+  .preview-overlay .preview-footer > * { pointer-events: auto; }
+  /* The pills are now the only thing separating the controls from whatever is
+     behind them, which on an option grid is a full-bleed gradient tile. Back
+     gets a near-opaque surface rather than the 5% wash it wore against a white
+     bar — at 5% over a saturated tile it is not a button, it is a smudge. */
+  .preview-overlay .preview-btn {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  }
+  /* The points counter never renders here — it is display: none earlier in
+     this same block. What does ride the floating strip is the quiz/token
+     score chips, whose --brand-cta fill reads as a shape on the white card
+     beneath them the same way Next does: their labels are dark-on-teal and
+     legible, the pill outline is chrome. Left alone. Back is inverted where
+     it is actually defined, further down this block. */
   .preview-overlay .preview-btn {
     flex: 1 1 0;
     max-width: var(--play-btn-max-w);
@@ -7584,10 +8530,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
     white-space: nowrap;
     border-radius: 14px;
   }
+  /* Inverted, because the bar underneath it is now white (see the footer's
+     background above). These were white-on-white the moment that landed:
+     6% white fill, 75% white text, 8% white border — the button measured
+     present, visible and opacity 1, and could not be seen at all. A reminder
+     that "visible" in the DOM is not the same as legible on screen. */
   .preview-overlay .preview-btn-back {
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.75);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: none;
+    color: #1C2034;
+    border: 1px solid rgba(0,0,0,0.10);
+  }
+  .preview-overlay .preview-btn-back:hover {
+    background: #fff;
+    color: #1C2034;
   }
   .preview-overlay .preview-btn-back.invisible {
     visibility: visible;
@@ -7631,12 +8587,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-thankyou-sub   { font-size: 1rem; max-width: 100%; }
 }
 
-/* Everything below is phone-only and stays on the flat 767px test. The studio
-   is not the player: the editor, the create wizard and the dashboard chrome
-   are all built for a pointer and a wide canvas, and a portrait iPad has room
-   for them in a way it does not for a 680px card floating in a 954px screen.
-   Widening the player's breakpoint should not quietly drag the whole studio
-   into a phone layout with it. */
+/* Everything below is phone-only and stays on the flat 767px test. This block
+   is the PLAYER's and the create wizard's phone layout. The studio — the
+   editor, dashboard and share surfaces — now has a deliberate phone layout of
+   its own, but it does not live here: it is the M-STUDIO section at the END of
+   this file, on the same flat 767px test (plus, for the editor stage, classes
+   a controller applies only on a phone). Two blocks on purpose: the player's
+   rules are pinned by player_hero_css_test and serve respondents; M-STUDIO
+   serves creators and may move fast without touching these. A portrait iPad
+   (768–1024) keeps the desktop studio on purpose — it has the room for it. */
 @media (max-width: 767px) {
 
   /* ═════════════════════════════════════════════════════════════════
@@ -7903,8 +8862,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
        masthead no longer competes for room here — its media query is now the
        complement of the mobile one, so a portrait tablet gets the stacked
        card WITHOUT a masthead above it. */
-    --play-hero-h:     clamp(200px, 40svh, 560px);
-    --play-right-min:  clamp(360px, 50svh, 700px);
+    /* Same 45/55 of the same card — only the clamp bounds are this tier's. */
+    --play-hero-h:     clamp(200px, calc(var(--play-card-h) * 0.45), 560px);
+    --play-right-min:  clamp(360px, calc(var(--play-card-h) * 0.55), 700px);
     --play-title:      clamp(1.625rem, 3.4vw, 2rem);
     --play-subtitle:   clamp(0.9375rem, 2vw, 1.0625rem);
     --play-pad-x:      clamp(26px, 4vw, 44px);
@@ -7932,9 +8892,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
        44.3%. A sideways phone (844x390) lands nearer 41%, because there the
        answer's floor wins the tie-break — which is the priority this file has
        always stated and the one place the split is allowed to give. */
-    --play-hero-h:    clamp(96px, 40svh, 224px);
+    --play-hero-h:    clamp(96px, calc(var(--play-card-h) * 0.45), 224px);
     --play-hero-min:  60px;
-    --play-right-min: clamp(170px, 50svh, 280px);
+    --play-right-min: clamp(170px, calc(var(--play-card-h) * 0.55), 280px);
     --play-pad-y:     clamp(10px, 2svh, 16px);
     /* --play-title used to drop to clamp(17px, 4.8vw, 22px) here. This tier is
        the least room on the card and the question was paying for it: an iPhone
@@ -8471,7 +9431,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
   width: 100%; max-width: 280px; margin: 0 auto; display: block;
   padding: 14px 18px; border-radius: 14px;
   background: #f4f6f9; border: 1.5px solid rgba(0,0,0,0.1);
-  font-family: "ABeeZee", sans-serif; font-size: 16px; color: #1C2034;
+  font-family: "ABeeZee", sans-serif; color: #1C2034;
+  /* max(), not a flat 16px: the iOS zoom threshold is 16 CSS PX, so a
+     respondent who has made their browser text SMALLER gets the zoom handed
+     straight back by a hardcoded value. Same reasoning as --play-input-fs,
+     which these fields predate. */
+  font-size: max(1rem, 16px);
   outline: none; box-sizing: border-box;
 }
 .freeform-date:focus { border-color: #01EACB; }
@@ -8491,7 +9456,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .freeform-month, .freeform-year {
   padding: 14px 0; border-radius: 14px; text-align: center;
   background: #f4f6f9; border: 1.5px solid rgba(0,0,0,0.1);
-  font-family: "ABeeZee", sans-serif; font-size: 16px; color: #1C2034;
+  font-family: "ABeeZee", sans-serif; color: #1C2034;
+  /* max(), not a flat 16px: the iOS zoom threshold is 16 CSS PX, so a
+     respondent who has made their browser text SMALLER gets the zoom handed
+     straight back by a hardcoded value. Same reasoning as --play-input-fs,
+     which these fields predate. */
+  font-size: max(1rem, 16px);
   outline: none; box-sizing: border-box;
 }
 .freeform-month { width: 64px; }
@@ -8651,6 +9621,23 @@ body.generating-overlay-active .bottom-bar { display: none; }
   margin-top: -18px;
   border-radius: 18px 18px 0 0;
 }
+/* …and the welcome logo has to come out of the float here for the same reason
+   it does on a real phone: the panel is whatever the hero left behind, not a
+   680px desktop column, so an absolutely-positioned logo lands ON TOP of the
+   question title. The player's fix is scoped to .preview-overlay and gated on
+   a phone-width media query, and this frame is neither — it is a desktop-width
+   page pretending to be a phone. So the creator was still judging the card in
+   a preview that showed the bug the live player no longer has, which is the
+   worst way round for a preview to be wrong.
+   Kept as its own rule rather than added to the overlay's selector list: the
+   two share the symptom, not the mechanism, and merging them would put a
+   media-query-gated rule and a class-gated one in one place where the next
+   person has to work out which half applies. */
+.device-tablet .split-right-logo,
+.device-mobile .split-right-logo {
+  position: static;
+  flex: 0 0 auto;
+}
 .device-tablet .split-right { padding: 32px 40px; }
 .device-mobile .split-right { padding: 24px 22px; }
 /* Selected: the split-card's 2px transparent border IS the bezel in device
@@ -8693,6 +9680,50 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* The masthead already covers the thank-you card at this width — a second
      copy inside the card itself would double up. */
   .player-thankyou-logo { display: none; }
+
+  /* ── Desktop player: the card fits its box, and the CTAs float ──────────
+     The 850x680 card was a fixed fact inside a centred, overflow:hidden
+     .preview-body — so on any window shorter than the card plus its chrome
+     (lang bar, an org masthead, a Test Mode strip, the 80px footer) the
+     overflow split evenly and the TOP half vanished with no scroll path.
+     The top of a card is its instruction eyebrow: "the 'how to play' prompt
+     for users is being cut off at the top of the card". A 1280x800 laptop
+     lost ~43px, an iPad mini in landscape ~86px, and card_header_pinned_test
+     couldn't see it because it measures the header against .split-card's own
+     rect, which moves with the card when the body clips it.
+
+     Three rules, one mechanism. The card's height consumes --play-card-h —
+     the player controller's own measurement of .preview-body, written as an
+     inline style by a ResizeObserver (see player_card_box_test for that
+     half) — less this box's 28px top and 24px bottom padding, clamped to the
+     classic 680 above and a 520 floor below, under which five answer pills
+     stop fitting. The bottom padding is also the CTA float: with the base
+     footer hairline gone, 24px of backdrop is what separates the card from
+     the pills ("if the bottom of the card hits the CTAs move the card height
+     to avoid the cta and the cards overlapping or touching"). And below the
+     floor the auto margins collapse (same idiom as the answer scroller's
+     centring, further up this file) so the body scrolls flush-top instead of
+     hiding the question.
+
+     Scoped to the PLAYER overlay: the editor's inline preview and the device
+     frames share these class names but not the player controller, and the
+     create wizard already opts its card out of the fixed height. Consume
+     --play-card-h, never redeclare it — the inline style would win anyway
+     (player_hero_css_test pins the one CSS declaration this falls back to).
+     No --play-hero-h/--play-right-min pair here on purpose: those tokens are
+     the mobile tiers' 45/55 contract and the test that holds them sums the
+     pairs it finds. */
+  .preview-overlay[data-controller~="player"] .preview-body {
+    padding-bottom: 24px;
+    overflow-y: auto;
+  }
+  .preview-overlay[data-controller~="player"] .preview-body > .preview-card,
+  .preview-overlay[data-controller~="player"] .preview-body > .preview-thankyou {
+    margin-top: auto; margin-bottom: auto;
+  }
+  .preview-overlay[data-controller~="player"] .split-card {
+    height: clamp(520px, calc(var(--play-card-h) - 52px), 680px);
+  }
 }
 
 /* Player: slim language switcher bar (replaces the old logo+title nav).
@@ -8796,7 +9827,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   top: -9px; bottom: -9px; left: -5px; right: -5px;
 }
 /* Armed. The player's standard 26px control pill, in the Test Mode yellow of
-   .play-banner-test — the chip looks like where it is about to take you. */
+   .play-test-frame — the chip looks like where it is about to take you. */
 .test-hatch-confirm {
   display: inline-flex; align-items: center;
   height: 26px; padding: 0 11px; border-radius: 100px;
@@ -8816,11 +9847,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
    on .preview-overlay. Deliberately qualified as
    ".preview-overlay[data-font-scale=…] SELECTOR" rather than just
    "[data-font-scale=…] SELECTOR": that extra class of specificity (0,3,0)
-   beats every existing pin on these same selectors — the .phone-bottom
-   compact tier (0,2,0), and the ones inside the narrow-viewport @media
-   blocks (0,1,0–0,2,0) — regardless of source order, so this one block
-   covers every breakpoint without having to be duplicated inside each of
-   them or kept below all of them in the file. ── */
+   beats every existing pin on these same selectors — the ones inside the
+   narrow-viewport @media blocks (0,1,0–0,2,0) — regardless of source order,
+   so this one block covers every breakpoint without having to be duplicated
+   inside each of them or kept below all of them in the file. ── */
 .preview-overlay[data-font-scale="large"] .q-title           { font-size: 25px; }
 .preview-overlay[data-font-scale="larger"] .q-title          { font-size: 28px; }
 .preview-overlay[data-font-scale="large"] .pick-text         { font-size: 17px; }
@@ -10789,4 +11819,417 @@ body.generating-overlay-active .bottom-bar { display: none; }
   width: 38px; height: 38px; border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(17, 20, 34, 0.8); color: #fff; font-size: 15px; cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   M-STUDIO — the phone creator experience (≤767px)
+
+   The studio's own phone layout, kept apart from the player block above on
+   purpose (see the note over that block's media query). Phase 1: dashboard +
+   the share panel as a bottom sheet. The dash-* selectors are class hooks
+   added to inline-styled wrappers in surveys/index.html.erb and
+   _dashboard_card.html.erb — !important where a rule must beat an inline
+   style, and only there.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* ── Dashboard (`/`) ─────────────────────────────────────────────────── */
+
+  .dash-hero    { padding: 22px 16px 26px !important; }
+  .dash-h1      { font-size: 28px !important; }
+  .dash-metrics { padding: 16px 16px 18px !important; }
+  /* Five auto-fit stats collapse to one long column on a phone; two across
+     keeps the strip a strip. The odd fifth tile spans the row. */
+  .dash-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  .dash-metrics-grid > .dash-stat:last-child { grid-column: 1 / -1; }
+  .dash-stat       { padding: 12px 10px !important; }
+  .dash-stat-value { font-size: 26px !important; }
+  .dash-body    { padding: 20px 16px 56px !important; }
+
+  /* Tile actions become real touch targets. The links/buttons carry their
+     size in inline padding (9px ≈ a 36px row) — min-height isn't inline, so
+     no !important needed; inline-flex centres the label inside the taller box. */
+  .dash-card-actions a,
+  .dash-card-actions button {
+    min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* ── Share panel → bottom sheet ──────────────────────────────────────── */
+
+  /* The one .app-modal--below-nav user is the share shell (surveys/index and,
+     later phases, the editor). On a phone it stops floating: pinned to the
+     bottom edge, full width, thumb-reach. The 72px top inset exists to clear
+     the desktop nav — meaningless under a sheet. */
+  .app-modal--below-nav { padding: 0; align-items: flex-end; }
+  .share-modal__shell {
+    max-width: 100%;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+    border-left: none; border-right: none; border-bottom: none;
+    /* No entrance motion on the sheet itself, deliberately: anything that
+       animates the shell's transform can be CAUGHT mid-flight by a renderer
+       that stops ticking (headless test browsers freeze both keyframes and
+       transitions part-way — measured at translateY(18%) and again at 15%),
+       and a displaced sheet is a broken sheet. If entrance polish comes
+       back, animate the BACKDROP's opacity — it has no geometry to strand. */
+  }
+
+  /* Touch sizes inside the panel: the copy/download/QR buttons and the
+     channel chips. Their desktop paddings make ~34–38px controls. */
+  .share-modal .share-btn,
+  .share-modal .share-chip {
+    min-height: 44px;
+    box-sizing: border-box;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .share-modal .share-url,
+  .share-modal .share-input { min-height: 44px; box-sizing: border-box; }
+  /* Readonly URL + Copy stack when a long play URL and a translated Copy
+     label can't share 358px. */
+  .share-modal .share-url-row { flex-wrap: wrap; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   M-STUDIO · PHASE 2 — the phone EDITOR shell ("the card IS the editor")
+
+   The mechanism is classes, not a rewrite. mobile_studio_controller puts
+   `preview-overlay m-studio` on the cards feed at ≤767px:
+
+     .preview-overlay  the PLAYER's own phone scope. Its whole card system —
+                       the 45/55 hero split, the 22px lip, in-card progress,
+                       the 16px input floor — lands on the editor's editable
+                       cards with not one player rule edited. That block is
+                       pinned by player_hero_css_test; this reuses it rather
+                       than restating it, which is the only way the creator's
+                       card and the respondent's card cannot drift.
+     .m-studio         editor-only geometry: full-height snap pages, hidden
+                       desktop rails, the floating chrome below.
+
+   Everything here is inside the ≤767px query AND under one of those classes,
+   so the desktop editor cannot see any of it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The chrome ships on every editor page and is display:none until the
+   controller says this is a phone. Stated OUT HERE, not inside the media
+   query: a rule that only exists below 767px leaves the desktop editor with
+   no rule at all, which is `display: block` — the whole phone chrome drawn
+   over the desktop editor. */
+.m-chrome { display: none; }
+
+@media (max-width: 767px) {
+
+  /* ── The stage ────────────────────────────────────────────────────────── */
+
+  /* The feed's own inline padding (64/84px, for the desktop float bars) is a
+     style attribute, so beating it needs !important. On a phone the card is
+     the screen: no lane, no gaps, no padding. */
+  .m-studio.editor-feed {
+    padding: 0 !important;
+    gap: 0 !important;
+    scroll-snap-type: y mandatory;
+  }
+
+  /* One card per screen. .card-slot is the unit the feed already reorders and
+     inserts into, and now also the unit it PAGES through — the footer's
+     Back/Next scroll between these, and the respondent's own card geometry
+     fills each one. */
+  .m-studio .card-slot {
+    flex: 0 0 100%;
+    min-height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  /* While a keyboard is up the browser scrolls the caret into view; mandatory
+     snap fights it and the card judders. Released for the duration. */
+  .m-studio-on.m-typing .m-studio.editor-feed { scroll-snap-type: none; }
+
+  /* The card fills its page. The desktop lane cap (max-width:1120px, applied
+     via .device-desktop) and the wrap's own chrome spacing both go. */
+  .m-studio .survey-card-wrap,
+  .m-studio .card-col {
+    max-width: 100% !important;
+    width: 100%;
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  /* .split-card's stacked phone form comes from the player block above (it is
+     keyed on .preview-overlay .split-card, which the stage now is). Only the
+     height chain needs saying: the card must fill the page it is on. */
+  .m-studio .card-slot > .survey-card-wrap { height: 100%; }
+
+  /* The per-card rail (drag grip, ▲▼, card number, Why, score, duplicate,
+     delete, add) is a fixed 148px column beside the card — there is no room
+     for it, and every one of its actions is reachable from the chrome or the
+     next phase's card sheet. Hidden, not removed: the overflow menu clicks
+     these very buttons to inherit their handlers and their invariants. */
+  .m-studio .card-rail { display: none; }
+
+  /* The desktop float bars (Leave editor / title / undo / score / device
+     toggle / language, and Journey / Shuffle / Design / Publish) are replaced
+     by the floating chrome below. */
+  .m-studio-on .editor-float-bar { display: none; }
+
+  /* The gate CTAs and cards (consent, thank-you) stay in the feed as pages of
+     their own — they are already snap targets. */
+  .m-studio .gate-card-wrap,
+  .m-studio .gate-cta-row {
+    scroll-snap-align: start;
+    padding: 0 16px;
+  }
+
+  /* ── The floating chrome ──────────────────────────────────────────────── */
+
+  /* Fixed, not absolute: the chrome floats over a stage that is itself
+     position:fixed and pinned to the visual viewport by viewport_height.js. */
+  .m-studio-on .m-chrome { display: block; }
+
+  /* THE ROOM THE CHROME TAKES, said in the token the card already reads.
+     --play-pill-zone is the player's own name for "the strip at the bottom of
+     the card the floating controls own"; .split-right's padding, the last
+     scroller's negative margin and its runway are all derived from it in the
+     player block. The creator's chrome is taller than a respondent's (a dock
+     under the footer), so retuning this ONE number moves all three with it
+     rather than fighting them one rule at a time.
+     122px is where the chrome actually ends — dock 14 + 52, footer 74 + 48 —
+     plus 12px of air, the same margin the player leaves. */
+  .m-studio { --play-pill-zone: calc(env(safe-area-inset-bottom, 0px) + 134px); }
+
+  /* ...and the same trick at the top. The player has no chrome above the card,
+     so its in-card progress bar sits at 10px and the no-hero panel clears it
+     by --play-bar-clear. The creator's card has a floating top bar over that
+     exact strip, so the bar was drawn underneath it and the eyebrow of a
+     no-hero card started level with the title pill. Move the bar below the
+     chrome and restate the clearance from its new position — the player's own
+     token again, so the padding follows the bar rather than being guessed. */
+  .m-studio { --play-bar-clear: calc(60px + 6px + 12px); }
+  /* Matching the player's own selector weight deliberately: its rule is
+     `.preview-overlay .split-card .panel-progress`, and the stage IS a
+     .preview-overlay, so a lighter selector here loses and the bar stays
+     under the chrome. Same three classes, later in the file. */
+  .m-studio .split-card .panel-progress { top: 60px; }
+
+  .m-topbar, .m-footer, .m-dock, .m-menu {
+    position: fixed;
+    z-index: 70;                       /* the stage is 60 */
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .m-topbar {
+    top: max(10px, env(safe-area-inset-top, 0px));
+    inset-inline: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Glass circles and the title pill: dark, translucent, blurred, so they
+     read over a white card, a photo hero or a brand backdrop alike — the same
+     trick .preview-btn-back plays in the player. */
+  .m-circle, .m-title-pill {
+    background: rgba(15,19,36,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    color: #fff;
+  }
+  .m-circle {
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    text-decoration: none;
+  }
+  .m-title-pill {
+    flex: 1 1 auto; min-width: 0;
+    height: 40px; border-radius: 100px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px;
+  }
+  .m-live-dot {
+    flex: 0 0 auto;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+  }
+  .m-live-dot.is-live { background: #01EACB; box-shadow: 0 0 8px rgba(1,234,203,0.9); }
+  .m-title-text {
+    flex: 1 1 auto; min-width: 0;
+    font-family: "ABeeZee", sans-serif;
+    font-size: 0.8125rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    outline: none;
+  }
+  /* Renaming needs the whole name, so the pill stops truncating while it has
+     focus — and wraps rather than scrolling sideways under a thumb. */
+  .m-title-text:focus {
+    white-space: normal; overflow: visible; text-overflow: clip;
+  }
+  .m-title-pill:focus-within {
+    height: auto; min-height: 40px;
+    padding-block: 8px;
+    box-shadow: 0 0 0 2px rgba(1,234,203,0.65);
+  }
+
+  /* Small, quiet, and on the trailing edge under the top bar — it is the one
+     thing on this screen that is neither the card nor a control, so it says
+     its word and takes no more room than that. */
+  .m-save-chip {
+    position: fixed;
+    z-index: 70;
+    top: calc(max(10px, env(safe-area-inset-top, 0px)) + 46px);
+    /* Leading edge, under the back button: the trailing edge belongs to the
+       overflow menu, which drops from the ⋯ directly onto this spot. */
+    inset-inline-start: 12px;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(15,19,36,0.55);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(8px);
+    font-family: "ABeeZee", sans-serif;
+    line-height: 1.5;
+    white-space: nowrap;
+    transition: opacity 0.18s ease;
+  }
+  .m-studio-on.m-typing .m-save-chip { opacity: 0.55; }
+
+  .m-menu {
+    top: calc(max(10px, env(safe-area-inset-top, 0px)) + 48px);
+    inset-inline-end: 12px;
+    min-width: 190px;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(23,27,48,0.94);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column;
+  }
+  .m-menu[hidden] { display: none; }
+  .m-menu-item {
+    min-height: 44px;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    border: none; background: none; cursor: pointer;
+    border-radius: 10px;
+    font-family: "ABeeZee", sans-serif; font-size: 0.875rem;
+    color: #fff; text-align: start;
+  }
+  .m-menu-item:disabled { opacity: 0.4; cursor: default; }
+  .m-menu-danger { color: #FF6B83; }
+
+  /* The deck footer IS the respondent's footer — .preview-btn styling comes
+     from the player block, since the chrome sits inside the same
+     .preview-overlay scope. Only the box needs stating. */
+  .m-footer {
+    inset-inline: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
+    height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    padding-inline: clamp(12px, 4vw, 26px);
+    pointer-events: none;              /* only the controls take touches */
+  }
+  .m-footer > * { pointer-events: auto; }
+  .m-progress-chip {
+    font-family: "Alata", sans-serif; font-size: 0.75rem;
+    color: #fff;
+    background: rgba(20,23,38,0.45);
+    backdrop-filter: blur(6px);
+    border-radius: 100px;
+    padding: 6px 14px;
+    white-space: nowrap;
+  }
+
+  /* The dock — one glass bar, thumb-height, centred. */
+  .m-dock {
+    inset-inline: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    display: flex; justify-content: center;
+    pointer-events: none;              /* the bar itself takes the touches */
+  }
+  /* The glass bar HUGS its buttons — a real element rather than a
+     pseudo-element sized off the viewport, because how wide the dock should be
+     is a question about how many buttons it has (a locked Verto has two, an
+     editable one four) and only the box holding them can answer it. */
+  .m-dock-bar {
+    pointer-events: auto;
+    display: flex; align-items: center; gap: 2px;
+    padding: 6px;
+    border-radius: 100px;
+    background: rgba(15,19,36,0.74);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .m-dock-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: none; background: none; color: #fff; cursor: pointer;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+  .m-dock-add {
+    background: #01EACB; color: #0B0E1C;
+    box-shadow: 0 4px 14px rgba(1,234,203,0.45);
+  }
+  .m-dock-share { color: #fff; }
+
+  /* Out of the way while the creator works. Typing hides everything but the
+     top bar (which carries the title being edited); scrolling just dims. */
+  .m-studio-on.m-scrolling .m-dock,
+  .m-studio-on.m-scrolling .m-footer { opacity: 0.35; }
+  .m-studio-on.m-typing .m-dock,
+  .m-studio-on.m-typing .m-footer {
+    opacity: 0; pointer-events: none; transform: translateY(8px);
+  }
+
+  /* ── The right column becomes a bottom sheet ──────────────────────────── */
+
+  /* Design / Publish & share / answer-type / quiz / tokens all live in this
+     one column, each already posting to its own endpoint. At phone width it
+     stops being a floating 430px column and becomes a sheet over the dimmed
+     card — same DOM, same controllers, same forms. */
+  .m-studio-on .editor-grid.is-panel-open { grid-template-columns: 1fr !important; }
+  .m-studio-on .right-column {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    top: auto;
+    z-index: 80;
+    width: 100%;
+    max-height: 88dvh;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    background: #272D4A;
+    box-shadow: 0 -12px 40px rgba(0,0,0,0.45);
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .m-studio-on .right-column > .type-panel {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+  /* The folder-tab strip is desktop furniture; on a sheet the views stack
+     under their own headings and the ✕ closes it. */
+  .m-studio-on .right-tabs { padding-inline: 12px 46px; }
+
+  /* ── Touch affordances on the card itself ─────────────────────────────── */
+
+  /* Per-option controls are hover-revealed on desktop. The existing
+     (hover: none) block already reveals them; here they get real sizes, since
+     on a phone they are the only way to reach those actions. */
+  .m-studio .option-style-btn,
+  .m-studio .pick-item-delete {
+    min-width: 32px; min-height: 32px;
+  }
+  .m-studio .add-media-fab,
+  .m-studio .add-bg-fab,
+  .m-studio .add-animation-fab,
+  .m-studio .split-left-design-prompt { min-height: 40px; }
 }

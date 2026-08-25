@@ -171,7 +171,7 @@
   <% end %>
 
   <% if archived %>
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 12px;">
+    <div class="dash-card-actions" style="display:flex;align-items:center;gap:8px;padding:10px 16px 12px;">
       <%= link_to t("dashboard_card.view_results"), survey_results_path(survey),
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;" %>
       <%# Archiving was always reversible — deleted_at is a soft flag and the
@@ -200,8 +200,10 @@
 
         data-panel-url, not data-share-url: inside the panel that attribute
         already means the /play link being handed to the OS share sheet. %>
+    <%# dash-card-actions is a phone hook only (M-STUDIO block): on ≤767px it
+        raises these rows' links/buttons to 44px touch targets. No desktop CSS. %>
     <% if published && current_membership&.admin? %>
-      <div style="padding:10px 16px 0;">
+      <div class="dash-card-actions" style="padding:10px 16px 0;">
         <button type="button"
                 data-action="click->share-modal#open"
                 data-panel-url="<%= share_survey_path(survey) %>"
@@ -211,7 +213,7 @@
       </div>
     <% end %>
 
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 0;">
+    <div class="dash-card-actions" style="display:flex;align-items:center;gap:8px;padding:10px 16px 0;">
       <%= link_to t("dashboard_card.edit"), survey_path(survey),
             style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",
             onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
@@ -235,7 +237,7 @@
       <% end %>
     </div>
 
-    <div style="padding:8px 16px 12px;">
+    <div class="dash-card-actions" style="padding:8px 16px 12px;">
       <%= link_to "▶ #{t("dashboard_card.preview")}", preview_survey_path(survey),
             style: "display:block;width:100%;box-sizing:border-box;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;",
             onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",

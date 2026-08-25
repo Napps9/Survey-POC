@@ -1,0 +1,124 @@
+<%# The phone editor's floating chrome — everything the creator gets besides
+    the card itself. display:none until the mobile-studio controller puts
+    .m-studio-on on the editor root (which it only does ≤767px), so desktop
+    carries these ~40 elements inert and invisible. All styling lives in the
+    M-STUDIO block of application.css.
+
+    Every action here DELEGATES: publish-panel/editor-panel open the same
+    right column (a bottom sheet at phone width), add/duplicate/delete run
+    the active card's own rail buttons, rename mirrors into the desktop
+    title span. This partial owns markup, never behaviour. %>
+<% live_locked = @survey.editing_locked? %>
+<div class="m-chrome" data-mobile-studio-target="chrome">
+
+  <%# ── Top bar: back · title (tap to rename) · preview · more ── %>
+  <div class="m-topbar">
+    <%= link_to root_path, class: "m-circle",
+          title: t("editor.m_back_to_dashboard", default: "Back to My Vertos"),
+          "aria-label": t("editor.m_back_to_dashboard", default: "Back to My Vertos") do %>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    <% end %>
+
+    <div class="m-title-pill">
+      <span class="m-live-dot<%= @survey.published? ? " is-live" : "" %>" aria-hidden="true"></span>
+      <span class="m-title-text"
+            data-mobile-studio-target="titleText"
+            <% unless live_locked %>
+            contenteditable="true" spellcheck="false" enterkeyhint="done"
+            data-action="input->mobile-studio#titleEdited keydown->mobile-studio#titleKeydown blur->mobile-studio#titleBlurred"
+            <% end %>><%= @survey.title %></span>
+    </div>
+
+    <%= link_to preview_survey_path(@survey), class: "m-circle",
+          title: t("editor.m_preview", default: "Preview as a respondent"),
+          "aria-label": t("editor.m_preview", default: "Preview as a respondent") do %>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+    <% end %>
+
+    <button type="button" class="m-circle"
+            title="<%= t("editor.m_more", default: "More") %>"
+            aria-label="<%= t("editor.m_more", default: "More") %>"
+            data-action="click->mobile-studio#toggleMenu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>
+    </button>
+  </div>
+
+  <%# Save state. The class list on the inner span is rewritten by
+      survey-editor#flash, so the chip's own styling lives on the wrapper —
+      the same split the desktop pill uses. %>
+  <div class="m-save-chip">
+    <span class="text-xs text-aquamarine" role="status"
+          data-survey-editor-target="status"><%= t("editor.all_saved", default: "Saved") %></span>
+  </div>
+
+  <%# ── Overflow menu ── %>
+  <div class="m-menu" hidden data-mobile-studio-target="menu">
+    <button type="button" class="m-menu-item" disabled
+            data-survey-editor-target="undoBtn"
+            data-action="click->survey-editor#undoClick click->mobile-studio#closeMenu">
+      <%= t("editor.undo", default: "Undo") %>
+    </button>
+    <% unless live_locked %>
+      <button type="button" class="m-menu-item"
+              data-action="click->mobile-studio#duplicateActive">
+        <%= t("editor.duplicate_card", default: "Duplicate") %>
+      </button>
+      <button type="button" class="m-menu-item m-menu-danger"
+              data-action="click->mobile-studio#deleteActive">
+        <%= t("editor.m_delete_card", default: "Delete this card") %>
+      </button>
+    <% end %>
+  </div>
+
+  <%# ── Deck footer: the respondent's own Back / Next, driving the pager ── %>
+  <div class="m-footer">
+    <button type="button" class="preview-btn preview-btn-back"
+            data-action="click->mobile-studio#prev"><%= t("player.back") %></button>
+    <span class="m-progress-chip" data-mobile-studio-target="progressChip" aria-live="polite"></span>
+    <button type="button" class="preview-btn preview-btn-next"
+            data-action="click->mobile-studio#next"><%= t("player.next") %></button>
+  </div>
+
+  <%# ── Dock: Design · Add · Settings · Share (Cards joins with the deck
+      sheet in the next phase — never ship a button whose meaning will
+      change under people's thumbs) ── %>
+  <div class="m-dock">
+   <div class="m-dock-bar">
+    <% unless live_locked %>
+      <button type="button" class="m-dock-btn"
+              title="<%= t("editor.design") %>" aria-label="<%= t("editor.design") %>"
+              data-action="click->publish-panel#openDesign click->editor-panel#open">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 2-2c0-.5-.2-1-.5-1.4-.4-.4-.5-.9-.5-1.4a2 2 0 0 1 2-2h2.1A3.7 3.7 0 0 0 22 10.6C21.7 6.3 17.3 3 12 3z"/><circle cx="7.6" cy="11.4" r="1.2" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.4" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.2" cy="7.4" r="1.2" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button type="button" class="m-dock-btn m-dock-add"
+              title="<%= t("editor.add_question") %>" aria-label="<%= t("editor.add_question") %>"
+              data-action="click->mobile-studio#addAfterActive">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    <% end %>
+    <button type="button" class="m-dock-btn"
+            title="<%= t("editor.publish_share") %>" aria-label="<%= t("editor.publish_share") %>"
+            data-action="click->publish-panel#open click->editor-panel#open">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="14.5" cy="7" r="2.3" fill="#272D4A"/><circle cx="8.5" cy="12" r="2.3" fill="#272D4A"/><circle cx="16.5" cy="17" r="2.3" fill="#272D4A"/></svg>
+    </button>
+    <% if current_membership&.admin? %>
+      <%# The full share panel (links, channels, QR) — the same frame the
+          dashboard opens, served by SurveyLinksController (admin-gated). %>
+      <button type="button" class="m-dock-btn m-dock-share"
+              title="<%= t("share_modal.eyebrow") %>" aria-label="<%= t("share_modal.eyebrow") %>"
+              data-action="click->share-modal#open"
+              data-panel-url="<%= share_survey_path(@survey) %>">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8 8l4-4 4 4"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+      </button>
+    <% else %>
+      <%# Non-admins can't open the share frame; the publish panel's Status
+          block (publish, copy link, QR) is the un-gated share surface. %>
+      <button type="button" class="m-dock-btn m-dock-share"
+              title="<%= t("editor.publish_share") %>" aria-label="<%= t("editor.publish_share") %>"
+              data-action="click->publish-panel#open click->editor-panel#open">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4"/><path d="M8 8l4-4 4 4"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>
+      </button>
+    <% end %>
+   </div>
+  </div>
+</div>

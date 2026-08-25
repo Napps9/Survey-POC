@@ -31,8 +31,6 @@ vi:
     add_option: Thêm tùy chọn
     new_option: Tùy chọn mới
     style_option: Tùy chỉnh câu trả lời này
-    new_response: "Câu trả lời mới"
-    add_response: "Thêm câu trả lời"
     remove_response: "Xóa câu trả lời này"
     remove_option: "Xoá thẻ"
     response_scale: "Số câu trả lời mỗi phát biểu"
@@ -64,12 +62,13 @@ vi:
     char_limit_option: '%{n} ký tự'
     allow_other: Cho phép câu trả lời tự do "Khác"
     required: "Câu hỏi bắt buộc"
+    ask_once: "Hỏi một lần — bỏ qua khi chơi lại sau khi đã trả lời"
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
     mark_correct: "Đánh dấu câu trả lời đúng"
     rating_star: "%{number} trên %{total}"
     correct_pick_hint: "Chạm vào (các) tùy chọn mà người chơi phải chọn để đúng."
-    correct_tap_hint: "Đặt kiểu vuốt đúng cho mỗi phát biểu."
+    correct_tap_hint: "Đặt câu trả lời đúng cho mỗi phát biểu."
     correct_scale_hint: "Chọn giá trị được tính là đúng."
     accepted_answers: "Câu trả lời được chấp nhận"
     accepted_answers_hint: "Mỗi dòng một câu — bất kỳ kết quả khớp nào (không phân biệt hoa thường) đều đúng."
@@ -86,11 +85,11 @@ vi:
       nps: "Kéo chất lỏng"
       multiple_choice: "Chọn một"
       select_many: "Chọn tất cả đáp án phù hợp"
-      prioritise: "Chạm và kéo để sắp xếp theo thứ tự ưu tiên"
+      prioritise: "Sắp xếp theo thứ tự ưu tiên"
       yes_no: "Chọn một"
       select_one_grid: "Chọn một"
       select_many_grid: "Chọn tất cả đáp án phù hợp"
-      tap_card: "Vuốt để trả lời"
+      tap_card: "Chạm để trả lời"
       open_ended: "Nhập câu trả lời của bạn"
       contact_form: "Chia sẻ thông tin của bạn"
       scenario: "Đọc tiếp rồi chọn"
@@ -104,7 +103,7 @@ vi:
       yes_no: "CÓ / KHÔNG"
       select_one_grid: "LƯỚI HÌNH ẢNH"
       select_many_grid: "LƯỚI HÌNH ẢNH"
-      tap_card: "VUỐT"
+      tap_card: "CHẠM"
       scenario: "TÌNH HUỐNG"
       open_ended: "VĂN BẢN TỰ DO"
       contact_form: "LIÊN HỆ"
@@ -121,7 +120,7 @@ vi:
       yes_no: "CHỌN MỘT ĐÁP ÁN"
       select_one_grid: "CHỌN MỘT ĐÁP ÁN"
       select_many_grid: "CHỌN TẤT CẢ ĐÁP ÁN PHÙ HỢP"
-      tap_card: "VUỐT ĐỂ TRẢ LỜI"
+      tap_card: "CHẠM ĐỂ TRẢ LỜI"
       scenario: "ĐỌC TIẾP RỒI CHỌN"
       open_ended: "NHẬP CÂU TRẢ LỜI CỦA BẠN"
       contact_form: "CHIA SẺ THÔNG TIN CỦA BẠN"
@@ -130,7 +129,7 @@ vi:
       select_many: "Chọn nhiều (danh sách)"
       select_one_grid: "Chọn một (lưới)"
       select_many_grid: "Chọn nhiều (lưới)"
-      tap_card: "Vuốt"
+      tap_card: "Chạm"
       range: "Thang đo"
       rating: "Đánh giá"
       nps: "NPS"
@@ -256,6 +255,15 @@ vi:
     respondent_code_note: 'Chúng tôi không bao giờ thấy mã này — nó được lưu dưới dạng băm một chiều, chỉ để đối chiếu câu trả lời của bạn với chính bạn lần sau.'
     respondent_code_continue: 'Tiếp tục'
     respondent_code_skip: 'Bỏ qua'
+    contact_title: "Để lại thông tin của bạn"
+    contact_body: "Nếu bạn muốn giữ liên lạc, hãy cho chúng tôi biết bạn là ai. Không bắt buộc — và được lưu tách biệt với câu trả lời của bạn."
+    contact_name: "Tên"
+    contact_email: "Email"
+    contact_company: "Công ty"
+    contact_industry: "Ngành"
+    contact_note: "Chỉ hỏi một lần trên thiết bị này. Thông tin của bạn được lưu tách biệt với câu trả lời, chỉ liên kết với tên người chơi của bạn."
+    contact_continue: "Tiếp tục"
+    contact_skip: "Tiếp tục mà không cần thông tin"
     comparison_title: Câu trả lời của bạn so với mọi người
     back: "← Quay lại"
     next: Tiếp →
@@ -379,12 +387,16 @@ vi:
       option_color: "Màu sắc"
       option_color_hex: "Mã hex"
       option_emoji: "Emoji"
-      option_icon: "Biểu tượng"
+      option_icon: "Biểu tượng thể thao"
+      option_icon_note: "Thư viện chỉ có thể thao. Với chủ đề khác, hãy dùng emoji ở trên."
       option_style_reset: "Đặt lại"
       option_style_done: "Xong"
       add_to_library: "Thêm vào thư viện"
       library_saving: "Đang lưu…"
       library_save_failed: "Không thể lưu vào thư viện"
+      remove_from_library: "Xoá khỏi thư viện"
+      library_remove_confirm: "Xoá hình ảnh này khỏi thư viện thương hiệu của bạn? Mọi thẻ đang dùng nó sẽ mất nó."
+      library_remove_failed: "Không thể xoá khỏi thư viện"
       confirm_delete: "Xóa thật chứ?"
       unsaved: Thay đổi chưa lưu
       undo_restored: 'Đã khôi phục thẻ'
@@ -997,6 +1009,10 @@ vi:
     all_saved: 'Đã lưu'
     leave_editor: 'Rời trình chỉnh sửa'
     undo: 'Hoàn tác'
+    m_back_to_dashboard: "Quay lại Verto của tôi"
+    m_preview: "Xem trước như người trả lời"
+    m_more: "Thêm"
+    m_delete_card: "Xóa thẻ này"
     duplicate_card: 'Nhân bản'
     emoji_pick: "Chọn emoji"
     brand_font: "Kiểu chữ"
@@ -1093,6 +1109,15 @@ vi:
     shuffle: Xáo trộn
     shuffle_title: Chọn lại hình ảnh từ thư viện Verto
     shuffle_confirm: Xáo trộn hình ảnh? Các hình ảnh hiện tại của bạn sẽ được thay thế bằng bộ ảnh mới từ thư viện.
+    shuffle_direction_toggle_title: "Thêm định hướng cho lần xáo trộn này"
+    shuffle_direction_heading: "Định hướng lần xáo trộn này"
+    shuffle_direction_hint: "Không bắt buộc. Hãy cho Verto biết bạn muốn gì ở hình ảnh và hoạt ảnh — một không khí, một bối cảnh, hoặc điều cần tránh."
+    shuffle_direction_label: "Định hướng"
+    shuffle_direction_placeholder: "vd. ánh sáng tự nhiên ấm, ngoài trời, nhóm nhỏ, không văn phòng"
+    shuffle_direction_toward: "Lần xáo trộn trước đã tìm: %{terms}"
+    shuffle_direction_avoiding: "và loại trừ: %{terms}"
+    shuffle_direction_clear: "Xóa"
+    shuffle_direction_apply: "Xáo trộn theo cách này"
     publish_share: Xuất bản & chia sẻ →
     answer_type: Loại câu trả lời
     select_card: Chọn một thẻ để thay đổi loại của nó
@@ -1171,7 +1196,7 @@ vi:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Quét để mở Verto này. Tải mã về để dùng cho áp phích và slide."
-    download_qr: "Tải QR (SVG)"
+    download_qr: "Tải QR (%{file_format})"
     download_qr_short: "Mã QR"
     custom_url: "URL tùy chỉnh"
     custom_url_placeholder: "summer-feedback-2026"

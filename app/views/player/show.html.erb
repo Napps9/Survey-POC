@@ -100,6 +100,11 @@
      style="<%= verto_backdrop_style_attr(@survey) %>"
      dir="<%= SupportedLocales.dir(@display_locale) %>"
      data-controller="player"
+     <%# The tap stack announces its last statement (tap-stack:complete) and
+         its Reset; the player answers with a paced auto-advance — the
+         respondent has nothing left to do on the card, so after a natural
+         beat the deck moves on for them (guards live in tapStackCompleted). %>
+     data-action="tap-stack:complete->player#tapStackCompleted tap-stack:cleared->player#cancelAutoAdvance"
      data-player-forms-value="<%= @survey.forms_mode? %>"
      data-player-progress-url-value="<%= progress_url %>"
      data-player-submit-url-value="<%= submit_url %>"
@@ -119,6 +124,7 @@
      data-player-token-back-nav-value="<%= @survey.token_back_nav_enabled? %>"
      data-player-leaderboard-value="<%= leaderboard_mode %>"
      data-player-leaderboard-url-value="<%= leaderboard_url %>"
+     data-player-contact-value="<%= @survey.contact_form_enabled? %>"
      data-player-retake-policy-value="<%= @survey.leaderboard_retake_policy %>"
      data-player-logic-value="<%= logic_mode %>"
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
@@ -128,21 +134,26 @@
          there twice over — the partial isn't rendered, and the controller has
          nowhere to send anyone. Blank is also what Test Mode's "no live endpoint
          may reach this page" test already asserts of every *-url-value. %>
+     <%# The survey-level consent gate renders as a bottom banner over the
+         first question (player/_consent_banner). This attribute is the whole
+         state machine: while present the deck is inert and dimmed and the
+         footer nav is hidden (CSS keys off it); agreeing removes it. %>
+     <%= "data-consent-pending".html_safe if @survey.show_consent_gate? %>
      data-player-test-mode-url-value="<%= preview_mode ? "" : live_test_survey_url(play_token) %>">
 
   <% if @test_mode %>
-    <%# Test Mode strip: viewers are unauthenticated testers, so no exit link
-        into the studio — just what this link is and that nothing is saved.
-        The one exception is @live_test (PlayerController#live_test_show): that
-        person arrived from a real play link and params[:token] still IS it, so
-        there is somewhere honest to send them back to. %>
-    <div class="play-banner play-banner-test">
-      <span class="play-banner-text">⚗ <%= t("player.test_mode_banner") %></span>
-      <% if @live_test %>
-        <%= link_to t("player.exit_test_mode"), play_survey_path(params[:token]),
-                    class: "play-banner-link" %>
-      <% end %>
-    </div>
+    <%# Test Mode used to be a strip across the top, and a strip is height:
+        ~31px off every card, on the one surface where the card is already
+        competing with a notch. It is a yellow ring around the whole viewport
+        now, drawn by .play-test-frame at the foot of this overlay — out of
+        flow, so it costs the card nothing.
+        The sentence survives here, clipped. A ring says "something is
+        different"; it cannot say "nothing you enter is saved", and that is
+        the only place a tester is told so. Visually hidden rather than
+        deleted, and rather than `display: none`, which would take it from a
+        screen reader too. The ⚗ glyph is gone with the strip: it was never
+        aria-hidden, so it was being announced as a word. %>
+    <p class="play-test-note"><%= t("player.test_mode_banner") %></p>
   <% elsif preview_mode %>
     <div class="play-banner play-banner-preview">
       <span class="play-banner-text">▶ <%= t("player.preview_banner") %></span>
@@ -178,74 +189,93 @@
     <%= render "player/font_scale_control" %>
   </div>
 
-  <div class="preview-body">
-    <%# Consent gate as the first card in the deck (reuses the creator's consent
-        text). It carries NO data-card-index, so it's never captured as an answer
-        and never shifts the answer keys, which align to the @survey.cards index. %>
-    <%# show_consent_gate? rather than consent_required?: a Verto that collects
-        personal data (the auto-appended birth date / location / gender tail)
-        but has no creator-authored gate still gets one, with default wording.
-        See Survey#default_consent_gate? for why this is enforced here rather
-        than at publish. %>
-    <% if @survey.show_consent_gate? %>
-      <div class="preview-card"
+  <%# inert while the consent banner is pending: the first question is VISIBLE
+      from the first paint — that is the point of the banner — but nothing in
+      the deck may be answerable, focusable or read by AT until a choice is
+      made. The player controller removes it together with the attribute. %>
+  <div class="preview-body"<%= " inert".html_safe if @survey.show_consent_gate? %>>
+    <%# The survey-level consent gate is NOT a card any more. It used to be a
+        full-screen pseudo-card pinned here, ahead of the deck; it is now the
+        bottom banner rendered after the footer (player/_consent_banner), so
+        the respondent lands straight on the first question. show_consent_gate?
+        rather than consent_required?: a Verto that collects personal data (the
+        auto-appended birth date / location / gender tail) but has no
+        creator-authored gate still gets one, with default wording. See
+        Survey#default_consent_gate? for why this is enforced here rather than
+        at publish. %>
+
+    <%# Respondent-code gate — under the consent banner when both are on, before
+        the first question. It carries NO data-card-index, so it never becomes an
+        answer and never shifts the answer keys, which align to @survey.cards positions.
+        The code is sent with the next save and immediately hashed; the plaintext
+        is never stored, logged, or returned. %>
+    <%# The FIRST card target ships .active from the server. Cards are
+        display:none until .active, and the class used to be applied only by
+        the player controller's first _update() — so on a cold cache over slow
+        wifi the respondent stared at an empty brand background for the whole
+        module waterfall (measured 6.5s at 400ms RTT) and read it as broken.
+        The controller re-runs the toggle at boot, so this is purely the
+        first paint arriving with the HTML; JS still owns navigation. %>
+
+    <%# Contact gate — a leading pseudo-card like the respondent-code gate
+        below: it carries NO data-card-index, so what's typed here can never
+        become an answer or shift the answer keys. The details ride the
+        ordinary saves into their own table (ContactDetail), keyed by the same
+        per-survey digest that names this device on the leaderboard — that
+        digest is the only link between the volunteered identity and the
+        pseudonymous responses. First visit only: submitting OR skipping
+        marks the device done and return visits start past it. A Verto with
+        this gate cannot also ask the neurodiversity question
+        (Survey#contact_form_excludes_neurodiversity). %>
+    <% if @survey.contact_form_enabled? %>
+      <div class="preview-card active"
            data-player-target="card"
-           data-card-type="consent_card">
-        <%# Rendered as the standard split-card so consent is in keeping with the
-            question-card design (branded left panel — with the creator's chosen
-            design image when one is set — + content on the right). %>
+           data-card-type="contact_gate_card">
         <div class="split-card">
-          <div class="split-left">
-            <% if @survey.consent_image.present? %>
-              <div class="split-left-img" style="background-image:url('<%= @survey.consent_image %>');"></div>
-              <div class="split-left-overlay"></div>
-              <% if @survey.consent_image_credit.present? %>
-                <div class="split-left-credit">
-                  <% if @survey.consent_image_credit_url.present? %>
-                    <a href="<%= @survey.consent_image_credit_url %>" target="_blank" rel="noopener nofollow">Photo by <%= @survey.consent_image_credit %></a>
-                  <% else %>
-                    Photo by <%= @survey.consent_image_credit %>
-                  <% end %>
-                </div>
-              <% end %>
-            <% end %>
-            <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
-          </div>
+          <div class="split-left"><div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div></div>
           <div class="split-right">
-            <div data-player-target="consentMain" class="play-consent-main">
+            <div class="play-consent-main">
               <div class="q-header">
-                <div class="q-title"><%= t("player.consent_title") %></div>
+                <div class="q-title"><%= t("player.contact_title") %></div>
               </div>
-              <div class="play-consent-body"><%= safe_join(@survey.effective_consent_text.to_s.split("\n"), tag.br) %></div>
-              <%# The privacy policy is linked from every consent gate, not just
-                  the default one — agreeing to share a birth date and a location
-                  should always be one tap from how that data is handled. %>
+              <div class="play-consent-body contact-gate-body"><%= t("player.contact_body") %></div>
+              <%# One flex child, not four: .play-consent-main's 16px gap
+                  between every input plus each input's own 14px margin made
+                  the gate a tower. Inside a wrapper the inputs space
+                  themselves and the gap is paid once. %>
+              <div class="contact-gate-fields">
+                <input type="text" class="respondent-code-input" data-player-target="contactName"
+                       autocomplete="name" maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_name") %>" placeholder="<%= t("player.contact_name") %>" />
+                <input type="email" class="respondent-code-input" data-player-target="contactEmail"
+                       autocomplete="email" inputmode="email" maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_email") %>" placeholder="<%= t("player.contact_email") %>" />
+                <input type="text" class="respondent-code-input" data-player-target="contactCompany"
+                       autocomplete="organization" maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_company") %>" placeholder="<%= t("player.contact_company") %>" />
+                <input type="text" class="respondent-code-input" data-player-target="contactIndustry"
+                       maxlength="<%= ContactDetail::MAX_FIELD %>"
+                       aria-label="<%= t("player.contact_industry") %>" placeholder="<%= t("player.contact_industry") %>" />
+              </div>
+              <div class="respondent-code-note"><%= t("player.contact_note") %></div>
               <div class="play-consent-legal">
                 <%= link_to t("player.consent_privacy_link"), privacy_path,
                             target: "_blank", rel: "noopener" %>
               </div>
               <div class="play-consent-actions">
                 <button type="button" class="play-consent-agree"
-                        data-action="click->player#agreeConsent"><%= t("player.consent_agree") %></button>
+                        data-action="click->player#submitContactDetails"><%= t("player.contact_continue") %></button>
                 <button type="button" class="play-consent-decline"
-                        data-action="click->player#declineConsent"><%= t("player.consent_decline") %></button>
+                        data-action="click->player#skipContactDetails"><%= t("player.contact_skip") %></button>
               </div>
-            </div>
-            <div class="play-consent-declined hidden" data-player-target="consentDeclined">
-              <%= t("player.consent_declined") %>
             </div>
           </div>
         </div>
       </div>
     <% end %>
 
-    <%# Respondent-code gate — after consent, before the first question. Like the
-        consent card it carries NO data-card-index, so it never becomes an answer
-        and never shifts the answer keys, which align to @survey.cards positions.
-        The code is sent with the next save and immediately hashed; the plaintext
-        is never stored, logged, or returned. %>
     <% if @survey.respondent_code_enabled? %>
-      <div class="preview-card"
+      <div class="preview-card<%= " active" unless @survey.contact_form_enabled? %>"
            data-player-target="card"
            data-card-type="respondent_code_card">
         <div class="split-card">
@@ -275,6 +305,7 @@
       </div>
     <% end %>
 
+    <% first_deck_card = !@survey.respondent_code_enabled? && !@survey.contact_form_enabled? %>
     <% cards.each do |card, idx| %>
       <%
         type    = card["type"].to_s
@@ -284,6 +315,8 @@
         prev_q += 1 if is_q
         prog   = total_q > 0 ? ((prev_q.to_f / total_q) * 100).round : 5
         prog   = 5 unless is_q
+        server_active = first_deck_card
+        first_deck_card = false
       %>
       <%# A graded card carries only a boolean flag in the live player — never
           its correct answer (that's revealed by the server after answering).
@@ -291,7 +324,7 @@
           A card's token config is NOT secret (unlike a quiz's correct answer)
           — it's public config the creator set, so it rides along even live,
           letting the player compute a running total client-side. %>
-      <div class="preview-card"
+      <div class="preview-card<%= " active" if server_active %>"
            data-player-target="card"
            data-card-index="<%= idx %>"
            data-card-cid="<%= card['cid'].to_s %>"
@@ -302,7 +335,8 @@
            <% if preview_mode && graded %>data-card-correct="<%= QuizGrading.correct_display(card).to_json %>" data-card-explanation="<%= card['explanation'] %>"<% end %>
            data-card-awards-tokens="<%= awards_tokens %>"
            <% if awards_tokens %>data-card-tokens="<%= card['tokens'].to_json %>" data-card-token-award="<%= card['token_award'].to_json %>" data-card-token-award-mode="<%= card['token_award_mode'] %>"<% end %>
-           data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>">
+           data-card-required="<%= (is_q && card['required']) ? 'true' : 'false' %>"
+           data-card-ask-once="<%= (is_q && card['ask_once']) ? 'true' : 'false' %>">
         <%= render "player/play_card", card: card, progress: prog, card_index: idx,
               locale: @display_locale, default_locale: @survey.default_locale %>
       </div>
@@ -518,5 +552,30 @@
             data-player-target="finishBtn"
             data-action="click->player#finish"><%= t("player.submit") %></button>
   </div>
+
+  <% if @survey.show_consent_gate? %>
+    <%= render "player/consent_banner" %>
+  <% end %>
+
+  <%# The Test Mode ring. Last child so it paints over everything it has to
+      outline — the footer, the required-answer hint, the consent banner — and
+      absolutely positioned so it takes no height from the card (see
+      .play-test-frame; a border on the overlay itself would be inside its
+      border-box and eat exactly the pixels this change is giving back).
+      pointer-events: none, or it swallows every tap meant for the card
+      underneath; the exit link opts back in.
+      Viewers are unauthenticated testers, so there is normally nowhere to
+      send them. The exception is @live_test (PlayerController#live_test_show):
+      that person arrived from a real play link and params[:token] still IS
+      it, so there is somewhere honest to go back to — and with the strip gone
+      this pill is the only way. %>
+  <% if @test_mode %>
+    <div class="play-test-frame">
+      <% if @live_test %>
+        <%= link_to t("player.exit_test_mode"), play_survey_path(params[:token]),
+                    class: "play-test-exit" %>
+      <% end %>
+    </div>
+  <% end %>
 
 </div>

@@ -31,8 +31,6 @@ he:
     add_option: הוסף אפשרות
     new_option: אפשרות חדשה
     style_option: עיצוב תשובה זו
-    new_response: "תשובה חדשה"
-    add_response: "הוספת תשובה"
     remove_response: "הסרת תשובה זו"
     remove_option: "מחיקת כרטיס"
     response_scale: "תשובות לכל היגד"
@@ -64,12 +62,13 @@ he:
     char_limit_option: '%{n} תווים'
     allow_other: אפשר תשובה חופשית מסוג ״אחר״
     required: "שאלת חובה"
+    ask_once: "לשאול פעם אחת — מדולג במשחקים חוזרים לאחר שנענתה"
     other: אחר
     other_placeholder: ספר לנו במילים שלך…
     mark_correct: "סמן את התשובה הנכונה"
     rating_star: "%{number} מתוך %{total}"
     correct_pick_hint: "הקש על האפשרות/אפשרויות שעל השחקנים לבחור כדי לצדוק."
-    correct_tap_hint: "הגדר את ההחלקה הנכונה לכל היגד."
+    correct_tap_hint: "הגדר את התשובה הנכונה לכל היגד."
     correct_scale_hint: "בחר את הערך שנחשב נכון."
     accepted_answers: "תשובות מתקבלות"
     accepted_answers_hint: "אחת בכל שורה — כל התאמה (ללא תלות באותיות גדולות/קטנות) נכונה."
@@ -86,11 +85,11 @@ he:
       nps: "גררו את הנוזל"
       multiple_choice: "בחר אפשרות אחת"
       select_many: "סמן את כל האפשרויות המתאימות"
-      prioritise: "לחץ וגרור כדי לסדר לפי סדר עדיפויות"
+      prioritise: "סדר לפי סדר עדיפויות"
       yes_no: "בחר אפשרות אחת"
       select_one_grid: "בחר אפשרות אחת"
       select_many_grid: "סמן את כל האפשרויות המתאימות"
-      tap_card: "החלק כדי לענות"
+      tap_card: "הקש כדי לענות"
       open_ended: "הקלד את התשובה שלך"
       contact_form: "שתפו את הפרטים שלכם"
       scenario: "המשך לקרוא, ואז בחר"
@@ -104,7 +103,7 @@ he:
       yes_no: "כן / לא"
       select_one_grid: "רשת תמונות"
       select_many_grid: "רשת תמונות"
-      tap_card: "החלקה"
+      tap_card: "הקשה"
       scenario: "תרחיש"
       open_ended: "טקסט חופשי"
       contact_form: "יצירת קשר"
@@ -121,7 +120,7 @@ he:
       yes_no: "בחר אפשרות אחת"
       select_one_grid: "בחר אפשרות אחת"
       select_many_grid: "סמן את כל האפשרויות המתאימות"
-      tap_card: "החלק כדי לענות"
+      tap_card: "הקש כדי לענות"
       scenario: "המשך לקרוא, ואז בחר"
       open_ended: "הקלד את התשובה שלך"
       contact_form: "שתפו את הפרטים שלכם"
@@ -130,7 +129,7 @@ he:
       select_many: "בחירה מרובה (רשימה)"
       select_one_grid: "בחירה אחת (רשת)"
       select_many_grid: "בחירה מרובה (רשת)"
-      tap_card: "החלקה"
+      tap_card: "הקשה"
       range: "טווח"
       rating: "דירוג"
       nps: "NPS"
@@ -256,6 +255,15 @@ he:
     respondent_code_note: 'אנחנו לא רואים אותו — הוא נשמר כגיבוב חד-כיווני, רק כדי שנוכל להתאים את התשובות שלכם לשלכם בפעם הבאה.'
     respondent_code_continue: 'המשך'
     respondent_code_skip: 'דלגו'
+    contact_title: "השאירו את הפרטים שלכם"
+    contact_body: "אם תרצו להישאר בקשר, ספרו לנו מי אתם. לא חובה — והפרטים נשמרים בנפרד מהתשובות שלכם."
+    contact_name: "שם"
+    contact_email: "אימייל"
+    contact_company: "חברה"
+    contact_industry: "תחום"
+    contact_note: "נשאל פעם אחת במכשיר הזה. הפרטים נשמרים בנפרד מהתשובות, ומקושרים רק לשם השחקן שלכם."
+    contact_continue: "המשך"
+    contact_skip: "המשך בלי פרטים"
     comparison_title: התשובות שלך מול כולם
     back: "← חזרה"
     next: הבא →
@@ -379,12 +387,16 @@ he:
       option_color: "צבע"
       option_color_hex: "קוד הקסדצימלי"
       option_emoji: "אימוג'י"
-      option_icon: "סמל"
+      option_icon: "אייקוני ספורט"
+      option_icon_note: "הספרייה מכסה ספורט בלבד. לכל נושא אחר, השתמשו באימוג'י למעלה."
       option_style_reset: "איפוס"
       option_style_done: "סיום"
       add_to_library: "הוסף לספרייה"
       library_saving: "שומר…"
       library_save_failed: "השמירה בספרייה נכשלה"
+      remove_from_library: "הסרה מהספרייה"
+      library_remove_confirm: "להסיר את התמונה הזו מספריית המותג שלך? כל כרטיס שכבר משתמש בה יאבד אותה."
+      library_remove_failed: "ההסרה מהספרייה נכשלה"
       confirm_delete: "באמת למחוק?"
       unsaved: שינויים שלא נשמרו
       undo_restored: 'הכרטיס שוחזר'
@@ -997,6 +1009,10 @@ he:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
     undo: 'ביטול'
+    m_back_to_dashboard: "חזרה ל-Vertos שלי"
+    m_preview: "תצוגה מקדימה כמשתתף"
+    m_more: "עוד"
+    m_delete_card: "מחיקת הכרטיס הזה"
     duplicate_card: 'שכפול'
     emoji_pick: "בחרו אימוג'י"
     brand_font: "גופן"
@@ -1093,6 +1109,15 @@ he:
     shuffle: ערבב
     shuffle_title: בחר מחדש תמונות מספריית verto
     shuffle_confirm: לערבב תמונות? התמונות הנוכחיות שלך יוחלפו בבחירה חדשה מהספרייה.
+    shuffle_direction_toggle_title: "הוסיפו הנחיה לערבוב הזה"
+    shuffle_direction_heading: "כוונו את הערבוב"
+    shuffle_direction_hint: "אופציונלי. ספרו ל-Verto מה אתם מחפשים בתמונות ובאנימציות — אווירה, סביבה, או משהו להשמיט."
+    shuffle_direction_label: "הנחיה"
+    shuffle_direction_placeholder: "לדוגמה: אור טבעי חמים, בחוץ, קבוצות קטנות, בלי משרדים"
+    shuffle_direction_toward: "הערבוב האחרון חיפש: %{terms}"
+    shuffle_direction_avoiding: "והשאיר בחוץ: %{terms}"
+    shuffle_direction_clear: "ניקוי"
+    shuffle_direction_apply: "ערבבו לפי זה"
     publish_share: פרסם ושתף →
     answer_type: סוג תשובה
     select_card: בחר כרטיס כדי לשנות את סוגו
@@ -1171,7 +1196,7 @@ he:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "סרקו כדי לפתוח את ה-Verto. הורידו את הקוד לפוסטרים ולמצגות."
-    download_qr: "הורדת QR (SVG)"
+    download_qr: "הורדת QR (%{file_format})"
     download_qr_short: "קוד QR"
     custom_url: "כתובת מותאמת"
     custom_url_placeholder: "summer-feedback-2026"

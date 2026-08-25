@@ -31,8 +31,6 @@ tr:
     add_option: Seçenek ekle
     new_option: Yeni seçenek
     style_option: Bu yanıtı biçimlendir
-    new_response: "Yeni yanıt"
-    add_response: "Yanıt ekle"
     remove_response: "Bu yanıtı kaldır"
     remove_option: "Kartı sil"
     response_scale: "İfade başına yanıt"
@@ -64,12 +62,13 @@ tr:
     char_limit_option: '%{n} karakter'
     allow_other: '"Diğer" serbest metin yanıtına izin ver'
     required: "Zorunlu soru"
+    ask_once: "Bir kez sor — yanıtlandıktan sonra tekrar oynanışlarda atlanır"
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
     mark_correct: "Doğru cevabı işaretle"
     rating_star: "%{total} üzerinden %{number}"
     correct_pick_hint: "Oyuncuların doğru olmak için seçmesi gereken seçenek(ler)e dokunun."
-    correct_tap_hint: "Her ifade için doğru kaydırmayı belirleyin."
+    correct_tap_hint: "Her ifade için doğru yanıtı belirleyin."
     correct_scale_hint: "Doğru sayılan değeri seçin."
     accepted_answers: "Kabul edilen cevaplar"
     accepted_answers_hint: "Her satıra bir tane — herhangi bir eşleşme (büyük/küçük harf duyarsız) doğrudur."
@@ -86,11 +85,11 @@ tr:
       nps: "Sıvıyı sürükleyin"
       multiple_choice: "Birini seçin"
       select_many: "Uygun olan tüm seçenekleri seçin"
-      prioritise: "Öncelik sırasına göre düzenlemek için tıklayıp sürükleyin"
+      prioritise: "Öncelik sırasına göre düzenleyin"
       yes_no: "Birini seçin"
       select_one_grid: "Birini seçin"
       select_many_grid: "Uygun olan tüm seçenekleri seçin"
-      tap_card: "Yanıtlamak için kaydırın"
+      tap_card: "Yanıtlamak için dokunun"
       open_ended: "Cevabınızı yazın"
       contact_form: "Bilgilerini paylaş"
       scenario: "Okumaya devam et, sonra seç"
@@ -104,7 +103,7 @@ tr:
       yes_no: "EVET / HAYIR"
       select_one_grid: "GÖRSEL IZGARA"
       select_many_grid: "GÖRSEL IZGARA"
-      tap_card: "KAYDIR"
+      tap_card: "DOKUN"
       scenario: "SENARYO"
       open_ended: "SERBEST METİN"
       contact_form: "İLETİŞİM"
@@ -121,7 +120,7 @@ tr:
       yes_no: "BİR SEÇENEK SEÇİN"
       select_one_grid: "BİR SEÇENEK SEÇİN"
       select_many_grid: "UYGUN OLAN TÜM SEÇENEKLERİ SEÇİN"
-      tap_card: "YANITLAMAK İÇİN KAYDIRIN"
+      tap_card: "YANITLAMAK İÇİN DOKUNUN"
       scenario: "OKUMAYA DEVAM ET, SONRA SEÇ"
       open_ended: "CEVABINIZI YAZIN"
       contact_form: "BİLGİLERİNİ PAYLAŞ"
@@ -130,7 +129,7 @@ tr:
       select_many: "Birden fazla seç (liste)"
       select_one_grid: "Birini seç (ızgara)"
       select_many_grid: "Birden fazla seç (ızgara)"
-      tap_card: "Kaydır"
+      tap_card: "Dokun"
       range: "Aralık"
       rating: "Puanlama"
       nps: "NPS"
@@ -256,6 +255,15 @@ tr:
     respondent_code_note: 'Bunu hiç görmüyoruz — tek yönlü bir özet olarak saklanır, yalnızca yanıtlarınız bir sonraki kez kendi yanıtlarınızla eşleştirilebilsin diye.'
     respondent_code_continue: 'Devam'
     respondent_code_skip: 'Atla'
+    contact_title: "Bilgilerinizi bırakın"
+    contact_body: "İletişimde kalmak isterseniz bize kim olduğunuzu söyleyin. İsteğe bağlı — ve yanıtlarınızdan ayrı saklanır."
+    contact_name: "Ad"
+    contact_email: "E-posta"
+    contact_company: "Şirket"
+    contact_industry: "Sektör"
+    contact_note: "Bu cihazda yalnızca bir kez sorulur. Bilgileriniz yanıtlarınızdan ayrı saklanır ve yalnızca oyuncu adınıza bağlanır."
+    contact_continue: "Devam et"
+    contact_skip: "Bilgi vermeden devam et"
     comparison_title: Yanıtlarınız vs herkes
     back: "← Geri"
     next: İleri →
@@ -379,12 +387,16 @@ tr:
       option_color: "Renk"
       option_color_hex: "Hex kodu"
       option_emoji: "Emoji"
-      option_icon: "Simge"
+      option_icon: "Spor simgeleri"
+      option_icon_note: "Kitaplık yalnızca sporu kapsıyor. Başka her konu için yukarıdaki emojiyi kullanın."
       option_style_reset: "Sıfırla"
       option_style_done: "Bitti"
       add_to_library: "Kitaplığa ekle"
       library_saving: "Kaydediliyor…"
       library_save_failed: "Kitaplığa kaydedilemedi"
+      remove_from_library: "Kitaplıktan kaldır"
+      library_remove_confirm: "Bu görseli marka kitaplığınızdan kaldırmak istiyor musunuz? Onu zaten kullanan her kart onu kaybeder."
+      library_remove_failed: "Kitaplıktan kaldırılamadı"
       confirm_delete: "Gerçekten silinsin mi?"
       unsaved: Kaydedilmemiş değişiklikler
       undo_restored: 'Kart geri alındı'
@@ -997,6 +1009,10 @@ tr:
     all_saved: 'Kaydedildi'
     leave_editor: 'Editörden çık'
     undo: 'Geri al'
+    m_back_to_dashboard: "Verto’larıma dön"
+    m_preview: "Katılımcı olarak önizle"
+    m_more: "Daha fazla"
+    m_delete_card: "Bu kartı sil"
     duplicate_card: 'Çoğalt'
     emoji_pick: "Emoji seç"
     brand_font: "Yazı tipi"
@@ -1093,6 +1109,15 @@ tr:
     shuffle: Karıştır
     shuffle_title: Verto kütüphanesinden yeni görseller seç
     shuffle_confirm: Görseller karıştırılsın mı? Mevcut resimleriniz kütüphaneden yapılan yeni bir seçimle değiştirilecek.
+    shuffle_direction_toggle_title: "Bu karıştırma için bir yön ekleyin"
+    shuffle_direction_heading: "Bu karıştırmayı yönlendirin"
+    shuffle_direction_hint: "İsteğe bağlı. Görsellerde ve animasyonlarda ne aradığınızı Verto'ya söyleyin — bir hava, bir ortam ya da dışarıda bırakılacak bir şey."
+    shuffle_direction_label: "Yön"
+    shuffle_direction_placeholder: "örn. sıcak doğal ışık, açık hava, küçük gruplar, ofis olmasın"
+    shuffle_direction_toward: "Son karıştırma şunu aradı: %{terms}"
+    shuffle_direction_avoiding: "ve şunu hariç tuttu: %{terms}"
+    shuffle_direction_clear: "Temizle"
+    shuffle_direction_apply: "Bununla karıştır"
     publish_share: Yayınla ve paylaş →
     answer_type: Yanıt Türü
     select_card: Türünü değiştirmek için bir kart seçin
@@ -1171,7 +1196,7 @@ tr:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Bu Verto'yu açmak için tarayın. Afiş ve sunumlar için kodu indirin."
-    download_qr: "QR indir (SVG)"
+    download_qr: "QR indir (%{file_format})"
     download_qr_short: "QR kodu"
     custom_url: "Özel URL"
     custom_url_placeholder: "summer-feedback-2026"

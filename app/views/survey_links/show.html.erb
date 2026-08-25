@@ -107,9 +107,16 @@
             </div>
             <div style="min-width:0;">
               <div class="share-hint"><%= t("share_modal.qr_hint") %></div>
-              <%= link_to t("share_modal.download_qr"), qr_survey_path(@survey),
-                    data: { turbo_frame: "_top" }, class: "share-btn",
-                    style: "margin-top:8px;display:inline-block;text-decoration:none;" %>
+              <%# PNG first — slides/Canva/chat apps take a PNG anywhere;
+                  SVG stays for print shops, where it scales losslessly. %>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+                <%= link_to t("share_modal.download_qr", file_format: "PNG"), qr_survey_path(@survey, format: :png),
+                      data: { turbo_frame: "_top" }, class: "share-btn",
+                      style: "display:inline-block;text-decoration:none;" %>
+                <%= link_to t("share_modal.download_qr", file_format: "SVG"), qr_survey_path(@survey),
+                      data: { turbo_frame: "_top" }, class: "share-btn",
+                      style: "display:inline-block;text-decoration:none;" %>
+              </div>
             </div>
           </div>
         <% end %>
@@ -177,8 +184,15 @@
                 </button>
               <% end %>
               <div style="display:flex;align-items:center;gap:10px;">
-                <%= link_to t("share_modal.download_qr_short"), qr_survey_path(@survey, link_id: link.id),
-                      data: { turbo_frame: "_top" }, class: "share-link__action" %>
+                <%# The acronyms are locale-invariant, so only the label and the
+                    accessible names go through i18n. %>
+                <span style="font-family:'ABeeZee',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);"><%= t("share_modal.download_qr_short") %></span>
+                <%= link_to "PNG", qr_survey_path(@survey, link_id: link.id, format: :png),
+                      data: { turbo_frame: "_top" }, class: "share-link__action",
+                      "aria-label": t("share_modal.download_qr", file_format: "PNG") %>
+                <%= link_to "SVG", qr_survey_path(@survey, link_id: link.id),
+                      data: { turbo_frame: "_top" }, class: "share-link__action",
+                      "aria-label": t("share_modal.download_qr", file_format: "SVG") %>
                 <%= button_to t("share_modal.delete_link"), survey_link_path(@survey, link), method: :delete,
                       form: { style: "margin:0;", data: { turbo_confirm: t("share_modal.delete_confirm", name: link.name) } },
                       class: "share-link__action share-link__action--danger" %>

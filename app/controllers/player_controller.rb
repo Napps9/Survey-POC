@@ -216,6 +216,7 @@ class PlayerController < ApplicationController
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
     apply_player_key(resp, data["player_key"])
+    apply_contact(data)
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
     resp.locale  = SupportedLocales.coerce(data["locale"]) if data["locale"].present?
@@ -247,6 +248,7 @@ class PlayerController < ApplicationController
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
     apply_player_key(resp, data["player_key"])
+    apply_contact(data)
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
     resp.status  = "completed"
@@ -688,11 +690,31 @@ class PlayerController < ApplicationController
   # recorded only while the feature is on, only as a digest, and set once per
   # response — a reload keeps the identity it started with.
   def apply_player_key(resp, key)
-    return unless @survey.leaderboard_active?
+    return unless @survey.player_identity_active?
     return if resp.player_key_digest.present?
 
     digest = @survey.player_key_digest(key)
     resp.player_key_digest = digest if digest
+  end
+
+  # Contact details ride the ordinary save payload the way the respondent code
+  # and player key do — no endpoint of their own, so the service worker's
+  # offline submit queue carries them for free. They are NOT part of answers:
+  # they land in their own table (ContactDetail), keyed by the same per-survey
+  # digest that assigns the leaderboard alias, which is the whole separation
+  # the feature promises. Idempotent, so the payload can carry them on every
+  # save until the client stops sending.
+  def apply_contact(data)
+    return unless @survey.contact_form_enabled?
+    fields = data["contact"]
+    return unless fields.is_a?(Hash)
+
+    digest = @survey.player_key_digest(data["player_key"])
+    return unless digest
+
+    ContactDetail.upsert_for!(survey: @survey, key_digest: digest, fields: fields)
+  rescue ActiveRecord::RecordInvalid
+    # Every field blank — nothing worth a row.
   end
 
   # NB: the status column defaults to "completed", so a freshly initialized
@@ -1012,10 +1034,17 @@ class PlayerController < ApplicationController
     resp.demographic_neurodiversity = chosen.compact.any? ? "|#{chosen.compact.sort.join('|')}|" : nil
   end
 
-  # The Verto content language to render: an explicit ?lang=, else the
-  # respondent's UI locale if the Verto has it, else the Verto's primary.
+  # The Verto content language to render: an explicit ?lang= always wins (it's
+  # the respondent's own choice, made in the player's language switcher); after
+  # that, the respondent's browser/system locale — but only while the creator
+  # has auto-detection on. With it off, a multilingual Verto opens in its
+  # primary language for everyone, and the switcher is how a respondent opts
+  # into another ("today when a Verto is opened it will revert to the system
+  # language — this needs to be controlled by the creator").
   def resolve_play_locale
-    @survey.display_locale_for(params[:lang], Current.locale)
+    preferred = [ params[:lang] ]
+    preferred << Current.locale if @survey.auto_detect_language?
+    @survey.display_locale_for(*preferred)
   end
 
   # ApplicationController#switch_locale already wraps this whole request in

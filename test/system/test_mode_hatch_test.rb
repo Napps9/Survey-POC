@@ -92,8 +92,11 @@ class TestModeHatchTest < ApplicationSystemTestCase
     find(".test-hatch-confirm").click
 
     assert_current_path "/test/live/#{@survey.publish_token}", wait: 5
-    assert_selector ".play-banner-test", wait: 5
-    assert_text I18n.t("player.test_mode_banner")
+    assert_selector ".play-test-frame", wait: 5
+    # visible: :all — the sentence is clipped to 1px now (the ring is what a
+    # tester sees), so Capybara's visibility rules will not find it otherwise.
+    assert_selector ".play-test-note", text: I18n.t("player.test_mode_banner"),
+                    visible: :all, wait: 5
     # And back out again, to the very link they arrived on.
     click_link I18n.t("player.exit_test_mode")
     assert_current_path "/play/#{@survey.publish_token}", wait: 5
@@ -148,7 +151,7 @@ class TestModeHatchTest < ApplicationSystemTestCase
     open_player
     press_and_hold 2.4
     find(".test-hatch-confirm").click
-    assert_selector ".play-banner-test", wait: 5
+    assert_selector ".play-test-frame", wait: 5
 
     click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
     all(".preview-card[data-card-index] .choice-item, .preview-card[data-card-index] [data-picker-target='item']").first&.click

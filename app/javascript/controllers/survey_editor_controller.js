@@ -43,7 +43,7 @@ const OPTION_LABEL_SELECTORS = {
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
-    "cardFlags", "panelOther", "panelRequired", "responseScale", "vertoTitle", "undoBtn"]
+    "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -483,8 +483,12 @@ export default class extends Controller {
     this._refreshUndoButton()
   }
 
+  // Plural: the mobile studio's overflow menu carries a second Undo (the
+  // desktop float bar's is hidden at phone width), and a button that never
+  // greys out claims there is something to undo when there is not.
   _refreshUndoButton() {
-    if (this.hasUndoBtnTarget) this.undoBtnTarget.disabled = !this._undoStack.length
+    const empty = !this._undoStack.length
+    this.undoBtnTargets.forEach((btn) => { btn.disabled = empty })
   }
 
   // Where a slot currently sits, as a closure that puts it back there. Captured
@@ -741,8 +745,19 @@ export default class extends Controller {
     const descEl  = cardEl.querySelector(".q-subtitle, .activity-desc")
     const optEls  = this._optionEls(cardEl)
     return {
-      text: titleEl?.textContent.trim() || "",
-      description: descEl?.textContent.trim() || "",
+      // innerText, NOT textContent, for the two fields a creator writes
+      // paragraphs into. Enter in a contenteditable wraps each line in a
+      // <div>, and textContent joins block boundaries with NOTHING — a
+      // welcome card written as three paragraphs came back from reload as
+      // one lump ("ideally need it to remember the spacing/line breaks",
+      // Feedback 17). innerText yields \n at those boundaries, the stored
+      // text keeps it, and white-space: pre-line on .q-title/.q-subtitle
+      // renders it — a stable round-trip, because _writeCard's textContent
+      // write puts the \n straight back and innerText re-reads it.
+      // Options and response labels stay on textContent on purpose: they are
+      // single-line by design and a stray Enter should not become a break.
+      text: this._readPlain(titleEl),
+      description: this._readPlain(descEl),
       options: optEls.map(el => el.textContent.trim()),
       responses: this._responseLabelEls(cardEl).map(el => el.textContent.trim()),
       pages: this._pageEls(cardEl).map(el => ({
@@ -756,11 +771,34 @@ export default class extends Controller {
     }
   }
 
+  // Line-break-preserving plain text. trim() only cuts the ends; interior
+  // newlines survive. The collapse handles how engines count an EMPTY line:
+  // <div><br></div> contributes the block boundary's newline AND the <br>'s,
+  // so one blank line read back as two. Two newlines — one blank line — is
+  // what the creator saw; runs beyond that are the double-count, not intent.
+  _readPlain(el) {
+    return (el?.innerText || "").replace(/\n{3,}/g, "\n\n").trim()
+  }
+
   // The rich-text layer of an editable region — innerHTML, but ONLY when
   // formatting elements are actually present, so a deck nobody has formatted
   // reads (and therefore serialises) byte-identically to the plain-text era.
+  //
+  // The div normalisation is the formatted half of the line-break fix above:
+  // when a creator bolds a word AND breaks lines, this layer engages, and the
+  // sanitiser strips <div> (not in the allowlist) while KEEPING its content —
+  // which joins the lines exactly like textContent did. <br> is allowed, so
+  // block boundaries become <br> before storing. A leading <div> is the first
+  // line rather than a break, hence the strip of one leading <br>; trailing
+  // empty divs would render as blank lines the plain layer trims, hence the
+  // trailing strip.
   _readHtml(el) {
-    return el && hasFormatting(el) ? el.innerHTML : null
+    if (!el || !hasFormatting(el)) return null
+    return el.innerHTML
+      .replace(/<div[^>]*>/gi, "<br>")
+      .replace(/<\/div>/gi, "")
+      .replace(/^<br>/i, "")
+      .replace(/(<br>)+$/i, "")
   }
 
   _writeCard(cardEl, content, fallback, locale) {
@@ -1440,6 +1478,7 @@ export default class extends Controller {
     if (!isQ) return
     if (this.hasPanelOtherTarget)    this.panelOtherTarget.checked    = card.dataset.cardAllowOther === "true"
     if (this.hasPanelRequiredTarget) this.panelRequiredTarget.checked = card.dataset.cardRequired === "true"
+    if (this.hasPanelAskOnceTarget)  this.panelAskOnceTarget.checked  = card.dataset.cardAskOnce === "true"
     this._syncResponseScale(card)
   }
 
@@ -1503,6 +1542,17 @@ export default class extends Controller {
     card.dataset.cardRequired = on ? "true" : "false"
     const chip = card.querySelector("[data-role='required-chip']")
     if (chip) chip.hidden = !on
+    this.markDirty()
+  }
+
+  // Ask-once: on a repeat play by the same device identity, this question is
+  // skipped once it has an answer (player_controller seeds the remembered
+  // answer and navigation passes over the card). Same write-to-dataset shape
+  // as Required above; serialize() reads it back as `ask_once`.
+  togglePanelAskOnce(event) {
+    const card = this._selectedCard()
+    if (!card) return
+    card.dataset.cardAskOnce = event.currentTarget.checked ? "true" : "false"
     this.markDirty()
   }
 
@@ -1629,6 +1679,17 @@ export default class extends Controller {
         // been moved off centre — the server drops a 50 anyway.
         const focal = parseInt(card.dataset.cardFocalY, 10)
         if (Number.isFinite(focal) && focal !== 50) out.focal_y = focal
+        // The re-crop record: the pre-crop original and where this crop sits
+        // in it — what lets "Adjust crop" zoom back OUT later. Rides the
+        // card's dataset the same way the image itself does, so it has to be
+        // re-serialised here or one autosave would silently strip it.
+        if (card.dataset.cardImageSource) {
+          out.image_source = card.dataset.cardImageSource
+          const cropRaw = card.dataset.cardImageCrop
+          if (cropRaw) {
+            try { out.image_crop = JSON.parse(cropRaw) } catch (_e) { /* junk rect — dropped */ }
+          }
+        }
       }
       // Slow push-in/out on the card's own imagery — meaningless for video,
       // so only carried alongside a photo or animation.
@@ -1651,6 +1712,7 @@ export default class extends Controller {
       }
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
       if (card.dataset.cardRequired === "true") out.required = true
+      if (card.dataset.cardAskOnce === "true") out.ask_once = true
 
       // Structural flags the DOM never re-derives — an open_ended input
       // flavour (e.g. the birth-date "month" picker) and the demographic
@@ -1789,7 +1851,7 @@ export default class extends Controller {
       } catch (_) { /* ignore malformed */ }
 
       // tap_card response scale — the 2-6 answers each statement is judged on.
-      // Read off the strip, which is the record (see card_editor#addResponse),
+      // Read off the strip, which is the record (see card_editor#_rewriteStrip),
       // and mirrored back onto the row so a type switch away and back rebuilds
       // the creator's scale instead of the default three. Only emitted while
       // the card IS a tap card: `responses` is meaningless on any other type
@@ -2718,10 +2780,16 @@ export default class extends Controller {
     }
   }
 
+  // Plural, like undoBtnTargets: the mobile studio hides the float bar this
+  // pill lives in, so a creator typing on a phone had no save state at all —
+  // the words were written, to an element CSS had taken off the screen. The
+  // chrome carries its own chip; both are fed from here so there is still one
+  // sentence about saving, said in two places.
   flash(text, klass) {
-    if (!this.hasStatusTarget) return
-    this.statusTarget.textContent = text
-    this.statusTarget.className = `text-xs ${klass}`
+    this.statusTargets.forEach((el) => {
+      el.textContent = text
+      el.className = `text-xs ${klass}`
+    })
   }
 
   // Save-status relay for the in-feed consent/thank-you gate cards —

@@ -32,7 +32,7 @@ class OptionLabelCapTest < ApplicationSystemTestCase
       "options" => [ "Automation", "Brand building" ] },
     # A range slider, whose five stops print side by side under one track. Its
     # first label is over the scale cap on purpose, for the same reason the
-    # grid has a legacy one: 13 of the 19 locales ship a preset agreement label
+    # grid has a legacy one: 18 of the 25 locales ship a preset agreement label
     # longer than 17 characters ("Zdecydowanie się nie zgadzam" is 28), so
     # over-length scale labels are ordinary shipped content, not a mistake.
     { "type" => "range", "cid" => "r1", "text" => "How does that land?",

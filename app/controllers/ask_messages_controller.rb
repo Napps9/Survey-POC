@@ -7,7 +7,8 @@
 # for the next.
 #
 # ── Spend ─────────────────────────────────────────────────────────────────────
-# A turn here is up to MAX_TOOL_ROUNDS + 1 Claude calls; the per-Verto chat is
+# A turn here is up to MAX_TOOL_ROUNDS + 2 Claude calls (the last only when the
+# answer turn came back wordless and is asked again); the per-Verto chat is
 # one Haiku call. So the rate limit is a third of that endpoint's, and unlike it
 # this one also takes the per-organisation daily cap — a tool loop is the most
 # expensive thing a signed-in user can trigger in this app, and the runaway case

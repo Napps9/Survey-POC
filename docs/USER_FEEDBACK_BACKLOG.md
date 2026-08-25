@@ -1,4 +1,43 @@
-# Playverto — user-feedback backlog
+# Playverto — user-feedback backlog  ·  **CLOSED**
+
+> **Status: every item below has shipped. This is a record, not a to-do list.**
+>
+> Audited against the code on 2026-08-21. Each cluster was checked for the
+> concrete artefact it called for, not taken on trust:
+>
+> | Cluster | Verified by |
+> |---|---|
+> | 1a — 502 on `generate_flow` | both halves: the quadratic translation is gone (`GenerateFlowJob` makes one Claude call for the flow plus **one per secondary locale**, the ratio this doc asked for), and the work left the Puma request thread entirely — `GenerateFlowJob` + `FlowGeneration`, polled by `FlowGenerationsController` |
+> | 1a — 400 on brand image upload | `ErrorReporting.report` on both create paths; the JSON path returns a readable `error` instead of a bare 400 |
+> | 1b — rename / unpublish / delete welcome card | `surveys#unpublish` route; `renameVerto()` in `survey_editor_controller.js`; the welcome card's delete no longer suppressed (`_card_row.html.erb` now excludes it from *duplicate* only) |
+> | 1b — disambiguate the three delete CTAs | each carries a target-naming `aria-label` (`editor.delete_card_n`) |
+> | 1c — consent after publishing | shipped, but **not** as the blanket `published?` guard proposed below — as `SurveysController::SETTINGS_LOCKED_IN_USE`, a curated field list locked once a Verto is in use. Most of what `update_settings` handles is presentation and distribution, which a creator may legitimately change for the life of a Verto |
+> | 1c — multi-screen consent card | `consent_gate` in `config/card_types.yml` |
+> | 1d — per-question tokens, Share, Compare regions | `token_types`, `share_enabled`, `regions_enabled` on `surveys`; per-share overrides of the latter two on `survey_shares` |
+> | 2 — undo, both layers | `_undoStack` in `survey_editor_controller.js`; `surveys#restore`; `deleted_cards` ring buffer |
+> | 2 — respondent code | `respondent_code_enabled` + `respondent_code_digest`, indexed per survey |
+> | 2 — free-text limit | `char_limit` with `Survey::DEFAULT_FREE_TEXT_LIMIT` and server-side enforcement |
+> | 2 — scenario page-turn | already marked SHIPPED in place below |
+>
+> **The research above the phase plans is still worth reading** — the three
+> findings in Context are structural facts about this codebase and still hold:
+> the editor's source of truth is the DOM (`serialize()` rebuilds the cards
+> array from live DOM on every save, and there is no render-from-JSON path),
+> and the tokenisation back-nav rule was a client bug with the server already
+> correct. Finding 1 needs one qualifier: the *legacy* gate is still survey
+> columns rendered as a pseudo-card at player index 0, exactly as described —
+> but there is now **also** a real `consent_gate` card type alongside it, which
+> is what the decision table above chose ("today's simple gate stays").
+>
+> **Two details in here have since gone stale.** Locale strings now live in
+> **25** files, not 19. And a player-rendering change no longer requires a
+> `CACHE_VERSION` bump: `/play` is served network-first with an offline cache
+> fallback, so content, markup and CSS reach respondents on their next ordinary
+> online visit — a bump is only needed when the service worker's own behaviour
+> changes. See `CLAUDE.md` for both.
+>
+> Current feedback tracking lives in the `VertoNow_BYO_Platform_Feedback_*`
+> sheets, not here.
 
 ## Context
 

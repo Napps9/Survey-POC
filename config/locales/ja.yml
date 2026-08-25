@@ -31,8 +31,6 @@ ja:
     add_option: 選択肢を追加
     new_option: 新しい選択肢
     style_option: この選択肢のスタイル
-    new_response: "新しい回答"
-    add_response: "回答を追加"
     remove_response: "この回答を削除"
     remove_option: "カードを削除"
     response_scale: "1文あたりの回答数"
@@ -64,12 +62,13 @@ ja:
     char_limit_option: '%{n} 文字'
     allow_other: "「その他」の自由記述回答を許可"
     required: "必須の質問"
+    ask_once: "一度だけ質問 — 回答後の再プレイではスキップ"
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
     mark_correct: "正解をマークする"
     rating_star: "%{total} 段階中 %{number}"
     correct_pick_hint: "プレイヤーが正解するために選ぶべき選択肢をタップしてください。"
-    correct_tap_hint: "各ステートメントに正しいスワイプを設定してください。"
+    correct_tap_hint: "各ステートメントに正しい回答を設定してください。"
     correct_scale_hint: "正解とみなす値を選んでください。"
     accepted_answers: "許容される回答"
     accepted_answers_hint: "1行に1つ — いずれかに一致すれば（大文字小文字を区別せず）正解です。"
@@ -86,11 +85,11 @@ ja:
       nps: "液体をドラッグ"
       multiple_choice: "1つ選択"
       select_many: "当てはまるものをすべて選択"
-      prioritise: "ドラッグして優先順位を並べ替え"
+      prioritise: "優先順位を並べ替え"
       yes_no: "1つ選択"
       select_one_grid: "1つ選択"
       select_many_grid: "当てはまるものをすべて選択"
-      tap_card: "スワイプして回答"
+      tap_card: "タップして回答"
       open_ended: "回答を入力"
       contact_form: "連絡先を入力"
       scenario: "読み進めてから選択"
@@ -104,7 +103,7 @@ ja:
       yes_no: "はい / いいえ"
       select_one_grid: "画像グリッド"
       select_many_grid: "画像グリッド"
-      tap_card: "スワイプ"
+      tap_card: "タップ"
       scenario: "シナリオ"
       open_ended: "自由記述"
       contact_form: "連絡先"
@@ -121,7 +120,7 @@ ja:
       yes_no: "1つ選択"
       select_one_grid: "1つ選択"
       select_many_grid: "当てはまるものをすべて選択"
-      tap_card: "スワイプして回答"
+      tap_card: "タップして回答"
       scenario: "読み進めてから選択"
       open_ended: "回答を入力"
       contact_form: "連絡先を入力"
@@ -130,7 +129,7 @@ ja:
       select_many: "複数選択（リスト）"
       select_one_grid: "1つ選択（グリッド）"
       select_many_grid: "複数選択（グリッド）"
-      tap_card: "スワイプ"
+      tap_card: "タップ"
       range: "範囲"
       rating: "評価"
       nps: "NPS"
@@ -256,6 +255,15 @@ ja:
     respondent_code_note: 'この内容は当方では見られません。一方向ハッシュとして保存され、次回あなたの回答と照合するためだけに使われます。'
     respondent_code_continue: '続ける'
     respondent_code_skip: 'スキップ'
+    contact_title: "連絡先を残す"
+    contact_body: "連絡を取り合いたい場合は、あなたのことを教えてください。任意です — 回答とは別に保管されます。"
+    contact_name: "名前"
+    contact_email: "メール"
+    contact_company: "会社"
+    contact_industry: "業界"
+    contact_note: "この端末で一度だけ表示されます。連絡先は回答とは別に保存され、プレイヤー名にのみ紐づきます。"
+    contact_continue: "続ける"
+    contact_skip: "入力せずに続ける"
     comparison_title: あなたの回答 vs 全員
     back: "← 戻る"
     next: 次へ →
@@ -379,12 +387,16 @@ ja:
       option_color: "色"
       option_color_hex: "16進コード"
       option_emoji: "絵文字"
-      option_icon: "アイコン"
+      option_icon: "スポーツアイコン"
+      option_icon_note: "ライブラリはスポーツのみです。ほかの題材には上の絵文字をお使いください。"
       option_style_reset: "リセット"
       option_style_done: "完了"
       add_to_library: "ライブラリに追加"
       library_saving: "保存中…"
       library_save_failed: "ライブラリに保存できませんでした"
+      remove_from_library: "ライブラリから削除"
+      library_remove_confirm: "この画像をブランドライブラリから削除しますか？すでに使用しているカードからも失われます。"
+      library_remove_failed: "ライブラリから削除できませんでした"
       confirm_delete: "本当に削除？"
       unsaved: 未保存の変更
       undo_restored: 'カードを元に戻しました'
@@ -553,8 +565,8 @@ ja:
         tap_card:
           tap_card: "素早くゲーム感覚の直感的リアクション — アンケート疲れなしに短いステートメントをいくつも試すのにぴったりです。"
           range: "速さの代わりにニュアンスが得られます — どれだけ速くではなく、どれだけ強く同意するかを見たい場合に。"
-          rating: "星はなじみのあるスケールですが、スワイプのテンポの良さは失われます。"
-          select_one_grid: "遊び心のあるスワイプの仕掛けがなくなります — 質問が本当に1つの静的な選択である場合のみ切り替えましょう。"
+          rating: "星はなじみのあるスケールですが、タップのテンポの良さは失われます。"
+          select_one_grid: "遊び心のあるタップの仕掛けがなくなります — 質問が本当に1つの静的な選択である場合のみ切り替えましょう。"
         scenario:
           scenario: "回答者がページをめくって読む短いストーリーと、最後のページでの2〜3択 — 1枚のカードでは収まらない、長めの状況設定の問いかけに最適です。"
           multiple_choice: "物語の積み上げをやめて、シンプルな単一選択リストに — ストーリーの文脈が何も加えていないなら切り替えましょう。"
@@ -997,6 +1009,10 @@ ja:
     all_saved: '保存済み'
     leave_editor: 'エディターを離れる'
     undo: '元に戻す'
+    m_back_to_dashboard: "マイVertoに戻る"
+    m_preview: "回答者としてプレビュー"
+    m_more: "その他"
+    m_delete_card: "このカードを削除"
     duplicate_card: '複製'
     emoji_pick: "絵文字を選ぶ"
     brand_font: "書体"
@@ -1093,6 +1109,15 @@ ja:
     shuffle: シャッフル
     shuffle_title: Vertoライブラリから画像を再選択
     shuffle_confirm: 画像をシャッフルしますか？現在の画像はライブラリから新たに選ばれた画像に置き換えられます。
+    shuffle_direction_toggle_title: "このシャッフルに方向性を追加"
+    shuffle_direction_heading: "シャッフルの方向性"
+    shuffle_direction_hint: "任意。画像やアニメーションに求めるもの（雰囲気、場面、避けたいもの）をVertoに伝えてください。"
+    shuffle_direction_label: "方向性"
+    shuffle_direction_placeholder: "例：温かい自然光、屋外、少人数、オフィスなし"
+    shuffle_direction_toward: "前回のシャッフルの検索：%{terms}"
+    shuffle_direction_avoiding: "除外：%{terms}"
+    shuffle_direction_clear: "クリア"
+    shuffle_direction_apply: "これでシャッフル"
     publish_share: 公開・共有 →
     answer_type: 回答タイプ
     select_card: タイプを変更するカードを選択
@@ -1171,7 +1196,7 @@ ja:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "スキャンするとこの Verto が開きます。ポスターやスライド用にコードをダウンロードできます。"
-    download_qr: "QR をダウンロード (SVG)"
+    download_qr: "QR をダウンロード (%{file_format})"
     download_qr_short: "QRコード"
     custom_url: "カスタム URL"
     custom_url_placeholder: "summer-feedback-2026"
@@ -1356,7 +1381,7 @@ ja:
     s7_perks_label: 自動入力でできること
     s7_perks:
     - テーマに合ったアンケート背景
-    - スワイプカードを含む全カードへの画像挿入
+    - タップカードを含む全カードへの画像挿入
     - エディターでしっくりくるまでシャッフル可能
     s7_title: どのように開始しますか？
     s7_sub: エディターでいつでも変更できます。

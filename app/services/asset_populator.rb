@@ -27,6 +27,37 @@
 # with a blank backdrop.
 #
 # Shuffle: pass a different `seed:` and call populate! again.
+#
+# ── The direction prompt (AssetPopulator.new(survey, direction:)) ──────────
+# Optional free text the creator types beside Shuffle saying what they want out
+# of the Verto's content and imagery — "warm, outdoors, small groups, no
+# offices". It belongs to ONE shuffle: it arrives with the click, steers that
+# run, and is not stored. It first shipped saved on the Verto so the box would
+# stay filled in, which turned it into invisible state — a steer typed once
+# went on quietly deciding every later shuffle, under a panel headed "Steer
+# THIS shuffle". A prompt box that comes back pre-filled is answering a
+# question nobody asked again.
+#
+# It is a PREFERENCE laid over every existing signal, never a
+# replacement for them: the theme still anchors the search, the card still
+# names its subject, safety and relevance still decide what may be applied.
+# Concretely it does four things (see the "Direction" section below):
+#
+#   * leads every Pexels query with up to DIRECTION_QUERY_TERMS of its words,
+#     with a one-step relaxation back to the undirected query when the
+#     narrowed one finds nothing;
+#   * widens the curated library's theme match/scoring with its words, and
+#     narrows `mood`/`style` to the ones it names;
+#   * feeds the range card's reaction-animation match alongside the theme;
+#   * vetoes: a clause the creator negated ("no offices") is never searched
+#     for and is filtered OUT of both Pexels results and the curated pool.
+#
+# And, when it names a subject area rather than a treatment, it leads outright
+# — see direction_subject?.
+#
+# Nothing here reads the survey for it. A populator built without a direction
+# behaves exactly as it did before the feature existed, which is what every
+# caller other than Shuffle gets.
 class AssetPopulator
   MANIFEST_PATH       = Rails.root.join("app/assets/images/verto-library/manifest.yml").freeze
   BACKGROUND_DIR      = "verto-library/backgrounds".freeze
@@ -100,6 +131,76 @@ class AssetPopulator
   CARD_RELEVANCE_FLOOR  = 4  # the photo must depict something the card names
   THEME_RELEVANCE_FLOOR = 3  # backgrounds / cards with no subject of their own
 
+  # ── Direction-prompt vocabulary ───────────────────────────────────────────
+  # How many of the direction's words ride along on a Pexels query. Deliberately
+  # small: Pexels narrows hard on every extra term, and a direction is a
+  # preference — it must not out-shout the theme and the card's own subject in
+  # the query it's appended to. The REST of the direction is far from wasted;
+  # it still drives library theme/mood/style scoring, the vetoes, and the range
+  # card's animation match. This is only the Pexels hint.
+  DIRECTION_QUERY_TERMS = 3
+
+  # Words that flip the rest of their clause from "want" to "don't want".
+  # Without this a direction reading "no offices" would put `offices` INTO the
+  # search — the exact opposite of what was typed. "less"/"fewer" count: in an
+  # imagery note "less corporate" is a veto, not a quantity.
+  NEGATION_CUES = %w[
+    no not never none nothing avoid avoiding without exclude excluding except
+    omit omitting skip skipping minus less fewer dont doesnt isnt arent
+  ].to_set.freeze
+
+  # Instruction scaffolding — the words people wrap a direction in, plus the
+  # nouns they use to refer to the Verto and its pictures. None of them names
+  # anything depictable, and leaving them in is not harmless: they are usually
+  # at the FRONT of the sentence, so they crowded out the actual instruction in
+  # the bounded slice sent to Pexels. "We want to make this verto professional
+  # and corporate" reduced to `make verto` — a generic verb and our own product
+  # name — and searched for that while "professional corporate" sat unused.
+  #
+  # STYLE vocabulary is deliberately absent: "photo" is filler in "make the
+  # photos warm" but is the whole instruction in "photos, not illustrations",
+  # and DIRECTION_STYLES needs to still see it. The near-synonyms that carry no
+  # style meaning (picture/image/visual) are filtered instead.
+  DIRECTION_FILLER = %w[
+    make makes making made keep keeps keeping give gives giving
+    look looks looking show shows showing use uses using put puts putting
+    try tries trying get gets getting turn turns
+    vibe vibes aesthetic feeling feelings mood moods tone
+    bit lot lots kind sort type way
+    something anything everything
+    image images imagery picture pictures visual visuals
+    verto vertos deck decks survey surveys questionnaire
+    card cards question questions
+    theme themes style styles
+    thing things stuff
+  ].to_set.freeze
+
+  # Direction word → manifest `mood:` value. The manifest vocabulary is small
+  # and closed (playful | energetic | festive | calm | serious | warm), so a
+  # handful of everyday synonyms per value is the difference between the box
+  # working and the creator having to guess our tag names.
+  DIRECTION_MOODS = {
+    "playful" => "playful", "fun" => "playful", "cheerful" => "playful", "lighthearted" => "playful",
+    "energetic" => "energetic", "energy" => "energetic", "dynamic" => "energetic", "lively" => "energetic", "active" => "energetic",
+    "festive" => "festive", "celebratory" => "festive", "celebration" => "festive", "party" => "festive",
+    "calm" => "calm", "calming" => "calm", "quiet" => "calm", "peaceful" => "calm", "serene" => "calm", "gentle" => "calm",
+    "serious" => "serious", "formal" => "serious", "professional" => "serious", "sober" => "serious", "corporate" => "serious",
+    "warm" => "warm", "warmth" => "warm", "cosy" => "warm", "cozy" => "warm", "friendly" => "warm", "inviting" => "warm"
+  }.freeze
+
+  # Direction word → manifest `style:` value (photo | illustrated | vector |
+  # vibrant | minimal | warm). Same reasoning as DIRECTION_MOODS.
+  DIRECTION_STYLES = {
+    "photo" => "photo", "photos" => "photo", "photography" => "photo", "photographic" => "photo", "realistic" => "photo",
+    "illustrated" => "illustrated", "illustration" => "illustrated", "illustrations" => "illustrated", "drawn" => "illustrated", "sketched" => "illustrated",
+    "vector" => "vector", "flat" => "vector", "graphic" => "vector", "iconic" => "vector",
+    "vibrant" => "vibrant", "colourful" => "vibrant", "colorful" => "vibrant", "bold" => "vibrant", "bright" => "vibrant", "punchy" => "vibrant",
+    "minimal" => "minimal", "minimalist" => "minimal", "simple" => "minimal", "clean" => "minimal", "sparse" => "minimal", "understated" => "minimal"
+  }.freeze
+
+  # The default mood spread, used when the direction names none of its own.
+  DEFAULT_MOODS = %w[playful energetic festive warm calm].freeze
+
   class << self
     def manifest
       @manifest_mtime ||= nil
@@ -126,6 +227,8 @@ class AssetPopulator
       candidates = Array(manifest["mobile_backgrounds"])
       return nil if candidates.empty?
 
+      # Theme-only. This runs on the PLAYER, long after any shuffle, so there
+      # is no direction in scope — a steer belongs to the run it was typed for.
       query  = { themes: theme_keywords(survey.theme), age: age_buckets(survey.audience_age) }
       themed = candidates.select do |a|
         asset_themes = Array(a["themes"]).map { |t| t.to_s.downcase }
@@ -160,6 +263,72 @@ class AssetPopulator
         expanded.concat(cluster) if (themes & cluster).any?
       end
       expanded.uniq
+    end
+
+    # ── Direction prompt parsing ──────────────────────────────────────────
+    # Splits `survey.shuffle_direction` into [wanted, unwanted]: the words the
+    # creator is asking for, and the words they've vetoed. Class-level because
+    # the player's mobile-backdrop pick reads the same direction without
+    # building a populator.
+    #
+    # A direction is written as a list of clauses ("warm light, outdoors, no
+    # offices"), so clauses are the unit. Within one clause the first negation
+    # cue flips everything AFTER it into the veto bucket and leaves everything
+    # before it in the wanted bucket — which is what makes both "warm and no
+    # offices" and "no offices and suits" come out right. Getting this wrong
+    # is not a near-miss: it would search for the one thing the creator asked
+    # us to keep out.
+    def direction_buckets(text)
+      wanted, unwanted = [], []
+      text.to_s.downcase.split(%r{[,;./\n|•—–]+}).each do |clause|
+        words = clause.scan(/[a-z']+/).map { |w| w.delete("'") }
+        cue   = words.index { |w| NEGATION_CUES.include?(w) }
+        if cue
+          wanted.concat(words.first(cue))
+          unwanted.concat(words.drop(cue + 1))
+        else
+          wanted.concat(words)
+        end
+      end
+      [ direction_tokens(wanted), direction_tokens(unwanted) ]
+    end
+
+    # Filler removal shared with the instance-level salient_words: what's left
+    # is what a word actually depicts.
+    def salient_tokens(words)
+      words.reject { |w| w.length < 3 || STOP_WORDS.include?(w) || QUESTION_FILLER.include?(w) }
+    end
+
+    # The same, plus the instruction scaffolding people wrap a DIRECTION in.
+    # A direction is prose aimed at us ("we want to make this verto…"), not
+    # question copy, so it carries a layer of filler question text never does.
+    def direction_tokens(words)
+      salient_tokens(words).reject { |w| DIRECTION_FILLER.include?(w) }.uniq
+    end
+
+    # True when a manifest asset is described by any vetoed word — matched
+    # against every tag it carries (themes, keywords, mood, style) and
+    # singularised on both sides so "no offices" also drops an `office` asset.
+    def vetoed_asset?(asset, unwanted)
+      return false if unwanted.empty?
+      tags = %w[themes keywords mood style].flat_map { |k| Array(asset[k]) }
+                                           .map { |t| t.to_s.downcase.singularize }
+      (tags & unwanted.map(&:singularize)).any?
+    end
+
+    # What a direction prompt reduces to: the terms that will be searched on,
+    # and the words that will be kept out. Shuffle reports this back to the
+    # editor after a run, because the alternative is what happened the first
+    # time this shipped — "We want to make this verto professional and
+    # corporate" reduced to `make verto`, searched for THAT, and nothing
+    # anywhere said why the pictures came back unchanged in character. A parse
+    # the creator can see is a parse they can correct.
+    #
+    # Needs the survey as well as the text: safety scrubbing is audience-
+    # dependent and the charged-term strip reads the theme.
+    def direction_reading(survey, direction)
+      pop = new(survey, direction: direction)
+      { toward: pop.send(:direction_terms), avoiding: pop.send(:direction_vetoes) }
     end
 
     def age_buckets(audience_age)
@@ -200,9 +369,13 @@ class AssetPopulator
     end
   end
 
-  def initialize(survey, seed: nil)
-    @survey = survey
-    @seed   = seed || survey.id
+  # `direction`: the creator's optional steer for THIS run (see the header).
+  # Absent for every caller but Shuffle, and absent means "behave as if the
+  # feature isn't there".
+  def initialize(survey, seed: nil, direction: nil)
+    @survey    = survey
+    @seed      = seed || survey.id
+    @direction = Survey.sanitize_shuffle_direction(direction)
     # Memoises Pexels search results per (query, orientation) so a populate!
     # run makes at most one API call per distinct query — keeps us well inside
     # the rate limit even for a long Verto.
@@ -263,6 +436,12 @@ class AssetPopulator
   # the other so a re-populate/shuffle can switch a card between the two. The
   # credit fields are shared (the renderer labels them "Photo by"/"Video by").
   def apply_card_media(card, picked)
+    # A populate/shuffle puts a DIFFERENT picture on the card, so the editor's
+    # re-crop record (the pre-crop original of the old upload, and the crop
+    # taken from it) describes pixels that are no longer there. Left behind,
+    # "Adjust crop" would reopen the previous photo underneath the new one.
+    card.delete("image_source")
+    card.delete("image_crop")
     if picked["video"].present?
       card["video"]        = picked["video"]
       card["video_poster"] = picked["video_poster"]
@@ -300,6 +479,9 @@ class AssetPopulator
     # eclipse a clean theme hit on nature.jpg for a Climate Verto.
     themed = candidates.select { |a| theme_match?(a, query) }
     pool   = themed.presence || candidates
+    # A vetoed backdrop is dropped — but "never blank" outranks the veto, so an
+    # exclusion that would empty the pool falls back to the unfiltered one.
+    pool   = allowed_assets(pool).presence || pool
 
     scored = pool.map { |a| [ score(a, query), a ] }
     top    = scored.max_by { |s, _| s }
@@ -373,7 +555,10 @@ class AssetPopulator
     # Require BOTH a card-type fit AND a thematic connection (theme keyword
     # OR card-keyword overlap). Without the theme/keyword gate, sports-people
     # art would happily land on a Climate Verto purely on age/mood scoring.
-    type_matching = Array(self.class.manifest["left_panel"]).select do |a|
+    # A vetoed asset is dropped outright here: unlike the background, a card
+    # panel is allowed to come back blank, and a blank panel is a better answer
+    # to "no offices" than an office.
+    type_matching = allowed_assets(Array(self.class.manifest["left_panel"])).select do |a|
       types = Array(a["card_types"])
       (types.empty? || types.include?(type)) && theme_match?(a, query)
     end
@@ -406,7 +591,7 @@ class AssetPopulator
     # tap_card's left panel.
     return nil if bucket.nil?
 
-    pool = Array(bucket)
+    pool = allowed_assets(Array(bucket))
     return nil if pool.empty?
 
     available = pool.reject { |a| used.include?(asset_url(dir, a["file"])) }
@@ -430,7 +615,7 @@ class AssetPopulator
       return urls
     end
 
-    pool = Array(self.class.manifest["swipe_cards"])
+    pool = allowed_assets(Array(self.class.manifest["swipe_cards"]))
     return [] if pool.empty?
 
     rng = rand_for("tap-#{card_idx}")
@@ -460,8 +645,36 @@ class AssetPopulator
     # image-library cluster expansion over-bridges (food → lifestyle → "game")
     # and would land a sport animation on a food Verto. NpsHelper owns the
     # animation vocabulary and the fallback.
-    pool = NpsHelper.range_themes_for(@survey.theme)
+    #
+    # The direction's words join the theme's (range_themes_for takes a list and
+    # scores on the union): the animation is this card's asset, so a Verto
+    # steered toward "recycling" should react with recycling. Vetoed animations
+    # are dropped unless that would empty the pool — a range card always needs
+    # SOME animation to play.
+    pool = NpsHelper.range_themes_for([ @survey.theme, direction_words.join(" ") ])
+    pool = allowed_range_themes(pool)
     pool[rand_for("range-theme-#{idx}").rand(pool.size)]
+  end
+
+  # The vetoed animations removed. When the veto empties the on-theme pool —
+  # "no football" on a football Verto — the answer is the neutral General group
+  # rather than the animation the creator just asked us not to play; only if
+  # THAT is empty too does the veto give way, because a range card has to play
+  # something.
+  def allowed_range_themes(pool)
+    return pool if veto_tokens.empty?
+    allowed = pool.reject { |slug| range_theme_vetoed?(slug) }
+    return allowed if allowed.any?
+    NpsHelper::RANGE_THEME_FALLBACK.reject { |slug| range_theme_vetoed?(slug) }.presence || pool
+  end
+
+  # A range animation is vetoed when the veto names its slug or one of the
+  # subject words NpsHelper says it depicts ("no football" drops both
+  # `football` and `football_goal`).
+  def range_theme_vetoed?(slug)
+    return false if veto_tokens.empty?
+    words = (slug.split("_") + Array(NpsHelper::RANGE_THEME_KEYWORDS[slug])).map(&:singularize)
+    (words & veto_tokens).any?
   end
 
   # ── Pexels source ───────────────────────────────────────────────────────
@@ -482,17 +695,27 @@ class AssetPopulator
       safe = results.size
       # 2. Brand-neutral, unless the theme itself invokes the charged subject.
       results = results.select { |p| charged_theme? || ContentSafety.neutral?(p["alt"]) }
+      neutral = results.size
+      # 3. Not something the direction prompt vetoed.
+      results = results.select { |p| direction_allows?(p["alt"]) }
       Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} -> " \
-                        "#{fetched} fetched / #{safe} safe / #{results.size} neutral")
+                        "#{fetched} fetched / #{safe} safe / #{neutral} neutral / " \
+                        "#{results.size} allowed")
       results
     end
   end
 
+  # The background's backdrop. Tries the directed query first and, if nothing
+  # clears the relevance floor, once more without the direction — a preference
+  # must not be able to cost the Verto its backdrop.
   def pexels_background_url
-    query  = background_query
-    photos = relevant(pexels_photos(query, :background), [], query_theme_words(query)) { |p| p["alt"] }
-    return nil if photos.empty?
-    chosen = photos[rand_for("bg").rand(photos.size)]
+    photos = nil
+    background_queries.each do |query|
+      photos = relevant(pexels_photos(query, :background), [], query_theme_words(query)) { |p| p["alt"] }
+      break if photos.any?
+    end
+    return nil if photos.blank?
+    chosen = direction_first(photos, rand_for("bg")) { |p| p["alt"] }.first
     PexelsClient.url_for(chosen, :background)
   end
 
@@ -504,7 +727,7 @@ class AssetPopulator
     query  = card_query(card)
     photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :card) }) { |p| p["alt"] }
     return nil if photos.empty?
-    ordered = photos.shuffle(random: rand_for("px-#{idx}"))
+    ordered = direction_first(photos, rand_for("px-#{idx}")) { |p| p["alt"] }
     ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
   end
 
@@ -516,7 +739,7 @@ class AssetPopulator
     videos = relevant_with_subject_retry(card, query, ->(q) { pexels_videos(q) }) { |v| v["url"] }
     return nil if videos.empty?
 
-    ordered = videos.shuffle(random: rand_for("pxv-#{idx}"))
+    ordered = direction_first(videos, rand_for("pxv-#{idx}")) { |v| v["url"] }
     chosen  = ordered.find { |v| (u = PexelsClient.video_file_url(v)) && !used.include?(u) }
     url     = chosen && PexelsClient.video_file_url(chosen)
     return nil unless url
@@ -539,6 +762,7 @@ class AssetPopulator
       # Videos carry no alt text; the page-URL slug is the best signal we have.
       results = results.select { |v| ContentSafety.safe?(v["url"], safety_age_buckets) }
       results = results.select { |v| charged_theme? || ContentSafety.neutral?(v["url"]) }
+      results = results.select { |v| direction_allows?(v["url"]) }
       Rails.logger.info("[AssetPopulator] pexels video q=#{query.inspect} -> #{results.size} result(s)")
       results
     end
@@ -550,12 +774,16 @@ class AssetPopulator
     return nil unless PexelsClient.configured?
     query  = card_query(card)
     photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :swipe) }) { |p| p["alt"] }
+    # Direction preference is applied to the PHOTOS, before they become URLs —
+    # the alt text is the only evidence of what a picture shows, and it doesn't
+    # survive the mapping. The unused-first rule then re-partitions without
+    # re-shuffling, so both orderings hold.
+    photos = direction_first(photos, rand_for("pxtap-#{card_idx}")) { |p| p["alt"] }
     urls   = photos.map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
     return nil if urls.empty?
 
-    rng = rand_for("pxtap-#{card_idx}")
     fresh, used_elsewhere = urls.partition { |u| !swipe_used.include?(u) }
-    ordered = fresh.shuffle(random: rng) + used_elsewhere.shuffle(random: rng)
+    ordered = fresh + used_elsewhere
     ordered *= ((count.to_f / ordered.size).ceil) if ordered.size < count
 
     picks = ordered.first(count)
@@ -614,15 +842,29 @@ class AssetPopulator
     @safety_age_buckets ||= self.class.age_buckets(@survey.audience_age)
   end
 
-  def background_query
+  def background_query(directed: true)
     # Backgrounds KEEP geography — a full-bleed skyline/landscape for the
     # Verto's place is neutral and legitimate (a "London life" Verto's
     # backdrop should be able to be London). Only charged terms are stripped
     # (unless the theme invokes them). The screenshot confirmed the theme-only
     # background was already correct; the bug was card copy, not the backdrop.
     terms = theme_query_terms.reject { |w| !charged_theme? && ContentSafety::CHARGED.include?(w) }
-    raw   = terms.first(3).join(" ").presence || "abstract background"
+                             .first(3)
+    terms = with_direction(terms) if directed
+    raw   = terms.join(" ").presence || "abstract background"
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract background"
+  end
+
+  # The backdrop queries to try — same prompt-first ladder as the cards: the
+  # direction-led query when the direction names a subject area, then the
+  # theme+direction query, then the theme alone. One entry (and identical
+  # behaviour to before) when there's no direction.
+  def background_queries
+    [
+      (direction_led_query if direction_affinity.any?),
+      background_query,
+      (background_query(directed: false) if direction_terms.any?)
+    ].compact.uniq
   end
 
   # Theme-anchored: the BASE of every card query is the Verto theme's subject,
@@ -640,7 +882,12 @@ class AssetPopulator
   # ContentSafety.scrub_query runs over the final joined query regardless of
   # which branch produced it. Fail-closed throughout: an unknown word is
   # simply not added, never allowed to steer the query on its own.
-  def card_query(card)
+  #
+  # The direction prompt, when set, is appended LAST (see with_direction) —
+  # after the theme base and after the card's own subject — so it colours the
+  # search without displacing what the card is about. `directed: false` rebuilds
+  # the same query without it, for the relaxation ladder in card_queries.
+  def card_query(card, directed: true)
     base = clean_theme_terms.first(2)
     refine =
       if theme_only_card?(card)
@@ -651,6 +898,7 @@ class AssetPopulator
         subject_terms(card_keywords(card), proper_nouns("#{card['text']} #{card['description']}"))
       end
     terms = (base + refine).uniq { |w| w.singularize }
+    terms = with_direction(terms) if directed
     raw   = terms.join(" ").presence || clean_theme_terms.first(3).join(" ").presence || "abstract"
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
   end
@@ -666,20 +914,47 @@ class AssetPopulator
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
   end
 
-  # Runs `fetch` (->(query) { API results }) for `query`, relevance-filters
-  # the results, and — only when `query` was refined by the AI-extracted
-  # subject and NOTHING survives the floor — retries once against the plain
-  # theme base before the caller falls through to the curated library.
-  # Skipped (not just a no-op retry) when the card carries no subject, or the
-  # theme base IS the query already: nothing would change on a second try.
+  # Runs `fetch` (->(query) { API results }) over progressively looser queries
+  # and returns the first relevance-filtered set that isn't empty; [] when none
+  # of them find anything and the caller falls through to the curated library.
+  # See card_queries for the ladder — with neither a direction nor an
+  # AI-extracted subject it is a single query and one call, exactly as before.
   def relevant_with_subject_retry(card, query, fetch, &text_for)
-    items = relevant(fetch.call(query), card_relevance_words(card), query_theme_words(query), &text_for)
-    return items if items.any? || card["subject"].to_s.strip.blank?
+    items = []
+    card_queries(card, query).each do |q|
+      items = relevant(fetch.call(q), card_relevance_words(card), query_theme_words(q), &text_for)
+      break if items.any?
+    end
+    items
+  end
 
-    fallback = theme_base_query
-    return items if fallback == query
-
-    relevant(fetch.call(fallback), card_relevance_words(card), query_theme_words(fallback), &text_for)
+  # The queries to try for one card, most direction-led first:
+  #
+  #   0. the prompt-first query — the direction plus one theme word — whenever
+  #      the direction names a subject area. The creator said what they want
+  #      the Verto to look like; ask for that before asking for anything else.
+  #   1. what the caller built — direction + theme base + card subject;
+  #   2. the same without the direction. A preference is the first thing to
+  #      give up: it is how the creator wants the subject shown, not what the
+  #      card is about.
+  #   3. the bare theme base, when an AI-extracted subject narrowed the query.
+  #      A subject can legitimately be more specific than what this theme's
+  #      Pexels library covers ("vintage bicycle" vs. plain "commute"), and a
+  #      theme-anchored photo still beats none.
+  #
+  # Rung 0 leading is the whole point and also its own risk, so the rungs below
+  # it stay exactly as they were: a direction that finds nothing still falls
+  # through to the card's own search rather than leaving the panel blank.
+  #
+  # De-duped, so a step that would re-send an identical query is skipped rather
+  # than spending a second API call to re-filter the same results.
+  def card_queries(card, query)
+    ladder = []
+    ladder << direction_led_query if direction_affinity.any?
+    ladder << query
+    ladder << card_query(card, directed: false) if direction_terms.any?
+    ladder << theme_base_query                  if card["subject"].to_s.strip.present?
+    ladder.uniq
   end
 
   # Cards imaged from the Verto theme ONLY, ignoring their own copy: scaffolding
@@ -737,13 +1012,176 @@ class AssetPopulator
     s
   end
 
+  # The curated library's query hash. The direction widens `themes` (so an
+  # asset the creator asked for can clear the Tier-1 thematic gate and score
+  # like a theme hit) and NARROWS `mood`/`style` to the ones it names — a
+  # direction saying "calm, minimal" should stop every playful asset collecting
+  # the mood bonus, which is the whole point of saying it.
   def survey_query_tags
     {
-      themes: self.class.theme_keywords(@survey.theme),
+      themes: self.class.theme_keywords(@survey.theme) | direction_themes,
       age:    self.class.age_buckets(@survey.audience_age),
-      mood:   %w[playful energetic festive warm calm],
-      style:  []
+      mood:   direction_moods.presence || DEFAULT_MOODS,
+      style:  direction_styles
     }
+  end
+
+  # ── Direction ─────────────────────────────────────────────────────────────
+
+  def direction_text
+    @direction
+  end
+
+  # [wanted, vetoed] — parsed once per run.
+  def direction_parts
+    @direction_parts ||= self.class.direction_buckets(direction_text)
+  end
+
+  # The words the creator asked FOR, minus anything the content-safety
+  # blocklist forbids for this audience and anything on the brand-neutrality
+  # (protest-visual) list. The direction is deliberate creator input, so unlike
+  # theme and card copy it keeps geography and proper nouns — "Scandinavian",
+  # "coastal", "London rooftops" are exactly the instruction. What it does NOT
+  # get is the charged-theme unlock: a charged word here is stripped the same
+  # way it is from a theme, because CHARGED contains everyday homographs
+  # ("march") and one of them in an imagery note is not the deliberate topic
+  # declaration that ContentSafety.charged_theme? is looking for. A creator who
+  # genuinely wants protest imagery says so in the Verto's theme, or picks it
+  # by hand in the media picker.
+  def direction_words
+    @direction_words ||= begin
+      words = direction_parts[0].reject { |w| !charged_theme? && ContentSafety::CHARGED.include?(w) }
+      ContentSafety.scrub_query(words.join(" "), safety_age_buckets).split
+    end
+  end
+
+  # The words the creator vetoed. Not safety-scrubbed and not charged-stripped:
+  # asking for LESS of something is safe whatever the word is.
+  def direction_vetoes
+    @direction_vetoes ||= direction_parts[1]
+  end
+
+  # The slice of the direction that rides along on a Pexels query.
+  def direction_terms
+    @direction_terms ||= direction_words.first(DIRECTION_QUERY_TERMS)
+  end
+
+  def direction_themes
+    @direction_themes ||= self.class.expand_themes(direction_words)
+  end
+
+  # ── Direction affinity: does the direction name a SUBJECT AREA? ───────────
+  # The direction's words expanded through the theme clusters, minus the
+  # Verto's own theme words. What's left is the vocabulary that counts as
+  # evidence a candidate followed the direction — and only the direction, which
+  # is why the theme words go: on a "community sport" Verto, a photo of a
+  # community sports day must not read as proof we found something "corporate"
+  # just because the work cluster happens to list "community" too.
+  #
+  # Subtracting the theme's LITERAL words, not its cluster expansion. The
+  # expansion is bidirectional and bridges hard on words like "community", so a
+  # community-sport theme already pulls the entire work vocabulary in —
+  # subtracting that cancelled "professional and corporate" down to nothing and
+  # silently disabled every prompt-first path below it. Bridges are why a
+  # nature background can win a food Verto; they are far too broad to define
+  # "what the theme already asked for".
+  #
+  # Empty unless the direction names a SUBJECT AREA (see direction_subject?),
+  # and that emptiness is load-bearing: everything prompt-first below is gated
+  # on it, so a direction that only says how a picture should look leaves the
+  # existing behaviour alone, while one that names a subject takes the lead.
+  #
+  # Alt text almost never repeats the creator's own adjective, so the cluster
+  # expansion is also what makes matching work at all: "corporate" is satisfied
+  # by an alt that says office, business or colleagues.
+  def direction_affinity
+    @direction_affinity ||=
+      if direction_subject?
+        (direction_themes - theme_query_terms).map(&:singularize).uniq
+      else
+        []
+      end
+  end
+
+  # Does the direction name a subject area, or only a treatment? The test is
+  # whether the theme clusters RECOGNISED any of its words — expand_themes
+  # returns what it was given plus whatever the clusters add, so anything left
+  # after removing the original words is a cluster saying "I know this topic".
+  # "professional and corporate" reaches the work cluster; "warm minimal"
+  # reaches nothing, because no cluster claims an adjective.
+  #
+  # Testing `direction_affinity.any?` directly would NOT work and looked like it
+  # would: expand_themes always echoes its input, so every non-empty direction
+  # has a non-empty expansion, the gate never closed, and "warm minimal" would
+  # have taken the prompt-first rung and flattened every card's own subject.
+  def direction_subject?
+    return @direction_subject if defined?(@direction_subject)
+    @direction_subject = (direction_themes - direction_words).any?
+  end
+
+  # True when a candidate's description shows what the direction asked for.
+  def direction_preferred?(text)
+    return false if direction_affinity.empty?
+    (relevance_tokens(text) & direction_affinity).any?
+  end
+
+  # Order candidates so the ones answering the direction come first, seeded so
+  # a given seed still yields a stable result. THIS is what makes a direction
+  # stick across a whole deck: two cards with the same query draw from the same
+  # Pexels pool, and picking from it at random meant one card got the office
+  # and the next got the rugby match. With no direction — or nothing in the
+  # pool that matches one — it is exactly the shuffle it replaces.
+  def direction_first(items, rng, &text_for)
+    return items.shuffle(random: rng) if direction_affinity.empty?
+    preferred, rest = items.partition { |it| direction_preferred?(text_for.call(it)) }
+    preferred.shuffle(random: rng) + rest.shuffle(random: rng)
+  end
+
+  def direction_moods
+    @direction_moods ||= direction_words.filter_map { |w| DIRECTION_MOODS[w] }.uniq
+  end
+
+  def direction_styles
+    @direction_styles ||= direction_words.filter_map { |w| DIRECTION_STYLES[w] }.uniq
+  end
+
+  # Vetoed words, singularised once, for matching against Pexels alt text and
+  # video slugs.
+  def veto_tokens
+    @veto_tokens ||= direction_vetoes.map(&:singularize)
+  end
+
+  # False when a candidate's description names something the creator vetoed.
+  def direction_allows?(text)
+    return true if veto_tokens.empty?
+    (relevance_tokens(text) & veto_tokens).empty?
+  end
+
+  # Drop curated assets the direction vetoed. Unlike the Pexels side this can
+  # empty a pool, so callers that must not come back blank (the background)
+  # fall back to the unfiltered pool themselves.
+  def allowed_assets(assets)
+    return assets if direction_vetoes.empty?
+    assets.reject { |a| self.class.vetoed_asset?(a, direction_vetoes) }
+  end
+
+  # Put the direction at the FRONT of a query's terms. It used to trail them,
+  # which read well in the code and badly in practice: a prioritise card's copy
+  # alone runs to a dozen words, so the instruction arrived as the last two of
+  # fifteen and the results came back looking like it was never typed.
+  def with_direction(terms)
+    (direction_terms + terms).uniq { |w| w.singularize }
+  end
+
+  # The prompt-first query: the direction plus just enough theme to keep the
+  # Verto recognisable. Tried BEFORE the card's own query whenever the direction
+  # names a subject area (see direction_affinity), because "make this verto
+  # professional and corporate" is an instruction about the whole deck, not a
+  # flavour to sprinkle on each card's separate search. It is one query for the
+  # whole run, so it also costs one API call rather than one per card.
+  def direction_led_query
+    raw = (direction_terms + clean_theme_terms.first(1)).uniq { |w| w.singularize }.join(" ")
+    ContentSafety.scrub_query(raw, safety_age_buckets).presence || theme_base_query
   end
 
   # theme_keywords / age_buckets are class methods now (see top of file);
@@ -762,9 +1200,7 @@ class AssetPopulator
   end
 
   def salient_words(text)
-    text.to_s.downcase.scan(/[a-z]+/).reject do |w|
-      w.length < 3 || STOP_WORDS.include?(w) || QUESTION_FILLER.include?(w)
-    end
+    self.class.salient_tokens(text.to_s.downcase.scan(/[a-z]+/))
   end
 
   # ── Pexels relevance floor ────────────────────────────────────────────────
@@ -777,10 +1213,21 @@ class AssetPopulator
     (salient_words(text) - SLUG_NOISE.to_a).map(&:singularize).uniq
   end
 
-  # Library-parity weights: +4 per card-subject hit, +3 per theme-term hit.
+  # Library-parity weights: +4 per card-subject hit, +3 per theme-term hit,
+  # +3 per direction-affinity hit.
+  #
+  # The direction has to count here or the prompt-first rung is self-defeating:
+  # ask Pexels for "professional corporate community", get back a photo of
+  # colleagues in an office, and score it against the literal query words it
+  # doesn't contain — zero, rejected, fall through to the card's own search and
+  # the deck stays exactly as it was. Crediting the affinity is not a loosening
+  # either: it is the same "does this picture depict something we asked for?"
+  # question, asked about the half of the request the creator typed themselves.
   def relevance_score(text, card_words, theme_words)
     tokens = relevance_tokens(text)
-    4 * (tokens & card_words).size + 3 * (tokens & theme_words).size
+    4 * (tokens & card_words).size +
+      3 * (tokens & theme_words).size +
+      3 * (tokens & direction_affinity).size
   end
 
   # The card's own subject words for scoring — empty for theme-only cards

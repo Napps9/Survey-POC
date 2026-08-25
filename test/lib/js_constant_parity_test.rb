@@ -148,7 +148,9 @@ class JsConstantParityTest < ActiveSupport::TestCase
     # The wrapper's own class is interpolated (it varies with `strong`), so the
     # markers are the two fixed classes inside it plus the hook the serializer
     # finds the strip by — between them nothing can build a strip elsewhere.
-    [ %(class="rotate-action-btn"), %(class="rotate-action-label"), "data-tap-response-label>" ].each do |marker|
+    # The mark's marker is an unclosed prefix: the editor flavour appends
+    # `rotate-action-btn--editable` (the mark is the 🎨 popover's click target).
+    [ %(class="rotate-action-btn), %(class="rotate-action-label"), "data-tap-response-label>" ].each do |marker|
       definitions = Dir[Rails.root.join("app/javascript/**/*.js")].select do |path|
         File.read(path).include?(marker)
       end.map { |path| path.sub("#{Rails.root}/app/javascript/", "") }
@@ -256,6 +258,48 @@ class JsConstantParityTest < ActiveSupport::TestCase
     assert_equal BrandPalette::DEFAULT, js_default,
                  "differing defaults make default? disagree across the mirror, so the " \
                  "same palette brands the player but not the editor (or vice versa)"
+  end
+
+  # Every derived key has to exist on BOTH sides, or the live preview and the
+  # served page disagree about a colour. primary_ink is the one that prompted
+  # this: a key added in Ruby and forgotten in JS would preview a creator's
+  # selected answers in the raw brand colour and then serve respondents the
+  # readable one — the preview lying about the product, which is the exact
+  # failure the mirror exists to prevent.
+  test "lib/brand_palette.js derives the same keys as BrandPalette#resolve" do
+    ruby_keys = BrandPalette.resolve("primary" => "#01EACB").keys.sort
+    body = js("lib/brand_palette.js")[/export function resolve\(raw\) \{.*?\n\}/m]
+    assert body, "resolve() not found in lib/brand_palette.js"
+
+    js_keys = (body.scan(/^\s{4}(\w+):/).flatten + BrandPalette::ROLES).uniq.sort
+    assert_equal ruby_keys, js_keys,
+                 "the two sides of the palette derive different keys. Missing in JS: " \
+                 "#{(ruby_keys - js_keys).inspect}; missing in Ruby: #{(js_keys - ruby_keys).inspect}"
+
+    # …and every one of them needs a CSS variable name, or it is derived and
+    # then dropped on the floor.
+    vars = js("lib/brand_palette.js")[/export const CSS_VARS = \{(.*?)\n\}/m, 1].scan(/(\w+):/).flatten
+    assert_empty ruby_keys - vars - %w[panel],
+                 "these derived colours have no --brand-* variable, so nothing can read " \
+                 "them: #{(ruby_keys - vars - %w[panel]).inspect}"
+  end
+
+  # The derivation itself, not just its name. Ported by hand once already; a
+  # silent divergence here shows up as a preview that is a shade off.
+  test "readableInk in the JS mirror agrees with BrandPalette#readable_ink" do
+    source = js("lib/brand_palette.js")
+    assert_includes source, "export function readableInk",
+                    "the JS mirror has no readableInk, so the live preview cannot derive " \
+                    "the readable selected-label colour at all"
+    assert_match(/step \+= 0\.02/, source,
+                 "the JS mirror walks in different steps from the Ruby side, so the two " \
+                 "will stop on different shades of the same brand")
+    assert_match(/minRatio = 4\.5/, source,
+                 "the JS mirror targets a different contrast ratio from the Ruby side")
+    assert_match(/readableInk\(p\.primary, lighten\(p\.primary, 0\.88\)\)/, source,
+                 "the JS mirror measures against a different surface — rgba(P, 0.12) over " \
+                 "white is lighten(P, 0.88), and anything else is not the row the label " \
+                 "actually sits on")
   end
 
   # The specific hole the drift went through: the editor's type panel builds a

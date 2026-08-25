@@ -15,6 +15,12 @@
   has_media  = has_video || has_img
   credit_word = has_video ? "Video by" : "Photo by"
   animate_asset = card["animate_asset"] == true
+  # "Adjust crop" only works on a photo the crop stage can redraw: same-origin
+  # (a stored path or inline data URL) — a Pexels URL taints the canvas and
+  # the final encode throws. media_picker#_syncAdjustFab applies the same rule
+  # client-side when the photo changes without a server render.
+  can_adjust_crop = editable && has_img && !has_video &&
+                    card["image"].to_s.match?(%r{\A(/|data:)})
 %>
 
 <%# The animation backdrop (card["media_bg"]) paints only where an animation
@@ -108,13 +114,50 @@
           <span><%= t("editor.change_background", default: "Background") %></span>
         </button>
       </div>
-    <% elsif has_media || has_lottie %>
-      <button type="button" class="add-media-fab"
-              data-action="click->media-picker#open"
-              title="<%= t("editor.change_media_title") %>">
-        <span class="add-media-fab-plus">＋</span>
-        <span><%= t("editor.change_media") %></span>
-      </button>
+    <% elsif has_lottie %>
+      <%# A Lottie is the one medium that can be TRANSPARENT, so what sits
+          behind it is a real design decision rather than nothing — and this
+          panel offered no way to make it ("I need the Change Background
+          option here for when we upload transparent lottie files"). Only the
+          entry point was missing: media-picker#_cardAnimates already returns
+          true for any card carrying a lottie, not just for range, so the
+          Animation background section has been in that modal all along with
+          nothing on this panel calling it.
+          Scoped to lotties deliberately. A photo or a video is opaque; a
+          background behind one is a control that does nothing. %>
+      <div class="split-left-cta-row">
+        <button type="button" class="add-media-fab"
+                data-action="click->media-picker#open"
+                title="<%= t("editor.change_media_title") %>">
+          <span class="add-media-fab-plus">＋</span>
+          <span><%= t("editor.change_media") %></span>
+        </button>
+        <button type="button" class="add-bg-fab"
+                data-action="click->media-picker#open"
+                title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
+          <span><%= t("editor.change_background", default: "Background") %></span>
+        </button>
+      </div>
+    <% elsif has_media %>
+      <%# A photo card gets a second control: reopen the crop stage against
+          the kept original (or the image itself, for legacy cards) instead
+          of remove-and-reupload — Feedback 17. Rendered for video cards too
+          but hidden, so swapping video → photo in the editor finds it ready
+          (the same reason the design prompt below stays in the DOM). %>
+      <div class="split-left-cta-row">
+        <button type="button" class="add-media-fab"
+                data-action="click->media-picker#open"
+                title="<%= t("editor.change_media_title") %>">
+          <span class="add-media-fab-plus">＋</span>
+          <span><%= t("editor.change_media") %></span>
+        </button>
+        <button type="button" class="add-bg-fab adjust-crop-fab"
+                data-action="click->media-picker#openAdjustCrop"
+                title="<%= t("editor.adjust_crop_title", default: "Reframe this card's photo — move and zoom the crop") %>"
+                <%= "hidden".html_safe unless can_adjust_crop %>>
+          <span><%= t("editor.adjust_crop", default: "Adjust crop") %></span>
+        </button>
+      </div>
     <% else %>
       <button type="button" class="split-left-design-prompt"
               data-action="click->media-picker#open"
@@ -123,6 +166,17 @@
         <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
         <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
       </button>
+      <%# Hidden until an upload lands on this card without a server render —
+          media_picker#_syncAdjustFab reveals it, the same stays-in-the-DOM
+          contract as the design prompt above. %>
+      <div class="split-left-cta-row">
+        <button type="button" class="add-bg-fab adjust-crop-fab"
+                data-action="click->media-picker#openAdjustCrop"
+                title="<%= t("editor.adjust_crop_title", default: "Reframe this card's photo — move and zoom the crop") %>"
+                hidden>
+          <span><%= t("editor.adjust_crop", default: "Adjust crop") %></span>
+        </button>
+      </div>
     <% end %>
   <% end %>
 </div>

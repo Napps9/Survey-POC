@@ -52,6 +52,28 @@ export function contrastText(hex) {
   return contrastDark >= contrastWhite ? "#1C2034" : "#FFFFFF"
 }
 
+export function contrastRatio(a, b) {
+  const la = luminance(a), lb = luminance(b)
+  const hi = Math.max(la, lb), lo = Math.min(la, lb)
+  return (hi + 0.05) / (lo + 0.05)
+}
+
+// Twin of BrandPalette#readable_ink — the brand colour made legible AS TEXT on
+// a light surface, same hue, taken down only as far as it has to go. See the
+// Ruby side for why contrastText cannot do this job (it answers "black or
+// white?", and the point is to stay the brand colour).
+export function readableInk(hex, on, minRatio = 4.5) {
+  if (!validHex(hex) || !validHex(on)) return hex
+  if (contrastRatio(hex, on) >= minRatio) return hex
+  let step = 0
+  while (step < 1) {
+    step += 0.02
+    const candidate = darken(hex, step)
+    if (contrastRatio(candidate, on) >= minRatio) return candidate
+  }
+  return "#1C2034"
+}
+
 export function darken(hex, amount) {
   return toHex(rgb(hex).map((c) => c * (1 - amount)))
 }
@@ -86,6 +108,9 @@ export function resolve(raw) {
     surface: lighten(p.bg, 0.08),
     surface_2: lighten(p.bg, 0.13),
     primary_soft: rgba(p.primary, 0.12),
+    // Measured against the surface it lands on: rgba(P, 0.12) composited onto
+    // white is exactly lighten(P, 0.88).
+    primary_ink: readableInk(p.primary, lighten(p.primary, 0.88)),
   }
 }
 
@@ -101,6 +126,7 @@ export const CSS_VARS = {
   surface: "--brand-surface",
   surface_2: "--brand-surface-2",
   primary_soft: "--brand-primary-soft",
+  primary_ink: "--brand-primary-ink",
 }
 
 // Apply a resolved palette's variables onto an element's inline style.

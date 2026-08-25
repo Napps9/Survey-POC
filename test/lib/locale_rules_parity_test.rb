@@ -1,7 +1,7 @@
 require "test_helper"
 
 # The editor's Rules of the Game strings (js.editor.rules.*) are mirrored
-# across all 19 locale files. verto_rules.js looks keys up at runtime, so a
+# across all 25 locale files. verto_rules.js looks keys up at runtime, so a
 # missing key in any locale surfaces as a raw key string in the UI — catch
 # the drift here instead.
 class LocaleRulesParityTest < ActiveSupport::TestCase

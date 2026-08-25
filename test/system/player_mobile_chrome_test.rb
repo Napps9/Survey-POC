@@ -119,6 +119,15 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
     2.times { click_button "Next"; sleep 0.4 } # → the grid card
     assert_equal "select_one_grid", find(".preview-card.active")["data-card-type"]
 
+    before = page.evaluate_script(<<~JS)
+      (() => {
+        const label = document.querySelector(".preview-card.active .choice-card .choice-label")
+        const cs = getComputedStyle(label)
+        return { w: label.offsetWidth, h: label.offsetHeight,
+                 family: cs.fontFamily, stroke: cs.webkitTextStrokeWidth }
+      })()
+    JS
+
     first(".preview-card.active .choice-card").click
     sleep 0.3
 
@@ -130,7 +139,9 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
         return {
           wrapper: getComputedStyle(li).boxShadow,
           tile:    getComputedStyle(bg).boxShadow,
-          label:   getComputedStyle(li.querySelector(".choice-label")).color
+          wash:    getComputedStyle(li.querySelector(".choice-overlay")).backgroundColor,
+          label:   getComputedStyle(li.querySelector(".choice-label")).color,
+          stroke:  getComputedStyle(li.querySelector(".choice-label")).webkitTextStrokeWidth
         }
       })()
     JS
@@ -139,10 +150,251 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
     assert_equal "none", shadows["wrapper"],
                  "the selection ring is still on the <li>, which encloses the caption text — " \
                  "'can the selection be just the box, and not the text as well?'"
+    assert_includes shadows["wash"], "0.42",
+                    "the wash over a selected tile's artwork is #{shadows['wash']}. It used " \
+                    "to be a hardcoded dark green — a colour from no palette, on a card that " \
+                    "is otherwise entirely brand-driven, so a magenta Verto tinted its chosen " \
+                    "answers green. It is derived from the brand's readable ink now, which is " \
+                    "the tone that darkens rather than washes out."
     assert_includes shadows["tile"], "rgb(1, 234, 203)",
-                    "the tile itself should carry the brand ring"
-    assert_equal "rgb(1, 234, 203)", shadows["label"],
-                 "the caption should turn brand when selected, the way a .choice-list row's " \
-                 "label already does"
+                    "the tile itself should carry the brand ring — the RING is chrome and " \
+                    "takes the raw brand colour; only the text had to move (see below)"
+
+    # This used to assert the raw brand primary, rgb(1, 234, 203), and it was
+    # wrong in a way a colour-equality test cannot notice: on the default
+    # palette that is 1.54:1 against the white caption row. Choosing an answer
+    # took its label from 16:1 to almost invisible, and the assertion held the
+    # bug in place because it only ever asked "is it the brand colour?".
+    #
+    # It is now the brand colour made legible — same hue, darkened only as far
+    # as 4.5:1 requires (BrandPalette#readable_ink). So this asserts the
+    # PROPERTY rather than the constant: a future brand, or a retuned
+    # derivation, should be free to land on a different value and still pass —
+    # what must never come back is a caption nobody can read.
+    ink = BrandPalette.resolve(BrandPalette::DEFAULT)["primary_ink"]
+    expected = "rgb(%d, %d, %d)" % BrandPalette.rgb(ink)
+    assert_equal expected, shadows["label"],
+                 "the caption should turn the READABLE brand colour when selected. The raw " \
+                 "primary is #{BrandPalette.contrast_ratio(BrandPalette::DEFAULT['primary'],
+                    BrandPalette.lighten(BrandPalette::DEFAULT['primary'], 0.88)).round(2)}:1 " \
+                 "on this surface, which is why it is not what lands here any more."
+
+    surface = page.evaluate_script(<<~JS)
+      (() => {
+        const li = document.querySelector('.preview-card.active .choice-card[data-selected="true"]')
+        let n = li.querySelector(".choice-label")
+        while (n) {
+          const bg = getComputedStyle(n).backgroundColor
+          if (bg && !/rgba\\(0, 0, 0, 0\\)|transparent/.test(bg)) return bg
+          n = n.parentElement
+        }
+        return "rgb(255, 255, 255)"
+      })()
+    JS
+    ratio = BrandPalette.contrast_ratio(ink, "#%02X%02X%02X" % surface.scan(/\d+/).first(3).map(&:to_i))
+    assert_operator ratio, :>=, 4.5,
+                    "the selected caption reads at #{ratio.round(2)}:1 against #{surface}. " \
+                    "Whatever colour selection turns the label, a respondent has to be able " \
+                    "to read the answer they just chose."
+
+    # Selecting used to swap the label's font FAMILY, which re-typeset the
+    # caption — "the font size actually reduces slightly … 'zero' drops onto
+    # 2 lines". The bold now comes from a text stroke, the one emphasis that
+    # cannot move a glyph. The stroke was collected above from the day this
+    # test was written and never asserted, so reverting the family swap kept
+    # the whole suite green — these four close that door.
+    # offsetWidth/Height, not getBoundingClientRect: selecting a tile lifts it
+    # with a scale transform, which moves the RECT of everything inside without
+    # re-typesetting a glyph. Layout metrics see through the lift; a real
+    # re-typeset (the family swap dropped 'zero' onto a second line) moves them
+    # by a full line-height.
+    after = page.evaluate_script(<<~JS)
+      (() => {
+        const label = document.querySelector('.preview-card.active .choice-card[data-selected="true"] .choice-label')
+        return { w: label.offsetWidth, h: label.offsetHeight,
+                 family: getComputedStyle(label).fontFamily }
+      })()
+    JS
+    assert_equal before["family"], after["family"],
+                 "selection swapped the caption's font family — the reflow this card was reported for"
+    assert_equal before["w"], after["w"],
+                 "the caption changed width on selection — selection must not re-typeset the label"
+    assert_equal before["h"], after["h"],
+                 "the caption changed height on selection — 'it would be good if the font size " \
+                 "doesnt change at all - just applies a bold format'"
+    assert_equal "0px", before["stroke"], "the resting caption should carry no text stroke"
+    refute_equal "0px", shadows["stroke"],
+                 "the selected caption's bold should come from -webkit-text-stroke — the " \
+                 "mechanism that thickens without reflowing"
+  end
+
+  # The other half of "just the box, and not the text as well", and the half
+  # that was left behind. The grid moved its ring onto the artwork; the LIST row
+  # went on drawing a brand border around the whole row — swatch, label and tick
+  # — which is the shape the note was describing. The ring is on the row's own
+  # 56px swatch now, matching the tile exactly, and the row keeps only its
+  # resting border and the soft tint that fills the box.
+  test "a selected list row rings its swatch, not the row around the words" do
+    open_player
+    3.times { click_button "Next"; sleep 0.4 } # → the bare multiple-choice list
+    assert_equal "multiple_choice", find(".preview-card.active")["data-card-type"]
+
+    first(".preview-card.active .choice-list-item").click
+    sleep 0.4
+
+    row = page.evaluate_script(<<~JS)
+      (() => {
+        const li = document.querySelector('.preview-card.active .choice-list-item[data-selected="true"]')
+        if (!li) return null
+        const unsel = document.querySelector('.preview-card.active .choice-list-item[data-selected="false"]')
+        const tile  = li.querySelector(".choice-list-tile")
+        return {
+          border:       getComputedStyle(li).borderColor,
+          restingBorder: unsel ? getComputedStyle(unsel).borderColor : null,
+          tint:         getComputedStyle(li).backgroundColor,
+          tileShadow:   tile ? getComputedStyle(tile).boxShadow : null
+        }
+      })()
+    JS
+
+    assert row, "no selected list row found"
+    assert_equal row["restingBorder"], row["border"],
+                 "the row's border still turns brand when it is chosen, so the selection is "                  "drawn around the label as well as the box — which is the thing row 4 asked "                  "about. The border is resting chrome; the mark belongs on the swatch."
+    assert_includes row["tileShadow"].to_s, "rgb(1, 234, 203)",
+                    "the row's 56px swatch carries no brand ring, so nothing marks the box at "                     "all now that the border does not. It should match the grid tile: the same "                     "lift, the same 2px ring, the same glow."
+    assert_not_equal "rgba(0, 0, 0, 0)", row["tint"],
+                     "the row lost its soft brand tint too. The tint fills the box, which is "                      "the box — without it a chosen row in a long list is hard to find."
+  end
+
+  # On a phone the CARD IS THE SCREEN, so no band of backdrop may show beneath
+  # it — "weird black bit at the bottom is still there, should be white".
+  #
+  # This test used to pin the fix rather than the requirement. The footer never
+  # had a background of its own: it was transparent, the Verto's brand backdrop
+  # showed through, and the white card stopped at the bar's top edge, so the
+  # bar read as a dark strip pasted underneath. Painting the bar white closed
+  # the gap, and this asserted rgb(255,255,255) — which was the mechanism, not
+  # the ask.
+  #
+  # The controls float now (see "THE CONTROLS FLOAT" in application.css), so
+  # the bar is transparent AGAIN and there is still no strip, because there is
+  # no longer anything below the card for a strip to be: the card runs to the
+  # bottom of the screen and the pills sit on top of it. Pinning white would
+  # now fail on a correct player.
+  #
+  # So pin the requirement both ways round. The card must reach the bottom —
+  # that kills the strip whatever the bar is doing — and the bar must be out of
+  # flow, because an IN-FLOW transparent bar is exactly how the strip came back
+  # the first time.
+  test "no band of backdrop shows beneath the card" do
+    open_player
+    m = page.evaluate_script(<<~JS)
+      (() => {
+        const ov   = document.querySelector(".preview-overlay")
+        const card = document.querySelector(".preview-card.active .split-card")
+        const foot = document.querySelector(".preview-footer")
+        const b = (el) => Math.round(el.getBoundingClientRect().bottom)
+        return {
+          gap: b(ov) - b(card),
+          position: getComputedStyle(foot).position,
+          footerBg: getComputedStyle(foot).backgroundColor,
+          overlayBg: getComputedStyle(document.querySelector(".preview-body")).backgroundColor
+        }
+      })()
+    JS
+
+    assert_operator m["gap"], :<=, 1,
+                    "there are #{m['gap']}px between the bottom of the card and the bottom of " \
+                    "the screen, and #{m['overlayBg']} is what shows in them. That is the dark " \
+                    "strip, back again."
+    assert_equal "absolute", m["position"],
+                 "the footer is back in flow (#{m['position']}). In flow it takes its height " \
+                 "out of the card, so unless it also paints itself the same colour as the card " \
+                 "the strip returns — which is the trap this fell into once already. Out of " \
+                 "flow it cannot, whatever colour it is."
+  end
+
+  # The half of that change that is easy to miss, and did get missed: the
+  # controls on the bar were drawn for a DARK bar. Back was 6% white on 8%
+  # white with 75% white text — on a white footer it measured present, visible
+  # and opacity 1, and could not be seen at all. "Visible" in the DOM is not
+  # the same as legible on screen, so this asserts contrast rather than
+  # existence.
+  #
+  # What it asks depends on how the control is painted, because only one of
+  # the two can be affected by the bar's colour at all:
+  #   • a TRANSLUCENT control is effectively sitting on the bar, so its label
+  #     is judged against the bar — this is the disappear-into-white case.
+  #   • an OPAQUE control brings its own background, so its label's contrast is
+  #     a question about that fill and nothing to do with the footer. What the
+  #     footer can still break is the button reading as a distinct SHAPE, so
+  #     the fill is judged against the bar instead.
+  #
+  # Worth recording, because this test found it and it is deliberately out of
+  # scope here: Submit is white on the brand CTA colour at 3.71:1, under the
+  # 4.5:1 floor for text of its size. That was true before the footer changed
+  # and is true on desktop too — it is a brand-palette question, not a
+  # consequence of this, and fixing it means changing a client's CTA colour.
+  # 3:1, not the 4.5:1 that body text of this size would normally want, and the
+  # reason is worth stating rather than quietly picking a number that passes.
+  # The failure this guards against is a control vanishing INTO the bar —
+  # measured at roughly 1.1:1 when Back was still drawn for a dark footer. A
+  # floor of 3 catches that with room to spare.
+  # It is set below 4.5 because Submit is white on the brand CTA colour at
+  # 3.71:1, which fails AA for its size — but that is true on desktop, was true
+  # before this change, and is a decision about a client's brand palette rather
+  # than about the footer. Raising this floor would make this test fail for a
+  # reason it does not own, so the finding is recorded above instead.
+  LEGIBLE_FLOOR = 3.0
+
+  test "the footer's controls are legible against it" do
+    open_player
+    contrast = page.evaluate_script(<<~JS)
+      (() => {
+        // No backslash classes here on purpose: this travels through a Ruby
+        // heredoc before the browser sees it, and an escaped regex arrives
+        // mangled. Computed colours are always "rgb(r, g, b)" or "rgba(...)",
+        // so stripping everything that is not a digit, dot or comma parses
+        // them without one.
+        const nums = (c) => c.replace(/[^0-9.,]/g, "").split(",").map(Number)
+        const lum = (c) => {
+          const [r, g, b] = nums(c).slice(0, 3).map(v => {
+            v /= 255
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)
+          })
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b
+        }
+        const ratio = (a, b) => {
+          const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p)
+          return (x + 0.05) / (y + 0.05)
+        }
+        const foot = getComputedStyle(document.querySelector(".preview-footer")).backgroundColor
+        const out = {}
+        for (const sel of [ ".preview-btn-back", ".preview-btn-next", ".preview-btn-finish" ]) {
+          const el = document.querySelector(".preview-footer " + sel)
+          if (!el) continue
+          const cs = getComputedStyle(el)
+          // A button with its own opaque fill is judged against that fill; a
+          // translucent one is effectively sitting on the bar itself.
+          // The label against whatever it is actually painted on: its own fill
+          // if that fill is opaque, otherwise the bar showing through it.
+          const own = cs.backgroundColor
+          const parts = nums(own)
+          const alpha = parts.length > 3 ? parts[3] : 1
+          const on = alpha > 0.5 ? own : foot
+          out[sel] = { on, ratio: +ratio(cs.color, on).toFixed(2) }
+        }
+        return out
+      })()
+    JS
+
+    assert contrast.any?, "no footer controls found"
+    contrast.each do |sel, m|
+      assert_operator m["ratio"], :>=, LEGIBLE_FLOOR,
+                      "#{sel}: its label is #{m['ratio']}:1 against #{m['on']}. The bar is " \
+                      "white now — a control still drawn for a dark bar reads as nothing at " \
+                      "all on it (Back measured about 1.1:1 before this, while reporting " \
+                      "itself visible with opacity 1)."
+    end
   end
 end

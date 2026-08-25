@@ -1,8 +1,9 @@
 require "test_helper"
 
 # The share panel's QR code: rendered inline for scanning off a screen, and
-# downloadable as an SVG for posters/slides. Both encode the same public link,
-# preferring a custom slug over the opaque publish_token.
+# downloadable as an SVG (print) or PNG (slides and other tools that won't
+# place an SVG). All encode the same public link, preferring a custom slug
+# over the opaque publish_token.
 class QrCodeTest < ActionDispatch::IntegrationTest
   CARDS = [
     { "type" => "welcome_card", "title" => "hi" },
@@ -47,6 +48,7 @@ class QrCodeTest < ActionDispatch::IntegrationTest
     get survey_path(s)
     assert_response :success
     assert_select "svg[viewBox]", minimum: 1
+    assert_match "Download QR (PNG)", response.body
     assert_match "Download QR (SVG)", response.body
   end
 
@@ -56,7 +58,7 @@ class QrCodeTest < ActionDispatch::IntegrationTest
 
     get survey_path(s)
     assert_response :success
-    assert_no_match "Download QR (SVG)", response.body
+    assert_no_match "Download QR (", response.body
   end
 
   test "the qr endpoint sends a standalone SVG named after the public link" do
@@ -84,11 +86,40 @@ class QrCodeTest < ActionDispatch::IntegrationTest
     assert box > 32, "viewBox should include the quiet-zone margin"
   end
 
+  test "the qr endpoint sends a real PNG when asked for one" do
+    org = sign_in_org("png")
+    s   = survey_for(org, slug: "team-pulse")
+
+    get qr_survey_path(s, format: :png)
+    assert_response :success
+    assert_equal "image/png", response.media_type
+    assert_match(/attachment/, response.headers["Content-Disposition"])
+    assert_match(/team-pulse-qr\.png/, response.headers["Content-Disposition"])
+    assert response.body.b.start_with?("\x89PNG\r\n\x1a\n".b), "download should be a PNG bytestream"
+  end
+
+  test "the qr png is print-sized, square, and keeps its quiet zone" do
+    org = sign_in_org("pngsize")
+    s   = survey_for(org)
+
+    get qr_survey_path(s, format: :png)
+    img = ChunkyPNG::Image.from_blob(response.body.b)
+    assert_equal img.width, img.height, "QR canvas should be square"
+    assert img.width >= 1024, "PNG should be large enough to print crisply"
+    # The corner sits inside the quiet zone: opaque white, never transparent —
+    # a transparent margin dies on dark slide decks.
+    assert_equal ChunkyPNG::Color::WHITE, img[0, 0], "quiet zone should be opaque white"
+    assert_equal ChunkyPNG::Color::WHITE, img[img.width - 1, img.height - 1]
+  end
+
   test "the qr endpoint 404s for an unpublished draft" do
     org = sign_in_org("nodraft")
     s   = survey_for(org, published: false)
 
     get qr_survey_path(s)
+    assert_response :not_found
+
+    get qr_survey_path(s, format: :png)
     assert_response :not_found
   end
 

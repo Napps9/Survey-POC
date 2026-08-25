@@ -52,7 +52,16 @@
            data-tap-stack-key="<%= key %>"
            data-tap-stack-direction="<%= response["direction"] %>"
            <%= option_style_data_attrs(response) %>>
-        <span class="rotate-action-btn" aria-hidden="true"><%= tap_response_mark(response, index: i) %></span>
+        <%# The mark itself opens the style popover: "users want to be able to
+            update the icons", and the icon is what they click — the hover-only
+            17px 🎨 beside it was never found. The span stays aria-hidden
+            (decorative to AT); keyboard and AT users have the focusable 🎨
+            button below, which reveals itself on focus-within. option-style#open
+            stops propagation, so this no longer falls through to the row's
+            tap-stack#pick preview. %>
+        <span class="rotate-action-btn rotate-action-btn--editable" aria-hidden="true"
+              data-action="click->option-style#open"
+              title="<%= t("card.style_option") %>"><%= tap_response_mark(response, index: i) %></span>
         <span class="rotate-action-label" contenteditable="true"
               data-tap-response-label><%= label %></span>
         <button type="button" class="option-style-btn tap-response-style-btn"
@@ -78,13 +87,13 @@
     <% end %>
   <% end %>
 
-  <%# 2-6: below the floor there is no question left to ask, above it the strip
-      stops fitting a phone card. The button hides itself at the ceiling rather
-      than going dead, so a full scale never offers an add that does nothing. %>
-  <% if editable && count < TapScales::MAX_RESPONSES %>
-    <button type="button" class="tap-response-add"
-            data-action="click->card-editor#addResponse"
-            title="<%= t("card.add_response", default: "Add an answer") %>"
-            aria-label="<%= t("card.add_response", default: "Add an answer") %>">＋</button>
-  <% end %>
+  <%# The ＋ that used to sit here is gone: two controls set the same number
+      and the card carried the weaker one. "Answers per statement" in the
+      settings panel says how many there are and shows the range at a glance,
+      where the ＋ only ever offered "one more" and had to hide itself at the
+      ceiling to avoid offering nothing. The per-answer × below stays — removing
+      a specific answer is not the same question as how many there should be.
+      Growing the scale from the panel now KEEPS the creator's wording
+      (card-editor#_keepCreatorContent); before, it reseeded every label from
+      the preset, which is why the ＋ existed. %>
 </div>

@@ -161,15 +161,31 @@
                   <% end %>
                   <% brand_assets.each do |att| %>
                     <%# Tile shows a small variant; the FULL-size original is
-                        what data-url applies to the card when picked. %>
-                    <button type="button"
-                            class="media-library-item"
-                            title="<%= att.blob.filename %>"
-                            style="background-image:url('<%= as_thumb_path(att) %>');"
-                            data-url="<%= rails_blob_path(att.blob, only_path: true) %>"
-                            data-media-picker-target="libraryItem"
-                            data-action="click->media-picker#pickLibraryItem"
-                            aria-selected="false"></button>
+                        what data-url applies to the card when picked.
+
+                        The tile IS a <button>, so the remove × cannot live
+                        inside it — it gets a positioned cell of its own around
+                        both. The cell is what the grid lays out and what lifts
+                        on hover; see .media-library-cell in application.css. %>
+                    <div class="media-library-cell">
+                      <button type="button"
+                              class="media-library-item"
+                              title="<%= att.blob.filename %>"
+                              style="background-image:url('<%= as_thumb_path(att) %>');"
+                              data-url="<%= rails_blob_path(att.blob, only_path: true) %>"
+                              data-asset-id="<%= att.id %>"
+                              data-media-picker-target="libraryItem"
+                              data-action="click->media-picker#pickLibraryItem"
+                              aria-selected="false"></button>
+                      <% if library_admin %>
+                        <button type="button"
+                                class="media-library-del"
+                                title="<%= t("js.editor.remove_from_library") %>"
+                                aria-label="<%= t("js.editor.remove_from_library") %>"
+                                data-delete-url="<%= organisation_asset_path(current_organisation, att.id, format: :json) %>"
+                                data-action="click->media-picker#deleteBrandAsset">×</button>
+                      <% end %>
+                    </div>
                   <% end %>
                 </div>
               </section>
@@ -310,9 +326,19 @@
                data-action="input->media-picker#cropZoomChanged" />
         <span class="media-crop-zoom-icon" aria-hidden="true">+</span>
       </div>
-      <div class="media-crop-hint"><%= t("editor.crop_hint", default: "Drag to reposition, use the slider to zoom") %></div>
+      <div class="media-crop-hint" data-media-picker-target="cropHint"><%= t("editor.crop_hint", default: "Drag to reposition, use the slider to zoom") %></div>
+      <%# The Adjust flow's hint for a card whose uncropped original was never
+          kept (pre-feature uploads, Skip'd uploads): the stored image is all
+          there is, so widening past it has no pixels to reach. Said here
+          rather than silently doing nothing at the slider's floor. %>
+      <div class="media-crop-hint" data-media-picker-target="cropHintLegacy" hidden><%= t("editor.crop_adjust_legacy_hint", default: "Drag to reposition or zoom in. The uncropped original wasn't kept for this photo, so it can't be zoomed back out.") %></div>
       <div class="media-crop-actions">
+        <%# In the Adjust flow the controller swaps Skip's label for Cancel —
+            nothing is pending there, so skipping IS backing out. %>
         <button type="button" class="media-btn-ghost"
+                data-media-picker-target="cropSkipBtn"
+                data-skip-label="<%= t("editor.crop_skip", default: "Skip") %>"
+                data-cancel-label="<%= t("editor.crop_cancel", default: "Cancel") %>"
                 data-action="click->media-picker#cropSkip"><%= t("editor.crop_skip", default: "Skip") %></button>
         <button type="button" class="media-btn-primary"
                 data-action="click->media-picker#cropApply"><%= t("editor.crop_apply", default: "Use this crop") %></button>

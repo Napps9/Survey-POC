@@ -31,8 +31,6 @@ id:
     add_option: Tambah opsi
     new_option: Opsi baru
     style_option: Gaya jawaban ini
-    new_response: "Jawaban baru"
-    add_response: "Tambah jawaban"
     remove_response: "Hapus jawaban ini"
     remove_option: "Hapus kartu"
     response_scale: "Jawaban per pernyataan"
@@ -64,12 +62,13 @@ id:
     char_limit_option: '%{n} karakter'
     allow_other: Izinkan jawaban teks bebas "Lainnya"
     required: "Pertanyaan wajib"
+    ask_once: "Tanya sekali — dilewati saat main ulang setelah dijawab"
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
     mark_correct: "Tandai jawaban yang benar"
     rating_star: "%{number} dari %{total}"
     correct_pick_hint: "Ketuk opsi yang harus dipilih pemain agar benar."
-    correct_tap_hint: "Atur geseran yang benar untuk setiap pernyataan."
+    correct_tap_hint: "Atur jawaban yang benar untuk setiap pernyataan."
     correct_scale_hint: "Pilih nilai yang dianggap benar."
     accepted_answers: "Jawaban yang diterima"
     accepted_answers_hint: "Satu per baris — kecocokan apa pun (tanpa peka huruf besar-kecil) dianggap benar."
@@ -86,11 +85,11 @@ id:
       nps: "Seret cairan"
       multiple_choice: "Pilih salah satu"
       select_many: "Pilih semua yang sesuai"
-      prioritise: "Klik dan seret untuk mengatur urutan prioritas"
+      prioritise: "Atur urutan prioritas"
       yes_no: "Pilih salah satu"
       select_one_grid: "Pilih salah satu"
       select_many_grid: "Pilih semua yang sesuai"
-      tap_card: "Geser untuk menjawab"
+      tap_card: "Ketuk untuk menjawab"
       open_ended: "Ketik jawaban Anda"
       contact_form: "Bagikan detail Anda"
       scenario: "Lanjutkan membaca, lalu pilih"
@@ -104,7 +103,7 @@ id:
       yes_no: "YA / TIDAK"
       select_one_grid: "GRID GAMBAR"
       select_many_grid: "GRID GAMBAR"
-      tap_card: "GESER"
+      tap_card: "KETUK"
       scenario: "SKENARIO"
       open_ended: "TEKS BEBAS"
       contact_form: "KONTAK"
@@ -121,7 +120,7 @@ id:
       yes_no: "PILIH SATU OPSI"
       select_one_grid: "PILIH SATU OPSI"
       select_many_grid: "PILIH SEMUA YANG SESUAI"
-      tap_card: "GESER UNTUK MENJAWAB"
+      tap_card: "KETUK UNTUK MENJAWAB"
       scenario: "LANJUTKAN MEMBACA, LALU PILIH"
       open_ended: "KETIK JAWABAN ANDA"
       contact_form: "BAGIKAN DETAIL ANDA"
@@ -130,7 +129,7 @@ id:
       select_many: "Pilih beberapa (daftar)"
       select_one_grid: "Pilih satu (grid)"
       select_many_grid: "Pilih beberapa (grid)"
-      tap_card: "Geser"
+      tap_card: "Ketuk"
       range: "Rentang"
       rating: "Penilaian"
       nps: "NPS"
@@ -256,6 +255,15 @@ id:
     respondent_code_note: 'Kami tidak pernah melihatnya — disimpan sebagai hash satu arah, hanya agar jawaban Anda dapat dicocokkan dengan jawaban Anda sendiri berikutnya.'
     respondent_code_continue: 'Lanjutkan'
     respondent_code_skip: 'Lewati'
+    contact_title: "Tinggalkan data Anda"
+    contact_body: "Jika ingin tetap terhubung, beri tahu kami siapa Anda. Opsional — dan disimpan terpisah dari jawaban Anda."
+    contact_name: "Nama"
+    contact_email: "Email"
+    contact_company: "Perusahaan"
+    contact_industry: "Industri"
+    contact_note: "Hanya ditanyakan sekali di perangkat ini. Data Anda disimpan terpisah dari jawaban, hanya terhubung ke nama pemain Anda."
+    contact_continue: "Lanjutkan"
+    contact_skip: "Lanjutkan tanpa data"
     comparison_title: Jawaban Anda vs semua orang
     back: "← Kembali"
     next: Lanjut →
@@ -379,12 +387,16 @@ id:
       option_color: "Warna"
       option_color_hex: "Kode heks"
       option_emoji: "Emoji"
-      option_icon: "Ikon"
+      option_icon: "Ikon olahraga"
+      option_icon_note: "Pustaka ini hanya mencakup olahraga. Untuk subjek lain, gunakan emoji di atas."
       option_style_reset: "Atur ulang"
       option_style_done: "Selesai"
       add_to_library: "Tambah ke pustaka"
       library_saving: "Menyimpan…"
       library_save_failed: "Gagal menyimpan ke pustaka"
+      remove_from_library: "Hapus dari pustaka"
+      library_remove_confirm: "Hapus gambar ini dari pustaka merek Anda? Kartu mana pun yang sudah memakainya akan kehilangannya."
+      library_remove_failed: "Gagal menghapus dari pustaka"
       confirm_delete: "Yakin hapus?"
       unsaved: Perubahan belum disimpan
       undo_restored: 'Kartu dipulihkan'
@@ -997,6 +1009,10 @@ id:
     all_saved: 'Tersimpan'
     leave_editor: 'Keluar dari editor'
     undo: 'Urungkan'
+    m_back_to_dashboard: "Kembali ke Verto Saya"
+    m_preview: "Pratinjau sebagai responden"
+    m_more: "Lainnya"
+    m_delete_card: "Hapus kartu ini"
     duplicate_card: 'Gandakan'
     emoji_pick: "Pilih emoji"
     brand_font: "Tipografi"
@@ -1093,6 +1109,15 @@ id:
     shuffle: Acak
     shuffle_title: Pilih ulang gambar dari pustaka verto
     shuffle_confirm: Acak gambar? Gambar Anda saat ini akan diganti dengan pilihan baru dari pustaka.
+    shuffle_direction_toggle_title: "Tambahkan arahan untuk pengacakan ini"
+    shuffle_direction_heading: "Arahkan pengacakan ini"
+    shuffle_direction_hint: "Opsional. Beri tahu Verto apa yang Anda inginkan dari gambar dan animasinya — suasana, latar, atau hal yang ingin dihindari."
+    shuffle_direction_label: "Arahan"
+    shuffle_direction_placeholder: "mis. cahaya alami hangat, di luar ruangan, kelompok kecil, tanpa kantor"
+    shuffle_direction_toward: "Pengacakan terakhir mencari: %{terms}"
+    shuffle_direction_avoiding: "dan mengecualikan: %{terms}"
+    shuffle_direction_clear: "Hapus"
+    shuffle_direction_apply: "Acak dengan ini"
     publish_share: Publikasikan & bagikan →
     answer_type: Tipe Jawaban
     select_card: Pilih kartu untuk mengubah tipenya
@@ -1171,7 +1196,7 @@ id:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Pindai untuk membuka Verto ini. Unduh kodenya untuk poster dan slide."
-    download_qr: "Unduh QR (SVG)"
+    download_qr: "Unduh QR (%{file_format})"
     download_qr_short: "Kode QR"
     custom_url: "URL khusus"
     custom_url_placeholder: "summer-feedback-2026"

@@ -1,13 +1,15 @@
 <title><%= content_for(:title) || "Playverto Verto Studio" %></title>
-<%# interactive-widget is PLAYER-ONLY. On Chrome/Android it makes the soft
-    keyboard shrink the LAYOUT viewport, so the player's `position: fixed;
-    inset: 0` overlay becomes genuinely the visible area and its footer rides
-    above the keyboard instead of being stranded mid-screen. Everywhere else
-    it is unwanted: the editor is built for a pointer, and the auth pages
-    depend on the browser's ordinary scroll-the-field-into-view behaviour.
-    iOS Safari ignores the hint entirely — see lib/viewport_height.js, which
-    is what carries that platform. %>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover<%= ",interactive-widget=resizes-content" if controller_name == "player" %>">
+<%# interactive-widget: for the player, and now the editor too. On
+    Chrome/Android it makes the soft keyboard shrink the LAYOUT viewport, so a
+    `position: fixed; inset: 0` overlay becomes genuinely the visible area and
+    its footer rides above the keyboard instead of being stranded mid-screen.
+    The editor earns it because the mobile studio makes the cards feed exactly
+    such an overlay (mobile_studio_controller adds .preview-overlay at ≤767px)
+    and a creator types INTO that card — the same problem, the same fix.
+    Still off elsewhere: the auth pages depend on the browser's ordinary
+    scroll-the-field-into-view behaviour. iOS Safari ignores the hint entirely
+    — see lib/viewport_height.js, which is what carries that platform. %>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover<%= ",interactive-widget=resizes-content" if controller_name == "player" || @interactive_widget_resize %>">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <%# A second theme-color meta wouldn't win — browsers honour the first valid
@@ -41,3 +43,17 @@
 <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 <%= render "layouts/i18n_js" %>
 <%= javascript_importmap_tags %>
+<%# The player's interactive modules, fetched WITH the page instead of after
+    it. Controllers are pinned preload: false and lazy-loaded (right for the
+    dashboard, where 60+ files up front dominated first paint) — but on /play
+    that lazy chain is a four-deep waterfall (application → controllers/index
+    → each controller → its lib imports), and on a cold cache over venue wifi
+    the respondent had a painted, dead card for the duration: "having to
+    refresh the page to be able to select an answer" — the refresh worked
+    because the second load hit warm caches. These hints flatten the chain to
+    one parallel wave; the lazy loader then resolves instantly from the module
+    map. Scoped to the player (and the owner's chromeless preview of it) so
+    every other page keeps the deliberate lazy behaviour. %>
+<% if controller_name == "player" || @chromeless %>
+  <%= javascript_module_preload_tag(*player_module_preload_paths) %>
+<% end %>

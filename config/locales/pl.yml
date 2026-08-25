@@ -31,8 +31,6 @@ pl:
     add_option: Dodaj opcję
     new_option: Nowa opcja
     style_option: Stylizuj tę odpowiedź
-    new_response: "Nowa odpowiedź"
-    add_response: "Dodaj odpowiedź"
     remove_response: "Usuń tę odpowiedź"
     remove_option: "Usuń kartę"
     response_scale: "Odpowiedzi na stwierdzenie"
@@ -64,12 +62,13 @@ pl:
     char_limit_option: '%{n} znaków'
     allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
     required: "Pytanie obowiązkowe"
+    ask_once: "Pytaj raz — pomijane przy kolejnych podejściach po udzieleniu odpowiedzi"
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
     mark_correct: "Zaznacz poprawną odpowiedź"
     rating_star: "%{number} z %{total}"
     correct_pick_hint: "Stuknij opcję (opcje), które gracze muszą wybrać, aby mieć rację."
-    correct_tap_hint: "Ustaw poprawne przeciągnięcie dla każdego stwierdzenia."
+    correct_tap_hint: "Ustaw poprawną odpowiedź dla każdego stwierdzenia."
     correct_scale_hint: "Wybierz wartość, która liczy się jako poprawna."
     accepted_answers: "Akceptowane odpowiedzi"
     accepted_answers_hint: "Jedna na wiersz — każde dopasowanie (bez rozróżniania wielkości liter) jest poprawne."
@@ -86,11 +85,11 @@ pl:
       nps: "Przeciągnij płyn"
       multiple_choice: "Wybierz jedną odpowiedź"
       select_many: "Zaznacz wszystkie pasujące odpowiedzi"
-      prioritise: "Kliknij i przeciągnij, aby ułożyć według priorytetu"
+      prioritise: "Ułóż według priorytetu"
       yes_no: "Wybierz jedną odpowiedź"
       select_one_grid: "Wybierz jedną odpowiedź"
       select_many_grid: "Zaznacz wszystkie pasujące odpowiedzi"
-      tap_card: "Przeciągnij, aby odpowiedzieć"
+      tap_card: "Dotknij, aby odpowiedzieć"
       open_ended: "Wpisz swoją odpowiedź"
       contact_form: "Podaj swoje dane"
       scenario: "Czytaj dalej, a potem wybierz"
@@ -104,7 +103,7 @@ pl:
       yes_no: "TAK / NIE"
       select_one_grid: "SIATKA OBRAZÓW"
       select_many_grid: "SIATKA OBRAZÓW"
-      tap_card: "PRZESUŃ"
+      tap_card: "DOTKNIJ"
       scenario: "SCENARIUSZ"
       open_ended: "TEKST OTWARTY"
       contact_form: "KONTAKT"
@@ -121,7 +120,7 @@ pl:
       yes_no: "WYBIERZ JEDNĄ ODPOWIEDŹ"
       select_one_grid: "WYBIERZ JEDNĄ ODPOWIEDŹ"
       select_many_grid: "ZAZNACZ WSZYSTKIE PASUJĄCE ODPOWIEDZI"
-      tap_card: "PRZECIĄGNIJ, ABY ODPOWIEDZIEĆ"
+      tap_card: "DOTKNIJ, ABY ODPOWIEDZIEĆ"
       scenario: "CZYTAJ DALEJ, A POTEM WYBIERZ"
       open_ended: "WPISZ SWOJĄ ODPOWIEDŹ"
       contact_form: "PODAJ SWOJE DANE"
@@ -130,7 +129,7 @@ pl:
       select_many: "Wybierz wiele (lista)"
       select_one_grid: "Wybierz jedną (siatka)"
       select_many_grid: "Wybierz wiele (siatka)"
-      tap_card: "Przesuń"
+      tap_card: "Dotknij"
       range: "Skala"
       rating: "Ocena"
       nps: "NPS"
@@ -256,6 +255,15 @@ pl:
     respondent_code_note: 'Nigdy go nie widzimy — jest zapisywany jako jednokierunkowy skrót, tylko po to, aby następnym razem powiązać Twoje odpowiedzi z Twoimi.'
     respondent_code_continue: 'Kontynuuj'
     respondent_code_skip: 'Pomiń'
+    contact_title: "Zostaw swoje dane"
+    contact_body: "Jeśli chcesz pozostać w kontakcie, powiedz nam, kim jesteś. Opcjonalne — przechowywane osobno od Twoich odpowiedzi."
+    contact_name: "Imię i nazwisko"
+    contact_email: "E-mail"
+    contact_company: "Firma"
+    contact_industry: "Branża"
+    contact_note: "Pytamy tylko raz na tym urządzeniu. Twoje dane są przechowywane osobno od odpowiedzi, powiązane wyłącznie z Twoją nazwą gracza."
+    contact_continue: "Kontynuuj"
+    contact_skip: "Kontynuuj bez danych"
     comparison_title: Twoje odpowiedzi vs wszyscy
     back: "← Wstecz"
     next: Dalej →
@@ -379,12 +387,16 @@ pl:
       option_color: "Kolor"
       option_color_hex: "Kod hex"
       option_emoji: "Emoji"
-      option_icon: "Ikona"
+      option_icon: "Ikony sportowe"
+      option_icon_note: "Biblioteka obejmuje tylko sport. W innych tematach użyj emoji powyżej."
       option_style_reset: "Resetuj"
       option_style_done: "Gotowe"
       add_to_library: "Dodaj do biblioteki"
       library_saving: "Zapisywanie…"
       library_save_failed: "Nie udało się zapisać w bibliotece"
+      remove_from_library: "Usuń z biblioteki"
+      library_remove_confirm: "Usunąć ten obraz z biblioteki marki? Każda karta, która już go używa, go straci."
+      library_remove_failed: "Nie udało się usunąć z biblioteki"
       confirm_delete: "Na pewno usunąć?"
       unsaved: Niezapisane zmiany
       undo_restored: 'Przywrócono kartę'
@@ -999,6 +1011,10 @@ pl:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
     undo: 'Cofnij'
+    m_back_to_dashboard: "Powrót do Moje Vertos"
+    m_preview: "Podgląd jako uczestnik"
+    m_more: "Więcej"
+    m_delete_card: "Usuń tę kartę"
     duplicate_card: 'Duplikuj'
     emoji_pick: "Wybierz emoji"
     brand_font: "Krój pisma"
@@ -1095,6 +1111,15 @@ pl:
     shuffle: Losuj
     shuffle_title: Wylosuj nowe obrazy z biblioteki Verto
     shuffle_confirm: Wylosować nowe obrazy? Aktualne zdjęcia zostaną zastąpione nowym wyborem z biblioteki.
+    shuffle_direction_toggle_title: "Dodaj wskazówkę do tego losowania"
+    shuffle_direction_heading: "Ukierunkuj to losowanie"
+    shuffle_direction_hint: "Opcjonalnie. Powiedz Verto, czego oczekujesz od zdjęć i animacji — nastroju, otoczenia albo tego, czego ma unikać."
+    shuffle_direction_label: "Wskazówka"
+    shuffle_direction_placeholder: "np. ciepłe naturalne światło, na zewnątrz, małe grupy, bez biur"
+    shuffle_direction_toward: "Ostatnie losowanie szukało: %{terms}"
+    shuffle_direction_avoiding: "i pominęło: %{terms}"
+    shuffle_direction_clear: "Wyczyść"
+    shuffle_direction_apply: "Losuj według tego"
     publish_share: Opublikuj i udostępnij →
     answer_type: Typ odpowiedzi
     select_card: Wybierz kartę, aby zmienić jej typ
@@ -1173,7 +1198,7 @@ pl:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Zeskanuj, aby otworzyć to Verto. Pobierz kod na plakaty i slajdy."
-    download_qr: "Pobierz QR (SVG)"
+    download_qr: "Pobierz QR (%{file_format})"
     download_qr_short: "Kod QR"
     custom_url: "Własny adres URL"
     custom_url_placeholder: "summer-feedback-2026"

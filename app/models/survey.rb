@@ -28,6 +28,7 @@ class Survey < ApplicationRecord
   # The leaderboard's anonymous names. Scoped to the Verto (a name is an
   # identity on ONE board) and gone with it.
   has_many :player_aliases, dependent: :destroy
+  has_many :contact_details, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in
   # the `cards` JSON as base64 data-URLs, which meant every render of a Verto
@@ -107,6 +108,100 @@ class Survey < ApplicationRecord
   # candidate the Verto exists in, else its primary language.
   def display_locale_for(*preferred)
     preferred.flatten.compact.map(&:to_s).find { |l| verto_locales.include?(l) } || default_locale
+  end
+
+  # Re-point the Verto at a different primary language, swapping canonical and
+  # translated text so nothing is lost: today's canonical fields move into
+  # i18n[old primary], and i18n[new primary] becomes the canonical text.
+  #
+  # Guarded hard, because the canonical text is more than words. Stored answers
+  # carry canonical option labels, and quiz `correct` and the token map are
+  # KEYED by them — so the swap is only legal while nobody has answered and the
+  # deck is still editable, and label-keyed structures are remapped positionally
+  # (option order is the identity, exactly the invariant SurveyTranslator
+  # preserves). A card whose translation is missing or misaligned keeps its
+  # canonical text for that field — visible in the editor, never corrupting.
+  def switch_primary_locale!(new_locale)
+    new_locale = new_locale.to_s
+    return false if new_locale == default_locale
+    raise ArgumentError, "not one of this Verto's languages" unless verto_locales.include?(new_locale)
+    raise ArgumentError, "questions are locked" if editing_locked?
+    raise ArgumentError, "already has responses" if responses.exists?
+
+    old_locale = default_locale
+    swapped = Array(cards).map { |c| self.class.swap_card_primary(c, old_locale, new_locale) }
+    update!(
+      cards:          swapped,
+      default_locale: new_locale,
+      locales:        ([ new_locale ] + (verto_locales - [ new_locale ])).uniq
+    )
+    true
+  end
+
+  # One card's half of the swap above. Class method so it is testable on a bare
+  # hash; returns a new hash, never mutates.
+  def self.swap_card_primary(card, old_locale, new_locale)
+    return card unless card.is_a?(Hash)
+
+    entry = card.dig("i18n", new_locale)
+    out = card.dup
+    old_entry = {
+      "text"        => card["text"].to_s,
+      "description" => card["description"].presence,
+      "options"     => (card["options"].presence if card["options"].is_a?(Array)),
+      "pages"       => (Array(card["pages"]).map { |p| p.slice("id", "text") }.presence if card["pages"].is_a?(Array)),
+      "explanation" => card["explanation"].presence,
+      "responses"   => (Array(card["responses"]).map { |r| r["label"].to_s }.presence if card["responses"].is_a?(Array))
+    }.compact
+
+    if entry.is_a?(Hash)
+      out["text"]        = entry["text"] if entry["text"].present?
+      out["description"] = entry["description"] if entry["description"].present?
+      out["explanation"] = entry["explanation"] if entry["explanation"].present?
+
+      # Pages swap by id — the id is the page's identity across languages.
+      if out["pages"].is_a?(Array) && entry["pages"].is_a?(Array)
+        by_id = entry["pages"].each_with_object({}) { |p, h| h[p["id"].to_s] = p["text"] if p.is_a?(Hash) }
+        out["pages"] = out["pages"].map do |p|
+          t = p.is_a?(Hash) ? by_id[p["id"].to_s] : nil
+          t.present? ? p.merge("text" => t) : p
+        end
+      end
+
+      # Options swap positionally — and only when the counts agree, because a
+      # short translation would silently shear labels off the end. When they
+      # swap, everything keyed by the old canonical labels moves with them.
+      old_options = Array(card["options"])
+      new_options = Array(entry["options"])
+      if old_options.any? && new_options.length == old_options.length
+        mapping = old_options.map.with_index { |o, i| [ o.to_s, new_options[i].to_s ] }.to_h
+        out["options"] = new_options
+        out["correct"] = remap_canonical_labels(card["correct"], mapping) if card.key?("correct")
+        out["tokens"]  = card["tokens"].transform_keys { |k| mapping.fetch(k.to_s, k) } if card["tokens"].is_a?(Hash)
+      end
+
+      # Tap scale labels are positional too, alongside stable keys.
+      resp_labels = Array(entry["responses"])
+      if out["responses"].is_a?(Array) && resp_labels.length == out["responses"].length
+        out["responses"] = out["responses"].each_with_index.map do |r, i|
+          resp_labels[i].to_s.strip.present? ? r.merge("label" => resp_labels[i].to_s.strip) : r
+        end
+      end
+    end
+
+    i18n = (card["i18n"] || {}).except(new_locale).merge(old_locale => old_entry)
+    out.merge("i18n" => i18n)
+  end
+
+  # `correct` is a canonical label (choice), an array of them (select-many), or
+  # a {statement => response_key} hash (tap) — statements are the labels there.
+  def self.remap_canonical_labels(correct, mapping)
+    case correct
+    when String then mapping.fetch(correct, correct)
+    when Array  then correct.map { |c| mapping.fetch(c.to_s, c) }
+    when Hash   then correct.transform_keys { |k| mapping.fetch(k.to_s, k) }
+    else correct
+    end
   end
 
   # Returns a copy of `cards` with `translated` (an array, aligned per-card, of
@@ -429,6 +524,46 @@ class Survey < ApplicationRecord
   def self.sanitize_background_image(value)
     sanitize_image_url(value)
   end
+
+  # A card's re-crop record: where its image was cut from image_source, as
+  # fractions of the source's natural size — x/y the top-left, w/h the
+  # extent, all 0..1 with a real area. Fractions rather than pixels so the
+  # record survives any resize of the stored source. Anything else is a
+  # value we don't understand — nil, and the caller drops the key (the same
+  # posture as focal_y: junk must not quietly become 0.0 and crop a corner).
+  def self.sanitize_image_crop(value)
+    return nil unless value.is_a?(Hash)
+    vals = %w[x y w h].map do |k|
+      raw = value[k] || value[k.to_sym]
+      numeric = raw.is_a?(Numeric) || raw.to_s.strip.match?(/\A-?\d+(?:\.\d+)?\z/)
+      numeric ? raw.to_f.clamp(0, 1) : nil
+    end
+    return nil if vals.any?(&:nil?)
+    x, y, w, h = vals
+    return nil if w <= 0 || h <= 0
+    { "x" => x.round(4), "y" => y.round(4), "w" => w.round(4), "h" => h.round(4) }
+  end
+
+  # The Shuffle direction prompt — the creator's optional free-text steer for
+  # what they want out of the Verto's content and imagery ("warm, outdoors,
+  # small groups, no offices"). It belongs to one shuffle and is NOT persisted;
+  # this just normalises what arrives with the click. Never rendered to a
+  # respondent and never sent to Claude; it only widens the words
+  # AssetPopulator searches and scores on, so the only handling it needs is a
+  # length cap and whitespace collapse. Blank comes back as nil, which is what
+  # "no direction" means everywhere downstream.
+  MAX_SHUFFLE_DIRECTION = 200
+
+  def self.sanitize_shuffle_direction(value)
+    value.to_s.gsub(/\s+/, " ").strip.first(MAX_SHUFFLE_DIRECTION).presence
+  end
+
+  # `shuffle_direction` shipped as a column and is no longer written or read:
+  # a saved steer is invisible state, and the box now starts empty every time.
+  # Ignored rather than dropped in the same change, so the containers still
+  # serving during the release don't SELECT a column the migration just
+  # removed. The DROP is a follow-up migration, safe once this is live.
+  self.ignored_columns += %w[shuffle_direction]
 
   # Whether a blob filename already ends in an extension ACTIVE_STORAGE_IMAGE_URL
   # accepts. Active Storage serves a blob at /rails/active_storage/…/<filename>,
@@ -881,6 +1016,21 @@ class Survey < ApplicationRecord
           c.delete("image_credit")
           c.delete("image_credit_url")
         end
+      end
+
+      # The re-crop record: the pre-crop original a card image was cut from
+      # (image_source, same allowlist as any image value) and the crop as
+      # fractions of it (image_crop) — what lets the editor's "Adjust crop"
+      # zoom back OUT of the shipped crop. Editor-only metadata: the player
+      # renders `image` and never reads either. A source without the image
+      # it explains is dead data; a crop without its source describes
+      # nothing — both dropped rather than kept, no warning (losing them
+      # degrades a card to remove-and-reupload, it doesn't lose the image).
+      if c.key?("image_source") || c.key?("image_crop")
+        c["image_source"] = c["image"].present? ? sanitize_image_url(c["image_source"]) : nil
+        c.delete("image_source") if c["image_source"].blank?
+        crop = c["image_source"].present? ? sanitize_image_crop(c["image_crop"]) : nil
+        crop ? c["image_crop"] = crop : c.delete("image_crop")
       end
 
       # CardSubjectExtractor's photographable-noun-phrase stamp, read by
@@ -1497,6 +1647,17 @@ class Survey < ApplicationRecord
     compare_note.presence || I18n.t("player.compare_promise")
   end
 
+  # The two tokenomics lines on the points intro, per-Verto with the locale
+  # default as the fallback — same contract as compare_note above and the
+  # thank-you copy below: nil means "say the usual thing".
+  def tokens_note_text
+    tokens_note.presence || I18n.t("player.tokens_welcome_note")
+  end
+
+  def leaderboard_note_text
+    leaderboard_note.presence || I18n.t("player.leaderboard_teaser")
+  end
+
   # ── What a respondent is offered after they finish ────────────────────────
   # SurveyLink answers these same three questions, overriding them per link
   # (see SurveyLink#compare_results?). Anything rendering the player asks
@@ -1653,10 +1814,11 @@ class Survey < ApplicationRecord
 
   # ── Consent ────────────────────────────────────────────────────────────────
   # Two shapes, one respondent-facing promise. The survey-level gate
-  # (consent_text) is a single pseudo-card pinned before the welcome card; a
-  # consent_gate CARD is an ordinary deck card that can span several pages and
-  # be reordered. A Verto uses one or the other — never both, or a respondent
-  # would be asked to agree twice.
+  # (consent_text) renders as a bottom BANNER over the first question
+  # (player/_consent_banner — it used to be a pseudo-card pinned before the
+  # deck); a consent_gate CARD is an ordinary deck card that can span several
+  # pages and be reordered. A Verto uses one or the other — never both, or a
+  # respondent would be asked to agree twice.
 
   # The multi-page consent card, if the deck has one.
   def consent_gate_card
@@ -1668,8 +1830,8 @@ class Survey < ApplicationRecord
   end
 
   # The survey-level gate. False once a consent card is in the deck, so the
-  # pseudo-card stops rendering rather than stacking a second gate in front of
-  # the first — the card wins, being the more specific thing the creator built.
+  # banner stops rendering rather than stacking a second gate on top of the
+  # first — the card wins, being the more specific thing the creator built.
   def consent_required?
     consent_text.present? && !consent_gate_card?
   end
@@ -1695,8 +1857,8 @@ class Survey < ApplicationRecord
     collects_personal_data? && consent_text.blank? && !consent_gate_card?
   end
 
-  # Whether the player renders the survey-level pseudo-card before the deck,
-  # from either the creator's own consent_text or the default above.
+  # Whether the player renders the survey-level consent banner over the first
+  # question, from either the creator's own consent_text or the default above.
   def show_consent_gate?
     consent_required? || default_consent_gate?
   end
@@ -1776,6 +1938,27 @@ class Survey < ApplicationRecord
   # database exception.
   validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
 
+  # THE GDPR WALL, scoped to where it bites (owner's call, 2026-08-24): a
+  # contact form may sit alongside age, location, gender and heritage, but
+  # never the NEURODIVERSITY question — health-adjacent special-category data
+  # next to a name and an email is the adjacency nobody here wants to hold.
+  # Enforced at the data layer so every path in — the settings toggle, the
+  # card autosave, the add-question modal's Demographics tiles, an import —
+  # hits the same wall, whichever side moved second. The message is
+  # creator-facing: surveys#update relays RecordInvalid text.
+  validate :contact_form_excludes_neurodiversity, if: :contact_form_enabled?
+
+  def contact_form_excludes_neurodiversity
+    return unless neurodiversity_cards?
+
+    errors.add(:base, "A Verto can collect contact details or ask the neurodiversity question, never both — " \
+                      "remove the neurodiversity question to keep the contact form, or turn the contact form off.")
+  end
+
+  def neurodiversity_cards?
+    Array(cards).any? { |c| DemographicQuestions.key_for(c) == "neurodiversity" }
+  end
+
   def self.normalize_leaderboard_retake_policy(value)
     LEADERBOARD_RETAKE_POLICIES.include?(value.to_s) ? value.to_s : "accumulate"
   end
@@ -1785,6 +1968,30 @@ class Survey < ApplicationRecord
   # pre-live tokenisation switch-off, but nothing renders or records).
   def leaderboard_active?
     tokenisation_enabled? && leaderboard_enabled?
+  end
+
+  # Whether the player should mint/record the durable per-device identity
+  # (player_key → per-survey digest). The leaderboard needs it for its alias;
+  # the contact gate needs it because the digest is the ONLY bridge between a
+  # contact row and the pseudonymous responses; ask-once questions need it
+  # because "asked once" is a promise made to an identity, and each run's
+  # response carries the remembered answer under that identity's digest.
+  def player_identity_active?
+    leaderboard_active? || contact_form_enabled? || ask_once_cards?
+  end
+
+  # Any question the creator marked "ask once per person" — skipped on repeat
+  # plays once the identity has answered it (the player seeds the remembered
+  # answer into each new run, so every response row stays complete).
+  def ask_once_cards?
+    Array(cards).any? { |c| c.is_a?(Hash) && c["ask_once"] }
+  end
+
+  # Any card in the deck flagged as a demographic question — the auto-appended
+  # birth/location/gender tail and the opt-in heritage/neurodiversity cards
+  # all carry "demographic" => true (DemographicQuestions).
+  def demographic_cards?
+    Array(cards).any? { |c| c.is_a?(Hash) && c["demographic"] }
   end
 
   def leaderboard_no_redo?

@@ -45,6 +45,17 @@ class Survey
           touched = true
         end
 
+        # The re-crop original rides the same storage rules as the image it
+        # was cut for: normally a stored path already (applyImage persists
+        # it), inline base64 only when that persist failed — exactly the
+        # payload this backfill exists to move out of the deck JSON. The
+        # crop rect is fractions of the source's natural size, so converting
+        # the URL leaves it correct.
+        if (url = convert(survey, card["image_source"]))
+          card["image_source"] = url
+          touched = true
+        end
+
         Array(card["option_images"]).each_with_index do |option_image, i|
           if (url = convert(survey, option_image))
             card["option_images"][i] = url

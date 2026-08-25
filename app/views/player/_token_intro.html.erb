@@ -9,21 +9,19 @@
     card, so an existing Verto looks exactly as it did. %>
 <div class="welcome-intake">
   <div class="welcome-intake-tokens">
-    <div class="welcome-intake-tokens-note">🎯 <%= t("player.tokens_welcome_note") %></div>
-    <% if @survey.token_types.any? %>
-      <div class="welcome-intake-token-types">
-        <% @survey.token_types.each do |tt| %>
-          <span class="welcome-token-type-pill"><%= tt["icon"] %> <%= tt["name"] %></span>
-        <% end %>
-      </div>
-    <% end %>
+    <%# Per-Verto copy with the locale default as fallback (Feedback 17: "being
+        able to edit both of the tokenomics text per verto would be useful").
+        The token-type pills row that sat between the two notes is gone at the
+        owner's ask — the player's own HUD chip already names the token, so
+        the preview was saying it twice. %>
+    <div class="welcome-intake-tokens-note">🎯 <%= @survey.tokens_note_text %></div>
     <%# The board is announced where the points promise already lands, so
         respondents know before playing that there's something to climb.
         leaderboard-tease adds no styling of its own — the note's amber is the
         readable colour on this light pill (brand primary is not; see the
         comment beside .leaderboard-tease in application.css). %>
     <% if @survey.leaderboard_enabled? %>
-      <div class="welcome-intake-tokens-note leaderboard-tease">🏆 <%= t("player.leaderboard_teaser") %></div>
+      <div class="welcome-intake-tokens-note leaderboard-tease">🏆 <%= @survey.leaderboard_note_text %></div>
     <% end %>
   </div>
 </div>

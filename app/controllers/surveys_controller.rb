@@ -113,8 +113,8 @@ class SurveysController < ApplicationController
 
   def settings_locked_message = t("flash.surveys.settings_locked")
 
-  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_audience_country, :qr ]
+  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy, :contacts ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr, :contacts ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -150,6 +150,10 @@ class SurveysController < ApplicationController
   end
 
   def show
+    # The mobile studio turns the cards feed into a fixed, viewport-sized
+    # overlay a creator types into (mobile_studio_controller, ≤767px), which
+    # is the layout the keyboard hint exists for — see layouts/_head.
+    @interactive_widget_resize = true
     # The editor hides the global top nav — it gets a "Leave editor" CTA in
     # its brief strip instead (the command palette stays reachable via ⌘K).
     @hide_main_nav = true
@@ -447,6 +451,12 @@ class SurveysController < ApplicationController
     PortfolioCommonQuestionSync.ensure_cards_for_survey(survey) if payload.key?("cards")
 
     render json: { ok: true, id: survey.id, updated_at: survey.updated_at, warnings: warnings.uniq }
+  rescue ActiveRecord::RecordInvalid => e
+    # Validation text is model-authored and creator-facing — the contact-form /
+    # demographics wall in particular has to say WHY the save was refused, or
+    # the add-question modal's Demographics tile just looks broken.
+    render json: { ok: false, error: e.record.errors.full_messages.to_sentence },
+           status: :unprocessable_entity
   rescue => e
     # Generic to the client, specific to Sentry (P1-16): a raw exception message
     # can carry a SQL fragment, a column name or a file path, and none of that
@@ -661,11 +671,12 @@ class SurveysController < ApplicationController
     render json: { ok: false, error: "That animation couldn't be stored." }, status: :unprocessable_entity
   end
 
-  # GET /surveys/:id/qr
+  # GET /surveys/:id/qr(.png)
   # The share panel's QR as a downloadable file, for posters, flyers and slide
   # decks — the panel itself renders the same SVG inline for scanning off a
-  # screen. 404s for a draft: there is no public link to encode yet, and a QR
-  # pointing at a dead URL is worse than no QR.
+  # screen. SVG by default (crisp at any print size); `.png` for the many
+  # tools that won't place an SVG. 404s for a draft: there is no public link
+  # to encode yet, and a QR pointing at a dead URL is worse than no QR.
   def qr
     # ?link_id= asks for a named share link's own code, so an audience with its
     # own address gets its own printable QR rather than the Verto's. Still
@@ -674,10 +685,76 @@ class SurveysController < ApplicationController
     key  = @survey.published? && link ? link.play_key : @survey.public_link_key
     return head :not_found if key.blank?
 
-    send_data helpers.verto_qr_svg_document(play_survey_url(key)),
-              type:        "image/svg+xml",
-              disposition: "attachment",
-              filename:    "#{key.parameterize}-qr.svg"
+    url = play_survey_url(key)
+    if params[:format] == "png"
+      send_data helpers.verto_qr_png(url),
+                type:        "image/png",
+                disposition: "attachment",
+                filename:    "#{key.parameterize}-qr.png"
+    else
+      send_data helpers.verto_qr_svg_document(url),
+                type:        "image/svg+xml",
+                disposition: "attachment",
+                filename:    "#{key.parameterize}-qr.svg"
+    end
+  end
+
+  # GET /surveys/:id/contacts.csv
+  # The contact register, for the creator. Admin-only (require_admin!) because
+  # unlike every results view this returns named individuals. Each row carries
+  # the leaderboard alias for the same identity — contacts and standings are
+  # two views of one key_digest — with the alias minted lazily here exactly the
+  # way the results page mints them (a contact who registered but never made
+  # the board still gets their name).
+  def contacts
+    rows = @survey.contact_details.order(:created_at)
+    aliases =
+      if @survey.leaderboard_active?
+        rows.each { |c| PlayerAlias.ensure_for!(survey: @survey, key_digest: c.key_digest) }
+        @survey.player_aliases.where(key_digest: rows.map(&:key_digest)).index_by(&:key_digest)
+      else
+        {}
+      end
+
+    csv = CSV.generate do |out|
+      out << [ "leaderboard_name", *ContactDetail::FIELDS, "added" ]
+      rows.each do |c|
+        out << [ aliases[c.key_digest]&.anon_name,
+                 *ContactDetail::FIELDS.map { |f| c[f] },
+                 c.created_at.iso8601 ]
+      end
+    end
+    send_data csv, type: "text/csv", disposition: "attachment",
+              filename: "verto-#{@survey.id}-contacts.csv"
+  end
+
+  # POST /surveys/:id/languages
+  # The editor's Language block: which languages this Verto exists in and which
+  # is primary, submitted as the full desired state (default_locale +
+  # locales[]). Ticking a NEW language queues a translation pass for just that
+  # language; unticking one only deselects it — the i18n entries stay on the
+  # cards, so re-ticking is instant and lossless. Changing the primary runs
+  # Survey#switch_primary_locale!, which self-guards (draft only, no responses,
+  # target must already be one of the Verto's languages) — the guard surfaces
+  # back to the panel as a query param, same pattern as slug_error.
+  def update_languages
+    if (desired_primary = params[:default_locale].presence&.to_s) && desired_primary != @survey.default_locale
+      begin
+        @survey.switch_primary_locale!(desired_primary)
+      rescue ArgumentError
+        return redirect_to survey_path(@survey, panel: "publish", language_error: "primary")
+      end
+    end
+
+    if params.key?(:locales)
+      primary = @survey.default_locale
+      desired = ([ primary ] + SupportedLocales.sanitize_list(params[:locales], fallback: [])).uniq
+      added   = desired - @survey.verto_locales
+      @survey.update!(locales: desired)
+      TranslateLocalesJob.perform_later(@survey.id, added) if added.any?
+    end
+
+    redirect_to survey_path(@survey, panel: "publish")
   end
 
   # POST /surveys/:id/duplicate
@@ -728,7 +805,7 @@ class SurveysController < ApplicationController
     # so the toggle only shows or hides them.
     %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
-       chrome_follows_verto_language].each do |flag|
+       chrome_follows_verto_language auto_detect_language contact_form_enabled].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end
@@ -749,6 +826,14 @@ class SurveysController < ApplicationController
     end
     if params.key?(:compare_note)
       attrs[:compare_note] = params[:compare_note].to_s.strip.first(160).presence
+    end
+    # The two tokenomics lines on the points intro — presentation copy, same
+    # trust level as compare_note. Blank restores the locale default.
+    if params.key?(:tokens_note)
+      attrs[:tokens_note] = params[:tokens_note].to_s.strip.first(200).presence
+    end
+    if params.key?(:leaderboard_note)
+      attrs[:leaderboard_note] = params[:leaderboard_note].to_s.strip.first(200).presence
     end
     if params.key?(:thankyou_title)
       attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence
@@ -817,7 +902,17 @@ class SurveysController < ApplicationController
       return
     end
 
-    @survey.update!(attrs) if attrs.any?
+    if attrs.any?
+      begin
+        @survey.update!(attrs)
+      rescue ActiveRecord::RecordInvalid
+        # The one validation a settings form can trip is the contact-form /
+        # neurodiversity wall; surface it the way the panel's other refusals
+        # surface (slug_error / language_error), not as a 500.
+        raise unless attrs.key?(:contact_form_enabled)
+        return redirect_to survey_path(@survey, panel: "publish", contact_error: "neurodiversity")
+      end
+    end
     respond_to do |format|
       # The settings forms are plain full-page POSTs; the in-feed
       # consent/thank-you gate cards save the same fields via fetch + JSON.
@@ -843,7 +938,19 @@ class SurveysController < ApplicationController
     if survey.editing_locked?
       return redirect_to survey_path(survey), alert: editing_locked_message
     end
-    AssetPopulator.new(survey, seed: SecureRandom.hex(4)).populate!
+    # The optional direction prompt belongs to THIS click and is not stored:
+    # the box comes back empty, and a steer typed once never goes on quietly
+    # deciding shuffles the creator didn't type it for.
+    direction = params[:direction]
+    AssetPopulator.new(survey, seed: SecureRandom.hex(4), direction: direction).populate!
+    # Report what the prompt reduced to, so a misparse is visible in the editor
+    # rather than only in the pictures. Flash, not a column: it describes the
+    # run that just happened, and it should be gone by the next page view.
+    if direction.present?
+      reading = AssetPopulator.direction_reading(survey, direction)
+      flash[:shuffle_toward]   = reading[:toward].join(", ").presence
+      flash[:shuffle_avoiding] = reading[:avoiding].join(", ").presence
+    end
     redirect_to survey_path(survey)
   rescue => e
     ErrorReporting.report("SurveysController#shuffle_assets", e)
@@ -1164,7 +1271,15 @@ class SurveysController < ApplicationController
     end
 
     key  = params[:key].to_s
-    card = DemographicQuestions.optional_card(key, locale: survey.default_locale)
+    # The contact wall, at the door rather than at the autosave: letting the
+    # card into the feed and failing the save later reads as a broken editor.
+    # Scoped to neurodiversity — age, location, gender and heritage may sit
+    # beside a contact form (Survey#contact_form_excludes_neurodiversity).
+    if survey.contact_form_enabled? && key == "neurodiversity"
+      return render json: { ok: false, error: "A Verto can collect contact details or ask the neurodiversity question, never both — turn the contact form off first." },
+                    status: :unprocessable_entity
+    end
+    card = DemographicQuestions.card_for_key(key, locale: survey.default_locale)
     unless card
       return render json: { ok: false, error: "Unknown demographic question." }, status: :unprocessable_entity
     end
@@ -1184,7 +1299,10 @@ class SurveysController < ApplicationController
     end
     # Belt-and-braces behind the tile grey-out (which reads the live DOM):
     # one of each per deck, or the answer sync's first-match would be arbitrary.
-    if Array(survey.cards).any? { |c| c.is_a?(Hash) && c["demographic_key"] == key }
+    # key_for, not demographic_key: the auto-appended tail predates keys, and a
+    # second birth-date card next to a keyless one is exactly the duplicate
+    # this exists to stop.
+    if Array(survey.cards).any? { |c| DemographicQuestions.key_for(c) == key }
       return render json: { ok: false, error: "This Verto already asks that." }, status: :unprocessable_entity
     end
 
@@ -1200,7 +1318,7 @@ class SurveysController < ApplicationController
       # so a multilingual Verto's next autosave doesn't persist the card
       # monolingual. No Claude call needed, unlike generate_card.
       (Array(survey.locales) - [ survey.default_locale ]).each do |loc|
-        tr = DemographicQuestions.optional_card(key, locale: loc)
+        tr = DemographicQuestions.card_for_key(key, locale: loc)
         (card["i18n"] ||= {})[loc] =
           { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"] }.compact
       end

@@ -1,7 +1,7 @@
 require "test_helper"
 
 # P2-2. Controller flash copy was hardcoded English; it now lives under the
-# `flash` namespace in all 19 locale files.
+# `flash` namespace in all 25 locale files.
 #
 # This checks the properties a human reviewer cannot check exhaustively across
 # 19 languages and hundreds of strings, and that a translator — human or model —
@@ -187,7 +187,7 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
   # Everything above compares locales against English. None of it can see the
   # other half of the contract: that the keys English defines are the keys the
   # code actually asks for. A controller calling a key that was renamed renders
-  # the raw dot path to the user, and 19 locale files would agree with each
+  # the raw dot path to the user, and 25 locale files would agree with each
   # other perfectly the whole time.
   CALL_SITE = /t\(\s*"(flash\.[a-z0-9_.]+)"/
   SOURCE_DIRS = %w[app/controllers app/models app/views app/services app/jobs app/mailers].freeze

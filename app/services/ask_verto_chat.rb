@@ -26,6 +26,15 @@
 # question rather than as an error. Only the final answer streams, token by
 # token, which is the part a person is waiting on.
 #
+# ── An answer turn that says nothing ──────────────────────────────────────────
+# That turn can finish cleanly and generate no text at all — the token budget
+# spent on reasoning before a word is written, a refusal, a turn reaching for a
+# tool it is not allowed. None of that arrives as an error; it arrives as a
+# successful, wordless stream, and everything downstream used to accept it as
+# the answer: a blank bubble under a full source rail, and nothing persisted, so
+# a reload lost the question too. stream_answer now asks a second time before
+# believing it, and finish reports the failure rather than closing on silence.
+#
 # ── How the loop ends ─────────────────────────────────────────────────────────
 # It used to end by noticing that a round came back without tool calls. That
 # noticing cost a whole answer: the model had already written ~450 tokens of
@@ -50,7 +59,20 @@ class AskVertoChat
   # defaulted to the same thing. See ClaudeModels::ASK_TOOL_ROUNDS.
   MODEL       = ClaudeModels::DEFAULT
   ROUND_MODEL = ClaudeModels::ASK_TOOL_ROUNDS
-  MAX_TOKENS  = 2000
+
+  # A round writes a tool call and nothing else (tool_choice "any"), so its
+  # ceiling only has to be big enough for one.
+  ROUND_MAX_TOKENS = 2000
+
+  # The answer's ceiling sits far above the ~250 words the prompt asks for,
+  # because max_tokens bounds EVERYTHING a turn generates — reasoning included.
+  # A model that thinks before it writes can spend a 2,000-token ceiling
+  # entirely on thinking and end the turn with stop_reason "max_tokens" and not
+  # one visible word: a clean, finished, wordless turn, which is what an empty
+  # answer bubble looks like from the inside. An unused ceiling costs nothing —
+  # only generated tokens are billed — so this is set where truncation stops
+  # being plausible rather than where the answer is expected to end.
+  ANSWER_MAX_TOKENS = 8000
 
   # How many times the model may call tools before it has to answer. Each round
   # is a Claude call, so this is the per-message cost ceiling. Four is enough to
@@ -161,7 +183,7 @@ class AskVertoChat
       call_at = monotonic
       response = @client.messages.create(
         model:           ROUND_MODEL,
-        max_tokens:      MAX_TOKENS,
+        max_tokens:      ROUND_MAX_TOKENS,
         system:          system_blocks(tools),
         tools:           tools.definitions,
         # A round researches; it does not answer. Without this the model ends
@@ -312,14 +334,12 @@ class AskVertoChat
     allowed_sources = tools.sources.to_h { |s| [ s["n"], s ] }
     allowed_quotes  = quote_lookup(tools)
 
-    buffer = +""
-    full   = +""
-
     # A round answered despite tool_choice "any". Replay what it wrote through
     # the same pipeline rather than paying for the same answer twice — the
     # markers still resolve against the same stamped sources, because it is
     # literally the same code doing the resolving.
     if drafted.present?
+      buffer = +""
       drafted.chars.each_slice(DRAFT_CHUNK) do |chunk|
         buffer << chunk.join
         flush!(buffer, allowed_sources, allowed_quotes, seen_quotes, &emit)
@@ -327,6 +347,35 @@ class AskVertoChat
       flush!(buffer, allowed_sources, allowed_quotes, seen_quotes, final: true, &emit)
       return finish(drafted, allowed_sources, seen_quotes, &emit)
     end
+
+    full = stream_once(convo, tools, allowed_sources, allowed_quotes, seen_quotes,
+                       phase: "answer_stream", &emit)
+
+    # A turn that generated no text is not an answer, and from in here there is
+    # no telling which of several things it was: the token budget spent on
+    # reasoning before a word was written, a refusal, a turn that wanted a tool
+    # it is not allowed. They all arrive identically — a clean, finished,
+    # wordless turn — and everything downstream used to accept that as an
+    # answer: the reader got an empty bubble under a full source rail, and
+    # nothing was persisted, so a reload lost the question too.
+    #
+    # So ask once more, in as many words. One extra call, and only on a turn
+    # that produced nothing to pay for.
+    if full.blank?
+      Rails.logger.warn("[AskVerto] answer turn produced no text " \
+                        "(stop_reason=#{@stop_reason || '-'}) — asking again")
+      full = stream_once(nudged(convo), tools, allowed_sources, allowed_quotes, seen_quotes,
+                         phase: "answer_retry", &emit)
+    end
+
+    finish(full, allowed_sources, seen_quotes, &emit)
+  end
+
+  # One streamed answer turn: emits its resolved pieces as they complete and
+  # returns the raw text it generated, markers and all.
+  def stream_once(convo, tools, allowed_sources, allowed_quotes, seen_quotes, phase:, &emit)
+    buffer = +""
+    full   = +""
 
     # The convo carries the tool rounds' tool_use/tool_result blocks, and the
     # API rejects those unless the tools they reference are declared — so the
@@ -337,7 +386,7 @@ class AskVertoChat
     stream_at = monotonic
     stream = @client.messages.stream_raw(
       model:           MODEL,
-      max_tokens:      MAX_TOKENS,
+      max_tokens:      ANSWER_MAX_TOKENS,
       system:          system_blocks(tools),
       tools:           tools.definitions,
       tool_choice:     { type: "none" },
@@ -347,6 +396,7 @@ class AskVertoChat
 
     usage = nil
     final_output = nil
+    @stop_reason = nil
     stream.each do |event|
       type = event.type if event.respond_to?(:type)
       case type
@@ -354,6 +404,7 @@ class AskVertoChat
         usage = event.message.usage
       when :message_delta
         final_output = event.usage.output_tokens if event.respond_to?(:usage) && event.usage
+        @stop_reason = stop_reason_of(event)
       when :content_block_delta
         delta = event.delta
         next unless delta.respond_to?(:type) && delta.type == :text_delta && delta.text
@@ -366,10 +417,33 @@ class AskVertoChat
     # Whatever is left can no longer be the start of a marker.
     flush!(buffer, allowed_sources, allowed_quotes, seen_quotes, final: true, &emit)
     log_usage("AskVertoChat", usage, model: MODEL, output_tokens: final_output,
-                                     ms: elapsed(stream_at), phase: "answer_stream")
+                                     ms: elapsed(stream_at), phase: phase)
+    # A truncated answer still reaches the reader — half an answer beats none —
+    # but this is the only thing that ever says the ceiling above is too low for
+    # the model behind CLAUDE_MODEL_DEFAULT, so it says it out loud.
+    if @stop_reason.to_s == "max_tokens"
+      Rails.logger.warn("[AskVerto] answer hit the #{ANSWER_MAX_TOKENS}-token ceiling (#{full.length} chars written)")
+    end
 
-    finish(full, allowed_sources, seen_quotes, &emit)
+    full
   end
+
+  # Why the stream stopped, as the stream itself reported it. Guarded to the
+  # bone: this is a diagnostic, and a diagnostic that raises is worse than one
+  # that says "-".
+  def stop_reason_of(event)
+    delta = event.delta if event.respond_to?(:delta)
+    delta.stop_reason if delta.respond_to?(:stop_reason)
+  end
+
+  # The retry's whole content: the instruction the wordless turn didn't act on,
+  # spelled out as a turn of its own. Consecutive user turns are legal — the API
+  # combines them — so this rides on the same conversation, cache breakpoint and
+  # all, rather than rebuilding one.
+  RETRY_NUDGE = "Write the answer now, as plain text, using only the tool results above. " \
+                "Do not call a tool. If those results do not answer the question, say exactly that.".freeze
+
+  def nudged(convo) = convo + [ { role: "user", content: RETRY_NUDGE } ]
 
   # Emit everything in the buffer that is unambiguously done. A partial marker at
   # the tail is held back until the next delta completes it.
@@ -455,6 +529,18 @@ class AskVertoChat
   # Close the turn: report which sources were actually used, and flag the case
   # the tool loop cannot prevent — an answer full of numbers and no citations.
   def finish(full, allowed_sources, seen_quotes, &emit)
+    # Asked twice, wordless twice. Every reader of this turn treats an empty
+    # answer as a finished one — the page renders the bubble, the controller
+    # persists nothing — so unless the turn says it failed, what arrives is a
+    # blank card under a full rail of sources, which reads as the app having
+    # lost the answer rather than never having had one.
+    if full.blank?
+      Rails.logger.error("[AskVerto] answer turn produced no text twice — reporting it to the reader")
+      emit&.call(t: "error", text: I18n.t("ask.chat.error"))
+      emit&.call(t: "done", citations: [])
+      return { text: "", citations: [], quotes: seen_quotes.values }
+    end
+
     used = full.scan(CITE_PATTERN).flatten.map(&:to_i).uniq.select { |n| allowed_sources.key?(n) }
     citations = used.map { |n| allowed_sources[n] }
 

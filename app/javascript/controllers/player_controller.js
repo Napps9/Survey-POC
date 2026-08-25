@@ -2,22 +2,26 @@ import { Controller } from "@hotwired/stimulus"
 import { t } from "lib/i18n"
 import { haptic } from "lib/haptics"
 import { presetFor, DEFAULT_TAP_COUNT } from "lib/tap_scales"
+import { visibleBandEnd } from "lib/visible_band"
 
 const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
 
 // Cards that ask for agreement rather than an answer, and drive their own
-// navigation. "consent_card" is the survey-level gate rendered as a pseudo-card
-// before the deck (from consent_text); "consent_gate" is the multi-page card
-// type a creator can place and reorder like any other. A Verto has one or the
-// other — Survey#consent_required? goes false once a consent_gate card exists,
-// so the pseudo-card stops rendering rather than stacking two gates.
-const CONSENT_TYPES = [ "consent_card", "consent_gate" ]
+// navigation. "consent_gate" is the multi-page card type a creator can place
+// and reorder like any other. The survey-level gate (from consent_text) is no
+// longer a card at all — it renders as the bottom banner in
+// player/_consent_banner, whose whole state is the overlay's
+// data-consent-pending attribute. A Verto has one gate or the other —
+// Survey#consent_required? goes false once a consent_gate card exists — which
+// is also why the banner and the card can share the consentMain/
+// consentDeclined targets and the agreeConsent action without colliding.
+const CONSENT_TYPES = [ "consent_gate" ]
 
 // Cards that drive their own navigation, so the deck's Back/Next/Finish are
 // hidden while one is showing. The consent shapes above, plus the
 // respondent-code gate.
-const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card" ]
+const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card", "contact_gate_card" ]
 
 // Respondent-local text-size preference (the "Aa" pill) — a person's own
 // reading accessibility need, not a per-Verto setting, so it's one fixed key
@@ -53,7 +57,8 @@ export default class extends Controller {
                     "regionsBtn", "regionsPanel", "regionsMain", "regionsMeta", "regionsList",
                     "regionsMapViewport", "regionsMapStage",
                     "regionDetail", "regionDetailTitle", "regionDetailList", "shareBtn", "requiredHint",
-                    "consentMain", "consentDeclined", "respondentCode",
+                    "consentBanner", "consentMain", "consentDeclined", "respondentCode",
+                    "contactName", "contactEmail", "contactCompany", "contactIndustry",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "testConfirm"]
@@ -71,6 +76,9 @@ export default class extends Controller {
     quizStateUrl: { type: String, default: "" },
     scoresUrl: { type: String, default: "" },
     tokenisation: { type: Boolean, default: false },
+    // The contact gate is on (Survey#contact_form_enabled) — mints the durable
+    // player key and sends the gate's details with the ordinary saves.
+    contact: { type: Boolean, default: false },
     tokenTypes: { type: Array, default: [] },
     // Show each answer's own award as the respondent leaves the card, on top of
     // the running total (see _revealTokenEarn).
@@ -168,9 +176,28 @@ export default class extends Controller {
     }
 
     this._sessionToken = this._ensureToken()
-    if (this.leaderboardValue) this._playerKey = this._ensurePlayerKey()
+    // The durable identity is minted for the leaderboard, the contact gate,
+    // or any ask-once question — for contacts it is the only bridge between
+    // the volunteered details and the pseudonymous responses, and for
+    // ask-once it is the identity the "asked once" promise is made to
+    // (Survey#player_identity_active? mirrors this server-side).
+    this._hasAskOnce = this.cardTargets.some(c => c.dataset.cardAskOnce === "true")
+    if (this.leaderboardValue || this.contactValue || this._hasAskOnce) {
+      this._playerKey = this._ensurePlayerKey()
+    }
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
     this._finishLabel = this.hasFinishBtnTarget ? this.finishBtnTarget.textContent : ""
+    // A device that already went through the contact gate (submitted or
+    // skipped) starts past it: the gate is a first-visit register, not a toll
+    // on every replay. Before _path so the taken path never contains it.
+    this._skipContactGateIfDone()
+    // Remembered ask-once answers seed this run before the first paint, and
+    // the starting card walks past any leading remembered questions.
+    this._seedOnceAnswers()
+    while (this._isOnceSkipped(this.currentValue) &&
+           this.currentValue < this.cardTargets.length - 1) {
+      this.currentValue++
+    }
     this._path = [this.currentValue]
     this._hops = 0
     if (this.logicValue) {
@@ -182,6 +209,10 @@ export default class extends Controller {
     // aggregation ignoring extra runs is the real enforcement.
     if (this.leaderboardValue && this.leaderboardUrlValue &&
         this.retakePolicyValue === "no_redo" && this._playedBefore()) {
+      // The board, not the questions — there is nothing left to consent to,
+      // and a banner over the standings would shadow them for no one's
+      // benefit. Cleared without recording anything.
+      this._clearConsentPending()
       this._showAlreadyPlayed()
       return
     }
@@ -189,11 +220,23 @@ export default class extends Controller {
     // remembered size instead of flashing default-size and then jumping.
     this._applyFontScale(this._loadFontScale())
     this._clearRetiredLiteMode()
+    // Same reason, one layer down: --play-card-h is what every tier's hero and
+    // answer panel is a share of, so it has to be right before the first card
+    // is laid out, not corrected after it.
+    this._fitCardHeight()
     this._update()
+    // The survey-level consent banner (player/_consent_banner). The state was
+    // server-rendered — data-consent-pending on the overlay, inert on the deck
+    // — so a reload lands exactly where the first paint did; all that is left
+    // to JS is to start keyboard users in the one live surface.
+    if (this.element.hasAttribute("data-consent-pending") && this.hasConsentBannerTarget) {
+      this.consentBannerTarget.focus()
+    }
     if (this.quizValue) this._initQuiz()
     if (this.tokenisationValue) this._initTokens()
     if (this.hasRegionsMapViewportTarget) this._setupMapPanZoom()
     this._watchFooterFit()
+    this._watchCardHeight()
     this._watchTyping()
 
     // Live answered-state for the Next button. Delegated on the deck rather
@@ -254,6 +297,7 @@ export default class extends Controller {
 
   disconnect() {
     this._footerObserver?.disconnect()
+    this._bodyObserver?.disconnect()
     if (this._answeredFrame) cancelAnimationFrame(this._answeredFrame)
     clearTimeout(this._revealTimer)
     // kbd-open lives on <html>, outside this controller's element, so it does
@@ -381,60 +425,118 @@ export default class extends Controller {
   //
   // The widget, the question and the footer are never on the list.
   _fitCard() {
-    // Typing layout is a policy, not a measurement. While a text control has
-    // focus the hero is off because the field IS the card (see _watchTyping),
-    // and the ladder must not buy it back on top of the keyboard. It must not
-    // run at all here either: with interactive-widget=resizes-content the
-    // layout viewport shrinks on keyboard open, which resizes the footer,
-    // which fires _watchFooterFit's observer — so without this guard the
-    // ladder would re-price the card between keystrokes.
+    // Not while someone is typing. The guard outlived the ladder it was written
+    // for — there is no longer anything here that could buy the hero back on
+    // top of the keyboard — but it still earns its place: with
+    // interactive-widget=resizes-content the layout viewport shrinks on
+    // keyboard open, which resizes the footer, which fires _watchFooterFit's
+    // observer. Unguarded, the scroll cue would be recomputed against a
+    // half-open keyboard between keystrokes.
+    // _watchTyping's blur branch clears kbd-open BEFORE calling back in here,
+    // so the cue is still re-decided once the answer has its room again.
     if (document.documentElement.classList.contains("kbd-open")) return
     const card = this.cardTargets[this.currentValue]
     if (!card) return
     const box = card.querySelector(".split-right > .mt-2")
     if (!box) return
-    const grid = box.querySelector(".choice-grid")
 
-    // A pixel of slack throughout: these are sub-pixel layout figures and an
-    // enhancement that rounds to "costs 0.4px" is free.
-    const over = () => box.scrollHeight - box.clientHeight
+    // This used to be a shed ladder. It priced the undecorated answer as a
+    // debt, then bought back the option artwork and then the hero, each only
+    // while it stayed free — so a card that could not afford its picture gave
+    // it up rather than scroll.
+    //
+    // That trade is off. The header is now a promise: 45% of the screen, on
+    // every card that can carry one, and the answer scrolls if it must
+    // ("everything else can have a header I think — even long lists, because
+    // players should know to scroll"). A guarantee a long list can revoke is
+    // not a guarantee, and the same Verto rendering differently on two phones
+    // was the thing being complained about.
+    //
+    // The three exceptions are not decided here and never were: the tap
+    // matrix, NPS and prioritise hide their strip in CSS (:has(.rotate-wrap),
+    // :has(.nps-slider) and :has(.prioritise-list) in the mobile block),
+    // because their answers cannot shrink — and prioritise's cannot scroll
+    // either, its rows being drag targets rather than a scrollable list. And a focused text field still drops the hero — see
+    // _watchTyping, which sets hero-off for the keyboard and is the reason
+    // that class survives this change while hero-slim and art-off do not.
+    //
+    // What is left is the one thing a scrolling answer needs more than a
+    // shedding one ever did: telling the respondent there is more below.
+    // No need to measure with is-scrollable cleared first, and it was worth
+    // checking rather than assuming, because the class is no longer passive —
+    // the floating controls hang the answer's runway off it. It cancels: the
+    // class adds a negative bottom margin to the box (clientHeight up by the
+    // pill zone) and the same padding to its content (scrollHeight up by the
+    // pill zone), so the difference is unchanged and the state cannot latch.
+    // Tried it both ways against a grid taken from overflowing to fitting;
+    // identical. What keeps that true is the reach guard in
+    // floating_footer_test — remove the margin and it fails there.
+    const over = box.scrollHeight - box.clientHeight
 
-    // The floor: the answer, undecorated.
-    card.classList.add("hero-off")
-    card.classList.remove("hero-slim")
-    grid?.classList.add("art-off")
-    let owed = over()
+    // The fade is drawn over the last of the content, so it has to know
+    // whether there IS anything below — left unconditional it greys out the
+    // final row's label on an answer that fits perfectly well.
+    box.classList.toggle("is-scrollable", over > 1)
+  }
 
-    // Rung 1 — the option artwork. It can come out CHEAPER than the floor as
-    // well as dearer: dropping tiles turns the grid into full-width rows, and
-    // on a narrow phone that is taller than the two-column grid it replaced.
-    // Hence re-reading the debt rather than assuming it only ever grows.
-    if (grid) {
-      grid.classList.remove("art-off")
-      if (over() > owed + 1) grid.classList.add("art-off")
-      else owed = over()
-    }
+  // ── The card's real height ──────────────────────────────────────────────
+  //
+  // --play-card-h is the token every mobile tier takes its hero and answer
+  // panel from, and its CSS definition — 100svh less the footer — is an
+  // ESTIMATE of the deck's box rather than a measurement of it. What it
+  // cannot see is anything stacked ABOVE the card inside the overlay: an org
+  // masthead, and on a notched iPhone the strip the safe area holds open.
+  // The Test Mode banner used to be the third and worst of them — the owner's
+  // device photos were all Test Mode on an iPhone with a dynamic island, so
+  // two were in play at once — and Test Mode is a ring around the viewport
+  // now (.play-test-frame), out of flow, costing the card nothing. That
+  // narrows what this has to catch; it does not retire it. Anything an
+  // overlay stacks above the deck does the same thing, which is why the
+  // measurement is the fix rather than a subtraction of known offenders.
+  //
+  // Reproduced at 393x768 with a 55px spacer standing in for the inset: the
+  // card is 609px and the token says 699. The hero is `flex: 0 0 auto` at 45%
+  // OF 699, so it takes 314 — 51% of the card it is actually in — and
+  // .split-right's min-height then claims 384 of the 295 that are left. The
+  // panel overflows the card by 67px and its bottom is cut. On most types
+  // what falls off is padding. On a scenario it is .book-nav-row: the two
+  // chevrons that are the ONLY way to turn a page, with no swipe fallback
+  // ("its unclear in the scenario question type how to go to the next one").
+  //
+  // .preview-body IS the box the card lives in, so measure that and say so.
+  // The CSS declaration stays, as the value in force before this runs. There
+  // is no feedback loop to guard against: the body's height comes from flex
+  // against the overlay, not from the card inside it, so writing the token
+  // cannot move what was just measured — but the 1px gate keeps a
+  // sub-pixel wobble from writing on every observer tick anyway.
+  _fitCardHeight() {
+    const body = this._bodyEl ||= this.element.querySelector(".preview-body")
+    if (!body) return
+    const h = body.clientHeight
+    if (!h) return
+    if (this._cardH != null && Math.abs(h - this._cardH) < 1) return
+    this._cardH = h
+    this.element.style.setProperty("--play-card-h", `${h}px`)
+  }
 
-    // Rung 2 — the hero, against whatever rung 1 settled on. Two sizes, dearest
-    // first: the full 45% strip, then the slim band it is always allowed to
-    // shrink to (--play-hero-min). The second offer exists because the verdict
-    // used to be all-or-nothing, and once the hero grew to 45% that meant a
-    // handful of answers traded their picture away entirely to buy back a few
-    // dozen pixels. The PRICE is unchanged — still "free or not at all",
-    // still `over() > owed + 1`, still nothing allowed to overflow.
-    card.classList.remove("hero-off")
-    if (over() > owed + 1) {
-      card.classList.add("hero-slim")
-      if (over() > owed + 1) {
-        card.classList.remove("hero-slim")
-        card.classList.add("hero-off")
-      }
-    }
-
-    // The "more below" fade is drawn over the last of the content, so it has
-    // to know whether there IS anything below — left unconditional it greys
-    // out the final row's label on an answer that fits perfectly well.
-    box.classList.toggle("is-scrollable", over() > 1)
+  _watchCardHeight() {
+    this._fitCardHeight()
+    const body = this._bodyEl
+    if (!body || typeof ResizeObserver === "undefined") return
+    // Rotation, the iOS toolbar collapsing, the keyboard, and the banner
+    // being dismissed all change this box without changing the viewport the
+    // CSS fallback is written against.
+    //
+    // And when the box changes, how much of the answer sits below the fold
+    // changes with it — so the scroll cue is re-decided here too, not only on
+    // the footer's observer. The footer does not resize when something above
+    // the card does (a banner appearing, the safe-area strip): an intake that
+    // fit at load and was pushed under the fold kept a stale "fits" verdict
+    // until the next card advance. No loop: the body's height comes from flex
+    // against the overlay, so nothing _fitCard toggles can move what
+    // _fitCardHeight just measured.
+    this._bodyObserver = new ResizeObserver(() => { this._fitCardHeight(); this._fitCard() })
+    this._bodyObserver.observe(body)
   }
 
   _watchFooterFit() {
@@ -471,10 +573,16 @@ export default class extends Controller {
         card?.classList.add("hero-off")
         this._revealField(el)
       } else {
-        // Not classList.remove: _fitCard may have set hero-off for its own
-        // reasons. It starts from the floor every time, so re-running it is
-        // the correct restore — and it is now unguarded again, because
-        // kbd-open has just come off.
+        // Take it off HERE, explicitly. This used to hand the restore to
+        // _fitCard, which was correct while _fitCard owned hero-off and
+        // recomputed it from scratch on every run — it does not any more (the
+        // shed ladder is gone), so leaving the restore to it would have left
+        // the hero off for the rest of the deck the moment anyone typed. The
+        // class now has exactly one owner, which is this branch's pair.
+        card?.classList.remove("hero-off")
+        // Still re-run it: the answer's height changed while the keyboard was
+        // up, so whether the "more below" fade belongs has to be re-decided.
+        // Unguarded again too, because kbd-open has just come off.
         this._fitCard()
       }
     }
@@ -496,10 +604,21 @@ export default class extends Controller {
     // The keyboard animates in (~250ms on iOS). Measuring before it lands
     // reads the pre-keyboard visible height and under-scrolls.
     this._revealTimer = setTimeout(() => {
-      const visible = window.visualViewport ? window.visualViewport.height : window.innerHeight
-      const floor   = Math.min(box.getBoundingClientRect().bottom, visible) - 8
+      // The floor is the lower edge of what the respondent can SEE, which is
+      // not the same number as visualViewport.height — see lib/visible_band for
+      // why, and for what comparing against the bare height costs on iOS. This
+      // used to read `Math.min(box…bottom, visualViewport.height)`, which is
+      // correct only where offsetTop is 0.
+      const floor = Math.min(box.getBoundingClientRect().bottom, visibleBandEnd()) - 8
       const over    = el.getBoundingClientRect().bottom - floor
-      if (over > 0) box.scrollTop += over
+      if (over <= 0) return
+      // Smooth, because by the time this fires the overlay has already ridden
+      // the keyboard up (see viewport_height.js) and stopped. An instant
+      // scrollTop here lands as a SECOND, separate movement a third of a
+      // second after the first — the two together are what reads as "flashed
+      // into place" rather than either one alone.
+      if (box.scrollTo) box.scrollTo({ top: box.scrollTop + over, behavior: "smooth" })
+      else box.scrollTop += over
     }, 300)
   }
 
@@ -645,7 +764,35 @@ export default class extends Controller {
   agreeConsent() {
     this._buzz()
     this._recordConsent(true)
+    // Two gates share this action and never coexist. The survey-level BANNER
+    // has no card to advance past — dismissing it hands back the deck that
+    // was under it all along. The multi-page consent_gate CARD is a deck
+    // position, so agreement there still means "move on".
+    if (this.element.hasAttribute("data-consent-pending")) {
+      this._dismissConsentBanner()
+      return
+    }
     this.next()
+  }
+
+  _dismissConsentBanner() {
+    this._clearConsentPending()
+    // The banner never occupied layout, but the nav buttons just appeared and
+    // the deck just became live — re-measure on the next frame and put focus
+    // where the respondent's next act is.
+    requestAnimationFrame(() => { this._fitCardHeight(); this._fitCard() })
+    const btn = this.nextBtnTarget.classList.contains("hidden") ? this.finishBtnTarget : this.nextBtnTarget
+    btn?.focus()
+  }
+
+  // Remove the pending state without recording anything — the shared teardown
+  // for agreement (which records first) and for paths where consent is moot
+  // (the already-played board). Declining deliberately does NOT come here:
+  // the attribute stays, the deck stays inert, and the banner shows its
+  // declined message in place.
+  _clearConsentPending() {
+    this.element.removeAttribute("data-consent-pending")
+    this.element.querySelector(".preview-body")?.removeAttribute("inert")
   }
 
   declineConsent() {
@@ -658,6 +805,117 @@ export default class extends Controller {
     this._recordConsent(false)
     if (this.hasConsentMainTarget) this.consentMainTarget.classList.add("hidden")
     if (this.hasConsentDeclinedTarget) this.consentDeclinedTarget.classList.remove("hidden")
+  }
+
+  // The contact gate. Details are held in memory and ride the ordinary saves
+  // (see _payload) — they are never part of answers. What IS written locally is
+  // a done-marker, so the gate is a first-visit register: a replay or return
+  // visit starts past it (_skipContactGateIfDone), which is also why skipping
+  // marks done — declining to register is an answer to the gate, not a snooze.
+  submitContactDetails() {
+    const contact = {}
+    for (const [field, has, target] of [
+      ["name",     this.hasContactNameTarget,     () => this.contactNameTarget],
+      ["email",    this.hasContactEmailTarget,    () => this.contactEmailTarget],
+      ["company",  this.hasContactCompanyTarget,  () => this.contactCompanyTarget],
+      ["industry", this.hasContactIndustryTarget, () => this.contactIndustryTarget]
+    ]) {
+      const value = has ? target().value.trim() : ""
+      if (value) contact[field] = value
+    }
+    if (Object.keys(contact).length) {
+      this._contact = contact
+      this._buzz()
+    }
+    this._markContactDone()
+    this.next()
+  }
+
+  skipContactDetails() {
+    this._markContactDone()
+    this.next()
+  }
+
+  // ── Ask-once questions ────────────────────────────────────────────────────
+  // A question the creator marked "ask once per person": the first run that
+  // answers it writes the answer here (see _capture), and every later run
+  // seeds it back into _answers and navigates past the card. The store shares
+  // localStorage with the durable player key, so the remembered answer and
+  // the identity it belongs to are one fate — and the seeded answer rides
+  // each run's ordinary payload, keeping every response row complete under
+  // that identity's digest.
+
+  _onceStoreKey() {
+    return `verto_once_${this.submitUrlValue}`
+  }
+
+  _readOnceStore() {
+    try {
+      return JSON.parse(localStorage.getItem(this._onceStoreKey()) || "{}") || {}
+    } catch (_) {
+      return {}
+    }
+  }
+
+  _writeOnceStore(cardIndex, answer) {
+    try {
+      const store = this._readOnceStore()
+      store[cardIndex] = answer
+      localStorage.setItem(this._onceStoreKey(), JSON.stringify(store))
+    } catch (_) { /* storage blocked — the question simply asks again next run */ }
+  }
+
+  // Seed remembered answers into this run. Only for cards still marked
+  // ask-once (the creator may have untoggled since) with a genuinely given
+  // answer — and record which card indexes are skippable this run.
+  _seedOnceAnswers() {
+    this._onceSkip = new Set()
+    const store = this._readOnceStore()
+    this.cardTargets.forEach((card, i) => {
+      if (card.dataset.cardAskOnce !== "true") return
+      const key = card.dataset.cardIndex
+      if (key === undefined || key === "") return
+      const remembered = store[key]
+      if (remembered === undefined || !this._isAnswerGiven(remembered)) return
+      this._answers[key] = remembered
+      this._onceSkip.add(i)
+    })
+  }
+
+  _isOnceSkipped(i) {
+    return !!this._onceSkip && this._onceSkip.has(i)
+  }
+
+  // The last card a respondent will actually SEE — trailing remembered cards
+  // don't count, so the button before them says Finish, not Next.
+  _lastInteractiveIndex() {
+    for (let i = this.cardTargets.length - 1; i >= 0; i--) {
+      if (!this._isOnceSkipped(i)) return i
+    }
+    return this.cardTargets.length - 1
+  }
+
+  _markContactDone() {
+    try { localStorage.setItem(`verto_contact_${this.submitUrlValue}`, "1") } catch (_) { /* storage blocked */ }
+  }
+
+  _contactDone() {
+    try {
+      return !!localStorage.getItem(`verto_contact_${this.submitUrlValue}`)
+    } catch (_) {
+      return false
+    }
+  }
+
+  // Advance the starting card past an already-done contact gate, before the
+  // first _update paints. Bounded walk rather than a single step, so it stays
+  // correct if another leading gate ever lands beside it.
+  _skipContactGateIfDone() {
+    if (!this._contactDone()) return
+    while (this.cardTargets[this.currentValue]?.dataset.cardType === "contact_gate_card" &&
+           this.currentValue < this.cardTargets.length - 1) {
+      this.currentValue++
+    }
   }
 
   // The respondent-code gate. The code is held in memory only until the next
@@ -691,6 +949,53 @@ export default class extends Controller {
     }).catch(() => { /* best-effort — nothing to retry from here */ })
   }
 
+  // The tap stack's last statement was just answered ("tap-stack:complete",
+  // routed via the overlay's data-action). There is nothing left to do on the
+  // card, so the deck moves on for the respondent — after a beat long enough
+  // to read as "done", not as being yanked: the throw animation (350ms) plus
+  // a breath on the all-answered face.
+  //
+  // Three deliberate refusals. A stale event (the stack isn't the current
+  // card — Back mid-throw) is ignored. A GRADED tap card keeps its reveal
+  // respondent-driven — auto-running next() would flash right/wrong at
+  // someone who wasn't looking yet. And the deck's last step never
+  // auto-advances: Finish (which submits) stays an explicit act, whether
+  // that's the linear last card, the last interactive card before an
+  // ask-once tail, or a logic route whose resolved answer leads to an end.
+  AUTO_ADVANCE_DELAY = 900
+
+  tapStackCompleted(event) {
+    const card = event.target.closest("[data-player-target='card']")
+    if (!card || this.cardTargets[this.currentValue] !== card) return
+    if (card.dataset.cardGraded === "true") return
+    if (this.hasFinishBtnTarget && !this.finishBtnTarget.classList.contains("hidden")) return
+    if (this.logicValue) {
+      this._capture(this.currentValue)
+      if (this._resolveNext(this.currentValue).end != null) return
+    }
+    this._cancelAutoAdvance()
+    this._autoAdvanceTimer = setTimeout(() => {
+      this._autoAdvanceTimer = null
+      // Belt behind the cancel event: if the stack is no longer complete when
+      // the beat lands (Reset raced the timer), stay put.
+      const stack = this.cardTargets[this.currentValue]?.querySelector("[data-controller~='tap-stack']")
+      if (stack && !stack.classList.contains("is-complete")) return
+      this.next()
+    }, this.AUTO_ADVANCE_DELAY)
+  }
+
+  // Public twin for the Reset hook ("tap-stack:reset"); _update clears the
+  // timer too, so a manual Next or Back during the beat never double-fires.
+  cancelAutoAdvance() {
+    this._cancelAutoAdvance()
+  }
+
+  _cancelAutoAdvance() {
+    if (!this._autoAdvanceTimer) return
+    clearTimeout(this._autoAdvanceTimer)
+    this._autoAdvanceTimer = null
+  }
+
   next() {
     // Scenario: the deck's Next means "turn the page" until the book's own
     // answer page is showing — otherwise one tap could skip the whole story
@@ -719,6 +1024,14 @@ export default class extends Controller {
     if (this.currentValue < this.cardTargets.length - 1) {
       this._buzz()
       this.currentValue++
+      // Ask-once: remembered questions are not re-asked — walk past them to
+      // the next card this respondent still owes an answer. Bounded by the
+      // deck end; _lastInteractiveIndex keeps Finish on the last REAL card,
+      // so this never strands anyone on a skipped tail.
+      while (this._isOnceSkipped(this.currentValue) &&
+             this.currentValue < this.cardTargets.length - 1) {
+        this.currentValue++
+      }
       this._update()
     }
   }
@@ -735,17 +1048,26 @@ export default class extends Controller {
     this._saveProgress()
     if (this.logicValue) {
       // Retrace the taken path — a plain currentValue-- could land on a card
-      // this respondent skipped by branching.
+      // this respondent skipped by branching. Remembered ask-once cards sit
+      // in the path (their seeded answers rode the routing), so pop through
+      // them too: Back means "the previous card I SAW".
       if (this._path.length > 1) {
-        this._path.pop()
-        this.currentValue = this._path[this._path.length - 1]
-        this._hops = Math.max(0, this._hops - 1)
+        do {
+          this._path.pop()
+          this.currentValue = this._path[this._path.length - 1]
+          this._hops = Math.max(0, this._hops - 1)
+        } while (this._path.length > 1 && this._isOnceSkipped(this.currentValue))
         this._update()
       }
       return
     }
     if (this.currentValue > 0) {
-      this.currentValue--
+      // Mirror of _advance's walk: Back lands on the previous card the
+      // respondent actually saw. If everything earlier is remembered, stay.
+      let dest = this.currentValue - 1
+      while (dest > 0 && this._isOnceSkipped(dest)) dest--
+      if (this._isOnceSkipped(dest)) return
+      this.currentValue = dest
       this._update()
     }
   }
@@ -770,6 +1092,12 @@ export default class extends Controller {
     // The leaderboard identity rides the same way, under the same discipline:
     // hashed server-side, set once per response, ignored while the board is off.
     if (this._playerKey) payload.player_key = this._playerKey
+    // Contact details too — which is what puts them through the service
+    // worker's offline submit queue without an endpoint of their own. The
+    // server files them in their own table (never in answers) keyed by the
+    // player key's digest; the write is idempotent, so riding every save
+    // costs nothing.
+    if (this._contact && this._playerKey) payload.contact = this._contact
     return payload
   }
 
@@ -870,6 +1198,12 @@ export default class extends Controller {
       this._buzz()
       this._path.push(dest.index)
       this.currentValue = dest.index
+      // Ask-once under logic: a remembered card is landed on (its seeded
+      // answer must drive its own routing) and immediately left — the
+      // recursion resolves the NEXT step from this card exactly as if the
+      // respondent had just answered it. The hop budget above still bounds
+      // the walk.
+      if (this._isOnceSkipped(dest.index)) { await this._advanceLogic(); return }
       this._update()
       return
     }
@@ -1144,6 +1478,14 @@ export default class extends Controller {
     const key = card.dataset.cardIndex
     if (key === undefined || key === "") return
     this._answers[key] = this._answerOf(card)
+    // Ask-once questions remember their answer on the device the moment it is
+    // given, alongside the identity that gave it — the durable player key in
+    // this same storage — so the next run seeds and skips (see
+    // _seedOnceAnswers). Storage and identity live or die together: clearing
+    // one clears both, which is what keeps "asked once PER PERSON" honest.
+    if (card.dataset.cardAskOnce === "true" && this._isAnswerGiven(this._answers[key])) {
+      this._writeOnceStore(key, this._answers[key])
+    }
   }
 
   // What this card holds right now, in the shape _isAnswerGiven reads.
@@ -1805,22 +2147,29 @@ export default class extends Controller {
 
   _update() {
     this._clearRequiredHint()
+    // Any navigation invalidates a pending tap-stack auto-advance — the
+    // respondent got there first (or the timer itself did; next() lands here).
+    this._cancelAutoAdvance()
     const cards = this.cardTargets
     const idx   = this.currentValue
     cards.forEach((c, i) => c.classList.toggle("active", i === idx))
     this._animateCardEntry(cards[idx], idx)
 
-    // Two gate shapes: "consent_card" is the survey-level pseudo-card pinned
-    // first, "consent_gate" is a real multi-page card the creator placed in the
-    // deck. Both drive themselves, so both suppress the deck nav; only a gate
-    // sitting FIRST is held out of the progress count, the same way a mid-deck
-    // welcome card or checkpoint is counted where it stands.
-    // Leading pseudo-cards (the consent gate rendered from consent_text, the
-    // respondent-code gate) carry no data-card-index, because they're not
-    // positions in @survey.cards and must never shift the answer keys. Counting
-    // them is also how they stay out of the progress the respondent sees —
-    // derived from the absence of an index rather than a hardcoded 1, so adding a
-    // second gate didn't silently make "Card 1 of N" wrong.
+    // Self-driving shapes: "consent_gate" is a real multi-page card the
+    // creator placed in the deck, and the respondent-code gate is a leading
+    // pseudo-card. Both drive themselves, so both suppress the deck nav; only
+    // a gate sitting FIRST is held out of the progress count, the same way a
+    // mid-deck welcome card or checkpoint is counted where it stands. (The
+    // survey-level consent gate is not in the deck at all any more — it is
+    // the bottom banner, and its nav suppression is CSS keyed off
+    // data-consent-pending, not this branch.)
+    // Leading pseudo-cards (today only the respondent-code gate) carry no
+    // data-card-index, because they're not positions in @survey.cards and
+    // must never shift the answer keys. Counting them is also how they stay
+    // out of the progress the respondent sees — derived from the absence of
+    // an index rather than a hardcoded 1, which is why the consent card's
+    // removal changed nothing here: offset simply reads 0 (or 1 with the
+    // code gate) and every formula below still holds.
     let offset = 0
     while (offset < cards.length && cards[offset].dataset.cardIndex == null) offset++
     const onConsent = SELF_DRIVING_TYPES.includes(cards[idx]?.dataset.cardType)
@@ -1850,11 +2199,11 @@ export default class extends Controller {
     this.progressTarget.textContent = t("player.progress", { n, total })
     this.element.style.setProperty("--player-progress", `${Math.min(100, Math.round((n / total) * 100))}%`)
     this.backBtnTarget.classList.remove("hidden")
-    // Don't allow stepping back onto the consent gate once agreed (or off the
-    // start of the visited path under logic).
+    // Don't allow stepping back onto a leading gate once past it (the
+    // respondent-code card), or off the start of the visited path under logic.
     this.backBtnTarget.classList.toggle("invisible", this.logicValue ? this._path.length <= 1 : idx === offset)
     // Under logic, "last" depends on the graph, not the array position.
-    const isLast = this.logicValue ? (this._staticNext(idx).end != null) : (idx === cards.length - 1)
+    const isLast = this.logicValue ? (this._staticNext(idx).end != null) : (idx >= this._lastInteractiveIndex())
     this.nextBtnTarget.classList.toggle("hidden", isLast)
     this.finishBtnTarget.classList.toggle("hidden", !isLast)
     if (this.quizValue) this._labelQuizNav()

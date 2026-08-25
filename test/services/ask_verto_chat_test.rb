@@ -12,18 +12,24 @@ require "ostruct"
 # a model returns, including when what it returns is wrong.
 class AskVertoChatTest < ActiveSupport::TestCase
   # A client that plays a scripted sequence: each entry is either a list of
-  # tool_use blocks (a tool round) or a string (the final answer, streamed a few
+  # tool_use blocks (a tool round) or a string (an answer turn, streamed a few
   # characters at a time so marker-splitting across deltas is exercised).
+  # Strings are consumed in order, so a script can hand the first answer turn ""
+  # and the retry the real thing.
   #
   # An entry in a tool round may also be `{ text: "…" }`, which becomes a text
   # block instead of a tool_use. That covers the two shapes the loop has to
   # survive: a round that answers in prose despite tool_choice "any", and a
   # round that writes a preamble alongside its tool call.
+  #
+  # `stop_reasons:` scripts what each answer turn reports on its message_delta;
+  # unscripted turns say :end_turn, as a turn that ran out of things to say does.
   class ScriptedClient
     attr_reader :calls
 
-    def initialize(script)
+    def initialize(script, stop_reasons: [])
       @script = script.dup
+      @stop_reasons = stop_reasons.dup
       @calls  = []
     end
 
@@ -48,14 +54,17 @@ class AskVertoChatTest < ActiveSupport::TestCase
 
     def stream_raw(**kwargs)
       @calls << kwargs.merge(op: :stream_raw)
-      text = @script.find { |s| s.is_a?(String) } || ""
+      index = @script.index { |s| s.is_a?(String) }
+      text  = index ? @script.delete_at(index) : ""
       events = [ OpenStruct.new(type: :message_start, message: OpenStruct.new(usage: usage)) ]
       # Three characters at a time, so "[[c:1]]" is guaranteed to straddle deltas.
       text.chars.each_slice(3) do |chunk|
         events << OpenStruct.new(type: :content_block_delta,
                                  delta: OpenStruct.new(type: :text_delta, text: chunk.join))
       end
-      events << OpenStruct.new(type: :message_delta, usage: OpenStruct.new(output_tokens: 20))
+      events << OpenStruct.new(type: :message_delta,
+                               delta: OpenStruct.new(stop_reason: @stop_reasons.shift || :end_turn),
+                               usage: OpenStruct.new(output_tokens: 20))
       events
     end
 
@@ -401,6 +410,109 @@ class AskVertoChatTest < ActiveSupport::TestCase
 
     assert_not_includes text_of(events), "Let me search",
       "a round's thinking-aloud is plumbing; only the answer turn is prose the reader sees"
+  end
+
+  # ── An answer turn that says nothing ──────────────────────────────────────
+  #
+  # A turn can finish cleanly and generate no text at all: the token budget
+  # spent on reasoning before a word was written, a refusal, a turn reaching for
+  # a tool it may not use. None of those arrive as an error — they arrive as a
+  # successful, wordless stream, and that used to be published as the answer.
+  # The reader got an empty bubble under a full rail of sources, and because a
+  # blank answer is never persisted, a reload lost the question with it.
+
+  test "a wordless answer turn is asked again rather than published as an answer" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "", "75% are very worried [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    result = chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    assert_equal 2, client.calls.count { |c| c[:op] == :stream_raw }
+    assert_equal "75% are very worried .", text_of(events)
+    assert_equal 1, result[:citations].size,
+      "the retry runs through the same pipeline, so its markers resolve against the same stamped sources"
+    assert_empty events.select { |e| e[:t] == "error" }, "the turn recovered — there is nothing to apologise for"
+  end
+
+  test "the retry asks for prose in as many words, and still forbids tool use" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "", "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    first, second = client.calls.select { |c| c[:op] == :stream_raw }
+    assert_not_includes first[:messages].to_json, AskVertoChat::RETRY_NUDGE,
+      "the first ask is the ordinary one; the nudge is what the retry adds"
+
+    assert_equal({ type: "none" }, second[:tool_choice])
+    assert_equal client.calls.first[:tools], second[:tools],
+      "the convo still carries tool_use blocks, and the API rejects those unless the tools are declared"
+    assert_equal({ role: "user", content: AskVertoChat::RETRY_NUDGE }, second[:messages].last)
+  end
+
+  test "an answer turn that says nothing twice tells the reader instead of closing on silence" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "", "" ])
+    chat.instance_variable_set(:@client, client)
+
+    events = []
+    result = chat.call(messages: [ { role: "user", content: "hi" } ]) { |e| events << e }
+
+    error = events.find { |e| e[:t] == "error" }
+    assert_not_nil error, "a turn with nothing to show must say so — an empty bubble reads as a lost answer"
+    assert_equal I18n.t("ask.chat.error"), error[:text]
+    assert_operator events.index { |e| e[:t] == "error" }, :<, events.index { |e| e[:t] == "done" },
+      "the reader should see the failure before the turn closes"
+    assert_equal "", result[:text]
+    assert_empty result[:citations]
+  end
+
+  test "the answer turn is given room to think before it writes" do
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "Worry is high [[c:1]]." ])
+    chat.instance_variable_set(:@client, client)
+
+    chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+
+    round  = client.calls.find { |c| c[:op] == :create }
+    answer = client.calls.find { |c| c[:op] == :stream_raw }
+
+    assert_equal AskVertoChat::ROUND_MAX_TOKENS, round[:max_tokens]
+    assert_equal AskVertoChat::ANSWER_MAX_TOKENS, answer[:max_tokens]
+    assert_operator answer[:max_tokens], :>, round[:max_tokens],
+      "max_tokens bounds reasoning too — a ceiling sized for the prose alone can be spent before a word is written"
+  end
+
+  test "why a wordless turn stopped is logged, or the next one is just as invisible" do
+    logged = []
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "", "Worry is high [[c:1]]." ],
+                                stop_reasons: [ :max_tokens ])
+    chat.instance_variable_set(:@client, client)
+
+    stub_method(Rails.logger, :warn, ->(msg) { logged << msg }) do
+      chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+    end
+
+    assert logged.any? { |msg| msg.include?("produced no text") && msg.include?("max_tokens") },
+      "the stop reason is the only thing that says WHICH failure this was"
+  end
+
+  test "an answer cut off at the ceiling is logged rather than passing for a short one" do
+    logged = []
+    chat = AskVertoChat.allocate
+    client = ScriptedClient.new([ fetch_step, answer_now_step, "Worry is hi" ], stop_reasons: [ :max_tokens ])
+    chat.instance_variable_set(:@client, client)
+
+    stub_method(Rails.logger, :warn, ->(msg) { logged << msg }) do
+      chat.call(messages: [ { role: "user", content: "hi" } ]) { |_| }
+    end
+
+    assert logged.any? { |msg| msg.include?("token ceiling") },
+      "a truncated answer still reaches the reader, but nothing else would ever say the ceiling is too low"
   end
 
   # ── Model tiering and caching ─────────────────────────────────────────────

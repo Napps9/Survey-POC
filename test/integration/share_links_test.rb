@@ -466,6 +466,11 @@ class ShareLinksTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "image/svg+xml", response.media_type
     assert_includes response.headers["Content-Disposition"], "poster-link-qr.svg"
+
+    get qr_survey_path(survey, link_id: link.id, format: :png)
+    assert_response :success
+    assert_equal "image/png", response.media_type
+    assert_includes response.headers["Content-Disposition"], "poster-link-qr.png"
   end
 
   test "a draft's link has no QR to download" do

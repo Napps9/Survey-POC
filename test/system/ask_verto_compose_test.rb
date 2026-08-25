@@ -130,6 +130,37 @@ class AskVertoComposeTest < ApplicationSystemTestCase
     end
   end
 
+  # Fetches its source, then closes the turn with nothing to read. This is the
+  # shape that was reported: a finished stream, the rail full, and an answer
+  # bubble holding a "See sources" pill and not one word.
+  class WordlessChat
+    def call(messages:, scope: {}, &emit)
+      emit&.call(t: "source", source: { "n" => 1, "verto" => "Valparaíso Youth Pulse",
+                                        "organisation" => "Anglo American Foundation",
+                                        "question" => "How worried are you about climate change?",
+                                        "responses" => 2648, "accent" => "#8B85FF" })
+      emit&.call(t: "done", citations: [])
+      { text: "", citations: [] }
+    end
+  end
+
+  test "a turn that closes with sources but no words says so instead of leaving an empty bubble" do
+    stub_method(AskVertoChat, :new, ->(*) { WordlessChat.new }) do
+      sign_in_as(@user)
+      visit ask_path
+      dismiss_cookie_banner
+
+      find(".ask-composer textarea").fill_in(with: "What are people saying about Quality Education?")
+      find(".ask-composer textarea").send_keys(:enter)
+
+      assert_text "What are people saying about Quality Education?", wait: 5
+      # The source really did arrive — this is the finished-but-wordless turn,
+      # not the killed stream the test above covers.
+      assert_selector ".ask-jump", wait: 5
+      assert_text I18n.t("js.ask.error"), wait: 5
+    end
+  end
+
   test "a refused turn shows the server's own explanation" do
     thread = @org.ask_threads.create!(user: @user)
     thread.ask_messages.create!(role: "user", text: "Earlier question")

@@ -31,8 +31,6 @@ nl:
     add_option: Optie toevoegen
     new_option: Nieuwe optie
     style_option: Dit antwoord stylen
-    new_response: "Nieuw antwoord"
-    add_response: "Antwoord toevoegen"
     remove_response: "Dit antwoord verwijderen"
     remove_option: "Kaart verwijderen"
     response_scale: "Antwoorden per stelling"
@@ -64,12 +62,13 @@ nl:
     char_limit_option: '%{n} tekens'
     allow_other: Sta een vrij tekstantwoord “Anders” toe
     required: "Verplichte vraag"
+    ask_once: "Eén keer vragen — overgeslagen bij opnieuw spelen na beantwoording"
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
     mark_correct: "Markeer het juiste antwoord"
     rating_star: "%{number} van %{total}"
     correct_pick_hint: "Tik op de optie(s) die spelers moeten kiezen om goed te zijn."
-    correct_tap_hint: "Stel de juiste swipe in voor elke stelling."
+    correct_tap_hint: "Stel het juiste antwoord in voor elke stelling."
     correct_scale_hint: "Kies de waarde die als juist telt."
     accepted_answers: "Geaccepteerde antwoorden"
     accepted_answers_hint: "Eén per regel — elke overeenkomst (niet hoofdlettergevoelig) is goed."
@@ -86,11 +85,11 @@ nl:
       nps: "Sleep de vloeistof"
       multiple_choice: "Kies één optie"
       select_many: "Kies alles wat van toepassing is"
-      prioritise: "Sleep om te rangschikken op prioriteit"
+      prioritise: "Rangschik op prioriteit"
       yes_no: "Kies één optie"
       select_one_grid: "Kies één optie"
       select_many_grid: "Kies alles wat van toepassing is"
-      tap_card: "Sleep om te antwoorden"
+      tap_card: "Tik om te antwoorden"
       open_ended: "Typ je antwoord"
       contact_form: "Deel je gegevens"
       scenario: "Lees verder en kies dan"
@@ -104,7 +103,7 @@ nl:
       yes_no: "JA / NEE"
       select_one_grid: "AFBEELDINGSRASTER"
       select_many_grid: "AFBEELDINGSRASTER"
-      tap_card: "SWIPEN"
+      tap_card: "TIKKEN"
       scenario: "SCENARIO"
       open_ended: "VRIJE TEKST"
       contact_form: "CONTACT"
@@ -121,7 +120,7 @@ nl:
       yes_no: "KIES ÉÉN OPTIE"
       select_one_grid: "KIES ÉÉN OPTIE"
       select_many_grid: "KIES ALLES WAT VAN TOEPASSING IS"
-      tap_card: "SWIPE OM TE ANTWOORDEN"
+      tap_card: "TIK OM TE ANTWOORDEN"
       scenario: "LEES VERDER EN KIES DAN"
       open_ended: "TYP JE ANTWOORD"
       contact_form: "DEEL JE GEGEVENS"
@@ -130,7 +129,7 @@ nl:
       select_many: "Meerdere kiezen (lijst)"
       select_one_grid: "Eén kiezen (raster)"
       select_many_grid: "Meerdere kiezen (raster)"
-      tap_card: "Swipen"
+      tap_card: "Tikken"
       range: "Schaal"
       rating: "Beoordeling"
       nps: "NPS"
@@ -256,6 +255,15 @@ nl:
     respondent_code_note: 'Wij zien deze nooit — hij wordt als eenrichtingshash opgeslagen, alleen zodat je antwoorden volgende keer aan die van jou gekoppeld kunnen worden.'
     respondent_code_continue: 'Doorgaan'
     respondent_code_skip: 'Overslaan'
+    contact_title: "Laat je gegevens achter"
+    contact_body: "Wil je in contact blijven, vertel ons dan wie je bent. Optioneel — en apart van je antwoorden bewaard."
+    contact_name: "Naam"
+    contact_email: "E-mail"
+    contact_company: "Bedrijf"
+    contact_industry: "Branche"
+    contact_note: "Wordt op dit apparaat maar één keer gevraagd. Je gegevens worden apart van je antwoorden bewaard, alleen gekoppeld aan je spelersnaam."
+    contact_continue: "Doorgaan"
+    contact_skip: "Doorgaan zonder gegevens"
     comparison_title: Jouw antwoorden vs iedereen
     back: "← Terug"
     next: Volgende →
@@ -379,12 +387,16 @@ nl:
       option_color: "Kleur"
       option_color_hex: "Hexcode"
       option_emoji: "Emoji"
-      option_icon: "Icoon"
+      option_icon: "Sporticonen"
+      option_icon_note: "De bibliotheek dekt alleen sport. Gebruik hierboven een emoji voor elk ander onderwerp."
       option_style_reset: "Herstellen"
       option_style_done: "Klaar"
       add_to_library: "Toevoegen aan bibliotheek"
       library_saving: "Opslaan…"
       library_save_failed: "Opslaan in de bibliotheek mislukt"
+      remove_from_library: "Verwijderen uit bibliotheek"
+      library_remove_confirm: "Deze afbeelding uit je merkbibliotheek verwijderen? Elke kaart die hem al gebruikt, raakt hem kwijt."
+      library_remove_failed: "Verwijderen uit de bibliotheek mislukt"
       confirm_delete: "Echt verwijderen?"
       unsaved: Niet-opgeslagen wijzigingen
       undo_restored: 'Kaart hersteld'
@@ -553,8 +565,8 @@ nl:
         tap_card:
           tap_card: "Snelle, spelachtige onderbuikreacties — perfect om meerdere korte stellingen te testen zonder enquêtemoeheid."
           range: "Ruilt snelheid in voor nuance — gebruik dit als je liever ziet hoe sterk mensen het eens zijn dan hoe snel."
-          rating: "Sterren geven een vertrouwde schaal, maar je verliest het vlotte swipe-gevoel."
-          select_one_grid: "Haalt het speelse swipe-mechanisme weg — wissel alleen als de vraag echt één statische keuze is."
+          rating: "Sterren geven een vertrouwde schaal, maar je verliest het vlotte tik-gevoel."
+          select_one_grid: "Haalt het speelse tik-mechanisme weg — wissel alleen als de vraag echt één statische keuze is."
         scenario:
           scenario: "Een kort verhaal dat respondenten pagina voor pagina doorbladeren, met op de laatste pagina een keuze uit 2–3 opties — het best voor langere, situationele vragen die één kaart zouden overladen."
           multiple_choice: "Laat de verhaalopbouw vallen voor een gewone lijst met één keuze — schakel over als de verhaalcontext niets toevoegt."
@@ -997,6 +1009,10 @@ nl:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
     undo: 'Ongedaan maken'
+    m_back_to_dashboard: "Terug naar Mijn Vertos"
+    m_preview: "Voorbeeld als deelnemer"
+    m_more: "Meer"
+    m_delete_card: "Deze kaart verwijderen"
     duplicate_card: 'Dupliceren'
     emoji_pick: "Kies een emoji"
     brand_font: "Lettertype"
@@ -1093,6 +1109,15 @@ nl:
     shuffle: Vernieuwen
     shuffle_title: Kies nieuwe afbeeldingen uit de Verto-bibliotheek
     shuffle_confirm: Afbeeldingen vernieuwen? Je huidige afbeeldingen worden vervangen door een nieuwe selectie uit de bibliotheek.
+    shuffle_direction_toggle_title: "Voeg een richting toe voor dit vernieuwen"
+    shuffle_direction_heading: "Stuur dit vernieuwen"
+    shuffle_direction_hint: "Optioneel. Vertel Verto wat je zoekt in de beelden en animaties — een sfeer, een omgeving of iets wat weg moet blijven."
+    shuffle_direction_label: "Richting"
+    shuffle_direction_placeholder: "bijv. warm natuurlijk licht, buiten, kleine groepen, geen kantoren"
+    shuffle_direction_toward: "Laatste vernieuwing zocht naar: %{terms}"
+    shuffle_direction_avoiding: "en liet weg: %{terms}"
+    shuffle_direction_clear: "Wissen"
+    shuffle_direction_apply: "Hiermee vernieuwen"
     publish_share: Publiceren & delen →
     answer_type: Antwoordtype
     select_card: Selecteer een kaart om het type te wijzigen
@@ -1171,7 +1196,7 @@ nl:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scan om deze Verto te openen. Download de code voor posters en slides."
-    download_qr: "QR downloaden (SVG)"
+    download_qr: "QR downloaden (%{file_format})"
     download_qr_short: "QR-code"
     custom_url: "Eigen URL"
     custom_url_placeholder: "summer-feedback-2026"
@@ -1356,7 +1381,7 @@ nl:
     s7_perks_label: Wat 'inhoud invullen' je oplevert
     s7_perks:
     - Een achtergrond die bij je thema past
-    - Afbeeldingen op elke kaart, inclusief swipe-kaarten
+    - Afbeeldingen op elke kaart, inclusief tik-kaarten
     - Vernieuwen in de editor totdat het goed voelt
     s7_title: Hoe wil je beginnen?
     s7_sub: Je kunt achteraf alles nog aanpassen in de editor.

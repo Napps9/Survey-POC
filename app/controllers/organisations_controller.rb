@@ -35,10 +35,11 @@ class OrganisationsController < ApplicationController
     # request, not a crash, so answer it the way every other rejection here is
     # answered: a status the client can read, with a reason attached.
     attrs  = params.fetch(:organisation, ActionController::Parameters.new)
-                   .permit(:name, :logo, :remove_logo)
-    remove = ActiveModel::Type::Boolean.new.cast(attrs.delete(:remove_logo))
+                   .permit(:name, :logo, :remove_logo, :logo_on_light, :remove_logo_on_light)
+    remove       = ActiveModel::Type::Boolean.new.cast(attrs.delete(:remove_logo))
+    remove_light = ActiveModel::Type::Boolean.new.cast(attrs.delete(:remove_logo_on_light))
 
-    if attrs.empty? && !remove
+    if attrs.empty? && !remove && !remove_light
       return respond_to_update(false, remove,
                                "We didn't receive the file — the upload may have been interrupted. Please try again.")
     end
@@ -46,20 +47,27 @@ class OrganisationsController < ApplicationController
     # SVG is stored and later served inline (see config/initializers/
     # active_storage.rb), so it must be scrubbed before it ever reaches
     # storage — an unsanitised SVG served same-origin would be stored XSS.
+    # BOTH logos, not just the first. An unsanitised SVG served same-origin is
+    # stored XSS, and a second upload slot that skipped this would be a second
+    # door into the same hole — the reason this loop exists rather than a
+    # repeated block.
     attrs = attrs.to_h
-    if svg_upload?(attrs[:logo])
-      cleaned = SvgSanitizer.clean_document(attrs[:logo].read)
+    %i[logo logo_on_light].each do |field|
+      next unless svg_upload?(attrs[field])
+
+      cleaned = SvgSanitizer.clean_document(attrs[field].read)
       if cleaned.nil?
         return respond_to_update(false, remove,
                                  "We couldn't read that SVG safely — please re-export it, or upload a PNG instead.")
       end
-      attrs[:logo] = { io: StringIO.new(cleaned), filename: attrs[:logo].original_filename,
+      attrs[field] = { io: StringIO.new(cleaned), filename: attrs[field].original_filename,
                        content_type: "image/svg+xml" }
     end
 
-    @organisation.logo.purge if remove
+    @organisation.logo.purge          if remove
+    @organisation.logo_on_light.purge if remove_light
     ok = @organisation.update(attrs)
-    respond_to_update(ok, remove,
+    respond_to_update(ok, remove || remove_light,
                       @organisation.errors.full_messages.to_sentence.presence || "Could not update organisation.")
   end
 

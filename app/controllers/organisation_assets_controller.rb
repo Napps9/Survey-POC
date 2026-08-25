@@ -54,13 +54,27 @@ class OrganisationAssetsController < ApplicationController
   end
 
   # DELETE /organisations/:organisation_id/assets/:id
+  #
+  # Two shapes, like create: the branding page deletes and reloads; the
+  # editor's media picker deletes from inside a modal and asks for JSON. A
+  # redirect would be the wrong answer there — Turbo would navigate the editor
+  # away mid-edit and take the creator's unsaved cards with it.
   def destroy
     org = current_organisation
     # Synchronous purge, like the logo remove — the blob is a small image and
-    # the admin expects it gone when the page reloads.
+    # the admin expects it gone when the page reloads. `org.assets.attachments`
+    # is the whole authorisation story: another account's attachment id simply
+    # isn't in this scope and raises RecordNotFound below.
     org.assets.attachments.find(params[:id]).purge
+
+    return render json: { ok: true, id: params[:id].to_i } if request.format.json?
+
     redirect_to organisation_memberships_path(org), notice: t("flash.organisation_assets.asset_removed")
   rescue ActiveRecord::RecordNotFound
+    if request.format.json?
+      return render json: { ok: false, error: t("flash.organisation_assets.asset_missing") },
+                    status: :not_found
+    end
     redirect_to organisation_memberships_path(org), alert: t("flash.organisation_assets.asset_missing")
   end
 
@@ -94,9 +108,14 @@ class OrganisationAssetsController < ApplicationController
     )
     org.assets.attach(blob)
     attachment = org.assets.attachments.order(:id).last
+    # delete_url travels with the tile so the picker never has to build a path
+    # from a string. A tile that has just been uploaded is as deletable as one
+    # the server rendered — otherwise the only way to undo a mis-upload made in
+    # the editor is to leave the editor.
     render json: { ok: true, id: attachment.id,
-                   url:   rails_blob_path(blob, only_path: true),
-                   thumb: helpers.as_thumb_path(attachment) }
+                   url:        rails_blob_path(blob, only_path: true),
+                   thumb:      helpers.as_thumb_path(attachment),
+                   delete_url: organisation_asset_path(org, attachment.id, format: :json) }
   rescue => e
     ErrorReporting.report("OrganisationAssetsController#create_from_data_url", e)
     render json: { ok: false, error: t("flash.organisation_assets.add_failed") }, status: :unprocessable_entity

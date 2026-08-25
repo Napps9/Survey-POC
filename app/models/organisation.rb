@@ -26,6 +26,18 @@ class Organisation < ApplicationRecord
 
   has_one_attached :logo
 
+  # A second logo, for LIGHT surfaces. Named for the surface it goes ON rather
+  # than for its own colour, because "logo_light" reads both ways and the wrong
+  # reading picks the invisible one: a light logo is what you use on a DARK
+  # background. Everything the platform draws is dark chrome — the masthead,
+  # the thank-you card, the editor, settings — except one thing, and it is the
+  # first thing a respondent ever sees: the welcome card's logo sits on the
+  # white answer panel. An account whose only mark is a white wordmark (the
+  # normal case, since the rest of the platform is dark) had it disappear
+  # there. Optional; brand_logo_tag falls back to :logo, so an account that
+  # uploads one logo behaves exactly as it did.
+  has_one_attached :logo_on_light
+
   # The organisation's own brand-asset library — images the org uploads once and
   # can then drop onto any card/background from the editor's media picker, the
   # same way the shared Verto Library works but scoped to this account only.
@@ -75,14 +87,26 @@ class Organisation < ApplicationRecord
   # Reject logo uploads that aren't a reasonably-sized image. Keeps junk/oversized
   # files (and surprising content types) out of storage; the controller surfaces
   # the error. Active Storage already serves SVGs as a download rather than inline.
-  def logo_must_be_a_supported_image
-    return unless logo.attached?
+  #
+  # BOTH SLOTS, over a list rather than as two copies. The light-surface logo
+  # shipped without this and a 3 MB PDF attached to it and validated clean —
+  # a second upload with none of the first one's manners. The controller's SVG
+  # scrubber already loops the same pair for the same reason (an unsanitised SVG
+  # served same-origin is stored XSS), so a slot added here and forgotten there,
+  # or the reverse, is the failure this shape is guarding against.
+  LOGO_ATTACHMENTS = %i[logo logo_on_light].freeze
 
-    unless LOGO_CONTENT_TYPES.include?(logo.blob.content_type)
-      errors.add(:logo, "must be a PNG, JPEG, GIF, WebP or SVG image")
-    end
-    if logo.blob.byte_size > LOGO_MAX_BYTES
-      errors.add(:logo, "must be smaller than 2 MB")
+  def logo_must_be_a_supported_image
+    LOGO_ATTACHMENTS.each do |field|
+      attachment = public_send(field)
+      next unless attachment.attached?
+
+      unless LOGO_CONTENT_TYPES.include?(attachment.blob.content_type)
+        errors.add(field, "must be a PNG, JPEG, GIF, WebP or SVG image")
+      end
+      if attachment.blob.byte_size > LOGO_MAX_BYTES
+        errors.add(field, "must be smaller than #{LOGO_MAX_BYTES / 1.megabyte} MB")
+      end
     end
   end
 

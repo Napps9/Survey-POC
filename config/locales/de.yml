@@ -31,8 +31,6 @@ de:
     add_option: Option hinzufügen
     new_option: Neue Option
     style_option: Diese Antwort gestalten
-    new_response: "Neue Antwort"
-    add_response: "Antwort hinzufügen"
     remove_response: "Diese Antwort entfernen"
     remove_option: "Karte löschen"
     response_scale: "Antworten pro Aussage"
@@ -64,12 +62,13 @@ de:
     char_limit_option: '%{n} Zeichen'
     allow_other: "„Andere“-Freitextantwort erlauben"
     required: "Pflichtfrage"
+    ask_once: "Einmal fragen — bei erneutem Spielen nach Beantwortung übersprungen"
     other: Andere
     other_placeholder: Sag es uns in eigenen Worten…
     mark_correct: "Richtige Antwort markieren"
     rating_star: "%{number} von %{total}"
     correct_pick_hint: "Tippe auf die Option(en), die Spieler wählen müssen, um richtig zu liegen."
-    correct_tap_hint: "Lege für jede Aussage den richtigen Wisch fest."
+    correct_tap_hint: "Lege für jede Aussage die richtige Antwort fest."
     correct_scale_hint: "Wähle den Wert, der als richtig zählt."
     accepted_answers: "Akzeptierte Antworten"
     accepted_answers_hint: "Eine pro Zeile — jede Übereinstimmung (Groß-/Kleinschreibung egal) ist richtig."
@@ -86,11 +85,11 @@ de:
       nps: "Flüssigkeit ziehen"
       multiple_choice: "Eine Option wählen"
       select_many: "Alle zutreffenden Optionen wählen"
-      prioritise: "Klicken und ziehen, um nach Priorität zu ordnen"
+      prioritise: "Nach Priorität ordnen"
       yes_no: "Eine Option wählen"
       select_one_grid: "Eine Option wählen"
       select_many_grid: "Alle zutreffenden Optionen wählen"
-      tap_card: "Wischen, um zu antworten"
+      tap_card: "Tippen, um zu antworten"
       open_ended: "Antwort eingeben"
       contact_form: "Teile deine Kontaktdaten"
       scenario: "Weiterlesen, dann wählen"
@@ -104,7 +103,7 @@ de:
       yes_no: "JA / NEIN"
       select_one_grid: "BILDRASTER"
       select_many_grid: "BILDRASTER"
-      tap_card: "WISCHEN"
+      tap_card: "TIPPEN"
       scenario: "SZENARIO"
       open_ended: "FREITEXT"
       contact_form: "KONTAKT"
@@ -121,7 +120,7 @@ de:
       yes_no: "EINE OPTION WÄHLEN"
       select_one_grid: "EINE OPTION WÄHLEN"
       select_many_grid: "ALLE ZUTREFFENDEN WÄHLEN"
-      tap_card: "ZUM ANTWORTEN WISCHEN"
+      tap_card: "ZUM ANTWORTEN TIPPEN"
       scenario: "WEITERLESEN, DANN WÄHLEN"
       open_ended: "ANTWORT EINGEBEN"
       contact_form: "KONTAKTDATEN TEILEN"
@@ -130,7 +129,7 @@ de:
       select_many: "Mehrere wählen (Liste)"
       select_one_grid: "Eins wählen (Raster)"
       select_many_grid: "Mehrere wählen (Raster)"
-      tap_card: "Wischen"
+      tap_card: "Tippen"
       range: "Skala"
       rating: "Bewertung"
       nps: "NPS"
@@ -256,6 +255,15 @@ de:
     respondent_code_note: 'Wir sehen ihn nie — er wird als Einweg-Hash gespeichert, nur damit Ihre Antworten beim nächsten Mal Ihren eigenen zugeordnet werden können.'
     respondent_code_continue: 'Weiter'
     respondent_code_skip: 'Überspringen'
+    contact_title: "Deine Kontaktdaten"
+    contact_body: "Wenn du in Kontakt bleiben möchtest, sag uns, wer du bist. Optional — und getrennt von deinen Antworten aufbewahrt."
+    contact_name: "Name"
+    contact_email: "E-Mail"
+    contact_company: "Unternehmen"
+    contact_industry: "Branche"
+    contact_note: "Wird auf diesem Gerät nur einmal gefragt. Deine Daten werden getrennt von deinen Antworten gespeichert und nur mit deinem Spielernamen verknüpft."
+    contact_continue: "Weiter"
+    contact_skip: "Ohne Angaben fortfahren"
     comparison_title: Deine Antworten vs. alle anderen
     back: "← Zurück"
     next: Weiter →
@@ -379,12 +387,16 @@ de:
       option_color: "Farbe"
       option_color_hex: "Hex-Code"
       option_emoji: "Emoji"
-      option_icon: "Symbol"
+      option_icon: "Sport-Symbole"
+      option_icon_note: "Die Bibliothek deckt nur Sport ab. Für jedes andere Thema oben ein Emoji verwenden."
       option_style_reset: "Zurücksetzen"
       option_style_done: "Fertig"
       add_to_library: "Zur Bibliothek hinzufügen"
       library_saving: "Wird gespeichert…"
       library_save_failed: "Speichern in der Bibliothek fehlgeschlagen"
+      remove_from_library: "Aus Bibliothek entfernen"
+      library_remove_confirm: "Dieses Bild aus deiner Markenbibliothek entfernen? Jede Karte, die es bereits verwendet, verliert es."
+      library_remove_failed: "Entfernen aus der Bibliothek fehlgeschlagen"
       confirm_delete: "Wirklich löschen?"
       unsaved: Ungespeicherte Änderungen
       undo_restored: 'Karte wiederhergestellt'
@@ -553,8 +565,8 @@ de:
         tap_card:
           tap_card: "Schnelle, spielerische Bauchreaktionen — perfekt, um mehrere kurze Aussagen ohne Umfrage-Ermüdung zu testen."
           range: "Ersetzt Tempo durch Nuancen — nutze das, wenn dich mehr interessiert, wie stark Leute zustimmen, statt wie schnell."
-          rating: "Sterne bieten eine vertraute Skala, aber du verlierst das schnelle Wisch-Gefühl."
-          select_one_grid: "Entfernt die verspielte Wisch-Mechanik — nur wechseln, wenn die Frage wirklich eine einzelne statische Auswahl ist."
+          rating: "Sterne bieten eine vertraute Skala, aber du verlierst das schnelle Tipp-Gefühl."
+          select_one_grid: "Entfernt die verspielte Tipp-Mechanik — nur wechseln, wenn die Frage wirklich eine einzelne statische Auswahl ist."
         scenario:
           scenario: "Eine kurze Geschichte, die Befragte Seite für Seite umblättern, mit einer Wahl aus 2–3 Optionen auf der letzten Seite — ideal für längere, situative Fragen, die eine einzelne Karte überfrachten würden."
           multiple_choice: "Lässt den erzählerischen Aufbau für eine schlichte Einzelauswahl-Liste weg — wechsle, wenn der Story-Kontext nichts beiträgt."
@@ -997,6 +1009,10 @@ de:
     all_saved: 'Gespeichert'
     leave_editor: 'Editor verlassen'
     undo: 'Rückgängig'
+    m_back_to_dashboard: "Zurück zu Meine Vertos"
+    m_preview: "Vorschau als Teilnehmer"
+    m_more: "Mehr"
+    m_delete_card: "Diese Karte löschen"
     duplicate_card: 'Duplizieren'
     emoji_pick: "Emoji wählen"
     brand_font: "Schriftart"
@@ -1093,6 +1109,15 @@ de:
     shuffle: Neu mischen
     shuffle_title: Neue Bilder aus der Verto-Bibliothek auswählen
     shuffle_confirm: Bilder neu mischen? Ihre aktuellen Bilder werden durch eine neue Auswahl aus der Bibliothek ersetzt.
+    shuffle_direction_toggle_title: "Eine Vorgabe für dieses Mischen hinzufügen"
+    shuffle_direction_heading: "Dieses Mischen lenken"
+    shuffle_direction_hint: "Optional. Sag Verto, was du dir von den Bildern und Animationen wünschst — eine Stimmung, ein Umfeld oder etwas, das weggelassen werden soll."
+    shuffle_direction_label: "Vorgabe"
+    shuffle_direction_placeholder: "z. B. warmes natürliches Licht, draußen, kleine Gruppen, keine Büros"
+    shuffle_direction_toward: "Letztes Mischen suchte nach: %{terms}"
+    shuffle_direction_avoiding: "und ließ aus: %{terms}"
+    shuffle_direction_clear: "Leeren"
+    shuffle_direction_apply: "Damit mischen"
     publish_share: Veröffentlichen & teilen →
     answer_type: Antworttyp
     select_card: Wähle eine Karte aus, um den Typ zu ändern
@@ -1171,7 +1196,7 @@ de:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scannen, um dieses Verto zu öffnen. Code für Plakate und Folien herunterladen."
-    download_qr: "QR herunterladen (SVG)"
+    download_qr: "QR herunterladen (%{file_format})"
     download_qr_short: "QR-Code"
     custom_url: "Eigene URL"
     custom_url_placeholder: "summer-feedback-2026"
@@ -1356,7 +1381,7 @@ de:
     s7_perks_label: Was die automatische Befüllung bietet
     s7_perks:
     - Ein zum Thema passendes Umfrage-Hintergrundbild
-    - Bilder auf jeder Karte, einschließlich Swipe-Karten
+    - Bilder auf jeder Karte, einschließlich Tipp-Karten
     - Im Editor neu mischen, bis es passt
     s7_title: Wie möchten Sie starten?
     s7_sub: Sie können im Editor jederzeit Änderungen vornehmen.

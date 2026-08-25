@@ -31,8 +31,6 @@ fr:
     add_option: Ajouter une option
     new_option: Nouvelle option
     style_option: Styliser cette réponse
-    new_response: "Nouvelle réponse"
-    add_response: "Ajouter une réponse"
     remove_response: "Supprimer cette réponse"
     remove_option: "Supprimer la carte"
     response_scale: "Réponses par affirmation"
@@ -64,12 +62,13 @@ fr:
     char_limit_option: '%{n} caractères'
     allow_other: Autoriser une réponse libre « Autre »
     required: "Question obligatoire"
+    ask_once: "Poser une seule fois — passée aux relectures une fois répondue"
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
     mark_correct: "Indiquer la bonne réponse"
     rating_star: "%{number} sur %{total}"
     correct_pick_hint: "Touchez la ou les options que les joueurs doivent choisir pour avoir raison."
-    correct_tap_hint: "Définissez le bon glissement pour chaque affirmation."
+    correct_tap_hint: "Définissez la bonne réponse pour chaque affirmation."
     correct_scale_hint: "Choisissez la valeur considérée comme correcte."
     accepted_answers: "Réponses acceptées"
     accepted_answers_hint: "Une par ligne — toute correspondance (insensible à la casse) est correcte."
@@ -86,11 +85,11 @@ fr:
       nps: "Faites glisser le liquide"
       multiple_choice: "Choisissez une réponse"
       select_many: "Sélectionnez toutes les réponses qui s'appliquent"
-      prioritise: "Cliquez et faites glisser pour classer par ordre de priorité"
+      prioritise: "Classez par ordre de priorité"
       yes_no: "Choisissez une réponse"
       select_one_grid: "Choisissez une réponse"
       select_many_grid: "Sélectionnez toutes les réponses qui s'appliquent"
-      tap_card: "Glissez pour répondre"
+      tap_card: "Touchez pour répondre"
       open_ended: "Saisissez votre réponse"
       contact_form: "Partagez vos coordonnées"
       scenario: "Lisez, puis choisissez"
@@ -104,7 +103,7 @@ fr:
       yes_no: "OUI / NON"
       select_one_grid: "GRILLE D'IMAGES"
       select_many_grid: "GRILLE D'IMAGES"
-      tap_card: "GLISSER"
+      tap_card: "TOUCHER"
       scenario: "SCÉNARIO"
       open_ended: "TEXTE LIBRE"
       contact_form: "CONTACT"
@@ -121,7 +120,7 @@ fr:
       yes_no: "CHOISISSEZ UNE RÉPONSE"
       select_one_grid: "CHOISISSEZ UNE RÉPONSE"
       select_many_grid: "SÉLECTIONNEZ TOUTES LES RÉPONSES QUI S'APPLIQUENT"
-      tap_card: "GLISSEZ POUR RÉPONDRE"
+      tap_card: "TOUCHEZ POUR RÉPONDRE"
       scenario: "LISEZ, PUIS CHOISISSEZ"
       open_ended: "SAISISSEZ VOTRE RÉPONSE"
       contact_form: "PARTAGEZ VOS COORDONNÉES"
@@ -130,7 +129,7 @@ fr:
       select_many: "Choix multiple (liste)"
       select_one_grid: "Choix unique (grille)"
       select_many_grid: "Choix multiple (grille)"
-      tap_card: "Glisser"
+      tap_card: "Toucher"
       range: "Échelle"
       rating: "Note"
       nps: "NPS"
@@ -256,6 +255,15 @@ fr:
     respondent_code_note: 'Nous ne le voyons jamais : il est stocké sous forme de hachage à sens unique, uniquement pour relier vos réponses aux vôtres la prochaine fois.'
     respondent_code_continue: 'Continuer'
     respondent_code_skip: 'Passer'
+    contact_title: "Laissez vos coordonnées"
+    contact_body: "Si vous souhaitez rester en contact, dites-nous qui vous êtes. Facultatif — et conservé à part de vos réponses."
+    contact_name: "Nom"
+    contact_email: "E-mail"
+    contact_company: "Entreprise"
+    contact_industry: "Secteur"
+    contact_note: "Demandé une seule fois sur cet appareil. Vos coordonnées sont conservées à part de vos réponses, liées uniquement à votre nom de joueur."
+    contact_continue: "Continuer"
+    contact_skip: "Continuer sans coordonnées"
     comparison_title: Vos réponses vs tout le monde
     back: "← Retour"
     next: Suivant →
@@ -379,12 +387,16 @@ fr:
       option_color: "Couleur"
       option_color_hex: "Code hexa"
       option_emoji: "Émoji"
-      option_icon: "Icône"
+      option_icon: "Icônes de sport"
+      option_icon_note: "La bibliothèque ne couvre que le sport. Pour tout autre sujet, utilisez un emoji ci-dessus."
       option_style_reset: "Réinitialiser"
       option_style_done: "Terminé"
       add_to_library: "Ajouter à la bibliothèque"
       library_saving: "Enregistrement…"
       library_save_failed: "Échec de l'enregistrement dans la bibliothèque"
+      remove_from_library: "Retirer de la bibliothèque"
+      library_remove_confirm: "Retirer cette image de votre bibliothèque de marque ? Toute carte qui l'utilise déjà la perdra."
+      library_remove_failed: "Impossible de la retirer de la bibliothèque"
       confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
       undo_restored: 'Carte restaurée'
@@ -553,8 +565,8 @@ fr:
         tap_card:
           tap_card: "Des réactions instinctives, rapides et ludiques — parfait pour tester plusieurs affirmations courtes sans lassitude du sondage."
           range: "Remplace la vitesse par la nuance — utilisez-le si vous préférez mesurer la force de l'accord plutôt que la rapidité."
-          rating: "Les étoiles offrent une échelle familière, mais vous perdez le rythme effréné du glissement."
-          select_one_grid: "Supprime la mécanique ludique du glissement — ne changez que si la question est vraiment un choix statique unique."
+          rating: "Les étoiles offrent une échelle familière, mais vous perdez le rythme effréné du toucher."
+          select_one_grid: "Supprime la mécanique ludique du toucher — ne changez que si la question est vraiment un choix statique unique."
         scenario:
           scenario: "Une courte histoire que les répondants tournent page après page, puis un choix de 2–3 options sur la dernière page — idéal pour les mises en situation longues qui surchargeraient une seule carte."
           multiple_choice: "Abandonne la montée narrative pour une simple liste à choix unique — changez si le contexte de l'histoire n'apporte rien."
@@ -997,6 +1009,10 @@ fr:
     all_saved: 'Enregistré'
     leave_editor: 'Quitter l''éditeur'
     undo: 'Annuler'
+    m_back_to_dashboard: "Retour à Mes Vertos"
+    m_preview: "Aperçu en tant que participant"
+    m_more: "Plus"
+    m_delete_card: "Supprimer cette carte"
     duplicate_card: 'Dupliquer'
     emoji_pick: "Choisir un émoji"
     brand_font: "Police"
@@ -1093,6 +1109,15 @@ fr:
     shuffle: Mélanger
     shuffle_title: Piocher de nouvelles images depuis la bibliothèque Verto
     shuffle_confirm: Mélanger les images ? Vos images actuelles seront remplacées par une nouvelle sélection depuis la bibliothèque.
+    shuffle_direction_toggle_title: "Ajouter une orientation pour ce mélange"
+    shuffle_direction_heading: "Orienter ce mélange"
+    shuffle_direction_hint: "Facultatif. Dites à Verto ce que vous attendez des images et des animations : une ambiance, un décor, ou ce qu'il faut éviter."
+    shuffle_direction_label: "Orientation"
+    shuffle_direction_placeholder: "ex. lumière naturelle chaude, en extérieur, petits groupes, pas de bureaux"
+    shuffle_direction_toward: "Dernier mélange : recherche de %{terms}"
+    shuffle_direction_avoiding: "et a exclu : %{terms}"
+    shuffle_direction_clear: "Effacer"
+    shuffle_direction_apply: "Mélanger avec ceci"
     publish_share: Publier & partager →
     answer_type: Type de réponse
     select_card: Sélectionnez une carte pour changer son type
@@ -1171,7 +1196,7 @@ fr:
     via_x: "X"
     via_linkedin: "LinkedIn"
     qr_hint: "Scannez pour ouvrir ce Verto. Téléchargez le code pour vos affiches et diapositives."
-    download_qr: "Télécharger le QR (SVG)"
+    download_qr: "Télécharger le QR (%{file_format})"
     download_qr_short: "Code QR"
     custom_url: "URL personnalisée"
     custom_url_placeholder: "summer-feedback-2026"
@@ -1356,7 +1381,7 @@ fr:
     s7_perks_label: Les avantages du remplissage automatique
     s7_perks:
     - Un arrière-plan assorti au thème de votre sondage
-    - Une image sur chaque carte, y compris les cartes à glisser
+    - Une image sur chaque carte, y compris les cartes à toucher
     - Mélangez dans l'éditeur jusqu'à trouver le rendu idéal
     s7_title: Comment souhaitez-vous démarrer ?
     s7_sub: Vous pourrez tout modifier dans l'éditeur.

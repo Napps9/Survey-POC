@@ -16,8 +16,20 @@ export default class extends Controller {
     if (params.get("tab") || params.get("panel") === "publish") this.open()
   }
 
-  open() {
+  // `event` is present only when this was fired by a data-action. On a phone
+  // a card tap must edit the card IN PLACE — popping the panel over it is the
+  // desktop behaviour and would bury the thing just tapped under a sheet. The
+  // dock and the chips still open it, because they call open() with no event
+  // (or from their own actions), and every desktop width is unaffected.
+  open(event) {
+    if (event?.type === "type-panel:cardSelected" && this._isPhone()) return
     if (this.hasGridTarget) this.gridTarget.classList.add("is-panel-open")
+  }
+
+  // The one width the studio calls a phone — kept identical to
+  // mobile_studio_controller's QUERY and the CSS blocks.
+  _isPhone() {
+    return window.matchMedia("(max-width: 767px)").matches
   }
 
   close() {

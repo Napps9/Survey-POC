@@ -238,4 +238,92 @@ class OrganisationAssetsTest < ActionDispatch::IntegrationTest
     assert_select "[data-media-picker-target=saveToLibrary]", 0
     assert_select ".media-library-add", 0
   end
+
+  # ── Removing a brand asset from inside the picker ───────────────────────
+  # The capability already existed on Settings → Brand; what was missing was
+  # the affordance in the grid a creator is actually looking at when they
+  # decide an image was a mistake.
+
+  def json_destroy(id)
+    delete organisation_asset_path(@org, id, format: :json),
+           headers: { "Accept" => "application/json" }
+  end
+
+  test "an admin removes a brand asset over JSON without being redirected" do
+    attach_asset("bye.png")
+    att = @org.reload.ordered_assets.first
+    login(@admin)
+
+    assert_difference -> { @org.reload.assets.attachments.size }, -1 do
+      json_destroy(att.id)
+    end
+    assert_response :success
+    # A redirect is the wrong answer inside a modal: Turbo would follow it and
+    # navigate the editor away, taking the creator's unsaved cards with it.
+    assert_equal true, response.parsed_body["ok"]
+    assert_equal att.id, response.parsed_body["id"]
+  end
+
+  test "a non-admin cannot remove a brand asset over JSON" do
+    attach_asset("keep.png")
+    att = @org.reload.ordered_assets.first
+    login(@member)
+
+    assert_no_difference -> { @org.reload.assets.attachments.size } do
+      json_destroy(att.id)
+    end
+    assert_response :forbidden
+    assert_equal false, response.parsed_body["ok"]
+  end
+
+  test "a JSON delete of an id this account does not own is a not-found, not a purge" do
+    other = Organisation.create!(name: "Rival", slug: "rival-#{SecureRandom.hex(2)}")
+    other.assets.attach(io: StringIO.new("\x89PNG\r\n\x1a\n"), filename: "theirs.png",
+                        content_type: "image/png")
+    theirs = other.reload.ordered_assets.first
+    login(@admin)
+
+    assert_no_difference -> { other.reload.assets.attachments.size } do
+      json_destroy(theirs.id)
+    end
+    assert_response :not_found
+    assert_equal false, response.parsed_body["ok"]
+  end
+
+  test "the create JSON hands back a delete url so a fresh tile is removable" do
+    login(@admin)
+    json_create(PNG_DATA_URL)
+    assert_response :success
+
+    body = response.parsed_body
+    # Without this the one tile you could NOT remove was the one you had just
+    # uploaded — the picker had no id to delete it by until a full reload.
+    assert body["delete_url"].present?, "create should return the tile's delete url"
+    assert_difference -> { @org.reload.assets.attachments.size }, -1 do
+      delete body["delete_url"], headers: { "Accept" => "application/json" }
+    end
+    assert_response :success
+  end
+
+  test "the picker's brand tiles carry a remove button for admins only" do
+    attach_asset("shown.png")
+    survey = @org.surveys.create!(title: "S", theme: "T", audience_age: "all", key_insight: "k",
+                                  default_locale: "en", locales: [ "en" ], cards: [])
+
+    login(@admin)
+    get survey_path(survey)
+    assert_response :success
+    assert_select ".media-library-cell .media-library-del", 1
+    # The tile needs its own identity for the JS to clear a pending pick that
+    # points at a blob it has just purged.
+    assert_select ".media-library-cell .media-library-item[data-asset-id]", 1
+
+    login(@member)
+    get survey_path(survey)
+    assert_response :success
+    assert_select ".media-library-del", 0
+    # ...but a member still SEES the library. Gating the tile must not gate
+    # the picture.
+    assert_select ".media-library-cell .media-library-item", 1
+  end
 end

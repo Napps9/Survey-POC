@@ -174,7 +174,7 @@ class TestModeTest < ActionDispatch::IntegrationTest
 
     get live_test_survey_path(token)
 
-    assert_select "a.play-banner-link[href=?]", play_survey_path(token)
+    assert_select "a.play-test-exit[href=?]", play_survey_path(token)
     assert_match I18n.t("player.exit_test_mode"), response.body
   end
 
@@ -186,7 +186,7 @@ class TestModeTest < ActionDispatch::IntegrationTest
     get test_survey_path(test_token)
 
     assert_response :success
-    assert_select "a.play-banner-link", 0
+    assert_select "a.play-test-exit", 0
   end
 
   test "it resolves a named send link and a vanity slug, like the player itself" do
@@ -194,7 +194,7 @@ class TestModeTest < ActionDispatch::IntegrationTest
     link = @survey.survey_links.create!(name: "Town hall", slug: "town-hall-#{SecureRandom.hex(2)}")
     get live_test_survey_path(link.slug)
     assert_response :success
-    assert_select "a.play-banner-link[href=?]", play_survey_path(link.slug)
+    assert_select "a.play-test-exit[href=?]", play_survey_path(link.slug)
 
     @survey.update!(slug: "vanity-#{SecureRandom.hex(2)}")
     get live_test_survey_path(@survey.slug)

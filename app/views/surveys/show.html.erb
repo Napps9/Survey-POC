@@ -49,7 +49,7 @@
 <script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker mobile-studio share-modal"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -91,7 +91,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.editing_locked? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -290,6 +290,7 @@
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
+           data-mobile-studio-target="stage"
            data-device-frame-target="feed"
            <%# The scroller editor-scroll-sync watches: it's the IntersectionObserver
                root, collapsed to this element's centre line — the same line the
@@ -334,46 +335,16 @@
             <% end %>
           </div>
           <div class="split-card">
-            <%# Left panel mirrors _split_left's editor mode: current design
-                image (if any) + the Add/Change design CTA. media-picker's
-                "consent" mode dispatches the pick to gate-cards, which
-                repaints the [data-consent-media] elements and persists
-                consent_image via update_settings. %>
+            <%# The player shows this gate as a bottom BANNER over the first
+                question now (player/_consent_banner) — text and buttons only,
+                no design image. The consent_image* fields are dormant, kept
+                for the snapshots already recorded against them; the picker's
+                "consent" mode and gate-cards' setConsentImage stay wired but
+                nothing offers them for the simple gate any more. This replica
+                keeps the card shape as a familiar text-editing surface, not
+                as a preview of the player. %>
             <div class="split-left" data-gate-cards-target="consentLeft">
-              <% if @survey.consent_image.present? %>
-                <div class="split-left-img" data-consent-media style="background-image:url('<%= @survey.consent_image %>');"></div>
-                <div class="split-left-overlay" data-consent-media></div>
-                <% if @survey.consent_image_credit.present? %>
-                  <div class="split-left-credit" data-consent-media>
-                    <% if @survey.consent_image_credit_url.present? %>
-                      <a href="<%= @survey.consent_image_credit_url %>" target="_blank" rel="noopener nofollow">Photo by <%= @survey.consent_image_credit %></a>
-                    <% else %>
-                      Photo by <%= @survey.consent_image_credit %>
-                    <% end %>
-                  </div>
-                <% end %>
-              <% end %>
               <div class="panel-progress"><div class="panel-progress-fill" style="width:5%;"></div></div>
-              <%# The design image saves through the same locked consent_image
-                  field, so the picker goes away with the rest of the editing. %>
-              <% unless live_locked %>
-                <% if @survey.consent_image.present? %>
-                  <button type="button" class="add-media-fab"
-                          data-action="click->media-picker#openConsent"
-                          title="<%= t("editor.change_media_title") %>">
-                    <span class="add-media-fab-plus">＋</span>
-                    <span><%= t("editor.change_media") %></span>
-                  </button>
-                <% else %>
-                  <button type="button" class="split-left-design-prompt"
-                          data-action="click->media-picker#openConsent"
-                          title="<%= t("editor.add_design_title") %>">
-                    <span class="split-left-design-prompt-icon">＋</span>
-                    <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
-                    <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
-                  </button>
-                <% end %>
-              <% end %>
             </div>
             <div class="split-right">
               <div class="play-consent-main">
@@ -490,13 +461,63 @@
                     data-action="click->journey#open">⤢ Journey</button>
           <% end %>
           <% unless live_locked %>
-            <%= button_to t("editor.shuffle"), shuffle_survey_assets_path(@survey),
-                  method: :post,
-                  form: { data: { turbo_confirm: t("editor.shuffle_confirm") } },
-                  title: t("editor.shuffle_title"),
-                  style: "padding:10px 22px;border-radius:100px;background:#2A2D3A;color:#fff;border:1px solid rgba(255,255,255,0.22);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;",
-                  onmouseover: "this.style.background='#383D4E'",
-                  onmouseout:  "this.style.background='#2A2D3A'" %>
+            <%# Shuffle is a split pill: the left half re-rolls the imagery as
+                it always has, the caret opens the optional DIRECTION prompt —
+                a line of free text telling Verto what the creator wants out of
+                the content and imagery ("warm, outdoors, no offices"). The
+                textarea lives inside the same form, so either submit button
+                carries it. It is NOT stored: the box starts empty every time,
+                and a steer applies only to the shuffle it was typed for. %>
+            <%= form_with url: shuffle_survey_assets_path(@survey), method: :post,
+                          data: { controller: "shuffle", action: "keydown.esc->shuffle#close" },
+                          class: "shuffle-form" do %>
+              <div class="shuffle-pill">
+                <button type="submit" class="shuffle-pill-go"
+                        title="<%= t("editor.shuffle_title") %>"
+                        data-turbo-confirm="<%= t("editor.shuffle_confirm") %>"><%= t("editor.shuffle") %></button>
+                <button type="button" class="shuffle-pill-caret"
+                        aria-expanded="false" aria-haspopup="true"
+                        title="<%= t("editor.shuffle_direction_toggle_title") %>"
+                        data-shuffle-target="toggle"
+                        data-action="click->shuffle#toggle">▾</button>
+              </div>
+
+              <div class="shuffle-direction" hidden data-shuffle-target="panel">
+                <div class="shuffle-direction-head"><%= t("editor.shuffle_direction_heading") %></div>
+                <p class="shuffle-direction-hint"><%= t("editor.shuffle_direction_hint") %></p>
+                <label class="shuffle-direction-label" for="shuffle-direction">
+                  <%= t("editor.shuffle_direction_label") %>
+                </label>
+                <%# Always empty. A prompt box that comes back pre-filled is
+                    answering a question nobody asked again. %>
+                <textarea id="shuffle-direction" name="direction" rows="3"
+                          class="shuffle-direction-input"
+                          maxlength="<%= Survey::MAX_SHUFFLE_DIRECTION %>"
+                          data-shuffle-target="input"
+                          placeholder="<%= t("editor.shuffle_direction_placeholder") %>"></textarea>
+                <%# What the LAST shuffle's prompt reduced to, carried in the
+                    flash by SurveysController#shuffle_assets. Shown so a prompt
+                    that parsed to something the creator didn't mean is visible
+                    here rather than only in the pictures — and gone by the next
+                    page view, like the run it describes. %>
+                <% if flash[:shuffle_toward].present? || flash[:shuffle_avoiding].present? %>
+                  <p class="shuffle-direction-reading">
+                    <% if flash[:shuffle_toward].present? %>
+                      <span><%= t("editor.shuffle_direction_toward", terms: flash[:shuffle_toward]) %></span>
+                    <% end %>
+                    <% if flash[:shuffle_avoiding].present? %>
+                      <span><%= t("editor.shuffle_direction_avoiding", terms: flash[:shuffle_avoiding]) %></span>
+                    <% end %>
+                  </p>
+                <% end %>
+                <div class="shuffle-direction-actions">
+                  <button type="button" class="shuffle-direction-clear"
+                          data-action="click->shuffle#clear"><%= t("editor.shuffle_direction_clear") %></button>
+                  <button type="submit" class="shuffle-direction-apply"
+                          data-turbo-confirm="<%= t("editor.shuffle_confirm") %>"><%= t("editor.shuffle_direction_apply") %></button>
+                </div>
+              </div>
+            <% end %>
             <button type="button"
                     style="padding:10px 22px;border-radius:100px;background:#2A2D3A;color:#fff;border:1px solid rgba(255,255,255,0.22);font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;transition:background 0.15s;"
                     onmouseover="this.style.background='#383D4E'"
@@ -510,6 +531,10 @@
                   data-action="click->publish-panel#open click->editor-panel#open"><%= t("editor.publish_share") %></button>
         </div>
       </div>
+
+      <%# Phone-only floating chrome (top bar, deck footer, dock) — inert and
+          display:none until mobile-studio puts .m-studio-on on the root. %>
+      <%= render "surveys/mobile_studio_chrome" %>
       </div><%# /feed wrapper %>
 
     </div><%# /cards column %>
@@ -655,6 +680,15 @@
                    data-action="change->survey-editor#togglePanelRequired">
             <span class="card-flag-track" aria-hidden="true"></span>
             <span class="card-flag-label"><%= t("card.required") %></span>
+          </label>
+          <%# Ask once per person: on repeat plays by the same device identity
+              the question is skipped once answered, the stored answer riding
+              each new run (player_controller.js _seedOnceAnswers). %>
+          <label class="card-flag">
+            <input type="checkbox" data-survey-editor-target="panelAskOnce"
+                   data-action="change->survey-editor#togglePanelAskOnce">
+            <span class="card-flag-track" aria-hidden="true"></span>
+            <span class="card-flag-label"><%= t("card.ask_once") %></span>
           </label>
 
           <%# Tap cards only: how many answers each swipe statement is judged on.
@@ -905,6 +939,23 @@
                        style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
                 <span>Show the running points total in the footer while playing. Checkpoints and the final tally still work either way — this only hides the live number.</span>
               </label>
+
+              <%# The two tokenomics lines on the points intro — editable per
+                  Verto, blank restores the locale default (Feedback 17). Same
+                  save-on-change convention as compare_note. %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Points note on the intro:</div>
+              <input type="text" name="tokens_note" maxlength="200"
+                     value="<%= @survey.tokens_note_text %>"
+                     onchange="this.form.requestSubmit()"
+                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+
+              <% if @survey.leaderboard_enabled? %>
+                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:10px 0 5px;">Leaderboard teaser on the intro:</div>
+                <input type="text" name="leaderboard_note" maxlength="200"
+                       value="<%= @survey.leaderboard_note_text %>"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <% end %>
             <% end %>
           <% end %>
 
@@ -1088,8 +1139,14 @@
                   Scan to open this Verto. Point a phone camera at it, or download
                   the code for posters and slides.
                 </div>
-                <%= link_to "Download QR (SVG)", qr_survey_path(@survey),
-                      style: "display:inline-block;margin-top:8px;padding:6px 10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+                <%# PNG first — slides/Canva/chat apps take a PNG anywhere;
+                    SVG stays for print shops, where it scales losslessly. %>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+                  <%= link_to "Download QR (PNG)", qr_survey_path(@survey, format: :png),
+                        style: "display:inline-block;padding:6px 10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+                  <%= link_to "Download QR (SVG)", qr_survey_path(@survey),
+                        style: "display:inline-block;padding:6px 10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);text-decoration:none;" %>
+                </div>
               </div>
             </div>
 
@@ -1247,15 +1304,77 @@
           <% end %>
         </details>
 
-        <%# Card content has always followed the Verto's own language
-            (default_locale / ?lang=); the surrounding chrome — Back/Next,
-            consent, the required hint, the thank-you screen — has always
-            followed the visitor's own browser/account locale instead, so a
-            Spanish-language Verto opened by an English-browser visitor shows
-            Spanish questions against English buttons. This is the one
-            override for that, off by default. %>
+        <%# Everything language: which languages this Verto exists in and which
+            is primary (surveys#update_languages), whether the player opens in
+            the respondent's own language automatically, and whether the
+            player chrome follows the Verto's language. Card content has
+            always followed the Verto's own language (default_locale /
+            ?lang=); the chrome override remains off by default. %>
         <details class="publish-block">
           <summary class="publish-block-title">Language <span class="pub-chev">⌄</span></summary>
+
+          <% primary_locked = live_locked || @survey.responses.exists? %>
+          <%= form_with url: survey_languages_path(@survey), method: :post, local: true, style: "margin:0 0 12px;" do %>
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:6px;">Primary language</div>
+            <select name="default_locale" onchange="this.form.requestSubmit()"
+                    <%= "disabled" if primary_locked %>
+                    style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
+              <% @survey.verto_locales.each do |code| %>
+                <% loc = SupportedLocales.find(code) %>
+                <option value="<%= code %>" <%= "selected" if code == @survey.default_locale %>><%= loc&.flag %> <%= loc&.english_name || code %></option>
+              <% end %>
+            </select>
+            <% if primary_locked %>
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+                The primary language is fixed once a Verto is live or has answers — it's the language the results are recorded in.
+              </div>
+            <% end %>
+            <% if params[:language_error] == "primary" %>
+              <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;">That couldn't become the primary language — a Verto that is live or already has answers keeps the one it was built in.</div>
+            <% end %>
+
+            <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin:12px 0 6px;">Languages</div>
+            <%# With every secondary unticked no locales[] field would submit at
+                all and the deselection would be silently ignored — the classic
+                checkbox-array absence. The blank sentinel always submits and
+                sanitize_list drops it. %>
+            <input type="hidden" name="locales[]" value="" />
+            <div style="max-height:190px;overflow-y:auto;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px 10px;">
+              <% verto_set = @survey.verto_locales %>
+              <% SupportedLocales.all.each do |loc| %>
+                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;padding:4px 0;">
+                  <input type="checkbox" name="locales[]" value="<%= loc.code %>"
+                         <%= "checked" if verto_set.include?(loc.code) %>
+                         <%= "disabled" if loc.code == @survey.default_locale %>
+                         onchange="this.form.requestSubmit()"
+                         style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" />
+                  <span style="flex-shrink:0;"><%= loc.flag %></span>
+                  <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= loc.native_name %> <span style="color:rgba(255,255,255,0.45);">· <%= loc.english_name %></span></span>
+                  <% if loc.code == @survey.default_locale %>
+                    <span style="margin-left:auto;flex-shrink:0;font-family:'Alata',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:#01EACB;">Primary</span>
+                  <% end %>
+                </label>
+              <% end %>
+            </div>
+            <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+              Tick a language and the Verto translates itself into it in the background — give it a minute, then reload. Unticking keeps the translation stored, so re-ticking is instant.
+            </div>
+          <% end %>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0 0 10px;" do %>
+            <input type="hidden" name="auto_detect_language" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="auto_detect_language" value="1"
+                     <%= "checked" if @survey.auto_detect_language? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Open in each respondent's own language when this Verto has it. Off: everyone starts in the primary language and picks another by hand.</span>
+            </label>
+          <% end %>
+
+          <%# The chrome — Back/Next, consent, the required hint, the thank-you
+              screen — has always followed the visitor's own browser/account
+              locale; this is the one override for that, off by default. %>
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
             <input type="hidden" name="chrome_follows_verto_language" value="0" />
             <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
@@ -1265,6 +1384,46 @@
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Show Back, Next and the other player controls in the Verto's own language, not the respondent's.</span>
             </label>
+          <% end %>
+        </details>
+
+        <%# Contact details — the identified register, deliberately NOT a card:
+            respondents meet it as a first-visit gate ahead of the deck, what
+            they type lands in its own table keyed by the same identity as
+            their leaderboard name, and it can never coexist with the
+            NEURODIVERSITY question (the model refuses either side while the
+            other is on; age, location, gender and heritage may coexist). %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Contact details <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="contact_form_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="contact_form_enabled" value="1"
+                     <%= "checked" if @survey.contact_form_enabled? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Ask for contact details (name, email, company, industry) the first time someone opens this Verto. Optional for them, asked once per device, and stored apart from their answers — linked only to their leaderboard name.</span>
+            </label>
+          <% end %>
+          <% if params[:contact_error] == "neurodiversity" %>
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;line-height:1.45;">
+              A Verto can collect contact details or ask the neurodiversity question — never both.
+              Delete the neurodiversity question from the deck first, then turn this on.
+            </div>
+          <% else %>
+            <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+              For GDPR, a Verto with a contact form can't also ask the neurodiversity question — age, location, gender and heritage are fine.
+            </div>
+          <% end %>
+          <% if @survey.contact_form_enabled? && current_membership&.admin? %>
+            <% contact_count = @survey.contact_details.count %>
+            <div style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);"><%= pluralize(contact_count, "contact") %> collected</span>
+              <% if contact_count.positive? %>
+                <%= link_to "Download CSV", survey_contacts_path(@survey, format: :csv),
+                      style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#01EACB;text-decoration:underline;text-underline-offset:3px;" %>
+              <% end %>
+            </div>
           <% end %>
         </details>
 
@@ -1935,8 +2094,15 @@
                 aria-label="<%= t("editor.emoji_pick", default: "Choose an emoji") %>">☺</button>
       </span>
     </div>
+    <%# The icon library is 48 sport SVGs and nothing else, so on a card about
+        cost or safety the grid is a wall of things that mean nothing — which
+        reads as a broken picker rather than a library that stops at sport.
+        The heading names its actual scope and the note points at the control
+        that DOES cover every subject, two rows up. Delete both when a general
+        icon set lands. %>
     <div class="option-style-row option-style-row--icons">
       <span><%= t("js.editor.option_icon") %></span>
+      <p class="option-style-icon-note"><%= t("js.editor.option_icon_note") %></p>
       <div class="option-style-icon-grid" data-option-style-target="iconGrid"></div>
     </div>
     <div class="option-style-popover-foot">
@@ -1966,5 +2132,21 @@
 
   <% if @survey.logic? && !@survey.editing_locked? %><%= render "surveys/generate_flow_modal" %><% end %>
   <% if @survey.logic? %><%= render "surveys/journey" %><% end %>
+
+  <%# Share panel — the dashboard's modal reused verbatim: the dock's Share
+      button sets this frame's src to /surveys/:id/share, and the frame is
+      cleared on close so reopening refetches. Admin-only, matching the
+      require_admin! on SurveyLinksController behind it; non-admins get the
+      Publish panel's Status block instead (see the dock in the chrome). %>
+  <% if current_membership&.admin? %>
+    <div data-share-modal-target="modal" class="app-modal app-modal--below-nav hidden">
+      <div class="app-modal__backdrop" data-action="click->share-modal#close"></div>
+      <div class="app-modal__panel share-modal__shell">
+        <%= turbo_frame_tag "share-modal", data: { share_modal_target: "frame" } do %>
+          <div class="share-modal__loading"><%= t("share_modal.loading") %></div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
 </div><%# /editor %>

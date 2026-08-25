@@ -24,6 +24,9 @@ this covers visuals).*
 4. **Picks are stable, not random.** The same Verto always populates with the
    same imagery. The editor's **Shuffle** button is the only thing that
    re-rolls the picks (and it's disabled once a Verto is live).
+5. **A shuffle can be steered.** An optional **direction prompt** beside
+   Shuffle lets the creator say what they're after — a mood, a setting, or
+   something to keep out — for that one shuffle (see §4a).
 
 ---
 
@@ -53,7 +56,9 @@ than the whole thing failing).
 After that:
 
 - **Shuffle assets** (editor toolbar) re-rolls every automatic pick with a
-  fresh random seed — a one-click "show me a different look".
+  fresh random seed — a one-click "show me a different look". Its caret opens
+  an optional **direction prompt** that steers what it re-rolls *toward* (see
+  §4a).
 - Editing a card never silently changes its imagery; only Shuffle or the
   media picker do.
 - **Live Vertos are locked** — Shuffle is blocked once a Verto is published,
@@ -144,6 +149,81 @@ the seed — that's all it does.
 
 **No visual déjà vu.** An asset already used on one card is avoided on the
 next; repeats are allowed only once a pool is exhausted.
+
+## 4a. The direction prompt (steering a shuffle)
+
+Beside the editor's **Shuffle** button is an optional free-text box — the
+**direction prompt** — where a creator says what they want out of the Verto's
+content and imagery: *"warm natural light, outdoors, small groups, no
+offices."*
+
+**It belongs to one shuffle and is not stored.** The box starts empty every
+time; a steer applies to the click it was typed for and nothing else. It first
+shipped saved on the Verto so the box would stay filled in, which turned it
+into invisible state — a sentence typed once went on quietly deciding every
+later shuffle, under a panel headed "Steer *this* shuffle". Nothing outside a
+shuffle reads a direction, so the picker's Recommended rail, its first search
+and the player's mobile backdrop are all theme-only.
+
+After a shuffle the panel reports what the prompt reduced to — *"Last shuffle
+searched for: professional, corporate"* — carried in the flash, so it describes
+the run that just happened and is gone by the next page view.
+
+It is a **preference layered over** everything above, never a replacement for
+it. The theme still anchors the search, a card still names its own subject,
+and safety and relevance still decide what may actually be applied.
+
+| Where it lands | What it does |
+|---|---|
+| Pexels queries | Up to three of its words **lead** every query, ahead of the theme and the card's subject. If the narrowed query finds nothing relevant, the direction is the first thing dropped and the query is re-run without it. |
+| Which result is applied | Candidates that visibly answer the direction are taken first. This is what makes a direction stick across a whole deck rather than landing on whichever card the seed happened to favour. |
+| Library scoring | Its words count as theme keywords (and expand through the same clusters), so an asset the creator asked for can clear the theme gate. A mood or style it names (*calm, minimal*) replaces the default spread instead of adding to it. |
+| Range animations | Its words join the theme's when matching the reaction-animation set, so a Verto steered toward "recycling" reacts with recycling. |
+| Mobile backdrop | Widens the themes that backdrop is matched on. |
+
+**Vetoes.** A negated clause — *"no offices", "avoid corporate stock"* — is
+never searched for; it is filtered *out* of both the Pexels results and the
+curated pool. Getting this backwards would be worse than ignoring it, so the
+parser splits on clauses and flips only what follows the negation word: *"warm
+and no offices"* wants warmth and vetoes offices. A veto that would leave a
+slot with nothing gives way only where the slot cannot be empty — the
+background and the range animation (which falls back to the neutral General
+set rather than playing the vetoed one). A card panel is allowed to come back
+blank: a clean panel is a better answer to "no offices" than an office.
+
+**What it takes from your words.** A direction is prose aimed at us, so the
+scaffolding people wrap it in — *make, keep, look, give, a bit, the images,
+this verto* — is stripped along with ordinary filler, and only the words that
+name something visual survive. What's left keeps the order it was written in,
+and the first two ride along on the search. The editor prints the result under
+the box (*"Searching for: professional, corporate"*), because a prompt that
+parses to something you didn't mean is otherwise invisible until the pictures
+come back looking untouched. That is exactly how this shipped broken the first
+time: *"We want to make this verto professional and corporate"* reduced to
+`make verto` and searched for that.
+
+**A direction that names a subject leads; one that names a treatment shades.**
+The two are told apart by whether the theme clusters recognise any of its words
+— "professional and corporate" reaches the work cluster, "warm minimal" reaches
+nothing, because no cluster claims an adjective.
+
+- **Names a subject** → the direction goes first. A prompt-first query (the
+  direction plus one theme word) is tried *before* each card's own search, its
+  vocabulary counts toward the relevance floor, and on-direction results are
+  applied ahead of the rest. A community-sport Verto told "professional and
+  corporate" comes back corporate — background and every card.
+- **Names only a treatment** → nothing above applies, and the direction does
+  what it always did: rides along on the query and narrows the library's
+  mood/style. It biases *among* pictures of the Verto's own subject rather
+  than replacing them.
+
+If a direction isn't moving things far enough, name a subject in it: *"offices,
+meeting rooms, city skyline"* moves a deck much further than *"more formal"*.
+
+**Safety is not negotiable by it.** The direction goes through the same
+age-aware content-safety scrub as every other search term, and a charged
+protest-visual word in it is stripped exactly as it would be in a theme — the
+imagery box is not where a Verto declares a charged topic; its theme is.
 
 ## 5. The Verto library
 
@@ -350,6 +430,13 @@ drop onto any card or background from the editor's media picker.
 - `app/javascript/controllers/media_picker_controller.js` — the editor's
   picker; `SurveysController#pexels_search` / `#shuffle_assets` — its
   endpoints.
+- The direction prompt (§4a): passed per-shuffle as
+  `AssetPopulator.new(survey, direction:)` and never persisted, parsed by
+  `AssetPopulator.direction_buckets` (wants vs. vetoes) and applied through the
+  populator's `direction_*` helpers — `direction_subject?` decides whether it
+  leads or only shades. `AssetPopulator.direction_reading` is what the editor
+  reports back after a run; `app/javascript/controllers/shuffle_controller.js`
+  opens the panel.
 - `Organisation#assets` + `OrganisationAssetsController` — the per-account brand
   asset library; surfaced in `surveys/_media_modal` ("Your brand library") and
   managed on `memberships/index`; `Survey::ACTIVE_STORAGE_IMAGE_URL` allows its

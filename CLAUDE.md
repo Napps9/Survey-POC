@@ -12,7 +12,7 @@ unless the owner asks for one — repo owner's standing instruction, 2026-06-11.
 Before every push to Main, the full local suite must be green:
 
 ```
-bin/rails test        # 65+ tests, ~5s
+bin/rails test        # ~2,570 tests; system tests are separate (bin/rails test:system, ~285)
 bin/rubocop
 bin/brakeman --no-pager
 bin/importmap audit
@@ -106,11 +106,11 @@ that: push green.
   tests. CI sets a stub value.
 - GitHub Actions branch filters are case-sensitive: the branch is `Main`,
   not `main` (ci.yml watches both).
-- Locale strings live in 19 files under `config/locales/` — new UI strings
+- Locale strings live in 25 files under `config/locales/` — new UI strings
   must be added to all of them (they mirror en.yml's structure).
   `test/lib/locale_structure_parity_test.rb` enforces this for the
   browser-facing namespaces (`js`, `defaults`, `card`, `templates`,
-  `demographics`, `ask`); JS reads strings via
+  `demographics`, `ask`, `unsubscribe`); JS reads strings via
   `window.I18N`, which carries `js:` plus the curated slice in
   `app/views/layouts/_i18n_js.html.erb` — a JS-facing string anywhere else
   renders as a raw dotted key.
