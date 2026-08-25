@@ -26,6 +26,9 @@ export default class extends Controller {
     // where before it was hidden behind an invisible control.
     const peers = item.parentElement?.querySelectorAll(wasTapCard ? ".rotate-card" : ".pick-item")
     if (peers && peers.length <= MIN_CARD_OPTIONS) return
+    // Read before the node goes, so the stack can be put back where the creator
+    // was rather than at the front (see the dispatch below).
+    const index = peers ? Array.from(peers).indexOf(item) : 0
     // A tap card's option_images are POSITIONAL — image[i] belongs to
     // statement[i] — and serialize() bounds the array by truncating its TAIL.
     // So removing a statement without removing its image shifted every picture
@@ -36,8 +39,15 @@ export default class extends Controller {
     if (wasTapCard) this._dropOptionImageAt(item)
     item.remove()
     this.dispatch("changed")
-    // Re-layout the stack so the remaining-cards dots update.
-    if (wasTapCard) this.element.dispatchEvent(new Event("tap-stack:reset"))
+    // Re-layout the stack so the remaining-cards dots update — and hold the
+    // creator's place while doing it. This used to send a plain reset, which
+    // put them back on statement 1: deleting the fourth of six meant walking
+    // the pager forward three times to carry on where they were. The same
+    // index is now the statement that took the deleted one's place, and
+    // tap-stack clamps it, so deleting the last one lands on the new last.
+    if (wasTapCard) {
+      this.element.dispatchEvent(new CustomEvent("tap-stack:goto", { detail: { index } }))
+    }
   }
 
   // Splice the doomed statement's image out of the card's positional array, so
@@ -119,9 +129,14 @@ export default class extends Controller {
     }
 
     this.dispatch("changed")
-    // Notify tap-stack controller to re-layout
+    // Re-layout the stack AND surface the statement just added — `index: -1`
+    // is "the last one", which is where an append puts it. The old plain reset
+    // laid the deck out from the front, so on a deck of four or more the caret
+    // below was placed in a statement the creator could not see: it was three
+    // cards down the stack at opacity 0, and everything they typed went into
+    // it invisibly.
     const tapStack = this.element.querySelector("[data-controller~='tap-stack']") || this.element
-    tapStack.dispatchEvent(new Event("tap-stack:reset"))
+    tapStack.dispatchEvent(new CustomEvent("tap-stack:goto", { detail: { index: -1 } }))
     const editable = card.querySelector("[contenteditable]")
     editable?.focus()
     if (editable) {

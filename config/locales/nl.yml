@@ -501,6 +501,10 @@ nl:
         whole_verto: "Hele Verto"
         card_n: "Kaart %{n}"
         section_empty: "Niets hier."
+      tap:
+        prev_statement: "Vorige stelling"
+        next_statement: "Volgende stelling"
+        statement_of: "Stelling %{n} van %{total}"
       scenario:
         page_of: "Pagina %{n} van %{total}"
         page_placeholder: "Schrijf deze pagina…"

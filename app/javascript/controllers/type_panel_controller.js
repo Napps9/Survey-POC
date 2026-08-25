@@ -219,12 +219,17 @@ const COMPONENTS = {
   // by a type switch looked nothing like the same card after a reload. The
   // response strip now comes from lib/tap_response_templates, which is the one
   // place its markup is written on this side of the wire.
+  //
+  // Always built editable (a type switch only happens in the editor), so it
+  // carries the creator's statement pager rather than the respondent's reset
+  // row — without it a card switched to Tap would show only its first
+  // statement, with no way to reach the rest.
   tap_card: (opts, ctx = {}) => {
     const optionImages = ctx.optionImages || []
     const responses = resolveResponses(ctx.responses)
     return `
     <div class="rotate-wrap" data-controller="tap-stack card-editor"
-         data-action="tap-stack:reset->tap-stack#reset">
+         data-action="tap-stack:reset->tap-stack#reset tap-stack:goto->tap-stack#goto">
       <div class="rotate-card-stack">
         ${opts.map((o,i) => {
           const img = optionImages[i]
@@ -248,8 +253,12 @@ const COMPONENTS = {
           <div class="rotate-dots" data-tap-stack-target="dots"></div>
         </div>
       </div>
-      <div class="rotate-reset-row">
-        <button type="button" class="rotate-reset-btn" data-action="click->tap-stack#reset">↺ ${esc(t("card.reset"))}</button>
+      <div class="tap-nav-row">
+        <button type="button" class="tap-nav-btn" data-tap-stack-target="prevBtn" data-action="click->tap-stack#back"
+                title="${esc(t("editor.tap.prev_statement"))}" aria-label="${esc(t("editor.tap.prev_statement"))}">‹</button>
+        <span class="tap-nav-count" data-tap-stack-target="counter" aria-live="polite"></span>
+        <button type="button" class="tap-nav-btn" data-tap-stack-target="nextBtn" data-action="click->tap-stack#forward"
+                title="${esc(t("editor.tap.next_statement"))}" aria-label="${esc(t("editor.tap.next_statement"))}">›</button>
       </div>
       <button type="button" class="tap-add-btn" data-action="click->card-editor#addTapOption">＋ ${esc(t("card.add_statement"))}</button>
     </div>`

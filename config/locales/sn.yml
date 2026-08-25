@@ -505,6 +505,10 @@ sn:
         whole_verto: "Verto Yose"
         card_n: "Kadhi %{n}"
         section_empty: "Hapana Chiri Pano."
+      tap:
+        prev_statement: "Chirevo Chapfuura"
+        next_statement: "Chirevo Chinotevera"
+        statement_of: "Chirevo %{n} che%{total}"
       scenario:
         page_of: "Peji %{n} re%{total}"
         page_placeholder: "Nyora peji rino…"

@@ -517,6 +517,10 @@ xh:
         whole_verto: "IVerto iphela"
         card_n: "Ikhadi %{n}"
         section_empty: "Akukho nto apha."
+      tap:
+        prev_statement: "Ingxelo edlulileyo"
+        next_statement: "Ingxelo elandelayo"
+        statement_of: "Ingxelo %{n} kwi-%{total}"
       scenario:
         page_of: "Iphepha %{n} kwi-%{total}"
         page_placeholder: "Bhala eli phepha…"
