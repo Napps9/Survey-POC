@@ -154,6 +154,37 @@ class PlayerHeroCssTest < ActiveSupport::TestCase
                  "the re-assert no longer sets --play-bar-clear, so it is a no-op rule")
   end
 
+  # The clearance is a padding, and a padding is only half the distance between
+  # the bar and the first line of the panel — the other half is where the panel
+  # STARTS, and the lip rule moves that. It matches on :has(.split-left-img),
+  # which these three types satisfy: they drop the hero STRIP, not the hero's
+  # markup. So a tap, NPS or prioritise card carrying a photo was pulled 22px
+  # (--play-lip) up into the 28px it had just been given to clear, and the
+  # progress fill sheared "TAP TO RESPOND" mid-letter — the same symptom the
+  # padding was added for, on the one variant the padding does not fix.
+  #
+  # A lip is the panel riding the bottom edge of a hero strip. These types have
+  # no strip, so there is no edge and nothing to round over. hero_promise_test
+  # measures the result in a browser; this names the two properties, because
+  # what went wrong is invisible in the rule that looks wrong.
+  test "the types that drop the hero strip drop its lip with it" do
+    body = rule_bodies(".preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right").first
+    lip  = css.index(".preview-overlay .split-card:has(.split-left-img)   .split-right")
+    reset = css.index(".preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right")
+
+    assert lip, "the hero lip rule is gone, or its selector no longer leads the list"
+    assert_operator reset, :>, lip,
+                    "the lip reset now sits ABOVE the lip itself. Both are (0,4,0), so the lip " \
+                    "wins and a hero-less card carrying a photo is pulled back under its bar."
+    assert_match(/margin-top:\s*0/, body,
+                 "the re-assert no longer zeroes margin-top, so --play-lip still pulls these " \
+                 "panels up under the progress bar on any card that carries an image")
+    assert_match(/border-radius:\s*0/, body,
+                 "the re-assert no longer zeroes border-radius: the panel keeps rounded top " \
+                 "corners over a hero strip it does not have, and the card's own corners " \
+                 "show through them")
+  end
+
   test "the hero and the answer panel state one ratio, in every tier" do
     pairs = css.scan(
       /--play-hero-h:\s*clamp\([^,]+,\s*calc\(var\(--play-card-h\)\s*\*\s*([\d.]+)\).*?

@@ -7813,6 +7813,24 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right {
     padding-top: var(--play-bar-clear);
+    /* ...and the LIP goes with the strip. The clearance above is a padding, and
+       a padding cannot be seen from the rule that moves the whole panel: the
+       lip rule further up matches on :has(.split-left-img) — the picture is
+       still in the DOM on these three types, only its strip is gone — so a tap
+       card CARRYING A PHOTO was pulled up by --play-lip (22px) into a bar it
+       had just been given 28px to clear. Net 6px, and the progress fill sheared
+       "TAP TO RESPOND" mid-letter again, on the one variant nothing covered:
+       the hero-less types were guarded, the hero types were guarded, and a
+       hero-less type WITH a hero's markup was neither.
+       The lip is a negative margin over the bottom edge of a hero strip. These
+       three drop that strip (the `display: contents` branches above), so there
+       is no edge to ride and nothing to round over — the same reset .hero-off
+       makes further down, for the same reason and in the same two properties.
+       z-index stays: with .split-left at `display: contents` the picture
+       positions against .split-card and would otherwise paint over the panel
+       that replaced it. */
+    margin-top: 0;
+    border-radius: 0;
   }
 
   /* The question never shrinks — it is the point of the card. Sizing it in
