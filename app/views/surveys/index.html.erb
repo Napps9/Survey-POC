@@ -45,7 +45,11 @@
        data-action="keydown.esc@window->create-menu#closeOnEsc keydown.esc@window->share-modal#closeOnEsc">
 
     <%# ── Hero ── %>
-    <div style="position:relative;overflow:hidden;padding:32px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+    <%# dash-* classes carry no desktop styling — they exist as stable hooks for
+        the M-STUDIO ≤767px overrides (application.css, end of file), because
+        these wrappers are styled inline and phone rules need something to bind
+        to that outranks nothing and names the element honestly. %>
+    <div class="dash-hero" style="position:relative;overflow:hidden;padding:32px 36px 40px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
       <div class="gen-orbs" style="opacity:0.28;">
         <div class="gen-orb gen-orb-2"></div>
         <div class="gen-orb gen-orb-3"></div>
@@ -62,7 +66,7 @@
               <span style="width:8px;height:8px;border-radius:50%;background:#01EACB;box-shadow:0 0 12px rgba(1,234,203,0.7);"></span>
               <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;"><%= t("dashboard.welcome_back") %></span>
             </div>
-            <h1 style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;">
+            <h1 class="dash-h1" style="font-family:'Alata',sans-serif;font-size:38px;color:#fff;line-height:1.1;margin:0 0 8px;">
               <%= t("dashboard.heading_html") %>
             </h1>
             <p style="font-family:'ABeeZee',sans-serif;font-size: var(--text-lg);color:rgba(255,255,255,0.45);margin:0;max-width:480px;line-height:1.55;">
@@ -203,8 +207,8 @@
     </div>
 
     <%# ── Metrics strip ── %>
-    <div style="position:relative;padding:24px 36px 28px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;max-width:1320px;margin:0 auto;">
+    <div class="dash-metrics" style="position:relative;padding:24px 36px 28px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;">
+      <div class="dash-metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;max-width:1320px;margin:0 auto;">
         <%
           stats = [
             { value: @surveys.size.to_s,         label: "Vertos",                       accent: "#01EACB", grad: "linear-gradient(135deg,rgba(1,234,203,0.18),rgba(1,234,203,0.04))" },
@@ -215,8 +219,8 @@
           ]
         %>
         <% stats.each do |s| %>
-          <div style="background:<%= s[:grad] %>;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px 16px;text-align:center;backdrop-filter:blur(8px);">
-            <div style="font-family:'Alata',sans-serif;font-size:36px;color:<%= s[:accent] %>;line-height:1;letter-spacing:-0.01em;"><%= s[:value] %></div>
+          <div class="dash-stat" style="background:<%= s[:grad] %>;border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:18px 16px;text-align:center;backdrop-filter:blur(8px);">
+            <div class="dash-stat-value" style="font-family:'Alata',sans-serif;font-size:36px;color:<%= s[:accent] %>;line-height:1;letter-spacing:-0.01em;"><%= s[:value] %></div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.5);margin-top:8px;letter-spacing:0.12em;text-transform:uppercase;"><%= s[:label] %></div>
           </div>
         <% end %>
@@ -224,7 +228,7 @@
     </div>
 
     <%# ── Body ── %>
-    <div style="flex:1;padding:32px 36px 60px;max-width:1320px;width:100%;margin:0 auto;box-sizing:border-box;">
+    <div class="dash-body" style="flex:1;padding:32px 36px 60px;max-width:1320px;width:100%;margin:0 auto;box-sizing:border-box;">
 
       <% if flash[:notice] %>
         <div style="background:rgba(1,234,203,0.1);border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:11px 16px;margin-bottom:20px;color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);"><%= flash[:notice] %></div>

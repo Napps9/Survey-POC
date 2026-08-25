@@ -8524,12 +8524,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-thankyou-sub   { font-size: 1rem; max-width: 100%; }
 }
 
-/* Everything below is phone-only and stays on the flat 767px test. The studio
-   is not the player: the editor, the create wizard and the dashboard chrome
-   are all built for a pointer and a wide canvas, and a portrait iPad has room
-   for them in a way it does not for a 680px card floating in a 954px screen.
-   Widening the player's breakpoint should not quietly drag the whole studio
-   into a phone layout with it. */
+/* Everything below is phone-only and stays on the flat 767px test. This block
+   is the PLAYER's and the create wizard's phone layout. The studio — the
+   editor, dashboard and share surfaces — now has a deliberate phone layout of
+   its own, but it does not live here: it is the M-STUDIO section at the END of
+   this file, on the same flat 767px test (plus, for the editor stage, classes
+   a controller applies only on a phone). Two blocks on purpose: the player's
+   rules are pinned by player_hero_css_test and serve respondents; M-STUDIO
+   serves creators and may move fast without touching these. A portrait iPad
+   (768–1024) keeps the desktop studio on purpose — it has the room for it. */
 @media (max-width: 767px) {
 
   /* ═════════════════════════════════════════════════════════════════
@@ -11753,4 +11756,76 @@ body.generating-overlay-active .bottom-bar { display: none; }
   width: 38px; height: 38px; border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(17, 20, 34, 0.8); color: #fff; font-size: 15px; cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   M-STUDIO — the phone creator experience (≤767px)
+
+   The studio's own phone layout, kept apart from the player block above on
+   purpose (see the note over that block's media query). Phase 1: dashboard +
+   the share panel as a bottom sheet. The dash-* selectors are class hooks
+   added to inline-styled wrappers in surveys/index.html.erb and
+   _dashboard_card.html.erb — !important where a rule must beat an inline
+   style, and only there.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* ── Dashboard (`/`) ─────────────────────────────────────────────────── */
+
+  .dash-hero    { padding: 22px 16px 26px !important; }
+  .dash-h1      { font-size: 28px !important; }
+  .dash-metrics { padding: 16px 16px 18px !important; }
+  /* Five auto-fit stats collapse to one long column on a phone; two across
+     keeps the strip a strip. The odd fifth tile spans the row. */
+  .dash-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  .dash-metrics-grid > .dash-stat:last-child { grid-column: 1 / -1; }
+  .dash-stat       { padding: 12px 10px !important; }
+  .dash-stat-value { font-size: 26px !important; }
+  .dash-body    { padding: 20px 16px 56px !important; }
+
+  /* Tile actions become real touch targets. The links/buttons carry their
+     size in inline padding (9px ≈ a 36px row) — min-height isn't inline, so
+     no !important needed; inline-flex centres the label inside the taller box. */
+  .dash-card-actions a,
+  .dash-card-actions button {
+    min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* ── Share panel → bottom sheet ──────────────────────────────────────── */
+
+  /* The one .app-modal--below-nav user is the share shell (surveys/index and,
+     later phases, the editor). On a phone it stops floating: pinned to the
+     bottom edge, full width, thumb-reach. The 72px top inset exists to clear
+     the desktop nav — meaningless under a sheet. */
+  .app-modal--below-nav { padding: 0; align-items: flex-end; }
+  .share-modal__shell {
+    max-width: 100%;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 18px 18px 0 0;
+    border-left: none; border-right: none; border-bottom: none;
+    /* No entrance motion on the sheet itself, deliberately: anything that
+       animates the shell's transform can be CAUGHT mid-flight by a renderer
+       that stops ticking (headless test browsers freeze both keyframes and
+       transitions part-way — measured at translateY(18%) and again at 15%),
+       and a displaced sheet is a broken sheet. If entrance polish comes
+       back, animate the BACKDROP's opacity — it has no geometry to strand. */
+  }
+
+  /* Touch sizes inside the panel: the copy/download/QR buttons and the
+     channel chips. Their desktop paddings make ~34–38px controls. */
+  .share-modal .share-btn,
+  .share-modal .share-chip {
+    min-height: 44px;
+    box-sizing: border-box;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .share-modal .share-url,
+  .share-modal .share-input { min-height: 44px; box-sizing: border-box; }
+  /* Readonly URL + Copy stack when a long play URL and a translated Copy
+     label can't share 358px. */
+  .share-modal .share-url-row { flex-wrap: wrap; }
 }
