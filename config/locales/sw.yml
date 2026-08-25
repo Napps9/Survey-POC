@@ -1009,6 +1009,10 @@ sw:
     all_saved: 'Imehifadhiwa'
     leave_editor: 'Ondoka kwenye kihariri'
     undo: 'Tendua'
+    m_back_to_dashboard: "Rudi kwenye Vertos Zangu"
+    m_preview: "Hakiki kama mjibu"
+    m_more: "Zaidi"
+    m_delete_card: "Futa kadi hii"
     duplicate_card: 'Nakili'
     emoji_pick: "Chagua emoji"
     brand_font: "Aina ya herufi"

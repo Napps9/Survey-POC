@@ -1009,6 +1009,10 @@ he:
     all_saved: 'נשמר'
     leave_editor: 'יציאה מהעורך'
     undo: 'ביטול'
+    m_back_to_dashboard: "חזרה ל-Vertos שלי"
+    m_preview: "תצוגה מקדימה כמשתתף"
+    m_more: "עוד"
+    m_delete_card: "מחיקת הכרטיס הזה"
     duplicate_card: 'שכפול'
     emoji_pick: "בחרו אימוג'י"
     brand_font: "גופן"

@@ -1009,6 +1009,10 @@ hi:
     all_saved: 'सहेजा गया'
     leave_editor: 'संपादक से बाहर निकलें'
     undo: 'पूर्ववत करें'
+    m_back_to_dashboard: "मेरे Vertos पर वापस जाएँ"
+    m_preview: "उत्तरदाता के रूप में देखें"
+    m_more: "अधिक"
+    m_delete_card: "यह कार्ड हटाएँ"
     duplicate_card: 'डुप्लिकेट करें'
     emoji_pick: "इमोजी चुनें"
     brand_font: "टाइपफ़ेस"

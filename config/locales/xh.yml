@@ -1025,6 +1025,10 @@ xh:
     all_saved: 'Kugciniwe'
     leave_editor: 'Phuma kumhleli'
     undo: 'Buyisela umva'
+    m_back_to_dashboard: "Buyela kwiVertos Zam"
+    m_preview: "Jonga njengomphenduli"
+    m_more: "Okungakumbi"
+    m_delete_card: "Cima eli khadi"
     duplicate_card: 'Phinda'
     emoji_pick: "Khetha i-emoji"
     brand_font: "Uhlobo lonobumba"

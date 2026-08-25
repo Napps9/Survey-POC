@@ -1025,6 +1025,10 @@ en:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
     undo: 'Undo'
+    m_back_to_dashboard: "Back to My Vertos"
+    m_preview: "Preview as a respondent"
+    m_more: "More"
+    m_delete_card: "Delete this card"
     duplicate_card: 'Duplicate'
     emoji_pick: "Choose an emoji"
     brand_font: "Typeface"

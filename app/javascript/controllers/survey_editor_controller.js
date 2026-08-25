@@ -483,8 +483,12 @@ export default class extends Controller {
     this._refreshUndoButton()
   }
 
+  // Plural: the mobile studio's overflow menu carries a second Undo (the
+  // desktop float bar's is hidden at phone width), and a button that never
+  // greys out claims there is something to undo when there is not.
   _refreshUndoButton() {
-    if (this.hasUndoBtnTarget) this.undoBtnTarget.disabled = !this._undoStack.length
+    const empty = !this._undoStack.length
+    this.undoBtnTargets.forEach((btn) => { btn.disabled = empty })
   }
 
   // Where a slot currently sits, as a closure that puts it back there. Captured

@@ -150,6 +150,10 @@ class SurveysController < ApplicationController
   end
 
   def show
+    # The mobile studio turns the cards feed into a fixed, viewport-sized
+    # overlay a creator types into (mobile_studio_controller, ≤767px), which
+    # is the layout the keyboard hint exists for — see layouts/_head.
+    @interactive_widget_resize = true
     # The editor hides the global top nav — it gets a "Leave editor" CTA in
     # its brief strip instead (the command palette stays reachable via ⌘K).
     @hide_main_nav = true

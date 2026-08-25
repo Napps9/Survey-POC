@@ -1009,6 +1009,10 @@ tr:
     all_saved: 'Kaydedildi'
     leave_editor: 'Editörden çık'
     undo: 'Geri al'
+    m_back_to_dashboard: "Verto’larıma dön"
+    m_preview: "Katılımcı olarak önizle"
+    m_more: "Daha fazla"
+    m_delete_card: "Bu kartı sil"
     duplicate_card: 'Çoğalt'
     emoji_pick: "Emoji seç"
     brand_font: "Yazı tipi"

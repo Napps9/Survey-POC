@@ -1009,6 +1009,10 @@ id:
     all_saved: 'Tersimpan'
     leave_editor: 'Keluar dari editor'
     undo: 'Urungkan'
+    m_back_to_dashboard: "Kembali ke Verto Saya"
+    m_preview: "Pratinjau sebagai responden"
+    m_more: "Lainnya"
+    m_delete_card: "Hapus kartu ini"
     duplicate_card: 'Gandakan'
     emoji_pick: "Pilih emoji"
     brand_font: "Tipografi"

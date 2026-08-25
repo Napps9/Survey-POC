@@ -1009,6 +1009,10 @@ ko:
     all_saved: '저장됨'
     leave_editor: '편집기 나가기'
     undo: '실행 취소'
+    m_back_to_dashboard: "내 Verto로 돌아가기"
+    m_preview: "응답자로 미리보기"
+    m_more: "더 보기"
+    m_delete_card: "이 카드 삭제"
     duplicate_card: '복제'
     emoji_pick: "이모지 선택"
     brand_font: "서체"

@@ -1013,6 +1013,10 @@ sn:
     all_saved: 'Zvachengetedzwa'
     leave_editor: 'Buda muChigadziriso'
     undo: 'Dzosa'
+    m_back_to_dashboard: "Dzokera kuVertos Yangu"
+    m_preview: "Ona sezvinoita anopindura"
+    m_more: "Zvimwe"
+    m_delete_card: "Bvisa kadhi iri"
     duplicate_card: 'Verengedza'
     emoji_pick: "Sarudza Emoji"
     brand_font: "Rudzi rweMavara"

@@ -1011,6 +1011,10 @@ ru:
     all_saved: 'Сохранено'
     leave_editor: 'Выйти из редактора'
     undo: 'Отменить'
+    m_back_to_dashboard: "Назад к моим Vertos"
+    m_preview: "Просмотр как участник"
+    m_more: "Ещё"
+    m_delete_card: "Удалить эту карточку"
     duplicate_card: 'Дублировать'
     emoji_pick: "Выбрать эмодзи"
     brand_font: "Шрифт"

@@ -11892,3 +11892,308 @@ body.generating-overlay-active .bottom-bar { display: none; }
      label can't share 358px. */
   .share-modal .share-url-row { flex-wrap: wrap; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   M-STUDIO · PHASE 2 — the phone EDITOR shell ("the card IS the editor")
+
+   The mechanism is classes, not a rewrite. mobile_studio_controller puts
+   `preview-overlay m-studio` on the cards feed at ≤767px:
+
+     .preview-overlay  the PLAYER's own phone scope. Its whole card system —
+                       the 45/55 hero split, the 22px lip, in-card progress,
+                       the 16px input floor — lands on the editor's editable
+                       cards with not one player rule edited. That block is
+                       pinned by player_hero_css_test; this reuses it rather
+                       than restating it, which is the only way the creator's
+                       card and the respondent's card cannot drift.
+     .m-studio         editor-only geometry: full-height snap pages, hidden
+                       desktop rails, the floating chrome below.
+
+   Everything here is inside the ≤767px query AND under one of those classes,
+   so the desktop editor cannot see any of it.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The chrome ships on every editor page and is display:none until the
+   controller says this is a phone. Stated OUT HERE, not inside the media
+   query: a rule that only exists below 767px leaves the desktop editor with
+   no rule at all, which is `display: block` — the whole phone chrome drawn
+   over the desktop editor. */
+.m-chrome { display: none; }
+
+@media (max-width: 767px) {
+
+  /* ── The stage ────────────────────────────────────────────────────────── */
+
+  /* The feed's own inline padding (64/84px, for the desktop float bars) is a
+     style attribute, so beating it needs !important. On a phone the card is
+     the screen: no lane, no gaps, no padding. */
+  .m-studio.editor-feed {
+    padding: 0 !important;
+    gap: 0 !important;
+    scroll-snap-type: y mandatory;
+  }
+
+  /* One card per screen. .card-slot is the unit the feed already reorders and
+     inserts into, and now also the unit it PAGES through — the footer's
+     Back/Next scroll between these, and the respondent's own card geometry
+     fills each one. */
+  .m-studio .card-slot {
+    flex: 0 0 100%;
+    min-height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  /* While a keyboard is up the browser scrolls the caret into view; mandatory
+     snap fights it and the card judders. Released for the duration. */
+  .m-studio-on.m-typing .m-studio.editor-feed { scroll-snap-type: none; }
+
+  /* The card fills its page. The desktop lane cap (max-width:1120px, applied
+     via .device-desktop) and the wrap's own chrome spacing both go. */
+  .m-studio .survey-card-wrap,
+  .m-studio .card-col {
+    max-width: 100% !important;
+    width: 100%;
+    margin: 0 !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  /* .split-card's stacked phone form comes from the player block above (it is
+     keyed on .preview-overlay .split-card, which the stage now is). Only the
+     height chain needs saying: the card must fill the page it is on. */
+  .m-studio .card-slot > .survey-card-wrap { height: 100%; }
+
+  /* The per-card rail (drag grip, ▲▼, card number, Why, score, duplicate,
+     delete, add) is a fixed 148px column beside the card — there is no room
+     for it, and every one of its actions is reachable from the chrome or the
+     next phase's card sheet. Hidden, not removed: the overflow menu clicks
+     these very buttons to inherit their handlers and their invariants. */
+  .m-studio .card-rail { display: none; }
+
+  /* The desktop float bars (Leave editor / title / undo / score / device
+     toggle / language, and Journey / Shuffle / Design / Publish) are replaced
+     by the floating chrome below. */
+  .m-studio-on .editor-float-bar { display: none; }
+
+  /* The gate CTAs and cards (consent, thank-you) stay in the feed as pages of
+     their own — they are already snap targets. */
+  .m-studio .gate-card-wrap,
+  .m-studio .gate-cta-row {
+    scroll-snap-align: start;
+    padding: 0 16px;
+  }
+
+  /* ── The floating chrome ──────────────────────────────────────────────── */
+
+  /* Fixed, not absolute: the chrome floats over a stage that is itself
+     position:fixed and pinned to the visual viewport by viewport_height.js. */
+  .m-studio-on .m-chrome { display: block; }
+
+  /* THE ROOM THE CHROME TAKES, said in the token the card already reads.
+     --play-pill-zone is the player's own name for "the strip at the bottom of
+     the card the floating controls own"; .split-right's padding, the last
+     scroller's negative margin and its runway are all derived from it in the
+     player block. The creator's chrome is taller than a respondent's (a dock
+     under the footer), so retuning this ONE number moves all three with it
+     rather than fighting them one rule at a time.
+     122px is where the chrome actually ends — dock 14 + 52, footer 74 + 48 —
+     plus 12px of air, the same margin the player leaves. */
+  .m-studio { --play-pill-zone: calc(env(safe-area-inset-bottom, 0px) + 134px); }
+
+  .m-topbar, .m-footer, .m-dock, .m-menu {
+    position: fixed;
+    z-index: 70;                       /* the stage is 60 */
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .m-topbar {
+    top: max(10px, env(safe-area-inset-top, 0px));
+    inset-inline: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Glass circles and the title pill: dark, translucent, blurred, so they
+     read over a white card, a photo hero or a brand backdrop alike — the same
+     trick .preview-btn-back plays in the player. */
+  .m-circle, .m-title-pill {
+    background: rgba(15,19,36,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px);
+    color: #fff;
+  }
+  .m-circle {
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    text-decoration: none;
+  }
+  .m-title-pill {
+    flex: 1 1 auto; min-width: 0;
+    height: 40px; border-radius: 100px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px;
+  }
+  .m-live-dot {
+    flex: 0 0 auto;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+  }
+  .m-live-dot.is-live { background: #01EACB; box-shadow: 0 0 8px rgba(1,234,203,0.9); }
+  .m-title-text {
+    flex: 1 1 auto; min-width: 0;
+    font-family: "ABeeZee", sans-serif;
+    font-size: 0.8125rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    outline: none;
+  }
+  /* Renaming needs the whole name, so the pill stops truncating while it has
+     focus — and wraps rather than scrolling sideways under a thumb. */
+  .m-title-text:focus {
+    white-space: normal; overflow: visible; text-overflow: clip;
+  }
+  .m-title-pill:focus-within {
+    height: auto; min-height: 40px;
+    padding-block: 8px;
+    box-shadow: 0 0 0 2px rgba(1,234,203,0.65);
+  }
+
+  .m-menu {
+    top: calc(max(10px, env(safe-area-inset-top, 0px)) + 48px);
+    inset-inline-end: 12px;
+    min-width: 190px;
+    padding: 6px;
+    border-radius: 14px;
+    background: rgba(23,27,48,0.94);
+    border: 1px solid rgba(255,255,255,0.14);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+    display: flex; flex-direction: column;
+  }
+  .m-menu[hidden] { display: none; }
+  .m-menu-item {
+    min-height: 44px;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    border: none; background: none; cursor: pointer;
+    border-radius: 10px;
+    font-family: "ABeeZee", sans-serif; font-size: 0.875rem;
+    color: #fff; text-align: start;
+  }
+  .m-menu-item:disabled { opacity: 0.4; cursor: default; }
+  .m-menu-danger { color: #FF6B83; }
+
+  /* The deck footer IS the respondent's footer — .preview-btn styling comes
+     from the player block, since the chrome sits inside the same
+     .preview-overlay scope. Only the box needs stating. */
+  .m-footer {
+    inset-inline: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
+    height: 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    padding-inline: clamp(12px, 4vw, 26px);
+    pointer-events: none;              /* only the controls take touches */
+  }
+  .m-footer > * { pointer-events: auto; }
+  .m-progress-chip {
+    font-family: "Alata", sans-serif; font-size: 0.75rem;
+    color: #fff;
+    background: rgba(20,23,38,0.45);
+    backdrop-filter: blur(6px);
+    border-radius: 100px;
+    padding: 6px 14px;
+    white-space: nowrap;
+  }
+
+  /* The dock — one glass bar, thumb-height, centred. */
+  .m-dock {
+    inset-inline: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    display: flex; justify-content: center;
+    pointer-events: none;              /* the bar itself takes the touches */
+  }
+  /* The glass bar HUGS its buttons — a real element rather than a
+     pseudo-element sized off the viewport, because how wide the dock should be
+     is a question about how many buttons it has (a locked Verto has two, an
+     editable one four) and only the box holding them can answer it. */
+  .m-dock-bar {
+    pointer-events: auto;
+    display: flex; align-items: center; gap: 2px;
+    padding: 6px;
+    border-radius: 100px;
+    background: rgba(15,19,36,0.74);
+    border: 1px solid rgba(255,255,255,0.16);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .m-dock-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: none; background: none; color: #fff; cursor: pointer;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+  .m-dock-add {
+    background: #01EACB; color: #0B0E1C;
+    box-shadow: 0 4px 14px rgba(1,234,203,0.45);
+  }
+  .m-dock-share { color: #fff; }
+
+  /* Out of the way while the creator works. Typing hides everything but the
+     top bar (which carries the title being edited); scrolling just dims. */
+  .m-studio-on.m-scrolling .m-dock,
+  .m-studio-on.m-scrolling .m-footer { opacity: 0.35; }
+  .m-studio-on.m-typing .m-dock,
+  .m-studio-on.m-typing .m-footer {
+    opacity: 0; pointer-events: none; transform: translateY(8px);
+  }
+
+  /* ── The right column becomes a bottom sheet ──────────────────────────── */
+
+  /* Design / Publish & share / answer-type / quiz / tokens all live in this
+     one column, each already posting to its own endpoint. At phone width it
+     stops being a floating 430px column and becomes a sheet over the dimmed
+     card — same DOM, same controllers, same forms. */
+  .m-studio-on .editor-grid.is-panel-open { grid-template-columns: 1fr !important; }
+  .m-studio-on .right-column {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    top: auto;
+    z-index: 80;
+    width: 100%;
+    max-height: 88dvh;
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+    background: #272D4A;
+    box-shadow: 0 -12px 40px rgba(0,0,0,0.45);
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .m-studio-on .right-column > .type-panel {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+  /* The folder-tab strip is desktop furniture; on a sheet the views stack
+     under their own headings and the ✕ closes it. */
+  .m-studio-on .right-tabs { padding-inline: 12px 46px; }
+
+  /* ── Touch affordances on the card itself ─────────────────────────────── */
+
+  /* Per-option controls are hover-revealed on desktop. The existing
+     (hover: none) block already reveals them; here they get real sizes, since
+     on a phone they are the only way to reach those actions. */
+  .m-studio .option-style-btn,
+  .m-studio .pick-item-delete {
+    min-width: 32px; min-height: 32px;
+  }
+  .m-studio .add-media-fab,
+  .m-studio .add-bg-fab,
+  .m-studio .add-animation-fab,
+  .m-studio .split-left-design-prompt { min-height: 40px; }
+}

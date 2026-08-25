@@ -1023,6 +1023,10 @@ zu:
     all_saved: 'Kulondoloziwe'
     leave_editor: 'Shiya umhleli'
     undo: 'Yenza kabusha'
+    m_back_to_dashboard: "Buyela kuma-Verto Ami"
+    m_preview: "Buka njengophendulayo"
+    m_more: "Okuningi"
+    m_delete_card: "Susa leli khadi"
     duplicate_card: 'Phinda'
     emoji_pick: "Khetha i-emoji"
     brand_font: "Uhlobo lwamagama"

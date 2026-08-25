@@ -49,7 +49,7 @@
 <script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker mobile-studio share-modal"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -91,7 +91,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.editing_locked? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -290,6 +290,7 @@
            data-brand-palette-target="preview"
            data-add-question-target="cardsFeed"
            data-survey-editor-target="feed"
+           data-mobile-studio-target="stage"
            data-device-frame-target="feed"
            <%# The scroller editor-scroll-sync watches: it's the IntersectionObserver
                root, collapsed to this element's centre line — the same line the
@@ -530,6 +531,10 @@
                   data-action="click->publish-panel#open click->editor-panel#open"><%= t("editor.publish_share") %></button>
         </div>
       </div>
+
+      <%# Phone-only floating chrome (top bar, deck footer, dock) — inert and
+          display:none until mobile-studio puts .m-studio-on on the root. %>
+      <%= render "surveys/mobile_studio_chrome" %>
       </div><%# /feed wrapper %>
 
     </div><%# /cards column %>
@@ -2127,5 +2132,21 @@
 
   <% if @survey.logic? && !@survey.editing_locked? %><%= render "surveys/generate_flow_modal" %><% end %>
   <% if @survey.logic? %><%= render "surveys/journey" %><% end %>
+
+  <%# Share panel — the dashboard's modal reused verbatim: the dock's Share
+      button sets this frame's src to /surveys/:id/share, and the frame is
+      cleared on close so reopening refetches. Admin-only, matching the
+      require_admin! on SurveyLinksController behind it; non-admins get the
+      Publish panel's Status block instead (see the dock in the chrome). %>
+  <% if current_membership&.admin? %>
+    <div data-share-modal-target="modal" class="app-modal app-modal--below-nav hidden">
+      <div class="app-modal__backdrop" data-action="click->share-modal#close"></div>
+      <div class="app-modal__panel share-modal__shell">
+        <%= turbo_frame_tag "share-modal", data: { share_modal_target: "frame" } do %>
+          <div class="share-modal__loading"><%= t("share_modal.loading") %></div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
 </div><%# /editor %>

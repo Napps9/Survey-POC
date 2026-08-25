@@ -25,7 +25,11 @@
         "slider_axis_auto", "slider_axis_horizontal", "slider_axis_vertical"
       ),
       "player" => ns.call("player", locale).slice(
-        "consent_agree", "consent_decline", "visit_website"
+        "consent_agree", "consent_decline", "visit_website",
+        # The mobile studio's deck chip ("Card 3 of 15") — the creator's
+        # footer is the respondent's footer, so it says the same sentence
+        # from the same string rather than a second copy under js:.
+        "progress"
       )
     }
   end

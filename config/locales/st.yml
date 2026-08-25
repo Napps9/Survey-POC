@@ -1025,6 +1025,10 @@ st:
     all_saved: 'E Bolokilwe'
     leave_editor: 'Tswa mohlophising'
     undo: 'Boela Morao'
+    m_back_to_dashboard: "Khutlela ho Vertos tsa Ka"
+    m_preview: "Sheba joalo ka moarabi"
+    m_more: "Tse ling"
+    m_delete_card: "Hlakola karete ena"
     duplicate_card: 'Kopitsa'
     emoji_pick: "Kgetha emoji"
     brand_font: "Mofuta wa Ditlhaku"

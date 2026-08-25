@@ -1011,6 +1011,10 @@ pl:
     all_saved: 'Zapisano'
     leave_editor: 'Opuść edytor'
     undo: 'Cofnij'
+    m_back_to_dashboard: "Powrót do Moje Vertos"
+    m_preview: "Podgląd jako uczestnik"
+    m_more: "Więcej"
+    m_delete_card: "Usuń tę kartę"
     duplicate_card: 'Duplikuj'
     emoji_pick: "Wybierz emoji"
     brand_font: "Krój pisma"

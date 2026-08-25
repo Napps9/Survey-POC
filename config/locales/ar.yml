@@ -1009,6 +1009,10 @@ ar:
     all_saved: 'تم الحفظ'
     leave_editor: 'مغادرة المحرر'
     undo: 'تراجع'
+    m_back_to_dashboard: "العودة إلى Vertos الخاصة بي"
+    m_preview: "معاينة كمشارك"
+    m_more: "المزيد"
+    m_delete_card: "حذف هذه البطاقة"
     duplicate_card: 'تكرار'
     emoji_pick: "اختر رمزًا تعبيريًا"
     brand_font: "نوع الخط"

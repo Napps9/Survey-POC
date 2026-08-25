@@ -1009,6 +1009,10 @@ fr:
     all_saved: 'Enregistré'
     leave_editor: 'Quitter l''éditeur'
     undo: 'Annuler'
+    m_back_to_dashboard: "Retour à Mes Vertos"
+    m_preview: "Aperçu en tant que participant"
+    m_more: "Plus"
+    m_delete_card: "Supprimer cette carte"
     duplicate_card: 'Dupliquer'
     emoji_pick: "Choisir un émoji"
     brand_font: "Police"

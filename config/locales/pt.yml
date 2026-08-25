@@ -1009,6 +1009,10 @@ pt:
     all_saved: 'Guardado'
     leave_editor: 'Sair do editor'
     undo: 'Desfazer'
+    m_back_to_dashboard: "Voltar para Os meus Vertos"
+    m_preview: "Pré-visualizar como participante"
+    m_more: "Mais"
+    m_delete_card: "Eliminar este cartão"
     duplicate_card: 'Duplicar'
     emoji_pick: "Escolher um emoji"
     brand_font: "Tipografia"

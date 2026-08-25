@@ -1009,6 +1009,10 @@ de:
     all_saved: 'Gespeichert'
     leave_editor: 'Editor verlassen'
     undo: 'Rückgängig'
+    m_back_to_dashboard: "Zurück zu Meine Vertos"
+    m_preview: "Vorschau als Teilnehmer"
+    m_more: "Mehr"
+    m_delete_card: "Diese Karte löschen"
     duplicate_card: 'Duplizieren'
     emoji_pick: "Emoji wählen"
     brand_font: "Schriftart"

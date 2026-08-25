@@ -1009,6 +1009,10 @@ ja:
     all_saved: '保存済み'
     leave_editor: 'エディターを離れる'
     undo: '元に戻す'
+    m_back_to_dashboard: "マイVertoに戻る"
+    m_preview: "回答者としてプレビュー"
+    m_more: "その他"
+    m_delete_card: "このカードを削除"
     duplicate_card: '複製'
     emoji_pick: "絵文字を選ぶ"
     brand_font: "書体"

@@ -1025,6 +1025,10 @@ tn:
     all_saved: 'E bolokilwe'
     leave_editor: 'Tswa mo sefetoding'
     undo: 'Boela morago'
+    m_back_to_dashboard: "Boela go Di-Verto tsa Me"
+    m_preview: "Leba jaaka morarabi"
+    m_more: "Tse dingwe"
+    m_delete_card: "Phimola karata e"
     duplicate_card: 'Kopolola'
     emoji_pick: "Tlhopha emoji"
     brand_font: "Mofuta wa ditlhaka"

@@ -1009,6 +1009,10 @@ vi:
     all_saved: 'Đã lưu'
     leave_editor: 'Rời trình chỉnh sửa'
     undo: 'Hoàn tác'
+    m_back_to_dashboard: "Quay lại Verto của tôi"
+    m_preview: "Xem trước như người trả lời"
+    m_more: "Thêm"
+    m_delete_card: "Xóa thẻ này"
     duplicate_card: 'Nhân bản'
     emoji_pick: "Chọn emoji"
     brand_font: "Kiểu chữ"

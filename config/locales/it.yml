@@ -1009,6 +1009,10 @@ it:
     all_saved: 'Salvato'
     leave_editor: 'Esci dall''editor'
     undo: 'Annulla'
+    m_back_to_dashboard: "Torna a I miei Vertos"
+    m_preview: "Anteprima come partecipante"
+    m_more: "Altro"
+    m_delete_card: "Elimina questa scheda"
     duplicate_card: 'Duplica'
     emoji_pick: "Scegli un'emoji"
     brand_font: "Carattere"

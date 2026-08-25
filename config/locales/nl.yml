@@ -1009,6 +1009,10 @@ nl:
     all_saved: 'Opgeslagen'
     leave_editor: 'Editor verlaten'
     undo: 'Ongedaan maken'
+    m_back_to_dashboard: "Terug naar Mijn Vertos"
+    m_preview: "Voorbeeld als deelnemer"
+    m_more: "Meer"
+    m_delete_card: "Deze kaart verwijderen"
     duplicate_card: 'Dupliceren'
     emoji_pick: "Kies een emoji"
     brand_font: "Lettertype"

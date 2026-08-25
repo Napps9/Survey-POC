@@ -1011,6 +1011,10 @@ uk:
     all_saved: 'Збережено'
     leave_editor: 'Вийти з редактора'
     undo: 'Скасувати'
+    m_back_to_dashboard: "Назад до Моїх Vertos"
+    m_preview: "Перегляд як учасник"
+    m_more: "Ще"
+    m_delete_card: "Видалити цю картку"
     duplicate_card: 'Дублювати'
     emoji_pick: "Вибрати емодзі"
     brand_font: "Шрифт"
