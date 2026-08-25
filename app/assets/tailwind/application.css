@@ -12001,6 +12001,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
      plus 12px of air, the same margin the player leaves. */
   .m-studio { --play-pill-zone: calc(env(safe-area-inset-bottom, 0px) + 134px); }
 
+  /* ...and the same trick at the top. The player has no chrome above the card,
+     so its in-card progress bar sits at 10px and the no-hero panel clears it
+     by --play-bar-clear. The creator's card has a floating top bar over that
+     exact strip, so the bar was drawn underneath it and the eyebrow of a
+     no-hero card started level with the title pill. Move the bar below the
+     chrome and restate the clearance from its new position — the player's own
+     token again, so the padding follows the bar rather than being guessed. */
+  .m-studio { --play-bar-clear: calc(60px + 6px + 12px); }
+  /* Matching the player's own selector weight deliberately: its rule is
+     `.preview-overlay .split-card .panel-progress`, and the stage IS a
+     .preview-overlay, so a lighter selector here loses and the bar stays
+     under the chrome. Same three classes, later in the file. */
+  .m-studio .split-card .panel-progress { top: 60px; }
+
   .m-topbar, .m-footer, .m-dock, .m-menu {
     position: fixed;
     z-index: 70;                       /* the stage is 60 */

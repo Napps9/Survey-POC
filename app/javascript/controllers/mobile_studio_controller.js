@@ -64,7 +64,16 @@ export default class extends Controller {
     stage.addEventListener("scroll", this._onScroll, { passive: true })
     stage.addEventListener("focusin", this._onFocusIn)
     stage.addEventListener("focusout", this._onFocusOut)
-    this._syncChip()
+    // Land on the first CARD, not on whatever precedes it in the feed. The
+    // consent CTA is a snap target of its own and sits above card one, so a
+    // phone opened the editor looking at a stray "+ Consent gate" pill tucked
+    // under the top bar. Only when we are ABOVE card one, so a rotation (which
+    // re-enters) keeps the creator where they were.
+    requestAnimationFrame(() => {
+      const first = this._slots()[0]
+      if (first && stage.scrollTop < first.offsetTop) stage.scrollTop = first.offsetTop
+      this._syncChip()
+    })
   }
 
   _exit() {
@@ -122,8 +131,12 @@ export default class extends Controller {
     const target = slots[i]
     if (!target) return
     this._pending = i
+    // A page turn is not the creator scrolling — it is them pressing a button
+    // and watching it work. Fading the very control they just pressed reads as
+    // the deck flinching, so the fade is suppressed for the trip.
+    this._paging = true
     clearTimeout(this._pendingClear)
-    this._pendingClear = setTimeout(() => { this._pending = null }, 600)
+    this._pendingClear = setTimeout(() => { this._pending = null; this._paging = false }, 600)
     this.stageTarget.scrollTo({ top: target.offsetTop, behavior: "smooth" })
     // The creator tapped, so the answer is already known — say it now rather
     // than after the scroll settles. A counter that lags the button it sits
@@ -143,7 +156,7 @@ export default class extends Controller {
   // ── Chrome fade: get out of the way while the creator works ─────────────
 
   _scrolled() {
-    this.element.classList.add("m-scrolling")
+    if (!this._paging) this.element.classList.add("m-scrolling")
     clearTimeout(this._scrollIdle)
     this._scrollIdle = setTimeout(() => {
       this.element.classList.remove("m-scrolling")
