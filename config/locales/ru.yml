@@ -501,6 +501,10 @@ ru:
         whole_verto: "Весь Verto"
         card_n: "Карточка %{n}"
         section_empty: "Здесь ничего нет."
+      tap:
+        prev_statement: "\u041F\u0440\u0435\u0434\u044B\u0434\u0443\u0449\u0435\u0435 \u0443\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u0435"
+        next_statement: "\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0435 \u0443\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u0435"
+        statement_of: "\u0423\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u0435 %{n} \u0438\u0437 %{total}"
       scenario:
         page_of: "Страница %{n} из %{total}"
         page_placeholder: "Напишите эту страницу…"

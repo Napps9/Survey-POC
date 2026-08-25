@@ -501,6 +501,10 @@ hi:
         whole_verto: "पूरा Verto"
         card_n: "कार्ड %{n}"
         section_empty: "यहाँ कुछ नहीं।"
+      tap:
+        prev_statement: "\u092A\u093F\u091B\u0932\u093E \u0915\u0925\u0928"
+        next_statement: "\u0905\u0917\u0932\u093E \u0915\u0925\u0928"
+        statement_of: "\u0915\u0925\u0928 %{n} / %{total}"
       scenario:
         page_of: "पेज %{n} / %{total}"
         page_placeholder: "यह पेज लिखें…"

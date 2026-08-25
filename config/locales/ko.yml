@@ -501,6 +501,10 @@ ko:
         whole_verto: "전체 Verto"
         card_n: "카드 %{n}"
         section_empty: "여기에는 없습니다."
+      tap:
+        prev_statement: "\uC774\uC804 \uBB38\uC7A5"
+        next_statement: "\uB2E4\uC74C \uBB38\uC7A5"
+        statement_of: "%{total}\uAC1C \uC911 %{n}\uBC88\uC9F8 \uBB38\uC7A5"
       scenario:
         page_of: "%{total}페이지 중 %{n}페이지"
         page_placeholder: "이 페이지를 작성하세요…"

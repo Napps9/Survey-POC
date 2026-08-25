@@ -517,6 +517,10 @@ tn:
         whole_verto: "Verto Yotlhe"
         card_n: "Karata %{n}"
         section_empty: "Ga go na sepe fano."
+      tap:
+        prev_statement: "Polelo e e fetileng"
+        next_statement: "Polelo e e latelang"
+        statement_of: "Polelo %{n} ya %{total}"
       scenario:
         page_of: "Tsebe %{n} ya %{total}"
         page_placeholder: "Kwala tsebe e…"

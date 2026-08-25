@@ -501,6 +501,10 @@ tr:
         whole_verto: "Tüm Verto"
         card_n: "Kart %{n}"
         section_empty: "Burada bir şey yok."
+      tap:
+        prev_statement: "\u00D6nceki ifade"
+        next_statement: "Sonraki ifade"
+        statement_of: "\u0130fade %{n} / %{total}"
       scenario:
         page_of: "Sayfa %{n} / %{total}"
         page_placeholder: "Bu sayfayı yaz…"

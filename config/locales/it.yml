@@ -501,6 +501,10 @@ it:
         whole_verto: "Verto intero"
         card_n: "Carta %{n}"
         section_empty: "Niente qui."
+      tap:
+        prev_statement: "Affermazione precedente"
+        next_statement: "Affermazione successiva"
+        statement_of: "Affermazione %{n} di %{total}"
       scenario:
         page_of: "Pagina %{n} di %{total}"
         page_placeholder: "Scrivi questa pagina…"

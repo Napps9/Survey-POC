@@ -501,6 +501,10 @@ sw:
         whole_verto: "Verto nzima"
         card_n: "Kadi %{n}"
         section_empty: "Hakuna kitu hapa."
+      tap:
+        prev_statement: "Kauli iliyotangulia"
+        next_statement: "Kauli inayofuata"
+        statement_of: "Kauli %{n} kati ya %{total}"
       scenario:
         page_of: "Ukurasa %{n} kati ya %{total}"
         page_placeholder: "Andika ukurasa huu…"

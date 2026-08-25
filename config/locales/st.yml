@@ -517,6 +517,10 @@ st:
         whole_verto: "Verto ka Bophara"
         card_n: "Karete %{n}"
         section_empty: "Ha ho letho mona."
+      tap:
+        prev_statement: "Polelo e fetileng"
+        next_statement: "Polelo e latelang"
+        statement_of: "Polelo %{n} ho tse %{total}"
       scenario:
         page_of: "Leqephe %{n} ho tse %{total}"
         page_placeholder: "Ngola leqephe lena…"

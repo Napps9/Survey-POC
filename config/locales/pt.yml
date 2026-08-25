@@ -501,6 +501,10 @@ pt:
         whole_verto: "Verto inteiro"
         card_n: "Cartão %{n}"
         section_empty: "Nada aqui."
+      tap:
+        prev_statement: "Afirma\u00E7\u00E3o anterior"
+        next_statement: "Pr\u00F3xima afirma\u00E7\u00E3o"
+        statement_of: "Afirma\u00E7\u00E3o %{n} de %{total}"
       scenario:
         page_of: "Página %{n} de %{total}"
         page_placeholder: "Escreva esta página…"

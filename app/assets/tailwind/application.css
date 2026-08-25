@@ -2964,6 +2964,25 @@
 }
 .rotate-reset-btn:hover { color: var(--brand-primary, #01EACB); }
 
+/* ── The creator's statement pager ───────────────────────────────────────
+   Editor only, and it takes the reset row's place rather than sitting beside
+   it: a respondent has answers to take back, a creator has a deck to walk.
+   The buttons borrow .book-chevron's rule outright (search for .tap-nav-btn
+   there) — the scenario card's editor nav does the same job on the other
+   paged type, and two pagers that look different would be two pagers to
+   learn. */
+.tap-nav-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; flex-shrink: 0;
+}
+/* Fixed width so the row doesn't twitch sideways as the count crosses from
+   one digit to two, or as a translation of "Statement %{n} of %{total}"
+   changes length under it. */
+.tap-nav-count {
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: 0.02em;
+  color: rgba(0,0,0,0.45); min-width: 120px; text-align: center;
+}
+
 /* ── The response strip — 2 to 6 answers (TapScales) ──────────────────────
    Two shapes, one DOM (see shared/_tap_responses.html.erb).
 
@@ -3383,7 +3402,12 @@
   display: flex; align-items: center; justify-content: center;
   gap: 10px; flex-shrink: 0;
 }
-.book-chevron {
+/* .tap-nav-btn is the tap card's editor pager (see .tap-nav-row above) — the
+   same control doing the same job on the other paged type, so it shares the
+   rule rather than growing a near-identical copy. It never appears in the
+   preview overlay, so the respondent-sized overrides below don't reach it. */
+.book-chevron,
+.tap-nav-btn {
   width: 34px; height: 34px; border-radius: 50%;
   /* Was rgba(0,0,0,0.14) on a 15px glyph at 0.55 — a hairline ring around a
      grey mark, on the only control that turns a scenario's page. */
@@ -3393,8 +3417,10 @@
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.12s, opacity 0.12s, transform 0.12s; flex-shrink: 0;
 }
-.book-chevron:hover:not(:disabled) { background: rgba(1,234,203,0.1); color: #007A66; transform: scale(1.06); }
-.book-chevron:disabled { opacity: 0.22; cursor: default; }
+.book-chevron:hover:not(:disabled),
+.tap-nav-btn:hover:not(:disabled) { background: rgba(1,234,203,0.1); color: #007A66; transform: scale(1.06); }
+.book-chevron:disabled,
+.tap-nav-btn:disabled { opacity: 0.22; cursor: default; }
 /* 44px on the respondent side. 34 is under the iOS minimum touch target, and
    on a scenario card these two circles are the ONLY way to turn a page —
    there is no swipe fallback. The editor keeps 34: it has a pointer, and its

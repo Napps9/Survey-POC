@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { indexForDirection } from "lib/tap_scales"
+import { t } from "lib/i18n"
 
 // Card-stack widget. Each card is a tap-stack#card target.
 //
@@ -10,7 +11,7 @@ import { indexForDirection } from "lib/tap_scales"
 // it was handed says. On click, the top card animates off-screen in that
 // direction and the next card surfaces.
 export default class extends Controller {
-  static targets = ["card", "counter", "dots", "controls"]
+  static targets = ["card", "counter", "dots", "controls", "prevBtn", "nextBtn"]
 
   connect() {
     this.position = 0
@@ -207,6 +208,49 @@ export default class extends Controller {
     requestAnimationFrame(() => this.layout())
   }
 
+  // ── Walking the deck without answering it (editor only) ─────────────────
+  // A respondent moves the stack by answering: pick() and the drag both land
+  // on _commit, which throws the top card off and surfaces the next. A creator
+  // has no such move. In the editor every pixel of the response strip is
+  // already spoken for — the mark opens the 🎨 popover, the label holds a
+  // caret, the 🎨 and × are their own buttons — so pick() has no click target
+  // left, and the deck simply never advanced. Statement 2 onwards could not be
+  // read, edited, given a picture or deleted: only the top card takes pointer
+  // events, and only the first card is ever the top card.
+  //
+  // So the editor gets a pager instead. It moves `position` and re-lays out,
+  // and that is all: nothing is recorded, so stepping past a statement is not
+  // an answer to it and stepping back does not take one away.
+  //
+  // Both stop propagation, for the reason pick() and every other control on
+  // this card do: the click would otherwise fall through and select/apply the
+  // type underneath. Turning to the next statement is not a request to open
+  // the Answer Type panel, and the panel opening moves the card under the
+  // pointer — so the side effect also took the second chevron out from under
+  // the click that was aimed at it.
+  forward(event) { if (event) { event.preventDefault(); event.stopPropagation() } this._goTo(this.position + 1) }
+  back(event)    { if (event) { event.preventDefault(); event.stopPropagation() } this._goTo(this.position - 1) }
+
+  // The same jump as an external command, for the editor's own edits —
+  // card-editor#addTapOption lands on the statement it has just appended, and
+  // #deleteOption stays where the creator was rather than snapping to the
+  // front. `index: -1` means "the last one", which is what an append wants
+  // without having to count the cards from outside.
+  goto(event) {
+    const index = event?.detail?.index
+    if (typeof index !== "number") return
+    this._goTo(index < 0 ? this.cardTargets.length - 1 : index)
+  }
+
+  // Clamped, so a caller may hand over an index that no longer exists (the
+  // statement it names has just been deleted) and still land somewhere real.
+  _goTo(index) {
+    const total = this.cardTargets.length
+    if (total === 0) return
+    this.position = Math.max(0, Math.min(index, total - 1))
+    this.layout()
+  }
+
   layout() {
     const total = this.cardTargets.length
     this._syncDots(total)
@@ -237,8 +281,14 @@ export default class extends Controller {
       card.style.transform  = `translateY(${ty}px) scale(${scale}) rotate(${rot})`
     })
     if (this.hasCounterTarget) {
-      this.counterTarget.textContent = `${Math.min(this.position + 1, total)} / ${total}`
+      this.counterTarget.textContent =
+        t("editor.tap.statement_of", { n: Math.min(this.position + 1, total), total })
     }
+    // Both ends of the pager say so rather than going quiet: a dead-looking
+    // chevron is the only thing that tells a creator the deck has no more
+    // statements, since the stack itself looks the same either way.
+    if (this.hasPrevBtnTarget) this.prevBtnTarget.disabled = this.position <= 0
+    if (this.hasNextBtnTarget) this.nextBtnTarget.disabled = this.position >= total - 1
   }
 
   // One dot per card; dots before the current position read as "done", the

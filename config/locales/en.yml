@@ -517,6 +517,10 @@ en:
         whole_verto: "Whole Verto"
         card_n: "Card %{n}"
         section_empty: "Nothing here."
+      tap:
+        prev_statement: "Previous statement"
+        next_statement: "Next statement"
+        statement_of: "Statement %{n} of %{total}"
       scenario:
         page_of: "Page %{n} of %{total}"
         page_placeholder: "Write this page…"
