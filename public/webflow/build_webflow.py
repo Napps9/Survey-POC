@@ -72,6 +72,11 @@ for h, (kind, name) in zip(hits, NAMES):
     open(f"{ASSETS}/{name}.{ext}", "wb").write(blob)
     written.append((f"{name}.{ext}", len(blob)))
 
+# The favicon is the app's own mark (app/assets/images/favicon.svg), not one of
+# the one-pager's embedded payloads — it lives outside the base64 sweep above.
+shutil.copyfile("/home/user/Survey-POC/app/assets/images/favicon.svg", f"{ASSETS}/favicon.svg")
+written.append(("favicon.svg", os.path.getsize(f"{ASSETS}/favicon.svg")))
+
 # Every payload becomes a bare filename, so the rest of this script works on
 # text rather than on megabytes of base64.
 _it = iter(NAMES)
@@ -471,6 +476,7 @@ PAGE = """<!doctype html>
 <title>VertoNow — a research platform that runs alongside your calls</title>
 <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400..700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 </head>
 <body data-theme="light">
 <div class="shell"><main>
