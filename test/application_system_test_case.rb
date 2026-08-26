@@ -60,7 +60,14 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       # these assertions are about the DOM carrying the right image, never about
       # the bytes arriving.
       url_blacklist: [ %r{\Ahttps?://(?!127\.0\.0\.1|localhost)}i ],
-      process_timeout: 30,
+      # This is the COLD START budget, not a per-command one — the browser is
+      # spawned lazily by the first driver call of the run (setup's
+      # clear_memory_cache), so the whole of Chrome's first launch has to fit
+      # inside it. 30s was enough locally and not on a loaded GitHub runner:
+      # the first test of a run died on ProcessTimeoutError while every later
+      # test reused the same browser happily. Nothing waits on this number in
+      # the passing case, so it costs nothing to make it generous.
+      process_timeout: 120,
       timeout: 20,
       headless: true
     )
