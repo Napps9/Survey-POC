@@ -4,6 +4,12 @@ on:
   pull_request:
   push:
     branches: [ Main, main ]
+  # A run that dies with `startup_failure` never started, so GitHub refuses to
+  # retry it — and render.yaml gates deploys on checks passing, so that commit
+  # sits undeployed with nothing to click. Without this trigger the only way
+  # back is an empty commit. 2026-08-26: one push produced two runs, one stuck
+  # queued and one startup_failure, and the deploy waited on both.
+  workflow_dispatch:
 
 jobs:
   test:
