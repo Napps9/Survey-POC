@@ -1,0 +1,181 @@
+<!-- Fast path, 3 of 3 -> Page settings > Custom code > Before </body> tag -->
+<script>
+(function(){
+  const DEMO_ORIGIN = "https://app.playverto.com";
+  const DEMO_PATH   = "/play/s3-wPFWIgpIVpATc2IAzPsBq";
+  const mockup = document.getElementById('demoMockup');
+
+  // The screen area inside the bezel, as fractions of the mockup — the same
+  // numbers the CSS positions against.
+  const SCREEN_W = 0.7515, SCREEN_H = 0.69;
+
+  // Logical viewport handed to the player, driven by HEIGHT because height is
+  // what constrains it: the player's card is a fixed 850x680 box (.split-card)
+  // that no rule ever shrinks, so a frame shorter than ~680 clips it — centred,
+  // so the top goes first. 780 clears the card with ~24px above it and leaves
+  // room for the bottom bar; the width is derived from the screen's own aspect
+  // so the Verto still fills the glass edge to edge, uncropped and undistorted.
+  // Measured, not guessed: 567 cut 82px off the top, 700 still cut 16px.
+  const EMBED_H = 780;
+
+  // Card videos ship preload="none" with a poster, loaded by an
+  // IntersectionObserver when the card comes into view — right for a phone on
+  // mobile data, wrong for a demo in a laptop mockup, where a clip that hasn't
+  // buffered paints nothing and the panel shows the Verto's brand colour
+  // instead. Same origin, so the page can just ask them to load now. Cheap and
+  // idempotent: a video already loading is left alone, and the poll stops once
+  // the deck stops producing new ones.
+  function nudgeVideos(){
+    const frame = document.querySelector('.screen-embed, .phone-screen-embed');
+    let doc;
+    try { doc = frame?.contentDocument } catch { return }
+    if (!doc) return;
+    doc.querySelectorAll('video').forEach(v => {
+      if (v.preload === 'none') v.preload = 'auto';
+      if (v.paused) v.play?.().catch(() => {});   // muted + playsinline: allowed
+    });
+  }
+
+  function fitEmbed(){
+    const frame = mockup?.querySelector('.screen-embed');
+    if (!frame) return;
+    const screenW = mockup.clientWidth * SCREEN_W;
+    const screenH = mockup.clientHeight * SCREEN_H;
+    if (screenW < 2 || screenH < 2) return;        // laid out mobile: CSS takes over
+    const embedW = Math.round(EMBED_H * (screenW / screenH));
+    frame.style.setProperty('--embed-w', embedW + 'px');
+    frame.style.setProperty('--embed-h', EMBED_H + 'px');
+    frame.style.setProperty('--embed-scale', screenH / EMBED_H);
+  }
+
+  // ---- Which device holds the live Verto ------------------------------
+  // ONE live frame at a time, by design: the player keys its session in
+  // sessionStorage by submit URL, so two live frames of this Verto would
+  // write into a single response. The reader taps a device to move the live
+  // Verto there; the other reverts to its screenshot. Progress survives the
+  // switch — both frames share the session token, and the player restores
+  // committed answers from the server when it boots.
+  const phone = document.getElementById('phoneMockup');
+
+  const phoneOverlay = document.getElementById('phonePlayOverlay');
+
+  const laptopOverlay = document.getElementById('laptopPlayOverlay');
+  let embedFailed = false;
+  let nudger = null;
+
+  function killFrames(){
+    if (nudger) { clearInterval(nudger); nudger = null; }
+    mockup?.querySelector('.screen-embed')?.remove();
+    mockup?.classList.remove('is-live');
+    phone?.querySelector('.phone-screen-embed')?.remove();
+    phone?.classList.remove('is-live');
+  }
+
+  // The phone frame's screen is wherever the still lays out (it keeps its
+  // box even while hidden), so the live frame is scaled onto exactly that.
+  function fitPhoneEmbed(){
+    const frame = phone?.querySelector('.phone-screen-embed');
+    const still = phone?.querySelector('img');
+    if (!frame || !still) return;
+    const w = still.clientWidth;
+    if (w < 2) return;
+    frame.style.transform = 'scale(' + (w / 390) + ')';
+  }
+
+  function syncOverlays(){
+    const phoneLive = !!phone?.classList.contains('is-live');
+    const laptopLive = !!mockup?.classList.contains('is-live');
+    if (phoneOverlay) phoneOverlay.hidden = embedFailed || phoneLive || !(laptopLive || phoneLive);
+    if (laptopOverlay) laptopOverlay.hidden = !phoneLive;
+  }
+
+  // The shared boot proof. Same-origin (hosted): the player's root is directly
+  // observable. Cross-origin (a downloaded copy): the player posts
+  // { verto: "ready" } when it starts — see player_controller.js#connect.
+  function bootFrame(frame, onOk, onFail){
+    const onReady = (e) => { if (e.data && e.data.verto === "ready") finish(true) };
+    window.addEventListener('message', onReady);
+    let settled = false;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener('message', onReady);
+      clearInterval(poll);
+      clearTimeout(giveUp);
+      ok ? onOk() : onFail();
+    };
+    const check = () => {
+      try {
+        if (frame.contentDocument?.querySelector('[data-controller~="player"]')) finish(true);
+      } catch { /* cross-origin: wait for verto:ready, or the timeout */ }
+    };
+    const poll   = setInterval(check, 500);
+    const giveUp = setTimeout(() => finish(false), 6000);
+    frame.addEventListener('load', () => setTimeout(check, 300));
+  }
+
+  function activateDevice(target){
+    if (embedFailed || !mockup) return;
+    killFrames();
+    const isPhone = target === 'phone' && phone;
+    const host = isPhone ? phone : mockup;
+
+    const frame = document.createElement('iframe');
+    frame.className = isPhone ? 'phone-screen-embed' : 'screen-embed';
+    frame.title = 'A live Verto you can play';
+    // Absolute, so it resolves from a downloaded copy of this file too. Served
+    // from the app this is still same-origin, so nothing changes there.
+    frame.src = DEMO_ORIGIN + DEMO_PATH;
+    host.appendChild(frame);
+    isPhone ? fitPhoneEmbed() : fitEmbed();
+
+    bootFrame(frame, () => {
+      host.classList.add('is-live');
+      isPhone ? fitPhoneEmbed() : fitEmbed();
+      syncOverlays();
+      nudgeVideos();
+      // The deck swaps cards as it's played, so keep nudging for a while
+      // rather than only at boot.
+      let nudges = 0;
+      nudger = setInterval(() => {
+        nudgeVideos();
+        if (++nudges > 40 && nudger) { clearInterval(nudger); nudger = null; }
+      }, 3000);
+      const note = document.getElementById('demoNote');
+      if (note) note.innerHTML = 'A real Verto, playing right here' +
+        (isPhone ? ' — on the phone. ' : '. ') +
+        '<a href="' + DEMO_ORIGIN + DEMO_PATH + '" class="demo-link" target="_blank" rel="noopener">Open it full screen ↗</a>';
+    }, () => {
+      if (isPhone) {
+        // The phone couldn't boot (network dropped mid-visit, most likely) —
+        // hand the session straight back to the laptop rather than leaving
+        // two screenshots and nothing playable.
+        killFrames();
+        syncOverlays();
+        activateDevice('laptop');
+      } else {
+        embedFailed = true;
+        killFrames();
+        syncOverlays();
+        const note = document.getElementById('demoNote');
+        if (note) note.innerHTML = 'The live demo needs a connection. ' +
+          '<a href="' + DEMO_ORIGIN + DEMO_PATH + '" class="demo-link" target="_blank" rel="noopener">Open the Verto in a new tab \u2197</a>';
+      }
+    });
+  }
+
+  phoneOverlay?.addEventListener('click', () => activateDevice('phone'));
+  laptopOverlay?.addEventListener('click', () => activateDevice('laptop'));
+
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => { fitEmbed(); fitPhoneEmbed(); });
+    if (mockup) ro.observe(mockup);
+    if (phone) ro.observe(phone);
+  } else {
+    window.addEventListener('resize', () => { fitEmbed(); fitPhoneEmbed(); });
+  }
+
+  activateDevice('laptop');
+
+})();
+</script>
