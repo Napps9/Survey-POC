@@ -62,6 +62,8 @@ sn:
     allow_other: "Bvumira mhinduro yakasununguka ye\"Zvimwe\""
     required: "Mubvunzo Unodikanwa"
     ask_once: "Bvunza kamwe chete — inodarikwa pakutamba zvakare mushure mekupindurwa"
+    recall_ask_once: "Zadza mhinduro dzekubvunza kamwe kubva pane imwe midziyo"
+    recall_ask_once_note: "Munhu anofungidzira kodhi yemupinduri uyu aizoona mhinduro idzodzo. Dzima kunze kwekunge uchizvida."
     other: "Zvimwe"
     other_placeholder: "Tiudze nemazwi ako…"
     mark_correct: "Ratidza Mhinduro Chaiyo"
@@ -112,6 +114,7 @@ sn:
       welcome_card: "KADHI REKUGAMUCHIRA"
       token_checkpoint: "CHEKIPOINTI"
       consent_gate: "MVUMO"
+      respondent_code: "KODHI YEMUPINDURI"
     panel_label:
       range: "ZVUZVURUDZA CHERENGO"
       rating: "DZVANYA KUTI UONGORORE"
@@ -294,6 +297,7 @@ sn:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Kunyora Mhinduro…"
@@ -503,6 +507,7 @@ sn:
         variety_ok: "Kusiyana kwakanaka — hapana rudzi rwemhinduro runodzokorora kazhinji."
         variety_run: "%{type} inoonekwa ka%{n}× kutevedzana — sanganisa nerimwe rudzi rwemhinduro."
         welcome_many: "Shandisa kadhi rimwe chete rekugamuchira (parizvino %{n})."
+        code_after_ask_once: "Mibvunzo %{n} yekubvunza kamwe iri pamberi pekadhi reKodhi yemupinduri, saka anodzoka pane imwe midziyo achapindura zvakare kodhi isati yazadza. Sundidzira kadhi rekodhi pamusoro pavo."
         static_tip: "Verto refu — funga zvekumira pakati kuti simba rirambe riri pamusoro."
         board_heading: "Zviri Kushanda Nezvinofanira Kugadziriswa"
         board_hint: "Zvakarongwa nemwenje wemugwagwa — dzvanya kadhi kuti uende kwariri."
@@ -1066,6 +1071,7 @@ sn:
     tab_quiz: 'Muitiro weKwizi'
     tab_tokens: 'Kuisa Mapoinzi'
     note_limit_split_hint: "Kupfuura mavara %{n} zvinotanga kumanikana pakadhi rekutanga — isai ruzivo rwakadzama pakadhi rakazvimirira."
+    respondent_code_card_note: "Verto iyi ine kadhi reKodhi yemupinduri mudhaki, saka kodhi inotorwa ipapo uye chirongwa ichi hachina basa."
     tab_logic: 'Fungiro Nemifambiro'
     flows_title: 'Mifambiro'
     flows_intro: 'Mapoka emakadhi ane mazita anogona kupindwa nemhinduro yakanongedzwa — semuenzaniso, seti dzemibvunzo dzeUK, UAE neUSA dzinodzokerana kana kupedzera pazvidzitiro zvazvo.'

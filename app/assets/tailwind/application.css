@@ -3687,6 +3687,15 @@
   color: rgba(255,255,255,0.88);
 }
 .card-flag input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+/* A line under a switch whose consequence is not obvious from its label — used
+   by the respondent-code card's recall toggle, where what the creator is
+   agreeing to (a guessed code can fetch someone's answers) has to be readable
+   at the moment they decide, not in a doc. */
+.card-flag-note {
+  margin: -4px 0 0 34px;
+  font-family: "ABeeZee", sans-serif; font-size: 11px; line-height: 1.45;
+  color: rgba(255,255,255,0.5);
+}
 .card-flag-track {
   position: relative; flex-shrink: 0;
   width: 36px; height: 20px; border-radius: 100px;

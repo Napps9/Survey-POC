@@ -140,11 +140,9 @@ class FlowGenerator
       Output via the emit_flow tool.
     MSG
 
-    unless locale.to_s == SupportedLocales::DEFAULT
-      lang = SupportedLocales.find(locale)
-      name = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
-      user_message << "\nLANGUAGE: Write the flow name, all question text, descriptions and ALL option labels in #{name}. Do not use English.\n"
-    end
+    user_message << PromptLanguage.instruction(
+      locale, scope: "the flow name, all question text, descriptions and ALL option labels"
+    )
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:cards][:items][:properties][:type][:enum] = SurveyGenerator.generatable_types

@@ -69,8 +69,13 @@ class ApplicationController < ActionController::Base
     header = request.env["HTTP_ACCEPT_LANGUAGE"]
     return nil if header.blank?
 
+    # Through SupportedLocales.coerce_tag rather than `.split("-").first`: that
+    # discarded the region subtag before looking anything up, so an en-US
+    # browser could only ever land on plain `en` no matter what the registry
+    # held. Region-tagged languages with a single entry ("pt-BR") still resolve
+    # by their subtag — coerce_tag tries the whole tag first and falls back.
     header.split(",")
-          .map { |tag| tag.split(";").first.to_s.strip.split("-").first.downcase }
-          .find { |code| SupportedLocales.supported?(code) }
+          .filter_map { |tag| SupportedLocales.coerce_tag(tag.split(";").first) }
+          .first
   end
 end

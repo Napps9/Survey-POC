@@ -30,7 +30,12 @@ namespace :i18n do
     only  = (args[:only] || ENV["ONLY"]).to_s.split(/[,\s]+/).reject(&:blank?)
     force = ENV["FORCE"].present?
 
-    targets = SupportedLocales.codes - [ "en" ]
+    # English variants are excluded, not merely defaulted past. en-US differs
+    # from en by SPELLING, and "translate these strings into English (US)" is
+    # not a job a translator can do sensibly — it invites paraphrase where the
+    # only wanted change is colour→color. `i18n:en_us` below is its maintenance
+    # path, and being a transform it cannot drift structurally.
+    targets = SupportedLocales.codes.reject { |c| SupportedLocales.english?(c) }
     targets &= only if only.any?
 
     client = Anthropic::Client.new(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
@@ -76,6 +81,49 @@ namespace :i18n do
       File.write(out_path, { code => unflatten(merged) }.to_yaml(line_width: -1))
       puts "wrote #{out_path.relative_path_from(Rails.root)} (#{existing_flat.size} kept, #{translated.size} new/updated, #{todo.size - translated.size} still missing)"
     end
+  end
+
+  desc "Regenerate config/locales/en-US.yml from en.yml by respelling. " \
+       "No API key needed — the two English variants differ in a closed set of " \
+       "words, not in meaning. DIFF=1 checks without writing."
+  # A word list rather than a regex, and that is the whole design: the near
+  # misses are the danger. "analysis" is identical in both variants, and so are
+  # "promise", "otherwise", "audience", "sequence", "confidence" and
+  # "preference" — every one of which appears in en.yml, and every one of which
+  # a blind /is([ae])/ rule would mangle.
+  #
+  # Generating also makes the KEY STRUCTURE identical by construction, which is
+  # what LocaleStructureParityTest, LocaleRulesParityTest and
+  # LocaleFlashParityTest each separately require of it.
+  task en_us: :environment do
+    lines = File.readlines(Rails.root.join("config/locales/en.yml"), encoding: "UTF-8")
+    root  = lines.index { |l| l.start_with?("en:") }
+    abort "en.yml no longer opens with an `en:` root key" unless root
+
+    out = lines.map do |line|
+      if line.strip.start_with?("#")
+        EnglishSpellings.americanise(line)
+      else
+        # The VALUE side only. A key is an identifier the code looks up —
+        # `editor.tab_tokens` is asked for by that name in both variants, and
+        # respelling keys here would make every one of those lookups miss.
+        m = line.match(/\A(\s*(?:- )?)([\w.\-]+:)?(\s*)(.*)\z/m)
+        m ? "#{m[1]}#{m[2]}#{m[3]}#{EnglishSpellings.americanise(m[4])}" : line
+      end
+    end
+    out[root] = "en-US:\n"
+
+    body = EN_US_HEADER + out[root..].join
+    path = Rails.root.join("config/locales/en-US.yml")
+
+    if ENV["DIFF"].present?
+      current = path.exist? ? File.read(path, encoding: "UTF-8") : ""
+      puts(body == current ? "en-US.yml is up to date" : "en-US.yml would change — run without DIFF")
+      next
+    end
+
+    File.write(path, body, encoding: "UTF-8")
+    puts "wrote config/locales/en-US.yml"
   end
 end
 
@@ -208,3 +256,22 @@ def unflatten(flat)
     end
   end
 end
+
+# ── US English ──────────────────────────────────────────────────────────────
+# The word list itself is EnglishSpellings (app/lib), not here: it is product
+# knowledge about the copy, it is what LocaleEnUsTest checks, and a rake file
+# cannot be tested.
+
+EN_US_HEADER = <<~HEAD
+  # US English — GENERATED from en.yml by `bin/rails i18n:en_us`. Do not edit by
+  # hand; regenerate.
+  #
+  # Two English variants exist because the PDF import's optimiser was quietly
+  # rewriting a creator's US spellings into UK ones. It had no instruction about
+  # spelling at all — every generator's language instruction was skipped for the
+  # default locale — so the model simply inherited the dialect of the prompts,
+  # which are written in British English throughout. See PromptLanguage.
+  #
+  # A transform, not a translation: the structure has to mirror en.yml exactly
+  # or the three locale parity tests fail, which is what they are for.
+HEAD

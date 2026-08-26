@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   post "play/:token/submit", to: "player#submit", as: :submit_survey
   post "play/:token/grade", to: "player#grade", as: :grade_survey
   post "play/:token/consent", to: "player#consent", as: :consent_survey
+  # Ask-once recall. POST, not GET, and that is not a REST quibble: the
+  # respondent's code travels in the body, and a code in a URL lands in server
+  # logs, in Referer headers and in the service worker's page cache.
+  post "play/:token/recall", to: "player#recall", as: :recall_survey
   get  "play/:token/quiz_state", to: "player#quiz_state", as: :quiz_state_survey
   get  "play/:token/scores", to: "player#scores", as: :player_scores
   get  "play/:token/results", to: "player#results", as: :player_results

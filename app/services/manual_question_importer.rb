@@ -156,7 +156,7 @@ class ManualQuestionImporter
       messages: [
         {
           role: "user",
-          content: "Extract every question from the questionnaire below and map each to its best-fitting Verto answer type.\n\n---\n\n#{text}"
+          content: import_instruction(locale, text)
         }
       ]
     )
@@ -169,6 +169,24 @@ class ManualQuestionImporter
     payload = deep_stringify(input_of(block))
     payload["cards"] = QuestionTypeClassifier.new.normalize_cards(payload["cards"])
     payload
+  end
+
+  private
+
+  # Same shape, and the same fix, as PdfQuestionImporter#import_instruction:
+  # `locale:` was on the signature and read by nothing, so a pasted
+  # questionnaire came back in whatever dialect the prompts were written in.
+  # Here the creator's own text is right there in the message, which makes
+  # "don't re-spell it" both more tempting to ignore and easier to check.
+  def import_instruction(locale, text)
+    [
+      "Extract every question from the questionnaire below and map each to its best-fitting Verto answer type.",
+      PromptLanguage.instruction(locale, scope: "any text you write yourself — optimised question text, descriptions and option labels"),
+      PromptLanguage::PRESERVE_SPELLING,
+      "This applies to `original_text` above all: it must be what the creator wrote, kept exactly.",
+      "\n---\n",
+      text
+    ].join("\n")
   end
 
   # tool_use?, input_of, deep_stringify come from AnthropicHelpers.

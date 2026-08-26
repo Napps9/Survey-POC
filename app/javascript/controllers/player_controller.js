@@ -21,7 +21,10 @@ const CONSENT_TYPES = [ "consent_gate" ]
 // Cards that drive their own navigation, so the deck's Back/Next/Finish are
 // hidden while one is showing. The consent shapes above, plus the
 // respondent-code gate.
-const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code_card", "contact_gate_card" ]
+// `respondent_code` is the CARD TYPE; `respondent_code_card` is the survey-level
+// pre-screen's pseudo-card, which the card supersedes but which existing Vertos
+// still use. Both drive their own navigation, so both belong here.
+const SELF_DRIVING_TYPES = [ ...CONSENT_TYPES, "respondent_code", "respondent_code_card", "contact_gate_card" ]
 
 // Respondent-local text-size preference (the "Aa" pill) — a person's own
 // reading accessibility need, not a per-Verto setting, so it's one fixed key
@@ -75,6 +78,11 @@ export default class extends Controller {
     gradeUrl: { type: String, default: "" },
     quizStateUrl: { type: String, default: "" },
     scoresUrl: { type: String, default: "" },
+    // Ask-once recall (Survey#respondent_code_recall?). Blank unless the
+    // creator turned it on AND there is a live token to reach — owner preview
+    // and Test Mode must never be able to read a real respondent's answers
+    // back, which is the same rule grade_url and scores_url follow.
+    recallUrl: { type: String, default: "" },
     tokenisation: { type: Boolean, default: false },
     // The contact gate is on (Survey#contact_form_enabled) — mints the durable
     // player key and sends the gate's details with the ordinary saves.
@@ -922,11 +930,28 @@ export default class extends Controller {
   // save carries it; nothing writes it to storage on this side either, so a
   // reload genuinely forgets it (the digest already recorded on the response is
   // what keeps the identity).
-  submitRespondentCode() {
+  async submitRespondentCode() {
     const entered = (this.hasRespondentCodeTarget ? this.respondentCodeTarget.value : "").trim()
     if (entered) {
       this._respondentCode = entered
       this._buzz()
+      // Recall, when the creator turned it on: ask the server whether this
+      // identity has already answered any of this deck's ask-once questions
+      // somewhere else. Until now "asked once" was a promise made to a BROWSER
+      // (localStorage plus a device-minted uuid), so a new phone asked
+      // everything again — which is the opposite of what the setting says.
+      //
+      // The deck cannot advance until the answer is in — a card seeded AFTER
+      // the respondent has walked past it is a card they answered twice. So
+      // the wait is real, and a wait a respondent cannot see is a button they
+      // think is broken. Hence the busy state, and hence _recall's short
+      // timeout: the fallback (ask the question again) is cheap.
+      this._setCodeBusy(true)
+      try {
+        this._applyRecall(await this._recall(entered))
+      } finally {
+        this._setCodeBusy(false)
+      }
     }
     // Deliberately does NOT save here. _saveProgress refuses to create a row
     // before there's a real answer, so that someone who opens a Verto and leaves
@@ -936,8 +961,79 @@ export default class extends Controller {
   }
 
   skipRespondentCode() {
+    // Per-RUN, and deliberately not persisted — unlike the contact gate's
+    // _markContactDone, which is. The contact gate is a first-visit register;
+    // a code someone declined once should still be offered next time in case
+    // they change their mind.
+    //
+    // It also clears nothing already seeded from this device's own store:
+    // "I'd rather not link my runs" is not "forget what this browser knows".
     this._respondentCode = null
     this.next()
+  }
+
+  // ── Recall ─────────────────────────────────────────────────────────────────
+
+  // The code card's own buttons, while the lookup is in flight. aria-busy for
+  // a screen reader, `disabled` so a second tap can't queue a second advance.
+  _setCodeBusy(busy) {
+    const card = this.cardTargets[this.currentValue]
+    if (!card) return
+    card.setAttribute("aria-busy", busy ? "true" : "false")
+    card.querySelectorAll(".play-consent-agree, .play-consent-decline")
+        .forEach(btn => { btn.disabled = busy })
+  }
+
+  // Ask-once answers this person gave under the same code, from the server.
+  // Empty on every failure — a Verto that can't reach the network simply asks
+  // the questions again, which is the pre-feature behaviour and no worse.
+  async _recall(code) {
+    if (!this.hasRecallUrlValue || !this.recallUrlValue) return {}
+    try {
+      const res = await fetch(this.recallUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_token: this._sessionToken, respondent_code: code }),
+        signal: AbortSignal.timeout(2000)
+      })
+      if (!res.ok) return {}
+      const data = await res.json()
+      return (data && data.answers) || {}
+    } catch (_e) {
+      return {}
+    }
+  }
+
+  // Precedence, and it only reads one way: THIS RUN beats the local store beats
+  // the server. The local store is this browser's record of an answer this
+  // identity actually gave here; recall is a claim about an identity asserted
+  // by a typed string, so it fills gaps and never overwrites.
+  _applyRecall(map) {
+    if (!map || !Object.keys(map).length) return
+
+    this._onceSkip = this._onceSkip || new Set()
+    this.cardTargets.forEach((card, i) => {
+      if (card.dataset.cardAskOnce !== "true") return
+      const key = card.dataset.cardIndex
+      if (key === undefined || key === "") return
+
+      const remembered = map[card.dataset.cardCid] ?? map[key]
+      if (remembered === undefined || !this._isAnswerGiven(remembered)) return
+      if (this._isAnswerGiven(this._answers[key])) return
+
+      this._answers[key] = remembered
+      // Teach this device, so a second run here needs no network and an
+      // offline replay still skips.
+      this._writeOnceStore(key, remembered)
+      // Forward only. `>`, not `>=`: the respondent is standing ON the code
+      // card, and marking a card BEHIND them as skipped would make Back step
+      // over one they did see. A deck that reorders itself under someone
+      // mid-run is worse than a question asked twice — so a card already
+      // passed has its answer completed silently and nothing rewinds.
+      if (i > this.currentValue) this._onceSkip.add(i)
+    })
+    // The last interactive card may have moved, so Next/Finish repaints.
+    this._update()
   }
 
   _recordConsent(agreed) {

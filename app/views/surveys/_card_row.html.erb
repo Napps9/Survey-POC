@@ -34,6 +34,10 @@
      data-card-allow-other="<%= card['allow_other'] ? 'true' : 'false' %>"
      data-card-required="<%= card['required'] ? 'true' : 'false' %>"
      data-card-ask-once="<%= card['ask_once'] ? 'true' : 'false' %>"
+     <%# Respondent-code card only. Like every other flag here it has to survive
+         the DOM round-trip autosave rebuilds each card from, or the first save
+         after a reload would silently switch recall back off. %>
+     data-card-recall="<%= card['recall'] ? 'true' : 'false' %>"
      data-card-input="<%= card['input'].to_s %>"
      data-card-demographic="<%= card['demographic'] ? 'true' : 'false' %>"
      <%# key_for, not the stored key: the auto-appended tail predates

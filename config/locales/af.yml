@@ -64,6 +64,8 @@ af:
     allow_other: "Laat 'n vrye teksantwoord vir “Ander” toe"
     required: "Verpligte vraag"
     ask_once: "Vra een keer — oorgeslaan by herhaalde speel nadat dit beantwoord is"
+    recall_ask_once: "Vul vra-een-keer-antwoorde van 'n ander toestel in"
+    recall_ask_once_note: "Iemand wat hierdie respondent se kode raai, sou daardie antwoorde sien. Af tensy jy dit nodig het."
     other: "Ander"
     other_placeholder: "Vertel ons in jou eie woorde…"
     mark_correct: "Merk die korrekte antwoord"
@@ -111,6 +113,7 @@ af:
       welcome_card: "WELKOMSKAART"
       token_checkpoint: "KONTROLEPUNT"
       consent_gate: "TOESTEMMING"
+      respondent_code: "RESPONDENTKODE"
     panel_label:
       range: "SLEEP DIE SKUIFKNOPPIE"
       rating: "TIK OM TE GRADEER"
@@ -291,6 +294,7 @@ af:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Antwoord word geskryf…"
@@ -500,6 +504,7 @@ af:
         variety_ok: "Goeie verskeidenheid — geen antwoordtipe herhaal te veel nie."
         variety_run: "%{type} verskyn %{n}× agtereenvolgens — meng 'n ander antwoordtipe in."
         welcome_many: "Gebruik hoogstens een welkomskaart (nou %{n})."
+        code_after_ask_once: "%{n} vra-een-keer-vrae kom voor die Respondentkode-kaart, so iemand wat op 'n nuwe toestel terugkeer beantwoord hulle weer voordat die kode hulle kan invul. Skuif die kodekaart bo hulle."
         static_tip: "Lang Verto — oorweeg 'n middelpouse om energie hoog te hou."
         board_heading: "Wat werk en wat om reg te maak"
         board_hint: "Gegroepeer volgens verkeersligkleur — tik 'n kaart om daarheen te spring."
@@ -1063,6 +1068,7 @@ af:
     tab_quiz: "Kwismodus"
     tab_tokens: "Tokenisering"
     note_limit_split_hint: "Verby %{n} karakters raak dit benoud op die inleidingskaart — sit die besonderhede eerder op hul eie kaart."
+    respondent_code_card_note: "Hierdie Verto het 'n Respondentkode-kaart in die pak, so die kode word daar ingesamel en hierdie instelling het geen uitwerking nie."
     tab_logic: "Logika & vloeie"
     flows_title: "Vloeie"
     flows_intro: "Genoemde groepe kaarte waarin 'n geroeteerde antwoord kan ingaan — bv. VK-, VAE- en VSA-vraagstelle wat later weer saamsmelt of op hul eie skerms eindig."

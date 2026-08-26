@@ -199,6 +199,17 @@ class QuestionTypeClassifier
       out["original_text"] = card["original_text"].to_s.strip if card["original_text"].to_s.strip.present?
       out["compliant"] = card["compliant"] if [ true, false ].include?(card["compliant"])
       out["issue"] = card["issue"].to_s.strip if card["issue"].to_s.strip.present?
+      # "Keep my wording exactly as uploaded" restored only the question TEXT,
+      # so a Verto whose every question was kept as written could still have the
+      # model's wording — and the model's spelling — throughout its OPTIONS and
+      # descriptions, with the review screen's diff showing none of it. These
+      # are emitted only when the model actually changed something, so a
+      # compliant card costs nothing to carry.
+      originals = Array(card["original_options"]).map { |o| o.to_s.strip }.reject(&:empty?)
+      out["original_options"] = originals if originals.any?
+      if card["original_description"].to_s.strip.present?
+        out["original_description"] = card["original_description"].to_s.strip
+      end
 
       options = Array(card["options"]).map { |o| o.to_s.strip }.reject(&:empty?)
       options = options.first(SurveyGenerator::TAP_CARD_MAX_STATEMENTS) if type == "tap_card"

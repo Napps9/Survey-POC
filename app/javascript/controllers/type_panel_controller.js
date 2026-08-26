@@ -360,6 +360,25 @@ const COMPONENTS = {
       </div>`
   },
 
+  // Mirrors the "when respondent_code" branch in _card_component.html.erb.
+  // Inert, for the same reason consent_gate's replica is: a creator switching a
+  // card to this type should be able to see where the prompt lands without
+  // typing a respondent's code on their behalf.
+  //
+  // Listed explicitly even though it is short, because COMPONENTS[type] falls
+  // back to `() => ""` — picking a type with no entry silently BLANKS the card,
+  // which is exactly what happened to consent_gate (BUG-015).
+  respondent_code: () => `
+      <div aria-hidden="true" style="pointer-events:none;">
+        <input type="text" class="respondent-code-input" tabindex="-1" readonly
+               placeholder="${esc(t("player.respondent_code_placeholder"))}" />
+        <div class="respondent-code-note">${esc(t("player.respondent_code_note"))}</div>
+        <div class="play-consent-actions">
+          <button type="button" class="play-consent-agree" tabindex="-1">${esc(t("player.respondent_code_continue"))}</button>
+          <button type="button" class="play-consent-decline" tabindex="-1">${esc(t("player.respondent_code_skip"))}</button>
+        </div>
+      </div>`,
+
   range: (opts, ctx = {}) => sliderHtml(opts, ctx),
 
   nps: (opts, ctx = {}) => npsHtml(opts, ctx.npsShape),

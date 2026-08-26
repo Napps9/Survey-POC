@@ -85,11 +85,14 @@ class CardOptimiser
       via the emit_optimised_question tool.
     MSG
 
-    unless locale.to_s == SupportedLocales::DEFAULT
-      lang = SupportedLocales.find(locale)
-      name = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
-      user_message << "\nLANGUAGE: Write the question text, any description and ALL option labels in #{name}. Do not use English.\n"
-    end
+    user_message << PromptLanguage.instruction(
+      locale, scope: "the question text, any description and ALL option labels"
+    )
+    # This service REWRITES the creator's own words, so it gets the stronger
+    # line as well. "The PDF question optimiser changed the questions from US
+    # Eng to UK Eng" — it was fixing a rules violation and re-spelling the
+    # question on the way past, which is a second edit nobody asked for.
+    user_message << "\n#{PromptLanguage::PRESERVE_SPELLING}\n"
 
     tool = TOOL.deep_dup
     # Cache the static prefix (tool schema + the shared SurveyGenerator::SYSTEM),

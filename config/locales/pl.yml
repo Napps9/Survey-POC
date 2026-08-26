@@ -63,6 +63,8 @@ pl:
     allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
     required: "Pytanie obowiązkowe"
     ask_once: "Pytaj raz — pomijane przy kolejnych podejściach po udzieleniu odpowiedzi"
+    recall_ask_once: "Uzupełnij odpowiedzi „pytaj raz” z innego urządzenia"
+    recall_ask_once_note: "Ktoś, kto odgadnie kod tego uczestnika, zobaczy te odpowiedzi. Wyłączone, chyba że jest potrzebne."
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
     mark_correct: "Zaznacz poprawną odpowiedź"
@@ -110,6 +112,7 @@ pl:
       welcome_card: "KARTA POWITALNA"
       token_checkpoint: "PUNKT KONTROLNY"
       consent_gate: "ZGODA"
+      respondent_code: "KOD UCZESTNIKA"
     panel_label:
       range: "PRZECIĄGNIJ SUWAK"
       rating: "STUKNIJ, ABY OCENIĆ"
@@ -290,6 +293,7 @@ pl:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Pisanie odpowiedzi…"
@@ -499,6 +503,7 @@ pl:
         variety_ok: "Dobra różnorodność — żaden typ odpowiedzi nie powtarza się zbyt często."
         variety_run: "%{type} pojawia się %{n}× z rzędu — przeplataj innym typem odpowiedzi."
         welcome_many: "Użyj najwyżej jednej karty powitalnej (teraz %{n})."
+        code_after_ask_once: "%{n} pytań „pytaj raz” znajduje się przed kartą Kod uczestnika, więc ktoś wracający na nowym urządzeniu odpowie na nie ponownie, zanim kod zdąży je uzupełnić. Przenieś kartę kodu nad nie."
         static_tip: "Długie Verto — rozważ przerwę w połowie, by utrzymać energię."
         board_heading: "Co działa, a co poprawić"
         board_hint: "Pogrupowane według sygnalizacji — dotknij karty, aby do niej przejść."
@@ -1058,6 +1063,7 @@ pl:
     tab_quiz: 'Tryb quizu'
     tab_tokens: 'Tokenizacja'
     note_limit_split_hint: "Powyżej %{n} znaków robi się ciasno na karcie wprowadzającej — szczegóły lepiej umieścić na osobnej karcie."
+    respondent_code_card_note: "Ten Verto ma w talii kartę Kod uczestnika, więc kod jest zbierany tam, a to ustawienie nie ma znaczenia."
     tab_logic: 'Logika i przepływy'
     flows_title: "Przepływy"
     flows_intro: "Nazwane grupy kart, do których trafia skierowana odpowiedź — np. zestawy pytań UK, ZEA i USA, które potem się schodzą lub kończą na własnych ekranach."

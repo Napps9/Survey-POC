@@ -63,6 +63,8 @@ es:
     allow_other: Permitir respuesta libre «Otro»
     required: "Pregunta obligatoria"
     ask_once: "Preguntar una vez — se omite en repeticiones tras responderse"
+    recall_ask_once: "Rellenar respuestas de una sola vez desde otro dispositivo"
+    recall_ask_once_note: "Quien adivine el código de esta persona vería esas respuestas. Desactivado salvo que lo necesites."
     other: Otro
     other_placeholder: Cuéntanos con tus propias palabras…
     mark_correct: "Marca la respuesta correcta"
@@ -110,6 +112,7 @@ es:
       welcome_card: "TARJETA DE BIENVENIDA"
       token_checkpoint: "PUNTO DE CONTROL"
       consent_gate: "CONSENTIMIENTO"
+      respondent_code: "CÓDIGO DE PARTICIPANTE"
     panel_label:
       range: "ARRASTRA EL DESLIZADOR"
       rating: "TOCA PARA CALIFICAR"
@@ -290,6 +293,7 @@ es:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Escribiendo la respuesta…"
@@ -499,6 +503,7 @@ es:
         variety_ok: "Buena variedad — ningún tipo de respuesta se repite demasiado."
         variety_run: "%{type} aparece %{n}× seguidas — alterna con otro tipo de respuesta."
         welcome_many: "Usa como máximo una tarjeta de bienvenida (ahora %{n})."
+        code_after_ask_once: "%{n} preguntas de una sola vez están antes de la tarjeta de código de participante, así que quien vuelva en otro dispositivo las responderá de nuevo antes de que el código pueda rellenarlas. Mueve la tarjeta de código encima."
         static_tip: "Verto largo — considera una pausa intermedia para mantener la energía."
         board_heading: "Qué funciona y qué corregir"
         board_hint: "Agrupado por semáforo — toca una tarjeta para ir a ella."
@@ -1056,6 +1061,7 @@ es:
     tab_quiz: 'Modo cuestionario'
     tab_tokens: 'Tokenización'
     note_limit_split_hint: "Más allá de %{n} caracteres queda apretado en la tarjeta de introducción: pon el detalle en su propia tarjeta."
+    respondent_code_card_note: "Este Verto tiene una tarjeta de código de participante en el mazo, así que el código se recoge ahí y este ajuste no tiene efecto."
     tab_logic: 'Lógica y flujos'
     flows_title: "Flujos"
     flows_intro: "Grupos de tarjetas con nombre a los que llega una respuesta enrutada — p. ej. sets de preguntas para UK, EAU y EE. UU. que convergen de nuevo o terminan en sus propias pantallas."

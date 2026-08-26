@@ -122,11 +122,9 @@ class SingleQuestionGenerator
       they apply — see the Awareness/Intention/Agency guidance above.
     RULES
 
-    unless locale.to_s == SupportedLocales::DEFAULT
-      lang = SupportedLocales.find(locale)
-      name = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
-      user_message << "\nLANGUAGE: Write the question text, any description and ALL option labels in #{name}. Do not use English.\n"
-    end
+    user_message << PromptLanguage.instruction(
+      locale, scope: "the question text, any description and ALL option labels"
+    )
 
     tool = TOOL.deep_dup
     tool[:input_schema][:properties][:type][:enum] = SurveyGenerator.generatable_types

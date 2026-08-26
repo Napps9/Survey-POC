@@ -26,6 +26,12 @@
       ),
       "player" => ns.call("player", locale).slice(
         "consent_agree", "consent_decline", "visit_website",
+        # The respondent-code card's own copy. type_panel_controller builds an
+        # inert replica of it when a creator switches a card to that type, and
+        # it has to read identically to the ERB that renders the real one — so
+        # the strings are sliced through rather than duplicated under js:.
+        "respondent_code_placeholder", "respondent_code_note",
+        "respondent_code_continue", "respondent_code_skip",
         # The mobile studio's deck chip ("Card 3 of 15") — the creator's
         # footer is the respondent's footer, so it says the same sentence
         # from the same string rather than a second copy under js:.

@@ -11,13 +11,27 @@
 # for the UI chrome; missing UI strings fall back to English).
 #
 # Fields:
-#   code         - I18n locale code (kept hyphen-free to stay clean in params/URLs)
+#   code         - I18n locale code. Kept to the bare language subtag wherever a
+#                  language has only one variant here, which keeps it clean in
+#                  params and URLs. `en-US` is the exception and deliberately
+#                  spelled the way every other system spells it: two English
+#                  variants have to be tellable apart, and inventing "enus" to
+#                  preserve the convention would only mean translating it back
+#                  at every boundary. ApplicationController#locale_from_header
+#                  matches the full tag before falling back to its subtag, so a
+#                  US browser reaches this entry rather than plain `en`.
 #   english_name - name in English (for admin/debug)
 #   native_name  - endonym, shown in the switcher
 #   flag         - emoji flag shown in the CTA
 #   dir          - "ltr" or "rtl"
 locales:
-  - { code: en, english_name: English,             native_name: English,            flag: "🇬🇧", dir: ltr }
+  # Two English variants. Not cosmetic: with only one, no prompt anywhere could
+  # say which spelling to write in — every generator's language instruction is
+  # skipped for the default locale — so the model inherited the dialect of the
+  # prompts, which are British, and quietly rewrote a US creator's questions
+  # into UK English. See PromptLanguage.
+  - { code: en,    english_name: "English (UK)", native_name: "English (UK)", flag: "🇬🇧", dir: ltr }
+  - { code: en-US, english_name: "English (US)", native_name: "English (US)", flag: "🇺🇸", dir: ltr }
   - { code: es, english_name: Spanish,             native_name: Español,            flag: "🇪🇸", dir: ltr }
   - { code: fr, english_name: French,              native_name: Français,           flag: "🇫🇷", dir: ltr }
   - { code: de, english_name: German,              native_name: Deutsch,            flag: "🇩🇪", dir: ltr }

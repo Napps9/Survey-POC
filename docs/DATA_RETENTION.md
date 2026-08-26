@@ -48,6 +48,35 @@ The `respondent_code_digest` is a one-way HMAC keyed per Verto
 (`Survey#respondent_code_key`), so a code is comparable **within** one Verto and
 nowhere else, and the plaintext is never stored, logged or returned.
 
+### Recall, and what it changes
+
+A `respondent_code` card can opt in to **recall** (`recall: true` on the card,
+off by default). With it on, entering a code at `POST /play/:token/recall`
+returns that identity's previously given answers **to ask-once questions only**,
+so "asked once" holds across devices rather than only across visits to one
+browser.
+
+This is the one place the product reads a digest back rather than merely
+grouping by it, and the digest's key is a code the respondent chose to be
+memorable — which is to say guessable. So it is bounded on every side that can
+be bounded (`RespondentRecall`, `PlayerController#recall`):
+
+- off unless the creator turned it on, on the card itself;
+- only cards *currently* flagged ask-once, and never a graded or token-awarding
+  one;
+- nothing else from the response — no demographics, region, locale, contact
+  details, score, totals, timestamps or counts;
+- a card whose stored answers **disagree** under one digest is dropped, on the
+  assumption that two people invented the same code;
+- one response shape for unknown code, blank code, recall off and nothing
+  recallable, so the endpoint cannot be used to confirm that a code exists;
+- three budgets: requests per IP, *distinct codes* per IP, and lookups per code.
+
+The residual exposure, stated rather than implied: a correctly guessed code
+returns that person's ask-once answers. A creator who does not need cross-device
+ask-once should leave recall off, which is the default, and still gets wave
+matching — that has never required reading anything back.
+
 ## Retention period
 
 Responses are kept for the life of the Verto. Deleting a Verto deletes its
@@ -98,6 +127,11 @@ consequence of collecting no identifier. Closing it would mean either showing
 respondents a receipt code at the end of a Verto that they could quote later, or
 storing a durable identifier — which trades a privacy property for a rights one.
 That is a product decision, not a bug fix, and it is not made here.
+
+The `respondent_code` card narrows the gap where a creator uses it — a
+respondent who chose a code has a handle on their own rows, and
+`RespondentDataController` already accepts one — but it does not close it: the
+code is optional, skippable, and only as good as the respondent's memory.
 
 ## Related
 

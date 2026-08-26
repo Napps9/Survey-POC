@@ -63,6 +63,8 @@ xh:
     allow_other: "Vumela impendulo yamahala engaphantsi kwe-“Enye”"
     required: "Umbuzo oyimfuneko"
     ask_once: "Buza kanye — iyatsitywa xa kudlalwa kwakhona emva kokuphendulwa"
+    recall_ask_once: "Zalisa iimpendulo ezibuzwa kanye ukusuka kwesinye isixhobo"
+    recall_ask_once_note: "Nabani na oqikelela ikhowudi yalo mphenduli angabona ezo mpendulo. Icimile ngaphandle kokuba uyayifuna."
     other: "Enye"
     other_placeholder: "Sixelele ngamazwi akho…"
     mark_correct: "Phawula impendulo echanekileyo"
@@ -119,6 +121,7 @@ xh:
       welcome_card: "IKHADI LOKWAMKELA"
       token_checkpoint: "INDAWO YOKUJONGA"
       consent_gate: "IMVUME"
+      respondent_code: "IKHOWUDI YOMPHENDULI"
     panel_label:
       range: "TSALA ISILAYIDI"
       rating: "CHUKUMISA UKUMISELA ISIQINGATHA"
@@ -306,6 +309,7 @@ xh:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Kubhalwa impendulo…"
@@ -515,6 +519,7 @@ xh:
         variety_ok: "Uhlobo oluhle — akukho hlobo lwempendulo luphindaphindwa kakhulu."
         variety_run: "I-%{type} ivela izihlandlo ezingu-%{n}× ngokulandelelana — xuba nolunye uhlobo lwempendulo."
         welcome_many: "Sebenzisa ikhadi elinye lokwamkela (ngoku %{n})."
+        code_after_ask_once: "Imibuzo engu-%{n} ebuzwa kanye ikhoyo phambi kwekhadi leKhowudi yomphenduli, ngoko obuyayo kwisixhobo esitsha uya kuyiphendula kwakhona ngaphambi kokuba ikhowudi ikwazi ukuyizalisa. Yisusele ikhadi lekhowudi ngaphezu kwayo."
         static_tip: "IVerto ende — cinga ikhefu phakathi ukuze ugcine amandla ephezulu."
         board_heading: "Oko kusebenzayo nekufuneka kulungiswe"
         board_hint: "Kuhlelwe ngokwemibala yokhanyiso lwendlela — chukumisa ikhadi ukuya kulo."
@@ -1078,6 +1083,7 @@ xh:
     tab_quiz: 'Inkqubo yovavanyo'
     tab_tokens: 'Ukunikwa kweetoken'
     note_limit_split_hint: "Ngaphaya kweempawu ezingu-%{n} kuya kucinana kwikhadi lentshayelelo — beka iinkcukacha kwikhadi lazo."
+    respondent_code_card_note: "Le Verto inekhadi leKhowudi yomphenduli kwipakethi, ngoko ikhowudi iqokelelwa apho kwaye le seti ayinampembelelo."
     tab_logic: 'Ingqiqo neendlela'
     flows_title: 'Iindlela zolwakhiwo'
     flows_intro: 'Amaqela amakhadi anamagama apho impendulo ekhonjiweyo inokungena — umz. izethu zemibuzo zeUK, iUAE neUSA ezidibana kwakhona okanye ziphele kwizikrini zazo.'

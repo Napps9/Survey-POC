@@ -939,6 +939,44 @@
       <% else %>
         <div class="token-checkpoint-placeholder"><%= t("card.token_checkpoint_placeholder") %></div>
       <% end %>
+
+    <% when "respondent_code" %>
+      <%# The respondent code, as a card the creator can place anywhere.
+          Identical mechanics to the survey-level pre-screen it supersedes
+          (player/show.html.erb, rendered only when respondent_code_prescreen?):
+          the same input target, the same two actions, the same promise in the
+          note. What differs is only WHERE it sits, which is the whole ask.
+
+          The code is held in memory by player_controller and rides the next
+          ordinary save — it is never written to storage, and the server keeps
+          only its HMAC. In the editor this is an inert replica: aria-hidden and
+          untabbable, so a creator can see where it lands without typing a
+          respondent's code on their behalf. %>
+      <% if mode == :player %>
+        <input type="text" class="respondent-code-input"
+               data-player-target="respondentCode"
+               maxlength="<%= Survey::MAX_RESPONDENT_CODE %>"
+               autocomplete="off" spellcheck="false"
+               aria-label="<%= display["text"].presence || t("player.respondent_code_title") %>"
+               placeholder="<%= t("player.respondent_code_placeholder") %>" />
+        <div class="respondent-code-note"><%= t("player.respondent_code_note") %></div>
+        <div class="play-consent-actions">
+          <button type="button" class="play-consent-agree"
+                  data-action="click->player#submitRespondentCode"><%= t("player.respondent_code_continue") %></button>
+          <button type="button" class="play-consent-decline"
+                  data-action="click->player#skipRespondentCode"><%= t("player.respondent_code_skip") %></button>
+        </div>
+      <% else %>
+        <div aria-hidden="true" style="pointer-events:none;">
+          <input type="text" class="respondent-code-input" tabindex="-1" readonly
+                 placeholder="<%= t("player.respondent_code_placeholder") %>" />
+          <div class="respondent-code-note"><%= t("player.respondent_code_note") %></div>
+          <div class="play-consent-actions">
+            <button type="button" class="play-consent-agree" tabindex="-1"><%= t("player.respondent_code_continue") %></button>
+            <button type="button" class="play-consent-decline" tabindex="-1"><%= t("player.respondent_code_skip") %></button>
+          </div>
+        </div>
+      <% end %>
     <% end %>
 
     <%# The tokenisation intro sits outside the type switch, because a creator

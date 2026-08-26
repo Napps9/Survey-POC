@@ -8,7 +8,11 @@
     <div style="margin-bottom:28px;">
       <div style="font-family:'Alata',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#FFFA77;margin-bottom:8px;">Import review</div>
       <h1 style="font-family:'Alata',sans-serif;font-size:30px;color:#F7F7F7;margin:0 0 10px;line-height:1.2;">
-        <%= @flagged_count %> of <%= @import_cards.size %> questions don't meet Verto's guidelines
+        <% if @flagged_count.to_i.positive? %>
+          <%= @flagged_count %> of <%= @import_cards.size %> questions don't meet Verto's guidelines
+        <% else %>
+          <%= @reworded_count %> of <%= @import_cards.size %> questions had their answers reworded
+        <% end %>
       </h1>
       <p style="font-family:'ABeeZee',sans-serif;font-size:15px;color:rgba(255,255,255,0.6);margin:0;line-height:1.55;">
         Your questions were imported exactly as written. Based on Verto's rules — short questions,
@@ -20,7 +24,13 @@
 
     <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:30px;">
       <% @import_cards.each_with_index do |card, idx| %>
-        <% flagged = card["compliant"] == false %>
+        <% flagged  = card["compliant"] == false %>
+        <%# Everything the model changed BESIDES the question text. This used to
+            be invisible: the diff below showed only text, so a card badged
+            "Kept as uploaded" could still be carrying reworded option labels
+            into a Verto whose creator had just asked for their own wording. %>
+        <% was_opts = Array(card["original_options"]).map { |o| o.to_s.strip }.reject(&:empty?) %>
+        <% was_desc = card["original_description"].to_s.strip %>
         <div style="background:rgba(255,255,255,0.03);border:1px solid <%= flagged ? 'rgba(255,250,119,0.35)' : 'rgba(255,255,255,0.08)' %>;border-radius:14px;padding:16px 18px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
             <span style="font-family:'Alata',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);">Q<%= idx + 1 %></span>
@@ -48,6 +58,35 @@
             </div>
           <% else %>
             <div style="font-family:'ABeeZee',sans-serif;font-size:14px;color:rgba(255,255,255,0.85);line-height:1.5;"><%= card["text"] %></div>
+          <% end %>
+
+          <% if was_opts.any? || was_desc.present? %>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px;">
+              <% if was_desc.present? %>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div style="border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;">
+                    <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:3px;">Your sub-text</div>
+                    <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.45;"><%= was_desc %></div>
+                  </div>
+                  <div style="border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:8px 12px;background:rgba(1,234,203,0.05);">
+                    <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#01EACB;margin-bottom:3px;">Verto's</div>
+                    <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;line-height:1.45;"><%= card["description"] %></div>
+                  </div>
+                </div>
+              <% end %>
+              <% if was_opts.any? %>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div style="border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;">
+                    <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:3px;">Your answers</div>
+                    <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5;"><%= was_opts.join(" · ") %></div>
+                  </div>
+                  <div style="border:1px solid rgba(1,234,203,0.3);border-radius:10px;padding:8px 12px;background:rgba(1,234,203,0.05);">
+                    <div style="font-family:'Alata',sans-serif;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:#01EACB;margin-bottom:3px;">Verto's</div>
+                    <div style="font-family:'ABeeZee',sans-serif;font-size:13px;color:#fff;line-height:1.5;"><%= Array(card["options"]).join(" · ") %></div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
           <% end %>
         </div>
       <% end %>

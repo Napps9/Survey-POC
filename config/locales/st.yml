@@ -65,6 +65,8 @@ st:
     allow_other: 'Dumella karabo ya mongolo o mahala wa "E nngwe"'
     required: "Potso e hlokahalang"
     ask_once: "Botsa hang feela — e tlolwa ha ho bapaloa hape ka mor'a hore e arajoe"
+    recall_ask_once: "Tlatsa dikarabo tse botsoang hang ho tswa sesebedisweng se seng"
+    recall_ask_once_note: "Motho ya hakanyang khoutu ya moarabi enwa o tla bona dikarabo tseo. E tima ntle le haeba o e hloka."
     other: "E nngwe"
     other_placeholder: "Re bolelle ka mantswe a hao…"
     mark_correct: "Tshwaya karabo e nepahetseng"
@@ -120,6 +122,7 @@ st:
       welcome_card: "KARETE YA KAMOHELO"
       token_checkpoint: "TEKO YA LINTLHA"
       consent_gate: "TUMELLO"
+      respondent_code: "KHOUTU YA MOARABI"
     panel_label:
       range: "HULA SEQHOMANE"
       rating: "TOBETSA HO LEKANYA"
@@ -306,6 +309,7 @@ st:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "E ntse e ngola karabo…"
@@ -515,6 +519,7 @@ st:
         variety_ok: "Ho fapafapana ho hlile ho lokile — ha ho mofuta wa karabo o phetahalang haholo."
         variety_run: "%{type} e hlaha makgetlo a %{n}× ka tatelano — kopanya le mofuta o mong wa karabo."
         welcome_many: "Sebedisa karete e le nngwe feela ya kamohelo (hona jwale %{n})."
+        code_after_ask_once: "Dipotso tse %{n} tse botsoang hang di tla pele ho karengoana ya Khoutu ya moarabi, kahoo ea khutlang ka sesebedisoa se secha o tla di araba hape pele khoutu e ka di tlatsa. Suthisetsa karengoana ya khoutu ka holim'a tsona."
         static_tip: "Verto e telele — nahana ka phomolo bohareng ho boloka matla."
         board_heading: "Se sebetsang le se lokelang ho lokiswa"
         board_hint: "Di hlophisitswe ka mabone a tsela — tobetsa karete ho ya ho yona."
@@ -1078,6 +1083,7 @@ st:
     tab_quiz: 'Mokgwa wa Teko'
     tab_tokens: "Ts'ebediso ya Ditokene"
     note_limit_split_hint: "Ka mora ditlhaku tse %{n} ho ba hlophehileng karengoaneng ya selelekela — beha dintlha karengoaneng ya tsona."
+    respondent_code_card_note: "Verto ena e na le karengoana ya Khoutu ya moarabi ka har'a dekele, kahoo khoutu e bokelloa moo 'me tlhophiso ena ha e na phello."
     tab_logic: 'Tsamaiso le Diphallo'
     flows_title: 'Diphallo'
     flows_intro: 'Dihlopha tse nang le mabitso tsa dikarete tseo karabo e lebisitsweng e ka di kenang — mohlala, disete tsa dipotso tsa UK, UAE le USA tse kopanang hape kapa tse fellang ka diskrini tsa tsona.'

@@ -3,7 +3,7 @@ class PlayerController < ApplicationController
   layout "fullscreen"
   skip_before_action :require_authentication
   skip_before_action :set_current_organisation
-  protect_from_forgery with: :null_session, only: [ :submit, :progress ]
+  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall ]
 
   # Public, unauthenticated write endpoints — cap per-IP request rate so one
   # source can't flood responses (results poisoning / storage abuse). Limits are
@@ -25,6 +25,15 @@ class PlayerController < ApplicationController
   # response — so an uncapped endpoint was an unauthenticated, repeatable
   # destruction primitive keyed only by a session token.
   rate_limit to: 30, within: 1.minute, only: :consent,
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+  # Recall is the one endpoint here that can return ANOTHER person's answers,
+  # and the key to it is a code chosen to be memorable — which is to say
+  # guessable. A real respondent calls this once, maybe twice after a typo, so
+  # the per-IP cap is deliberately far below anything legitimate. Two further
+  # budgets in #recall_budget_ok? bound the thing this cap cannot see: how many
+  # DISTINCT codes one caller tries, and how often one code is tried from
+  # anywhere.
+  rate_limit to: 10, within: 1.minute, only: :recall,
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # A respondent's autocomplete keystrokes are debounced client-side, so a
   # generous per-minute cap here only guards against a runaway client/bot.
@@ -294,6 +303,38 @@ class PlayerController < ApplicationController
   # first event for a session wins (a retry/replay never overwrites an
   # already-recorded timestamp), and the snapshot ties the record to the exact
   # consent_text shown at that moment, immune to the creator editing it later.
+  # POST /play/:token/recall
+  #
+  # Ask-once answers this respondent already gave under the code they just
+  # typed — see RespondentRecall for what is and is not returned, and why.
+  #
+  # Every refusal returns the SAME body a successful-but-empty lookup does:
+  # unknown code, blank code, recall switched off, budget spent. An endpoint
+  # that distinguishes "no such code" from "that code has nothing" is an
+  # endpoint that confirms codes.
+  def recall
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+
+    data   = JSON.parse(request.body.read)
+    code   = data["respondent_code"]
+    digest = @survey.respondent_code_active? ? @survey.respondent_code_digest(code) : nil
+
+    answers = if digest && recall_budget_ok?(digest)
+      RespondentRecall.new(@survey).answers_for(digest)
+    else
+      {}
+    end
+
+    render json: { ok: true, answers: answers }
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue => e
+    # Deliberately generic: an exception message here could carry the code.
+    ErrorReporting.report("PlayerController#recall", e)
+    render json: { ok: true, answers: {} }
+  end
+
   def consent
     return render json: { ok: false }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
@@ -679,11 +720,47 @@ class PlayerController < ApplicationController
   # Set once per response: a later request can't overwrite it, so a respondent who
   # reloads mid-Verto keeps the identity they started with.
   def apply_respondent_code(resp, code)
-    return unless @survey.respondent_code_enabled?
+    # `active?`, not `enabled?`: the code can now be collected by a card in the
+    # deck as well as by the survey-level pre-screen, and asking the column
+    # alone meant a deck using only the card recorded no digest at all — so
+    # wave matching, the returning-respondent count and recall would every one
+    # of them have found nothing.
+    return unless @survey.respondent_code_active?
     return if resp.respondent_code_digest.present?
 
     digest = @survey.respondent_code_digest(code)
     resp.respondent_code_digest = digest if digest
+  end
+
+  # Two budgets the per-IP request cap cannot express, both cheap counters in
+  # Rails.cache (no-op under the null store in test, same as `rate_limit`).
+  #
+  #   per IP   — how many DISTINCT codes one caller has tried this hour.
+  #              Counting distinct codes rather than requests is what keeps
+  #              this safe behind venue NAT: fifty respondents on one Wi-Fi try
+  #              fifty codes, but each tries their OWN, once. A guesser needs
+  #              hundreds.
+  #   per code — how often one digest has been asked for from anywhere, so a
+  #              distributed guess at an obvious code ("test", "abc", "1234")
+  #              still runs out.
+  MAX_RECALL_CODES_PER_IP = 12
+  MAX_RECALL_PER_CODE     = 20
+
+  def recall_budget_ok?(digest)
+    ip_key = "recall:#{@survey.id}:ip:#{request.remote_ip}:#{digest}"
+    # A repeat of the SAME code from the same IP is a retry, not a new guess —
+    # it must not spend the distinct-code budget. The marker is what makes the
+    # count distinct.
+    unless Rails.cache.exist?(ip_key)
+      Rails.cache.write(ip_key, true, expires_in: 1.hour)
+      tried = Rails.cache.increment("recall:#{@survey.id}:ip:#{request.remote_ip}", 1, expires_in: 1.hour)
+      return false if tried && tried > MAX_RECALL_CODES_PER_IP
+    end
+
+    asked = Rails.cache.increment("recall:#{@survey.id}:code:#{digest}", 1, expires_in: 1.hour)
+    return false if asked && asked > MAX_RECALL_PER_CODE
+
+    true
   end
 
   # The leaderboard identity, same discipline as the respondent code above:

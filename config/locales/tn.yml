@@ -65,6 +65,8 @@ tn:
     allow_other: 'Letla karabo ya mahala ya "E Sele"'
     required: "Potso e e tlhokegang"
     ask_once: "Botsa gangwe fela — e tlolwa fa go tshamekwa gape morago ga go arabiwa"
+    recall_ask_once: "Tlatsa dikarabo tse di botswang gangwe go tswa mo sedirisiweng se sengwe"
+    recall_ask_once_note: "Mongwe yo o akanyang khoutu ya moarabi yo o tla bona dikarabo tseo. E timilwe ntle le fa o e tlhoka."
     other: "E Sele"
     other_placeholder: "Re bolelele ka mafoko a gago…"
     mark_correct: "Tshwaya karabo e e nepagetseng"
@@ -120,6 +122,7 @@ tn:
       welcome_card: "KARATA YA TAMOGELO"
       token_checkpoint: "KGATO YA DINTLHA"
       consent_gate: "TUMELANO"
+      respondent_code: "KHOUTU YA MOARABI"
     panel_label:
       range: "GOGA SEKGOGA"
       rating: "TOBETSA GO LEKANYETSA"
@@ -306,6 +309,7 @@ tn:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "E kwala karabo…"
@@ -515,6 +519,7 @@ tn:
         variety_ok: "Farologano e ntle — ga go na mofuta wa karabo o o boaboelelwang thata."
         variety_run: "%{type} e tlhagelela makgetlho a %{n}× ka go latelana — tswakanya le mofuta o mongwe wa karabo."
         welcome_many: "Dirisa bonnye karata e le nngwe fela ya tamogelo (jaanong ke %{n})."
+        code_after_ask_once: "Dipotso tse %{n} tse di botswang gangwe di tla pele ga karata ya Khoutu ya moarabi, ka jalo yo o boelang ka sedirisiwa se sesha o tla di araba gape pele khoutu e ka di tlatsa. Suthisetsa karata ya khoutu kwa godimo ga tsona."
         static_tip: "Verto e telele — akanya ka khutso ya fa gare go boloka maatla."
         board_heading: "Se se dirang sentle le se se tshwanetseng go baakanngwa"
         board_hint: "Di rulagantswe ka mabone a tsela — tobetsa karata go ya kwa go yona."
@@ -1078,6 +1083,7 @@ tn:
     tab_quiz: 'Mokgwa wa tlhatlhobo'
     tab_tokens: 'Tokeni'
     note_limit_split_hint: "Morago ga ditlhaka tse %{n} go a patana mo karateng ya matseno — baya dintlha mo karateng ya tsona."
+    respondent_code_card_note: "Verto e e na le karata ya Khoutu ya moarabi mo pakeng, ka jalo khoutu e kokoanngwa koo mme tlhophiso e ga e na seabe."
     tab_logic: 'Tlhaloganyo le ditsela'
     flows_title: 'Ditsela'
     flows_intro: 'Ditlhopha tse di neilweng maina tsa dikarata tse karabo e e neetsweng tsela e ka tsenang mo go tsona — sk. diseto tsa dipotso tsa UK, UAE le USA tse di kopanang gape kgotsa tsa fela ka ditsebe tsa tsona.'

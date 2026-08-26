@@ -359,6 +359,26 @@ export function analyzeVerto(cards, { flows = [] } = {}) {
   const welcomes = list.filter((c) => c && c.type === "welcome_card").length
   if (welcomes > WELCOME_MAX) checks.push(check("welcome", RED, t("editor.rules.welcome_many", { n: welcomes })))
 
+  // Ask-once questions ahead of the respondent-code card.
+  //
+  // Recall fills in ask-once answers FORWARD from the moment the code is
+  // entered — a card already passed cannot be un-shown, and rewinding a deck
+  // under someone mid-run would be worse than asking again. So an ask-once
+  // question sitting before the code card is one this respondent answers a
+  // second time on every new device, which is precisely what the creator
+  // turned ask-once on to avoid.
+  //
+  // A warning, not a hoist. Survey.hoist_consent_gate MOVES a late consent
+  // gate because a late gate is a compliance failure — answers are already
+  // stored by the time someone declines. A late code card costs a repeated
+  // question and nothing else, and silently relocating a card the creator
+  // placed is a bigger surprise than the problem it fixes.
+  const codeAt   = list.findIndex((c) => c && c.type === "respondent_code")
+  const askBefore = codeAt >= 0 ? list.slice(0, codeAt).filter((c) => c && c.askOnce).length : 0
+  if (askBefore > 0) {
+    checks.push(check("code_after_ask_once", YELLOW, t("editor.rules.code_after_ask_once", { n: askBefore })))
+  }
+
   // §1.5 — a long Verto benefits from a midway break (a tip, not a penalty).
   if (cardCount >= PACE_TIP_AT || questionCount >= PACE_TIP_AT) checks.push(check("static", INFO, t("editor.rules.static_tip")))
 

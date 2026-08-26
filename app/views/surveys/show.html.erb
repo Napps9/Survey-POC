@@ -714,6 +714,23 @@
           </div>
         </div>
 
+        <%# Respondent-code card only. It cannot live in .card-flags above:
+            that block hides for every non-question card, and this IS one.
+
+            Off by default and worded so the trade is visible where the choice
+            is made. The code is chosen to be memorable, which is to say
+            guessable, and this is the switch that lets a guessed code fetch
+            somebody's answers — see RespondentRecall. %>
+        <div class="card-flags" data-survey-editor-target="recallToggle" hidden>
+          <label class="card-flag">
+            <input type="checkbox" data-survey-editor-target="panelRecall"
+                   data-action="change->survey-editor#togglePanelRecall">
+            <span class="card-flag-track" aria-hidden="true"></span>
+            <span class="card-flag-label"><%= t("card.recall_ask_once") %></span>
+          </label>
+          <div class="card-flag-note"><%= t("card.recall_ask_once_note") %></div>
+        </div>
+
       </div>
 
       <%# ── All question types modal ── %>
@@ -1554,6 +1571,16 @@
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Ask respondents for a code they make up themselves, so you can compare the same people across repeat runs. You never see the code — only a one-way hash, which can't be matched against any other Verto.</span>
             </label>
+            <%# When the deck carries a Respondent code CARD, this switch has
+                nothing left to do: the card collects the code wherever the
+                creator put it, and the pre-screen is not rendered
+                (Survey#respondent_code_prescreen?). Saying so beats leaving a
+                checkbox that looks like it is still deciding something. %>
+            <% if @survey.respondent_code_card? %>
+              <div class="card-flag-note" style="margin-left:24px;">
+                <%= t("editor.respondent_code_card_note") %>
+              </div>
+            <% end %>
             <% if @survey.respondent_code_enabled? %>
               <input type="text" name="respondent_code_prompt" maxlength="200"
                      value="<%= @survey.respondent_code_prompt %>"

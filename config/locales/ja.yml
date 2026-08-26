@@ -63,6 +63,8 @@ ja:
     allow_other: "「その他」の自由記述回答を許可"
     required: "必須の質問"
     ask_once: "一度だけ質問 — 回答後の再プレイではスキップ"
+    recall_ask_once: "他の端末で答えた「一度だけ」の回答を引き継ぐ"
+    recall_ask_once_note: "この回答者のコードを推測した人にはその回答が見えます。必要なときだけオンにしてください。"
     other: その他
     other_placeholder: ご自身の言葉でお聞かせください…
     mark_correct: "正解をマークする"
@@ -110,6 +112,7 @@ ja:
       welcome_card: "ウェルカムカード"
       token_checkpoint: "チェックポイント"
       consent_gate: "同意"
+      respondent_code: "回答者コード"
     panel_label:
       range: "スライダーをドラッグ"
       rating: "タップして評価"
@@ -290,6 +293,7 @@ ja:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "回答を作成中…"
@@ -499,6 +503,7 @@ ja:
         variety_ok: "良いバラエティです — 同じ回答タイプが多すぎません。"
         variety_run: "%{type}が%{n}回連続しています — 別の回答タイプを挟みましょう。"
         welcome_many: "ウェルカムカードは1枚までにしましょう（現在%{n}）。"
+        code_after_ask_once: "「一度だけ」の設問が %{n} 件、回答者コードのカードより前にあります。新しい端末で戻ってきた人は、コードが入力を引き継ぐ前にもう一度答えることになります。コードのカードをその前に移動してください。"
         static_tip: "長いVerto — 集中力を保つため中盤に休憩を検討しましょう。"
         board_heading: "良い点と修正すべき点"
         board_hint: "信号でグループ分け — カードをタップで移動します。"
@@ -1056,6 +1061,7 @@ ja:
     tab_quiz: 'クイズモード'
     tab_tokens: 'トークン化'
     note_limit_split_hint: "%{n}文字を超えるとイントロカードで窮屈になります — 詳細は専用のカードに置いてください。"
+    respondent_code_card_note: "この Verto のデッキには回答者コードのカードがあるため、コードはそちらで収集され、この設定は効果がありません。"
     tab_logic: 'ロジックとフロー'
     flows_title: "フロー"
     flows_intro: "ルーティングされた回答が入る名前付きカードグループ。例:UK・UAE・USAの質問セットが後で合流するか、それぞれの画面で終了します。"

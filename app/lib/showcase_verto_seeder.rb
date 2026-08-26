@@ -212,7 +212,7 @@ class ShowcaseVertoSeeder
   # a retired card, so keeping one would seed a card nobody would ever see.
   def cards
     DemographicQuestions.append_to([
-      welcome_card, consent_card, router_card,
+      welcome_card, consent_card, code_card, router_card,
       # Lane A — people who play.
       grid_one_card, rating_card, tap_card,
       # Lane B — people who watch.
@@ -266,6 +266,20 @@ class ShowcaseVertoSeeder
                     "comparison screen and the map look like with real answers in them, and " \
                     "nothing else. You can stop at any point." }
       ],
+      "image" => asset("left-panel", "sports-people-desktop-2.jpg") }
+  end
+
+  # The respondent code, in the place it belongs: after the consent screens and
+  # before the first question, so an identity exists for everything that
+  # follows. In the showcase it is a demonstration of the card and nothing more
+  # — `recall` is left off (the default), so nothing is ever read back, and the
+  # copy says why it is being asked rather than implying the demo needs it.
+  def code_card
+    { "cid" => "c_code", "type" => "respondent_code",
+      "text" => "Make up a code you'll remember",
+      "description" => "Part of the demonstration: a code like this is how a Verto matches the " \
+                       "same person across repeat runs without ever knowing who they are. Only a " \
+                       "one-way hash is stored. Skip it if you'd rather.",
       "image" => asset("left-panel", "sports-people-desktop-2.jpg") }
   end
 

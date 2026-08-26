@@ -63,6 +63,8 @@ nl:
     allow_other: Sta een vrij tekstantwoord “Anders” toe
     required: "Verplichte vraag"
     ask_once: "Eén keer vragen — overgeslagen bij opnieuw spelen na beantwoording"
+    recall_ask_once: "Eenmalige antwoorden van een ander apparaat invullen"
+    recall_ask_once_note: "Wie de code van deze respondent raadt, ziet die antwoorden. Uit tenzij je het nodig hebt."
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
     mark_correct: "Markeer het juiste antwoord"
@@ -110,6 +112,7 @@ nl:
       welcome_card: "WELKOMSTKAART"
       token_checkpoint: "CHECKPOINT"
       consent_gate: "TOESTEMMING"
+      respondent_code: "RESPONDENTCODE"
     panel_label:
       range: "SLEEP DE SCHUIFREGELAAR"
       rating: "TIK OM TE BEOORDELEN"
@@ -290,6 +293,7 @@ nl:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Het antwoord schrijven…"
@@ -499,6 +503,7 @@ nl:
         variety_ok: "Goede afwisseling — geen antwoordtype herhaalt te vaak."
         variety_run: "%{type} verschijnt %{n}× achter elkaar — wissel af met een ander antwoordtype."
         welcome_many: "Gebruik hooguit één welkomstkaart (nu %{n})."
+        code_after_ask_once: "%{n} eenmalige vragen staan vóór de kaart Respondentcode, dus wie terugkomt op een nieuw apparaat beantwoordt ze opnieuw voordat de code ze kan invullen. Zet de codekaart erboven."
         static_tip: "Lang Verto — overweeg een pauze halverwege om de energie hoog te houden."
         board_heading: "Wat goed is en wat beter kan"
         board_hint: "Gegroepeerd per stoplicht — tik op een kaart om ernaartoe te gaan."
@@ -1056,6 +1061,7 @@ nl:
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisatie'
     note_limit_split_hint: "Boven %{n} tekens wordt het krap op de introkaart — zet de details liever op een eigen kaart."
+    respondent_code_card_note: "Deze Verto heeft een kaart Respondentcode in het deck, dus de code wordt daar verzameld en deze instelling heeft geen effect."
     tab_logic: 'Logica & flows'
     flows_title: "Flows"
     flows_intro: "Benoemde kaartgroepen waar een gerouteerd antwoord in terechtkomt — bijv. vragensets voor UK, VAE en VS die daarna samenkomen of op eigen schermen eindigen."

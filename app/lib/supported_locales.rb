@@ -9,6 +9,13 @@ module SupportedLocales
 
   DEFAULT = "en".freeze
 
+  # The English variants. They share a language and differ only in spelling, so
+  # code that means "is this Verto in English" has to ask about the set rather
+  # than compare against DEFAULT — which is what every generator's language
+  # instruction used to do, and why an en-US Verto would otherwise sail past the
+  # guard and be told "…in English (US). Do not use English."
+  ENGLISH = %w[en en-US].freeze
+
   class << self
     # All locales in registry order.
     def all
@@ -49,6 +56,29 @@ module SupportedLocales
     # Coerce arbitrary input to a known code, falling back to DEFAULT.
     def coerce(code)
       supported?(code) ? code.to_s : DEFAULT
+    end
+
+    def english?(code)
+      ENGLISH.include?(code.to_s)
+    end
+
+    # Resolve one Accept-Language tag ("en-US", "en-gb", "pt-BR") to a supported
+    # code, or nil.
+    #
+    # The full tag first, case-insensitively, because that is the only way a US
+    # browser can reach `en-US` at all — the header carries a region subtag and
+    # the old resolver threw it away before looking anything up. Then the bare
+    # language subtag, which is what every other entry in the registry is keyed
+    # by and what makes "pt-BR" still find Portuguese.
+    def coerce_tag(tag)
+      raw = tag.to_s.strip
+      return nil if raw.blank?
+
+      exact = codes.find { |c| c.casecmp?(raw) }
+      return exact if exact
+
+      base = raw.split("-").first.to_s.downcase
+      base.presence && supported?(base) ? base : nil
     end
 
     def flag(code)        = find(code)&.flag

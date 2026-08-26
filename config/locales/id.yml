@@ -63,6 +63,8 @@ id:
     allow_other: Izinkan jawaban teks bebas "Lainnya"
     required: "Pertanyaan wajib"
     ask_once: "Tanya sekali — dilewati saat main ulang setelah dijawab"
+    recall_ask_once: "Isi jawaban tanya-sekali dari perangkat lain"
+    recall_ask_once_note: "Siapa pun yang menebak kode responden ini akan melihat jawaban tersebut. Nonaktif kecuali diperlukan."
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
     mark_correct: "Tandai jawaban yang benar"
@@ -110,6 +112,7 @@ id:
       welcome_card: "KARTU SAMBUTAN"
       token_checkpoint: "PATOK UJI"
       consent_gate: "PERSETUJUAN"
+      respondent_code: "KODE RESPONDEN"
     panel_label:
       range: "GESER PENGGESER"
       rating: "KETUK UNTUK MENILAI"
@@ -290,6 +293,7 @@ id:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Menulis jawaban…"
@@ -499,6 +503,7 @@ id:
         variety_ok: "Variasi bagus — tidak ada tipe jawaban yang terlalu sering berulang."
         variety_run: "%{type} muncul %{n}× berturut-turut — selingi dengan tipe jawaban lain."
         welcome_many: "Gunakan paling banyak satu kartu sambutan (sekarang %{n})."
+        code_after_ask_once: "%{n} pertanyaan tanya-sekali berada sebelum kartu Kode responden, jadi orang yang kembali di perangkat baru akan menjawabnya lagi sebelum kode dapat mengisinya. Pindahkan kartu kode ke atasnya."
         static_tip: "Verto panjang — pertimbangkan jeda di tengah agar tetap bersemangat."
         board_heading: "Apa yang sudah baik dan apa yang perlu diperbaiki"
         board_hint: "Dikelompokkan berdasarkan lampu lalu lintas — ketuk kartu untuk membukanya."
@@ -1056,6 +1061,7 @@ id:
     tab_quiz: 'Mode kuis'
     tab_tokens: 'Tokenisasi'
     note_limit_split_hint: "Lebih dari %{n} karakter akan terlihat sesak di kartu intro — taruh detailnya di kartu tersendiri."
+    respondent_code_card_note: "Verto ini memiliki kartu Kode responden di dek, jadi kode dikumpulkan di sana dan pengaturan ini tidak berpengaruh."
     tab_logic: 'Logika & alur'
     flows_title: "Alur"
     flows_intro: "Kelompok kartu bernama yang dimasuki jawaban yang dirutekan — mis. set pertanyaan UK, UEA, dan AS yang kemudian bergabung kembali atau berakhir di layarnya sendiri."

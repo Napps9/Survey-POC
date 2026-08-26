@@ -63,6 +63,8 @@ zu:
     allow_other: "Vumela impendulo yamahhala ye-“Okunye”"
     required: "Umbuzo odingekayo"
     ask_once: "Buza kanye — iyeqiwa uma kudlalwa futhi ngemva kokuphendulwa"
+    recall_ask_once: "Gcwalisa izimpendulo ezibuzwa kanye kusukela kwenye idivayisi"
+    recall_ask_once_note: "Noma ubani oqagela ikhodi yalo mphenduli angazibona lezo zimpendulo. Ivaliwe ngaphandle uma uyidinga."
     other: "Okunye"
     other_placeholder: "Sitshele ngamazwi akho…"
     mark_correct: "Maka impendulo eqondile"
@@ -118,6 +120,7 @@ zu:
       welcome_card: "IKHADI LOKWAMUKELA"
       token_checkpoint: "ISIGABA SOKUHLOLA"
       consent_gate: "IMVUME"
+      respondent_code: "IKHODI YOMPHENDULI"
     panel_label:
       range: "HUDULA ISILAIDI"
       rating: "THEPHA UKUZE ULINGANISE"
@@ -304,6 +307,7 @@ zu:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Kubhalwa impendulo…"
@@ -513,6 +517,7 @@ zu:
         variety_ok: "Ukwehlukahluka okuhle — akukho uhlobo lwempendulo oluphindaphindwa kakhulu."
         variety_run: "U-%{type} uvela kanambambili angu-%{n}× kulandelana — xuba nolunye uhlobo lwempendulo."
         welcome_many: "Sebenzisa ikhadi lokwamukela elilodwa kuphela (manje %{n})."
+        code_after_ask_once: "Imibuzo engu-%{n} ebuzwa kanye ingaphambi kwekhadi leKhodi yomphenduli, ngakho obuyayo kudivayisi entsha uzoyiphendula futhi ngaphambi kokuba ikhodi ikwazi ukuyigcwalisa. Susa ikhadi lekhodi ulibeke ngaphezu kwayo."
         static_tip: "I-Verto ende — cabangela ikhefu laphakathi ukuze ugcine amandla."
         board_heading: "Okusebenzayo nokudinga ukulungiswa"
         board_hint: "Kuhlelwe ngokwezibani zomgwaqo — thepha ikhadi ukuze uye kulo."
@@ -1076,6 +1081,7 @@ zu:
     tab_quiz: 'Imodi yesivivinyo'
     tab_tokens: 'Ukuthokheniza'
     note_limit_split_hint: "Ngaphezu kwezinhlamvu ezingu-%{n} kuyaminyana ekhadini lesingeniso — beka imininingwane ekhadini layo."
+    respondent_code_card_note: "Le Verto inekhadi leKhodi yomphenduli kudekhi, ngakho ikhodi iqoqwa lapho futhi lesi silungiselelo asinamthelela."
     tab_logic: 'Ukubonga & izinhlelo'
     flows_title: 'Izinhlelo'
     flows_intro: 'Amaqembu amakhadi anamagama lapho impendulo eqondisiwe ingangena — isb. iseti zemibuzo ze-UK, UAE ne-USA ezihlangana ngemuva noma ziphelele ezikrinini zazo.'

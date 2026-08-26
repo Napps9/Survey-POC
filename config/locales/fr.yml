@@ -63,6 +63,8 @@ fr:
     allow_other: Autoriser une réponse libre « Autre »
     required: "Question obligatoire"
     ask_once: "Poser une seule fois — passée aux relectures une fois répondue"
+    recall_ask_once: "Reprendre les réponses à poser une fois depuis un autre appareil"
+    recall_ask_once_note: "Quiconque devine le code de ce participant verrait ces réponses. Désactivé sauf si nécessaire."
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
     mark_correct: "Indiquer la bonne réponse"
@@ -110,6 +112,7 @@ fr:
       welcome_card: "CARTE D'ACCUEIL"
       token_checkpoint: "BILAN"
       consent_gate: "CONSENTEMENT"
+      respondent_code: "CODE PARTICIPANT"
     panel_label:
       range: "FAITES GLISSER LE CURSEUR"
       rating: "TOUCHEZ POUR NOTER"
@@ -290,6 +293,7 @@ fr:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Rédaction de la réponse…"
@@ -499,6 +503,7 @@ fr:
         variety_ok: "Bonne variété — aucun type de réponse ne se répète trop."
         variety_run: "%{type} apparaît %{n}× de suite — alternez avec un autre type de réponse."
         welcome_many: "Utilisez au plus une carte de bienvenue (actuellement %{n})."
+        code_after_ask_once: "%{n} questions à poser une fois se trouvent avant la carte Code participant : quelqu'un qui revient sur un nouvel appareil y répondra de nouveau avant que le code puisse les remplir. Placez la carte de code au-dessus."
         static_tip: "Verto long — pensez à une pause à mi-parcours pour garder le rythme."
         board_heading: "Ce qui va et ce qu'il faut corriger"
         board_hint: "Regroupé par feu tricolore — touchez une carte pour y accéder."
@@ -1056,6 +1061,7 @@ fr:
     tab_quiz: 'Mode quiz'
     tab_tokens: 'Tokenisation'
     note_limit_split_hint: "Au-delà de %{n} caractères, c'est à l'étroit sur la carte d'introduction — mettez plutôt le détail sur sa propre carte."
+    respondent_code_card_note: "Ce Verto contient une carte Code participant : le code est collecté là, et ce réglage n'a aucun effet."
     tab_logic: 'Logique et parcours'
     flows_title: "Flux"
     flows_intro: "Groupes de cartes nommés où mène une réponse routée — p. ex. des séries de questions UK, EAU et USA qui convergent ensuite ou finissent sur leurs propres écrans."

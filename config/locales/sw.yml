@@ -63,6 +63,8 @@ sw:
     allow_other: Ruhusu jibu huru la "Nyingine"
     required: "Swali la lazima"
     ask_once: "Uliza mara moja — huruka unapocheza tena baada ya kujibiwa"
+    recall_ask_once: "Jaza majibu ya kuuliza-mara-moja kutoka kifaa kingine"
+    recall_ask_once_note: "Yeyote anayekisia msimbo wa mjibu huyu ataona majibu hayo. Imezimwa isipokuwa unahitaji."
     other: Nyingine
     other_placeholder: Tuambie kwa maneno yako mwenyewe…
     mark_correct: "Weka jibu sahihi"
@@ -110,6 +112,7 @@ sw:
       welcome_card: "KADI YA KARIBU"
       token_checkpoint: "KIPIMO"
       consent_gate: "RIDHAA"
+      respondent_code: "MSIMBO WA MJIBU"
     panel_label:
       range: "BURUTA KITELEZI"
       rating: "GUSA ILI KUKADIRIA"
@@ -290,6 +293,7 @@ sw:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Inaandika jibu…"
@@ -499,6 +503,7 @@ sw:
         variety_ok: "Aina nzuri — hakuna aina ya jibu inayojirudia mno."
         variety_run: "%{type} inajitokeza mara %{n}× mfululizo — changanya na aina nyingine ya jibu."
         welcome_many: "Tumia kadi moja tu ya karibu (sasa %{n})."
+        code_after_ask_once: "Maswali %{n} ya kuuliza-mara-moja yako kabla ya kadi ya Msimbo wa mjibu, hivyo anayerudi kwa kifaa kipya atayajibu tena kabla msimbo haujayajaza. Sogeza kadi ya msimbo juu yao."
         static_tip: "Verto refu — fikiria mapumziko ya katikati kudumisha ari."
         board_heading: "Kinachofaa na cha kurekebisha"
         board_hint: "Imepangwa kwa taa za barabarani — gusa kadi ili kuiendea."
@@ -1056,6 +1061,7 @@ sw:
     tab_quiz: 'Hali ya maswali'
     tab_tokens: 'Utoaji wa tokeni'
     note_limit_split_hint: "Zaidi ya herufi %{n} inakuwa finyu kwenye kadi ya utangulizi — weka maelezo kwenye kadi yake mwenyewe."
+    respondent_code_card_note: "Verto hii ina kadi ya Msimbo wa mjibu kwenye deki, hivyo msimbo hukusanywa hapo na mpangilio huu hauna athari."
     tab_logic: 'Mantiki na mtiririko'
     flows_title: "Mitiririko"
     flows_intro: "Vikundi vya kadi vyenye majina ambavyo jibu lililoelekezwa huingia — mf. seti za maswali za UK, UAE na USA zinazoungana tena baadaye au kuishia kwenye skrini zao."

@@ -63,6 +63,8 @@ pt:
     allow_other: Permitir resposta livre “Outro”
     required: "Pergunta obrigatória"
     ask_once: "Perguntar uma vez — ignorada em repetições depois de respondida"
+    recall_ask_once: "Preencher respostas de pergunta única a partir de outro dispositivo"
+    recall_ask_once_note: "Quem adivinhar o código deste participante veria essas respostas. Desligado salvo se precisar."
     other: Outro
     other_placeholder: Diga-nos pelas suas próprias palavras…
     mark_correct: "Marque a resposta correta"
@@ -110,6 +112,7 @@ pt:
       welcome_card: "CARTÃO DE BOAS-VINDAS"
       token_checkpoint: "PONTO DE CONTROLO"
       consent_gate: "CONSENTIMENTO"
+      respondent_code: "CÓDIGO DO PARTICIPANTE"
     panel_label:
       range: "ARRASTE O CONTROLE DESLIZANTE"
       rating: "TOQUE PARA AVALIAR"
@@ -290,6 +293,7 @@ pt:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "A escrever a resposta…"
@@ -499,6 +503,7 @@ pt:
         variety_ok: "Boa variedade — nenhum tipo de resposta se repete demais."
         variety_run: "%{type} aparece %{n}× seguidas — alterne com outro tipo de resposta."
         welcome_many: "Use no máximo um cartão de boas-vindas (agora %{n})."
+        code_after_ask_once: "%{n} perguntas de pergunta única estão antes do cartão Código do participante, por isso quem regressar noutro dispositivo responde-lhes de novo antes de o código as poder preencher. Mova o cartão do código para cima delas."
         static_tip: "Verto longo — considere uma pausa no meio para manter a energia."
         board_heading: "O que está bom e o que corrigir"
         board_hint: "Agrupado por semáforo — toque num cartão para ir até ele."
@@ -1056,6 +1061,7 @@ pt:
     tab_quiz: 'Modo de quiz'
     tab_tokens: 'Tokenização'
     note_limit_split_hint: "Acima de %{n} caracteres fica apertado no cartão de introdução — coloque o detalhe num cartão próprio."
+    respondent_code_card_note: "Este Verto tem um cartão Código do participante no baralho, por isso o código é recolhido aí e esta definição não tem efeito."
     tab_logic: 'Lógica e fluxos'
     flows_title: "Fluxos"
     flows_intro: "Grupos de cartões com nome onde uma resposta encaminhada entra — p. ex. conjuntos de perguntas UK, EAU e EUA que depois convergem ou terminam em ecrãs próprios."

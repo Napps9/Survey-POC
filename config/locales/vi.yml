@@ -63,6 +63,8 @@ vi:
     allow_other: Cho phép câu trả lời tự do "Khác"
     required: "Câu hỏi bắt buộc"
     ask_once: "Hỏi một lần — bỏ qua khi chơi lại sau khi đã trả lời"
+    recall_ask_once: "Điền các câu hỏi chỉ hỏi một lần từ thiết bị khác"
+    recall_ask_once_note: "Ai đoán được mã của người trả lời này sẽ thấy các câu trả lời đó. Tắt trừ khi bạn cần."
     other: Khác
     other_placeholder: Hãy chia sẻ bằng lời của bạn…
     mark_correct: "Đánh dấu câu trả lời đúng"
@@ -110,6 +112,7 @@ vi:
       welcome_card: "THẺ CHÀO MỪNG"
       token_checkpoint: "ĐIỂM KIỂM TRA"
       consent_gate: "ĐỒNG Ý"
+      respondent_code: "MÃ NGƯỜI TRẢ LỜI"
     panel_label:
       range: "KÉO THANH TRƯỢT"
       rating: "CHẠM ĐỂ ĐÁNH GIÁ"
@@ -290,6 +293,7 @@ vi:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Đang viết câu trả lời…"
@@ -499,6 +503,7 @@ vi:
         variety_ok: "Đa dạng tốt — không loại đáp án nào lặp lại quá nhiều."
         variety_run: "%{type} xuất hiện %{n}× liên tiếp — xen kẽ loại đáp án khác."
         welcome_many: "Dùng tối đa một thẻ chào mừng (hiện %{n})."
+        code_after_ask_once: "%{n} câu hỏi chỉ hỏi một lần nằm trước thẻ Mã người trả lời, nên người quay lại trên thiết bị mới sẽ trả lời lại trước khi mã kịp điền. Hãy chuyển thẻ mã lên trên chúng."
         static_tip: "Verto dài — cân nhắc một quãng nghỉ giữa chừng để giữ năng lượng."
         board_heading: "Điều gì ổn và điều gì cần sửa"
         board_hint: "Nhóm theo đèn giao thông — chạm vào một thẻ để chuyển đến."
@@ -1056,6 +1061,7 @@ vi:
     tab_quiz: 'Chế độ đố vui'
     tab_tokens: 'Mã hóa token'
     note_limit_split_hint: "Quá %{n} ký tự sẽ bị chật trên thẻ giới thiệu — hãy đưa phần chi tiết sang một thẻ riêng."
+    respondent_code_card_note: "Verto này có thẻ Mã người trả lời trong bộ thẻ, nên mã được thu thập ở đó và cài đặt này không có tác dụng."
     tab_logic: 'Logic & luồng'
     flows_title: "Luồng"
     flows_intro: "Nhóm thẻ có tên mà câu trả lời được định tuyến sẽ đi vào — vd. bộ câu hỏi UK, UAE và USA rồi hội tụ lại hoặc kết thúc trên màn hình riêng."

@@ -168,9 +168,14 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
   test "no non-English locale left the English text verbatim" do
     # Catches a translator that skipped entries. Short strings are excluded —
     # a proper noun or a one-word label legitimately matches across languages.
+    #
+    # Every ENGLISH variant is skipped, not just `en`. en-US is a spelling
+    # transform of en, so most of these strings are identical by design and an
+    # identical string there is evidence of nothing. Only around 80 of en.yml's
+    # 1,600 keys differ between the two at all.
     suspicious = []
     LOCALES.each do |locale|
-      next if locale == "en"
+      next if SupportedLocales.english?(locale)
 
       leaves(flash_tree(locale)).each do |key, value|
         english = @en[key]

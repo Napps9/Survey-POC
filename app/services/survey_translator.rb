@@ -183,10 +183,24 @@ class SurveyTranslator
 
       Translate every card below into #{target.english_name}. Return exactly
       #{source.size} card entries in order, each with the same option count as
-      its source. Source cards (JSON):
+      its source.
+      #{variant_note(source_locale, target.code)}
+      Source cards (JSON):
 
       #{JSON.pretty_generate(payload)}
     MSG
+  end
+
+  # A Verto can carry BOTH English variants as content languages, in which case
+  # this "translation" is a respelling and nothing else. Saying so is cheaper
+  # than letting a model decide how much licence "translate into English (US)"
+  # gives it — the answer we want is colour→color and not one word more.
+  def variant_note(source_locale, target_locale)
+    return "" unless SupportedLocales.english?(source_locale) && SupportedLocales.english?(target_locale)
+
+    "Both languages are English: change ONLY the spelling to the target " \
+    "variant (e.g. colour/color, organise/organize). Keep every other word, " \
+    "the punctuation and the phrasing exactly as they are."
   end
 
   # Did the model run out of output budget mid-batch? `try` rather than a direct

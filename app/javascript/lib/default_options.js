@@ -27,7 +27,8 @@ export const DEFAULT_OPTIONS = {
   open_ended:       [],
   welcome_card:     [],
   token_checkpoint: [],
-  consent_gate:     []
+  consent_gate:     [],
+  respondent_code:  []
 }
 
 // The table above is the ENGLISH FALLBACK. Placeholder options are card

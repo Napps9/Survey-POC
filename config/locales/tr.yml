@@ -63,6 +63,8 @@ tr:
     allow_other: '"Diğer" serbest metin yanıtına izin ver'
     required: "Zorunlu soru"
     ask_once: "Bir kez sor — yanıtlandıktan sonra tekrar oynanışlarda atlanır"
+    recall_ask_once: "Bir kez sorulan yanıtları başka bir cihazdan doldur"
+    recall_ask_once_note: "Bu katılımcının kodunu tahmin eden biri o yanıtları görür. Gerekmedikçe kapalı."
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
     mark_correct: "Doğru cevabı işaretle"
@@ -110,6 +112,7 @@ tr:
       welcome_card: "KARŞILAMA KARTI"
       token_checkpoint: "KONTROL NOKTASI"
       consent_gate: "ONAY"
+      respondent_code: "KATILIMCI KODU"
     panel_label:
       range: "KAYDIRICIYI SÜRÜKLE"
       rating: "PUANLAMAK İÇİN DOKUNUN"
@@ -290,6 +293,7 @@ tr:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Yanıt yazılıyor…"
@@ -499,6 +503,7 @@ tr:
         variety_ok: "İyi çeşitlilik — hiçbir yanıt türü çok sık tekrarlanmıyor."
         variety_run: "%{type} arka arkaya %{n}× görünüyor — başka bir yanıt türüyle değiştirin."
         welcome_many: "En fazla bir karşılama kartı kullanın (şu an %{n})."
+        code_after_ask_once: "Bir kez sorulacak %{n} soru, Katılımcı kodu kartından önce geliyor; yeni bir cihazla dönen biri, kod bunları dolduramadan yeniden yanıtlar. Kod kartını bunların üstüne taşıyın."
         static_tip: "Uzun Verto — enerjiyi korumak için ortada bir mola düşünün."
         board_heading: "Neyin iyi olduğu ve neyin düzeltileceği"
         board_hint: "Trafik ışığına göre gruplandı — gitmek için bir karta dokunun."
@@ -1056,6 +1061,7 @@ tr:
     tab_quiz: 'Sınav modu'
     tab_tokens: 'Jetonlaştırma'
     note_limit_split_hint: "%{n} karakteri geçince tanıtım kartında sıkışık görünür — ayrıntıyı kendi kartına koyun."
+    respondent_code_card_note: "Bu Verto'nun destesinde bir Katılımcı kodu kartı var; kod orada toplanır ve bu ayarın etkisi olmaz."
     tab_logic: 'Mantık ve akışlar'
     flows_title: "Akışlar"
     flows_intro: "Yönlendirilen bir yanıtın girdiği adlandırılmış kart grupları — ör. sonradan birleşen ya da kendi ekranlarında biten UK, BAE ve ABD soru setleri."

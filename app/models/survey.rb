@@ -1130,10 +1130,38 @@ class Survey < ApplicationRecord
         c["subject"] = c["subject"].to_s.strip.first(MAX_CARD_SUBJECT).presence
         c.delete("subject") if c["subject"].blank?
       end
+      # The respondent-code card's recall opt-in. Coerced to a strict boolean
+      # rather than left to ride through like the other card flags, because
+      # this one is the switch on an endpoint that hands back a DIFFERENT
+      # person's answers — a truthy string arriving from a client is not a
+      # creator's decision, and only that card can carry it at all.
+      if c.key?("recall")
+        c["type"].to_s == "respondent_code" && c["recall"] == true ? c["recall"] = true : c.delete("recall")
+      end
       c
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
+       .then { |list| enforce_single_respondent_code(list, warnings: warnings) }
        .then { |list| drop_retired_cards(list, warnings: warnings) }
        .then { |list| hoist_consent_gate(list, warnings: warnings) }
+  end
+
+  # At most one respondent-code card per deck, same shape and same reasoning as
+  # enforce_single_welcome above: a second one asks the same person for the same
+  # code twice, and apply_respondent_code sets the digest ONCE per response, so
+  # the second card's answer would be silently discarded anyway. Dropped with a
+  # warning rather than rejected, so a deck that somehow acquired two can still
+  # be saved.
+  def self.enforce_single_respondent_code(list, warnings: nil)
+    seen = false
+    list.filter_map do |c|
+      next c unless c.is_a?(Hash) && c["type"].to_s == "respondent_code"
+      if seen
+        warnings << "duplicate_respondent_code" if warnings
+        next nil
+      end
+      seen = true
+      c
+    end
   end
 
   # Cards of a retired type never survive a save (see CardTypes.retired?).
@@ -1388,6 +1416,34 @@ class Survey < ApplicationRecord
   # code nor recognise someone across their other Vertos.
 
   MAX_RESPONDENT_CODE = 60
+
+  # The code can be collected two ways, and the card supersedes the switch —
+  # exactly as consent_gate supersedes consent_text (see #consent_required?).
+  #
+  #   respondent_code_enabled?    the survey-level PRE-SCREEN switch, raw column
+  #   respondent_code_card?       a respondent_code card sits in the deck
+  #   respondent_code_prescreen?  render the pseudo-card before the deck
+  #   respondent_code_active?     a code is being collected AT ALL — which is
+  #                               what the player's write path has to ask, and
+  #                               asking the column instead meant a deck using
+  #                               only the card never recorded a digest.
+  #
+  # Leaving the column predicate raw keeps the settings form, the migration and
+  # every Blazer query working untouched.
+  def respondent_code_card
+    Array(cards).find { |c| c.is_a?(Hash) && c["type"].to_s == "respondent_code" }
+  end
+
+  def respondent_code_card? = respondent_code_card.present?
+  def respondent_code_prescreen? = respondent_code_enabled? && !respondent_code_card?
+  def respondent_code_active? = respondent_code_enabled? || respondent_code_card?
+
+  # Whether entering the code may fill in ask-once answers this person gave on
+  # another device. Off unless the creator turned it on, on the card itself —
+  # see PlayerController#recall for what that costs and why it is opt-in.
+  def respondent_code_recall?
+    respondent_code_card&.dig("recall") == true
+  end
 
   def respondent_code_prompt_text
     respondent_code_prompt.presence || I18n.t("player.respondent_code_prompt_default")

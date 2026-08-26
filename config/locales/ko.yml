@@ -63,6 +63,8 @@ ko:
     allow_other: '"기타" 자유 입력 답변 허용'
     required: "필수 질문"
     ask_once: "한 번만 질문 — 답변 후 재플레이 시 건너뜀"
+    recall_ask_once: "다른 기기에서 답한 '한 번만' 문항 채우기"
+    recall_ask_once_note: "이 응답자의 코드를 추측한 사람은 그 답을 볼 수 있습니다. 필요할 때만 켜세요."
     other: 기타
     other_placeholder: 직접 입력해 주세요…
     mark_correct: "정답 표시하기"
@@ -110,6 +112,7 @@ ko:
       welcome_card: "환영 카드"
       token_checkpoint: "체크포인트"
       consent_gate: "동의"
+      respondent_code: "응답자 코드"
     panel_label:
       range: "슬라이더를 드래그하세요"
       rating: "탭해서 평가하세요"
@@ -290,6 +293,7 @@ ko:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "답변을 작성하는 중…"
@@ -499,6 +503,7 @@ ko:
         variety_ok: "다양성이 좋아요 — 같은 답변 유형이 너무 자주 반복되지 않아요."
         variety_run: "%{type}이(가) %{n}회 연속 나와요 — 다른 답변 유형을 섞으세요."
         welcome_many: "환영 카드는 최대 한 개만 사용하세요 (현재 %{n})."
+        code_after_ask_once: "'한 번만' 문항 %{n}개가 응답자 코드 카드보다 앞에 있습니다. 새 기기로 돌아온 사람은 코드가 채워주기 전에 다시 답하게 됩니다. 코드 카드를 그 위로 옮기세요."
         static_tip: "긴 Verto — 집중력 유지를 위해 중간 휴식을 고려하세요."
         board_heading: "잘된 점과 고칠 점"
         board_hint: "신호등별로 분류 — 카드를 탭하면 해당 카드로 이동합니다."
@@ -1056,6 +1061,7 @@ ko:
     tab_quiz: '퀴즈 모드'
     tab_tokens: '토큰화'
     note_limit_split_hint: "%{n}자를 넘으면 인트로 카드에서 빽빽해집니다 — 자세한 내용은 별도의 카드에 담으세요."
+    respondent_code_card_note: "이 Verto의 덱에 응답자 코드 카드가 있어 코드는 그곳에서 수집되며, 이 설정은 적용되지 않습니다."
     tab_logic: '로직과 흐름'
     flows_title: "플로우"
     flows_intro: "라우팅된 답변이 들어가는 이름 있는 카드 그룹 — 예: 나중에 합류하거나 각자의 화면에서 끝나는 UK·UAE·USA 질문 세트."

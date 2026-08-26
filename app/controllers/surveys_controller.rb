@@ -307,11 +307,17 @@ class SurveysController < ApplicationController
     payload = build.payload
     cards   = Array(build.result["cards"])
     flagged = cards.select { |c| c["compliant"] == false }
+    # A card whose TEXT was already compliant can still have had its options or
+    # sub-text reworded, and "Keep my wording exactly as uploaded" is a promise
+    # about all three. Skipping the review screen for those meant the creator
+    # never saw the change and never got the choice.
+    reworded = cards.select { |c| self.class.import_card_reworded?(c) }
 
-    if flagged.any?
+    if flagged.any? || reworded.any?
       @import_payload = self.class.import_verifier.generate(payload)
       @import_cards   = cards
       @flagged_count  = flagged.size
+      @reworded_count = (reworded - flagged).size
       return render :import_review, layout: "fullscreen"
     end
 
@@ -1608,11 +1614,30 @@ class SurveysController < ApplicationController
     }
   end
 
+  # Did the model reword anything on this card BEYOND its question text?
+  # Emitted only when it actually did (see PdfQuestionImporter::TOOL), so the
+  # presence of either key IS the answer.
+  def self.import_card_reworded?(card)
+    Array(card["original_options"]).any? || card["original_description"].to_s.strip.present?
+  end
+
+  IMPORT_REVIEW_KEYS = %w[compliant issue original_text original_options original_description].freeze
+
   def create_imported_survey!(payload, variant:)
     result = payload["result"]
     cards  = Array(result["cards"]).map do |c|
-      card = c.except("compliant", "issue", "original_text")
-      card["text"] = c["original_text"] if variant == "verbatim" && c["original_text"].present?
+      card = c.except(*IMPORT_REVIEW_KEYS)
+      # "Keep my wording exactly as uploaded" used to restore the question text
+      # and nothing else, so a Verto in which every question was kept as written
+      # could still carry the model's wording — and, before PromptLanguage, the
+      # model's SPELLING — through every option label and sub-text. The review
+      # screen diffed only the text, so none of it was ever visible either.
+      if variant == "verbatim"
+        card["text"]        = c["original_text"] if c["original_text"].present?
+        card["description"] = c["original_description"] if c["original_description"].to_s.strip.present?
+        originals           = Array(c["original_options"]).map { |o| o.to_s.strip }.reject(&:empty?)
+        card["options"]     = originals if originals.any?
+      end
       card
     end
 

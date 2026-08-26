@@ -218,3 +218,27 @@ consent_gate:
   explainer:    "Consent spread over as many screens as it needs — an information sheet, then the agreement. Respondents turn through the pages and agree (or decline) on the last one; declining ends the Verto for them. Use this instead of the single consent gate when there's too much to fit on one screen."
   picker_icon:  "📋"
   pickable:     true
+
+# The respondent code, as a card in the deck.
+#
+# The code itself is not new — it has been a survey-level PRE-SCREEN since the
+# waves feature, a pseudo-card pinned before the deck (respondent_code_enabled).
+# As a real card it can sit wherever the creator wants it, which is the ask:
+# after a welcome card, after a consent gate, or mid-deck once someone has
+# invested a few answers and is likelier to bother.
+#
+# Same relationship to the switch that consent_gate has to consent_text — the
+# card supersedes it (Survey#respondent_code_prescreen?) rather than doubling
+# it up. Non-question: what it captures is recorded on the response as an HMAC
+# digest, never as an answer, exactly like a consent gate's agreement.
+respondent_code:
+  badge:        "RESPONDENT CODE"
+  badge_css:    "sb-welcome"
+  accent:       "#0CA7FF"
+  panel_label:  ""
+  eyebrow:      ""
+  picker_name:  "Respondent code"
+  picker_desc:  "A code they invent, to link their runs"
+  explainer:    "Asks respondents to make up a short code they'll remember. It's stored only as a one-way hash, so nobody can read it or recognise someone across other Vertos — but the same code given again matches their runs to each other. Use it to measure change between waves, and (with recall on) to carry ask-once answers to a new device."
+  picker_icon:  "🔑"
+  pickable:     true
