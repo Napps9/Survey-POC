@@ -501,6 +501,10 @@ vi:
         whole_verto: "Toàn bộ Verto"
         card_n: "Thẻ %{n}"
         section_empty: "Không có gì ở đây."
+      tap:
+        prev_statement: "Ph\u00E1t bi\u1EC3u tr\u01B0\u1EDBc"
+        next_statement: "Ph\u00E1t bi\u1EC3u ti\u1EBFp theo"
+        statement_of: "Ph\u00E1t bi\u1EC3u %{n} / %{total}"
       scenario:
         page_of: "Trang %{n} / %{total}"
         page_placeholder: "Viết trang này…"

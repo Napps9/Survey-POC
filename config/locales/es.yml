@@ -501,6 +501,10 @@ es:
         whole_verto: "Verto completo"
         card_n: "Tarjeta %{n}"
         section_empty: "Nada aquí."
+      tap:
+        prev_statement: "Enunciado anterior"
+        next_statement: "Enunciado siguiente"
+        statement_of: "Enunciado %{n} de %{total}"
       scenario:
         page_of: "Página %{n} de %{total}"
         page_placeholder: "Escribe esta página…"

@@ -12,11 +12,23 @@ unless the owner asks for one — repo owner's standing instruction, 2026-06-11.
 Before every push to Main, the full local suite must be green:
 
 ```
-bin/rails test        # ~2,570 tests; system tests are separate (bin/rails test:system, ~285)
+bin/rails test        # ~2,670 tests
+bin/rails test:system # ~385, run on its own
 bin/rubocop
 bin/brakeman --no-pager
 bin/importmap audit
 ```
+
+**The full system suite runs before EVERY push — including after a rebase, and
+including when the commits you rebased onto touch none of your files.** No
+shortcut on the grounds that the overlap is zero, that the suite passed before
+the rebase, or that the change is server-side and "covered by the integration
+tests". Owner's standing instruction, 2026-08-25, after exactly that reasoning
+was used to skip one.
+
+Other sessions push to Main through the day, so a 20-minute system run often
+finishes to find origin has moved. Rebase and run it again. Losing the race is
+the expected cost, not a reason to trim the gate.
 
 ## Work log (Trello)
 

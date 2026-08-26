@@ -501,6 +501,10 @@ ar:
         whole_verto: "الـ Verto كاملاً"
         card_n: "البطاقة %{n}"
         section_empty: "لا شيء هنا."
+      tap:
+        prev_statement: "\u0627\u0644\u0639\u0628\u0627\u0631\u0629 \u0627\u0644\u0633\u0627\u0628\u0642\u0629"
+        next_statement: "\u0627\u0644\u0639\u0628\u0627\u0631\u0629 \u0627\u0644\u062A\u0627\u0644\u064A\u0629"
+        statement_of: "\u0627\u0644\u0639\u0628\u0627\u0631\u0629 %{n} \u0645\u0646 %{total}"
       scenario:
         page_of: "الصفحة %{n} من %{total}"
         page_placeholder: "اكتب هذه الصفحة…"

@@ -515,6 +515,10 @@ zu:
         whole_verto: "I-Verto yonke"
         card_n: "Ikhadi %{n}"
         section_empty: "Akukho lutho lapha."
+      tap:
+        prev_statement: "Isitatimende esidlule"
+        next_statement: "Isitatimende esilandelayo"
+        statement_of: "Isitatimende %{n} kwangu-%{total}"
       scenario:
         page_of: "Ikhasi %{n} kwangu-%{total}"
         page_placeholder: "Bhala leli khasi…"

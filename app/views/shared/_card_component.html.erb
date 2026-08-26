@@ -9,8 +9,9 @@
 
     The :editor mode adds inline edit chrome: contenteditable text,
     "card-editor" controller alongside "picker", per-option delete buttons,
-    "Add option" / "Add statement" rows, and the tap-stack reset row. The
-    other modes render the same widgets read-only.
+    "Add option" / "Add statement" rows, and the tap-stack statement pager
+    (which takes the place of the respondent's reset row). The other modes
+    render the same widgets read-only.
 %>
 <%
   mode    ||= :preview
@@ -326,7 +327,7 @@
       <% option_images = Array(card["option_images"]) %>
       <div class="rotate-wrap"
            data-controller="<%= editable ? 'tap-stack card-editor' : 'tap-stack' %>"
-           data-action="tap-stack:reset->tap-stack#reset">
+           data-action="tap-stack:reset->tap-stack#reset tap-stack:goto->tap-stack#goto">
         <div class="rotate-card-stack">
           <% Array(display["options"]).each_with_index do |opt, i| %>
             <% img = option_images[i] %>
@@ -391,13 +392,39 @@
           </div>
         </div>
 
-        <div class="rotate-reset-row">
-          <button type="button" class="rotate-reset-btn"
-                  data-action="click->tap-stack#reset">↺ <%= t("card.reset") %></button>
-        </div>
+        <%# One row per mode, because the two modes want opposite things from
+            the deck. A respondent has answers to take back, so they get Reset.
+            A creator has a deck to WALK, and until this row existed had no way
+            to: the editor's response strip is entirely spoken for (see
+            tap-stack#forward), so tapping never advanced the stack, and every
+            statement after the first was unreachable — unreadable, unedittable,
+            and out of reach of its own image and delete buttons, which only the
+            top card receives pointer events for.
+
+            Shaped like the scenario card's editor nav row, the other type whose
+            content hides behind a page turn: a creator shouldn't have to learn
+            two pagers. %>
         <% if editable %>
+          <div class="tap-nav-row">
+            <button type="button" class="tap-nav-btn"
+                    data-tap-stack-target="prevBtn"
+                    data-action="click->tap-stack#back"
+                    title="<%= t("js.editor.tap.prev_statement", default: "Previous statement") %>"
+                    aria-label="<%= t("js.editor.tap.prev_statement", default: "Previous statement") %>">‹</button>
+            <span class="tap-nav-count" data-tap-stack-target="counter" aria-live="polite"></span>
+            <button type="button" class="tap-nav-btn"
+                    data-tap-stack-target="nextBtn"
+                    data-action="click->tap-stack#forward"
+                    title="<%= t("js.editor.tap.next_statement", default: "Next statement") %>"
+                    aria-label="<%= t("js.editor.tap.next_statement", default: "Next statement") %>">›</button>
+          </div>
           <button type="button" class="tap-add-btn"
                   data-action="click->card-editor#addTapOption">＋ <%= t("card.add_statement") %></button>
+        <% else %>
+          <div class="rotate-reset-row">
+            <button type="button" class="rotate-reset-btn"
+                    data-action="click->tap-stack#reset">↺ <%= t("card.reset") %></button>
+          </div>
         <% end %>
       </div>
 

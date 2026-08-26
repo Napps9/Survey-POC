@@ -501,6 +501,10 @@ id:
         whole_verto: "Seluruh Verto"
         card_n: "Kartu %{n}"
         section_empty: "Tidak ada apa-apa di sini."
+      tap:
+        prev_statement: "Pernyataan sebelumnya"
+        next_statement: "Pernyataan berikutnya"
+        statement_of: "Pernyataan %{n} dari %{total}"
       scenario:
         page_of: "Halaman %{n} dari %{total}"
         page_placeholder: "Tulis halaman ini…"

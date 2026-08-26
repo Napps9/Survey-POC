@@ -178,6 +178,47 @@ class HeroPromiseTest < ApplicationSystemTestCase
     end
   end
 
+  # ...and the bar the panel kept must not be the bar the panel sits under.
+  #
+  # The instruction ("TAP TO RESPOND", "DRAG THE SLIDER") is the first line of
+  # the panel, and the bar is absolutely positioned against .split-card, so
+  # whether they collide is decided by where the PANEL starts. Two rules move
+  # it and neither can see the other: --play-bar-clear pushes the text down by
+  # a padding, and the hero lip pulls the whole panel up by a negative margin.
+  #
+  # Every card in this deck carries an image, which is the case that puts them
+  # in each other's way — these three drop the hero STRIP but keep the hero's
+  # MARKUP, so the lip rule (:has(.split-left-img)) still matched and took 22
+  # of the 28px of clearance back. Net 6px, and the progress fill sheared the
+  # instruction mid-letter, photographed on an iPhone twice: once before the
+  # padding existed, once after, because the padding was never the whole sum.
+  # Measured, not asserted from the CSS: this is the arithmetic of three rules
+  # in two stylesheets, and each of them looks right on its own.
+  [ [ 3, "tap_card" ], [ 4, "nps" ], [ 5, "prioritise" ] ].each do |index, type|
+    test "#{type}'s instruction clears the progress bar rather than sitting under it" do
+      open_at(index)
+      m = page.evaluate_script(<<~JS)
+        (() => {
+          const card = document.querySelector(".preview-card.active")
+          const bar  = card.querySelector(".panel-progress").getBoundingClientRect()
+          const eb   = card.querySelector(".q-eyebrow").getBoundingClientRect()
+          const right = card.querySelector(".split-right")
+          return { barBottom: bar.bottom, eyebrowTop: eb.top,
+                   panelTop: right.getBoundingClientRect().top,
+                   marginTop: getComputedStyle(right).marginTop }
+        })()
+      JS
+
+      assert_operator m["eyebrowTop"], :>=, m["barBottom"],
+                      "#{type}'s instruction starts at #{m['eyebrowTop'].round(1)}px, inside a bar " \
+                      "that ends at #{m['barBottom'].round(1)}px — the text is drawn under the " \
+                      "progress fill. The panel's own top is #{m['panelTop'].round(1)}px with " \
+                      "margin-top #{m['marginTop']}: a negative margin here means the hero lip is " \
+                      "being applied to a card that has no hero strip to ride over, and it is " \
+                      "eating the bar clearance the padding was supposed to buy."
+    end
+  end
+
   # The exception that matters most, because breaking it would silently undo
   # the keyboard work rather than look wrong on a screenshot: a focused text
   # field still takes the hero's room. _watchTyping owns hero-off now that

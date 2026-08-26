@@ -501,6 +501,10 @@ ja:
         whole_verto: "Verto全体"
         card_n: "カード%{n}"
         section_empty: "ここには何もありません。"
+      tap:
+        prev_statement: "\u524D\u306E\u30B9\u30C6\u30FC\u30C8\u30E1\u30F3\u30C8"
+        next_statement: "\u6B21\u306E\u30B9\u30C6\u30FC\u30C8\u30E1\u30F3\u30C8"
+        statement_of: "%{total}\u4EF6\u4E2D%{n}\u4EF6\u76EE\u306E\u30B9\u30C6\u30FC\u30C8\u30E1\u30F3\u30C8"
       scenario:
         page_of: "%{total}ページ中%{n}ページ目"
         page_placeholder: "このページを書く…"

@@ -501,6 +501,10 @@ de:
         whole_verto: "Ganzer Verto"
         card_n: "Karte %{n}"
         section_empty: "Nichts hier."
+      tap:
+        prev_statement: "Vorherige Aussage"
+        next_statement: "N\u00E4chste Aussage"
+        statement_of: "Aussage %{n} von %{total}"
       scenario:
         page_of: "Seite %{n} von %{total}"
         page_placeholder: "Diese Seite schreiben…"

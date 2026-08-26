@@ -501,6 +501,10 @@ pl:
         whole_verto: "Cały Verto"
         card_n: "Karta %{n}"
         section_empty: "Nic tutaj."
+      tap:
+        prev_statement: "Poprzednie stwierdzenie"
+        next_statement: "Nast\u0119pne stwierdzenie"
+        statement_of: "Stwierdzenie %{n} z %{total}"
       scenario:
         page_of: "Strona %{n} z %{total}"
         page_placeholder: "Napisz tę stronę…"

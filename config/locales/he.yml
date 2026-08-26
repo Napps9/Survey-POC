@@ -501,6 +501,10 @@ he:
         whole_verto: "כל ה-Verto"
         card_n: "כרטיס %{n}"
         section_empty: "אין כאן כלום."
+      tap:
+        prev_statement: "\u05D4\u05DE\u05E9\u05E4\u05D8 \u05D4\u05E7\u05D5\u05D3\u05DD"
+        next_statement: "\u05D4\u05DE\u05E9\u05E4\u05D8 \u05D4\u05D1\u05D0"
+        statement_of: "\u05DE\u05E9\u05E4\u05D8 %{n} \u05DE\u05EA\u05D5\u05DA %{total}"
       scenario:
         page_of: "עמוד %{n} מתוך %{total}"
         page_placeholder: "כתוב את העמוד הזה…"

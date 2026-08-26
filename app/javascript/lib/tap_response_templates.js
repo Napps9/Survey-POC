@@ -110,3 +110,19 @@ export function tapResponseStripHtml(responses) {
       ${responses.map((r, i) => tapResponseHtml(r, i)).join("")}
     </div>`
 }
+
+// The respondent's reset row — the twin of the `else` branch in
+// shared/_card_component.html.erb's tap_card block.
+//
+// It lives here because the editor and the respondent get DIFFERENT rows in
+// that block: a creator gets the statement pager (they have a deck to walk), a
+// respondent gets Reset (they have answers to take back). The preview overlay
+// clones the EDITOR's card, so it inherits the pager and has to swap this back
+// in — see preview_verto_controller#_stripEditorChrome. Nothing else builds it.
+export function tapResetRowHtml() {
+  return `
+    <div class="rotate-reset-row">
+      <button type="button" class="rotate-reset-btn"
+              data-action="click->tap-stack#reset">↺ ${esc(t("card.reset"))}</button>
+    </div>`
+}

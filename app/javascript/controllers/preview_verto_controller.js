@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { tapResetRowHtml } from "lib/tap_response_templates"
 
 export default class extends Controller {
   static targets = [
@@ -120,8 +121,8 @@ export default class extends Controller {
   // Rebuild preview cards from the editor's live DOM. The editor card
   // markup IS the source of truth — autosave reads from it too. We
   // deep-clone each editor `.split-card`, strip the editor-only chrome
-  // (contenteditable, delete/add buttons, the "Add media" FAB, the
-  // card-editor controller binding), and drop it into the matching
+  // (contenteditable, delete/add buttons, the "Add media" FAB, the tap card's
+  // statement pager, the card-editor controller binding), and drop it into the matching
   // `.preview-card` wrapper. Stimulus's MutationObserver rebinds the
   // picker / tap-stack / slider / rating controllers automatically.
   _syncPreviewCards() {
@@ -174,6 +175,46 @@ export default class extends Controller {
       ".book-edit-tools, .logic-branch-block, .mark-correct, .mark-correct-grid, " +
       ".tap-card-image-btn, .slider-axis-toggle, .add-animation-fab"
     ).forEach(el => el.remove())
+
+    // 1b. The tap card's statement pager is the one piece of editor chrome that
+    //     cannot simply be deleted, because it does not SIT BESIDE a
+    //     respondent control — it takes one's place. The editor renders the
+    //     pager INSTEAD of the reset row (a creator has a deck to walk, a
+    //     respondent has answers to take back), so removing it on its own would
+    //     hand a previewed tap card no way to start its deck over, which is a
+    //     control the player has. Swap, don't strip.
+    //
+    //     Everything in the list above is additive chrome, which is why a flat
+    //     remove has served until now. This is the first replacement, and the
+    //     reason it is a separate step rather than another selector in it.
+    clone.querySelectorAll(".tap-nav-row").forEach((row) => {
+      const holder = document.createElement("template")
+      holder.innerHTML = tapResetRowHtml().trim()
+      const reset = holder.content.firstElementChild
+      reset ? row.replaceWith(reset) : row.remove()
+    })
+
+    // 1c. The editor's per-answer STYLE and REMOVE controls. `option-style` is
+    //     bound on the editor root (surveys/show), which is an ancestor of this
+    //     overlay as well, so a cloned 🎨 is not inert decoration — it opens the
+    //     creator's colour/icon popover from inside a respondent view.
+    //
+    //     On a tap card it also breaks answering outright. The popover's real
+    //     click target there is the answer MARK itself (see _tap_responses:
+    //     "users want to be able to update the icons, and the icon is what they
+    //     click"), and option-style#open stops propagation — so a previewed
+    //     respondent tapping an answer opened a style popover instead of
+    //     choosing it, and the deck never advanced. Hence stripping the action
+    //     as well as the buttons: with both gone the row falls back to its own
+    //     tap-stack#pick, which is what the player does.
+    clone.querySelectorAll(".option-style-btn, .tap-response-delete").forEach(el => el.remove())
+    clone.querySelectorAll('[data-action*="option-style#"]').forEach((el) => {
+      const kept = (el.getAttribute("data-action") || "")
+        .split(/\s+/).filter(a => a && !a.includes("option-style#")).join(" ")
+      kept ? el.setAttribute("data-action", kept) : el.removeAttribute("data-action")
+      // The hover ring that advertised the mark as a control goes with it.
+      el.classList.remove("rotate-action-btn--editable")
+    })
 
     // 2. The "+ Other" CTA is disabled in the editor itself (there the
     //    checkbox above it does the toggling, not the button) — re-enable it

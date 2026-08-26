@@ -1059,16 +1059,30 @@ class PlayerController < ApplicationController
     @survey.display_locale_for(*preferred)
   end
 
-  # ApplicationController#switch_locale already wraps this whole request in
-  # Current.locale (the visitor's platform locale) — that's why the player's
-  # chrome (Back/Next/Submit, consent gate, the required hint, the thank-you
-  # screen) has always followed the VISITOR, while card content follows the
-  # VERTO (resolve_play_locale). chrome_follows_verto_language nests a second,
-  # narrower override around just this render: t() calls made while rendering
-  # (which includes the layout, so <html lang/dir> and window.I18N move too)
-  # read @display_locale instead, for this response only. Falls back to
-  # English chrome for a Verto locale with no chrome translations, via the
-  # ordinary i18n fallback chain (config.i18n.fallbacks) — never a raw key.
+  # ApplicationController#switch_locale wraps this whole request in
+  # Current.locale (the visitor's platform locale). The player's chrome
+  # (Back/Next/Submit, consent gate, the required hint, the thank-you screen)
+  # USED to follow that, while card content followed the VERTO
+  # (resolve_play_locale) — and on a Verto that does not offer the visitor's
+  # language the two disagreed in public: a German browser got a German
+  # consent box, German buttons and <html lang="de"> over English questions.
+  # The consent gate is the case that made it untenable, being a statement
+  # about what THIS Verto collects rather than a button label: "the Consent
+  # Box for Age and Residence still in German".
+  #
+  # So chrome_follows_verto_language defaults to TRUE now (and was backfilled
+  # onto existing rows — see the migration). It nests a second, narrower
+  # override around just this render: t() calls made while rendering (which
+  # includes the layout, so <html lang/dir> and window.I18N move too) read
+  # @display_locale instead, for this response only. @display_locale rather
+  # than the Verto's primary on purpose — a respondent who picks another
+  # content language should get the chrome that goes with what they are
+  # reading, and it IS the primary until someone does. Falls back to English
+  # chrome for a Verto locale with no chrome translations, via the ordinary
+  # i18n fallback chain (config.i18n.fallbacks) — never a raw key.
+  #
+  # Turning it off is still offered, for a Verto that would rather meet each
+  # respondent in their own language.
   def render_with_chrome_language
     if @survey.chrome_follows_verto_language?
       I18n.with_locale(@display_locale) { render :show }
