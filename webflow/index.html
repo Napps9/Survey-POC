@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VertoNow — a research platform that runs alongside your calls</title>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400..700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-theme="light">
+<div class="shell"><main>
+
+
+
+
+
+
+
+
+    <div class="hero">
+      <div class="eyebrow">VertoNow · The research platform</div>
+      <h1>A research platform that runs<br><span>alongside your calls.</span></h1>
+      <p class="sub">VertoNow reaches the contacts your call programme doesn't. Your primary interviews stay exactly as they are — the same list simply gets a second way in, one that takes three minutes and needs no diary.</p>
+      <div class="hero-ctas">
+        <a href="#try" class="btn btn-primary">Play a live Verto</a>
+        <a href="#start" class="btn btn-ghost">How it works</a>
+      </div>
+    </div>
+
+    <ul class="benefits">
+      <li>
+        <div class="num">01</div>
+        <div>
+          <h3>Capture the measurement quicker</h3>
+          <p>One send reaches the whole list at once, so results return in days rather than across a scheduling cycle.</p>
+        </div>
+      </li>
+      <li>
+        <div class="num">02</div>
+        <div>
+          <h3>Without adding interviewer hours</h3>
+          <p>Nothing to book, nothing to write up. The same team covers considerably more of the list.</p>
+        </div>
+      </li>
+      <li>
+        <div class="num">03</div>
+        <div>
+          <h3>When the contact is ready to answer</h3>
+          <p>A "not now" becomes a link they open on their own time, rather than the end of the conversation.</p>
+        </div>
+      </li>
+    </ul>
+
+    <section id="try">
+      <div class="section-index">01 — The Platform</div>
+      <h2>Three minutes. This is what your contact gets.</h2>
+<!-- VertoNow live demo — paste into a Webflow HTML Embed element.
+     Needs: the four images below uploaded to Webflow assets, and this page's
+     domain added to the player's frame-ancestors (see README).
+     Replace assets with the folder Webflow serves your uploads from. -->
+<style>
+.laptop-mockup{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.6195 / 1;
+    margin: 2rem 0;
+  }
+  .laptop-mockup .laptop-frame{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    display: block;
+  }
+  .laptop-mockup .screen-shot{
+    position: absolute;
+    left: 12.4%;
+    top: 3.1%;
+    width: 75.15%;
+    height: 69%;
+    z-index: 1;
+    display: block;
+    object-fit: cover;
+    object-position: center top;
+  }
+  /* The live Verto. The player composes for the viewport it's given, so the
+     frame is laid out at a FIXED logical width and scaled to fit the screen
+     area — a multiple of the container would shrink with the page and cross
+     the player's 768px mobile breakpoint on narrower screens, putting a phone
+     UI in a laptop. Pointer events map through the transform, so it stays
+     playable. --embed-scale is set from JS against the measured bezel. */
+  .laptop-mockup .screen-embed{
+    position: absolute;
+    left: 12.4%;
+    top: 3.1%;
+    width: var(--embed-w, 1376px);
+    height: var(--embed-h, 780px);
+    transform: scale(var(--embed-scale, 0.51));
+    transform-origin: top left;
+    border: 0;
+    z-index: 2;
+    display: block;
+    background: #1C2034;
+  }
+  .laptop-mockup .laptop-frame{ z-index: 3; }
+  .laptop-mockup.is-live .screen-shot{ visibility: hidden; }
+  .laptop-mockup.is-playable .screen-shot{ visibility: hidden; }
+
+  .demo-note{
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.86rem;
+    color: var(--text-muted);
+  }
+  .demo-note a{ color: var(--accent); }
+
+  /* ---------- Phone view (section 03) ----------
+     A static shot of the player's real phone layout, in a CSS-drawn bezel —
+     an embedded image, so it works in a downloaded copy with no network.
+     Deliberately NOT a second live embed: the player keys its session in
+     sessionStorage by submit URL, so two live frames of one Verto would write
+     into the same response. */
+  .try-intro{
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+  .try-intro-copy{ flex: 1; min-width: 0; }
+  .phone-mockup{
+    flex: 0 0 232px;
+    padding: 10px;
+    border-radius: 36px;
+    background: #17171a;
+    border: 1px solid var(--border);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.38);
+    position: relative;
+  }
+  [data-theme="light"] .phone-mockup{ box-shadow: 0 16px 36px rgba(23,23,26,0.18); }
+  .phone-mockup::before{           /* the notch */
+    content: "";
+    position: absolute;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 74px; height: 16px;
+    border-radius: 99px;
+    background: #17171a;
+    z-index: 2;
+  }
+  .phone-mockup img{
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 27px;
+  }
+  .phone-caption{
+    margin-top: 0.8rem;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .phone-mockup{ transition: flex-basis 0.25s ease; }
+  .phone-mockup.is-live{ flex-basis: 280px; }
+  .phone-mockup.is-live > img{ visibility: hidden; }
+  /* The live Verto in the phone: the player's real 390x844 phone layout,
+     scaled onto the still's box. Radius is in UNSCALED units, so 27px of
+     visual rounding needs ~40px here at the ~0.67 scale. */
+  .phone-screen-embed{
+    position: absolute;
+    left: 10px; top: 10px;
+    width: 390px; height: 844px;
+    transform-origin: top left;
+    border: 0;
+    border-radius: 40px;
+    background: #1C2034;
+    z-index: 2;
+  }
+  /* Tap-to-take-the-session affordance, shown on whichever device is showing
+     its still while the other one is live. */
+  .device-overlay{
+    position: absolute;
+    inset: 10px;
+    border-radius: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.35);
+    border: 0;
+    cursor: pointer;
+    z-index: 4;
+    padding: 0;
+  }
+  .device-overlay[hidden]{ display: none; }
+  /* The phone's overlay covers exactly the still (same aspect), not the
+     caption beneath it. */
+  .phone-mockup > .device-overlay{ inset: 10px 10px auto 10px; aspect-ratio: 390 / 844; }
+  .device-overlay span{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #fff;
+    background: #AE1E45;
+    padding: 0.55rem 1.1rem;
+    border-radius: 99px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    white-space: nowrap;
+  }
+  .device-overlay:hover span{ transform: scale(1.04); }
+  .laptop-overlay{
+    /* `inset` must come FIRST: it is a shorthand for top/right/bottom/left, so
+       declaring it after them resets the two we actually want back to auto and
+       the scrim lands at its static position instead of over the screen. */
+    inset: auto;
+    left: 12.4%; top: 3.1%;
+    width: 75.15%; height: 69%;
+    border-radius: 6px;
+  }
+  /* The phone is much taller than the copy; centring left the text
+     stranded halfway down an empty column. */
+  .try-intro{ align-items: flex-start; }
+/* Phones: the laptop's screen is ~325px wide there — too small to play in.
+     Drop the bezel and give the player the full column at a phone-ish aspect. */
+  @media (max-width: 860px){
+    .laptop-mockup{
+      aspect-ratio: auto;
+      height: 600px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .laptop-mockup .laptop-frame{ display: none; }
+    .laptop-mockup .screen-shot,
+    .laptop-mockup .screen-embed{
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      transform: none;
+    }}
+  @media (max-width: 860px){
+    /* On an actual phone the live embed below IS the mobile experience —
+       the still would be redundant. */
+    .try-intro{ display: block; }
+    .phone-mockup{ display: none; }}
+
+  @media (max-width: 640px){
+
+    /* 600px of a phone screen is most of it, and the rebuilt player doesn't
+       have the content to fill that much. */
+    .laptop-mockup{ height: 520px; }}
+</style>
+
+<div class="try-intro">
+  <div class="try-intro-copy">
+    <p>A live Verto, embedded in this page — not a video of one.
+       <span class="on-desktop">Play it in the laptop, or tap the phone to move it across.</span>
+       <span class="on-mobile">Play it right here.</span></p>
+  </div>
+  <figure class="phone-mockup" id="phoneMockup">
+    <button type="button" class="device-overlay" id="phonePlayOverlay" hidden><span>&#9654; Play it here</span></button>
+    <img src="assets/phone-verto-card.webp" alt="The same Verto on a phone: a stacked card with a photo up top, the question below, and tappable answer tiles.">
+    <figcaption class="phone-caption">Where most of your<br>contacts will answer it.</figcaption>
+  </figure>
+</div>
+
+<div class="laptop-mockup" id="demoMockup">
+  <button type="button" class="device-overlay laptop-overlay" id="laptopPlayOverlay" hidden><span>&#9654; Bring it back to the laptop</span></button>
+  <img class="screen-shot" src="assets/laptop-screen-verto.webp" alt="A live Verto being played: a question card with a photo panel, picture answer options, a running score and a Check answer button.">
+  <img src="assets/laptop-bezel.webp" class="laptop-frame" alt="">
+</div>
+<p class="demo-note" id="demoNote">A real Verto, playing right here. Want the whole thing?
+  <a href="https://app.playverto.com/play/s3-wPFWIgpIVpATc2IAzPsBq" class="demo-link" target="_blank" rel="noopener">Open it in a new tab &#8599;</a></p>
+
+<script>
+(function(){
+  const DEMO_ORIGIN = "https://app.playverto.com";
+  const DEMO_PATH   = "/play/s3-wPFWIgpIVpATc2IAzPsBq";
+  const mockup = document.getElementById('demoMockup');
+
+  // The screen area inside the bezel, as fractions of the mockup — the same
+  // numbers the CSS positions against.
+  const SCREEN_W = 0.7515, SCREEN_H = 0.69;
+
+  // Logical viewport handed to the player, driven by HEIGHT because height is
+  // what constrains it: the player's card is a fixed 850x680 box (.split-card)
+  // that no rule ever shrinks, so a frame shorter than ~680 clips it — centred,
+  // so the top goes first. 780 clears the card with ~24px above it and leaves
+  // room for the bottom bar; the width is derived from the screen's own aspect
+  // so the Verto still fills the glass edge to edge, uncropped and undistorted.
+  // Measured, not guessed: 567 cut 82px off the top, 700 still cut 16px.
+  const EMBED_H = 780;
+
+  // Card videos ship preload="none" with a poster, loaded by an
+  // IntersectionObserver when the card comes into view — right for a phone on
+  // mobile data, wrong for a demo in a laptop mockup, where a clip that hasn't
+  // buffered paints nothing and the panel shows the Verto's brand colour
+  // instead. Same origin, so the page can just ask them to load now. Cheap and
+  // idempotent: a video already loading is left alone, and the poll stops once
+  // the deck stops producing new ones.
+  function nudgeVideos(){
+    const frame = document.querySelector('.screen-embed, .phone-screen-embed');
+    let doc;
+    try { doc = frame?.contentDocument } catch { return }
+    if (!doc) return;
+    doc.querySelectorAll('video').forEach(v => {
+      if (v.preload === 'none') v.preload = 'auto';
+      if (v.paused) v.play?.().catch(() => {});   // muted + playsinline: allowed
+    });
+  }
+
+  function fitEmbed(){
+    const frame = mockup?.querySelector('.screen-embed');
+    if (!frame) return;
+    const screenW = mockup.clientWidth * SCREEN_W;
+    const screenH = mockup.clientHeight * SCREEN_H;
+    if (screenW < 2 || screenH < 2) return;        // laid out mobile: CSS takes over
+    const embedW = Math.round(EMBED_H * (screenW / screenH));
+    frame.style.setProperty('--embed-w', embedW + 'px');
+    frame.style.setProperty('--embed-h', EMBED_H + 'px');
+    frame.style.setProperty('--embed-scale', screenH / EMBED_H);
+  }
+
+  // ---- Which device holds the live Verto ------------------------------
+  // ONE live frame at a time, by design: the player keys its session in
+  // sessionStorage by submit URL, so two live frames of this Verto would
+  // write into a single response. The reader taps a device to move the live
+  // Verto there; the other reverts to its screenshot. Progress survives the
+  // switch — both frames share the session token, and the player restores
+  // committed answers from the server when it boots.
+  const phone = document.getElementById('phoneMockup');
+
+  const phoneOverlay = document.getElementById('phonePlayOverlay');
+
+  const laptopOverlay = document.getElementById('laptopPlayOverlay');
+  let embedFailed = false;
+  let nudger = null;
+
+  function killFrames(){
+    if (nudger) { clearInterval(nudger); nudger = null; }
+    mockup?.querySelector('.screen-embed')?.remove();
+    mockup?.classList.remove('is-live');
+    phone?.querySelector('.phone-screen-embed')?.remove();
+    phone?.classList.remove('is-live');
+  }
+
+  // The phone frame's screen is wherever the still lays out (it keeps its
+  // box even while hidden), so the live frame is scaled onto exactly that.
+  function fitPhoneEmbed(){
+    const frame = phone?.querySelector('.phone-screen-embed');
+    const still = phone?.querySelector('img');
+    if (!frame || !still) return;
+    const w = still.clientWidth;
+    if (w < 2) return;
+    frame.style.transform = 'scale(' + (w / 390) + ')';
+  }
+
+  function syncOverlays(){
+    const phoneLive = !!phone?.classList.contains('is-live');
+    const laptopLive = !!mockup?.classList.contains('is-live');
+    if (phoneOverlay) phoneOverlay.hidden = embedFailed || phoneLive || !(laptopLive || phoneLive);
+    if (laptopOverlay) laptopOverlay.hidden = !phoneLive;
+  }
+
+  // The shared boot proof. Same-origin (hosted): the player's root is directly
+  // observable. Cross-origin (a downloaded copy): the player posts
+  // { verto: "ready" } when it starts — see player_controller.js#connect.
+  function bootFrame(frame, onOk, onFail){
+    const onReady = (e) => { if (e.data && e.data.verto === "ready") finish(true) };
+    window.addEventListener('message', onReady);
+    let settled = false;
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener('message', onReady);
+      clearInterval(poll);
+      clearTimeout(giveUp);
+      ok ? onOk() : onFail();
+    };
+    const check = () => {
+      try {
+        if (frame.contentDocument?.querySelector('[data-controller~="player"]')) finish(true);
+      } catch { /* cross-origin: wait for verto:ready, or the timeout */ }
+    };
+    const poll   = setInterval(check, 500);
+    const giveUp = setTimeout(() => finish(false), 6000);
+    frame.addEventListener('load', () => setTimeout(check, 300));
+  }
+
+  function activateDevice(target){
+    if (embedFailed || !mockup) return;
+    killFrames();
+    const isPhone = target === 'phone' && phone;
+    const host = isPhone ? phone : mockup;
+
+    const frame = document.createElement('iframe');
+    frame.className = isPhone ? 'phone-screen-embed' : 'screen-embed';
+    frame.title = 'A live Verto you can play';
+    // Absolute, so it resolves from a downloaded copy of this file too. Served
+    // from the app this is still same-origin, so nothing changes there.
+    frame.src = DEMO_ORIGIN + DEMO_PATH;
+    host.appendChild(frame);
+    isPhone ? fitPhoneEmbed() : fitEmbed();
+
+    bootFrame(frame, () => {
+      host.classList.add('is-live');
+      isPhone ? fitPhoneEmbed() : fitEmbed();
+      syncOverlays();
+      nudgeVideos();
+      // The deck swaps cards as it's played, so keep nudging for a while
+      // rather than only at boot.
+      let nudges = 0;
+      nudger = setInterval(() => {
+        nudgeVideos();
+        if (++nudges > 40 && nudger) { clearInterval(nudger); nudger = null; }
+      }, 3000);
+      const note = document.getElementById('demoNote');
+      if (note) note.innerHTML = 'A real Verto, playing right here' +
+        (isPhone ? ' — on the phone. ' : '. ') +
+        '<a href="' + DEMO_ORIGIN + DEMO_PATH + '" class="demo-link" target="_blank" rel="noopener">Open it full screen ↗</a>';
+    }, () => {
+      if (isPhone) {
+        // The phone couldn't boot (network dropped mid-visit, most likely) —
+        // hand the session straight back to the laptop rather than leaving
+        // two screenshots and nothing playable.
+        killFrames();
+        syncOverlays();
+        activateDevice('laptop');
+      } else {
+        embedFailed = true;
+        killFrames();
+        syncOverlays();
+        const note = document.getElementById('demoNote');
+        if (note) note.innerHTML = 'The live demo needs a connection. ' +
+          '<a href="' + DEMO_ORIGIN + DEMO_PATH + '" class="demo-link" target="_blank" rel="noopener">Open the Verto in a new tab \u2197</a>';
+      }
+    });
+  }
+
+  phoneOverlay?.addEventListener('click', () => activateDevice('phone'));
+  laptopOverlay?.addEventListener('click', () => activateDevice('laptop'));
+
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => { fitEmbed(); fitPhoneEmbed(); });
+    if (mockup) ro.observe(mockup);
+    if (phone) ro.observe(phone);
+  } else {
+    window.addEventListener('resize', () => { fitEmbed(); fitPhoneEmbed(); });
+  }
+
+  activateDevice('laptop');
+
+})();
+</script>
+    </section>
+
+    <section id="results">
+      <div class="section-index">02 — What Comes Back</div>
+      <h2>Counted while the fieldwork is still running.</h2>
+
+      <figure class="shot">
+        <div class="shot-pan"><img src="assets/results-world-map.webp" alt="A Verto's results screen: a world map with responding countries highlighted, a live response count, and filter pills for time window, distribution channel and country."></div>
+        <figcaption><strong>Who answered, live.</strong> Segment by country, channel or demographic.</figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="shot-pan"><img src="assets/results-questions.webp" alt="Question-level results: a scenario card, an image-grid question with percentage bars and counts per option, and a swipe-statement card showing agree/disagree splits per statement."></div>
+        <figcaption><strong>Question by question, already counted.</strong> The same rows drive the CSV and the report.</figcaption>
+      </figure>
+
+      <div class="pill-row">
+        <span>Your questions, word for word</span>
+        <span>Grids, ranking, scales, open text</span>
+        <span>Screening logic</span>
+        <span>20 languages</span>
+        <span>Live dashboard</span>
+        <span>Open ends themed with counts</span>
+        <span>CSV &amp; Google Sheets</span>
+        <span>Your brand</span>
+      </div>
+
+      <div class="not-list">
+        <strong>Not a panel, not a fieldwork agency.</strong> No sample sourcing, no quotas, no incentives — you bring the contact list.
+      </div>
+    </section>
+
+    <section id="proof">
+      <div class="section-index">03 — Track Record</div>
+      <div class="traction-image">
+        <img src="assets/traction-figures.webp" alt="Play Verto traction: The Big Green Legacy reached 100,000+ young people in the UAE across 842 schools and universities with a 75% completion rate and 42 curriculum recommendations. Wall's Ice Cream campaign reached 17,000+ players across 12 new markets with an 86% completion rate and 3m people reached.">
+      </div>
+
+      <div class="quote-bubble">
+        <p>"I loved working with the team at Play Verto... they understood the brief clearly, engaged with 17k consumers in a fun, relatable way."</p>
+        <cite>— Sarah Hogan, Snr. Global Marketing Director, Wall's Ice Cream</cite>
+      </div>
+    </section>
+
+    <section id="start">
+      <div class="section-index">04 — Getting Started</div>
+      <h2>Create it, share it, capture the results.</h2>
+      <p class="lede">VertoNow is a self-serve platform: you own the Verto, the brand on it, and the data behind it.</p>
+
+      <div class="cta-panel">
+        <h3>And we build the first one with you</h3>
+        <ul class="perk-list">
+          <li>We build the first Verto with you, from your existing questions — included in sign-up, not a separate engagement.</li>
+          <li>Share it how you already reach people: email, a follow-up call, a QR code.</li>
+          <li>Results live, and out to CSV or Google Sheets.</li>
+        </ul>
+        <a href="#contact" class="btn btn-primary">Talk to us about your list →</a>
+      </div>
+
+      <div class="not-list">
+        <strong>On the data.</strong> Anonymous by default — no names or contact details unless you add a contact card. Consent wording is stored against every response.
+      </div>
+    </section>
+
+
+
+
+
+
+</main></div>
+
+</body>
+</html>

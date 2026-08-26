@@ -1,0 +1,23 @@
+<!-- VertoNow demo, 2 of 3 -> an HTML Embed element on the canvas, placed
+     where the mockup should appear in section 01. Replace ASSET_BASE with your
+     Webflow asset folder. -->
+<div class="try-intro">
+  <div class="try-intro-copy">
+    <p>A live Verto, embedded in this page — not a video of one.
+       <span class="on-desktop">Play it in the laptop, or tap the phone to move it across.</span>
+       <span class="on-mobile">Play it right here.</span></p>
+  </div>
+  <figure class="phone-mockup" id="phoneMockup">
+    <button type="button" class="device-overlay" id="phonePlayOverlay" hidden><span>&#9654; Play it here</span></button>
+    <img src="ASSET_BASE/phone-verto-card.webp" alt="The same Verto on a phone: a stacked card with a photo up top, the question below, and tappable answer tiles.">
+    <figcaption class="phone-caption">Where most of your<br>contacts will answer it.</figcaption>
+  </figure>
+</div>
+
+<div class="laptop-mockup" id="demoMockup">
+  <button type="button" class="device-overlay laptop-overlay" id="laptopPlayOverlay" hidden><span>&#9654; Bring it back to the laptop</span></button>
+  <img class="screen-shot" src="ASSET_BASE/laptop-screen-verto.webp" alt="A live Verto being played: a question card with a photo panel, picture answer options, a running score and a Check answer button.">
+  <img src="ASSET_BASE/laptop-bezel.webp" class="laptop-frame" alt="">
+</div>
+<p class="demo-note" id="demoNote">A real Verto, playing right here. Want the whole thing?
+  <a href="https://app.playverto.com/play/s3-wPFWIgpIVpATc2IAzPsBq" class="demo-link" target="_blank" rel="noopener">Open it in a new tab &#8599;</a></p>

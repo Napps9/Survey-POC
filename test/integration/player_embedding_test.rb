@@ -19,6 +19,14 @@ class PlayerEmbeddingTest < ActionDispatch::IntegrationTest
     csp.split(";").map(&:strip).find { |d| d.start_with?("frame-ancestors") }
   end
 
+  def with_frame_ancestors(value)
+    was = ENV["PLAYER_FRAME_ANCESTORS"]
+    ENV["PLAYER_FRAME_ANCESTORS"] = value
+    yield
+  ensure
+    ENV["PLAYER_FRAME_ANCESTORS"] = was
+  end
+
   test "the player may be framed by the app and by a locally-opened file" do
     get play_survey_path(survey_with(publish_token: SecureRandom.hex(8)).publish_token)
     assert_response :success
@@ -37,6 +45,29 @@ class PlayerEmbeddingTest < ActionDispatch::IntegrationTest
     get test_survey_path(survey.test_token)
     assert_response :success
     assert_equal "frame-ancestors 'self' file:", frame_ancestors
+  end
+
+  # The marketing site is on another domain, so hosting the one-pager's demo
+  # there needs that domain named. It's a deploy setting rather than a constant
+  # because the list belongs to whoever owns the domains — see the Webflow kit
+  # in webflow/README.md.
+  test "PLAYER_FRAME_ANCESTORS adds sites without displacing the defaults" do
+    with_frame_ancestors("https://www.playverto.com https://playverto.webflow.io") do
+      get play_survey_path(survey_with(publish_token: SecureRandom.hex(8)).publish_token)
+      assert_response :success
+      assert_equal "frame-ancestors 'self' file: https://www.playverto.com https://playverto.webflow.io",
+        frame_ancestors
+    end
+  end
+
+  test "PLAYER_FRAME_ANCESTORS accepts commas, and drops sources a CSP can't use" do
+    # A bare host is silently inert in a source list and `*` would let any site
+    # on the internet frame a Verto — the one thing this directive prevents. Both
+    # are likelier as a typo than as an intention, so neither survives.
+    with_frame_ancestors("playverto.com, *, https://ok.example.com , javascript:alert(1)") do
+      get play_survey_path(survey_with(publish_token: SecureRandom.hex(8)).publish_token)
+      assert_equal "frame-ancestors 'self' file: https://ok.example.com", frame_ancestors
+    end
   end
 
   test "the rest of the app is still same-origin only" do

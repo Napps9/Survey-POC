@@ -620,13 +620,25 @@ class PlayerController < ApplicationController
     return if policy.nil?
 
     embeddable = policy.dup
-    embeddable.frame_ancestors :self, "file:"
+    embeddable.frame_ancestors(:self, "file:", *extra_frame_ancestors)
     request.content_security_policy = embeddable
 
     # Rails' default SAMEORIGIN blocks a file:// parent on its own, whatever the
     # CSP says — modern browsers prefer frame-ancestors, but only when
     # X-Frame-Options isn't there to contradict it.
     response.headers.delete("X-Frame-Options")
+  end
+
+  # Sites allowed to frame a Verto beyond the app itself: the marketing site,
+  # which is on another domain, and the staging domain it's built on. Space- or
+  # comma-separated in PLAYER_FRAME_ANCESTORS, so adding one is a deploy setting
+  # rather than a code change — the list belongs to whoever owns the domains.
+  #
+  # Scheme-qualified origins only. A bare host is silently useless in a CSP
+  # source list, and `*` would hand every site on the internet the ability to
+  # frame someone's Verto, which is the thing this directive exists to prevent.
+  def extra_frame_ancestors
+    ENV.fetch("PLAYER_FRAME_ANCESTORS", "").split(/[\s,]+/).grep(%r{\Ahttps?://[^\s/]+\z})
   end
 
   # Swap the inherited :modern version set for the player's own (see
