@@ -378,6 +378,7 @@ es:
       appeal_submitted: "Enviado para revisión — te avisaremos en cuanto se compruebe."
       appeal_failed: "No se pudo enviar para revisión — inténtalo de nuevo."
       emoji_none: "Ningún emoji coincide."
+      note_limit_count: "%{n} / %{recommended} recomendado · %{max} máx."
       rich_bold: "Negrita"
       rich_italic: "Cursiva"
       rich_underline: "Subrayado"
@@ -1051,6 +1052,7 @@ es:
     ty_forward_label_placeholder: 'Texto del botón (p. ej. Visita nuestro sitio)'
     tab_quiz: 'Modo cuestionario'
     tab_tokens: 'Tokenización'
+    note_limit_split_hint: "Más allá de %{n} caracteres queda apretado en la tarjeta de introducción: pon el detalle en su propia tarjeta."
     tab_logic: 'Lógica y flujos'
     flows_title: "Flujos"
     flows_intro: "Grupos de tarjetas con nombre a los que llega una respuesta enrutada — p. ej. sets de preguntas para UK, EAU y EE. UU. que convergen de nuevo o terminan en sus propias pantallas."
@@ -1110,18 +1112,18 @@ es:
       one: Duración estimada ~%{count} min
       other: Duración estimada ~%{count} mins
     design: Diseño
-    shuffle: Mezclar
-    shuffle_title: Seleccionar nuevas imágenes de la biblioteca de Verto
-    shuffle_confirm: "¿Mezclar imágenes? Tus imágenes actuales serán reemplazadas por una nueva selección de la biblioteca."
-    shuffle_direction_toggle_title: "Añadir una indicación para esta mezcla"
-    shuffle_direction_heading: "Orienta esta mezcla"
+    shuffle: "Mezclar imágenes"
+    shuffle_title: "Vuelve a elegir cada imagen y animación de la biblioteca de Verto: tus preguntas y su orden no cambian"
+    shuffle_confirm: "¿Mezclar imágenes? Cada imagen y animación se reemplazará por una nueva selección de la biblioteca. Tus preguntas y su orden se quedan exactamente como están."
+    shuffle_direction_toggle_title: "Añadir una indicación para esta mezcla de imágenes"
+    shuffle_direction_heading: "Orienta esta mezcla de imágenes"
     shuffle_direction_hint: "Opcional. Dile a Verto qué buscas en las imágenes y animaciones: un ambiente, un escenario o algo que quieras evitar."
     shuffle_direction_label: "Indicación"
     shuffle_direction_placeholder: "p. ej. luz natural cálida, exteriores, grupos pequeños, sin oficinas"
     shuffle_direction_toward: "La última mezcla buscó: %{terms}"
     shuffle_direction_avoiding: "y excluyó: %{terms}"
     shuffle_direction_clear: "Borrar"
-    shuffle_direction_apply: "Mezclar con esto"
+    shuffle_direction_apply: "Mezclar imágenes con esto"
     publish_share: Publicar y compartir →
     answer_type: Tipo de respuesta
     select_card: Selecciona una tarjeta para cambiar su tipo
@@ -1386,7 +1388,7 @@ es:
     s7_perks:
     - Un fondo de encuesta acorde a tu temática
     - Imágenes en cada tarjeta, incluidas las tarjetas de toque
-    - Mezcla en el editor hasta que te convenza
+    - "Mezcla las imágenes en el editor hasta que te convenza"
     s7_title: "¿Cómo te gustaría empezar?"
     s7_sub: Podrás cambiar cualquier cosa en el editor.
     s7_recommended: Recomendado

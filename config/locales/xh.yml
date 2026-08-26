@@ -394,6 +394,7 @@ xh:
       appeal_submitted: "Kuthunyelwe ukuze kuhlolwe — siya kukwazisa xa sele kuhlolwe."
       appeal_failed: "Ayikwazekanga ukuthumela ukuze kuhlolwe — nceda uzame kwakhona."
       emoji_none: "Akukho i-emoji ihambelana."
+      note_limit_count: "%{n} / %{recommended} ecetyiswayo · %{max} ubuninzi"
       rich_bold: "Ukushinyisa"
       rich_italic: "Ukujika"
       rich_underline: "Umgca ongezantsi"
@@ -1073,6 +1074,7 @@ xh:
     ty_forward_label_placeholder: 'Ileyibhile yeqhosha (umz. Tyelela iwebhusayithi yethu)'
     tab_quiz: 'Inkqubo yovavanyo'
     tab_tokens: 'Ukunikwa kweetoken'
+    note_limit_split_hint: "Ngaphaya kweempawu ezingu-%{n} kuya kucinana kwikhadi lentshayelelo — beka iinkcukacha kwikhadi lazo."
     tab_logic: 'Ingqiqo neendlela'
     flows_title: 'Iindlela zolwakhiwo'
     flows_intro: 'Amaqela amakhadi anamagama apho impendulo ekhonjiweyo inokungena — umz. izethu zemibuzo zeUK, iUAE neUSA ezidibana kwakhona okanye ziphele kwizikrini zazo.'
@@ -1132,18 +1134,18 @@ xh:
       one: "Kuqikelelwa ~%{count} umzuzu"
       other: "Kuqikelelwa ~%{count} imizuzu"
     design: "Uyilo"
-    shuffle: "Xuba"
-    shuffle_title: "Khetha kwakhona imifanekiso kwithala leverto"
-    shuffle_confirm: "Xuba imifanekiso? Imifanekiso yakho yangoku iya kutshintshwa nokhetho olutsha oluvela kwithala."
-    shuffle_direction_toggle_title: "Yongeza isikhokelo solu xubo"
-    shuffle_direction_heading: "Khokela olu xubo"
+    shuffle: "Xuba imifanekiso"
+    shuffle_title: "Khetha kwakhona wonke umfanekiso nomfanekiso oshukumayo kwithala leVerto — imibuzo yakho nolandelelwano lwayo alutshintshi"
+    shuffle_confirm: "Xuba imifanekiso? Wonke umfanekiso nomfanekiso oshukumayo uya kutshintshwa nokhetho olutsha oluvela kwithala. Imibuzo yakho nolandelelwano lwayo luhlala kanye njengoko lunjalo."
+    shuffle_direction_toggle_title: "Yongeza isikhokelo solu xubo lwemifanekiso"
+    shuffle_direction_heading: "Khokela olu xubo lwemifanekiso"
     shuffle_direction_hint: "Akunyanzelekanga. Xelela iVerto oko ukufunayo kwimifanekiso nakwimifanekiso enyakazayo — imeko-bume, indawo, okanye into omawuyishiye ngaphandle."
     shuffle_direction_label: "Isikhokelo"
     shuffle_direction_placeholder: "umz. ukukhanya kwendalo okufudumeleyo, ngaphandle, amaqela amancinci, akukho ma-ofisi"
     shuffle_direction_toward: "Uxubo lokugqibela lukhangele: %{terms}"
     shuffle_direction_avoiding: "kwaye lushiye ngaphandle: %{terms}"
     shuffle_direction_clear: "Cima"
-    shuffle_direction_apply: "Xuba ngale ndlela"
+    shuffle_direction_apply: "Xuba imifanekiso ngale ndlela"
     publish_share: "Papasha uze wabelane →"
     answer_type: "Uhlobo lweMpendulo"
     select_card: "Khetha ikhadi ukutshintsha uhlobo lwalo"
@@ -1408,7 +1410,7 @@ xh:
     s7_perks:
       - "Umva woqhankqalazo ohambelana nomxholo"
       - "Imifanekiso kwikhadi ngalinye, kubandakanya amakhadi okutyhala"
-      - "Xuba kumhleli de kuve kamnandi"
+      - "Xuba imifanekiso kumhleli de kuve kamnandi"
     s7_title: "Ungathanda ukuqala njani?"
     s7_sub: "Usenokutshintsha nantoni na kumhleli."
     s7_recommended: "Iyacetyiswa"
@@ -1768,7 +1770,7 @@ xh:
       pdf_too_large: "Loo PDF inkulu kakhulu — nceda uyigcine ngaphantsi kwee-MB ezingu-%{limit}."
       restored: "“%{name}” ibuyisiwe. Isele kuyilo lwakho — yipapashe kwakhona xa sele ulungele."
       settings_locked: "Le Verto iyasebenza okanye sele inezimpendulo — useto lwemvume namanqaku alunakutshintsha ngoku."
-      shuffle_failed: "Ayikwazekanga ukuxuba izixhobo — nceda uzame kwakhona."
+      shuffle_failed: "Ayikwazekanga ukuxuba imifanekiso — nceda uzame kwakhona."
       unpublished: "Upapasho lweVerto lususiwe — ibuyele kuyilo onokulihlela."
   ask:
     stale_note: "Eminye imithombo ecatshulwe kule mpendulo ithe kamva yashiya iqoqo elabelweneyo."

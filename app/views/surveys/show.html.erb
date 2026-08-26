@@ -942,19 +942,41 @@
 
               <%# The two tokenomics lines on the points intro — editable per
                   Verto, blank restores the locale default (Feedback 17). Same
-                  save-on-change convention as compare_note. %>
+                  save-on-change convention as compare_note.
+
+                  Each carries BOTH of its limits (note-limit): the 200-char
+                  storage cap was the only number a creator could find, and it
+                  is the less useful of the two — the note is a single pill on
+                  the intro card, so it stops fitting long before it stops
+                  saving. See note_limit_controller.js. %>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Points note on the intro:</div>
-              <input type="text" name="tokens_note" maxlength="200"
-                     value="<%= @survey.tokens_note_text %>"
-                     onchange="this.form.requestSubmit()"
-                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <div data-controller="note-limit"
+                   data-note-limit-recommended-value="<%= Survey::RECOMMENDED_NOTE %>"
+                   data-note-limit-max-value="<%= Survey::MAX_NOTE %>">
+                <input type="text" name="tokens_note" maxlength="<%= Survey::MAX_NOTE %>"
+                       value="<%= @survey.tokens_note_text %>"
+                       data-note-limit-target="input"
+                       data-action="input->note-limit#update"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                <div class="note-limit-count" data-note-limit-target="count"></div>
+                <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_NOTE) %></div>
+              </div>
 
               <% if @survey.leaderboard_enabled? %>
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:10px 0 5px;">Leaderboard teaser on the intro:</div>
-                <input type="text" name="leaderboard_note" maxlength="200"
-                       value="<%= @survey.leaderboard_note_text %>"
-                       onchange="this.form.requestSubmit()"
-                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                <div data-controller="note-limit"
+                     data-note-limit-recommended-value="<%= Survey::RECOMMENDED_NOTE %>"
+                     data-note-limit-max-value="<%= Survey::MAX_NOTE %>">
+                  <input type="text" name="leaderboard_note" maxlength="<%= Survey::MAX_NOTE %>"
+                         value="<%= @survey.leaderboard_note_text %>"
+                         data-note-limit-target="input"
+                         data-action="input->note-limit#update"
+                         onchange="this.form.requestSubmit()"
+                         style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                  <div class="note-limit-count" data-note-limit-target="count"></div>
+                  <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_NOTE) %></div>
+                </div>
               <% end %>
             <% end %>
           <% end %>

@@ -378,6 +378,7 @@ ar:
       appeal_submitted: "تم الإرسال للمراجعة — سنُعلمك بمجرد التحقق منها."
       appeal_failed: "تعذّر إرسال ذلك للمراجعة — يرجى المحاولة مرة أخرى."
       emoji_none: "لا توجد رموز مطابقة."
+      note_limit_count: "%{n} / %{recommended} موصى به · %{max} حد أقصى"
       rich_bold: "غامق"
       rich_italic: "مائل"
       rich_underline: "تسطير"
@@ -1051,6 +1052,7 @@ ar:
     ty_forward_label_placeholder: 'نص الزر (مثال: زيارة موقعنا)'
     tab_quiz: 'وضع الاختبار'
     tab_tokens: 'الترميز'
+    note_limit_split_hint: "بعد %{n} حرفًا يصبح النص مزدحمًا على بطاقة المقدمة — ضع التفاصيل في بطاقة خاصة بها بدلاً من ذلك."
     tab_logic: 'المنطق والمسارات'
     flows_title: "المسارات"
     flows_intro: "مجموعات بطاقات مسمّاة تقود إليها إجابة موجَّهة — مثل مجموعات أسئلة للمملكة المتحدة والإمارات وأمريكا تلتقي لاحقًا أو تنتهي بشاشاتها الخاصة."
@@ -1110,18 +1112,18 @@ ar:
       one: المدة المقدرة ~%{count} دقيقة
       other: المدة المقدرة ~%{count} دقائق
     design: التصميم
-    shuffle: خلط
-    shuffle_title: إعادة اختيار الصور من مكتبة Verto
-    shuffle_confirm: هل تريد خلط الصور؟ سيتم استبدال صورك الحالية باختيار جديد من المكتبة.
-    shuffle_direction_toggle_title: "أضف توجيهًا لهذا الخلط"
-    shuffle_direction_heading: "وجّه هذا الخلط"
+    shuffle: "خلط الصور"
+    shuffle_title: "إعادة اختيار كل صورة ورسم متحرك من مكتبة Verto — أسئلتك وترتيبها لا يتغيران"
+    shuffle_confirm: "هل تريد خلط الصور؟ سيتم استبدال كل صورة ورسم متحرك باختيار جديد من المكتبة. أسئلتك وترتيبها يبقيان كما هما تمامًا."
+    shuffle_direction_toggle_title: "أضف توجيهًا لخلط الصور هذا"
+    shuffle_direction_heading: "وجّه خلط الصور هذا"
     shuffle_direction_hint: "اختياري. أخبر Verto بما تبحث عنه في الصور والرسوم المتحركة — الأجواء أو المكان أو ما تريد استبعاده."
     shuffle_direction_label: "التوجيه"
     shuffle_direction_placeholder: "مثال: ضوء طبيعي دافئ، في الهواء الطلق، مجموعات صغيرة، بدون مكاتب"
     shuffle_direction_toward: "بحث الخلط الأخير عن: %{terms}"
     shuffle_direction_avoiding: "واستبعد: %{terms}"
     shuffle_direction_clear: "مسح"
-    shuffle_direction_apply: "اخلط بهذا"
+    shuffle_direction_apply: "اخلط الصور بهذا"
     publish_share: نشر ومشاركة ←
     answer_type: نوع الإجابة
     select_card: اختر بطاقة لتغيير نوعها

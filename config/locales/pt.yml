@@ -378,6 +378,7 @@ pt:
       appeal_submitted: "Enviado para revisão — avisamos assim que for verificado."
       appeal_failed: "Não foi possível enviar para revisão — tente novamente."
       emoji_none: "Nenhum emoji corresponde."
+      note_limit_count: "%{n} / %{recommended} recomendado · %{max} máx."
       rich_bold: "Negrito"
       rich_italic: "Itálico"
       rich_underline: "Sublinhado"
@@ -1051,6 +1052,7 @@ pt:
     ty_forward_label_placeholder: 'Texto do botão (ex. Visite o nosso site)'
     tab_quiz: 'Modo de quiz'
     tab_tokens: 'Tokenização'
+    note_limit_split_hint: "Acima de %{n} caracteres fica apertado no cartão de introdução — coloque o detalhe num cartão próprio."
     tab_logic: 'Lógica e fluxos'
     flows_title: "Fluxos"
     flows_intro: "Grupos de cartões com nome onde uma resposta encaminhada entra — p. ex. conjuntos de perguntas UK, EAU e EUA que depois convergem ou terminam em ecrãs próprios."
@@ -1110,18 +1112,18 @@ pt:
       one: Estimado ~%{count} min
       other: Estimado ~%{count} mins
     design: Design
-    shuffle: Embaralhar
-    shuffle_title: Escolher novas imagens da biblioteca Verto
-    shuffle_confirm: Embaralhar imagens? As suas imagens atuais serão substituídas por uma nova seleção da biblioteca.
-    shuffle_direction_toggle_title: "Adicionar uma orientação para este embaralhamento"
-    shuffle_direction_heading: "Oriente este embaralhamento"
+    shuffle: "Embaralhar imagens"
+    shuffle_title: "Escolher de novo cada imagem e animação da biblioteca Verto — as suas perguntas e a ordem delas não mudam"
+    shuffle_confirm: "Embaralhar imagens? Cada imagem e animação será substituída por uma nova seleção da biblioteca. As suas perguntas e a ordem delas ficam exatamente como estão."
+    shuffle_direction_toggle_title: "Adicionar uma orientação para este embaralhamento de imagens"
+    shuffle_direction_heading: "Oriente este embaralhamento de imagens"
     shuffle_direction_hint: "Opcional. Diga ao Verto o que procura nas imagens e animações — um clima, um cenário ou algo a deixar de fora."
     shuffle_direction_label: "Orientação"
     shuffle_direction_placeholder: "ex. luz natural quente, ao ar livre, grupos pequenos, sem escritórios"
     shuffle_direction_toward: "O último embaralhamento procurou: %{terms}"
     shuffle_direction_avoiding: "e excluiu: %{terms}"
     shuffle_direction_clear: "Limpar"
-    shuffle_direction_apply: "Embaralhar com isto"
+    shuffle_direction_apply: "Embaralhar imagens com isto"
     publish_share: Publicar e partilhar →
     answer_type: Tipo de resposta
     select_card: Selecione um cartão para alterar o seu tipo
@@ -1386,7 +1388,7 @@ pt:
     s7_perks:
     - Um fundo do inquérito combinado com o tema
     - Imagens em todos os cartões, incluindo cartões de deslize
-    - Embaralhe no editor até ficar como pretende
+    - "Embaralhe as imagens no editor até ficar como pretende"
     s7_title: Como prefere começar?
     s7_sub: Pode sempre alterar qualquer coisa no editor.
     s7_recommended: Recomendado

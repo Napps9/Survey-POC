@@ -392,6 +392,7 @@ zu:
       appeal_submitted: "Kuthunyelwe ukuze kubuyekezwe — sizokwazisa uma sekuhloliwe."
       appeal_failed: "Akukwazanga ukuthunyelwa ukuze kubuyekezwe — sicela uzame futhi."
       emoji_none: "Ayikho i-emoji efanayo."
+      note_limit_count: "%{n} / %{recommended} okunconywayo · %{max} ubuningi"
       rich_bold: "Okuqinile"
       rich_italic: "Okugobile"
       rich_underline: "Ukugcina umugqa ngaphansi"
@@ -1071,6 +1072,7 @@ zu:
     ty_forward_label_placeholder: 'Igama lenkinobho (isb. Vakashela isayithi yethu)'
     tab_quiz: 'Imodi yesivivinyo'
     tab_tokens: 'Ukuthokheniza'
+    note_limit_split_hint: "Ngaphezu kwezinhlamvu ezingu-%{n} kuyaminyana ekhadini lesingeniso — beka imininingwane ekhadini layo."
     tab_logic: 'Ukubonga & izinhlelo'
     flows_title: 'Izinhlelo'
     flows_intro: 'Amaqembu amakhadi anamagama lapho impendulo eqondisiwe ingangena — isb. iseti zemibuzo ze-UK, UAE ne-USA ezihlangana ngemuva noma ziphelele ezikrinini zazo.'
@@ -1130,18 +1132,18 @@ zu:
       one: "Kulinganiselwa ~%{count} umzuzu"
       other: "Kulinganiselwa ~%{count} imizuzu"
     design: "Umklamo"
-    shuffle: "Xuba"
-    shuffle_title: "Khetha kabusha izithombe kulayibrari ye-verto"
-    shuffle_confirm: "Uxube izithombe? Izithombe zakho zamanje zizoshintshwa ngokukhethwa okusha kulayibrari."
-    shuffle_direction_toggle_title: "Engeza isiqondiso salokhu kuxuba"
-    shuffle_direction_heading: "Qondisa lokhu kuxuba"
+    shuffle: "Xuba izithombe"
+    shuffle_title: "Khetha kabusha sonke isithombe nopopayi kulayibrari ye-Verto — imibuzo yakho nokulandelana kwayo akushintshi"
+    shuffle_confirm: "Uxube izithombe? Sonke isithombe nopopayi kuzoshintshwa ngokukhethwa okusha kulayibrari. Imibuzo yakho nokulandelana kwayo kuhlala kunjalo."
+    shuffle_direction_toggle_title: "Engeza isiqondiso salokhu kuxuba izithombe"
+    shuffle_direction_heading: "Qondisa lokhu kuxuba izithombe"
     shuffle_direction_hint: "Akuphoqelekile. Tshela i-Verto ukuthi ufunani ezithombeni nasekunyakazeni kwezithombe — umoya, indawo, noma into okufanele ishiywe ngaphandle."
     shuffle_direction_label: "Isiqondiso"
     shuffle_direction_placeholder: "isb. ukukhanya kwemvelo okufudumele, ngaphandle, amaqembu amancane, awekho amahhovisi"
     shuffle_direction_toward: "Ukuxuba kokugcina kufune: %{terms}"
     shuffle_direction_avoiding: "futhi kushiye ngaphandle: %{terms}"
     shuffle_direction_clear: "Sula"
-    shuffle_direction_apply: "Xuba ngalokhu"
+    shuffle_direction_apply: "Xuba izithombe ngalokhu"
     publish_share: "Shicilela bese wabelana →"
     answer_type: "Uhlobo Lwempendulo"
     select_card: "Khetha ikhadi ukuze ushintshe uhlobo lwalo"
@@ -1406,7 +1408,7 @@ zu:
     s7_perks:
       - "Isizinda socwaningo esihambisana nendikimba"
       - "Izithombe kukhadi ngalinye, kubandakanya amakhadi okuhudula"
-      - "Xuba kumhleli kuze kuzwakale kahle"
+      - "Xuba izithombe kumhleli kuze kuzwakale kahle"
     s7_title: "Ungathanda ukuqala kanjani?"
     s7_sub: "Usengakwazi ukushintsha noma yini kumhleli."
     s7_recommended: "Okuncomekile"
@@ -1764,7 +1766,7 @@ zu:
       pdf_too_large: "Leyo PDF inkulu kakhulu — sicela uyigcine ngaphansi kuka-%{limit}MB."
       restored: "“%{name}” ibuyisiwe. Isebuyele ezinhlakeni zakho — iyishicilele futhi uma usulungele."
       settings_locked: "Le-Verto isesikhundleni noma isivele inezimpendulo — izilungiselelo zemvume nezamaphuzu azikwazi ukushintsha manje."
-      shuffle_failed: "Akukwazanga ukuxuba izinsiza — sicela uzame futhi."
+      shuffle_failed: "Akukwazanga ukuxuba izithombe — sicela uzame futhi."
       unpublished: "I-Verto ayisashicilelwe — isebuyele ohlakeni ongalihlela."
   ask:
     stale_note: "Eminye imithombo ecashunwe kule mpendulo isike yashiya inqolobane eyabelene."

@@ -378,6 +378,7 @@ vi:
       appeal_submitted: "Đã gửi để xét duyệt — chúng tôi sẽ thông báo khi có kết quả."
       appeal_failed: "Không thể gửi để xét duyệt — vui lòng thử lại."
       emoji_none: "Không có emoji phù hợp."
+      note_limit_count: "%{n} / %{recommended} khuyến nghị · %{max} tối đa"
       rich_bold: "Đậm"
       rich_italic: "Nghiêng"
       rich_underline: "Gạch chân"
@@ -1051,6 +1052,7 @@ vi:
     ty_forward_label_placeholder: 'Nhãn nút (vd. Ghé thăm trang của chúng tôi)'
     tab_quiz: 'Chế độ đố vui'
     tab_tokens: 'Mã hóa token'
+    note_limit_split_hint: "Quá %{n} ký tự sẽ bị chật trên thẻ giới thiệu — hãy đưa phần chi tiết sang một thẻ riêng."
     tab_logic: 'Logic & luồng'
     flows_title: "Luồng"
     flows_intro: "Nhóm thẻ có tên mà câu trả lời được định tuyến sẽ đi vào — vd. bộ câu hỏi UK, UAE và USA rồi hội tụ lại hoặc kết thúc trên màn hình riêng."
@@ -1110,18 +1112,18 @@ vi:
       one: Ước tính ~%{count} phút
       other: Ước tính ~%{count} phút
     design: Thiết kế
-    shuffle: Xáo trộn
-    shuffle_title: Chọn lại hình ảnh từ thư viện Verto
-    shuffle_confirm: Xáo trộn hình ảnh? Các hình ảnh hiện tại của bạn sẽ được thay thế bằng bộ ảnh mới từ thư viện.
-    shuffle_direction_toggle_title: "Thêm định hướng cho lần xáo trộn này"
-    shuffle_direction_heading: "Định hướng lần xáo trộn này"
+    shuffle: "Xáo trộn hình ảnh"
+    shuffle_title: "Chọn lại từng hình ảnh và hoạt ảnh từ thư viện Verto — câu hỏi và thứ tự của chúng không thay đổi"
+    shuffle_confirm: "Xáo trộn hình ảnh? Mọi hình ảnh và hoạt ảnh sẽ được thay bằng lựa chọn mới từ thư viện. Câu hỏi và thứ tự của chúng vẫn giữ nguyên."
+    shuffle_direction_toggle_title: "Thêm định hướng cho lần xáo trộn hình ảnh này"
+    shuffle_direction_heading: "Định hướng lần xáo trộn hình ảnh này"
     shuffle_direction_hint: "Không bắt buộc. Hãy cho Verto biết bạn muốn gì ở hình ảnh và hoạt ảnh — một không khí, một bối cảnh, hoặc điều cần tránh."
     shuffle_direction_label: "Định hướng"
     shuffle_direction_placeholder: "vd. ánh sáng tự nhiên ấm, ngoài trời, nhóm nhỏ, không văn phòng"
     shuffle_direction_toward: "Lần xáo trộn trước đã tìm: %{terms}"
     shuffle_direction_avoiding: "và loại trừ: %{terms}"
     shuffle_direction_clear: "Xóa"
-    shuffle_direction_apply: "Xáo trộn theo cách này"
+    shuffle_direction_apply: "Xáo trộn hình ảnh theo cách này"
     publish_share: Xuất bản & chia sẻ →
     answer_type: Loại câu trả lời
     select_card: Chọn một thẻ để thay đổi loại của nó
@@ -1386,7 +1388,7 @@ vi:
     s7_perks:
     - Hình nền khớp với chủ đề của bạn
     - Hình ảnh trên mỗi thẻ, bao gồm cả thẻ vuốt
-    - Xáo trộn trong trình chỉnh sửa cho đến khi ưng ý
+    - "Xáo trộn hình ảnh trong trình chỉnh sửa cho đến khi ưng ý"
     s7_title: Bạn muốn bắt đầu như thế nào?
     s7_sub: Bạn vẫn có thể thay đổi bất kỳ nội dung nào trong trình chỉnh sửa.
     s7_recommended: Được đề xuất

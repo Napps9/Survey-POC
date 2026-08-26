@@ -90,4 +90,40 @@ class TokenNotesTest < ActionDispatch::IntegrationTest
                "would render an empty pill instead"
     assert_nil s.leaderboard_note
   end
+
+  # ── Both limits, on screen ─────────────────────────────────────────────────
+  # The 200-char cap has always been enforced, but it was the only number a
+  # creator could find and it is the less useful of the two: each note renders
+  # as a single pill on the intro, so it stops FITTING (about 120) long before
+  # it stops SAVING. Showing one limit taught the wrong one.
+
+  test "the cap is a named constant, enforced on the way in" do
+    s = survey
+    admin_for(s.organisation)
+
+    post survey_settings_path(s), params: { tokens_note: "x" * (Survey::MAX_NOTE + 50) }
+
+    assert_equal Survey::MAX_NOTE, s.reload.tokens_note.length,
+                 "the note must be cut to MAX_NOTE server-side — maxlength is a courtesy, not a guard"
+    assert_operator Survey::RECOMMENDED_NOTE, :<, Survey::MAX_NOTE,
+                    "the recommended width has to sit below the cap or there is nothing to advise about"
+  end
+
+  test "the editor shows both limits and the split-to-a-card advice" do
+    s = survey
+    admin_for(s.organisation)
+
+    get survey_path(s)
+    assert_response :success
+
+    assert_match 'data-note-limit-recommended-value="120"', response.body
+    assert_match 'data-note-limit-max-value="200"', response.body
+    assert_match I18n.t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_NOTE), response.body
+
+    counter = I18n.t("js.editor.note_limit_count")
+    %w[%{n} %{recommended} %{max}].each do |slot|
+      assert_includes counter, slot,
+                      "the counter must name the count AND both limits — it is the whole point of the string"
+    end
+  end
 end

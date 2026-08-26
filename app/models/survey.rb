@@ -1650,6 +1650,18 @@ class Survey < ApplicationRecord
   # The two tokenomics lines on the points intro, per-Verto with the locale
   # default as the fallback — same contract as compare_note above and the
   # thank-you copy below: nil means "say the usual thing".
+  #
+  # Two limits, not one, and the editor shows both. MAX_NOTE is the storage
+  # bound — past it the copy is simply cut. RECOMMENDED_NOTE is where the line
+  # stops fitting: the note renders as a single pill on the points intro
+  # (player/_token_intro.html.erb), and the shipped default
+  # (player.tokens_welcome_note) is 101 characters, so ~120 is the width the
+  # design actually holds. A creator with more to say than that is writing a
+  # card, not a note, and the editor says so rather than letting them find out
+  # on a phone.
+  MAX_NOTE         = 200
+  RECOMMENDED_NOTE = 120
+
   def tokens_note_text
     tokens_note.presence || I18n.t("player.tokens_welcome_note")
   end

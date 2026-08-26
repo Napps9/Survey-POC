@@ -378,6 +378,7 @@ pl:
       appeal_submitted: "Wysłano do weryfikacji — powiadomimy Cię, gdy zostanie sprawdzone."
       appeal_failed: "Nie udało się wysłać do weryfikacji — spróbuj ponownie."
       emoji_none: "Brak pasujących emoji."
+      note_limit_count: "%{n} / %{recommended} zalecane · %{max} maks."
       rich_bold: "Pogrubienie"
       rich_italic: "Kursywa"
       rich_underline: "Podkreślenie"
@@ -1053,6 +1054,7 @@ pl:
     ty_forward_label_placeholder: 'Etykieta przycisku (np. Odwiedź naszą stronę)'
     tab_quiz: 'Tryb quizu'
     tab_tokens: 'Tokenizacja'
+    note_limit_split_hint: "Powyżej %{n} znaków robi się ciasno na karcie wprowadzającej — szczegóły lepiej umieścić na osobnej karcie."
     tab_logic: 'Logika i przepływy'
     flows_title: "Przepływy"
     flows_intro: "Nazwane grupy kart, do których trafia skierowana odpowiedź — np. zestawy pytań UK, ZEA i USA, które potem się schodzą lub kończą na własnych ekranach."
@@ -1112,18 +1114,18 @@ pl:
       one: Szacowany czas ~%{count} min
       other: Szacowany czas ~%{count} min
     design: Projekt
-    shuffle: Losuj
-    shuffle_title: Wylosuj nowe obrazy z biblioteki Verto
-    shuffle_confirm: Wylosować nowe obrazy? Aktualne zdjęcia zostaną zastąpione nowym wyborem z biblioteki.
-    shuffle_direction_toggle_title: "Dodaj wskazówkę do tego losowania"
-    shuffle_direction_heading: "Ukierunkuj to losowanie"
+    shuffle: "Losuj obrazy"
+    shuffle_title: "Wylosuj od nowa każdy obraz i animację z biblioteki Verto — Twoje pytania i ich kolejność się nie zmieniają"
+    shuffle_confirm: "Wylosować nowe obrazy? Każdy obraz i animacja zostaną zastąpione nowym wyborem z biblioteki. Twoje pytania i ich kolejność pozostaną dokładnie takie same."
+    shuffle_direction_toggle_title: "Dodaj wskazówkę do tego losowania obrazów"
+    shuffle_direction_heading: "Ukierunkuj to losowanie obrazów"
     shuffle_direction_hint: "Opcjonalnie. Powiedz Verto, czego oczekujesz od zdjęć i animacji — nastroju, otoczenia albo tego, czego ma unikać."
     shuffle_direction_label: "Wskazówka"
     shuffle_direction_placeholder: "np. ciepłe naturalne światło, na zewnątrz, małe grupy, bez biur"
     shuffle_direction_toward: "Ostatnie losowanie szukało: %{terms}"
     shuffle_direction_avoiding: "i pominęło: %{terms}"
     shuffle_direction_clear: "Wyczyść"
-    shuffle_direction_apply: "Losuj według tego"
+    shuffle_direction_apply: "Losuj obrazy według tego"
     publish_share: Opublikuj i udostępnij →
     answer_type: Typ odpowiedzi
     select_card: Wybierz kartę, aby zmienić jej typ
@@ -1388,7 +1390,7 @@ pl:
     s7_perks:
     - Tło dopasowane do motywu ankiety
     - Obrazy na każdej karcie, w tym kartach do przesuwania
-    - Losuj w edytorze, aż efekt będzie odpowiedni
+    - "Losuj obrazy w edytorze, aż efekt będzie odpowiedni"
     s7_title: Jak chcesz zacząć?
     s7_sub: Wszystko możesz zmienić później w edytorze.
     s7_recommended: Zalecane
@@ -1739,7 +1741,7 @@ pl:
       pdf_too_large: "Ten plik PDF jest za duży — musi mieć mniej niż %{limit} MB."
       restored: "„%{name}” przywrócone. Wróciło do Twoich wersji roboczych — opublikuj je ponownie, gdy będziesz gotowy."
       settings_locked: "To Verto jest aktywne albo ma już odpowiedzi — nie można teraz zmienić ustawień zgody ani punktacji."
-      shuffle_failed: "Nie udało się przetasować obrazów — spróbuj jeszcze raz."
+      shuffle_failed: "Nie udało się wylosować obrazów — spróbuj jeszcze raz."
       unpublished: "Publikacja Verto cofnięta — wróciło do wersji roboczej, którą możesz edytować."
   ask:
     stale_note: "Niektóre źródła cytowane w tej odpowiedzi nie należą już do wspólnego korpusu."

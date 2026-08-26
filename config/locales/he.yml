@@ -378,6 +378,7 @@ he:
       appeal_submitted: "נשלח לבדיקה — נודיע לכם ברגע שהיא תיבדק."
       appeal_failed: "לא ניתן היה לשלוח לבדיקה — נסו שוב."
       emoji_none: "אין אימוג'י תואם."
+      note_limit_count: "%{n} / %{recommended} מומלץ · %{max} מקסימום"
       rich_bold: "מודגש"
       rich_italic: "נטוי"
       rich_underline: "קו תחתון"
@@ -1051,6 +1052,7 @@ he:
     ty_forward_label_placeholder: 'תווית הכפתור (למשל בקרו באתר שלנו)'
     tab_quiz: 'מצב חידון'
     tab_tokens: 'טוקניזציה'
+    note_limit_split_hint: "מעל %{n} תווים זה נדחס בכרטיס הפתיחה — עדיף לשים את הפירוט בכרטיס נפרד."
     tab_logic: 'לוגיקה וזרימות'
     flows_title: "מסלולים"
     flows_intro: "קבוצות כרטיסים בעלות שם שאליהן מגיעה תשובה מנותבת — למשל סטים של שאלות ל-UK, איחוד האמירויות וארצות הברית שמתאחדים בהמשך או מסתיימים במסכים משלהם."
@@ -1110,18 +1112,18 @@ he:
       one: משוער ~%{count} דקה
       other: משוער ~%{count} דקות
     design: עיצוב
-    shuffle: ערבב
-    shuffle_title: בחר מחדש תמונות מספריית verto
-    shuffle_confirm: לערבב תמונות? התמונות הנוכחיות שלך יוחלפו בבחירה חדשה מהספרייה.
-    shuffle_direction_toggle_title: "הוסיפו הנחיה לערבוב הזה"
-    shuffle_direction_heading: "כוונו את הערבוב"
+    shuffle: "ערבב תמונות"
+    shuffle_title: "בחרו מחדש כל תמונה ואנימציה מספריית Verto — השאלות שלכם והסדר שלהן לא משתנים"
+    shuffle_confirm: "לערבב תמונות? כל תמונה ואנימציה יוחלפו בבחירה חדשה מהספרייה. השאלות שלכם והסדר שלהן יישארו בדיוק כפי שהם."
+    shuffle_direction_toggle_title: "הוסיפו הנחיה לערבוב התמונות הזה"
+    shuffle_direction_heading: "כוונו את ערבוב התמונות"
     shuffle_direction_hint: "אופציונלי. ספרו ל-Verto מה אתם מחפשים בתמונות ובאנימציות — אווירה, סביבה, או משהו להשמיט."
     shuffle_direction_label: "הנחיה"
     shuffle_direction_placeholder: "לדוגמה: אור טבעי חמים, בחוץ, קבוצות קטנות, בלי משרדים"
     shuffle_direction_toward: "הערבוב האחרון חיפש: %{terms}"
     shuffle_direction_avoiding: "והשאיר בחוץ: %{terms}"
     shuffle_direction_clear: "ניקוי"
-    shuffle_direction_apply: "ערבבו לפי זה"
+    shuffle_direction_apply: "ערבבו תמונות לפי זה"
     publish_share: פרסם ושתף →
     answer_type: סוג תשובה
     select_card: בחר כרטיס כדי לשנות את סוגו
@@ -1386,7 +1388,7 @@ he:
     s7_perks:
     - רקע לסקר המותאם לנושא
     - תמונה בכל כרטיס, כולל כרטיסי החלקה
-    - ערבוב בעורך עד שמרגיש נכון
+    - "ערבבו תמונות בעורך עד שמרגיש נכון"
     s7_title: איך תרצה להתחיל?
     s7_sub: תמיד אפשר לשנות הכל בעורך.
     s7_recommended: מומלץ
@@ -1736,7 +1738,7 @@ he:
       pdf_too_large: "ה-PDF הזה גדול מדי — הקפידו על פחות מ-%{limit}MB."
       restored: "“%{name}” שוחזר. הוא חזר לטיוטות שלכם — פרסמו אותו שוב כשתהיו מוכנים."
       settings_locked: "ה-Verto הזה פעיל או שכבר יש לו תגובות — לא ניתן לשנות כעת את הגדרות ההסכמה והניקוד."
-      shuffle_failed: "לא ניתן היה לערבב את הנכסים — נסו שוב."
+      shuffle_failed: "לא ניתן היה לערבב את התמונות — נסו שוב."
       unpublished: "פרסום ה-Verto בוטל — הוא חזר להיות טיוטה שאתם יכולים לערוך."
   ask:
     stale_note: "חלק מהמקורות שצוטטו בתשובה זו כבר אינם חלק מהמאגר המשותף."

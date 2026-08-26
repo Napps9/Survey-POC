@@ -394,6 +394,7 @@ tn:
       appeal_submitted: "E rometswe go sekasekwa — re tla go itsise fa e sena go sekasekwa."
       appeal_failed: "Go paletswe go romela go sekasekwa — tsweetswee leka gape."
       emoji_none: "Ga go na emoji e e tshwanang."
+      note_limit_count: "%{n} / %{recommended} e e atlenegisiwang · %{max} bogolo"
       rich_bold: "E Boima"
       rich_italic: "E Sekamileng"
       rich_underline: "E Gataka"
@@ -1073,6 +1074,7 @@ tn:
     ty_forward_label_placeholder: 'Leina la konopo (sk. Etela webosaete ya rona)'
     tab_quiz: 'Mokgwa wa tlhatlhobo'
     tab_tokens: 'Tokeni'
+    note_limit_split_hint: "Morago ga ditlhaka tse %{n} go a patana mo karateng ya matseno — baya dintlha mo karateng ya tsona."
     tab_logic: 'Tlhaloganyo le ditsela'
     flows_title: 'Ditsela'
     flows_intro: 'Ditlhopha tse di neilweng maina tsa dikarata tse karabo e e neetsweng tsela e ka tsenang mo go tsona — sk. diseto tsa dipotso tsa UK, UAE le USA tse di kopanang gape kgotsa tsa fela ka ditsebe tsa tsona.'
@@ -1132,18 +1134,18 @@ tn:
       one: "E lekanyediwa ~metsotso %{count}"
       other: "E lekanyediwa ~metsotso %{count}"
     design: "Sebopego"
-    shuffle: "Tswakanya"
-    shuffle_title: "Tlhopha gape ditshwantsho go tswa mo laeboraring ya verto"
-    shuffle_confirm: "Tswakanya ditshwantsho? Ditshwantsho tsa gago tsa jaanong di tla fetolwa ka tlhopho e ntšha go tswa mo laeboraring."
-    shuffle_direction_toggle_title: "Tsenya kaelo ya go tswakanya mo"
-    shuffle_direction_heading: "Kaela go tswakanya mo"
+    shuffle: "Tswakanya ditshwantsho"
+    shuffle_title: "Tlhopha gape setshwantsho sengwe le sengwe le dianimeishene go tswa mo laeboraring ya Verto — dipotso tsa gago le thulaganyo ya tsona ga di fetoge"
+    shuffle_confirm: "Tswakanya ditshwantsho? Setshwantsho sengwe le sengwe le dianimeishene di tla fetolwa ka tlhopho e ntšha go tswa mo laeboraring. Dipotso tsa gago le thulaganyo ya tsona di nna fela jaaka di ntse."
+    shuffle_direction_toggle_title: "Tsenya kaelo ya go tswakanya ditshwantsho mo"
+    shuffle_direction_heading: "Kaela go tswakanya ditshwantsho mo"
     shuffle_direction_hint: "Ga go patelesege. Bolelela Verto se o se batlang mo ditshwantshong le mo dianimeishening — maikutlo, lefelo, kgotsa se o sa se batleng."
     shuffle_direction_label: "Kaelo"
     shuffle_direction_placeholder: "sekai: lesedi le le bothitho la tlholego, kwa ntle, ditlhopha tse dinnye, go se na dikantoro"
     shuffle_direction_toward: "Go tswakanya ga bofelo go batlile: %{terms}"
     shuffle_direction_avoiding: "mme go tlositse: %{terms}"
     shuffle_direction_clear: "Phimola"
-    shuffle_direction_apply: "Tswakanya ka se"
+    shuffle_direction_apply: "Tswakanya ditshwantsho ka se"
     publish_share: "Phasaladitsa & abelana →"
     answer_type: "Mofuta wa Karabo"
     select_card: "Tlhopha karata go fetola mofuta wa yona"
@@ -1408,7 +1410,7 @@ tn:
     s7_perks:
       - "Kwa morago ga Verto go tsamaisanya le setlhogo"
       - "Ditshwantsho mo karateng nngwe le nngwe, go akaretswa dikarata tsa go sutha"
-      - "Tswakanya mo sefetoding go fitlha go siame"
+      - "Tswakanya ditshwantsho mo sefetoding go fitlha go siame"
     s7_title: "O ka rata go simolola jang?"
     s7_sub: "O sa ntse o ka fetola sengwe le sengwe mo sefetoding."
     s7_recommended: "E Eletswang"
@@ -1766,7 +1768,7 @@ tn:
       pdf_too_large: "PDF eo e kgolo thata — tsweetswee e boloke e le kwa tlase ga MB %{limit}."
       restored: "“%{name}” e busitswe. E boetse mo dintlhamong tsa gago — e phasaladitse gape fa o siametse."
       settings_locked: "Verto e e teng mo tirisong kgotsa e setse e na le dikarabo — dipeakanyo tsa tumelano le dintlha ga di kake tsa fetoga jaanong."
-      shuffle_failed: "Go paletswe go tswakanya dithoto — tsweetswee leka gape."
+      shuffle_failed: "Go paletswe go tswakanya ditshwantsho — tsweetswee leka gape."
       unpublished: "Verto e emisitswe go phasaladiwa — e boetse kwa ntlhamong e o ka e baakanyang."
   ask:
     stale_note: "Bangwe ba metswedi e e umakilweng mo karabong e ba setse ba tswile mo pokelong e e abelanngwang."

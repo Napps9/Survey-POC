@@ -378,6 +378,7 @@ ja:
       appeal_submitted: "レビューに送信しました — 確認が済み次第お知らせします。"
       appeal_failed: "レビューへの送信に失敗しました — もう一度お試しください。"
       emoji_none: "一致する絵文字がありません。"
+      note_limit_count: "%{n} / 推奨 %{recommended} · 最大 %{max}"
       rich_bold: "太字"
       rich_italic: "斜体"
       rich_underline: "下線"
@@ -1051,6 +1052,7 @@ ja:
     ty_forward_label_placeholder: 'ボタンのラベル（例：サイトを見る）'
     tab_quiz: 'クイズモード'
     tab_tokens: 'トークン化'
+    note_limit_split_hint: "%{n}文字を超えるとイントロカードで窮屈になります — 詳細は専用のカードに置いてください。"
     tab_logic: 'ロジックとフロー'
     flows_title: "フロー"
     flows_intro: "ルーティングされた回答が入る名前付きカードグループ。例:UK・UAE・USAの質問セットが後で合流するか、それぞれの画面で終了します。"
@@ -1110,18 +1112,18 @@ ja:
       one: 推定 約%{count}分
       other: 推定 約%{count}分
     design: デザイン
-    shuffle: シャッフル
-    shuffle_title: Vertoライブラリから画像を再選択
-    shuffle_confirm: 画像をシャッフルしますか？現在の画像はライブラリから新たに選ばれた画像に置き換えられます。
-    shuffle_direction_toggle_title: "このシャッフルに方向性を追加"
-    shuffle_direction_heading: "シャッフルの方向性"
+    shuffle: "画像をシャッフル"
+    shuffle_title: "Vertoライブラリから画像とアニメーションを選び直します — 設問とその順序は変わりません"
+    shuffle_confirm: "画像をシャッフルしますか？すべての画像とアニメーションがライブラリから新たに選ばれたものに置き換えられます。設問とその順序はそのままです。"
+    shuffle_direction_toggle_title: "この画像シャッフルに方向性を追加"
+    shuffle_direction_heading: "画像シャッフルの方向性"
     shuffle_direction_hint: "任意。画像やアニメーションに求めるもの（雰囲気、場面、避けたいもの）をVertoに伝えてください。"
     shuffle_direction_label: "方向性"
     shuffle_direction_placeholder: "例：温かい自然光、屋外、少人数、オフィスなし"
     shuffle_direction_toward: "前回のシャッフルの検索：%{terms}"
     shuffle_direction_avoiding: "除外：%{terms}"
     shuffle_direction_clear: "クリア"
-    shuffle_direction_apply: "これでシャッフル"
+    shuffle_direction_apply: "これで画像をシャッフル"
     publish_share: 公開・共有 →
     answer_type: 回答タイプ
     select_card: タイプを変更するカードを選択
@@ -1386,7 +1388,7 @@ ja:
     s7_perks:
     - テーマに合ったアンケート背景
     - タップカードを含む全カードへの画像挿入
-    - エディターでしっくりくるまでシャッフル可能
+    - "エディターでしっくりくるまで画像をシャッフル可能"
     s7_title: どのように開始しますか？
     s7_sub: エディターでいつでも変更できます。
     s7_recommended: おすすめ
@@ -1727,7 +1729,7 @@ ja:
       pdf_too_large: "その PDF は大きすぎます — %{limit}MB 未満に収めてください。"
       restored: "「%{name}」を復元しました。下書きに戻りました — 準備ができたら再度公開してください。"
       settings_locked: "この Verto は公開中か、すでに回答があります — 同意とスコアリングの設定は変更できません。"
-      shuffle_failed: "アセットをシャッフルできませんでした — もう一度お試しください。"
+      shuffle_failed: "画像をシャッフルできませんでした — もう一度お試しください。"
       unpublished: "Verto の公開を取り消しました — 編集できる下書きに戻りました。"
   ask:
     stale_note: "この回答で引用された情報源の一部は、その後共有コーパスから削除されました。"

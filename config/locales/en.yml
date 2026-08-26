@@ -394,6 +394,7 @@ en:
       appeal_submitted: "Submitted for review — we'll let you know once it's checked."
       appeal_failed: "Couldn't submit that for review — please try again."
       emoji_none: "No emoji match that."
+      note_limit_count: "%{n} / %{recommended} recommended · %{max} max"
       rich_bold: "Bold"
       rich_italic: "Italic"
       rich_underline: "Underline"
@@ -1073,6 +1074,7 @@ en:
     ty_forward_label_placeholder: 'Button label (e.g. Visit our site)'
     tab_quiz: 'Quiz mode'
     tab_tokens: 'Tokenisation'
+    note_limit_split_hint: "Past %{n} characters this gets cramped on the intro card — put the detail on its own card instead."
     tab_logic: 'Logic & flows'
     flows_title: 'Flows'
     flows_intro: 'Named groups of cards a routed answer can enter — e.g. UK, UAE and USA question sets that converge back or finish on their own screens.'
@@ -1132,18 +1134,18 @@ en:
       one: "Estimated ~%{count} min"
       other: "Estimated ~%{count} mins"
     design: "Design"
-    shuffle: "Shuffle"
-    shuffle_title: "Re-pick imagery from the verto library"
-    shuffle_confirm: "Shuffle imagery? Your current pictures will be replaced with a fresh pick from the library."
-    shuffle_direction_toggle_title: "Add a direction for this shuffle"
-    shuffle_direction_heading: "Steer this shuffle"
+    shuffle: "Shuffle imagery"
+    shuffle_title: "Re-pick every picture and animation from the Verto library — your questions and their order don't change"
+    shuffle_confirm: "Shuffle imagery? Every picture and animation is replaced with a fresh pick from the library. Your questions and their order stay exactly as they are."
+    shuffle_direction_toggle_title: "Add a direction for this imagery shuffle"
+    shuffle_direction_heading: "Steer this imagery shuffle"
     shuffle_direction_hint: "Optional. Tell Verto what you're after in the pictures and animations — a mood, a setting, anything to leave out."
     shuffle_direction_label: "Direction"
     shuffle_direction_placeholder: "e.g. warm natural light, outdoors, small groups, no offices"
     shuffle_direction_toward: "Last shuffle searched for: %{terms}"
     shuffle_direction_avoiding: "and kept out: %{terms}"
     shuffle_direction_clear: "Clear"
-    shuffle_direction_apply: "Shuffle with this"
+    shuffle_direction_apply: "Shuffle imagery with this"
     publish_share: "Publish & share →"
     answer_type: "Answer Type"
     select_card: "Select a card to change its type"
@@ -1408,7 +1410,7 @@ en:
     s7_perks:
       - "A theme-matched survey backdrop"
       - "Imagery on every card, including tap cards"
-      - "Shuffle in the editor until it feels right"
+      - "Shuffle the imagery in the editor until it feels right"
     s7_title: "How would you like to start?"
     s7_sub: "You can still change anything in the editor."
     s7_recommended: "Recommended"
@@ -1768,7 +1770,7 @@ en:
       pdf_too_large: "That PDF is too large — please keep it under %{limit}MB."
       restored: "“%{name}” restored. It's back in your drafts — publish again when you're ready."
       settings_locked: "This Verto is live or already has responses — consent and scoring settings can't change now."
-      shuffle_failed: "Couldn't shuffle assets — please try again."
+      shuffle_failed: "Couldn't shuffle the imagery — please try again."
       unpublished: "Verto unpublished — it's back to a draft you can edit."
   ask:
     stale_note: "Some sources cited in this answer have since left the shared corpus."

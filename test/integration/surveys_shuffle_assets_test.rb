@@ -60,7 +60,24 @@ class SurveysShuffleAssetsTest < ActionDispatch::IntegrationTest
     )
     get survey_path(s)
     assert_response :success
-    assert_match ">Shuffle<", response.body
+    assert_match ">#{I18n.t('editor.shuffle')}<", response.body
+  end
+
+  # The CTA was the bare word "Shuffle" until a creator standing in front of a
+  # deck of cards read it as "reorder my questions" and said so. It re-rolls
+  # imagery and touches neither card order nor option order, so the label has to
+  # name what it acts on, and the confirm has to say what is NOT moving —
+  # otherwise the reassurance only exists in the tooltip nobody hovers.
+  test "the Shuffle copy names imagery and promises the deck order is untouched" do
+    label = I18n.t("editor.shuffle")
+    assert_match(/imagery/i, label, "the CTA must name its object, not read as a bare verb")
+
+    confirm = I18n.t("editor.shuffle_confirm")
+    assert_match(/imagery|picture/i, confirm)
+    assert_match(/order/i, confirm, "the confirm must say the question order stays put")
+
+    assert_match(/imagery/i, I18n.t("flash.surveys.shuffle_failed"),
+                 "the failure flash said 'assets', which names nothing a creator recognises")
   end
 
   test "editor renders the Change-animation CTA and picker for a range card" do

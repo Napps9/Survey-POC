@@ -382,6 +382,7 @@ sn:
       appeal_submitted: "Yatumirwa kuti iongororwe — tichakuzivisa kana yaongororwa."
       appeal_failed: "Hazvina kukwanisa kutumira izvozvo kuti kuongororwe — ndapota edza zvakare."
       emoji_none: "Hapana emoji inoenderana neizvozvo."
+      note_limit_count: "%{n} / %{recommended} zvinokurudzirwa · %{max} zvakanyanya"
       rich_bold: "Yakasimba"
       rich_italic: "Yakarereka"
       rich_underline: "Yakaisirwa Mutsara Pasi"
@@ -1061,6 +1062,7 @@ sn:
     ty_forward_label_placeholder: 'Zita reBhatani (semuenzaniso, Shanyira Webhusaiti Yedu)'
     tab_quiz: 'Muitiro weKwizi'
     tab_tokens: 'Kuisa Mapoinzi'
+    note_limit_split_hint: "Kupfuura mavara %{n} zvinotanga kumanikana pakadhi rekutanga — isai ruzivo rwakadzama pakadhi rakazvimirira."
     tab_logic: 'Fungiro Nemifambiro'
     flows_title: 'Mifambiro'
     flows_intro: 'Mapoka emakadhi ane mazita anogona kupindwa nemhinduro yakanongedzwa — semuenzaniso, seti dzemibvunzo dzeUK, UAE neUSA dzinodzokerana kana kupedzera pazvidzitiro zvazvo.'
@@ -1120,18 +1122,18 @@ sn:
       one: "Inofungidzirwa ~maminetsi %{count}"
       other: "Inofungidzirwa ~maminetsi %{count}"
     design: "Gadziriro"
-    shuffle: "Sanganisa"
-    shuffle_title: "Sarudzazve Mifananidzo Kubva Kulaibhurari yeVerto"
-    shuffle_confirm: "Sanganisa mifananidzo? Mifananidzo yako yeparizvino ichatsiviwa nesarudzo itsva kubva kulaibhurari."
-    shuffle_direction_toggle_title: "Wedzera nhungamiro yekusanganisa uku"
-    shuffle_direction_heading: "Tungamira kusanganisa uku"
+    shuffle: "Sanganisa mifananidzo"
+    shuffle_title: "Sarudza patsva mufananidzo wega wega neanofamba kubva kulaibhurari yeVerto — mibvunzo yako nekutevedzana kwayo hazvichinji"
+    shuffle_confirm: "Sanganisa mifananidzo? Mufananidzo wega wega neanofamba zvichatsiviwa nesarudzo itsva kubva kulaibhurari. Mibvunzo yako nekutevedzana kwayo zvinoramba zvakadaro."
+    shuffle_direction_toggle_title: "Wedzera nhungamiro yekusanganisa mifananidzo uku"
+    shuffle_direction_heading: "Tungamira kusanganisa mifananidzo uku"
     shuffle_direction_hint: "Hazvimanikidzwe. Udza Verto zvaunoda pamifananidzo neanimeshoni — mamiriro, nzvimbo, kana zvausingadi."
     shuffle_direction_label: "Nhungamiro"
     shuffle_direction_placeholder: "semuenzaniso: chiedza chinodziya chechisikigo, kunze, mapoka madiki, pasina mahofisi"
     shuffle_direction_toward: "Kusanganisa kwekupedzisira kwakatsvaga: %{terms}"
     shuffle_direction_avoiding: "uye kwakasiya kunze: %{terms}"
     shuffle_direction_clear: "Bvisa"
-    shuffle_direction_apply: "Sanganisa nezvizvi"
+    shuffle_direction_apply: "Sanganisa mifananidzo nezvizvi"
     publish_share: "Buritsa & Govana →"
     answer_type: "Rudzi rweMhinduro"
     select_card: "Sarudza Kadhi Kuti Uchinje Rudzi Rwaro"
@@ -1396,7 +1398,7 @@ sn:
     s7_perks:
       - "Mumashure meongororo inoenderana nemusoro"
       - "Mifananidzo pakadhi rimwe nerimwe, kusanganisira makadhi ekuzvuzvurudza"
-      - "Sanganisa muChigadziriso kusvika zvanzwika zvakanaka"
+      - "Sanganisa mifananidzo muChigadziriso kusvika zvanzwika zvakanaka"
     s7_title: "Ungada Kutanga Sei?"
     s7_sub: "Uchiri kugona kuchinja chero chinhu muChigadziriso."
     s7_recommended: "Zvinokurudzirwa"
@@ -1739,7 +1741,7 @@ sn:
       pdf_too_large: "PDF iyoyo yakakura zvikuru — ndapota ichengete pasi peMB %{limit}."
       restored: "“%{name}” yadzoswa. Yadzokera mumadhirafiti ako — iburitsezve kana wagadzirira."
       settings_locked: "Verto iyi iri pachena kana yatova nemhinduro — zvirongwa zvemvumo nezvibodzwa hazvigoni kuchinja parizvino."
-      shuffle_failed: "Hazvina kukwanisa kusanganisa midziyo — ndapota edza zvakare."
+      shuffle_failed: "Hazvina kukwanisa kusanganisa mifananidzo — ndapota edza zvakare."
       unpublished: "Verto yabviswa kuburitswa — yadzokera kudhirafiti yaunogona kugadzirisa."
   ask:
     stale_note: "Dzimwe nzvimbo dzakanyorwa mumhinduro iyi dzabva mudhata rakagovaniswa."
