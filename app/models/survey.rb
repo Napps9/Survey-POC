@@ -606,22 +606,109 @@ class Survey < ApplicationRecord
   # had a real, present value which sanitizing dropped (e.g. an oversized or
   # unsupported upload) — so the caller can tell the editor something didn't
   # stick, instead of the drop being silent.
-  def self.sanitize_cards_images!(cards, warnings: nil)
-    seen_cids = Set.new
+  # Every card carries a stable opaque id so answer-branching can target it by
+  # cid (not array index). Backfill a missing cid AND de-dupe collisions: two
+  # cards sharing a cid (from a duplicated/imported/hand-crafted deck) would
+  # make a `{card: X}` route resolve to whichever card is last and orphan the
+  # other, so any blank-or-already-seen cid is reassigned a fresh unique one
+  # (the first occurrence keeps the id, so existing routes to it still resolve).
+  #
+  # Lifted out of sanitize_cards_images! (which still calls it first, so the
+  # behaviour there is unchanged) because two other callers need cids to EXIST
+  # before the editor's first save mints them: an import, whose deck is created
+  # outside the editor's save path, and the media merge below, which matches the
+  # populator's picks to live cards by cid and would match nothing against a
+  # deck of blanks.
+  def self.ensure_cids!(cards)
+    seen = Set.new
     Array(cards).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
-      # Every card carries a stable opaque id so answer-branching can target it
-      # by cid (not array index). Backfill a missing cid AND de-dupe collisions:
-      # two cards sharing a cid (from a duplicated/imported/hand-crafted deck)
-      # would make a `{card: X}` route resolve to whichever card is last and
-      # orphan the other, so any blank-or-already-seen cid is reassigned a fresh
-      # unique one (the first occurrence keeps the id, so existing routes to it
-      # still resolve).
       cid = c["cid"].to_s.strip
-      cid = "c_#{SecureRandom.hex(4)}" while cid.blank? || seen_cids.include?(cid)
-      seen_cids << cid
+      cid = "c_#{SecureRandom.hex(4)}" while cid.blank? || seen.include?(cid)
+      seen << cid
       c["cid"] = cid
+      c
+    end
+  end
+
+  # ── The import's setup window ──────────────────────────────────────────────
+  # An imported Verto hands its creator straight to the editor while
+  # FinishVertoSetupJob fills in imagery behind them. That is deliberate — they
+  # have already waited through the upload and the review screen — but it opens
+  # a window in which two writers hold different truths about the same deck.
+  #
+  # The editor's is the DOM: survey_editor_controller#serialize() rebuilds every
+  # card from `data-card-*`, and emits `image` only when `data-card-image` is
+  # non-empty. At redirect time it is empty for every card, because the job has
+  # not run yet. So the first autosave — one keystroke is enough — used to PATCH
+  # a deck with no imagery in it over the deck the job had just populated, and
+  # #update replaces `cards` wholesale. background_image survived (it is a
+  # column, and serialize() never sends it), which is why the report was "a
+  # background but blank cards" rather than "nothing happened".
+  #
+  # While the flag stands, the client PROVABLY does not know about the pictures
+  # yet, so its silence about them is not a decision to remove them. Once
+  # setup_pending_since clears, #update behaves exactly as it always has.
+  MEDIA_KEYS = %w[
+    image video video_poster image_credit image_credit_url
+    option_images range_theme subject
+  ].freeze
+
+  # Long enough that a five-language import finishes inside it, short enough
+  # that a job the memory watchdog kills (see VertoBuild#stale?, same reasoning)
+  # stops holding the window open. The job clears the flag in an `ensure`; this
+  # is the backstop for the case where the job never gets to run its `ensure`.
+  SETUP_STALE_AFTER = 10.minutes
+
+  def setup_pending?
+    setup_pending_since.present? && setup_pending_since > SETUP_STALE_AFTER.ago
+  end
+
+  # Carry the stored imagery onto an incoming deck that doesn't mention it.
+  # Matched by cid — never by index, because the creator can insert, delete or
+  # reorder cards inside the window, and index-matching would paste the right
+  # picture onto the wrong card, which looks intentional and is worse than no
+  # picture at all.
+  #
+  # One direction only: stored media fills an incoming card that has none. A
+  # card the creator has since given its own image, video or animation keeps
+  # theirs, and nothing else on the card is touched.
+  def self.keep_setup_media(stored, incoming)
+    by_cid = Array(stored).each_with_object({}) do |card, h|
+      next unless card.is_a?(Hash)
+      cid = card["cid"].to_s
+      h[cid] = card if cid.present?
+    end
+    return incoming if by_cid.empty?
+
+    Array(incoming).map do |card|
+      next card unless card.is_a?(Hash)
+      was = by_cid[card["cid"].to_s]
+      next card unless was.is_a?(Hash)
+      next card if card_has_media?(card)
+
+      c = card.dup
+      MEDIA_KEYS.each do |key|
+        value = was[key]
+        c[key] = value if value.present?
+      end
+      c
+    end
+  end
+
+  # A card's left panel holds a photo OR a video OR an animation. Any of the
+  # three means the card has been given its imagery and nothing should overwrite
+  # it — the same test AssetPopulator uses to decide what a fill-only run skips.
+  def self.card_has_media?(card)
+    return false unless card.is_a?(Hash)
+    card["image"].present? || card["video"].present? || card["lottie"].present?
+  end
+
+  def self.sanitize_cards_images!(cards, warnings: nil)
+    Array(ensure_cids!(cards)).map do |card|
+      next card unless card.is_a?(Hash)
+      c = card.dup
       # Common Question provenance rides in from the editor's autosave payload
       # (the card row carries it as a data attribute so it survives the DOM
       # round-trip). Coerce to a positive integer or drop it: it's client-supplied

@@ -372,9 +372,23 @@ class AssetPopulator
   # `direction`: the creator's optional steer for THIS run (see the header).
   # Absent for every caller but Shuffle, and absent means "behave as if the
   # feature isn't there".
-  def initialize(survey, seed: nil, direction: nil)
+  #
+  # `fill_only`: skip any card that already holds a photo, a video or an
+  # animation. This is the difference between the product's two callers, and it
+  # is worth naming rather than inferring. Shuffle is the creator saying "give
+  # me DIFFERENT pictures", so it must overwrite — that is the feature. Auto
+  # population is the platform saying "you have none yet", so it must not:
+  # FinishVertoSetupJob runs while its creator is already in the editor and can
+  # have picked their own imagery in the meantime.
+  #
+  # (The job's comment has claimed since it was written that population "only
+  # fills in cards that have no image yet". Until this flag existed that was
+  # simply untrue — pick_card_image_path skipped only tap_card, range and
+  # `lottie` cards, and apply_card_media overwrote unconditionally.)
+  def initialize(survey, seed: nil, direction: nil, fill_only: false)
     @survey    = survey
     @seed      = seed || survey.id
+    @fill_only = fill_only
     @direction = Survey.sanitize_shuffle_direction(direction)
     # Memoises Pexels search results per (query, orientation) so a populate!
     # run makes at most one API call per distinct query — keeps us well inside
@@ -383,7 +397,49 @@ class AssetPopulator
     @pexels_video_cache = {}
   end
 
+  # Compute the picks and save them positionally over this Verto's deck. The
+  # caller that owns the deck outright — Shuffle, and the wizard's BuildVertoJob,
+  # both of which run when nobody else is writing — uses this.
   def populate!
+    compute!
+    @survey.save!
+  end
+
+  # Compute the same picks, then write them as a MERGE rather than as a deck.
+  #
+  # For the import path, where the creator is already in the editor and can save
+  # the deck from under this run. A whole-deck write there would silently undo
+  # whatever they had just done — the same hazard translate_survey!'s digest
+  # guard exists for, in the other direction.
+  #
+  # The picks are computed against the deck as loaded and then applied, under a
+  # row lock, to the deck as it is NOW: matched by cid (never by index — the
+  # creator can insert, delete or reorder inside this window, and index-matching
+  # would paste the right picture onto the wrong card), and only onto cards that
+  # still have no media of their own. So the creator's edits and this run's
+  # imagery both land, and neither erases the other.
+  def populate_merged!
+    compute!
+    picks      = Array(@survey.cards).map { |c| c.is_a?(Hash) ? c.dup : c }
+    background = @survey.background_image
+    # compute! left its positional result on the record in memory. Drop it
+    # before locking — the merge below is the write, and `with_lock` refuses a
+    # record carrying unpersisted changes anyway (it would have nothing sane to
+    # do with them).
+    @survey.reload
+
+    @survey.with_lock do
+      live = Survey.ensure_cids!(Array(@survey.cards))
+      @survey.cards = Survey.keep_setup_media(picks, live)
+      # Only if the creator hasn't chosen one. Unlike the cards this is a
+      # column, so the editor's autosave never sends it and never clears it.
+      @survey.background_image = background if @survey.background_image.blank?
+      @survey.save!
+    end
+  end
+
+  # Shared by both writes above: everything except the save.
+  def compute!
     used       = Set.new   # left_panel + select_art + range_art picks
     swipe_used = Set.new   # swipe_cards picks across the whole survey
 
@@ -406,10 +462,13 @@ class AssetPopulator
           apply_card_media(new_card, picked)
           media_idx += 1
         end
-        if card["type"].to_s == "tap_card"
+        # The other two per-card assets, under the same fill-only rule as the
+        # left panel: a creator who picked statement images or an animation
+        # theme in the seconds after an import keeps them.
+        if card["type"].to_s == "tap_card" && !(@fill_only && Array(card["option_images"]).any?(&:present?))
           new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
         end
-        if card["type"].to_s == "range"
+        if card["type"].to_s == "range" && !(@fill_only && card["range_theme"].present?)
           new_card["range_theme"] = pick_range_theme(idx)
         end
       rescue => e
@@ -419,7 +478,6 @@ class AssetPopulator
     end
 
     @survey.cards = cards
-    @survey.save!
   end
 
   # Run a pick that may reach Pexels; on any error log and return nil so the
@@ -520,6 +578,10 @@ class AssetPopulator
     # media picker wipes `lottie` along with it. A deliberate animation is not
     # Shuffle's to overwrite.
     return nil if card["lottie"].present?
+    # Fill-only: this card already has its picture, so don't even ask Pexels for
+    # one. Belt to compute!'s braces — and it is this line whose absence made
+    # FinishVertoSetupJob's "only fills in cards that have no image yet" untrue.
+    return nil if @fill_only && Survey.card_has_media?(card)
 
     if PexelsClient.configured?
       if prefer_video && (vid = pexels_card_video(card, idx, used))
@@ -794,12 +856,64 @@ class AssetPopulator
   # Search-query builders reuse the same theme/keyword signals the curated
   # scorer uses, so Pexels picks track the survey the same way.
   def theme_query_terms
-    @survey.theme.to_s.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+    theme_source_text.downcase.scan(/[a-z]+/).reject { |w| STOP_WORDS.include?(w) }
+  end
+
+  # What every query is anchored on.
+  #
+  # Normally the creator's stated `theme`. An IMPORT can have none: import_pdf
+  # submits with formnovalidate and, unlike #generate, validates neither theme
+  # nor audience. With a blank theme clean_theme_terms is [], card_query falls
+  # through to "abstract", and CARD_RELEVANCE_FLOOR then rejects nearly every
+  # photo that comes back — a populate run that COMPLETES and still yields
+  # almost no imagery, which to the creator is indistinguishable from one that
+  # never ran. (test/integration/pdf_import_test.rb already fixtures
+  # `"theme" => ""`, so this shape was always the expected one for an import.)
+  #
+  # So a blank theme falls back to whatever else the Verto says about itself,
+  # and failing that to the deck's own vocabulary.
+  def theme_source_text
+    return @theme_source_text if defined?(@theme_source_text)
+
+    @theme_source_text =
+      @survey.theme.presence ||
+      stated_text.presence ||
+      deck_subject_text
+  end
+
+  # Title, key insight and description — minus a title the app minted rather
+  # than the creator, which would anchor every query on the word "imported".
+  PLACEHOLDER_TITLES = [ "imported verto", "untitled", "untitled verto", "new verto" ].freeze
+
+  def stated_text
+    title = @survey.title.to_s.strip
+    title = "" if PLACEHOLDER_TITLES.include?(title.downcase)
+    [ title, @survey.key_insight, @survey.description ].compact_blank.join(" ")
+  end
+
+  # The deck describing itself: the most frequent subject words across its real
+  # question cards. Scaffolding and demographic cards are excluded for the same
+  # reason card_query excludes them — they are about the Verto, not its topic.
+  def deck_subject_text
+    words = Array(@survey.cards).flat_map do |card|
+      next [] unless card.is_a?(Hash)
+      next [] unless CardTypes.question?(card["type"])
+      next [] if theme_only_card?(card)
+
+      subject = card["subject"].to_s.strip
+      subject.present? ? salient_words(subject) : card_keywords(card).first(3)
+    end
+    words.tally.sort_by { |word, n| [ -n, word ] }.first(4).map(&:first).join(" ")
   end
 
   # Does this Verto's theme deliberately invoke the protest/activism topic?
   # When it does, the neutrality suppression and charged-term query stripping
   # switch off for the whole run — the creator's stated topic wins. Memoised.
+  #
+  # Reads @survey.theme, NOT theme_source_text, and that asymmetry is the point:
+  # the unlock exists because the creator SAID this is the topic. A phrase we
+  # derived from a title or from the deck's own card copy is not a stated topic,
+  # and letting a derivation flip a safety switch would be a regression.
   def charged_theme?
     return @charged_theme if defined?(@charged_theme)
     @charged_theme = ContentSafety.charged_theme?(@survey.theme)
@@ -1019,7 +1133,7 @@ class AssetPopulator
   # the mood bonus, which is the whole point of saying it.
   def survey_query_tags
     {
-      themes: self.class.theme_keywords(@survey.theme) | direction_themes,
+      themes: self.class.theme_keywords(theme_source_text) | direction_themes,
       age:    self.class.age_buckets(@survey.audience_age),
       mood:   direction_moods.presence || DEFAULT_MOODS,
       style:  direction_styles

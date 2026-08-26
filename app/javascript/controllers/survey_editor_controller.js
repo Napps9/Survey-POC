@@ -2801,4 +2801,15 @@ export default class extends Controller {
     else if (state === "saved") this.flash(t("editor.saved", { time }), "text-aquamarine")
     else if (state === "error") this.flash(t("editor.save_failed", { msg }), "text-hot-pink")
   }
+
+  // Same pill, for an IMPORT's imagery arriving behind the creator. Until this
+  // existed the editor said nothing at all while FinishVertoSetupJob ran, so a
+  // deck that was about to fill with pictures was indistinguishable from one
+  // that never would — which is how "images didn't generate" gets reported for
+  // a job that was working. See setup_status_controller.js.
+  setupStatus(event) {
+    const { state } = event.detail || {}
+    if (state === "running")   this.flash(t("editor.setup_finding_images"), "text-smoke/60")
+    else if (state === "done") this.flash(t("editor.setup_images_ready"), "text-aquamarine")
+  }
 }

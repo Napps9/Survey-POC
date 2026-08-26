@@ -1062,4 +1062,111 @@ class AssetPopulatorTest < ActiveSupport::TestCase
     refute_includes q, "protest",
       "the imagery box is not the place a Verto declares a charged topic — its theme is"
   end
+  # ── fill_only, and the two writes ─────────────────────────────────────────
+  # The product has two callers and they want opposite things. Shuffle is the
+  # creator saying "give me DIFFERENT pictures" — overwriting is the feature.
+  # Auto-population is the platform saying "you have none yet", and it runs
+  # while an import's creator is already in the editor, possibly picking their
+  # own. FinishVertoSetupJob's comment claimed since it was written that
+  # population "only fills in cards that have no image yet"; until fill_only
+  # existed that was simply untrue.
+
+  test "fill_only leaves imagery the creator already has, of every kind" do
+    cards = [
+      { "type" => "multiple_choice", "cid" => "c_1", "text" => "Mine",  "options" => %w[A B],
+        "image" => "/assets/verto-library/mine.jpg" },
+      { "type" => "multiple_choice", "cid" => "c_2", "text" => "Video", "options" => %w[A B],
+        "video" => "https://videos.example/v.mp4" },
+      { "type" => "multiple_choice", "cid" => "c_3", "text" => "Empty", "options" => %w[A B] },
+      { "type" => "tap_card",        "cid" => "c_4", "text" => "Swipe", "options" => %w[x y],
+        "option_images" => [ "/assets/verto-library/a.jpg", "/assets/verto-library/b.jpg" ] },
+      { "type" => "range",           "cid" => "c_5", "text" => "Hard?", "options" => %w[Easy Hard],
+        "range_theme" => "recycling" }
+    ]
+    s = make_survey(theme: "Sport fans", cards: cards)
+    s.update!(background_image: "/assets/verto-library/backgrounds/chosen.jpg")
+
+    AssetPopulator.new(s, fill_only: true).populate!
+
+    s.reload
+    assert_equal "/assets/verto-library/mine.jpg", s.cards[0]["image"], "a chosen photo is not the platform's to replace"
+    assert_equal "https://videos.example/v.mp4",   s.cards[1]["video"]
+    assert_nil   s.cards[1]["image"],              "and it must not gain a photo alongside its video"
+    assert       s.cards[2]["image"].present?,     "the empty card is the whole point — it must still be filled"
+    assert_equal [ "/assets/verto-library/a.jpg", "/assets/verto-library/b.jpg" ], s.cards[3]["option_images"]
+    assert_equal "recycling", s.cards[4]["range_theme"]
+  end
+
+  test "Shuffle still overwrites, because that is what Shuffle is" do
+    cards = [ { "type" => "multiple_choice", "cid" => "c_1", "text" => "Mine", "options" => %w[A B],
+                "image" => "/assets/verto-library/mine.jpg" } ]
+    s = make_survey(theme: "Sport fans", cards: cards)
+
+    AssetPopulator.new(s, seed: "abc").populate!
+
+    assert_not_equal "/assets/verto-library/mine.jpg", s.reload.cards.first["image"],
+                     "a creator clicking Shuffle is asking for a different picture"
+  end
+
+  test "populate_merged! applies picks to the deck as it is NOW, not as it was loaded" do
+    cards = [
+      { "type" => "multiple_choice", "cid" => "c_1", "text" => "One", "options" => %w[A B] },
+      { "type" => "multiple_choice", "cid" => "c_2", "text" => "Two", "options" => %w[A B] }
+    ]
+    s = make_survey(theme: "Sport fans", cards: cards)
+
+    populator = AssetPopulator.new(s, fill_only: true)
+    # The creator edits and reorders from the editor while the run is in flight.
+    Survey.find(s.id).update!(cards: [
+      { "type" => "multiple_choice", "cid" => "c_2", "text" => "Two", "options" => %w[A B] },
+      { "type" => "multiple_choice", "cid" => "c_1", "text" => "Renamed by hand", "options" => %w[A B] }
+    ])
+    populator.populate_merged!
+
+    fresh = Survey.find(s.id).cards
+    assert_equal %w[c_2 c_1], fresh.map { |c| c["cid"] }, "the creator's reorder must stand"
+    assert_equal "Renamed by hand", fresh.second["text"], "and their edit with it"
+    assert fresh.all? { |c| c["image"].present? }, "while both cards still get their imagery"
+  end
+
+  # ── A blank theme ─────────────────────────────────────────────────────────
+  # import_pdf posts with formnovalidate and, unlike #generate, validates
+  # neither theme nor audience — so an imported Verto routinely has none. With
+  # nothing to anchor on, card_query fell through to "abstract" and the
+  # relevance floor then rejected nearly every photo that came back: a run that
+  # COMPLETED and still yielded almost nothing, which to the creator looks
+  # exactly like one that never ran.
+
+  test "a blank theme falls back to what the Verto does say about itself" do
+    s = make_survey(theme: "", cards: [ { "type" => "multiple_choice", "text" => "Q", "options" => %w[A B] } ])
+    s.update!(title: "Grassroots football in Leeds", key_insight: "why players stay")
+
+    terms = AssetPopulator.new(s).send(:theme_source_text)
+    assert_includes terms, "football"
+    assert_includes terms, "players", "the key insight counts too — it is the creator's own words"
+  end
+
+  test "a title the app minted is not something to anchor a photo search on" do
+    s = make_survey(theme: "", cards: [
+      { "type" => "multiple_choice", "text" => "Which sport do you play most?", "options" => [ "Football", "Netball" ] }
+    ])
+    s.update!(title: "Imported Verto", key_insight: nil, description: nil)
+
+    source = AssetPopulator.new(s).send(:theme_source_text)
+    assert_not_includes source, "imported", "every query would have been anchored on the word 'imported'"
+    assert source.present?, "it has to fall through to the deck's own vocabulary rather than give up"
+    assert_match(/sport|play|football|netball/, source)
+  end
+
+  test "a derived theme does not unlock the charged-term allowance" do
+    s = make_survey(theme: "", cards: [ { "type" => "multiple_choice", "text" => "Q", "options" => %w[A B] } ])
+    s.update!(title: "Protest and dissent")
+
+    populator = AssetPopulator.new(s)
+    assert_includes populator.send(:theme_source_text).downcase, "protest"
+    assert_not populator.send(:charged_theme?),
+               "the allowance exists because the creator STATED the topic — a phrase we " \
+               "derived from a title is not a statement, and letting a derivation flip a " \
+               "safety switch would be a regression"
+  end
 end
