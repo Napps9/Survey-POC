@@ -1043,6 +1043,13 @@ sw:
     focal_label: "Nafasi ya kichwa cha simu"
     focal_hint: "Buruta juu au chini"
     focal_note: "Huathiri kichwa kwenye simu pekee — picha kamili huhifadhiwa, kwa hivyo unaweza kubadilisha hili wakati wowote."
+    reposition: "Badilisha nafasi"
+    reposition_title: "Panga upya maudhui ya kadi hii — buruta kubadilisha nafasi, au punguza na ukuze picha"
+    reposition_statement_title: "Badilisha nafasi au punguza picha ya kauli hii"
+    reposition_hint: "Buruta picha kuchagua kinachoonyeshwa na fremu. Picha nzima huhifadhiwa, kwa hivyo unaweza kubadilisha hili wakati wowote."
+    reposition_hint_video: "Buruta video kuchagua kinachoonyeshwa na fremu. Video zinaweza kubadilishwa nafasi lakini haziwezi kupunguzwa."
+    reposition_crop: "Punguza na ukuze"
+    reposition_apply: "Hifadhi nafasi"
     required_chip: 'Lazima'
     ty_title_label: 'Kichwa cha shukrani'
     ty_body_label: 'Ujumbe wa shukrani'

@@ -1043,6 +1043,13 @@ nl:
     focal_label: "Positie van mobiele koptekst"
     focal_hint: "Sleep omhoog of omlaag"
     focal_note: "Heeft alleen invloed op de koptekst op telefoons — de volledige afbeelding blijft bewaard, dus je kunt dit altijd wijzigen."
+    reposition: "Herpositioneren"
+    reposition_title: "Kader de media van deze kaart opnieuw — sleep om te verplaatsen, of snijd een foto bij en zoom in"
+    reposition_statement_title: "De afbeelding van deze stelling verplaatsen of bijsnijden"
+    reposition_hint: "Sleep de afbeelding om te kiezen wat het kader laat zien. De hele afbeelding blijft bewaard, dus je kunt dit altijd aanpassen."
+    reposition_hint_video: "Sleep de video om te kiezen wat het kader laat zien. Video's kun je verplaatsen, maar niet bijsnijden."
+    reposition_crop: "Bijsnijden en zoomen"
+    reposition_apply: "Positie opslaan"
     required_chip: 'Verplicht'
     ty_title_label: 'Bedanktitel'
     ty_body_label: 'Bedankbericht'

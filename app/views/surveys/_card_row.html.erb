@@ -44,8 +44,16 @@
      data-card-options="<%= Array(card['options']).to_json %>"
      data-card-pages="<%= Array(card['pages']).to_json %>"
      data-card-option-images="<%= Array(card['option_images']).to_json %>"
+     <%# Per-statement repositions, positional against option_images. Only
+         emitted when a statement has actually been moved — an untouched tap
+         card carries no attribute, and the serialiser then sends no key. %>
+     <% if card['option_focals'].present? %>data-card-option-focals="<%= Array(card['option_focals']).to_json %>"<% end %>
      <% if card['option_styles'].present? %>data-card-option-styles="<%= Array(card['option_styles']).to_json %>"<% end %>
      <% if card_media_bg(card).present? %>data-card-media-bg="<%= card_media_bg(card).to_json %>"<% end %>
+     <%# Where the card's photo or video sits in the frames that crop it. Both
+         axes always present so the editor's live drag has something to rewrite;
+         50 means centre and the serialiser sends nothing. %>
+     data-card-focal-x="<%= card_focal_x(card) %>"
      data-card-focal-y="<%= card_focal_y(card) %>"
      <% if card['animate_asset'] == true %>data-card-animate-asset="true"<% end %>
      <% if card['responses'].present? %>data-card-responses="<%= Array(card['responses']).to_json %>"<% end %>

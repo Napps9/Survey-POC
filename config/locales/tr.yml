@@ -1043,6 +1043,13 @@ tr:
     focal_label: "Mobil başlık konumu"
     focal_hint: "Yukarı veya aşağı sürükleyin"
     focal_note: "Yalnızca telefonlardaki başlığı etkiler — görselin tamamı korunur, bu yüzden istediğiniz zaman değiştirebilirsiniz."
+    reposition: "Yeniden konumlandır"
+    reposition_title: "Bu kartın görselini yeniden çerçeveleyin — sürükleyerek konumlandırın ya da bir fotoğrafı kırpıp yakınlaştırın"
+    reposition_statement_title: "Bu ifadenin görselini yeniden konumlandır veya kırp"
+    reposition_hint: "Çerçevenin neyi göstereceğini seçmek için görseli sürükleyin. Görselin tamamı korunur, bu yüzden bunu istediğiniz zaman değiştirebilirsiniz."
+    reposition_hint_video: "Çerçevenin neyi göstereceğini seçmek için videoyu sürükleyin. Videolar yeniden konumlandırılabilir ama kırpılamaz."
+    reposition_crop: "Kırp ve yakınlaştır"
+    reposition_apply: "Konumu kaydet"
     required_chip: 'Zorunlu'
     ty_title_label: 'Teşekkür başlığı'
     ty_body_label: 'Teşekkür mesajı'

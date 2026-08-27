@@ -1043,6 +1043,13 @@ id:
     focal_label: "Posisi header seluler"
     focal_hint: "Seret ke atas atau ke bawah"
     focal_note: "Hanya memengaruhi header di ponsel — gambar utuh tetap disimpan, jadi Anda bisa mengubahnya kapan saja."
+    reposition: "Ubah posisi"
+    reposition_title: "Bingkai ulang media kartu ini — seret untuk mengubah posisi, atau pangkas dan perbesar foto"
+    reposition_statement_title: "Ubah posisi atau pangkas gambar pernyataan ini"
+    reposition_hint: "Seret gambar untuk memilih apa yang ditampilkan bingkai. Gambar utuh tetap disimpan, jadi Anda bisa mengubahnya kapan saja."
+    reposition_hint_video: "Seret video untuk memilih apa yang ditampilkan bingkai. Video bisa diubah posisinya, tetapi tidak bisa dipangkas."
+    reposition_crop: "Pangkas & perbesar"
+    reposition_apply: "Simpan posisi"
     required_chip: 'Wajib'
     ty_title_label: 'Judul terima kasih'
     ty_body_label: 'Pesan terima kasih'

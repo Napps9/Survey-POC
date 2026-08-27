@@ -176,6 +176,14 @@ function esc(s) {
                        .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
 }
 
+// One axis of a stored reposition, as a whole percentage. Junk lands on 50
+// (centre) rather than 0, matching Survey.sanitize_focal_percent — a NaN piped
+// into a background-position voids the whole shorthand.
+function clampPercent(v) {
+  const n = Number(v)
+  return Number.isFinite(n) ? Math.round(Math.min(100, Math.max(0, n))) : 50
+}
+
 // The localised compatibility note for switching `fromType` → `entry.type`.
 // t() returns the key itself when a translation is missing, so an untranslated
 // pair falls back to the English note baked into COMPATIBILITY.
@@ -226,6 +234,7 @@ const COMPONENTS = {
   // statement, with no way to reach the rest.
   tap_card: (opts, ctx = {}) => {
     const optionImages = ctx.optionImages || []
+    const optionFocals = ctx.optionFocals || []
     const responses = resolveResponses(ctx.responses)
     return `
     <div class="rotate-wrap" data-controller="tap-stack card-editor"
@@ -234,12 +243,20 @@ const COMPONENTS = {
         ${opts.map((o,i) => {
           const img = optionImages[i]
           const [a,b] = SWIPE_FILLS[i % SWIPE_FILLS.length]
-          const bg = img ? `#fff url('${img.replace(/'/g, "\\'")}') center/cover no-repeat` : `linear-gradient(135deg,${a},${b})`
+          // Mirrors option_focal_position in application_helper: the statement's
+          // stored reposition fills the shorthand's position slot, centre when
+          // it has none.
+          const f = optionFocals[i]
+          const pos = f ? `${clampPercent(f.x)}% ${clampPercent(f.y)}%` : "50% 50%"
+          const bg = img ? `#fff url('${img.replace(/'/g, "\\'")}') ${pos}/cover no-repeat` : `linear-gradient(135deg,${a},${b})`
           return `<div class="rotate-card" data-tap-stack-target="card" data-canonical="${esc(o)}">
                     <div class="rotate-card-media" style="background:${bg};"></div>
                     <div class="rotate-card-statement"><span contenteditable="true">${esc(o)}</span></div>
                     <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="${esc(t("editor.change_statement_image_title"))}">
                       <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
+                    </button>
+                    <button type="button" class="tap-card-adjust-btn" data-action="click->media-picker#openAdjust" data-media-picker-option-index="${i}" title="${esc(t("editor.reposition_statement_title"))}" aria-label="${esc(t("editor.reposition_statement_title"))}"${img ? "" : " hidden"}>
+                      <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"></path><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"></path></svg></span>
                     </button>
                     <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
                   </div>`
@@ -1242,6 +1259,7 @@ export default class extends Controller {
         sliderAxis:      card.dataset.cardSliderAxis || "auto",
         pages:           this._pagesFor(card, type),
         optionImages:    this._optionImagesFor(card, type),
+        optionFocals:    this._optionFocalsFor(card),
         optionStyles:    this._optionStylesFor(card),
         responses:       this._responsesFor(card),
         // Kept off the card's own dataset because it is only ever read here;
@@ -1423,6 +1441,19 @@ export default class extends Controller {
     const generated = this._generateTapOptionImages(card, this._optionsFor(card, type).length)
     if (generated.length) card.dataset.cardOptionImages = JSON.stringify(generated)
     return generated
+  }
+
+  // Per-statement repositions for the rebuild, positional against
+  // option_images. Carried through a type switch for the same reason the
+  // images are: a creator who tries another type and comes back should find
+  // their framing, not every picture snapped back to centre.
+  _optionFocalsFor(card) {
+    try {
+      const focals = JSON.parse(card.dataset.cardOptionFocals || "[]")
+      return Array.isArray(focals) ? focals : []
+    } catch (_) {
+      return []
+    }
   }
 
   // Per-option style overrides for the rebuild, from the same snapshot

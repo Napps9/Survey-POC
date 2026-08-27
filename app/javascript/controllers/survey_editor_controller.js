@@ -1673,14 +1673,19 @@ export default class extends Controller {
       } else if (video) {
         out.video = video
         if (card.dataset.cardVideoPoster) out.video_poster = card.dataset.cardVideoPoster
+        // A clip is cropped by the panel exactly as a photo is, so it carries
+        // the same focal pair — repositioning is the only reframing a video
+        // can have, which makes dropping it here the difference between the
+        // control working and silently undoing itself on the next autosave.
+        this._writeFocal(out, card)
       } else if (image) {
         out.image = image
-        // Where that image sits in the mobile header. Only carried when it has
-        // been moved off centre — the server drops a 50 anyway.
-        const focal = parseInt(card.dataset.cardFocalY, 10)
-        if (Number.isFinite(focal) && focal !== 50) out.focal_y = focal
+        // Where that image sits in the frames that crop it: --focal-y in the
+        // mobile header, --focal-x in the desktop panel. Only carried when
+        // moved off centre — the server drops a 50 anyway.
+        this._writeFocal(out, card)
         // The re-crop record: the pre-crop original and where this crop sits
-        // in it — what lets "Adjust crop" zoom back OUT later. Rides the
+        // in it — what lets "Crop & zoom" zoom back OUT later. Rides the
         // card's dataset the same way the image itself does, so it has to be
         // re-serialised here or one autosave would silently strip it.
         if (card.dataset.cardImageSource) {
@@ -1850,6 +1855,18 @@ export default class extends Controller {
         }
       } catch (_) { /* ignore malformed */ }
 
+      // Where each of those statement pictures sits inside its card — same
+      // positional array, bounded the same way, carried through a type switch
+      // for the same reason. Only emitted when something in it is set: the
+      // server drops an all-centre array, and sending one on every save would
+      // put a key on every tap card in the deck for nothing.
+      try {
+        const optFocals = JSON.parse(card.dataset.cardOptionFocals || "[]")
+        if (Array.isArray(optFocals) && optFocals.some(Boolean)) {
+          out.option_focals = (type === "tap_card" && primOpts.length) ? optFocals.slice(0, primOpts.length) : optFocals
+        }
+      } catch (_) { /* ignore malformed */ }
+
       // tap_card response scale — the 2-6 answers each statement is judged on.
       // Read off the strip, which is the record (see card_editor#_rewriteStrip),
       // and mirrored back onto the row so a type switch away and back rebuilds
@@ -2004,6 +2021,17 @@ export default class extends Controller {
   logicScopeForCid(cid) {
     const wrap = document.querySelector(`.survey-card-wrap[data-card-cid="${CSS.escape(cid)}"]`)
     return wrap ? this._logicScope(wrap) : null
+  }
+
+  // The card media's focal pair, onto whichever branch of serialize() is
+  // carrying media. Centre is the default everywhere and the server drops a 50,
+  // so an untouched card emits neither key and serialises byte-identically to
+  // before this axis existed.
+  _writeFocal(out, card) {
+    for (const [ key, attr ] of [ [ "focal_x", "cardFocalX" ], [ "focal_y", "cardFocalY" ] ]) {
+      const value = parseInt(card.dataset[attr], 10)
+      if (Number.isFinite(value) && value !== 50) out[key] = Math.min(100, Math.max(0, value))
+    }
   }
 
   // A tap card's response scale, read off the strip that renders it. The DOM is

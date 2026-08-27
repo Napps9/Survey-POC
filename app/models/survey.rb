@@ -544,6 +544,36 @@ class Survey < ApplicationRecord
     { "x" => x.round(4), "y" => y.round(4), "w" => w.round(4), "h" => h.round(4) }
   end
 
+  # One axis of a reposition: a 0-100 percentage, rounded to a whole number
+  # because that is all a background-position can usefully carry here. nil for
+  # anything that isn't a number, so junk is dropped rather than silently
+  # becoming 0 and pinning the frame to an edge.
+  def self.sanitize_focal_percent(raw)
+    numeric = raw.is_a?(Numeric) || raw.to_s.strip.match?(/\A-?\d+(?:\.\d+)?\z/)
+    numeric ? raw.to_f.clamp(0, 100).round : nil
+  end
+
+  # A tap card's per-statement repositions, aligned slot-for-slot with its
+  # (already sanitised) option_images. Each entry is an {"x","y"} pair or nil.
+  # A slot with no image, or one whose image didn't survive sanitising, can't
+  # have a position: keeping one would be a rule waiting to reposition the NEXT
+  # picture dropped into that slot. Trailing nils are trimmed and an array with
+  # nothing left in it comes back empty, so a card that has been reset back to
+  # centre stores no key at all rather than a row of nulls.
+  def self.sanitize_option_focals(value, images)
+    focals = Array(value).first(images.length).each_with_index.map do |entry, i|
+      next nil if images[i].blank?
+      next nil unless entry.is_a?(Hash)
+      x = sanitize_focal_percent(entry["x"] || entry[:x])
+      y = sanitize_focal_percent(entry["y"] || entry[:y])
+      next nil if x.nil? && y.nil?
+      pair = { "x" => x || 50, "y" => y || 50 }
+      pair == { "x" => 50, "y" => 50 } ? nil : pair
+    end
+    focals.pop while focals.any? && focals.last.nil?
+    focals
+  end
+
   # The Shuffle direction prompt — the creator's optional free-text steer for
   # what they want out of the Verto's content and imagery ("warm, outdoors,
   # small groups, no offices"). It belongs to one shuffle and is NOT persisted;
@@ -706,31 +736,6 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
-      # Where a card's image sits vertically inside the MOBILE header strip.
-      # 0-100, a percentage handed straight to background-position; 50 (centre)
-      # is the default and is stored as nothing. The card image is a 9:16
-      # portrait while the mobile hero is roughly 3:1, so `cover` + centre shows
-      # only the middle band of a tall photo and a face at the top of the frame
-      # is simply gone — "to drag the image up and down to choose the perfect
-      # spot for mobile headers. This would be a huge win" (18 Aug).
-      #
-      # A stored position rather than a second crop: the original stays intact,
-      # so it can be re-adjusted later and every other surface keeps the whole
-      # image.
-      if c.key?("focal_y")
-        raw   = c["focal_y"]
-        # `.to_f` alone would turn any junk into 0.0, i.e. silently pin the
-        # header to the top of the image. A value that isn't a number is a
-        # value we don't understand — drop it and use the centre.
-        numeric = raw.is_a?(Numeric) || raw.to_s.strip.match?(/\A-?\d+(?:\.\d+)?\z/)
-        focal   = numeric ? raw.to_f.clamp(0, 100).round : nil
-        if c["image"].present? && focal && focal != 50
-          c["focal_y"] = focal
-        else
-          c.delete("focal_y")
-        end
-      end
-
       # Animation backdrop — the colour or image behind a Lottie / range
       # animation, overriding the Verto-wide --brand-panel for this one card.
       # Only meaningful where an animation actually fills the panel (a photo or
@@ -1031,6 +1036,53 @@ class Survey < ApplicationRecord
         c.delete("image_source") if c["image_source"].blank?
         crop = c["image_source"].present? ? sanitize_image_crop(c["image_crop"]) : nil
         crop ? c["image_crop"] = crop : c.delete("image_crop")
+      end
+
+      # Where the card's media sits inside whatever frame crops it — the mobile
+      # header strip, the editor's device frames, and (horizontally) the desktop
+      # panel. 0-100 per axis, percentages handed straight to background-position
+      # / object-position; 50 (centre) is the default and is stored as nothing.
+      # A card image is a 9:16 portrait while the mobile hero is roughly 3:1, so
+      # `cover` + centre shows only the middle band of a tall photo and a face at
+      # the top of the frame is simply gone — "to drag the image up and down to
+      # choose the perfect spot for mobile headers. This would be a huge win"
+      # (18 Aug).
+      #
+      # A stored position rather than a second crop: the original stays intact,
+      # so it can be re-adjusted for ever and every other surface still gets the
+      # whole picture. That is also what makes it the one reframing that works on
+      # media the crop stage cannot touch — a Pexels photo (cross-origin, so the
+      # canvas tainting kills the re-encode) or a video (never croppable) — which
+      # is why the horizontal axis exists at all: "reposition every image and
+      # piece of content, at the moment I can only do it with uploads".
+      #
+      # Read AFTER image/video/lottie have been scrubbed, so a position can only
+      # survive alongside media that itself survived.
+      if c.key?("focal_x") || c.key?("focal_y")
+        positioned = c["image"].present? || c["video"].present?
+        %w[focal_x focal_y].each do |axis|
+          next unless c.key?(axis)
+          # `.to_f` alone would turn any junk into 0.0, i.e. silently pin the
+          # frame to the edge of the image. A value that isn't a number is a
+          # value we don't understand — drop it and use the centre.
+          focal = sanitize_focal_percent(c[axis])
+          if positioned && focal && focal != 50
+            c[axis] = focal
+          else
+            c.delete(axis)
+          end
+        end
+      end
+
+      # The same reposition, once per tap-card statement. POSITIONAL against
+      # option_images (index i is statement i, exactly like the images
+      # themselves), each entry either an {"x","y"} pair or nil for "this one
+      # sits where it always did". A slot whose image didn't survive above
+      # loses its position with it, and an array that ends up saying nothing
+      # is dropped rather than stored as a row of nulls.
+      if c.key?("option_focals")
+        focals = sanitize_option_focals(c["option_focals"], Array(c["option_images"]))
+        focals.any? ? c["option_focals"] = focals : c.delete("option_focals")
       end
 
       # CardSubjectExtractor's photographable-noun-phrase stamp, read by

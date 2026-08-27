@@ -352,12 +352,12 @@
 .split-left-img {
   position: absolute; inset: 0;
   background-size: cover;
-  /* --focal-y is the card's stored vertical focal point (default 50%). It only
-     changes anything where the frame crops vertically — the mobile header strip
-     and the editor's device frames, where a 9:16 image is shown in a ~3:1 band.
-     On desktop the panel is taller than it is wide, so the crop is horizontal
-     and this is a no-op. */
-  background-position: 50% var(--focal-y, 50%);
+  /* The card's stored focal point (default centre on both axes). Each axis only
+     changes anything where the frame crops THAT way: --focal-y in the mobile
+     header strip and the editor's device frames, where a 9:16 image is shown in
+     a ~3:1 band, and --focal-x on desktop, where the panel is taller than 9:16
+     and the picture is cropped left and right instead. */
+  background-position: var(--focal-x, 50%) var(--focal-y, 50%);
 }
 /* Optional slow push-in/out on a card's own photo or Lottie (never video —
    its own motion is enough — or range, whose reaction set already
@@ -377,6 +377,11 @@
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
+  /* Same stored focal pair as a photo — object-position is what
+     background-position is for an element that carries its own pixels. A clip
+     can never be cropped (there is no canvas re-encode for video), so this is
+     the whole of what repositioning a video means. */
+  object-position: var(--focal-x, 50%) var(--focal-y, 50%);
   background: var(--brand-panel, #2E3564);
 }
 .split-left-overlay {
@@ -990,12 +995,12 @@
   color: #1C2034;
   border-color: rgba(1,234,203,1);
 }
-/* The Adjust-crop fab toggles with the `hidden` attribute (server-rendered
-   for photo cards, media_picker#_syncAdjustFab as photos come and go), and
-   .add-bg-fab's own display:inline-flex would beat the UA's [hidden] rule —
+/* The Reposition fab toggles with the `hidden` attribute (server-rendered for
+   cards that carry media, media_picker#_syncAdjustFab as media comes and goes),
+   and .add-bg-fab's own display:inline-flex would beat the UA's [hidden] rule —
    author display always wins over that default. Same for the cta-row that
    exists only to hold it on the no-media prompt panel. */
-.adjust-crop-fab[hidden] {
+.media-adjust-fab[hidden] {
   display: none;
 }
 .split-left-cta-row:not(:has(> :not([hidden]))) {
@@ -1476,6 +1481,70 @@
   width: min(280px, 100%);
   margin-top: 18px;
 }
+
+/* ── Media picker reposition stage ──
+   The crop stage's non-destructive twin: it stores where the media SITS in the
+   frame rather than re-encoding it, which is the only reframing available for a
+   cross-origin photo or a video. Shares the crop stage's chrome so the two read
+   as one control from either entry point. */
+.media-pos-stage {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  flex: 1;
+}
+.media-pos-stage[hidden] { display: none; }
+.media-pos-frame {
+  position: relative;
+  width: min(280px, 100%);
+  overflow: hidden;
+  border-radius: 14px;
+  background: #0E1120;
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: grab;
+  touch-action: none;
+}
+.media-pos-frame:active { cursor: grabbing; }
+/* Both layers fill the frame and are cropped by it exactly the way the card
+   panel crops them, so what the creator drags here is what the card shows.
+   The controller sets the position/object-position as the drag moves. */
+.media-pos-img {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+.media-pos-video {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 50%;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;   /* the FRAME owns the drag, not the media inside it */
+}
+.media-pos-img[hidden], .media-pos-video[hidden] { display: none; }
+.media-pos-hint {
+  color: rgba(255,255,255,0.4);
+  font-size: 12px;
+  margin-top: 12px;
+  text-align: center;
+  max-width: min(280px, 100%);
+  line-height: 1.4;
+}
+.media-pos-actions {
+  display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+  width: min(280px, 100%);
+  margin-top: 18px;
+}
+/* "Crop & zoom" is the hand-off to the destructive stage and only exists for a
+   same-origin still, so it sits away from the Cancel/Save pair rather than in
+   the confirm cluster. */
+.media-pos-actions .media-pos-crop-btn { margin-right: auto; }
+.media-pos-crop-btn[hidden] { display: none; }
 
 /* ── Add Question modal ── */
 .aq-modal-backdrop {
@@ -5931,6 +6000,24 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .rotate-card:hover .tap-card-image-btn,
 .rotate-card:focus-within .tap-card-image-btn { opacity: 1; }
 .tap-card-image-btn:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
+/* Reposition/crop, immediately to the right of the image chip — "next to the
+   change this statement's image we need a reposition/crop cta". Same chip, same
+   reveal rules; it simply sits one slot along (9px + 22px wide + 6px gap).
+   Hidden by the `hidden` attribute on a statement with no picture, which
+   display:flex would otherwise beat. */
+.tap-card-adjust-btn {
+  position: absolute; top: 7px; left: 37px;
+  display: flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  background: rgba(0,0,0,0.55); border: none; border-radius: 50%;
+  cursor: pointer; color: #fff;
+  opacity: 0; transition: opacity 0.15s, background 0.15s, color 0.15s;
+  z-index: 10; padding: 0;
+}
+.tap-card-adjust-btn[hidden] { display: none; }
+.rotate-card:hover .tap-card-adjust-btn,
+.rotate-card:focus-within .tap-card-adjust-btn { opacity: 1; }
+.tap-card-adjust-btn:hover { background: rgba(1,234,203,0.85); color: #1C2034; }
 /* Takes the Verto's own brand rather than a fixed teal, so the one "add" the
    card still offers reads as part of that Verto. The fallback is the default
    palette's primary — brand_palette_style_attr emits nothing at all when a
@@ -6741,6 +6828,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .editing-translation .tap-add-btn,
 .editing-translation .tap-card-delete,
 .editing-translation .tap-card-image-btn,
+.editing-translation .tap-card-adjust-btn,
 .editing-translation .aq-trigger-btn,
 .editing-translation [data-action*="type-panel#deleteCard"] { display: none !important; }
 .editing-translation .type-list,
@@ -8957,6 +9045,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 @media (hover: none) and (pointer: coarse) {
   .pick-item-delete,
   .tap-card-delete,
+  .tap-card-adjust-btn,
   .tap-card-image-btn { opacity: 1; }
 }
 

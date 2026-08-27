@@ -1043,6 +1043,13 @@ ko:
     focal_label: "모바일 헤더 위치"
     focal_hint: "위아래로 드래그"
     focal_note: "휴대폰의 헤더에만 적용됩니다. 원본 이미지는 그대로 유지되므로 언제든지 바꿀 수 있습니다."
+    reposition: "위치 조정"
+    reposition_title: "이 카드의 미디어 구도 조정 — 끌어서 위치를 옮기거나, 사진을 자르고 확대하세요"
+    reposition_statement_title: "이 문항 이미지의 위치 조정 또는 자르기"
+    reposition_hint: "이미지를 끌어서 프레임에 보일 부분을 선택하세요. 원본 이미지는 그대로 보관되므로 언제든지 바꿀 수 있습니다."
+    reposition_hint_video: "동영상을 끌어서 프레임에 보일 부분을 선택하세요. 동영상은 위치는 조정할 수 있지만 자를 수는 없습니다."
+    reposition_crop: "자르기 및 확대"
+    reposition_apply: "위치 저장"
     required_chip: '필수'
     ty_title_label: '감사 제목'
     ty_body_label: '감사 메시지'

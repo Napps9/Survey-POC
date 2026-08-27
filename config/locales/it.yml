@@ -1043,6 +1043,13 @@ it:
     focal_label: "Posizione dell'intestazione mobile"
     focal_hint: "Trascina su o giù"
     focal_note: "Riguarda solo l'intestazione su telefono — l'immagine completa viene conservata, quindi puoi cambiarla quando vuoi."
+    reposition: "Riposiziona"
+    reposition_title: "Reinquadra il contenuto di questa scheda: trascina per riposizionare, oppure ritaglia e ingrandisci una foto"
+    reposition_statement_title: "Riposiziona o ritaglia l'immagine di questa affermazione"
+    reposition_hint: "Trascina l'immagine per scegliere cosa mostra la cornice. L'immagine intera viene conservata, quindi puoi cambiarla quando vuoi."
+    reposition_hint_video: "Trascina il video per scegliere cosa mostra la cornice. I video si possono riposizionare ma non ritagliare."
+    reposition_crop: "Ritaglia e ingrandisci"
+    reposition_apply: "Salva posizione"
     required_chip: 'Obbligatoria'
     ty_title_label: 'Titolo di ringraziamento'
     ty_body_label: 'Messaggio di ringraziamento'

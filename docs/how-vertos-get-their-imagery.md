@@ -329,6 +329,34 @@ New Tap-card statements added in the editor self-serve an image from the
 swipe pool, preferring ones the deck isn't already using — the same
 no-repeats rule the automatic pass follows.
 
+### Reframing what's already there
+
+Every card's media, and every Tap-card statement's picture, carries a
+**Reposition** control beside its Change-media CTA. Two different jobs sit
+behind it:
+
+- **Reposition** (always available) records *where the media sits* inside the
+  frame that crops it — `focal_x` / `focal_y` on a card, one entry of the
+  positional `option_focals` array on a statement, all 0–100 percentages fed
+  straight to `background-position` (a photo) or `object-position` (a video).
+  Nothing is re-encoded, so the whole picture is kept and the choice can be
+  changed for ever. Each axis only bites where the frame actually crops that
+  way: vertical in the mobile header strip and the device frames, horizontal
+  in the ordinary desktop panel.
+- **Crop & zoom** (a button inside the same stage) is the destructive path:
+  it redraws the image on a canvas at the slot's fixed ratio. That only works
+  on a **same-origin still** — a Pexels URL taints the canvas and the encode
+  throws, and a video has no canvas path at all — so the button is simply
+  absent for a stock photo or a clip. Where the pre-crop original was kept
+  (`image_source` + `image_crop`, stamped by an upload's own crop) the stage
+  reopens seeded from it and can zoom back **out**; where it wasn't, it says so
+  and offers reposition-and-zoom-in only.
+
+That split is why repositioning, not cropping, is what every image can have.
+Swapping the picture — by hand or by a Shuffle — clears the framing with it:
+a focal point describes one photograph's subject, and on the next picture it
+would be a shove rather than a setting.
+
 **Range cards** have no photo to swap, so they get their own peer of the media
 picker: a **Change animation** CTA on the card's left panel opens the
 `animation-picker` modal — a grouped, live-preview grid of every reaction set

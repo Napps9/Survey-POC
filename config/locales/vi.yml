@@ -1043,6 +1043,13 @@ vi:
     focal_label: "Vị trí tiêu đề trên di động"
     focal_hint: "Kéo lên hoặc xuống"
     focal_note: "Chỉ ảnh hưởng đến tiêu đề trên điện thoại — ảnh gốc vẫn được giữ nên bạn có thể thay đổi bất cứ lúc nào."
+    reposition: "Đổi vị trí"
+    reposition_title: "Đóng khung lại nội dung của thẻ này — kéo để đổi vị trí, hoặc cắt và phóng to ảnh"
+    reposition_statement_title: "Đổi vị trí hoặc cắt hình ảnh của câu này"
+    reposition_hint: "Kéo hình ảnh để chọn phần khung sẽ hiển thị. Ảnh gốc vẫn được giữ nguyên nên bạn có thể thay đổi bất cứ lúc nào."
+    reposition_hint_video: "Kéo video để chọn phần khung sẽ hiển thị. Video có thể đổi vị trí nhưng không thể cắt."
+    reposition_crop: "Cắt và phóng to"
+    reposition_apply: "Lưu vị trí"
     required_chip: 'Bắt buộc'
     ty_title_label: 'Tiêu đề cảm ơn'
     ty_body_label: 'Lời nhắn cảm ơn'
