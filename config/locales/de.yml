@@ -63,6 +63,8 @@ de:
     allow_other: "„Andere“-Freitextantwort erlauben"
     required: "Pflichtfrage"
     ask_once: "Einmal fragen — bei erneutem Spielen nach Beantwortung übersprungen"
+    recall_ask_once: "Einmal-Antworten von einem anderen Gerät übernehmen"
+    recall_ask_once_note: "Wer den Code dieser teilnehmenden Person errät, sähe diese Antworten. Aus, sofern nicht gebraucht."
     other: Andere
     other_placeholder: Sag es uns in eigenen Worten…
     mark_correct: "Richtige Antwort markieren"
@@ -110,6 +112,7 @@ de:
       welcome_card: "WILLKOMMENSKARTE"
       token_checkpoint: "ZWISCHENSTAND"
       consent_gate: "EINWILLIGUNG"
+      respondent_code: "TEILNEHMERCODE"
     panel_label:
       range: "REGLER ZIEHEN"
       rating: "TIPPEN ZUM BEWERTEN"
@@ -290,6 +293,7 @@ de:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Antwort wird geschrieben…"
@@ -378,6 +382,10 @@ de:
       appeal_submitted: "Zur Prüfung eingereicht — wir informieren dich, sobald sie abgeschlossen ist."
       appeal_failed: "Konnte das nicht zur Prüfung einreichen — bitte versuche es erneut."
       emoji_none: "Keine passenden Emoji."
+      emoji_all: "Alle"
+      note_limit_count: "%{n} / %{recommended} empfohlen · %{max} max."
+      setup_finding_images: "Bilder für deine Karten werden gesucht…"
+      setup_images_ready: "Bilder hinzugefügt"
       rich_bold: "Fett"
       rich_italic: "Kursiv"
       rich_underline: "Unterstrichen"
@@ -495,6 +503,7 @@ de:
         variety_ok: "Gute Abwechslung — kein Antworttyp wiederholt sich zu oft."
         variety_run: "%{type} kommt %{n}× hintereinander vor — wechsle den Antworttyp."
         welcome_many: "Höchstens eine Willkommenskarte verwenden (jetzt %{n})."
+        code_after_ask_once: "%{n} Einmal-Fragen stehen vor der Teilnehmercode-Karte, sodass jemand, der auf einem neuen Gerät zurückkehrt, sie erneut beantwortet, bevor der Code sie ausfüllen kann. Verschiebe die Code-Karte darüber."
         static_tip: "Langes Verto — erwäge eine Pause in der Mitte, um die Energie zu halten."
         board_heading: "Was passt und was zu verbessern ist"
         board_hint: "Nach Ampel gruppiert — tippe auf eine Karte, um zu ihr zu springen."
@@ -1060,6 +1069,8 @@ de:
     ty_forward_label_placeholder: 'Button-Text (z. B. Website besuchen)'
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisierung'
+    note_limit_split_hint: "Ab %{n} Zeichen wird es auf der Intro-Karte eng — bringen Sie die Details lieber auf einer eigenen Karte unter."
+    respondent_code_card_note: "Dieses Verto hat eine Teilnehmercode-Karte im Deck, der Code wird also dort erfasst und diese Einstellung hat keine Wirkung."
     tab_logic: 'Logik & Abläufe'
     flows_title: "Flows"
     flows_intro: "Benannte Kartengruppen, in die eine geroutete Antwort führt — z. B. Fragesets für UK, VAE und USA, die wieder zusammenlaufen oder auf eigenen Screens enden."
@@ -1119,18 +1130,18 @@ de:
       one: Geschätzt ~%{count} Min.
       other: Geschätzt ~%{count} Min.
     design: Design
-    shuffle: Neu mischen
-    shuffle_title: Neue Bilder aus der Verto-Bibliothek auswählen
-    shuffle_confirm: Bilder neu mischen? Ihre aktuellen Bilder werden durch eine neue Auswahl aus der Bibliothek ersetzt.
-    shuffle_direction_toggle_title: "Eine Vorgabe für dieses Mischen hinzufügen"
-    shuffle_direction_heading: "Dieses Mischen lenken"
+    shuffle: "Bilder neu mischen"
+    shuffle_title: "Jedes Bild und jede Animation neu aus der Verto-Bibliothek wählen — Ihre Fragen und deren Reihenfolge bleiben unverändert"
+    shuffle_confirm: "Bilder neu mischen? Jedes Bild und jede Animation wird durch eine neue Auswahl aus der Bibliothek ersetzt. Ihre Fragen und deren Reihenfolge bleiben genau so, wie sie sind."
+    shuffle_direction_toggle_title: "Eine Vorgabe für dieses Bildmischen hinzufügen"
+    shuffle_direction_heading: "Dieses Bildmischen lenken"
     shuffle_direction_hint: "Optional. Sag Verto, was du dir von den Bildern und Animationen wünschst — eine Stimmung, ein Umfeld oder etwas, das weggelassen werden soll."
     shuffle_direction_label: "Vorgabe"
     shuffle_direction_placeholder: "z. B. warmes natürliches Licht, draußen, kleine Gruppen, keine Büros"
     shuffle_direction_toward: "Letztes Mischen suchte nach: %{terms}"
     shuffle_direction_avoiding: "und ließ aus: %{terms}"
     shuffle_direction_clear: "Leeren"
-    shuffle_direction_apply: "Damit mischen"
+    shuffle_direction_apply: "Bilder damit mischen"
     publish_share: Veröffentlichen & teilen →
     answer_type: Antworttyp
     select_card: Wähle eine Karte aus, um den Typ zu ändern
@@ -1395,7 +1406,7 @@ de:
     s7_perks:
     - Ein zum Thema passendes Umfrage-Hintergrundbild
     - Bilder auf jeder Karte, einschließlich Tipp-Karten
-    - Im Editor neu mischen, bis es passt
+    - "Im Editor die Bilder neu mischen, bis es passt"
     s7_title: Wie möchten Sie starten?
     s7_sub: Sie können im Editor jederzeit Änderungen vornehmen.
     s7_recommended: Empfohlen
@@ -1619,7 +1630,7 @@ de:
       not_live: "Dieses Verto ist nicht live."
       closed: "Verto geschlossen — es ist nicht mehr unter /play erreichbar, die Ergebnisse bleiben erhalten."
       unpublished: "Veröffentlichung zurückgezogen — das Verto ist wieder ein Entwurf, den du bearbeiten kannst."
-      shuffle_failed: "Die Assets konnten nicht neu gemischt werden — bitte versuche es erneut."
+      shuffle_failed: "Die Bilder konnten nicht neu gemischt werden — bitte versuche es erneut."
       archived: "„%{name}“ gelöscht. Der Link für Teilnehmende funktioniert nicht mehr; die Ergebnisse bleiben in deiner Archiv-Liste."
       restored: "„%{name}“ wiederhergestellt. Es liegt wieder in deinen Entwürfen — veröffentliche es erneut, wenn du bereit bist."
       destroyed_forever: "„%{name}“ dauerhaft gelöscht. Alle Antworten und Daten wurden entfernt."

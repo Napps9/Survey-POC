@@ -63,6 +63,8 @@ pt:
     allow_other: Permitir resposta livre “Outro”
     required: "Pergunta obrigatória"
     ask_once: "Perguntar uma vez — ignorada em repetições depois de respondida"
+    recall_ask_once: "Preencher respostas de pergunta única a partir de outro dispositivo"
+    recall_ask_once_note: "Quem adivinhar o código deste participante veria essas respostas. Desligado salvo se precisar."
     other: Outro
     other_placeholder: Diga-nos pelas suas próprias palavras…
     mark_correct: "Marque a resposta correta"
@@ -110,6 +112,7 @@ pt:
       welcome_card: "CARTÃO DE BOAS-VINDAS"
       token_checkpoint: "PONTO DE CONTROLO"
       consent_gate: "CONSENTIMENTO"
+      respondent_code: "CÓDIGO DO PARTICIPANTE"
     panel_label:
       range: "ARRASTE O CONTROLE DESLIZANTE"
       rating: "TOQUE PARA AVALIAR"
@@ -290,6 +293,7 @@ pt:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "A escrever a resposta…"
@@ -378,6 +382,10 @@ pt:
       appeal_submitted: "Enviado para revisão — avisamos assim que for verificado."
       appeal_failed: "Não foi possível enviar para revisão — tente novamente."
       emoji_none: "Nenhum emoji corresponde."
+      emoji_all: "Todos"
+      note_limit_count: "%{n} / %{recommended} recomendado · %{max} máx."
+      setup_finding_images: "A procurar imagens para os seus cartões…"
+      setup_images_ready: "Imagens adicionadas"
       rich_bold: "Negrito"
       rich_italic: "Itálico"
       rich_underline: "Sublinhado"
@@ -495,6 +503,7 @@ pt:
         variety_ok: "Boa variedade — nenhum tipo de resposta se repete demais."
         variety_run: "%{type} aparece %{n}× seguidas — alterne com outro tipo de resposta."
         welcome_many: "Use no máximo um cartão de boas-vindas (agora %{n})."
+        code_after_ask_once: "%{n} perguntas de pergunta única estão antes do cartão Código do participante, por isso quem regressar noutro dispositivo responde-lhes de novo antes de o código as poder preencher. Mova o cartão do código para cima delas."
         static_tip: "Verto longo — considere uma pausa no meio para manter a energia."
         board_heading: "O que está bom e o que corrigir"
         board_hint: "Agrupado por semáforo — toque num cartão para ir até ele."
@@ -1060,6 +1069,8 @@ pt:
     ty_forward_label_placeholder: 'Texto do botão (ex. Visite o nosso site)'
     tab_quiz: 'Modo de quiz'
     tab_tokens: 'Tokenização'
+    note_limit_split_hint: "Acima de %{n} caracteres fica apertado no cartão de introdução — coloque o detalhe num cartão próprio."
+    respondent_code_card_note: "Este Verto tem um cartão Código do participante no baralho, por isso o código é recolhido aí e esta definição não tem efeito."
     tab_logic: 'Lógica e fluxos'
     flows_title: "Fluxos"
     flows_intro: "Grupos de cartões com nome onde uma resposta encaminhada entra — p. ex. conjuntos de perguntas UK, EAU e EUA que depois convergem ou terminam em ecrãs próprios."
@@ -1119,18 +1130,18 @@ pt:
       one: Estimado ~%{count} min
       other: Estimado ~%{count} mins
     design: Design
-    shuffle: Embaralhar
-    shuffle_title: Escolher novas imagens da biblioteca Verto
-    shuffle_confirm: Embaralhar imagens? As suas imagens atuais serão substituídas por uma nova seleção da biblioteca.
-    shuffle_direction_toggle_title: "Adicionar uma orientação para este embaralhamento"
-    shuffle_direction_heading: "Oriente este embaralhamento"
+    shuffle: "Embaralhar imagens"
+    shuffle_title: "Escolher de novo cada imagem e animação da biblioteca Verto — as suas perguntas e a ordem delas não mudam"
+    shuffle_confirm: "Embaralhar imagens? Cada imagem e animação será substituída por uma nova seleção da biblioteca. As suas perguntas e a ordem delas ficam exatamente como estão."
+    shuffle_direction_toggle_title: "Adicionar uma orientação para este embaralhamento de imagens"
+    shuffle_direction_heading: "Oriente este embaralhamento de imagens"
     shuffle_direction_hint: "Opcional. Diga ao Verto o que procura nas imagens e animações — um clima, um cenário ou algo a deixar de fora."
     shuffle_direction_label: "Orientação"
     shuffle_direction_placeholder: "ex. luz natural quente, ao ar livre, grupos pequenos, sem escritórios"
     shuffle_direction_toward: "O último embaralhamento procurou: %{terms}"
     shuffle_direction_avoiding: "e excluiu: %{terms}"
     shuffle_direction_clear: "Limpar"
-    shuffle_direction_apply: "Embaralhar com isto"
+    shuffle_direction_apply: "Embaralhar imagens com isto"
     publish_share: Publicar e partilhar →
     answer_type: Tipo de resposta
     select_card: Selecione um cartão para alterar o seu tipo
@@ -1395,7 +1406,7 @@ pt:
     s7_perks:
     - Um fundo do inquérito combinado com o tema
     - Imagens em todos os cartões, incluindo cartões de deslize
-    - Embaralhe no editor até ficar como pretende
+    - "Embaralhe as imagens no editor até ficar como pretende"
     s7_title: Como prefere começar?
     s7_sub: Pode sempre alterar qualquer coisa no editor.
     s7_recommended: Recomendado

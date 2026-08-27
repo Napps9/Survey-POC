@@ -63,6 +63,8 @@ pl:
     allow_other: Zezwól na odpowiedź „Inne” w formie tekstu
     required: "Pytanie obowiązkowe"
     ask_once: "Pytaj raz — pomijane przy kolejnych podejściach po udzieleniu odpowiedzi"
+    recall_ask_once: "Uzupełnij odpowiedzi „pytaj raz” z innego urządzenia"
+    recall_ask_once_note: "Ktoś, kto odgadnie kod tego uczestnika, zobaczy te odpowiedzi. Wyłączone, chyba że jest potrzebne."
     other: Inne
     other_placeholder: Powiedz nam własnymi słowami…
     mark_correct: "Zaznacz poprawną odpowiedź"
@@ -110,6 +112,7 @@ pl:
       welcome_card: "KARTA POWITALNA"
       token_checkpoint: "PUNKT KONTROLNY"
       consent_gate: "ZGODA"
+      respondent_code: "KOD UCZESTNIKA"
     panel_label:
       range: "PRZECIĄGNIJ SUWAK"
       rating: "STUKNIJ, ABY OCENIĆ"
@@ -290,6 +293,7 @@ pl:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Pisanie odpowiedzi…"
@@ -378,6 +382,10 @@ pl:
       appeal_submitted: "Wysłano do weryfikacji — powiadomimy Cię, gdy zostanie sprawdzone."
       appeal_failed: "Nie udało się wysłać do weryfikacji — spróbuj ponownie."
       emoji_none: "Brak pasujących emoji."
+      emoji_all: "Wszystkie"
+      note_limit_count: "%{n} / %{recommended} zalecane · %{max} maks."
+      setup_finding_images: "Szukanie obrazów do Twoich kart…"
+      setup_images_ready: "Obrazy dodane"
       rich_bold: "Pogrubienie"
       rich_italic: "Kursywa"
       rich_underline: "Podkreślenie"
@@ -495,6 +503,7 @@ pl:
         variety_ok: "Dobra różnorodność — żaden typ odpowiedzi nie powtarza się zbyt często."
         variety_run: "%{type} pojawia się %{n}× z rzędu — przeplataj innym typem odpowiedzi."
         welcome_many: "Użyj najwyżej jednej karty powitalnej (teraz %{n})."
+        code_after_ask_once: "%{n} pytań „pytaj raz” znajduje się przed kartą Kod uczestnika, więc ktoś wracający na nowym urządzeniu odpowie na nie ponownie, zanim kod zdąży je uzupełnić. Przenieś kartę kodu nad nie."
         static_tip: "Długie Verto — rozważ przerwę w połowie, by utrzymać energię."
         board_heading: "Co działa, a co poprawić"
         board_hint: "Pogrupowane według sygnalizacji — dotknij karty, aby do niej przejść."
@@ -1062,6 +1071,8 @@ pl:
     ty_forward_label_placeholder: 'Etykieta przycisku (np. Odwiedź naszą stronę)'
     tab_quiz: 'Tryb quizu'
     tab_tokens: 'Tokenizacja'
+    note_limit_split_hint: "Powyżej %{n} znaków robi się ciasno na karcie wprowadzającej — szczegóły lepiej umieścić na osobnej karcie."
+    respondent_code_card_note: "Ten Verto ma w talii kartę Kod uczestnika, więc kod jest zbierany tam, a to ustawienie nie ma znaczenia."
     tab_logic: 'Logika i przepływy'
     flows_title: "Przepływy"
     flows_intro: "Nazwane grupy kart, do których trafia skierowana odpowiedź — np. zestawy pytań UK, ZEA i USA, które potem się schodzą lub kończą na własnych ekranach."
@@ -1121,18 +1132,18 @@ pl:
       one: Szacowany czas ~%{count} min
       other: Szacowany czas ~%{count} min
     design: Projekt
-    shuffle: Losuj
-    shuffle_title: Wylosuj nowe obrazy z biblioteki Verto
-    shuffle_confirm: Wylosować nowe obrazy? Aktualne zdjęcia zostaną zastąpione nowym wyborem z biblioteki.
-    shuffle_direction_toggle_title: "Dodaj wskazówkę do tego losowania"
-    shuffle_direction_heading: "Ukierunkuj to losowanie"
+    shuffle: "Losuj obrazy"
+    shuffle_title: "Wylosuj od nowa każdy obraz i animację z biblioteki Verto — Twoje pytania i ich kolejność się nie zmieniają"
+    shuffle_confirm: "Wylosować nowe obrazy? Każdy obraz i animacja zostaną zastąpione nowym wyborem z biblioteki. Twoje pytania i ich kolejność pozostaną dokładnie takie same."
+    shuffle_direction_toggle_title: "Dodaj wskazówkę do tego losowania obrazów"
+    shuffle_direction_heading: "Ukierunkuj to losowanie obrazów"
     shuffle_direction_hint: "Opcjonalnie. Powiedz Verto, czego oczekujesz od zdjęć i animacji — nastroju, otoczenia albo tego, czego ma unikać."
     shuffle_direction_label: "Wskazówka"
     shuffle_direction_placeholder: "np. ciepłe naturalne światło, na zewnątrz, małe grupy, bez biur"
     shuffle_direction_toward: "Ostatnie losowanie szukało: %{terms}"
     shuffle_direction_avoiding: "i pominęło: %{terms}"
     shuffle_direction_clear: "Wyczyść"
-    shuffle_direction_apply: "Losuj według tego"
+    shuffle_direction_apply: "Losuj obrazy według tego"
     publish_share: Opublikuj i udostępnij →
     answer_type: Typ odpowiedzi
     select_card: Wybierz kartę, aby zmienić jej typ
@@ -1397,7 +1408,7 @@ pl:
     s7_perks:
     - Tło dopasowane do motywu ankiety
     - Obrazy na każdej karcie, w tym kartach do przesuwania
-    - Losuj w edytorze, aż efekt będzie odpowiedni
+    - "Losuj obrazy w edytorze, aż efekt będzie odpowiedni"
     s7_title: Jak chcesz zacząć?
     s7_sub: Wszystko możesz zmienić później w edytorze.
     s7_recommended: Zalecane
@@ -1748,7 +1759,7 @@ pl:
       pdf_too_large: "Ten plik PDF jest za duży — musi mieć mniej niż %{limit} MB."
       restored: "„%{name}” przywrócone. Wróciło do Twoich wersji roboczych — opublikuj je ponownie, gdy będziesz gotowy."
       settings_locked: "To Verto jest aktywne albo ma już odpowiedzi — nie można teraz zmienić ustawień zgody ani punktacji."
-      shuffle_failed: "Nie udało się przetasować obrazów — spróbuj jeszcze raz."
+      shuffle_failed: "Nie udało się wylosować obrazów — spróbuj jeszcze raz."
       unpublished: "Publikacja Verto cofnięta — wróciło do wersji roboczej, którą możesz edytować."
   ask:
     stale_note: "Niektóre źródła cytowane w tej odpowiedzi nie należą już do wspólnego korpusu."

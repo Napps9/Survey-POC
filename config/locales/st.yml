@@ -65,6 +65,8 @@ st:
     allow_other: 'Dumella karabo ya mongolo o mahala wa "E nngwe"'
     required: "Potso e hlokahalang"
     ask_once: "Botsa hang feela — e tlolwa ha ho bapaloa hape ka mor'a hore e arajoe"
+    recall_ask_once: "Tlatsa dikarabo tse botsoang hang ho tswa sesebedisweng se seng"
+    recall_ask_once_note: "Motho ya hakanyang khoutu ya moarabi enwa o tla bona dikarabo tseo. E tima ntle le haeba o e hloka."
     other: "E nngwe"
     other_placeholder: "Re bolelle ka mantswe a hao…"
     mark_correct: "Tshwaya karabo e nepahetseng"
@@ -120,6 +122,7 @@ st:
       welcome_card: "KARETE YA KAMOHELO"
       token_checkpoint: "TEKO YA LINTLHA"
       consent_gate: "TUMELLO"
+      respondent_code: "KHOUTU YA MOARABI"
     panel_label:
       range: "HULA SEQHOMANE"
       rating: "TOBETSA HO LEKANYA"
@@ -306,6 +309,7 @@ st:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "E ntse e ngola karabo…"
@@ -394,6 +398,10 @@ st:
       appeal_submitted: "E rometswe bakeng sa tlhahlobo — re tla o tsebisa hang ha e hlahlojwa."
       appeal_failed: "Ho paletswe ho romela bakeng sa tlhahlobo — ka kopo leka hape."
       emoji_none: "Ha ho emoji e tshwanang le seo."
+      emoji_all: "Tsohle"
+      note_limit_count: "%{n} / %{recommended} e kgothaletswang · %{max} bongata"
+      setup_finding_images: "Ho batla ditshwantsho bakeng sa dikarengoana tsa hao…"
+      setup_images_ready: "Ditshwantsho di kentswe"
       rich_bold: "E Boima"
       rich_italic: "E Sekamileng"
       rich_underline: "E Ngodilweng ka Tlase"
@@ -511,6 +519,7 @@ st:
         variety_ok: "Ho fapafapana ho hlile ho lokile — ha ho mofuta wa karabo o phetahalang haholo."
         variety_run: "%{type} e hlaha makgetlo a %{n}× ka tatelano — kopanya le mofuta o mong wa karabo."
         welcome_many: "Sebedisa karete e le nngwe feela ya kamohelo (hona jwale %{n})."
+        code_after_ask_once: "Dipotso tse %{n} tse botsoang hang di tla pele ho karengoana ya Khoutu ya moarabi, kahoo ea khutlang ka sesebedisoa se secha o tla di araba hape pele khoutu e ka di tlatsa. Suthisetsa karengoana ya khoutu ka holim'a tsona."
         static_tip: "Verto e telele — nahana ka phomolo bohareng ho boloka matla."
         board_heading: "Se sebetsang le se lokelang ho lokiswa"
         board_hint: "Di hlophisitswe ka mabone a tsela — tobetsa karete ho ya ho yona."
@@ -1082,6 +1091,8 @@ st:
     ty_forward_label_placeholder: 'Lebo la konopo (mohlala, Etela webosaete ya rona)'
     tab_quiz: 'Mokgwa wa Teko'
     tab_tokens: "Ts'ebediso ya Ditokene"
+    note_limit_split_hint: "Ka mora ditlhaku tse %{n} ho ba hlophehileng karengoaneng ya selelekela — beha dintlha karengoaneng ya tsona."
+    respondent_code_card_note: "Verto ena e na le karengoana ya Khoutu ya moarabi ka har'a dekele, kahoo khoutu e bokelloa moo 'me tlhophiso ena ha e na phello."
     tab_logic: 'Tsamaiso le Diphallo'
     flows_title: 'Diphallo'
     flows_intro: 'Dihlopha tse nang le mabitso tsa dikarete tseo karabo e lebisitsweng e ka di kenang — mohlala, disete tsa dipotso tsa UK, UAE le USA tse kopanang hape kapa tse fellang ka diskrini tsa tsona.'
@@ -1141,18 +1152,18 @@ st:
       one: "Ho hakanngwa ~metsotso e %{count}"
       other: "Ho hakanngwa ~metsotso e %{count}"
     design: "Moralo"
-    shuffle: "Ferekanya"
-    shuffle_title: "Kgetha hape ditshwantsho ho tswa polokelong ya verto"
-    shuffle_confirm: "Ferekanya ditshwantsho? Ditshwantsho tsa hao tsa hona jwale di tla nkelwa sebaka ke khetho e ntjha ho tswa polokelong."
-    shuffle_direction_toggle_title: "Kenya tataiso bakeng sa ho ferekanya hona"
-    shuffle_direction_heading: "Tataisa ho ferekanya hona"
+    shuffle: "Ferekanya ditshwantsho"
+    shuffle_title: "Kgetha hape setshwantsho se seng le se seng le dianimeishene ho tswa polokelong ya Verto — dipotso tsa hao le tatellano ya tsona ha di fetohe"
+    shuffle_confirm: "Ferekanya ditshwantsho? Setshwantsho se seng le se seng le dianimeishene di tla nkelwa sebaka ke khetho e ntjha ho tswa polokelong. Dipotso tsa hao le tatellano ya tsona di dula jwalo feela."
+    shuffle_direction_toggle_title: "Kenya tataiso bakeng sa ho ferekanya ditshwantsho hona"
+    shuffle_direction_heading: "Tataisa ho ferekanya ditshwantsho hona"
     shuffle_direction_hint: "Ha ho tlamo. Bolella Verto seo o se batlang ditshwantshong le diaenimeishene — moya, sebaka, kapa seo o sa se batleng."
     shuffle_direction_label: "Tataiso"
     shuffle_direction_placeholder: "mohlala: leseli le futhumetseng la tlhaho, ka ntle, dihlopha tse nyane, ha ho diofisi"
     shuffle_direction_toward: "Ho ferekanya ha ho qetela ho batlile: %{terms}"
     shuffle_direction_avoiding: "mme ha tlosa: %{terms}"
     shuffle_direction_clear: "Hlakola"
-    shuffle_direction_apply: "Ferekanya ka sena"
+    shuffle_direction_apply: "Ferekanya ditshwantsho ka sena"
     publish_share: "Phatlalatsa mme o arolelane →"
     answer_type: "Mofuta wa Karabo"
     select_card: "Kgetha karete ho fetola mofuta wa yona"
@@ -1417,7 +1428,7 @@ st:
     s7_perks:
       - "Bokamorao ba patlisiso bo lumellanang le sehlooho sa hao"
       - "Ditshwantsho karetteng e nngwe le e nngwe, ho kenyeletswa dikarete tsa ho hula"
-      - "Ferekanya mohlophisimng ho fihlela ho utlwahala hantle"
+      - "Ferekanya ditshwantsho mohlophising ho fihlela ho utlwahala hantle"
     s7_title: "O ka rata ho qala jwang?"
     s7_sub: "O sa ntse o ka fetola eng kapa eng mohlophising."
     s7_recommended: "E Kgothaletswang"
@@ -1775,7 +1786,7 @@ st:
       pdf_too_large: "PDF eo e kgolo haholo — ka kopo o e boloke ka tlase ho MB tse %{limit}."
       restored: "“%{name}” e kgutlisitswe. E se e le meralong ya hao hape — e phatlalatse hape ha o se o itokisitse."
       settings_locked: "Verto ena e a phela kapa e se e na le dikarabo — ditlhophiso tsa tumello le tsa lintlha ha di sa ka di fetoha hona jwale."
-      shuffle_failed: "Ho paletswe ho ferekanya dithoto — ka kopo leka hape."
+      shuffle_failed: "Ho paletswe ho ferekanya ditshwantsho — ka kopo leka hape."
       unpublished: "Phatlalatso ya Verto e hlakotswe — e kgutletse moralong o ka fetolwang."
   ask:
     stale_note: "Mehlodi e meng e qotsitsweng karabong ena e se e tlohile bokgobapuong bo arolelanweng."

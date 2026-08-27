@@ -146,14 +146,10 @@ class HeritageOptionsGenerator
 
   def user_message(name, locale)
     msg = +"Country: #{name}\n\nList the #{WANTED} most commonly identified heritage categories there, most common first."
-    return msg if locale.to_s == SupportedLocales::DEFAULT
-
-    lang = SupportedLocales.find(locale)
-    label = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
     # Same posture as SingleQuestionGenerator: the labels are what a respondent
     # reads, so they are written in the Verto's language rather than translated
     # out of English afterwards.
-    msg << "\n\nLANGUAGE: Write every label in #{label}. Do not use English."
+    msg << "\n" << PromptLanguage.instruction(locale, scope: "every label")
     msg
   end
 end

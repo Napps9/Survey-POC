@@ -29,9 +29,33 @@ class FinishVertoSetupTest < ActiveSupport::TestCase
     SurveyTranslator.singleton_class.remove_method(:new)
   end
 
+  # Both writes, because the job takes the merged one and the wizard takes the
+  # positional one — a stub that knows only about `populate!` would let the job
+  # raise NoMethodError into auto_populate_assets!'s rescue and look like it had
+  # simply chosen not to populate.
   def with_no_assets
-    AssetPopulator.define_singleton_method(:new) { |*| Object.new.tap { |o| o.define_singleton_method(:populate!) { nil } } }
+    AssetPopulator.define_singleton_method(:new) do |*, **|
+      Object.new.tap do |o|
+        o.define_singleton_method(:populate!) { nil }
+        o.define_singleton_method(:populate_merged!) { nil }
+      end
+    end
     yield
+  ensure
+    AssetPopulator.singleton_class.remove_method(:new)
+  end
+
+  # Records how AssetPopulator was constructed and which write was asked for.
+  def recording_populator
+    seen = {}
+    AssetPopulator.define_singleton_method(:new) do |_survey, **kwargs|
+      seen[:fill_only] = kwargs[:fill_only]
+      Object.new.tap do |o|
+        o.define_singleton_method(:populate!)        { seen[:write] = :positional }
+        o.define_singleton_method(:populate_merged!) { seen[:write] = :merged }
+      end
+    end
+    yield seen
   ensure
     AssetPopulator.singleton_class.remove_method(:new)
   end
@@ -49,18 +73,52 @@ class FinishVertoSetupTest < ActiveSupport::TestCase
 
   # The race the guard exists for: the creator saved an edit while the
   # translation calls were in flight. Writing back would undo it.
+  #
+  # The digest is taken by the job at the moment it starts translating, not at
+  # the moment it was enqueued, so this is the only window it has to cover — and
+  # it is the one that matters, because translation is the slow half (one Claude
+  # call per secondary locale) while imagery is seconds.
   test "it declines to overwrite a deck edited while it was running" do
     s = survey
-    digest = VertoGeneration.cards_digest(s)
-    s.update!(cards: [ { "type" => "yes_no", "cid" => "c_1", "text" => "Creator's edit", "options" => %w[Yes No] } ])
 
-    with_translator do
-      with_no_assets { FinishVertoSetupJob.perform_now(s.id, digest) }
+    # The edit lands DURING the translation call, which is the shape the guard
+    # is for. Everything before that point the job now translates rather than
+    # discards — see the test below.
+    fake = Object.new
+    fake.define_singleton_method(:call) do |cards:, target_locale:, source_locale:|
+      s.update!(cards: [ { "type" => "yes_no", "cid" => "c_1", "text" => "Creator's edit", "options" => %w[Yes No] } ])
+      Array(cards).map { |c| { "text" => "#{target_locale}:#{c['text']}", "options" => Array(c["options"]) } }
+    end
+    SurveyTranslator.define_singleton_method(:new) { |*| fake }
+    begin
+      with_no_assets { FinishVertoSetupJob.perform_now(s.id, VertoGeneration.cards_digest(s)) }
+    ensure
+      SurveyTranslator.singleton_class.remove_method(:new)
     end
 
     s.reload
     assert_equal "Creator's edit", s.cards.first["text"], "the creator's edit must survive"
     assert_nil s.cards.first.dig("i18n", "es"), "the translation is the thing dropped, not the edit"
+  end
+
+  # An edit made before the job reaches its translation step is no longer a
+  # reason to throw the translation away. The job recomputes the digest against
+  # the deck as it finds it, so the creator's own words get translated instead
+  # of the stale ones being translated and then refused — which lost the
+  # translation and gained nothing.
+  test "an edit made before translation starts is translated, not discarded" do
+    s = survey
+    enqueued_digest = VertoGeneration.cards_digest(s)
+    s.update!(cards: [ { "type" => "yes_no", "cid" => "c_1", "text" => "Creator's edit", "options" => %w[Yes No] } ])
+
+    with_translator do
+      with_no_assets { FinishVertoSetupJob.perform_now(s.id, enqueued_digest) }
+    end
+
+    s.reload
+    assert_equal "Creator's edit", s.cards.first["text"]
+    assert_equal "es:Creator's edit", s.cards.first.dig("i18n", "es", "text"),
+                 "the translation must be of what the deck says NOW"
   end
 
   test "with no digest it writes unconditionally, which is what the wizard needs" do
@@ -99,22 +157,66 @@ class FinishVertoSetupTest < ActiveSupport::TestCase
     assert_not_equal before, VertoGeneration.cards_digest(s.reload)
   end
 
-  test "asset population still runs even when the translation was declined" do
+  test "the import path populates fill-only, and merges rather than overwriting" do
     s = survey
-    digest = VertoGeneration.cards_digest(s)
-    s.update!(cards: [ { "type" => "yes_no", "cid" => "c_1", "text" => "Edited", "options" => %w[Yes No] } ])
-
-    populated = false
-    AssetPopulator.define_singleton_method(:new) do |*|
-      Object.new.tap { |o| o.define_singleton_method(:populate!) { populated = true } }
+    recording_populator do |seen|
+      with_translator { FinishVertoSetupJob.perform_now(s.id, VertoGeneration.cards_digest(s)) }
+      assert_equal true,    seen[:fill_only], "auto-population must never overwrite a creator's own imagery"
+      assert_equal :merged, seen[:write],     "the creator is in the editor — a whole-deck write would undo their save"
     end
+  end
+
+  # This is the bug the reordering is for. The rescue inside translate_survey!
+  # covers the SurveyTranslator call only; the update! after it is unguarded, so
+  # a raise there used to propagate to discard_on and take the asset population
+  # that had not run yet with it. Imagery goes first now, and each step has its
+  # own rescue, so neither can cost the other.
+  test "imagery survives a translation that raises" do
+    s = survey
+
+    boom = Object.new
+    boom.define_singleton_method(:call) { |**| raise "translator down" }
+    SurveyTranslator.define_singleton_method(:new) { |*| boom }
     begin
-      with_translator { FinishVertoSetupJob.perform_now(s.id, digest) }
+      recording_populator do |seen|
+        assert_nothing_raised { FinishVertoSetupJob.perform_now(s.id, VertoGeneration.cards_digest(s)) }
+        assert_equal :merged, seen[:write], "imagery must run whatever translation does"
+      end
     ensure
-      AssetPopulator.singleton_class.remove_method(:new)
+      SurveyTranslator.singleton_class.remove_method(:new)
     end
+  end
 
-    assert populated, "imagery only fills empty slots, so it's safe regardless"
+  # The flag is what keeps the editor polling and what keeps
+  # SurveysController#update carrying imagery the client can't see yet. A job
+  # that finished without clearing it would strand both until it went stale.
+  test "the setup flag is cleared on the way out, however the job ends" do
+    s = survey
+    s.update!(setup_pending_since: Time.current)
+    assert s.setup_pending?
+
+    with_translator { with_no_assets { FinishVertoSetupJob.perform_now(s.id, VertoGeneration.cards_digest(s)) } }
+    assert_nil s.reload.setup_pending_since
+
+    s.update!(setup_pending_since: Time.current)
+    boom = Object.new
+    boom.define_singleton_method(:call) { |**| raise "translator down" }
+    SurveyTranslator.define_singleton_method(:new) { |*| boom }
+    begin
+      with_no_assets { FinishVertoSetupJob.perform_now(s.id, VertoGeneration.cards_digest(s)) }
+    ensure
+      SurveyTranslator.singleton_class.remove_method(:new)
+    end
+    assert_nil s.reload.setup_pending_since, "a failing step must still close the window"
+  end
+
+  # A stale flag is not a permanent one: if the process dies before `ensure`
+  # runs, the window closes on its own rather than leaving the editor polling
+  # and #update merging forever.
+  test "the setup window expires on its own" do
+    s = survey
+    s.update!(setup_pending_since: Survey::SETUP_STALE_AFTER.ago - 1.minute)
+    assert_not s.setup_pending?
   end
 end
 

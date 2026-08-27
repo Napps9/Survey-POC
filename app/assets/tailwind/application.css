@@ -3723,6 +3723,34 @@
 }
 .option-limit-counter--pinned.is-full { background: #FF1E6F; color: #fff; }
 .option-limit-counter--pinned.is-over { background: #FFCC00; color: #4A3B00; }
+
+/* ── Points-note counter (the tokenisation settings panel) ──────────────────
+   The same two-limit idea as .option-limit-counter above, on the opposite
+   surface: that one sits on the near-white card canvas, this one on the dark
+   right-hand settings panel, so the palette inverts. Everything else is the
+   same contract — the numbers carry the meaning on their own ("137 / 120
+   recommended · 200 max" is legible with the colour ignored) and hue only
+   reinforces it.
+
+   Amber for "past the recommended width, still saves", pink for the wall.
+   The split hint rides underneath and only appears in the amber state, which
+   is the one where there is something to do about it. */
+.note-limit-count {
+  margin: 5px 2px 0;
+  font-family: "Alata", sans-serif;
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  user-select: none;
+}
+.note-limit-count.is-over { color: #FFCC00; }
+.note-limit-count.is-full { color: #FF7DA8; font-weight: 600; }
+.note-limit-hint {
+  margin: 4px 2px 0;
+  font-family: "ABeeZee", sans-serif;
+  font-size: 11px; line-height: 1.45;
+  color: rgba(255,204,0,0.85);
+}
+.note-limit-hint[hidden] { display: none; }
 /* A grid tile stacks its label under its artwork, so the counter can sit in
    normal flow beneath it. A LIST row is a flex line — tile, label, tick — and
    a counter dropped into it becomes a fourth flex item that takes its width
@@ -3790,6 +3818,15 @@
   color: rgba(255,255,255,0.88);
 }
 .card-flag input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+/* A line under a switch whose consequence is not obvious from its label — used
+   by the respondent-code card's recall toggle, where what the creator is
+   agreeing to (a guessed code can fetch someone's answers) has to be readable
+   at the moment they decide, not in a doc. */
+.card-flag-note {
+  margin: -4px 0 0 34px;
+  font-family: "ABeeZee", sans-serif; font-size: 11px; line-height: 1.45;
+  color: rgba(255,255,255,0.5);
+}
 .card-flag-track {
   position: relative; flex-shrink: 0;
   width: 36px; height: 20px; border-radius: 100px;

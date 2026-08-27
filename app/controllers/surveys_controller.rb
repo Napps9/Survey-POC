@@ -41,6 +41,12 @@ class SurveysController < ApplicationController
   throttle_ai to: 60,  within: 1.hour, name: "stock-shuffle", respond: :html,
               only: %i[ shuffle_assets ], message: STOCK_THROTTLE_MESSAGE
 
+  # Not throttle_ai — setup_status spends nothing at all (one row read). But it
+  # is polled in a loop by an open editor tab, so it gets a plain cap generous
+  # enough that a legitimate 2s poll never meets it. No-op in test (null cache).
+  rate_limit to: 120, within: 1.minute, only: :setup_status,
+             with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+
   # Stock search paging. 24 was previously an inline literal at each call site
   # and there was no way to ask for a second page, so the library simply ended
   # after 24 results — creators read that as "this is everything Verto has".
@@ -301,11 +307,17 @@ class SurveysController < ApplicationController
     payload = build.payload
     cards   = Array(build.result["cards"])
     flagged = cards.select { |c| c["compliant"] == false }
+    # A card whose TEXT was already compliant can still have had its options or
+    # sub-text reworded, and "Keep my wording exactly as uploaded" is a promise
+    # about all three. Skipping the review screen for those meant the creator
+    # never saw the change and never got the choice.
+    reworded = cards.select { |c| self.class.import_card_reworded?(c) }
 
-    if flagged.any?
+    if flagged.any? || reworded.any?
       @import_payload = self.class.import_verifier.generate(payload)
       @import_cards   = cards
       @flagged_count  = flagged.size
+      @reworded_count = (reworded - flagged).size
       return render :import_review, layout: "fullscreen"
     end
 
@@ -409,6 +421,15 @@ class SurveysController < ApplicationController
     attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")
       attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
+      # An import's creator is in the editor while FinishVertoSetupJob is still
+      # filling in imagery behind them. The editor rebuilds every card from the
+      # DOM, and the DOM has no pictures in it yet, so its silence about them is
+      # not a decision to remove them — it is a client that provably does not
+      # know about them. Carry them across, by cid, until the window closes.
+      # Once setup_pending_since clears this line is a no-op and #update behaves
+      # exactly as it always has. Before the flow compile, so the compile sees
+      # the final deck.
+      attrs[:cards] = Survey.keep_setup_media(survey.cards, attrs[:cards]) if survey.setup_pending?
       # First-class flows compile down to the per-card `next` pointers the
       # player resolves (see FlowCompiler). Run on every save so the STORED
       # deck can never disagree with the stored flows, whatever the client
@@ -830,10 +851,10 @@ class SurveysController < ApplicationController
     # The two tokenomics lines on the points intro — presentation copy, same
     # trust level as compare_note. Blank restores the locale default.
     if params.key?(:tokens_note)
-      attrs[:tokens_note] = params[:tokens_note].to_s.strip.first(200).presence
+      attrs[:tokens_note] = params[:tokens_note].to_s.strip.first(Survey::MAX_NOTE).presence
     end
     if params.key?(:leaderboard_note)
-      attrs[:leaderboard_note] = params[:leaderboard_note].to_s.strip.first(200).presence
+      attrs[:leaderboard_note] = params[:leaderboard_note].to_s.strip.first(Survey::MAX_NOTE).presence
     end
     if params.key?(:thankyou_title)
       attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence
@@ -955,6 +976,29 @@ class SurveysController < ApplicationController
   rescue => e
     ErrorReporting.report("SurveysController#shuffle_assets", e)
     redirect_to survey_path(survey), alert: t("flash.surveys.shuffle_failed")
+  end
+
+  # GET /surveys/:id/setup_status — what an import's editor polls while
+  # FinishVertoSetupJob fills in imagery behind it.
+  #
+  # One row read: no Pexels, no Claude, nothing computed, which is what makes it
+  # cheap enough to poll. It reports only the media, keyed by cid, so the
+  # editor can paint the pictures in AND — the part that matters — write them
+  # onto the `data-card-*` attributes its own autosave rebuilds the deck from.
+  # Without that write the next keystroke would erase everything this job did.
+  def setup_status
+    survey = Current.organisation.surveys.kept.find(params[:id])
+    render json: {
+      ok:               true,
+      pending:          survey.setup_pending?,
+      background_image: survey.background_image,
+      # The ready-made custom-property value, not just the URL: the gradient
+      # over it is part of the look and lives in one place
+      # (ApplicationHelper#verto_brand_bg_image_var). Rebuilding that string in
+      # JS is how the editor's backdrop and the player's would drift apart.
+      background_css:   helpers.verto_brand_bg_image_var(survey),
+      cards:            Array(survey.cards).filter_map { |card| setup_media_entry(card) }
+    }
   end
 
   def destroy
@@ -1570,11 +1614,30 @@ class SurveysController < ApplicationController
     }
   end
 
+  # Did the model reword anything on this card BEYOND its question text?
+  # Emitted only when it actually did (see PdfQuestionImporter::TOOL), so the
+  # presence of either key IS the answer.
+  def self.import_card_reworded?(card)
+    Array(card["original_options"]).any? || card["original_description"].to_s.strip.present?
+  end
+
+  IMPORT_REVIEW_KEYS = %w[compliant issue original_text original_options original_description].freeze
+
   def create_imported_survey!(payload, variant:)
     result = payload["result"]
     cards  = Array(result["cards"]).map do |c|
-      card = c.except("compliant", "issue", "original_text")
-      card["text"] = c["original_text"] if variant == "verbatim" && c["original_text"].present?
+      card = c.except(*IMPORT_REVIEW_KEYS)
+      # "Keep my wording exactly as uploaded" used to restore the question text
+      # and nothing else, so a Verto in which every question was kept as written
+      # could still carry the model's wording — and, before PromptLanguage, the
+      # model's SPELLING — through every option label and sub-text. The review
+      # screen diffed only the text, so none of it was ever visible either.
+      if variant == "verbatim"
+        card["text"]        = c["original_text"] if c["original_text"].present?
+        card["description"] = c["original_description"] if c["original_description"].to_s.strip.present?
+        originals           = Array(c["original_options"]).map { |o| o.to_s.strip }.reject(&:empty?)
+        card["options"]     = originals if originals.any?
+      end
       card
     end
 
@@ -1591,25 +1654,45 @@ class SurveysController < ApplicationController
     cards += resolve_common_cards(payload["common_question_ids"])
     cards  = DemographicQuestions.append_to(cards, locale: payload["default_locale"])
 
+    title = payload["verto_name"].presence || result["title"].presence || "Imported Verto"
     survey = Current.organisation.surveys.create!(
-      title:          payload["verto_name"].presence || result["title"].presence || "Imported Verto",
+      title:          title,
       description:    result["description"],
-      theme:          payload["theme"].presence,
+      # An import has no theme field of its own — the wizard's Card 8 posts with
+      # formnovalidate, so unlike #generate nothing here requires one. A blank
+      # theme is not a cosmetic gap: AssetPopulator anchors every query on it,
+      # and with nothing to anchor on the relevance floor rejects almost every
+      # photo that comes back. Falling back to the Verto's own name gives the
+      # populator something true to work from (it derives further from the deck
+      # itself when even that is missing — see AssetPopulator#theme_source_text)
+      # and, because Shuffle and the recommended-images rail read the stored
+      # COLUMN rather than the populator, fixing it here fixes those too.
+      theme:          payload["theme"].presence || result["title"].presence || payload["verto_name"].presence,
       audience_age:   payload["audience_age"].presence,
       key_insight:    payload["key_insight"].presence,
-      cards:          cards,
+      # Cids up front. The editor mints them on its first save, which is too
+      # late for an import: the job matches its picks to live cards BY cid, and
+      # against a deck of blanks it would match nothing — while the editor,
+      # serialising a card with no cid, would have a fresh one minted on every
+      # autosave and churn the deck's identities until the first reload.
+      cards:          Survey.ensure_cids!(cards),
       brand_palette:  payload["brand_palette"].presence,
       default_locale: payload["default_locale"],
       locales:        payload["locales"],
-      quiz:           ActiveModel::Type::Boolean.new.cast(payload["quiz"]) || false
+      quiz:           ActiveModel::Type::Boolean.new.cast(payload["quiz"]) || false,
+      # Says "imagery and translations are still landing" to the editor (which
+      # polls #setup_status and paints them in) and to #update (which carries
+      # imagery the client cannot see yet). The job clears it in an `ensure`.
+      setup_pending_since: Time.current
     )
 
     Current.organisation.update(default_brand_palette: payload["brand_palette"]) if payload["brand_palette"].present?
     # Translation and imagery are the slow tail of an import — five Claude calls
     # on a five-language deck, plus a run of Pexels lookups — and they used to run
-    # right here, on a request thread. The creator goes straight to the editor now
-    # and the cards fill in behind them. The digest is what stops the job writing
-    # a stale deck over an edit they make in the meantime; see the job.
+    # right here, on a request thread. The creator still goes straight to the
+    # editor; the difference now is that the imagery arrives IN FRONT of them
+    # rather than on a reload nobody told them to do, and that neither their
+    # edits nor the job's picks can erase the other. See the job.
     FinishVertoSetupJob.perform_later(survey.id, VertoGeneration.cards_digest(survey))
     survey
   end
@@ -1618,6 +1701,17 @@ class SurveysController < ApplicationController
   # failure (e.g. a transient Pexels issue) must never block Verto creation.
   def auto_populate_assets!(survey)
     VertoGeneration.auto_populate_assets!(survey)
+  end
+
+  # One card's media for #setup_status, or nil when there is nothing to say
+  # about it yet. Cid-keyed and media-only: the editor already has the words.
+  def setup_media_entry(card)
+    return nil unless card.is_a?(Hash)
+    cid = card["cid"].to_s
+    return nil if cid.blank?
+    return nil if Survey::MEDIA_KEYS.none? { |key| card[key].present? }
+
+    { cid: cid }.merge(card.slice(*Survey::MEDIA_KEYS).symbolize_keys.compact_blank)
   end
 
   # Snapshot the SELECTED Common Questions into Verto-card hashes. Takes

@@ -63,6 +63,8 @@ fr:
     allow_other: Autoriser une réponse libre « Autre »
     required: "Question obligatoire"
     ask_once: "Poser une seule fois — passée aux relectures une fois répondue"
+    recall_ask_once: "Reprendre les réponses à poser une fois depuis un autre appareil"
+    recall_ask_once_note: "Quiconque devine le code de ce participant verrait ces réponses. Désactivé sauf si nécessaire."
     other: Autre
     other_placeholder: Dites-le avec vos propres mots…
     mark_correct: "Indiquer la bonne réponse"
@@ -110,6 +112,7 @@ fr:
       welcome_card: "CARTE D'ACCUEIL"
       token_checkpoint: "BILAN"
       consent_gate: "CONSENTEMENT"
+      respondent_code: "CODE PARTICIPANT"
     panel_label:
       range: "FAITES GLISSER LE CURSEUR"
       rating: "TOUCHEZ POUR NOTER"
@@ -290,6 +293,7 @@ fr:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Rédaction de la réponse…"
@@ -378,6 +382,10 @@ fr:
       appeal_submitted: "Envoyé pour examen — nous vous préviendrons une fois vérifié."
       appeal_failed: "Impossible d'envoyer pour examen — veuillez réessayer."
       emoji_none: "Aucun émoji correspondant."
+      emoji_all: "Tout"
+      note_limit_count: "%{n} / %{recommended} recommandé · %{max} max"
+      setup_finding_images: "Recherche d'images pour vos cartes…"
+      setup_images_ready: "Images ajoutées"
       rich_bold: "Gras"
       rich_italic: "Italique"
       rich_underline: "Souligné"
@@ -495,6 +503,7 @@ fr:
         variety_ok: "Bonne variété — aucun type de réponse ne se répète trop."
         variety_run: "%{type} apparaît %{n}× de suite — alternez avec un autre type de réponse."
         welcome_many: "Utilisez au plus une carte de bienvenue (actuellement %{n})."
+        code_after_ask_once: "%{n} questions à poser une fois se trouvent avant la carte Code participant : quelqu'un qui revient sur un nouvel appareil y répondra de nouveau avant que le code puisse les remplir. Placez la carte de code au-dessus."
         static_tip: "Verto long — pensez à une pause à mi-parcours pour garder le rythme."
         board_heading: "Ce qui va et ce qu'il faut corriger"
         board_hint: "Regroupé par feu tricolore — touchez une carte pour y accéder."
@@ -1060,6 +1069,8 @@ fr:
     ty_forward_label_placeholder: 'Libellé du bouton (ex. Visitez notre site)'
     tab_quiz: 'Mode quiz'
     tab_tokens: 'Tokenisation'
+    note_limit_split_hint: "Au-delà de %{n} caractères, c'est à l'étroit sur la carte d'introduction — mettez plutôt le détail sur sa propre carte."
+    respondent_code_card_note: "Ce Verto contient une carte Code participant : le code est collecté là, et ce réglage n'a aucun effet."
     tab_logic: 'Logique et parcours'
     flows_title: "Flux"
     flows_intro: "Groupes de cartes nommés où mène une réponse routée — p. ex. des séries de questions UK, EAU et USA qui convergent ensuite ou finissent sur leurs propres écrans."
@@ -1119,18 +1130,18 @@ fr:
       one: Estimé ~%{count} min
       other: Estimé ~%{count} mins
     design: Design
-    shuffle: Mélanger
-    shuffle_title: Piocher de nouvelles images depuis la bibliothèque Verto
-    shuffle_confirm: Mélanger les images ? Vos images actuelles seront remplacées par une nouvelle sélection depuis la bibliothèque.
-    shuffle_direction_toggle_title: "Ajouter une orientation pour ce mélange"
-    shuffle_direction_heading: "Orienter ce mélange"
+    shuffle: "Mélanger les images"
+    shuffle_title: "Repiocher chaque image et animation dans la bibliothèque Verto — vos questions et leur ordre ne changent pas"
+    shuffle_confirm: "Mélanger les images ? Chaque image et animation sera remplacée par une nouvelle sélection de la bibliothèque. Vos questions et leur ordre restent exactement les mêmes."
+    shuffle_direction_toggle_title: "Ajouter une orientation pour ce mélange d'images"
+    shuffle_direction_heading: "Orienter ce mélange d'images"
     shuffle_direction_hint: "Facultatif. Dites à Verto ce que vous attendez des images et des animations : une ambiance, un décor, ou ce qu'il faut éviter."
     shuffle_direction_label: "Orientation"
     shuffle_direction_placeholder: "ex. lumière naturelle chaude, en extérieur, petits groupes, pas de bureaux"
     shuffle_direction_toward: "Dernier mélange : recherche de %{terms}"
     shuffle_direction_avoiding: "et a exclu : %{terms}"
     shuffle_direction_clear: "Effacer"
-    shuffle_direction_apply: "Mélanger avec ceci"
+    shuffle_direction_apply: "Mélanger les images avec ceci"
     publish_share: Publier & partager →
     answer_type: Type de réponse
     select_card: Sélectionnez une carte pour changer son type
@@ -1395,7 +1406,7 @@ fr:
     s7_perks:
     - Un arrière-plan assorti au thème de votre sondage
     - Une image sur chaque carte, y compris les cartes à toucher
-    - Mélangez dans l'éditeur jusqu'à trouver le rendu idéal
+    - "Mélangez les images dans l'éditeur jusqu'à trouver le rendu idéal"
     s7_title: Comment souhaitez-vous démarrer ?
     s7_sub: Vous pourrez tout modifier dans l'éditeur.
     s7_recommended: Recommandé

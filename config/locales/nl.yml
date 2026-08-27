@@ -63,6 +63,8 @@ nl:
     allow_other: Sta een vrij tekstantwoord “Anders” toe
     required: "Verplichte vraag"
     ask_once: "Eén keer vragen — overgeslagen bij opnieuw spelen na beantwoording"
+    recall_ask_once: "Eenmalige antwoorden van een ander apparaat invullen"
+    recall_ask_once_note: "Wie de code van deze respondent raadt, ziet die antwoorden. Uit tenzij je het nodig hebt."
     other: Anders
     other_placeholder: Vertel het in je eigen woorden…
     mark_correct: "Markeer het juiste antwoord"
@@ -110,6 +112,7 @@ nl:
       welcome_card: "WELKOMSTKAART"
       token_checkpoint: "CHECKPOINT"
       consent_gate: "TOESTEMMING"
+      respondent_code: "RESPONDENTCODE"
     panel_label:
       range: "SLEEP DE SCHUIFREGELAAR"
       rating: "TIK OM TE BEOORDELEN"
@@ -290,6 +293,7 @@ nl:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Het antwoord schrijven…"
@@ -378,6 +382,10 @@ nl:
       appeal_submitted: "Ingediend ter beoordeling — we laten het je weten zodra het is gecontroleerd."
       appeal_failed: "Kon dit niet ter beoordeling indienen — probeer het opnieuw."
       emoji_none: "Geen emoji gevonden."
+      emoji_all: "Alle"
+      note_limit_count: "%{n} / %{recommended} aanbevolen · %{max} max"
+      setup_finding_images: "Afbeeldingen zoeken voor je kaarten…"
+      setup_images_ready: "Afbeeldingen toegevoegd"
       rich_bold: "Vet"
       rich_italic: "Cursief"
       rich_underline: "Onderstreept"
@@ -495,6 +503,7 @@ nl:
         variety_ok: "Goede afwisseling — geen antwoordtype herhaalt te vaak."
         variety_run: "%{type} verschijnt %{n}× achter elkaar — wissel af met een ander antwoordtype."
         welcome_many: "Gebruik hooguit één welkomstkaart (nu %{n})."
+        code_after_ask_once: "%{n} eenmalige vragen staan vóór de kaart Respondentcode, dus wie terugkomt op een nieuw apparaat beantwoordt ze opnieuw voordat de code ze kan invullen. Zet de codekaart erboven."
         static_tip: "Lang Verto — overweeg een pauze halverwege om de energie hoog te houden."
         board_heading: "Wat goed is en wat beter kan"
         board_hint: "Gegroepeerd per stoplicht — tik op een kaart om ernaartoe te gaan."
@@ -1060,6 +1069,8 @@ nl:
     ty_forward_label_placeholder: 'Knoptekst (bijv. Bezoek onze site)'
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisatie'
+    note_limit_split_hint: "Boven %{n} tekens wordt het krap op de introkaart — zet de details liever op een eigen kaart."
+    respondent_code_card_note: "Deze Verto heeft een kaart Respondentcode in het deck, dus de code wordt daar verzameld en deze instelling heeft geen effect."
     tab_logic: 'Logica & flows'
     flows_title: "Flows"
     flows_intro: "Benoemde kaartgroepen waar een gerouteerd antwoord in terechtkomt — bijv. vragensets voor UK, VAE en VS die daarna samenkomen of op eigen schermen eindigen."
@@ -1119,18 +1130,18 @@ nl:
       one: Geschat ~%{count} min
       other: Geschat ~%{count} min
     design: Ontwerp
-    shuffle: Vernieuwen
-    shuffle_title: Kies nieuwe afbeeldingen uit de Verto-bibliotheek
-    shuffle_confirm: Afbeeldingen vernieuwen? Je huidige afbeeldingen worden vervangen door een nieuwe selectie uit de bibliotheek.
-    shuffle_direction_toggle_title: "Voeg een richting toe voor dit vernieuwen"
-    shuffle_direction_heading: "Stuur dit vernieuwen"
+    shuffle: "Afbeeldingen vernieuwen"
+    shuffle_title: "Kies elke afbeelding en animatie opnieuw uit de Verto-bibliotheek — je vragen en hun volgorde veranderen niet"
+    shuffle_confirm: "Afbeeldingen vernieuwen? Elke afbeelding en animatie wordt vervangen door een nieuwe selectie uit de bibliotheek. Je vragen en hun volgorde blijven precies zoals ze zijn."
+    shuffle_direction_toggle_title: "Voeg een richting toe voor dit vernieuwen van afbeeldingen"
+    shuffle_direction_heading: "Stuur dit vernieuwen van afbeeldingen"
     shuffle_direction_hint: "Optioneel. Vertel Verto wat je zoekt in de beelden en animaties — een sfeer, een omgeving of iets wat weg moet blijven."
     shuffle_direction_label: "Richting"
     shuffle_direction_placeholder: "bijv. warm natuurlijk licht, buiten, kleine groepen, geen kantoren"
     shuffle_direction_toward: "Laatste vernieuwing zocht naar: %{terms}"
     shuffle_direction_avoiding: "en liet weg: %{terms}"
     shuffle_direction_clear: "Wissen"
-    shuffle_direction_apply: "Hiermee vernieuwen"
+    shuffle_direction_apply: "Afbeeldingen hiermee vernieuwen"
     publish_share: Publiceren & delen →
     answer_type: Antwoordtype
     select_card: Selecteer een kaart om het type te wijzigen
@@ -1395,7 +1406,7 @@ nl:
     s7_perks:
     - Een achtergrond die bij je thema past
     - Afbeeldingen op elke kaart, inclusief tik-kaarten
-    - Vernieuwen in de editor totdat het goed voelt
+    - "Vernieuw de afbeeldingen in de editor totdat het goed voelt"
     s7_title: Hoe wil je beginnen?
     s7_sub: Je kunt achteraf alles nog aanpassen in de editor.
     s7_recommended: Aanbevolen
@@ -1619,7 +1630,7 @@ nl:
       not_live: "Die Verto is niet live."
       closed: "Verto gesloten — hij staat niet meer op /play en de resultaten blijven bewaard."
       unpublished: "Publicatie ongedaan gemaakt — de Verto is weer een concept dat je kunt bewerken."
-      shuffle_failed: "Kon de assets niet vernieuwen — probeer het opnieuw."
+      shuffle_failed: "Kon de afbeeldingen niet vernieuwen — probeer het opnieuw."
       archived: "“%{name}” verwijderd. De link voor respondenten werkt niet meer; de resultaten blijven in je Archief staan."
       restored: "“%{name}” hersteld. Hij staat weer bij je concepten — publiceer opnieuw wanneer je er klaar voor bent."
       destroyed_forever: "“%{name}” definitief verwijderd. Alle reacties en gegevens zijn gewist."

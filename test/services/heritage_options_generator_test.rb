@@ -65,7 +65,15 @@ class HeritageOptionsGeneratorTest < ActiveSupport::TestCase
     content = kwargs[:messages].first[:content]
     assert_match "United Kingdom", content,
                  "the model gets the country's name — an alpha-2 code is ambiguous"
-    refute_match(/LANGUAGE:/, content, "an English Verto needs no language instruction")
+    # An English Verto used to get NO language instruction at all — every
+    # generator opened `return "" if locale == SupportedLocales::DEFAULT`. That
+    # silence is what let the model inherit the dialect of the prompts, which
+    # are British throughout, and hand a US creator's questions back respelled.
+    # English is stated now, and which English.
+    assert_match(/LANGUAGE: Write every label in British English/, content)
+    refute_match(/Do not use English/, content,
+                 "nonsense for an English variant — a self-contradicting instruction " \
+                 "makes output unpredictable rather than merely wrong")
   end
 
   test "asks for the labels in the Verto's language rather than translating after" do

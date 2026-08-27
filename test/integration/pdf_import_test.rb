@@ -123,6 +123,64 @@ class PdfImportTest < ActionDispatch::IntegrationTest
     assert_equal "Short version?", optimised.cards.find { |c| c["type"] == "open_ended" }["text"]
   end
 
+  # "Keep my wording exactly as uploaded" used to restore the question TEXT and
+  # nothing else — so a Verto in which every question was kept as written could
+  # still carry the model's wording, and (before PromptLanguage) the model's
+  # SPELLING, through every option label and sub-text. The review screen diffed
+  # only the text, so none of it was ever visible either.
+  test "verbatim restores the options and sub-text, not just the question" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Favourite colour?", "compliant" => true,
+        "original_text" => "Favorite color?",
+        "options"              => [ "Blue", "Grey", "Neither" ],
+        "original_options"     => [ "Blue", "Gray", "Neither" ],
+        "description"          => "Pick the colour you like best.",
+        "original_description" => "Pick the color you like best." }
+    ]
+    payload = {
+      "result" => { "title" => "Imported", "cards" => cards },
+      "verto_name" => "US spellings", "theme" => "", "audience_age" => "", "key_insight" => "",
+      "brand_palette" => nil, "default_locale" => "en-US", "locales" => [ "en-US" ],
+      "common_question_ids" => []
+    }
+    signed = SurveysController.import_verifier.generate(payload)
+
+    post finalize_import_survey_path, params: { payload: signed, variant: "verbatim" }
+    card = @org.surveys.order(:id).last.cards.find { |c| c["type"] == "multiple_choice" }
+
+    assert_equal "Favorite color?", card["text"]
+    assert_equal [ "Blue", "Gray", "Neither" ], card["options"],
+                 "an option label the creator wrote is their wording too"
+    assert_equal "Pick the color you like best.", card["description"]
+    %w[original_options original_description compliant issue original_text].each do |key|
+      refute card.key?(key), "#{key} is review-only and must not reach the stored deck"
+    end
+
+    post finalize_import_survey_path, params: { payload: signed, variant: "optimised" }
+    optimised = @org.surveys.order(:id).last.cards.find { |c| c["type"] == "multiple_choice" }
+    assert_equal [ "Blue", "Grey", "Neither" ], optimised["options"], "the other button still takes Verto's version"
+  end
+
+  # A card whose text was already compliant could have its OPTIONS reworded and
+  # sail straight past the review screen into the editor, so the creator never
+  # saw the change and never got the choice.
+  test "reworded options pause the import even when every question was compliant" do
+    cards = [
+      { "type" => "multiple_choice", "text" => "Favourite colour?", "compliant" => true,
+        "original_text" => "Favourite colour?",
+        "options" => [ "Blue", "Grey" ], "original_options" => [ "Blue", "Gray" ] }
+    ]
+    stub_importer({ "title" => "Imported", "cards" => cards }) do
+      assert_no_difference -> { @org.surveys.count } do
+        post import_pdf_survey_path, params: { pdf: pdf_upload, default_locale: "en", locales: [ "en" ], verto_name: "Colours" }
+      end
+    end
+    assert_response :success
+    assert_match "had their answers reworded", response.body
+    assert_match "Your answers", response.body
+    assert_match "Gray", response.body, "the creator has to be able to SEE what changed"
+  end
+
   test "a tampered finalize payload is rejected" do
     assert_no_difference -> { @org.surveys.count } do
       post finalize_import_survey_path, params: { payload: "garbage", variant: "verbatim" }

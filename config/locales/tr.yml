@@ -63,6 +63,8 @@ tr:
     allow_other: '"Diğer" serbest metin yanıtına izin ver'
     required: "Zorunlu soru"
     ask_once: "Bir kez sor — yanıtlandıktan sonra tekrar oynanışlarda atlanır"
+    recall_ask_once: "Bir kez sorulan yanıtları başka bir cihazdan doldur"
+    recall_ask_once_note: "Bu katılımcının kodunu tahmin eden biri o yanıtları görür. Gerekmedikçe kapalı."
     other: Diğer
     other_placeholder: Kendi sözcüklerinizle anlatın…
     mark_correct: "Doğru cevabı işaretle"
@@ -110,6 +112,7 @@ tr:
       welcome_card: "KARŞILAMA KARTI"
       token_checkpoint: "KONTROL NOKTASI"
       consent_gate: "ONAY"
+      respondent_code: "KATILIMCI KODU"
     panel_label:
       range: "KAYDIRICIYI SÜRÜKLE"
       rating: "PUANLAMAK İÇİN DOKUNUN"
@@ -290,6 +293,7 @@ tr:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Yanıt yazılıyor…"
@@ -378,6 +382,10 @@ tr:
       appeal_submitted: "İnceleme için gönderildi — kontrol edilir edilmez size bildireceğiz."
       appeal_failed: "İnceleme için gönderilemedi — lütfen tekrar deneyin."
       emoji_none: "Eşleşen emoji yok."
+      emoji_all: "Tümü"
+      note_limit_count: "%{n} / %{recommended} önerilen · %{max} maks."
+      setup_finding_images: "Kartlarınız için görseller aranıyor…"
+      setup_images_ready: "Görseller eklendi"
       rich_bold: "Kalın"
       rich_italic: "İtalik"
       rich_underline: "Altı çizili"
@@ -495,6 +503,7 @@ tr:
         variety_ok: "İyi çeşitlilik — hiçbir yanıt türü çok sık tekrarlanmıyor."
         variety_run: "%{type} arka arkaya %{n}× görünüyor — başka bir yanıt türüyle değiştirin."
         welcome_many: "En fazla bir karşılama kartı kullanın (şu an %{n})."
+        code_after_ask_once: "Bir kez sorulacak %{n} soru, Katılımcı kodu kartından önce geliyor; yeni bir cihazla dönen biri, kod bunları dolduramadan yeniden yanıtlar. Kod kartını bunların üstüne taşıyın."
         static_tip: "Uzun Verto — enerjiyi korumak için ortada bir mola düşünün."
         board_heading: "Neyin iyi olduğu ve neyin düzeltileceği"
         board_hint: "Trafik ışığına göre gruplandı — gitmek için bir karta dokunun."
@@ -1060,6 +1069,8 @@ tr:
     ty_forward_label_placeholder: 'Düğme etiketi (örn. Sitemizi ziyaret edin)'
     tab_quiz: 'Sınav modu'
     tab_tokens: 'Jetonlaştırma'
+    note_limit_split_hint: "%{n} karakteri geçince tanıtım kartında sıkışık görünür — ayrıntıyı kendi kartına koyun."
+    respondent_code_card_note: "Bu Verto'nun destesinde bir Katılımcı kodu kartı var; kod orada toplanır ve bu ayarın etkisi olmaz."
     tab_logic: 'Mantık ve akışlar'
     flows_title: "Akışlar"
     flows_intro: "Yönlendirilen bir yanıtın girdiği adlandırılmış kart grupları — ör. sonradan birleşen ya da kendi ekranlarında biten UK, BAE ve ABD soru setleri."
@@ -1119,18 +1130,18 @@ tr:
       one: Tahmini ~%{count} dk
       other: Tahmini ~%{count} dk
     design: Tasarım
-    shuffle: Karıştır
-    shuffle_title: Verto kütüphanesinden yeni görseller seç
-    shuffle_confirm: Görseller karıştırılsın mı? Mevcut resimleriniz kütüphaneden yapılan yeni bir seçimle değiştirilecek.
-    shuffle_direction_toggle_title: "Bu karıştırma için bir yön ekleyin"
-    shuffle_direction_heading: "Bu karıştırmayı yönlendirin"
+    shuffle: "Görselleri karıştır"
+    shuffle_title: "Verto kütüphanesinden her görseli ve animasyonu yeniden seç — sorularınız ve sıraları değişmez"
+    shuffle_confirm: "Görseller karıştırılsın mı? Her görsel ve animasyon kütüphaneden yapılan yeni bir seçimle değiştirilecek. Sorularınız ve sıraları aynen kalacak."
+    shuffle_direction_toggle_title: "Bu görsel karıştırması için bir yön ekleyin"
+    shuffle_direction_heading: "Bu görsel karıştırmasını yönlendirin"
     shuffle_direction_hint: "İsteğe bağlı. Görsellerde ve animasyonlarda ne aradığınızı Verto'ya söyleyin — bir hava, bir ortam ya da dışarıda bırakılacak bir şey."
     shuffle_direction_label: "Yön"
     shuffle_direction_placeholder: "örn. sıcak doğal ışık, açık hava, küçük gruplar, ofis olmasın"
     shuffle_direction_toward: "Son karıştırma şunu aradı: %{terms}"
     shuffle_direction_avoiding: "ve şunu hariç tuttu: %{terms}"
     shuffle_direction_clear: "Temizle"
-    shuffle_direction_apply: "Bununla karıştır"
+    shuffle_direction_apply: "Bununla görselleri karıştır"
     publish_share: Yayınla ve paylaş →
     answer_type: Yanıt Türü
     select_card: Türünü değiştirmek için bir kart seçin
@@ -1395,7 +1406,7 @@ tr:
     s7_perks:
     - Temanıza uygun anket arka planı
     - Kaydırma kartları dahil her kartta görsel
-    - Doğru hissedene kadar editörde karıştırın
+    - "Doğru hissedene kadar editörde görselleri karıştırın"
     s7_title: Nasıl başlamak istersiniz?
     s7_sub: Editörde her şeyi değiştirmeye devam edebilirsiniz.
     s7_recommended: Önerilen

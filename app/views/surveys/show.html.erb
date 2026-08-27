@@ -49,7 +49,13 @@
 <script id="option-icon-map" type="application/json"><%= option_icon_map_data.to_json.html_safe %></script>
 
 <div class="flex flex-col h-full"
-     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker mobile-studio share-modal"
+     data-controller="type-panel preview-verto survey-editor media-picker animation-picker publish-panel brand-palette add-question journey editor-panel editor-scroll-sync gate-cards score-modal flows option-style rich-text emoji-picker mobile-studio share-modal setup-status"
+     <%# An import hands its creator straight to the editor while
+         FinishVertoSetupJob is still filling in imagery behind them. Pending is
+         false for every other creation path, and the controller then does
+         nothing at all. See setup_status_controller.js. %>
+     data-setup-status-url-value="<%= setup_status_survey_path(@survey) %>"
+     data-setup-status-pending-value="<%= @survey.setup_pending? %>"
      data-gate-cards-url-value="<%= survey_settings_path(@survey) %>"
      data-survey-editor-url-value="<%= survey_path(@survey) %>"
      data-brand-palette-url-value="<%= survey_path(@survey) %>"
@@ -91,7 +97,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.editing_locked? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus setup-status:progress->survey-editor#setupStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -708,6 +714,23 @@
           </div>
         </div>
 
+        <%# Respondent-code card only. It cannot live in .card-flags above:
+            that block hides for every non-question card, and this IS one.
+
+            Off by default and worded so the trade is visible where the choice
+            is made. The code is chosen to be memorable, which is to say
+            guessable, and this is the switch that lets a guessed code fetch
+            somebody's answers — see RespondentRecall. %>
+        <div class="card-flags" data-survey-editor-target="recallToggle" hidden>
+          <label class="card-flag">
+            <input type="checkbox" data-survey-editor-target="panelRecall"
+                   data-action="change->survey-editor#togglePanelRecall">
+            <span class="card-flag-track" aria-hidden="true"></span>
+            <span class="card-flag-label"><%= t("card.recall_ask_once") %></span>
+          </label>
+          <div class="card-flag-note"><%= t("card.recall_ask_once_note") %></div>
+        </div>
+
       </div>
 
       <%# ── All question types modal ── %>
@@ -942,19 +965,41 @@
 
               <%# The two tokenomics lines on the points intro — editable per
                   Verto, blank restores the locale default (Feedback 17). Same
-                  save-on-change convention as compare_note. %>
+                  save-on-change convention as compare_note.
+
+                  Each carries BOTH of its limits (note-limit): the 200-char
+                  storage cap was the only number a creator could find, and it
+                  is the less useful of the two — the note is a single pill on
+                  the intro card, so it stops fitting long before it stops
+                  saving. See note_limit_controller.js. %>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Points note on the intro:</div>
-              <input type="text" name="tokens_note" maxlength="200"
-                     value="<%= @survey.tokens_note_text %>"
-                     onchange="this.form.requestSubmit()"
-                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <div data-controller="note-limit"
+                   data-note-limit-recommended-value="<%= Survey::RECOMMENDED_NOTE %>"
+                   data-note-limit-max-value="<%= Survey::MAX_NOTE %>">
+                <input type="text" name="tokens_note" maxlength="<%= Survey::MAX_NOTE %>"
+                       value="<%= @survey.tokens_note_text %>"
+                       data-note-limit-target="input"
+                       data-action="input->note-limit#update"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                <div class="note-limit-count" data-note-limit-target="count"></div>
+                <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_NOTE) %></div>
+              </div>
 
               <% if @survey.leaderboard_enabled? %>
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:10px 0 5px;">Leaderboard teaser on the intro:</div>
-                <input type="text" name="leaderboard_note" maxlength="200"
-                       value="<%= @survey.leaderboard_note_text %>"
-                       onchange="this.form.requestSubmit()"
-                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                <div data-controller="note-limit"
+                     data-note-limit-recommended-value="<%= Survey::RECOMMENDED_NOTE %>"
+                     data-note-limit-max-value="<%= Survey::MAX_NOTE %>">
+                  <input type="text" name="leaderboard_note" maxlength="<%= Survey::MAX_NOTE %>"
+                         value="<%= @survey.leaderboard_note_text %>"
+                         data-note-limit-target="input"
+                         data-action="input->note-limit#update"
+                         onchange="this.form.requestSubmit()"
+                         style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                  <div class="note-limit-count" data-note-limit-target="count"></div>
+                  <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_NOTE) %></div>
+                </div>
               <% end %>
             <% end %>
           <% end %>
@@ -1526,6 +1571,16 @@
                      style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
               <span>Ask respondents for a code they make up themselves, so you can compare the same people across repeat runs. You never see the code — only a one-way hash, which can't be matched against any other Verto.</span>
             </label>
+            <%# When the deck carries a Respondent code CARD, this switch has
+                nothing left to do: the card collects the code wherever the
+                creator put it, and the pre-screen is not rendered
+                (Survey#respondent_code_prescreen?). Saying so beats leaving a
+                checkbox that looks like it is still deciding something. %>
+            <% if @survey.respondent_code_card? %>
+              <div class="card-flag-note" style="margin-left:24px;">
+                <%= t("editor.respondent_code_card_note") %>
+              </div>
+            <% end %>
             <% if @survey.respondent_code_enabled? %>
               <input type="text" name="respondent_code_prompt" maxlength="200"
                      value="<%= @survey.respondent_code_prompt %>"

@@ -61,6 +61,17 @@ class PdfQuestionImporter
                   - scenario: 2 or 3 options, each <= 30 chars
                 DESC
               },
+              original_options: {
+                type: "array",
+                items: { type: "string" },
+                description: <<~DESC
+                  The option labels EXACTLY as written in the PDF, unmodified.
+                  Emit this ONLY when `options` above differs from what the PDF
+                  said — same wording means there is nothing to record, so omit
+                  it and save the tokens. Same alignment as `options`.
+                DESC
+              },
+              original_description: { type: "string", description: "The sub-text EXACTLY as written in the PDF. Only when `description` above differs from it." },
               allow_other: { type: "boolean", description: "Set true only if the question explicitly offers a free-text 'Other'." }
             },
             required: %w[type text original_text compliant]
@@ -158,7 +169,7 @@ class PdfQuestionImporter
           role: "user",
           content: [
             { type: "document", source: { type: "base64", media_type: "application/pdf", data: pdf_data } },
-            { type: "text", text: "Extract every question from this PDF and map each to its best-fitting Verto answer type." }
+            { type: "text", text: import_instruction(locale) }
           ]
         }
       ]
@@ -172,6 +183,31 @@ class PdfQuestionImporter
     payload = deep_stringify(input_of(block))
     payload["cards"] = QuestionTypeClassifier.new.normalize_cards(payload["cards"])
     payload
+  end
+
+  private
+
+  # `locale:` arrived on this method's signature and was then thrown away —
+  # nothing in this file read it — so an import had no language steer of any
+  # kind. That mattered more here than anywhere else: this service does not just
+  # write, it REWRITES a creator's own questions, and with no instruction the
+  # model took its spelling from the prompts, which are British throughout.
+  # "The PDF question optimiser changed the questions from US Eng to UK Eng."
+  #
+  # Two lines, doing different jobs. The first says which language and which
+  # English to write NEW text in (the optimised rewrites, generated option
+  # labels). The second says not to touch the spelling of text that already
+  # exists — because a rules fix that also re-spells the question is a second
+  # edit nobody asked for, and `original_text` is meant to be a faithful
+  # transcription rather than a normalised one.
+  def import_instruction(locale)
+    [
+      "Extract every question from this PDF and map each to its best-fitting Verto answer type.",
+      PromptLanguage.instruction(locale, scope: "any text you write yourself — optimised question text, descriptions and option labels"),
+      PromptLanguage::PRESERVE_SPELLING,
+      "This applies to `original_text` above all: it must be what the PDF says, " \
+      "transcribed exactly, not tidied or re-spelled."
+    ].join("\n")
   end
 
   # tool_use?, input_of, deep_stringify come from AnthropicHelpers.

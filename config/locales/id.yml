@@ -63,6 +63,8 @@ id:
     allow_other: Izinkan jawaban teks bebas "Lainnya"
     required: "Pertanyaan wajib"
     ask_once: "Tanya sekali — dilewati saat main ulang setelah dijawab"
+    recall_ask_once: "Isi jawaban tanya-sekali dari perangkat lain"
+    recall_ask_once_note: "Siapa pun yang menebak kode responden ini akan melihat jawaban tersebut. Nonaktif kecuali diperlukan."
     other: Lainnya
     other_placeholder: Beri tahu kami dengan kata-kata Anda sendiri…
     mark_correct: "Tandai jawaban yang benar"
@@ -110,6 +112,7 @@ id:
       welcome_card: "KARTU SAMBUTAN"
       token_checkpoint: "PATOK UJI"
       consent_gate: "PERSETUJUAN"
+      respondent_code: "KODE RESPONDEN"
     panel_label:
       range: "GESER PENGGESER"
       rating: "KETUK UNTUK MENILAI"
@@ -290,6 +293,7 @@ id:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Menulis jawaban…"
@@ -378,6 +382,10 @@ id:
       appeal_submitted: "Terkirim untuk ditinjau — kami akan memberitahumu setelah diperiksa."
       appeal_failed: "Tidak dapat mengirim untuk ditinjau — silakan coba lagi."
       emoji_none: "Tidak ada emoji yang cocok."
+      emoji_all: "Semua"
+      note_limit_count: "%{n} / %{recommended} disarankan · %{max} maks"
+      setup_finding_images: "Mencari gambar untuk kartu Anda…"
+      setup_images_ready: "Gambar ditambahkan"
       rich_bold: "Tebal"
       rich_italic: "Miring"
       rich_underline: "Garis bawah"
@@ -495,6 +503,7 @@ id:
         variety_ok: "Variasi bagus — tidak ada tipe jawaban yang terlalu sering berulang."
         variety_run: "%{type} muncul %{n}× berturut-turut — selingi dengan tipe jawaban lain."
         welcome_many: "Gunakan paling banyak satu kartu sambutan (sekarang %{n})."
+        code_after_ask_once: "%{n} pertanyaan tanya-sekali berada sebelum kartu Kode responden, jadi orang yang kembali di perangkat baru akan menjawabnya lagi sebelum kode dapat mengisinya. Pindahkan kartu kode ke atasnya."
         static_tip: "Verto panjang — pertimbangkan jeda di tengah agar tetap bersemangat."
         board_heading: "Apa yang sudah baik dan apa yang perlu diperbaiki"
         board_hint: "Dikelompokkan berdasarkan lampu lalu lintas — ketuk kartu untuk membukanya."
@@ -1060,6 +1069,8 @@ id:
     ty_forward_label_placeholder: 'Label tombol (mis. Kunjungi situs kami)'
     tab_quiz: 'Mode kuis'
     tab_tokens: 'Tokenisasi'
+    note_limit_split_hint: "Lebih dari %{n} karakter akan terlihat sesak di kartu intro — taruh detailnya di kartu tersendiri."
+    respondent_code_card_note: "Verto ini memiliki kartu Kode responden di dek, jadi kode dikumpulkan di sana dan pengaturan ini tidak berpengaruh."
     tab_logic: 'Logika & alur'
     flows_title: "Alur"
     flows_intro: "Kelompok kartu bernama yang dimasuki jawaban yang dirutekan — mis. set pertanyaan UK, UEA, dan AS yang kemudian bergabung kembali atau berakhir di layarnya sendiri."
@@ -1119,18 +1130,18 @@ id:
       one: Perkiraan ~%{count} mnt
       other: Perkiraan ~%{count} mnt
     design: Desain
-    shuffle: Acak
-    shuffle_title: Pilih ulang gambar dari pustaka verto
-    shuffle_confirm: Acak gambar? Gambar Anda saat ini akan diganti dengan pilihan baru dari pustaka.
-    shuffle_direction_toggle_title: "Tambahkan arahan untuk pengacakan ini"
-    shuffle_direction_heading: "Arahkan pengacakan ini"
+    shuffle: "Acak gambar"
+    shuffle_title: "Pilih ulang setiap gambar dan animasi dari pustaka Verto — pertanyaan Anda dan urutannya tidak berubah"
+    shuffle_confirm: "Acak gambar? Setiap gambar dan animasi akan diganti dengan pilihan baru dari pustaka. Pertanyaan Anda dan urutannya tetap persis seperti sekarang."
+    shuffle_direction_toggle_title: "Tambahkan arahan untuk pengacakan gambar ini"
+    shuffle_direction_heading: "Arahkan pengacakan gambar ini"
     shuffle_direction_hint: "Opsional. Beri tahu Verto apa yang Anda inginkan dari gambar dan animasinya — suasana, latar, atau hal yang ingin dihindari."
     shuffle_direction_label: "Arahan"
     shuffle_direction_placeholder: "mis. cahaya alami hangat, di luar ruangan, kelompok kecil, tanpa kantor"
     shuffle_direction_toward: "Pengacakan terakhir mencari: %{terms}"
     shuffle_direction_avoiding: "dan mengecualikan: %{terms}"
     shuffle_direction_clear: "Hapus"
-    shuffle_direction_apply: "Acak dengan ini"
+    shuffle_direction_apply: "Acak gambar dengan ini"
     publish_share: Publikasikan & bagikan →
     answer_type: Tipe Jawaban
     select_card: Pilih kartu untuk mengubah tipenya
@@ -1395,7 +1406,7 @@ id:
     s7_perks:
     - Latar belakang survei yang sesuai tema
     - Gambar di setiap kartu, termasuk kartu geser
-    - Acak di editor hingga terasa pas
+    - "Acak gambar di editor hingga terasa pas"
     s7_title: Bagaimana Anda ingin memulai?
     s7_sub: Anda masih bisa mengubah apa saja di editor.
     s7_recommended: Direkomendasikan
@@ -1737,7 +1748,7 @@ id:
       pdf_too_large: "PDF itu terlalu besar — mohon batasi hingga kurang dari %{limit}MB."
       restored: "“%{name}” dipulihkan. Kembali ke draf Anda — terbitkan lagi saat Anda siap."
       settings_locked: "Verto ini sedang live atau sudah memiliki tanggapan — pengaturan persetujuan dan penilaian tidak dapat diubah lagi sekarang."
-      shuffle_failed: "Tidak dapat mengacak aset — silakan coba lagi."
+      shuffle_failed: "Tidak dapat mengacak gambar — silakan coba lagi."
       unpublished: "Verto batal diterbitkan — kembali menjadi draf yang bisa Anda edit."
   ask:
     stale_note: "Beberapa sumber yang dikutip dalam jawaban ini sudah tidak ada lagi di korpus bersama."

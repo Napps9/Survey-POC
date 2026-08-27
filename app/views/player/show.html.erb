@@ -70,6 +70,15 @@
   scores_url     = live_quiz ? player_scores_url(play_token) : ""
   graded_set     = quiz_mode ? @survey.graded_card_indices.to_set : Set.new
 
+  # Ask-once recall: entering the code fills in answers this person already
+  # gave to this deck's ask-once questions somewhere else. Off unless the
+  # creator turned it on, on the card itself — it hands back a DIFFERENT
+  # person's answers if a code is guessed, so it is never on by default. Blank
+  # in owner preview and Test Mode for the same reason grade_url is: neither
+  # has any business reading a real respondent's answers.
+  recall_url = (@survey.respondent_code_recall? && !preview_mode && play_token.present?) ?
+                 recall_survey_url(play_token) : ""
+
   # Tokenisation: a card's token config is public (rendered straight into the
   # page), so the running total is computed entirely client-side — no
   # grade-style round trip needed. The server only recomputes the
@@ -118,6 +127,7 @@
      data-player-grade-url-value="<%= grade_url %>"
      data-player-quiz-state-url-value="<%= quiz_state_url %>"
      data-player-scores-url-value="<%= scores_url %>"
+     data-player-recall-url-value="<%= recall_url %>"
      data-player-tokenisation-value="<%= token_mode %>"
      data-player-token-types-value="<%= @survey.token_types.to_json %>"
      data-player-token-reveal-value="<%= @survey.token_reveal_enabled? %>"
@@ -274,7 +284,12 @@
       </div>
     <% end %>
 
-    <% if @survey.respondent_code_enabled? %>
+    <%# The survey-level PRE-SCREEN. Rendered only when the deck has no
+        respondent_code card of its own: the card supersedes the switch, the
+        same way consent_gate supersedes consent_text
+        (Survey#respondent_code_prescreen?). Asking twice would be asking twice
+        for a code the server records once. %>
+    <% if @survey.respondent_code_prescreen? %>
       <div class="preview-card<%= " active" unless @survey.contact_form_enabled? %>"
            data-player-target="card"
            data-card-type="respondent_code_card">
@@ -305,7 +320,7 @@
       </div>
     <% end %>
 
-    <% first_deck_card = !@survey.respondent_code_enabled? && !@survey.contact_form_enabled? %>
+    <% first_deck_card = !@survey.respondent_code_prescreen? && !@survey.contact_form_enabled? %>
     <% cards.each do |card, idx| %>
       <%
         type    = card["type"].to_s

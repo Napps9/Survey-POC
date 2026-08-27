@@ -657,22 +657,109 @@ class Survey < ApplicationRecord
   # had a real, present value which sanitizing dropped (e.g. an oversized or
   # unsupported upload) — so the caller can tell the editor something didn't
   # stick, instead of the drop being silent.
-  def self.sanitize_cards_images!(cards, warnings: nil)
-    seen_cids = Set.new
+  # Every card carries a stable opaque id so answer-branching can target it by
+  # cid (not array index). Backfill a missing cid AND de-dupe collisions: two
+  # cards sharing a cid (from a duplicated/imported/hand-crafted deck) would
+  # make a `{card: X}` route resolve to whichever card is last and orphan the
+  # other, so any blank-or-already-seen cid is reassigned a fresh unique one
+  # (the first occurrence keeps the id, so existing routes to it still resolve).
+  #
+  # Lifted out of sanitize_cards_images! (which still calls it first, so the
+  # behaviour there is unchanged) because two other callers need cids to EXIST
+  # before the editor's first save mints them: an import, whose deck is created
+  # outside the editor's save path, and the media merge below, which matches the
+  # populator's picks to live cards by cid and would match nothing against a
+  # deck of blanks.
+  def self.ensure_cids!(cards)
+    seen = Set.new
     Array(cards).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
-      # Every card carries a stable opaque id so answer-branching can target it
-      # by cid (not array index). Backfill a missing cid AND de-dupe collisions:
-      # two cards sharing a cid (from a duplicated/imported/hand-crafted deck)
-      # would make a `{card: X}` route resolve to whichever card is last and
-      # orphan the other, so any blank-or-already-seen cid is reassigned a fresh
-      # unique one (the first occurrence keeps the id, so existing routes to it
-      # still resolve).
       cid = c["cid"].to_s.strip
-      cid = "c_#{SecureRandom.hex(4)}" while cid.blank? || seen_cids.include?(cid)
-      seen_cids << cid
+      cid = "c_#{SecureRandom.hex(4)}" while cid.blank? || seen.include?(cid)
+      seen << cid
       c["cid"] = cid
+      c
+    end
+  end
+
+  # ── The import's setup window ──────────────────────────────────────────────
+  # An imported Verto hands its creator straight to the editor while
+  # FinishVertoSetupJob fills in imagery behind them. That is deliberate — they
+  # have already waited through the upload and the review screen — but it opens
+  # a window in which two writers hold different truths about the same deck.
+  #
+  # The editor's is the DOM: survey_editor_controller#serialize() rebuilds every
+  # card from `data-card-*`, and emits `image` only when `data-card-image` is
+  # non-empty. At redirect time it is empty for every card, because the job has
+  # not run yet. So the first autosave — one keystroke is enough — used to PATCH
+  # a deck with no imagery in it over the deck the job had just populated, and
+  # #update replaces `cards` wholesale. background_image survived (it is a
+  # column, and serialize() never sends it), which is why the report was "a
+  # background but blank cards" rather than "nothing happened".
+  #
+  # While the flag stands, the client PROVABLY does not know about the pictures
+  # yet, so its silence about them is not a decision to remove them. Once
+  # setup_pending_since clears, #update behaves exactly as it always has.
+  MEDIA_KEYS = %w[
+    image video video_poster image_credit image_credit_url
+    option_images range_theme subject
+  ].freeze
+
+  # Long enough that a five-language import finishes inside it, short enough
+  # that a job the memory watchdog kills (see VertoBuild#stale?, same reasoning)
+  # stops holding the window open. The job clears the flag in an `ensure`; this
+  # is the backstop for the case where the job never gets to run its `ensure`.
+  SETUP_STALE_AFTER = 10.minutes
+
+  def setup_pending?
+    setup_pending_since.present? && setup_pending_since > SETUP_STALE_AFTER.ago
+  end
+
+  # Carry the stored imagery onto an incoming deck that doesn't mention it.
+  # Matched by cid — never by index, because the creator can insert, delete or
+  # reorder cards inside the window, and index-matching would paste the right
+  # picture onto the wrong card, which looks intentional and is worse than no
+  # picture at all.
+  #
+  # One direction only: stored media fills an incoming card that has none. A
+  # card the creator has since given its own image, video or animation keeps
+  # theirs, and nothing else on the card is touched.
+  def self.keep_setup_media(stored, incoming)
+    by_cid = Array(stored).each_with_object({}) do |card, h|
+      next unless card.is_a?(Hash)
+      cid = card["cid"].to_s
+      h[cid] = card if cid.present?
+    end
+    return incoming if by_cid.empty?
+
+    Array(incoming).map do |card|
+      next card unless card.is_a?(Hash)
+      was = by_cid[card["cid"].to_s]
+      next card unless was.is_a?(Hash)
+      next card if card_has_media?(card)
+
+      c = card.dup
+      MEDIA_KEYS.each do |key|
+        value = was[key]
+        c[key] = value if value.present?
+      end
+      c
+    end
+  end
+
+  # A card's left panel holds a photo OR a video OR an animation. Any of the
+  # three means the card has been given its imagery and nothing should overwrite
+  # it — the same test AssetPopulator uses to decide what a fill-only run skips.
+  def self.card_has_media?(card)
+    return false unless card.is_a?(Hash)
+    card["image"].present? || card["video"].present? || card["lottie"].present?
+  end
+
+  def self.sanitize_cards_images!(cards, warnings: nil)
+    Array(ensure_cids!(cards)).map do |card|
+      next card unless card.is_a?(Hash)
+      c = card.dup
       # Common Question provenance rides in from the editor's autosave payload
       # (the card row carries it as a data attribute so it survives the DOM
       # round-trip). Coerce to a positive integer or drop it: it's client-supplied
@@ -1123,10 +1210,38 @@ class Survey < ApplicationRecord
         c["subject"] = c["subject"].to_s.strip.first(MAX_CARD_SUBJECT).presence
         c.delete("subject") if c["subject"].blank?
       end
+      # The respondent-code card's recall opt-in. Coerced to a strict boolean
+      # rather than left to ride through like the other card flags, because
+      # this one is the switch on an endpoint that hands back a DIFFERENT
+      # person's answers — a truthy string arriving from a client is not a
+      # creator's decision, and only that card can carry it at all.
+      if c.key?("recall")
+        c["type"].to_s == "respondent_code" && c["recall"] == true ? c["recall"] = true : c.delete("recall")
+      end
       c
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
+       .then { |list| enforce_single_respondent_code(list, warnings: warnings) }
        .then { |list| drop_retired_cards(list, warnings: warnings) }
        .then { |list| hoist_consent_gate(list, warnings: warnings) }
+  end
+
+  # At most one respondent-code card per deck, same shape and same reasoning as
+  # enforce_single_welcome above: a second one asks the same person for the same
+  # code twice, and apply_respondent_code sets the digest ONCE per response, so
+  # the second card's answer would be silently discarded anyway. Dropped with a
+  # warning rather than rejected, so a deck that somehow acquired two can still
+  # be saved.
+  def self.enforce_single_respondent_code(list, warnings: nil)
+    seen = false
+    list.filter_map do |c|
+      next c unless c.is_a?(Hash) && c["type"].to_s == "respondent_code"
+      if seen
+        warnings << "duplicate_respondent_code" if warnings
+        next nil
+      end
+      seen = true
+      c
+    end
   end
 
   # Cards of a retired type never survive a save (see CardTypes.retired?).
@@ -1381,6 +1496,34 @@ class Survey < ApplicationRecord
   # code nor recognise someone across their other Vertos.
 
   MAX_RESPONDENT_CODE = 60
+
+  # The code can be collected two ways, and the card supersedes the switch —
+  # exactly as consent_gate supersedes consent_text (see #consent_required?).
+  #
+  #   respondent_code_enabled?    the survey-level PRE-SCREEN switch, raw column
+  #   respondent_code_card?       a respondent_code card sits in the deck
+  #   respondent_code_prescreen?  render the pseudo-card before the deck
+  #   respondent_code_active?     a code is being collected AT ALL — which is
+  #                               what the player's write path has to ask, and
+  #                               asking the column instead meant a deck using
+  #                               only the card never recorded a digest.
+  #
+  # Leaving the column predicate raw keeps the settings form, the migration and
+  # every Blazer query working untouched.
+  def respondent_code_card
+    Array(cards).find { |c| c.is_a?(Hash) && c["type"].to_s == "respondent_code" }
+  end
+
+  def respondent_code_card? = respondent_code_card.present?
+  def respondent_code_prescreen? = respondent_code_enabled? && !respondent_code_card?
+  def respondent_code_active? = respondent_code_enabled? || respondent_code_card?
+
+  # Whether entering the code may fill in ask-once answers this person gave on
+  # another device. Off unless the creator turned it on, on the card itself —
+  # see PlayerController#recall for what that costs and why it is opt-in.
+  def respondent_code_recall?
+    respondent_code_card&.dig("recall") == true
+  end
 
   def respondent_code_prompt_text
     respondent_code_prompt.presence || I18n.t("player.respondent_code_prompt_default")
@@ -1730,6 +1873,18 @@ class Survey < ApplicationRecord
   # The two tokenomics lines on the points intro, per-Verto with the locale
   # default as the fallback — same contract as compare_note above and the
   # thank-you copy below: nil means "say the usual thing".
+  #
+  # Two limits, not one, and the editor shows both. MAX_NOTE is the storage
+  # bound — past it the copy is simply cut. RECOMMENDED_NOTE is where the line
+  # stops fitting: the note renders as a single pill on the points intro
+  # (player/_token_intro.html.erb), and the shipped default
+  # (player.tokens_welcome_note) is 101 characters, so ~120 is the width the
+  # design actually holds. A creator with more to say than that is writing a
+  # card, not a note, and the editor says so rather than letting them find out
+  # on a phone.
+  MAX_NOTE         = 200
+  RECOMMENDED_NOTE = 120
+
   def tokens_note_text
     tokens_note.presence || I18n.t("player.tokens_welcome_note")
   end

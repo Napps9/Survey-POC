@@ -81,9 +81,19 @@ module VertoGeneration
   # Every new Verto opens with imagery rather than a blank editor. Best-effort:
   # a Pexels outage must not fail the creation, it just means an unillustrated
   # deck the creator can fill in themselves.
-  def auto_populate_assets!(survey)
+  #
+  # Two shapes, because the two creation paths differ in one way that matters:
+  # whether anyone else is writing to the deck at the same time.
+  #
+  #   wizard  — BuildVertoJob runs while its creator is held on the wait screen.
+  #             Nobody else can write. Positional save, overwrite allowed.
+  #   import  — FinishVertoSetupJob runs while its creator is already IN the
+  #             editor. Both `merge:` (write by cid onto the live deck) and
+  #             `fill_only:` (never overwrite imagery they have since chosen).
+  def auto_populate_assets!(survey, fill_only: false, merge: false)
     extract_card_subjects!(survey)
-    AssetPopulator.new(survey).populate!
+    populator = AssetPopulator.new(survey, fill_only: fill_only)
+    merge ? populator.populate_merged! : populator.populate!
   rescue => e
     ErrorReporting.report("AssetPopulator", e)
   end
@@ -94,6 +104,11 @@ module VertoGeneration
   # here is invisible rather than fatal. Mutates survey.cards in memory only;
   # populate! (immediately after) is what actually saves, so the subject
   # stamps and the image picks land in the same write instead of two.
+  #
+  # Under `merge:` the in-memory stamp is still not what saves — the subjects
+  # ride the computed picks and are carried onto the live deck by cid, because
+  # `subject` is one of Survey::MEDIA_KEYS. Without that a later Shuffle would
+  # have lost the anchor this pass paid Claude for.
   # Independently best-effort from populate! itself — one Pexels/Claude
   # outage must never take out the other.
   def extract_card_subjects!(survey)

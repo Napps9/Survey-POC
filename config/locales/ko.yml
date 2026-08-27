@@ -63,6 +63,8 @@ ko:
     allow_other: '"기타" 자유 입력 답변 허용'
     required: "필수 질문"
     ask_once: "한 번만 질문 — 답변 후 재플레이 시 건너뜀"
+    recall_ask_once: "다른 기기에서 답한 '한 번만' 문항 채우기"
+    recall_ask_once_note: "이 응답자의 코드를 추측한 사람은 그 답을 볼 수 있습니다. 필요할 때만 켜세요."
     other: 기타
     other_placeholder: 직접 입력해 주세요…
     mark_correct: "정답 표시하기"
@@ -110,6 +112,7 @@ ko:
       welcome_card: "환영 카드"
       token_checkpoint: "체크포인트"
       consent_gate: "동의"
+      respondent_code: "응답자 코드"
     panel_label:
       range: "슬라이더를 드래그하세요"
       rating: "탭해서 평가하세요"
@@ -290,6 +293,7 @@ ko:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "답변을 작성하는 중…"
@@ -378,6 +382,10 @@ ko:
       appeal_submitted: "검토를 위해 제출되었습니다 — 확인되는 대로 알려드릴게요."
       appeal_failed: "검토 제출에 실패했습니다 — 다시 시도해 주세요."
       emoji_none: "일치하는 이모지가 없습니다."
+      emoji_all: "전체"
+      note_limit_count: "%{n} / 권장 %{recommended} · 최대 %{max}"
+      setup_finding_images: "카드에 넣을 이미지를 찾는 중…"
+      setup_images_ready: "이미지가 추가되었습니다"
       rich_bold: "굵게"
       rich_italic: "기울임"
       rich_underline: "밑줄"
@@ -495,6 +503,7 @@ ko:
         variety_ok: "다양성이 좋아요 — 같은 답변 유형이 너무 자주 반복되지 않아요."
         variety_run: "%{type}이(가) %{n}회 연속 나와요 — 다른 답변 유형을 섞으세요."
         welcome_many: "환영 카드는 최대 한 개만 사용하세요 (현재 %{n})."
+        code_after_ask_once: "'한 번만' 문항 %{n}개가 응답자 코드 카드보다 앞에 있습니다. 새 기기로 돌아온 사람은 코드가 채워주기 전에 다시 답하게 됩니다. 코드 카드를 그 위로 옮기세요."
         static_tip: "긴 Verto — 집중력 유지를 위해 중간 휴식을 고려하세요."
         board_heading: "잘된 점과 고칠 점"
         board_hint: "신호등별로 분류 — 카드를 탭하면 해당 카드로 이동합니다."
@@ -1060,6 +1069,8 @@ ko:
     ty_forward_label_placeholder: '버튼 라벨 (예: 사이트 방문)'
     tab_quiz: '퀴즈 모드'
     tab_tokens: '토큰화'
+    note_limit_split_hint: "%{n}자를 넘으면 인트로 카드에서 빽빽해집니다 — 자세한 내용은 별도의 카드에 담으세요."
+    respondent_code_card_note: "이 Verto의 덱에 응답자 코드 카드가 있어 코드는 그곳에서 수집되며, 이 설정은 적용되지 않습니다."
     tab_logic: '로직과 흐름'
     flows_title: "플로우"
     flows_intro: "라우팅된 답변이 들어가는 이름 있는 카드 그룹 — 예: 나중에 합류하거나 각자의 화면에서 끝나는 UK·UAE·USA 질문 세트."
@@ -1119,18 +1130,18 @@ ko:
       one: 예상 약 %{count}분
       other: 예상 약 %{count}분
     design: 디자인
-    shuffle: 셔플
-    shuffle_title: Verto 라이브러리에서 이미지를 다시 선택합니다
-    shuffle_confirm: 이미지를 섞을까요? 현재 사진이 라이브러리에서 새로 선택한 사진으로 교체됩니다.
-    shuffle_direction_toggle_title: "이 셔플에 방향 추가"
-    shuffle_direction_heading: "셔플 방향 정하기"
+    shuffle: "이미지 셔플"
+    shuffle_title: "Verto 라이브러리에서 모든 이미지와 애니메이션을 다시 고릅니다 — 질문과 순서는 바뀌지 않습니다"
+    shuffle_confirm: "이미지를 섞을까요? 모든 이미지와 애니메이션이 라이브러리에서 새로 고른 것으로 교체됩니다. 질문과 그 순서는 그대로 유지됩니다."
+    shuffle_direction_toggle_title: "이 이미지 셔플에 방향 추가"
+    shuffle_direction_heading: "이미지 셔플 방향 정하기"
     shuffle_direction_hint: "선택 사항. 이미지와 애니메이션에서 원하는 분위기, 장소, 빼고 싶은 것을 Verto에 알려 주세요."
     shuffle_direction_label: "방향"
     shuffle_direction_placeholder: "예: 따뜻한 자연광, 야외, 소규모 그룹, 사무실 제외"
     shuffle_direction_toward: "지난 셔플 검색어: %{terms}"
     shuffle_direction_avoiding: "제외: %{terms}"
     shuffle_direction_clear: "지우기"
-    shuffle_direction_apply: "이대로 셔플"
+    shuffle_direction_apply: "이대로 이미지 셔플"
     publish_share: 게시 및 공유 →
     answer_type: 답변 유형
     select_card: 카드를 선택해 유형을 변경하세요
@@ -1395,7 +1406,7 @@ ko:
     s7_perks:
     - 테마에 맞는 설문 배경
     - 탭 카드를 포함한 모든 카드에 이미지 적용
-    - 마음에 들 때까지 에디터에서 셔플 가능
+    - "마음에 들 때까지 에디터에서 이미지 셔플 가능"
     s7_title: 어떻게 시작하시겠어요?
     s7_sub: 에디터에서 언제든지 수정할 수 있습니다.
     s7_recommended: 추천
@@ -1736,7 +1747,7 @@ ko:
       pdf_too_large: "이 PDF는 너무 큽니다 — %{limit}MB 이내로 유지해 주세요."
       restored: "“%{name}”을(를) 복원했습니다. 초안으로 돌아왔습니다 — 준비되면 다시 게시하세요."
       settings_locked: "이 Verto는 라이브 중이거나 이미 응답이 있습니다 — 이제 동의 및 점수 설정을 변경할 수 없습니다."
-      shuffle_failed: "애셋을 섞을 수 없습니다 — 다시 시도해 주세요."
+      shuffle_failed: "이미지를 섞을 수 없습니다 — 다시 시도해 주세요."
       unpublished: "Verto 게시를 취소했습니다 — 편집할 수 있는 초안으로 돌아갔습니다."
   ask:
     stale_note: "이 답변에 인용된 일부 출처는 이후 공유 코퍼스에서 제외되었습니다."

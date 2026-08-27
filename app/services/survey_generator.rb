@@ -565,20 +565,15 @@ class SurveyGenerator
   end
 
 
-  # When the primary language isn't English, instruct the model to write the
-  # whole Verto in that language (respondent-facing text + every option label).
+  # Which language, and which English, the whole Verto is written in. Through
+  # PromptLanguage so the five services that used to carry a copy of this can't
+  # drift, and so English gets an instruction at all — see that file for why its
+  # absence was a bug rather than a saving.
   def language_instruction(locale)
-    return "" if locale.to_s == SupportedLocales::DEFAULT
-
-    lang = SupportedLocales.find(locale)
-    name = lang ? "#{lang.english_name} (#{lang.native_name})" : locale.to_s
-    <<~LANG
-
-      LANGUAGE: Write the ENTIRE Verto — title, description, every question's
-      text and description, and ALL answer option labels — in #{name}. Do not
-      use English for any respondent-facing text. Keep the same design rules and
-      length limits.
-    LANG
+    PromptLanguage.instruction(locale, scope: <<~SCOPE.squish)
+      the ENTIRE Verto — title, description, every question's text and
+      description, and ALL answer option labels
+    SCOPE
   end
 
   # Quiz-mode addendum (user message, so prompt caching survives the toggle).

@@ -43,7 +43,8 @@ const OPTION_LABEL_SELECTORS = {
 
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
-    "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale", "vertoTitle", "undoBtn"]
+    "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale",
+                    "recallToggle", "panelRecall", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -1137,6 +1138,9 @@ export default class extends Controller {
       options: c.options,
       pages: c.pages,
       allowOther: cardEl.dataset.cardAllowOther === "true",
+      // Read by analyzeVerto's code_after_ask_once check. Without this line
+      // that check is dead code that always passes.
+      askOnce: cardEl.dataset.cardAskOnce === "true",
       // Demographic cards are exempt from the option-shape rules (their
       // option lists are platform-set taxonomies) — see verto_rules.js.
       demographic: cardEl.dataset.cardDemographic === "true"
@@ -1473,6 +1477,16 @@ export default class extends Controller {
   // type-panel on select, type apply and delete.
   syncCardFlags(card) {
     if (!this.hasCardFlagsTarget) return
+    // The respondent-code card's own switch, before the early return below:
+    // it is a NON-question card, so the flags block never shows for it and its
+    // toggle would never be reached if it lived inside one.
+    if (this.hasRecallToggleTarget) {
+      const isCode = card?.dataset.cardType === "respondent_code"
+      this.recallToggleTarget.hidden = !isCode
+      if (isCode && this.hasPanelRecallTarget) {
+        this.panelRecallTarget.checked = card.dataset.cardRecall === "true"
+      }
+    }
     const isQ = card && !NON_QUESTION_TYPES.includes(card.dataset.cardType)
     this.cardFlagsTarget.hidden = !isQ
     if (!isQ) return
@@ -1553,6 +1567,17 @@ export default class extends Controller {
     const card = this._selectedCard()
     if (!card) return
     card.dataset.cardAskOnce = event.currentTarget.checked ? "true" : "false"
+    this.markDirty()
+  }
+
+  // Whether entering the code may fill in ask-once answers this person gave on
+  // another device. Same write-to-dataset shape as the flags above;
+  // serialize() reads it back as `recall`, and the server refuses the key on
+  // any card that is not a respondent_code (Survey.sanitize_cards_images!).
+  togglePanelRecall(event) {
+    const card = this._selectedCard()
+    if (!card) return
+    card.dataset.cardRecall = event.currentTarget.checked ? "true" : "false"
     this.markDirty()
   }
 
@@ -1718,6 +1743,7 @@ export default class extends Controller {
       if (card.dataset.cardAllowOther === "true") out.allow_other = true
       if (card.dataset.cardRequired === "true") out.required = true
       if (card.dataset.cardAskOnce === "true") out.ask_once = true
+      if (card.dataset.cardRecall === "true") out.recall = true
 
       // Structural flags the DOM never re-derives — an open_ended input
       // flavour (e.g. the birth-date "month" picker) and the demographic
@@ -2833,5 +2859,16 @@ export default class extends Controller {
     if (state === "saving")     this.flash(t("editor.saving"), "text-smoke/60")
     else if (state === "saved") this.flash(t("editor.saved", { time }), "text-aquamarine")
     else if (state === "error") this.flash(t("editor.save_failed", { msg }), "text-hot-pink")
+  }
+
+  // Same pill, for an IMPORT's imagery arriving behind the creator. Until this
+  // existed the editor said nothing at all while FinishVertoSetupJob ran, so a
+  // deck that was about to fill with pictures was indistinguishable from one
+  // that never would — which is how "images didn't generate" gets reported for
+  // a job that was working. See setup_status_controller.js.
+  setupStatus(event) {
+    const { state } = event.detail || {}
+    if (state === "running")   this.flash(t("editor.setup_finding_images"), "text-smoke/60")
+    else if (state === "done") this.flash(t("editor.setup_images_ready"), "text-aquamarine")
   }
 }

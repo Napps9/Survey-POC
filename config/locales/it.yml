@@ -63,6 +63,8 @@ it:
     allow_other: Consenti risposta libera “Altro”
     required: "Domanda obbligatoria"
     ask_once: "Chiedi una volta — saltata alle ripetizioni una volta risposta"
+    recall_ask_once: "Recupera le risposte da chiedere una volta sola da un altro dispositivo"
+    recall_ask_once_note: "Chi indovinasse il codice di questo partecipante vedrebbe quelle risposte. Disattivo salvo necessità."
     other: Altro
     other_placeholder: Raccontacelo con parole tue…
     mark_correct: "Indica la risposta corretta"
@@ -110,6 +112,7 @@ it:
       welcome_card: "SCHEDA DI BENVENUTO"
       token_checkpoint: "CHECKPOINT"
       consent_gate: "CONSENSO"
+      respondent_code: "CODICE PARTECIPANTE"
     panel_label:
       range: "TRASCINA IL CURSORE"
       rating: "TOCCA PER VALUTARE"
@@ -290,6 +293,7 @@ it:
     welcome_card: []
     token_checkpoint: []
     consent_gate: []
+    respondent_code: []
   js:
     ask:
       answering: "Scrittura della risposta…"
@@ -378,6 +382,10 @@ it:
       appeal_submitted: "Inviato per la revisione — ti avviseremo appena sarà verificato."
       appeal_failed: "Impossibile inviare per la revisione — riprova."
       emoji_none: "Nessuna emoji corrispondente."
+      emoji_all: "Tutti"
+      note_limit_count: "%{n} / %{recommended} consigliati · %{max} max"
+      setup_finding_images: "Ricerca di immagini per le tue card…"
+      setup_images_ready: "Immagini aggiunte"
       rich_bold: "Grassetto"
       rich_italic: "Corsivo"
       rich_underline: "Sottolineato"
@@ -495,6 +503,7 @@ it:
         variety_ok: "Buona varietà — nessun tipo di risposta si ripete troppo."
         variety_run: "%{type} appare %{n}× di fila — alterna con un altro tipo di risposta."
         welcome_many: "Usa al massimo una scheda di benvenuto (ora %{n})."
+        code_after_ask_once: "%{n} domande da porre una volta sola precedono la card Codice partecipante, quindi chi torna su un nuovo dispositivo risponderà di nuovo prima che il codice possa compilarle. Sposta la card del codice sopra di esse."
         static_tip: "Verto lungo — valuta una pausa a metà per mantenere l'energia."
         board_heading: "Cosa funziona e cosa correggere"
         board_hint: "Raggruppato per semaforo — tocca una carta per raggiungerla."
@@ -1060,6 +1069,8 @@ it:
     ty_forward_label_placeholder: 'Etichetta del pulsante (es. Visita il nostro sito)'
     tab_quiz: 'Modalità quiz'
     tab_tokens: 'Tokenizzazione'
+    note_limit_split_hint: "Oltre %{n} caratteri diventa stretto sulla card introduttiva: metti il dettaglio su una card a sé."
+    respondent_code_card_note: "Questo Verto ha una card Codice partecipante nel mazzo, quindi il codice viene raccolto lì e questa impostazione non ha effetto."
     tab_logic: 'Logica e flussi'
     flows_title: "Flussi"
     flows_intro: "Gruppi di schede con nome in cui entra una risposta instradata — es. set di domande UK, EAU e USA che poi convergono o finiscono su schermate proprie."
@@ -1119,18 +1130,18 @@ it:
       one: Stimato ~%{count} min
       other: Stimato ~%{count} min
     design: Design
-    shuffle: Rimescola
-    shuffle_title: Scegli nuove immagini dalla libreria Verto
-    shuffle_confirm: Rimescolare le immagini? Le foto attuali verranno sostituite con una nuova selezione dalla libreria.
-    shuffle_direction_toggle_title: "Aggiungi un'indicazione per questo rimescolamento"
-    shuffle_direction_heading: "Orienta questo rimescolamento"
+    shuffle: "Rimescola immagini"
+    shuffle_title: "Riscegli ogni immagine e animazione dalla libreria Verto — le tue domande e il loro ordine non cambiano"
+    shuffle_confirm: "Rimescolare le immagini? Ogni immagine e animazione verrà sostituita con una nuova selezione dalla libreria. Le tue domande e il loro ordine restano esattamente come sono."
+    shuffle_direction_toggle_title: "Aggiungi un'indicazione per questo rimescolamento di immagini"
+    shuffle_direction_heading: "Orienta questo rimescolamento di immagini"
     shuffle_direction_hint: "Facoltativo. Di' a Verto cosa cerchi nelle immagini e nelle animazioni: un'atmosfera, un contesto o qualcosa da escludere."
     shuffle_direction_label: "Indicazione"
     shuffle_direction_placeholder: "es. luce naturale calda, all'aperto, piccoli gruppi, niente uffici"
     shuffle_direction_toward: "L'ultimo rimescolamento ha cercato: %{terms}"
     shuffle_direction_avoiding: "ed ha escluso: %{terms}"
     shuffle_direction_clear: "Cancella"
-    shuffle_direction_apply: "Rimescola con questo"
+    shuffle_direction_apply: "Rimescola le immagini con questo"
     publish_share: Pubblica e condividi →
     answer_type: Tipo di risposta
     select_card: Seleziona una carta per cambiarne il tipo
@@ -1395,7 +1406,7 @@ it:
     s7_perks:
     - Uno sfondo abbinato al tema del sondaggio
     - Un'immagine su ogni scheda, incluse le tap card
-    - Rimescola nell'editor finché non ti convince
+    - "Rimescola le immagini nell'editor finché non ti convince"
     s7_title: Come vorresti iniziare?
     s7_sub: Potrai comunque modificare tutto nell'editor.
     s7_recommended: Consigliato
@@ -1619,7 +1630,7 @@ it:
       not_live: "Quel Verto non è live."
       closed: "Verto chiuso — non è più su /play e i suoi risultati vengono conservati."
       unpublished: "Pubblicazione annullata — il Verto è di nuovo una bozza che puoi modificare."
-      shuffle_failed: "Non è stato possibile rimescolare gli asset — riprova."
+      shuffle_failed: "Non è stato possibile rimescolare le immagini — riprova."
       archived: "“%{name}” eliminato. Il link per i risponditori non funziona più; i risultati restano nella tua lista Archiviati."
       restored: "“%{name}” ripristinato. È di nuovo tra le tue bozze — ripubblicalo quando sei pronto."
       destroyed_forever: "“%{name}” eliminato definitivamente. Tutte le risposte e i dati sono stati cancellati."

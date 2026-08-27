@@ -112,10 +112,11 @@ module CardTypes
 
   # Card types with no answer captured — a "question" card is everything else.
   # welcome_card and token_checkpoint are intro/milestone screens; consent_gate
-  # captures an agreement, which is recorded on the response itself
-  # (consent_agreed_at) rather than as an answer. None are graded, scored,
+  # captures an agreement and respondent_code a self-invented identifier, both
+  # of which are recorded on the response itself (consent_agreed_at,
+  # respondent_code_digest) rather than as an answer. None are graded, scored,
   # aggregated, or counted toward progress.
-  NON_QUESTION_TYPES = %w[welcome_card token_checkpoint consent_gate].freeze
+  NON_QUESTION_TYPES = %w[welcome_card token_checkpoint consent_gate respondent_code].freeze
 
   def question?(type)
     !NON_QUESTION_TYPES.include?(type.to_s)
@@ -130,8 +131,11 @@ module CardTypes
   def pickable_for(survey)
     list = pickable
     list = list.reject { |key, _attrs| key == "token_checkpoint" } unless survey&.tokenisation_enabled?
-    if survey && Array(survey.cards).any? { |c| c.is_a?(Hash) && c["type"].to_s == "welcome_card" }
-      list = list.reject { |key, _attrs| key == "welcome_card" }
+    # Types a deck may hold only one of. Survey.enforce_single_* drops the
+    # second on save, so offering one is offering a card that cannot survive.
+    %w[welcome_card respondent_code].each do |once|
+      next unless survey && Array(survey.cards).any? { |c| c.is_a?(Hash) && c["type"].to_s == once }
+      list = list.reject { |key, _attrs| key == once }
     end
     list
   end
