@@ -1050,6 +1050,8 @@ tr:
     reposition_hint_video: "Çerçevenin neyi göstereceğini seçmek için videoyu sürükleyin. Videolar yeniden konumlandırılabilir ama kırpılamaz."
     reposition_crop: "Kırp ve yakınlaştır"
     reposition_apply: "Konumu kaydet"
+    reposition_chrome_statement: "İfade"
+    reposition_chrome_answers: "Yanıtlar"
     required_chip: 'Zorunlu'
     ty_title_label: 'Teşekkür başlığı'
     ty_body_label: 'Teşekkür mesajı'

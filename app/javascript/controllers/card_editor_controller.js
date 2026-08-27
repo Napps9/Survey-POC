@@ -2,12 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 import { choiceListItemHtml, prioritiseItemHtml, esc } from "lib/choice_templates"
 import { tapResponseStripHtml } from "lib/tap_response_templates"
 import { resolveResponses, presetFor, MIN_TAP_RESPONSES } from "lib/tap_scales"
+import { optionMediaStyle } from "lib/option_media"
 import { t } from "lib/i18n"
-
-const SWIPE_FILLS = [
-  ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
-  ["#f8d7da","#f5a8b0"], ["#e2d9f3","#c3aee8"]
-]
 
 // The fewest options a card may be cut down to from the editor. One is enough
 // to keep the card a question and to give "add option" a row to clone.
@@ -127,15 +123,15 @@ export default class extends Controller {
     const card = document.createElement("div")
     card.className = "rotate-card"
     card.dataset.tapStackTarget = "card"
-    const mediaBg = newImage
-      ? `#fff url('${newImage}') center/cover no-repeat`
-      : `linear-gradient(135deg,${SWIPE_FILLS[n % SWIPE_FILLS.length].join(",")})`
+    // A fresh statement is framed at centre, cover-fit — there is no stored
+    // reposition for a picture it has only just been given.
+    const mediaBg = optionMediaStyle(newImage, null, n)
     // Both image chips, matching _card_component.html.erb and type_panel's
     // rebuild. This markup used to carry only the delete ×, so a statement
     // added in the editor was the one statement whose picture could not be
     // changed — or, now, repositioned — until the page was reloaded.
     card.innerHTML = `
-      <div class="rotate-card-media" style="background:${mediaBg}"></div>
+      <div class="rotate-card-media" style="${mediaBg}"></div>
       <div class="rotate-card-statement"><span contenteditable="true">New statement</span></div>
       <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${n}" title="${esc(t("editor.change_statement_image_title"))}" aria-label="${esc(t("editor.change_statement_image_title"))}">
         <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>

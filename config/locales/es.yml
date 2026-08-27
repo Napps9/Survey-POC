@@ -1050,6 +1050,8 @@ es:
     reposition_hint_video: "Arrastra el vídeo para elegir lo que muestra el marco. Los vídeos se pueden reposicionar, pero no recortar."
     reposition_crop: "Recortar y ampliar"
     reposition_apply: "Guardar posición"
+    reposition_chrome_statement: "Afirmación"
+    reposition_chrome_answers: "Respuestas"
     required_chip: 'Obligatoria'
     ty_title_label: 'Título de agradecimiento'
     ty_body_label: 'Mensaje de agradecimiento'

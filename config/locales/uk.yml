@@ -1052,6 +1052,8 @@ uk:
     reposition_hint_video: "Перетягніть відео, щоб обрати, що показує рамка. Відео можна змістити, але не обрізати."
     reposition_crop: "Обрізати й наблизити"
     reposition_apply: "Зберегти положення"
+    reposition_chrome_statement: "Твердження"
+    reposition_chrome_answers: "Відповіді"
     required_chip: 'Обовʼязкове'
     ty_title_label: 'Заголовок подяки'
     ty_body_label: 'Повідомлення подяки'

@@ -553,6 +553,23 @@ class Survey < ApplicationRecord
     numeric ? raw.to_f.clamp(0, 100).round : nil
   end
 
+  # How far past cover-fit the media is punched in, 1 (fit) to FOCAL_ZOOM_MAX.
+  # Its job is to CREATE the slack a reposition slides: at cover-fit an axis
+  # where the picture already matches the frame has nothing hidden to reveal,
+  # so dragging it does nothing — which is exactly the "I can't move it
+  # vertically" case. Zooming in hides some of both axes, and both then move.
+  # Non-destructive like the focal point itself: the stored image is untouched
+  # and this can be wound back to 1 for ever. nil at 1 (or for junk), so the
+  # caller drops the key and the default applies.
+  FOCAL_ZOOM_MAX = 3.0
+
+  def self.sanitize_focal_zoom(raw)
+    numeric = raw.is_a?(Numeric) || raw.to_s.strip.match?(/\A-?\d+(?:\.\d+)?\z/)
+    return nil unless numeric
+    zoom = raw.to_f.clamp(1.0, FOCAL_ZOOM_MAX).round(2)
+    zoom > 1.0 ? zoom : nil
+  end
+
   # A tap card's per-statement repositions, aligned slot-for-slot with its
   # (already sanitised) option_images. Each entry is an {"x","y"} pair or nil.
   # A slot with no image, or one whose image didn't survive sanitising, can't
@@ -566,9 +583,13 @@ class Survey < ApplicationRecord
       next nil unless entry.is_a?(Hash)
       x = sanitize_focal_percent(entry["x"] || entry[:x])
       y = sanitize_focal_percent(entry["y"] || entry[:y])
-      next nil if x.nil? && y.nil?
-      pair = { "x" => x || 50, "y" => y || 50 }
-      pair == { "x" => 50, "y" => 50 } ? nil : pair
+      z = sanitize_focal_zoom(entry["z"] || entry[:z])
+      next nil if x.nil? && y.nil? && z.nil?
+      slot = { "x" => x || 50, "y" => y || 50 }
+      slot["z"] = z if z
+      # Centred AND at cover-fit is the default this slot would render at
+      # anyway — stored, it is a row of numbers that say nothing.
+      slot == { "x" => 50, "y" => 50 } ? nil : slot
     end
     focals.pop while focals.any? && focals.last.nil?
     focals
@@ -1058,7 +1079,7 @@ class Survey < ApplicationRecord
       #
       # Read AFTER image/video/lottie have been scrubbed, so a position can only
       # survive alongside media that itself survived.
-      if c.key?("focal_x") || c.key?("focal_y")
+      if c.key?("focal_x") || c.key?("focal_y") || c.key?("focal_zoom")
         positioned = c["image"].present? || c["video"].present?
         %w[focal_x focal_y].each do |axis|
           next unless c.key?(axis)
@@ -1071,6 +1092,13 @@ class Survey < ApplicationRecord
           else
             c.delete(axis)
           end
+        end
+        # How far past cover-fit it sits. Kept independently of the axes: a
+        # creator can punch in without moving off centre, and the zoom is
+        # what gives an already-fitting axis something to slide.
+        if c.key?("focal_zoom")
+          zoom = positioned ? sanitize_focal_zoom(c["focal_zoom"]) : nil
+          zoom ? c["focal_zoom"] = zoom : c.delete("focal_zoom")
         end
       end
 

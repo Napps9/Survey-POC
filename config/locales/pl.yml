@@ -1052,6 +1052,8 @@ pl:
     reposition_hint_video: "Przeciągnij film, aby wybrać, co pokazuje kadr. Filmy można przesuwać, ale nie da się ich przycinać."
     reposition_crop: "Przytnij i powiększ"
     reposition_apply: "Zapisz położenie"
+    reposition_chrome_statement: "Stwierdzenie"
+    reposition_chrome_answers: "Odpowiedzi"
     required_chip: 'Wymagane'
     ty_title_label: 'Tytuł podziękowania'
     ty_body_label: 'Wiadomość podziękowania'

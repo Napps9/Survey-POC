@@ -1054,6 +1054,8 @@ sn:
     reposition_hint_video: "Zvuzvurudza vhidhiyo kusarudza zvinoratidzwa nefuremu. Mavhidhiyo anogona kuchinjwa nzvimbo asi haacheki."
     reposition_crop: "Cheka uye Swededza"
     reposition_apply: "Chengetedza Nzvimbo"
+    reposition_chrome_statement: "Chirevo"
+    reposition_chrome_answers: "Mhinduro"
     crop_zoom: "Swededza"
     crop_hint: "Zvuzvurudza kuti uchinje nzvimbo, shandisa cherengo kuti uswededze"
     crop_skip: "Pfuura"

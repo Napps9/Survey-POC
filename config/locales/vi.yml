@@ -1050,6 +1050,8 @@ vi:
     reposition_hint_video: "Kéo video để chọn phần khung sẽ hiển thị. Video có thể đổi vị trí nhưng không thể cắt."
     reposition_crop: "Cắt và phóng to"
     reposition_apply: "Lưu vị trí"
+    reposition_chrome_statement: "Câu"
+    reposition_chrome_answers: "Câu trả lời"
     required_chip: 'Bắt buộc'
     ty_title_label: 'Tiêu đề cảm ơn'
     ty_body_label: 'Lời nhắn cảm ơn'

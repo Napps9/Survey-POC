@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { applyFocal, focalPercent, focalZoom, optionMediaStyle, FOCAL_ZOOM_MAX } from "lib/option_media"
 import { t } from "lib/i18n"
 
 // Modal that lets editors attach an image to a card's left panel.
@@ -21,7 +22,7 @@ export default class extends Controller {
     "cropStage", "cropFrame", "cropImg", "cropZoom",
     "cropHint", "cropHintLegacy", "cropSkipBtn",
     "posStage", "posFrame", "posImg", "posVideo", "posHint", "posHintVideo", "posCropBtn",
-    "modalTitle",
+    "posZoom", "posChrome", "modalTitle",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
   static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array, appealCreateUrl: String, appealsListUrl: String }
@@ -48,14 +49,6 @@ export default class extends Controller {
   // card/background/tap-option art frame is).
   static CROP_RATIO = { card: [ 720, 1280 ], background: [ 1920, 1080 ], tapOption: [ 800, 800 ] }
   static CROP_ZOOM_MAX = 3 // how far past cover-fit the slider lets an editor punch in
-
-  // Same gradient pairs _card_component.html.erb falls back to when a tap-card
-  // statement has no image, so a cleared/never-set slot repaints identically
-  // to a fresh server render.
-  static TAP_OPTION_FILLS = [
-    [ "#d4edda", "#a8d5b5" ], [ "#d1ecf1", "#9fd5df" ], [ "#fff3cd", "#ffd88a" ],
-    [ "#f8d7da", "#f5a8b0" ], [ "#e2d9f3", "#c3aee8" ]
-  ]
 
   connect() {
     this._activeCard = null
@@ -881,6 +874,11 @@ export default class extends Controller {
 
     this._posX = slot.x
     this._posY = slot.y
+    this._posZoom = this._clampZoom(slot.z)
+    this._posNatW = 0
+    this._posNatH = 0
+    if (this.hasPosZoomTarget) this.posZoomTarget.value = String(this._posZoom)
+    this._renderPosChrome(slot)
     slot.type === "video" ? this._mountPosVideo(slot) : this._mountPosImage(slot)
   }
 
@@ -896,7 +894,8 @@ export default class extends Controller {
       kind: "card", index: null, type, card, el, measureEl: el,
       url: video || image,
       x: this._cardFocal(card, "cardFocalX"),
-      y: this._cardFocal(card, "cardFocalY")
+      y: this._cardFocal(card, "cardFocalY"),
+      z: this._clampZoom(card.dataset.cardFocalZoom)
     }
   }
 
@@ -916,8 +915,13 @@ export default class extends Controller {
       // and shorter than the card actually is. Every card fills the stack
       // (position:absolute; inset:0), which carries no transform of its own.
       measureEl: rotateCard?.closest(".rotate-card-stack") || rotateCard || null,
+      // The chrome that will sit ON this picture — the statement band and the
+      // response strip — measured off the live card so the stage can show what
+      // is about to cover it.
+      chromeEl: rotateCard || null,
       x: this._clampPercent(focal.x),
-      y: this._clampPercent(focal.y)
+      y: this._clampPercent(focal.y),
+      z: this._clampZoom(focal.z)
     }
   }
 
@@ -925,12 +929,12 @@ export default class extends Controller {
     return this._clampPercent(card?.dataset?.[key])
   }
 
-  // Centre for anything that isn't a number — never 0, which would silently
-  // pin the frame to an edge (the same posture as Survey.sanitize_focal_percent).
-  _clampPercent(value) {
-    const n = Number(value)
-    return Number.isFinite(n) ? Math.round(Math.min(100, Math.max(0, n))) : 50
-  }
+  // Centre / cover-fit for anything that isn't a number — never 0, which would
+  // silently pin the frame to an edge. Shared with every other painter of this
+  // model (see lib/option_media), so the editor, the rebuild and the server
+  // cannot disagree about what a stored value means.
+  _clampPercent(value) { return focalPercent(value) }
+  _clampZoom(value)    { return focalZoom(value) }
 
   _optionFocals(card) {
     try {
@@ -970,23 +974,128 @@ export default class extends Controller {
     vid.play?.()?.catch(() => { /* paused preview is fine */ })
   }
 
-  // Natural size + the frame's measured box give the cover-fit overflow on
-  // each axis: how many pixels of the picture are hidden there. Zero overflow
-  // means that axis isn't cropped at all, and dragging it is a no-op.
+  // Remember the natural size; the overflow itself is derived, because zoom
+  // changes it and the slider can move at any time.
   _measurePos(naturalW, naturalH) {
-    if (!this.hasPosFrameTarget || !(naturalW > 0) || !(naturalH > 0)) return
+    if (!(naturalW > 0) || !(naturalH > 0)) return
+    this._posNatW = naturalW
+    this._posNatH = naturalH
+    this._recomputeOverflow()
+  }
+
+  // How many pixels of the picture are hidden on each axis, relative to the
+  // FRAME. Cover fits the picture to a box that is _posZoom times the frame, so
+  // the painted size is (zoom × cover-scale × natural) and the overflow is
+  // whatever of that the frame doesn't show. Zero on an axis means the picture
+  // exactly fits there and a drag has nothing to reveal — which is the whole
+  // reason the zoom slider exists.
+  _recomputeOverflow() {
+    this._posOverflowX = 0
+    this._posOverflowY = 0
+    if (!this.hasPosFrameTarget || !(this._posNatW > 0) || !(this._posNatH > 0)) return
     const rect = this.posFrameTarget.getBoundingClientRect()
     const fw = rect.width, fh = rect.height
     if (!(fw > 0) || !(fh > 0)) return
-    const scale = Math.max(fw / naturalW, fh / naturalH)
-    this._posOverflowX = Math.max(0, naturalW * scale - fw)
-    this._posOverflowY = Math.max(0, naturalH * scale - fh)
+    const zoom  = this._clampZoom(this._posZoom)
+    const scale = zoom * Math.max(fw / this._posNatW, fh / this._posNatH)
+    this._posOverflowX = Math.max(0, this._posNatW * scale - fw)
+    this._posOverflowY = Math.max(0, this._posNatH * scale - fh)
   }
 
+  // The stage's preview layer reads the SAME custom properties the card does,
+  // so what the creator drags here is rendered by the identical rule rather
+  // than by a lookalike.
   _paintPos() {
-    const value = `${this._posX}% ${this._posY}%`
-    if (this.hasPosImgTarget)   this.posImgTarget.style.backgroundPosition = value
-    if (this.hasPosVideoTarget) this.posVideoTarget.style.objectPosition = value
+    applyFocal(this.hasPosImgTarget ? this.posImgTarget : null, this._posX, this._posY, this._posZoom)
+    applyFocal(this.hasPosVideoTarget ? this.posVideoTarget : null, this._posX, this._posY, this._posZoom)
+  }
+
+  // Zoom slider. Punching in hides more of the picture on both axes, which is
+  // what gives an axis that already fits something to slide — so the overflow
+  // has to be recomputed before the next drag, not after it.
+  posZoomChanged(event) {
+    this._posZoom = this._clampZoom(parseFloat(event.target.value))
+    this._recomputeOverflow()
+    this._paintPos()
+  }
+
+  // ── "Where do the options sit?" ─────────────────────────────────────────
+  // A tap statement's picture is never seen bare: the statement band covers its
+  // top and the response strip (or, at five answers and up, the whole fanned
+  // arc) covers its bottom. Framing a face into either of those is the easiest
+  // mistake to make here and the only one you cannot see until you play the
+  // deck. So the stage draws them.
+  //
+  // Measured off the LIVE card rather than hard-coded: the strip changes shape
+  // with the answer count (see .rotate-card-controls--fan), and a ghost that
+  // guessed would be wrong for exactly the cards that need it most.
+  _renderPosChrome(slot) {
+    if (!this.hasPosChromeTarget) return
+    this.posChromeTarget.replaceChildren()
+    // Measured against the STACK, which carries no transform of its own —
+    // tap-stack gives each card a resting translate/rotate, and a rotated box
+    // measures wider and shorter than the card really is.
+    const box = slot.chromeEl && slot.measureEl?.getBoundingClientRect()
+    if (!box || !(box.width > 0) || !(box.height > 0)) {
+      this.posChromeTarget.hidden = true
+      return
+    }
+    // The statement band belongs to the card that was clicked; the answers are
+    // a SIBLING of the cards, one level up on the stack — looking for both
+    // inside the card found only the band, and the answers are the half a
+    // creator is most likely to frame a face into.
+    const find = (sel) => slot.chromeEl.querySelector(sel) || slot.measureEl.querySelector(sel)
+    const parts = [
+      [ this._rectOf(find(".rotate-card-statement")), t("editor.reposition_chrome_statement") ],
+      // The pills themselves, not the box that holds them: past four answers
+      // the strip becomes a full-card fan wrapper (.rotate-card-controls--fan
+      // is top:0), so ghosting the wrapper greyed the entire picture and said
+      // nothing about where anything actually lands.
+      [ this._unionRect(slot, "[data-tap-response]"), t("editor.reposition_chrome_answers") ]
+    ]
+    let drew = false
+    for (const [ rect, label ] of parts) {
+      if (!rect || !(rect.height > 0)) continue
+      const ghost = document.createElement("div")
+      ghost.className = "media-pos-ghost"
+      ghost.style.left   = `${((rect.left - box.left) / box.width) * 100}%`
+      ghost.style.top    = `${((rect.top - box.top) / box.height) * 100}%`
+      ghost.style.width  = `${(rect.width / box.width) * 100}%`
+      ghost.style.height = `${(rect.height / box.height) * 100}%`
+      const tag = document.createElement("span")
+      tag.className = "media-pos-ghost-label"
+      tag.textContent = label
+      ghost.appendChild(tag)
+      this.posChromeTarget.appendChild(ghost)
+      drew = true
+    }
+    this.posChromeTarget.hidden = !drew
+  }
+
+  _rectOf(el) {
+    const rect = el?.getBoundingClientRect()
+    return rect && rect.height > 0 ? rect : null
+  }
+
+  // The smallest box holding every match — what the answer pills between them
+  // actually cover, however the current answer count arranges them.
+  _unionRect(slot, selector) {
+    const els = [
+      ...(slot.chromeEl?.querySelectorAll(selector) || []),
+      ...(slot.measureEl?.querySelectorAll(selector) || [])
+    ]
+    let box = null
+    for (const el of els) {
+      const r = this._rectOf(el)
+      if (!r) continue
+      box = box ? {
+        left:   Math.min(box.left, r.left),
+        top:    Math.min(box.top, r.top),
+        right:  Math.max(box.right, r.right),
+        bottom: Math.max(box.bottom, r.bottom)
+      } : { left: r.left, top: r.top, right: r.right, bottom: r.bottom }
+    }
+    return box && { ...box, width: box.right - box.left, height: box.bottom - box.top }
   }
 
   posDragStart(event) {
@@ -1030,8 +1139,8 @@ export default class extends Controller {
     event?.preventDefault()
     const slot = this._posSlot
     if (!slot) return
-    if (slot.kind === "tapOption") this._writeOptionFocal(slot.card, slot.index, this._posX, this._posY)
-    else this._writeCardFocal(slot.card, this._posX, this._posY)
+    if (slot.kind === "tapOption") this._writeOptionFocal(slot.card, slot.index, this._posX, this._posY, this._posZoom)
+    else this._writeCardFocal(slot.card, this._posX, this._posY, this._posZoom)
     this._notifyDirty()
     this.close()
   }
@@ -1080,44 +1189,48 @@ export default class extends Controller {
 
   // The card hero's focal pair. Written onto the row (what autosave reads) and
   // painted straight onto the live panel, so the two can never disagree.
-  _writeCardFocal(card, x, y) {
+  _writeCardFocal(card, x, y, z) {
     if (!card) return
-    this._setFocalDataset(card, x, y)
+    this._setFocalDataset(card, x, y, z)
     this._paintCardFocal(card)
   }
 
-  _setFocalDataset(card, x, y) {
-    // 50 is the default everywhere — stored as nothing, so a reset-to-centre
-    // leaves no attribute for the serialiser or the sanitiser to carry.
+  _setFocalDataset(card, x, y, z) {
+    // Centre and cover-fit are the defaults everywhere — stored as nothing, so
+    // a reset leaves no attribute for the serialiser or the sanitiser to carry.
     if (this._clampPercent(x) === 50) delete card.dataset.cardFocalX
     else card.dataset.cardFocalX = String(this._clampPercent(x))
     if (this._clampPercent(y) === 50) delete card.dataset.cardFocalY
     else card.dataset.cardFocalY = String(this._clampPercent(y))
+    const zoom = this._clampZoom(z)
+    if (zoom > 1) card.dataset.cardFocalZoom = String(Number(zoom.toFixed(2)))
+    else delete card.dataset.cardFocalZoom
   }
 
-  // Both media elements read the same two custom properties (see
-  // .split-left-img / .split-left-video), so one painter covers photo and video.
+  // Both media elements read the same custom properties (see .split-left-img /
+  // .split-left-video), so one painter covers photo and video.
   _paintCardFocal(card) {
     const x = this._cardFocal(card, "cardFocalX")
     const y = this._cardFocal(card, "cardFocalY")
-    card.querySelectorAll(".split-left-img, .split-left-video").forEach(el => {
-      el.style.setProperty("--focal-x", `${x}%`)
-      el.style.setProperty("--focal-y", `${y}%`)
-    })
+    const z = this._clampZoom(card.dataset.cardFocalZoom)
+    card.querySelectorAll(".split-left-img, .split-left-video").forEach(el => applyFocal(el, x, y, z))
   }
 
   // One statement's focal pair, positional against option_images exactly like
   // the images themselves. A centred slot is stored as null rather than a
   // {50,50} pair, so an untouched deck serialises to nothing.
-  _writeOptionFocal(card, index, x, y) {
+  _writeOptionFocal(card, index, x, y, z) {
     if (!card || !Number.isInteger(index)) return
     const focals = this._optionFocals(card)
     while (focals.length <= index) focals.push(null)
     const cx = this._clampPercent(x)
     const cy = this._clampPercent(y)
-    focals[index] = (cx === 50 && cy === 50) ? null : { x: cx, y: cy }
+    const cz = Number(this._clampZoom(z).toFixed(2))
+    const slot = { x: cx, y: cy }
+    if (cz > 1) slot.z = cz
+    focals[index] = (cx === 50 && cy === 50 && cz === 1) ? null : slot
     this._storeOptionFocals(card, focals)
-    this._paintOptionFocal(card, index, cx, cy)
+    this._paintOptionFocal(card, index, cx, cy, cz)
   }
 
   _storeOptionFocals(card, focals) {
@@ -1126,14 +1239,13 @@ export default class extends Controller {
     else delete card.dataset.cardOptionFocals
   }
 
-  // The statement's media layer is painted with the `background` SHORTHAND
-  // (server render and client rebuild alike), so setting the longhand after it
-  // is what moves the picture without disturbing its url or its white base.
-  _paintOptionFocal(card, index, x, y) {
+  // The statement's media layer reads the same custom properties every other
+  // cover-cropped layer does, so moving it is writing those — the url and the
+  // white base underneath it are untouched.
+  _paintOptionFocal(card, index, x, y, z) {
     const rotateCard = card.querySelectorAll(".rotate-card")[index]
     if (!rotateCard) return
-    const target = rotateCard.querySelector(".rotate-card-media") || rotateCard
-    target.style.backgroundPosition = `${x}% ${y}%`
+    applyFocal(rotateCard.querySelector(".rotate-card-media") || rotateCard, x, y, z)
   }
 
   _readAsDataUrl(file, done = this._stashPending.bind(this)) {
@@ -1939,14 +2051,10 @@ export default class extends Controller {
     const rotateCard = card.querySelectorAll(".rotate-card")[index]
     if (!rotateCard) return
     const target = rotateCard.querySelector(".rotate-card-media") || rotateCard
-    if (url) {
-      // The shorthand resets background-position with it, which is exactly
-      // right here: the slot is back to centre.
-      target.style.background = `#fff url('${url.replace(/'/g, "\\'")}') 50% 50%/cover no-repeat`
-    } else {
-      const [ a, b ] = this.constructor.TAP_OPTION_FILLS[index % this.constructor.TAP_OPTION_FILLS.length]
-      target.style.background = `linear-gradient(135deg,${a},${b})`
-    }
+    // The one string every painter of this layer shares (see lib/option_media).
+    // cssText, not `background`: it has to clear the previous picture's focal
+    // properties as well as its url, and the new slot is centred at cover-fit.
+    target.style.cssText = optionMediaStyle(url, null, index)
   }
 
   _setCardImage(card, url, credit = "", creditUrl = "", media = {}) {
@@ -1956,6 +2064,7 @@ export default class extends Controller {
     if (card) {
       delete card.dataset.cardFocalX
       delete card.dataset.cardFocalY
+      delete card.dataset.cardFocalZoom
     }
     // "Animate asset" is a preference, not tied to one specific photo, so it
     // survives swapping to a different picture — cleared only when the card
@@ -2049,6 +2158,7 @@ export default class extends Controller {
     // keeps the row saying the same thing.
     delete card.dataset.cardFocalX
     delete card.dataset.cardFocalY
+    delete card.dataset.cardFocalZoom
     // No photo, no re-crop record — see _setCardImage.
     delete card.dataset.cardImageSource
     delete card.dataset.cardImageCrop
@@ -2328,6 +2438,7 @@ export default class extends Controller {
     // for a focal point to move, so the card stops carrying one.
     delete card.dataset.cardFocalX
     delete card.dataset.cardFocalY
+    delete card.dataset.cardFocalZoom
     // No photo, no re-crop record — see _setCardImage.
     delete card.dataset.cardImageSource
     delete card.dataset.cardImageCrop

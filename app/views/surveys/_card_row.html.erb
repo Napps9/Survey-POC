@@ -55,6 +55,7 @@
          50 means centre and the serialiser sends nothing. %>
      data-card-focal-x="<%= card_focal_x(card) %>"
      data-card-focal-y="<%= card_focal_y(card) %>"
+     <% if card['focal_zoom'].present? %>data-card-focal-zoom="<%= card_focal_zoom(card) %>"<% end %>
      <% if card['animate_asset'] == true %>data-card-animate-asset="true"<% end %>
      <% if card['responses'].present? %>data-card-responses="<%= Array(card['responses']).to_json %>"<% end %>
      data-card-recommended-images="<%= AssetPopulator.recommended_paths(@survey, context: :card, card: card).to_json %>"

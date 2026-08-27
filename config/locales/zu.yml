@@ -1064,6 +1064,8 @@ zu:
     reposition_hint_video: "Hudula ividiyo ukuze ukhethe lokho okuboniswa uhlaka. Amavidiyo angabekwa kabusha kodwa awakwazi ukunqunywa."
     reposition_crop: "Nquma futhi ukhulise"
     reposition_apply: "Londoloza indawo"
+    reposition_chrome_statement: "Isitatimende"
+    reposition_chrome_answers: "Izimpendulo"
     crop_zoom: "Khulisa"
     crop_hint: "Hudula ukuze uguqule indawo, sebenzisa isilaidi ukuze ukhulise"
     crop_skip: "Yeqa"

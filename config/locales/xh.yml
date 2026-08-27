@@ -1066,6 +1066,8 @@ xh:
     reposition_hint_video: "Tsala ividiyo ukhethe oko ifreyimu ikubonisayo. Iividiyo zinokubekwa kwenye indawo kodwa azinakunqunyulwa."
     reposition_crop: "Nqumla usondeze"
     reposition_apply: "Gcina indawo"
+    reposition_chrome_statement: "Ingxelo"
+    reposition_chrome_answers: "Iimpendulo"
     crop_zoom: "Sondeza"
     crop_hint: "Tsala ukuze uyibeke kwenye indawo, sebenzisa isilayidi ukusondeza"
     crop_skip: "Yeka"

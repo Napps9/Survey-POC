@@ -1050,6 +1050,8 @@ hi:
     reposition_hint_video: "फ़्रेम में क्या दिखे, यह चुनने के लिए वीडियो को खींचें। वीडियो की जगह बदली जा सकती है, पर उन्हें क्रॉप नहीं किया जा सकता।"
     reposition_crop: "क्रॉप और ज़ूम"
     reposition_apply: "स्थिति सहेजें"
+    reposition_chrome_statement: "कथन"
+    reposition_chrome_answers: "उत्तर"
     required_chip: 'अनिवार्य'
     ty_title_label: 'धन्यवाद शीर्षक'
     ty_body_label: 'धन्यवाद संदेश'

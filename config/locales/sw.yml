@@ -1050,6 +1050,8 @@ sw:
     reposition_hint_video: "Buruta video kuchagua kinachoonyeshwa na fremu. Video zinaweza kubadilishwa nafasi lakini haziwezi kupunguzwa."
     reposition_crop: "Punguza na ukuze"
     reposition_apply: "Hifadhi nafasi"
+    reposition_chrome_statement: "Kauli"
+    reposition_chrome_answers: "Majibu"
     required_chip: 'Lazima'
     ty_title_label: 'Kichwa cha shukrani'
     ty_body_label: 'Ujumbe wa shukrani'

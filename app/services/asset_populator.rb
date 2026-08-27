@@ -451,6 +451,7 @@ class AssetPopulator
     # reason the creator could see.
     card.delete("focal_x")
     card.delete("focal_y")
+    card.delete("focal_zoom")
     if picked["video"].present?
       card["video"]        = picked["video"]
       card["video_poster"] = picked["video_poster"]

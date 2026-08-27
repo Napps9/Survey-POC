@@ -1072,6 +1072,8 @@ en:
     reposition_hint_video: "Drag the video to choose what the frame shows. Videos can be repositioned but not cropped."
     reposition_crop: "Crop & zoom"
     reposition_apply: "Save position"
+    reposition_chrome_statement: "Statement"
+    reposition_chrome_answers: "Answers"
     request_review: "Request review"
     approved_by_review: "Approved by review"
     required_chip: 'Required'

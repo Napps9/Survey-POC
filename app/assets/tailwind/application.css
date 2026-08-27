@@ -349,14 +349,30 @@
   height: 56px;
   border-radius: 10px;
 }
+/* ── The reposition model, shared by every cover-cropped media layer ──
+   A layer is --focal-zoom times the frame in both dimensions, and `cover` fills
+   THAT box. Two things are then hidden from the frame: the cover overflow (the
+   picture's aspect against the box's) and the zoom overflow (the box's size
+   against the frame's). Both slide off a SINGLE stored fraction, because both
+   offsets below are proportional to it — background-position takes the first,
+   the layer's own left/top takes the second. At fraction 0 the picture's left
+   (or top) edge sits on the frame's; at 1, its right (or bottom) edge does.
+
+   At zoom 1 the layer is exactly the frame and left/top are 0, so this reduces
+   to plain `cover` + background-position — what every existing card renders
+   today, unchanged.
+
+   Zoom exists because a picture whose shape already matches the frame hides
+   nothing on that axis, so there is nothing for a drag to reveal. Punching in
+   is what buys the slack; it is stored, never re-encoded, and windable back to
+   1 whenever the creator likes. */
 .split-left-img {
-  position: absolute; inset: 0;
+  position: absolute;
+  width:  calc(100% * var(--focal-zoom, 1));
+  height: calc(100% * var(--focal-zoom, 1));
+  left: calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fx, 0.5));
+  top:  calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fy, 0.5));
   background-size: cover;
-  /* The card's stored focal point (default centre on both axes). Each axis only
-     changes anything where the frame crops THAT way: --focal-y in the mobile
-     header strip and the editor's device frames, where a 9:16 image is shown in
-     a ~3:1 band, and --focal-x on desktop, where the panel is taller than 9:16
-     and the picture is cropped left and right instead. */
   background-position: var(--focal-x, 50%) var(--focal-y, 50%);
 }
 /* Optional slow push-in/out on a card's own photo or Lottie (never video —
@@ -374,13 +390,16 @@
   animation: verto-asset-breathe 5s ease-in-out infinite;
 }
 .split-left-video {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+  position: absolute;
+  /* The same model as .split-left-img above — object-fit/object-position are
+     what background-size/background-position are for an element that carries
+     its own pixels. A clip can never be cropped (there is no canvas re-encode
+     for video), so reposition-and-zoom is the whole of what it can have. */
+  width:  calc(100% * var(--focal-zoom, 1));
+  height: calc(100% * var(--focal-zoom, 1));
+  left: calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fx, 0.5));
+  top:  calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fy, 0.5));
   object-fit: cover;
-  /* Same stored focal pair as a photo — object-position is what
-     background-position is for an element that carries its own pixels. A clip
-     can never be cropped (there is no canvas re-encode for video), so this is
-     the whole of what repositioning a video means. */
   object-position: var(--focal-x, 50%) var(--focal-y, 50%);
   background: var(--brand-panel, #2E3564);
 }
@@ -1507,24 +1526,56 @@
   touch-action: none;
 }
 .media-pos-frame:active { cursor: grabbing; }
-/* Both layers fill the frame and are cropped by it exactly the way the card
-   panel crops them, so what the creator drags here is what the card shows.
-   The controller sets the position/object-position as the drag moves. */
+/* Both layers are laid out by the SAME rules the card uses (see
+   .split-left-img), reading the same custom properties — so the stage is the
+   card's rendering, not a lookalike that can drift from it. The controller
+   writes those properties as the drag and the zoom slider move. */
 .media-pos-img {
-  position: absolute; inset: 0;
+  position: absolute;
+  width:  calc(100% * var(--focal-zoom, 1));
+  height: calc(100% * var(--focal-zoom, 1));
+  left: calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fx, 0.5));
+  top:  calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fy, 0.5));
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: 50% 50%;
+  background-position: var(--focal-x, 50%) var(--focal-y, 50%);
 }
 .media-pos-video {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+  position: absolute;
+  width:  calc(100% * var(--focal-zoom, 1));
+  height: calc(100% * var(--focal-zoom, 1));
+  left: calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fx, 0.5));
+  top:  calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fy, 0.5));
   max-width: none;
   object-fit: cover;
-  object-position: 50% 50%;
+  object-position: var(--focal-x, 50%) var(--focal-y, 50%);
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;   /* the FRAME owns the drag, not the media inside it */
+}
+/* The card's own furniture, ghosted over the picture: what will cover it once
+   this is a real card. Never a hit target — the drag underneath is the point. */
+.media-pos-chrome {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.media-pos-chrome[hidden] { display: none; }
+.media-pos-ghost {
+  position: absolute;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed rgba(255,255,255,0.55);
+  background: rgba(7, 11, 28, 0.42);
+  border-radius: 6px;
+}
+.media-pos-ghost-label {
+  font-family: "Alata", sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.82);
+  text-align: center;
+  padding: 0 6px;
 }
 .media-pos-img[hidden], .media-pos-video[hidden] { display: none; }
 .media-pos-hint {
@@ -2950,10 +3001,21 @@
 .preview-overlay .rotate-card { touch-action: none; }
 .preview-overlay .rotate-card:active { cursor: grabbing; }
 /* Full-bleed image/gradient, with the statement in a dark band at the TOP. */
+/* One tap statement's picture, on the same reposition model as .split-left-img
+   (see the comment there).
+   The url arrives inline as background-image, NOT as the `background`
+   shorthand it used to be: a shorthand resets background-position along with
+   everything else, and an inline declaration outranks any stylesheet rule — so
+   the shorthand would have quietly won every reposition back to its own value. */
 .rotate-card-media {
-  position: absolute; inset: 0;
+  position: absolute;
+  width:  calc(100% * var(--focal-zoom, 1));
+  height: calc(100% * var(--focal-zoom, 1));
+  left: calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fx, 0.5));
+  top:  calc((1 - var(--focal-zoom, 1)) * 100% * var(--focal-fy, 0.5));
   background-size: cover;
-  background-position: center;
+  background-repeat: no-repeat;
+  background-position: var(--focal-x, 50%) var(--focal-y, 50%);
 }
 .rotate-card-statement {
   position: absolute;

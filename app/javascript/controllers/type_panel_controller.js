@@ -7,6 +7,7 @@ import { choiceListItemHtml, prioritiseItemHtml, choiceGridItemHtml, addOptionBt
 import { tapResponseStripHtml, tapGlyphSvg } from "lib/tap_response_templates"
 import { resolveResponses, fans } from "lib/tap_scales"
 import { injectIcons } from "lib/option_icons"
+import { optionMediaStyle } from "lib/option_media"
 import { t } from "lib/i18n"
 
 
@@ -166,22 +167,9 @@ const DEFAULT_PAGES = {
 // scale works too. Keep in sync.
 const NPS_STEPS = 11
 
-const SWIPE_FILLS = [
-  ["#d4edda","#a8d5b5"], ["#d1ecf1","#9fd5df"], ["#fff3cd","#ffd88a"],
-  ["#f8d7da","#f5a8b0"], ["#e2d9f3","#c3aee8"]
-]
-
 function esc(s) {
   return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
                        .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
-}
-
-// One axis of a stored reposition, as a whole percentage. Junk lands on 50
-// (centre) rather than 0, matching Survey.sanitize_focal_percent — a NaN piped
-// into a background-position voids the whole shorthand.
-function clampPercent(v) {
-  const n = Number(v)
-  return Number.isFinite(n) ? Math.round(Math.min(100, Math.max(0, n))) : 50
 }
 
 // The localised compatibility note for switching `fromType` → `entry.type`.
@@ -242,15 +230,11 @@ const COMPONENTS = {
       <div class="rotate-card-stack">
         ${opts.map((o,i) => {
           const img = optionImages[i]
-          const [a,b] = SWIPE_FILLS[i % SWIPE_FILLS.length]
-          // Mirrors option_focal_position in application_helper: the statement's
-          // stored reposition fills the shorthand's position slot, centre when
-          // it has none.
-          const f = optionFocals[i]
-          const pos = f ? `${clampPercent(f.x)}% ${clampPercent(f.y)}%` : "50% 50%"
-          const bg = img ? `#fff url('${img.replace(/'/g, "\\'")}') ${pos}/cover no-repeat` : `linear-gradient(135deg,${a},${b})`
+          // Mirrors ApplicationHelper#option_media_style — the picture as
+          // longhands plus this statement's stored reposition.
+          const bg = optionMediaStyle(img, optionFocals[i], i)
           return `<div class="rotate-card" data-tap-stack-target="card" data-canonical="${esc(o)}">
-                    <div class="rotate-card-media" style="background:${bg};"></div>
+                    <div class="rotate-card-media" style="${bg}"></div>
                     <div class="rotate-card-statement"><span contenteditable="true">${esc(o)}</span></div>
                     <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${i}" title="${esc(t("editor.change_statement_image_title"))}">
                       <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>

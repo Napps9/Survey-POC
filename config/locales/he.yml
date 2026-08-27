@@ -1050,6 +1050,8 @@ he:
     reposition_hint_video: "גררו את הסרטון כדי לבחור מה המסגרת מציגה. אפשר למקם סרטונים מחדש אבל לא לחתוך אותם."
     reposition_crop: "חיתוך והתקרבות"
     reposition_apply: "שמירת המיקום"
+    reposition_chrome_statement: "משפט"
+    reposition_chrome_answers: "תשובות"
     required_chip: 'חובה'
     ty_title_label: 'כותרת התודה'
     ty_body_label: 'הודעת התודה'

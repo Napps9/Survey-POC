@@ -1051,6 +1051,8 @@ af:
     reposition_hint_video: "Sleep die video om te kies wat die raam wys. Video's kan herposisioneer word, maar nie gesny word nie."
     reposition_crop: "Sny en zoem"
     reposition_apply: "Stoor posisie"
+    reposition_chrome_statement: "Stelling"
+    reposition_chrome_answers: "Antwoorde"
     crop_zoom: "Zoem"
     crop_hint: "Sleep om te herposisioneer, gebruik die skuifknoppie om te zoem"
     crop_skip: "Slaan oor"

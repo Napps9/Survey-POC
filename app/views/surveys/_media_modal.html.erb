@@ -331,13 +331,30 @@
         <div class="media-pos-img" data-media-picker-target="posImg" hidden></div>
         <video class="media-pos-video" data-media-picker-target="posVideo"
                muted loop playsinline preload="metadata" hidden></video>
+        <%# Where the card's own furniture will sit over this picture — for a
+            tap statement, the statement band and the response strip. Built
+            from the live card's measurements by _renderPosChrome, because the
+            strip changes shape with the answer count. %>
+        <div class="media-pos-chrome" data-media-picker-target="posChrome" hidden></div>
+      </div>
+      <%# Punching in past cover-fit. Its real job is to create slack: a picture
+          whose shape already matches the frame hides nothing on that axis, so
+          a drag there does nothing until there is something to reveal. Nothing
+          is re-encoded — this winds back to 1 whenever the creator likes. %>
+      <div class="media-crop-controls">
+        <span class="media-crop-zoom-icon" aria-hidden="true">−</span>
+        <input type="range" class="media-crop-zoom" min="1" max="3" step="0.01" value="1"
+               data-media-picker-target="posZoom"
+               aria-label="<%= t("editor.crop_zoom", default: "Zoom") %>"
+               data-action="input->media-picker#posZoomChanged" />
+        <span class="media-crop-zoom-icon" aria-hidden="true">+</span>
       </div>
       <%# Two hints rather than one built in JS, the same way the crop stage
           carries its legacy note: the strings stay in the locale files and out
           of the browser payload. The video one says plainly why there is no
           Crop button beside it. %>
-      <div class="media-pos-hint" data-media-picker-target="posHint"><%= t("editor.reposition_hint", default: "Drag the picture to choose what the frame shows. The whole image is kept, so you can change this any time.") %></div>
-      <div class="media-pos-hint" data-media-picker-target="posHintVideo" hidden><%= t("editor.reposition_hint_video", default: "Drag the video to choose what the frame shows. Videos can be repositioned but not cropped.") %></div>
+      <div class="media-pos-hint" data-media-picker-target="posHint"><%= t("editor.reposition_hint", default: "Drag the picture to choose what the frame shows, and zoom in to move it further. The whole image is kept, so you can change this any time.") %></div>
+      <div class="media-pos-hint" data-media-picker-target="posHintVideo" hidden><%= t("editor.reposition_hint_video", default: "Drag the video to choose what the frame shows, and zoom in to move it further. Videos can be repositioned but not cropped.") %></div>
       <div class="media-pos-actions">
         <button type="button" class="media-btn-ghost media-pos-crop-btn"
                 data-media-picker-target="posCropBtn"

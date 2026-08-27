@@ -544,6 +544,54 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     end
   end
 
+  # ── Zoom (focal_zoom) ─────────────────────────────────────────────────
+  # A picture whose shape already matches the frame hides nothing on that axis,
+  # so a drag there has nothing to reveal — "we need to be able to reposition
+  # vertical as well as horizontally". Punching in past cover-fit is what buys
+  # the slack, and like the focal point it re-encodes nothing.
+
+  test "focal_zoom is kept, clamped and rounded" do
+    [ [ 1.5, 1.5 ], [ "2.25", 2.25 ], [ 0.2, nil ], [ 9, 3.0 ], [ 1, nil ], [ "wide", nil ] ].each do |given, want|
+      cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "focal_zoom" => given } ]
+      out = Survey.sanitize_cards_images!(cards).first
+      if want
+        assert_equal want, out["focal_zoom"], "focal_zoom #{given.inspect} should land on #{want}"
+      else
+        refute out.key?("focal_zoom"), "focal_zoom #{given.inspect} says nothing and should not be stored"
+      end
+    end
+  end
+
+  test "focal_zoom stands alone — a card can punch in without moving off centre" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH,
+                "focal_x" => 50, "focal_y" => 50, "focal_zoom" => 1.8 } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal 1.8, out["focal_zoom"]
+    refute out.key?("focal_x"), "centre is still centre — only the zoom was set"
+    refute out.key?("focal_y")
+  end
+
+  test "focal_zoom dies with the media it magnifies" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "focal_zoom" => 2 } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("focal_zoom")
+  end
+
+  test "a statement's zoom rides in its own slot" do
+    cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a b],
+                "option_images" => [ ASSET_PATH, ASSET_PATH ],
+                "option_focals" => [ { "x" => 20, "y" => 30, "z" => 1.4 }, { "z" => 2 } ] } ]
+    assert_equal [ { "x" => 20, "y" => 30, "z" => 1.4 }, { "x" => 50, "y" => 50, "z" => 2.0 } ],
+                 Survey.sanitize_cards_images!(cards).first["option_focals"],
+                 "a zoomed-but-centred statement is still a reframing and must survive"
+  end
+
+  test "a statement centred at cover-fit is stored as nothing" do
+    cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a],
+                "option_images" => [ ASSET_PATH ],
+                "option_focals" => [ { "x" => 50, "y" => 50, "z" => 1 } ] } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("option_focals")
+  end
+
   test "option_focals dies with the images it positions" do
     cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a],
                 "option_images" => [ "https://evil.example.com/x.jpg" ],

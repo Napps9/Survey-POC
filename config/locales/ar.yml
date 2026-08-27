@@ -1050,6 +1050,8 @@ ar:
     reposition_hint_video: "اسحب الفيديو لتحديد ما يظهره الإطار. يمكن تغيير موضع مقاطع الفيديو لكن لا يمكن اقتصاصها."
     reposition_crop: "اقتصاص وتكبير"
     reposition_apply: "حفظ الموضع"
+    reposition_chrome_statement: "العبارة"
+    reposition_chrome_answers: "الإجابات"
     required_chip: 'إلزامي'
     ty_title_label: 'عنوان الشكر'
     ty_body_label: 'رسالة الشكر'

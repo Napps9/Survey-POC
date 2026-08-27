@@ -1050,6 +1050,8 @@ it:
     reposition_hint_video: "Trascina il video per scegliere cosa mostra la cornice. I video si possono riposizionare ma non ritagliare."
     reposition_crop: "Ritaglia e ingrandisci"
     reposition_apply: "Salva posizione"
+    reposition_chrome_statement: "Affermazione"
+    reposition_chrome_answers: "Risposte"
     required_chip: 'Obbligatoria'
     ty_title_label: 'Titolo di ringraziamento'
     ty_body_label: 'Messaggio di ringraziamento'

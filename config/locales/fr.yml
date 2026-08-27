@@ -1050,6 +1050,8 @@ fr:
     reposition_hint_video: "Faites glisser la vidéo pour choisir ce que montre le cadre. Les vidéos peuvent être repositionnées mais pas recadrées."
     reposition_crop: "Recadrer et zoomer"
     reposition_apply: "Enregistrer la position"
+    reposition_chrome_statement: "Affirmation"
+    reposition_chrome_answers: "Réponses"
     required_chip: 'Obligatoire'
     ty_title_label: 'Titre de remerciement'
     ty_body_label: 'Message de remerciement'

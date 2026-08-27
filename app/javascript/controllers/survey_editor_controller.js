@@ -2032,6 +2032,11 @@ export default class extends Controller {
       const value = parseInt(card.dataset[attr], 10)
       if (Number.isFinite(value) && value !== 50) out[key] = Math.min(100, Math.max(0, value))
     }
+    // How far past cover-fit it is punched in — what gives an axis that already
+    // fits the frame something to slide. Cover-fit is the default, so a 1 is
+    // sent as nothing and the server drops it anyway.
+    const zoom = parseFloat(card.dataset.cardFocalZoom)
+    if (Number.isFinite(zoom) && zoom > 1) out.focal_zoom = Math.min(3, zoom)
   }
 
   // A tap card's response scale, read off the strip that renders it. The DOM is

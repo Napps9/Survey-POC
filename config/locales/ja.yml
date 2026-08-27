@@ -1050,6 +1050,8 @@ ja:
     reposition_hint_video: "動画をドラッグして、枠に表示する部分を選びます。動画は位置の調整はできますが、切り抜きはできません。"
     reposition_crop: "切り抜き・拡大"
     reposition_apply: "位置を保存"
+    reposition_chrome_statement: "文"
+    reposition_chrome_answers: "回答"
     required_chip: '必須'
     ty_title_label: 'サンクスのタイトル'
     ty_body_label: 'サンクスのメッセージ'

@@ -1050,6 +1050,8 @@ nl:
     reposition_hint_video: "Sleep de video om te kiezen wat het kader laat zien. Video's kun je verplaatsen, maar niet bijsnijden."
     reposition_crop: "Bijsnijden en zoomen"
     reposition_apply: "Positie opslaan"
+    reposition_chrome_statement: "Stelling"
+    reposition_chrome_answers: "Antwoorden"
     required_chip: 'Verplicht'
     ty_title_label: 'Bedanktitel'
     ty_body_label: 'Bedankbericht'

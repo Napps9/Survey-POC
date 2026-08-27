@@ -1066,6 +1066,8 @@ tn:
     reposition_hint_video: "Goga bidio go tlhopha se foreimi e se bontshang. Dibidio di ka bewa sesha mme ga di kake tsa segwa."
     reposition_crop: "Sega o atolose"
     reposition_apply: "Boloka boemo"
+    reposition_chrome_statement: "Polelo"
+    reposition_chrome_answers: "Dikarabo"
     crop_zoom: "Atolosa"
     crop_hint: "Goga go fetola boemo, dirisa sekgoga go atolosa"
     crop_skip: "Tlolela"

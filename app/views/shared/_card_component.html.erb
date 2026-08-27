@@ -331,15 +331,10 @@
         <div class="rotate-card-stack">
           <% Array(display["options"]).each_with_index do |opt, i| %>
             <% img = option_images[i] %>
-            <% bg_a = ['#d4edda','#d1ecf1','#fff3cd','#f8d7da','#e2d9f3'][i % 5] %>
-            <% bg_b = ['#a8d5b5','#9fd5df','#ffd88a','#f5a8b0','#c3aee8'][i % 5] %>
-            <%# The statement's own reposition rides in the shorthand's position
-                slot, where `center` used to be hard-coded. A square stock photo
-                in a taller-than-square card is cropped top and bottom, and this
-                is what says which band to keep. %>
-            <% bg_style = img.present? ?
-                 "background:#fff url('#{img}') #{option_focal_position(card, i)}/cover no-repeat;" :
-                 "background:linear-gradient(135deg,#{bg_a},#{bg_b});" %>
+            <%# The picture as longhands plus this statement's own reposition —
+                see option_media_style, and .rotate-card-media for why the
+                `background` shorthand can't carry either. %>
+            <% bg_style = option_media_style(card, i, img) %>
             <%# Players can also drag the card off (tap-stack#dragStart); the
                 editor's statements are contenteditable, where a drag would
                 fight text selection, so the action is player-only. %>

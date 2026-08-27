@@ -338,21 +338,63 @@ module ApplicationHelper
     v.presence ? v.to_f.clamp(0, 100).round : 50
   end
 
-  # The pair as custom properties, for the elements whose CSS reads them. Emitted
-  # whole rather than only when moved: the editor rewrites these live as the
-  # creator drags, and a property that isn't on the element to start with has
-  # nothing for the fallback to be replaced on.
-  def card_focal_style(card)
-    "--focal-x: #{card_focal_x(card)}%; --focal-y: #{card_focal_y(card)}%;"
+  # How far past cover-fit the media is punched in. 1 unless the creator has
+  # zoomed — which they do to give an axis that already fits the frame
+  # something to slide (see Survey.sanitize_focal_zoom).
+  def card_focal_zoom(card)
+    focal_zoom_value(card.is_a?(Hash) ? card["focal_zoom"] : nil)
   end
 
-  # One tap-card statement's reposition, as the `position` term of the
-  # `background` shorthand its media layer is painted with. "50% 50%" (centre,
-  # the historic value) unless that statement has been dragged.
-  def option_focal_position(card, index)
+  # A card stores it as `focal_zoom`; one statement's slot in option_focals
+  # stores it as `z`, alongside that slot's own x/y. Same number either way.
+  def focal_zoom_value(raw)
+    raw.presence ? raw.to_f.clamp(1.0, Survey::FOCAL_ZOOM_MAX).round(2) : 1.0
+  end
+
+  # The whole reposition as custom properties, for the elements whose CSS reads
+  # them. Emitted whole rather than only when moved: the editor rewrites these
+  # live as the creator drags, and a property that isn't on the element to
+  # start with has nothing for the fallback to be replaced on.
+  #
+  # Two forms of each axis, because CSS can't turn one into the other: the
+  # percentage drives background-position/object-position, and the bare
+  # fraction drives the layer's own offset (see .split-left-img).
+  def focal_custom_properties(x, y, zoom)
+    "--focal-x: #{x}%; --focal-y: #{y}%; " \
+    "--focal-fx: #{(x / 100.0).round(4)}; --focal-fy: #{(y / 100.0).round(4)}; " \
+    "--focal-zoom: #{zoom};"
+  end
+
+  def card_focal_style(card)
+    focal_custom_properties(card_focal_x(card), card_focal_y(card), card_focal_zoom(card))
+  end
+
+  # The same, for one tap-card statement's media layer. Centre at cover-fit —
+  # the historic rendering — unless that statement has been reframed.
+  def option_focal_style(card, index)
     focal = Array(card.is_a?(Hash) ? card["option_focals"] : nil)[index]
-    return "50% 50%" unless focal.is_a?(Hash)
-    "#{card_focal_axis(focal, 'x')}% #{card_focal_axis(focal, 'y')}%"
+    focal = {} unless focal.is_a?(Hash)
+    focal_custom_properties(card_focal_axis(focal, "x"), card_focal_axis(focal, "y"),
+                            focal_zoom_value(focal["z"]))
+  end
+
+  # The whole inline style for one tap statement's media layer: its picture (as
+  # longhands — see .rotate-card-media for why never the shorthand) plus that
+  # statement's reposition, or the positional gradient when it has no picture.
+  # type_panel_controller's tap_card builder and card_editor#addTapOption mirror
+  # this, so a statement rebuilt or added client-side paints identically.
+  OPTION_TILE_FILLS = [
+    %w[#d4edda #a8d5b5], %w[#d1ecf1 #9fd5df], %w[#fff3cd #ffd88a],
+    %w[#f8d7da #f5a8b0], %w[#e2d9f3 #c3aee8]
+  ].freeze
+
+  def option_media_style(card, index, image)
+    if image.present?
+      "background-color:#fff; background-image:url('#{image}'); #{option_focal_style(card, index)}"
+    else
+      a, b = OPTION_TILE_FILLS[index % OPTION_TILE_FILLS.length]
+      "background-image:linear-gradient(135deg,#{a},#{b});"
+    end
   end
 
   # A card's animation backdrop, as an inline style for .split-left. An image

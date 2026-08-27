@@ -73,6 +73,34 @@ class MediaRepositionTest < ApplicationSystemTestCase
     JS
   end
 
+  # A picture whose shape exactly matches the frame — the case that hides
+  # nothing at cover-fit, and so the case the zoom exists for. Derived from the
+  # frame's own measured box so it is an exact match whatever the panel's
+  # rendered size happens to be, and fed through the controller's own
+  # _measurePos so the maths under test is the shipped maths.
+  def seed_natural_matching_frame
+    evaluate_script(<<~JS)
+      (() => {
+        const app  = window.Stimulus || window.application
+        const root = document.querySelector('[data-controller~="media-picker"]')
+        const c = app.getControllerForElementAndIdentifier(root, "media-picker")
+        const r = document.querySelector("[data-media-picker-target='posFrame']").getBoundingClientRect()
+        c._measurePos(Math.round(r.width * 4), Math.round(r.height * 4))
+      })()
+    JS
+  end
+
+  def pos_overflow
+    evaluate_script(<<~JS)
+      (() => {
+        const app  = window.Stimulus || window.application
+        const root = document.querySelector('[data-controller~="media-picker"]')
+        const c = app.getControllerForElementAndIdentifier(root, "media-picker")
+        return [ c._posOverflowX, c._posOverflowY ]
+      })()
+    JS
+  end
+
   def drag_pos_frame(dx, dy)
     evaluate_script(<<~JS)
       (() => {
@@ -252,10 +280,13 @@ class MediaRepositionTest < ApplicationSystemTestCase
     assert_equal 1, focals.length, "trailing untouched statements are stored as nothing"
     assert_operator focals[0]["y"], :<, 50, "dragging down should pull the focal point above centre"
 
-    painted = evaluate_script(
-      %(document.querySelectorAll(".rotate-card")[0].querySelector(".rotate-card-media").style.backgroundPosition)
-    )
-    assert_equal "#{focals[0]['x']}% #{focals[0]['y']}%", painted,
+    painted = evaluate_script(<<~JS)
+      (() => {
+        const el = document.querySelectorAll(".rotate-card")[0].querySelector(".rotate-card-media")
+        return [ el.style.getPropertyValue("--focal-x"), el.style.getPropertyValue("--focal-y") ]
+      })()
+    JS
+    assert_equal [ "#{focals[0]['x']}%", "#{focals[0]['y']}%" ], painted,
                  "the statement's live media layer must be repainted with what was stored"
 
     serialized = evaluate_script(<<~JS)
@@ -291,6 +322,115 @@ class MediaRepositionTest < ApplicationSystemTestCase
                  "the array must shift with the statements, not stay put and re-point"
     images = JSON.parse(card_dataset("tap_card", "cardOptionImages"))
     assert_equal 2, images.length
+  end
+
+  # ── Zoom: what makes an axis that already fits movable at all ───────────
+  # With cover-fit, an axis where the picture's shape matches the frame hides
+  # nothing — so a drag there has nothing to reveal, however hard you pull.
+  # That is the "I can't move it vertically" report. Punching in past cover-fit
+  # hides some of BOTH axes, and both then move.
+
+  test "zooming in gives an already-fitting axis something to slide" do
+    survey = build_survey([ { "type" => "open_ended", "text" => "Tell us more", "image" => PEXELS_IMAGE } ])
+    open_editor(survey)
+    assert_text "Tell us more"
+    find(".survey-card-wrap[data-card-type='open_ended'] .media-adjust-fab").click
+    wait_for_pos_stage
+
+    # A picture that exactly fills the frame: nothing hidden on either axis.
+    seed_natural_matching_frame
+    assert_equal [ 0, 0 ], pos_overflow.map(&:round),
+                 "a picture matching the frame hides nothing at cover-fit — that is the bug being fixed"
+
+    # The slider is the fix: at 2x, both axes have slack.
+    find("[data-media-picker-target='posZoom']").set(2)
+    ox, oy = pos_overflow
+    assert_operator ox, :>, 0, "zooming in must open up the horizontal axis"
+    assert_operator oy, :>, 0, "…and the vertical one, which is the axis that was stuck"
+
+    drag_pos_frame(0, -40)
+    click_button "Save position"
+    assert_no_selector ".media-modal-backdrop", visible: true
+
+    assert_operator card_dataset("open_ended", "cardFocalY").to_i, :>, 50,
+                    "the vertical drag has to move the frame now"
+    assert_equal "2", card_dataset("open_ended", "cardFocalZoom")
+    painted = evaluate_script(
+      %(document.querySelector(".survey-card-wrap[data-card-type='open_ended'] .split-left-img").style.getPropertyValue("--focal-zoom"))
+    )
+    assert_equal "2", painted, "the live panel must be repainted at the stored zoom"
+
+    serialized = evaluate_script(<<~JS)
+      (() => {
+        const app  = window.Stimulus || window.application
+        const root = document.querySelector('[data-controller~="survey-editor"]')
+        const c    = app.getControllerForElementAndIdentifier(root, "survey-editor")
+        return c.serialize().cards.find(k => k.type === "open_ended")
+      })()
+    JS
+    assert_equal 2, serialized["focal_zoom"],
+                 "serialize() dropped focal_zoom — one autosave would snap the picture back to fit"
+  end
+
+  test "winding the zoom back to cover-fit stores nothing" do
+    survey = build_survey([ { "type" => "open_ended", "text" => "Tell us more",
+                              "image" => PEXELS_IMAGE, "focal_zoom" => 2.5 } ])
+    open_editor(survey)
+    assert_text "Tell us more"
+    assert_equal "2.5", card_dataset("open_ended", "cardFocalZoom")
+
+    find(".survey-card-wrap[data-card-type='open_ended'] .media-adjust-fab").click
+    wait_for_pos_stage
+    # The stage reopens AT the stored zoom, not reset to fit.
+    assert_equal "2.5", find("[data-media-picker-target='posZoom']").value
+
+    find("[data-media-picker-target='posZoom']").set(1)
+    click_button "Save position"
+    assert_no_selector ".media-modal-backdrop", visible: true
+    assert card_dataset("open_ended", "cardFocalZoom").blank?,
+           "cover-fit is the default — storing it stores nothing"
+  end
+
+  # ── "Where do the options sit?" ─────────────────────────────────────────
+  # A statement's picture is never seen bare: the statement band covers its top
+  # and the response strip its bottom. Framing a face into either is the one
+  # mistake you cannot see until you play the deck.
+
+  test "the reposition stage shows the statement band and answer strip over the picture" do
+    survey = build_survey([ { "type" => "tap_card", "text" => "Rate these",
+                              "options" => [ "One", "Two" ],
+                              "option_images" => [ PEXELS_IMAGE, PEXELS_IMAGE ] } ])
+    open_editor(survey)
+    assert_text "Rate these"
+
+    evaluate_script(%(document.querySelectorAll(".rotate-card")[0].querySelector(".tap-card-adjust-btn").click()))
+    wait_for_pos_stage
+
+    ghosts = all("[data-media-picker-target='posChrome'] .media-pos-ghost", visible: :all)
+    assert_equal 2, ghosts.size, "both the statement band and the answer strip should be drawn"
+    labels = ghosts.map { |g| g.text(:all).strip }
+    assert_includes labels, "Statement"
+    assert_includes labels, "Answers"
+
+    # Drawn from the LIVE card's measurements, so it stays true as the strip
+    # changes shape with the answer count — the band sits at the top, the
+    # answers at the bottom, and neither is a full-height guess.
+    tops = evaluate_script(<<~JS)
+      Array.from(document.querySelectorAll("[data-media-picker-target='posChrome'] .media-pos-ghost"))
+           .map(el => parseFloat(el.style.top))
+    JS
+    assert_operator tops.min, :<, 20, "the statement band belongs near the top of the frame"
+    assert_operator tops.max, :>, 20, "the answer strip belongs below it"
+  end
+
+  test "a card hero gets no ghost — nothing of the card sits over it" do
+    survey = build_survey([ { "type" => "open_ended", "text" => "Tell us more", "image" => PEXELS_IMAGE } ])
+    open_editor(survey)
+    assert_text "Tell us more"
+    find(".survey-card-wrap[data-card-type='open_ended'] .media-adjust-fab").click
+    wait_for_pos_stage
+
+    assert_no_selector "[data-media-picker-target='posChrome']", visible: true
   end
 
   # The chip's index used to be baked into the markup, and deleting a statement

@@ -1050,6 +1050,8 @@ id:
     reposition_hint_video: "Seret video untuk memilih apa yang ditampilkan bingkai. Video bisa diubah posisinya, tetapi tidak bisa dipangkas."
     reposition_crop: "Pangkas & perbesar"
     reposition_apply: "Simpan posisi"
+    reposition_chrome_statement: "Pernyataan"
+    reposition_chrome_answers: "Jawaban"
     required_chip: 'Wajib'
     ty_title_label: 'Judul terima kasih'
     ty_body_label: 'Pesan terima kasih'

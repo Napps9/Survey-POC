@@ -1052,6 +1052,8 @@ ru:
     reposition_hint_video: "Перетащите видео, чтобы выбрать, что показывает рамка. Видео можно сместить, но не обрезать."
     reposition_crop: "Обрезать и приблизить"
     reposition_apply: "Сохранить положение"
+    reposition_chrome_statement: "Утверждение"
+    reposition_chrome_answers: "Ответы"
     required_chip: 'Обязательный'
     ty_title_label: 'Заголовок благодарности'
     ty_body_label: 'Сообщение благодарности'

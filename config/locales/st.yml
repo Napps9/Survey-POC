@@ -1066,6 +1066,8 @@ st:
     reposition_hint_video: "Hula video ho khetha seo foreimi e se bontšang. Livideo li ka behoa hape empa li ke ke tsa kutoa."
     reposition_crop: "Kuta le ho atolosa"
     reposition_apply: "Boloka sebaka"
+    reposition_chrome_statement: "Polelo"
+    reposition_chrome_answers: "Likarabo"
     crop_zoom: "Atolosa"
     crop_hint: "Hula ho fetola boemo, sebedisa seqhomane ho atolosa"
     crop_skip: "Tlola"

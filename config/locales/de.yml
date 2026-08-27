@@ -1050,6 +1050,8 @@ de:
     reposition_hint_video: "Ziehe das Video, um zu bestimmen, was der Rahmen zeigt. Videos lassen sich verschieben, aber nicht zuschneiden."
     reposition_crop: "Zuschneiden & zoomen"
     reposition_apply: "Position speichern"
+    reposition_chrome_statement: "Aussage"
+    reposition_chrome_answers: "Antworten"
     required_chip: 'Pflicht'
     ty_title_label: 'Titel der Dankeschön-Seite'
     ty_body_label: 'Nachricht der Dankeschön-Seite'
