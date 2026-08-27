@@ -6092,10 +6092,28 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 
 .preview-thankyou {
   display: none; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center; justify-content: flex-start;
   gap: 20px; text-align: center; padding: 40px;
 }
-.preview-thankyou.active { display: flex; }
+/* A thank-you screen can outgrow the player: points, a leaderboard and four
+   CTAs stack up fast, and a short viewport is common (a phone in a laptop
+   mockup, a small handset, landscape). It used to sit inside TWO vertically
+   centred boxes — this one and .preview-body — and centred overflow spills
+   equally in both directions. The half above the top is then unreachable,
+   because browsers create no scrollable area before the origin: the top of a
+   long thank-you was not merely off-screen, it could not be scrolled to.
+   Reproduced at 390x240, where the card's own top sat at -24px.
+
+   align-self stops .preview-body centring it, so nothing spills upward, and
+   the screen scrolls itself instead of being clipped by that parent's
+   overflow: hidden. Card layout is untouched — this applies only while the
+   thank-you is showing. */
+.preview-thankyou.active {
+  display: flex;
+  align-self: stretch;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 /* Opaque card so the thank-you (and comparison) never clash with a brand
    background image. Fixed dark surface keeps the light text/wordmark legible
    regardless of the Verto's palette. */
@@ -6112,6 +6130,10 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   align-items: center;
   gap: 16px;
   text-align: center;
+  /* Auto margins take the spare room when there is any and collapse to zero
+     when there isn't, so a thank-you that fits stays centred exactly as it was
+     and only a too-tall one starts at the top of its scroll area. */
+  margin-block: auto;
 }
 .preview-thankyou-emoji { font-size: 60px; line-height: 1; }
 .preview-thankyou-title {
