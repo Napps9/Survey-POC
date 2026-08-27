@@ -26,15 +26,4 @@ class OnePagerFaviconTest < ActiveSupport::TestCase
         "one-pagers have drifted apart"
     end
   end
-
-  test "the Webflow kit points at the same mark as a file" do
-    # Served, so it has a host — and 28KB of base64 would more than double a
-    # 20KB reference build.
-    index = Rails.root.join("public/webflow/index.html").read
-    assert_match %r{<link[^>]*rel="icon"[^>]*href="assets/favicon\.svg"}, index,
-      "the kit's reference build declares no favicon"
-    assert_equal Rails.root.join("app/assets/images/favicon.svg").read,
-      Rails.root.join("public/webflow/assets/favicon.svg").read,
-      "the kit's copy of the mark has drifted from the app's"
-  end
 end

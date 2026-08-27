@@ -47,10 +47,11 @@ class PlayerEmbeddingTest < ActionDispatch::IntegrationTest
     assert_equal "frame-ancestors 'self' file:", frame_ancestors
   end
 
-  # The marketing site is on another domain, so hosting the one-pager's demo
-  # there needs that domain named. It's a deploy setting rather than a constant
-  # because the list belongs to whoever owns the domains — see the Webflow kit
-  # in webflow/README.md.
+  # A Verto embedded in a page on another domain — the marketing site, a
+  # partner's page — needs that domain named. It's a deploy setting rather than
+  # a constant because the list belongs to whoever owns the domains, and
+  # `frame-ancestors` is checked against every ancestor rather than only the
+  # immediate parent, so nesting doesn't get you out of naming them.
   test "PLAYER_FRAME_ANCESTORS adds sites without displacing the defaults" do
     with_frame_ancestors("https://www.playverto.com https://playverto.webflow.io") do
       get play_survey_path(survey_with(publish_token: SecureRandom.hex(8)).publish_token)
