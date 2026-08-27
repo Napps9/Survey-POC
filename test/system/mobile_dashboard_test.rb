@@ -4,6 +4,17 @@ require "application_system_test_case"
 # dashboard and the share panel are the first creator surfaces with a real
 # phone layout. Geometry is asserted, not class names — the promise is "a
 # thumb can use this", which is a matter of pixels.
+#
+# Touch-target heights are read with offsetHeight, NOT
+# getBoundingClientRect().height. The rect maps through ancestor transforms
+# and comes back as a float, and .dashboard-card is a composited layer (it
+# carries a transform transition and hover handlers that swap transform),
+# with the hero's gen-orb-drift animations keeping frames flowing behind it.
+# A 44px min-height therefore measures 43.99993896484375 — 44 minus 2^-14,
+# float noise rather than a layout value — often enough to redden CI roughly
+# one run in five. offsetHeight is the integer layout height and is exactly
+# what "is this 44px of thumb" means. The sheet's edge-to-edge geometry below
+# still uses the rect: that one genuinely wants viewport coordinates.
 class MobileDashboardTest < ApplicationSystemTestCase
   PHONE   = [ 390, 844 ].freeze
   DESKTOP = [ 1280, 900 ].freeze
@@ -45,7 +56,7 @@ class MobileDashboardTest < ApplicationSystemTestCase
     # Every action on a tile is at least the iOS touch minimum.
     min_h = evaluate_script(<<~JS)
       Math.min(...[...document.querySelectorAll(".dash-card-actions a, .dash-card-actions button")]
-        .map(el => el.getBoundingClientRect().height))
+        .map(el => el.offsetHeight))
     JS
     assert_operator min_h, :>=, 44, "a tile action came out under 44px"
   end
@@ -73,7 +84,7 @@ class MobileDashboardTest < ApplicationSystemTestCase
     # Copy button + channel chips are touch-sized inside the sheet.
     min_h = evaluate_script(<<~JS)
       Math.min(...[...document.querySelectorAll(".share-modal .share-btn")]
-        .map(el => el.getBoundingClientRect().height))
+        .map(el => el.offsetHeight))
     JS
     assert_operator min_h, :>=, 44, "a share control came out under 44px"
   end

@@ -149,7 +149,19 @@ class AskVertoReplayTest < ApplicationSystemTestCase
     open_ask
     all(".ask-cite").first.click
 
+    # This is the only test here that clicks something *inside* the folder
+    # straight after opening it, and the folder arrives before it has stopped
+    # moving: .ask-panel turns visible the instant is-panel-open lands
+    # (transition-delay: 0s) while the grid column is still animating 0 → 468px
+    # over 0.28s. Capybara will therefore happily click a consent tab that is
+    # at x=1406 in a 1280px viewport — the click lands on nothing, _showPane
+    # never runs, and the pane stays display:none. Wait for the pane the chip
+    # selects, then for the slide, the same as the floating-chrome test below.
+    assert_selector ".ask-paper[data-pane='detail'].is-active"
+    sleep 0.4 # the 0.28s column slide, settled
+
     find(".ask-tab[data-pane='consent']").click
+    assert_selector ".ask-tab[data-pane='consent'].is-active"
 
     within ".ask-paper[data-pane='consent']" do
       assert_text I18n.t("js.ask.consent_opted_in")
