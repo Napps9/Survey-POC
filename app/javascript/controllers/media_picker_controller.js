@@ -20,6 +20,8 @@ export default class extends Controller {
     "focalSection", "focalFrame", "focalImg",
     "cropStage", "cropFrame", "cropImg", "cropZoom",
     "cropHint", "cropHintLegacy", "cropSkipBtn",
+    "posStage", "posFrame", "posImg", "posVideo", "posHint", "posHintVideo", "posCropBtn",
+    "modalTitle",
     "appealBtn", "appealStatus", "approvedSection", "approvedGrid"
   ]
   static values = { url: String, pexsearchUrl: String, moderateUrl: String, cardImageUrl: String, cardLottieUrl: String, libraryUrl: String, theme: String, backgroundRecommended: Array, appealCreateUrl: String, appealsListUrl: String }
@@ -71,12 +73,16 @@ export default class extends Controller {
     // no record stamps none onto the card.
     this._pendingSource = null
     this._pendingCrop = null
-    // The Adjust flow: true while the crop stage is re-editing a card's
-    // existing photo (opened by openAdjustCrop rather than an upload), with
-    // _adjustSource holding the stored original's URL so apply doesn't
+    // The Adjust flow: true while the crop stage is re-editing an existing
+    // picture (reached from the reposition stage rather than from an upload),
+    // with _adjustSource holding the stored original's URL so apply doesn't
     // re-persist bytes the server already has.
     this._adjustMode = false
     this._adjustSource = null
+    // The reposition stage's subject: which card (and, for a tap card, which
+    // statement) is being reframed, what its media is, and the element the
+    // position is painted onto. Null whenever that stage is closed.
+    this._posSlot = null
   }
 
   open(event) {
@@ -225,6 +231,24 @@ export default class extends Controller {
     return this.element.querySelector("[data-gate-cards-target='consentLeft']")
   }
 
+  // Which statement a chip belongs to, taken from the DOM rather than from the
+  // index baked into the markup. option_images is positional and deleting a
+  // statement removes its node without renumbering the chips after it, so a
+  // baked index goes stale the moment a statement is deleted — and pointed the
+  // picker at a different statement than the one whose chip was clicked. DOM
+  // order is the alignment everywhere else (see the serialiser); it is here
+  // too. The attribute stays as the fallback, and as what marks a trigger as
+  // a statement's rather than the card's own.
+  _tapIndexFor(trigger, card) {
+    const rotate = trigger?.closest(".rotate-card")
+    if (rotate && card) {
+      const i = Array.from(card.querySelectorAll(".rotate-card")).indexOf(rotate)
+      if (i >= 0) return i
+    }
+    const raw = parseInt(trigger?.dataset.mediaPickerOptionIndex, 10)
+    return Number.isNaN(raw) ? null : raw
+  }
+
   // Opens the same modal but targets ONE tap-card statement's image instead
   // of the card's own left-panel image/video.
   openTapOption(event) {
@@ -233,8 +257,8 @@ export default class extends Controller {
     const trigger = event?.currentTarget
     const card    = trigger?.closest("[data-survey-editor-target='card']")
                  || trigger?.closest(".survey-card-wrap")
-    const index   = parseInt(trigger?.dataset.mediaPickerOptionIndex, 10)
-    if (!card || Number.isNaN(index)) return
+    const index   = this._tapIndexFor(trigger, card)
+    if (!card || index == null) return
     this._mode = "tapOption"
     this._optionIndex = index
     this._activeCard = card
@@ -283,6 +307,7 @@ export default class extends Controller {
     this._renderApproved([])
     this._clearSearch()
     this._closeCropStage()
+    this._closePosStage()
     document.removeEventListener("keydown", this._escListener)
   }
 
@@ -459,6 +484,7 @@ export default class extends Controller {
       const [ rw, rh ] = this.constructor.CROP_RATIO[this._mode]
       if (this.hasCropFrameTarget) this.cropFrameTarget.style.aspectRatio = `${rw} / ${rh}`
       this._showCropStage(true)
+      this._setModalTitle("crop")
       // The frame's rendered size depends on the aspect-ratio just applied —
       // defer a frame so getBoundingClientRect reflects the real layout.
       requestAnimationFrame(() => this._layoutCrop())
@@ -612,14 +638,19 @@ export default class extends Controller {
   // later Adjust has everything it needs through the legacy path already.
   //
   // In the Adjust flow this button reads "Cancel" (relabelled at open):
-  // the stage is re-editing a photo already on the card, nothing is
-  // pending, and the card must leave exactly as it came.
+  // the stage is re-editing a picture already on the card, nothing is
+  // pending, and the card must leave exactly as it came. Backing out returns
+  // to the reposition stage it was reached from — the creator asked to
+  // reframe, not to leave the modal.
   cropSkip(event) {
     event?.preventDefault()
     if (!this._cropImgEl) return
     if (this._adjustMode) {
+      const backToPos = this._cropFromPos && this._posSlot
       this._closeCropStage()
-      this.close()
+      if (!backToPos) { this.close(); return }
+      this._showPosStage(true)
+      this._setModalTitle("reposition")
       return
     }
     const dataUrl = this._downscaledDataUrl(this._cropImgEl)
@@ -627,33 +658,30 @@ export default class extends Controller {
     this._stashPending(dataUrl)
   }
 
-  // "Adjust crop" on a card that already carries a photo: reopen the crop
-  // stage seeded from the kept original (image_source) and the stored rect
+  // The crop stage reopened against a picture that is already on a card:
+  // seeded from the kept original (image_source) and the stored rect
   // (image_crop), so the frame can move AND widen — the owner's ask was
   // exactly that you shouldn't have to remove and re-upload to re-frame.
-  // On a legacy card (nothing kept — pre-feature uploads, Skip'd uploads)
-  // the current image stands in as the source: reposition and zoom IN are
-  // real, zoom OUT has no pixels to reach, and the hint says so. Applying
-  // from that state promotes the current image to the kept source, so the
-  // NEXT adjust has the full record.
+  // On a legacy slot (nothing kept — pre-feature uploads, Skip'd uploads, and
+  // every tap-card statement) the current image stands in as the source:
+  // reposition and zoom IN are real, zoom OUT has no pixels to reach, and the
+  // hint says so. Applying from that state promotes the current image to the
+  // kept source, so the NEXT adjust of a card hero has the full record.
   //
-  // The stage opens directly — no tabs, no Library, no modal Apply button —
-  // so "Use this crop" applies immediately and "Skip" reads Cancel.
-  openAdjustCrop(event) {
-    event?.preventDefault()
-    event?.stopPropagation()
-    const trigger = event?.currentTarget
-    const card    = trigger?.closest("[data-survey-editor-target='card']")
-                 || trigger?.closest(".survey-card-wrap")
+  // Reached from the reposition stage's "Crop & zoom", which is where the
+  // same-origin check that gates it lives; this is the belt to that brace.
+  // The stage stands alone — no tabs, no Library, no modal Apply button — so
+  // "Use this crop" applies immediately and "Skip" reads Cancel.
+  _beginAdjustCrop(slot) {
+    const card = slot?.card
     if (!card) return
-    const source = card.dataset.cardImageSource || card.dataset.cardImage
-    // Same-origin only (a stored path or inline data URL): drawing a
-    // cross-origin image taints the canvas and the final encode throws.
-    // The fab is hidden for such cards; this is the belt to that brace.
-    if (!source || !(source.startsWith("/") || source.startsWith("data:"))) return
-    const legacy = !card.dataset.cardImageSource
+    // A card hero can re-crop from its kept original; a tap statement has no
+    // such record, so the stored image itself is all there is to draw from.
+    const kept   = slot.kind === "card" ? card.dataset.cardImageSource : ""
+    const source = kept || slot.url
+    if (!this._croppable(source)) return
+    const legacy = !kept
 
-    this._mode = "card"
     this._activeCard = card
     this._pendingUrl = null
     this._pendingVideo = null
@@ -661,8 +689,9 @@ export default class extends Controller {
     this._pendingCrop = null
     // The picture doesn't change identity when its framing does — keep the
     // credit it already carries rather than wiping it with a stale pending.
-    this._pendingCredit    = card.dataset.cardImageCredit || ""
-    this._pendingCreditUrl = card.dataset.cardImageCreditUrl || ""
+    // Only a card hero carries one; a statement image has no credit line.
+    this._pendingCredit    = slot.kind === "card" ? (card.dataset.cardImageCredit || "") : ""
+    this._pendingCreditUrl = slot.kind === "card" ? (card.dataset.cardImageCreditUrl || "") : ""
     this._setApplyEnabled(false)
     this._adjustMode = true
     this._adjustSource = source
@@ -681,6 +710,7 @@ export default class extends Controller {
     // Stage up immediately (empty), THEN decode — opening on image load
     // would flash the picker's tabs for however long the decode takes.
     this._showCropStage(true)
+    this._setModalTitle("crop")
     this.backdropTarget.hidden = false
     document.addEventListener("keydown", this._escListener)
 
@@ -689,7 +719,7 @@ export default class extends Controller {
       if (!this._adjustMode) return // closed while decoding
       this._cropImgEl = img
       if (this.hasCropImgTarget) this.cropImgTarget.src = source
-      const [ rw, rh ] = this.constructor.CROP_RATIO[this._mode]
+      const [ rw, rh ] = this.constructor.CROP_RATIO[this._mode] || this.constructor.CROP_RATIO.card
       if (this.hasCropFrameTarget) this.cropFrameTarget.style.aspectRatio = `${rw} / ${rh}`
       requestAnimationFrame(() => {
         this._layoutCrop()
@@ -700,6 +730,14 @@ export default class extends Controller {
     // and an empty stuck stage would read as broken.
     img.onerror = () => this.close()
     img.src = source
+  }
+
+  // Drawing an image onto a canvas taints it unless it is same-origin, and the
+  // crop stage's final encode then throws — so a stored path or an inline data
+  // URL is croppable and a Pexels CDN URL is not.
+  _croppable(url) {
+    const v = String(url || "")
+    return v.startsWith("/") || v.startsWith("data:")
   }
 
   // Reproduce a stored crop in the stage: scale so the rect's width fills
@@ -725,8 +763,24 @@ export default class extends Controller {
 
   _showCropStage(show) {
     if (this.hasCropStageTarget) this.cropStageTarget.hidden = !show
-    // The crop stage takes over the modal's content area — the normal
-    // tabs/body/foot (Upload/Library, Cancel/Apply) sit this out meanwhile.
+    this._takeOverModal(show)
+  }
+
+  // Which of the modal's jobs the head announces. The head is the only chrome
+  // that survives a stage taking over the body, so leaving it on "Add media"
+  // through a crop or a reposition was the modal claiming to be doing
+  // something else. `key` is a data-*-label on the title element; anything
+  // unnamed falls back to the default.
+  _setModalTitle(key) {
+    if (!this.hasModalTitleTarget) return
+    const el = this.modalTitleTarget
+    const label = el.dataset[`${key}Label`] || el.dataset.defaultLabel
+    if (label) el.textContent = label
+  }
+
+  // A full-height stage (crop or reposition) takes over the modal's content
+  // area — the normal tabs/body/foot (Upload/Library, Cancel/Apply) sit it out.
+  _takeOverModal(show) {
     const tabs = this.element.querySelector(".media-modal-tabs")
     const body = this.element.querySelector(".media-modal-body")
     const foot = this.element.querySelector(".media-modal-foot")
@@ -737,6 +791,7 @@ export default class extends Controller {
 
   _closeCropStage() {
     this._showCropStage(false)
+    this._setModalTitle("default")
     if (this._cropObjectUrl) URL.revokeObjectURL(this._cropObjectUrl)
     this._cropObjectUrl = null
     this._cropImgEl = null
@@ -753,6 +808,332 @@ export default class extends Controller {
       this.cropImgTarget.removeAttribute("src")
       this.cropImgTarget.style.transform = ""
     }
+  }
+
+  // ── Reposition stage ────────────────────────────────────
+  // The non-destructive half of reframing. Nothing is re-encoded: it records
+  // only WHERE the media sits inside the frame that crops it (focal_x/focal_y
+  // on a card hero, one entry of option_focals on a tap statement), which is
+  // the one reframing available to media the crop stage cannot touch — a
+  // Pexels photo (cross-origin, so the canvas tainting kills the encode) or a
+  // video (no canvas path at all, and "no crop on the videos" by request).
+  // That is the whole of "reposition every image and piece of content — at the
+  // moment I can only do it with uploads".
+  //
+  // The frame is sized to the REAL slot the media fills, so a drag here is
+  // what the card will show rather than an approximation of it.
+
+  openAdjust(event) {
+    event?.preventDefault()
+    event?.stopPropagation()
+    const trigger = event?.currentTarget
+    const card    = trigger?.closest("[data-survey-editor-target='card']")
+                 || trigger?.closest(".survey-card-wrap")
+    if (!card) return
+    // A chip inside a statement reframes that statement; the panel fab
+    // reframes the card's own hero.
+    const index = trigger?.closest(".rotate-card") ? this._tapIndexFor(trigger, card) : null
+    const slot  = index == null ? this._cardSlot(card) : this._tapOptionSlot(card, index)
+    if (!slot) return
+
+    // The crop hand-off runs through the ordinary apply path, which keys off
+    // these — set them here so "Crop & zoom" needs no second resolution pass.
+    this._mode = slot.kind
+    this._optionIndex = slot.index
+    this._activeCard = card
+    this._pendingUrl = null
+    this._pendingVideo = null
+    this._pendingSource = null
+    this._pendingCrop = null
+    this._posSlot = slot
+    // Cleared per open, not just per close: the overflow belongs to ONE
+    // picture in ONE frame, and a stale pair would let a drag move media the
+    // new frame doesn't crop. _measurePos fills them back in once the media
+    // reports its natural size.
+    this._posOverflowX = 0
+    this._posOverflowY = 0
+    this._posDragging = false
+    this._cropFromPos = false
+
+    // Crop is for stills the browser will let us redraw. A video is never
+    // croppable and a cross-origin photo cannot be, so the button is simply
+    // absent rather than present-and-failing.
+    if (this.hasPosCropBtnTarget) {
+      this.posCropBtnTarget.hidden = !(slot.type === "image" && this._croppable(slot.url))
+    }
+    const isVideo = slot.type === "video"
+    if (this.hasPosHintTarget) this.posHintTarget.hidden = isVideo
+    if (this.hasPosHintVideoTarget) this.posHintVideoTarget.hidden = !isVideo
+    this._showPosStage(true)
+    this._setModalTitle("reposition")
+    this.backdropTarget.hidden = false
+    document.addEventListener("keydown", this._escListener)
+
+    // Match the stage frame to the slot's own shape, so the crop the creator
+    // is adjusting is the crop they are looking at on the card. A slot with no
+    // measurable box (scrolled out, a card mid-rebuild) falls back to the
+    // nominal ratio for its kind.
+    const rect = slot.measureEl?.getBoundingClientRect()
+    const [ rw, rh ] = (rect && rect.width > 0 && rect.height > 0)
+      ? [ rect.width, rect.height ]
+      : (this.constructor.CROP_RATIO[slot.kind] || this.constructor.CROP_RATIO.card)
+    if (this.hasPosFrameTarget) this.posFrameTarget.style.aspectRatio = `${rw} / ${rh}`
+
+    this._posX = slot.x
+    this._posY = slot.y
+    slot.type === "video" ? this._mountPosVideo(slot) : this._mountPosImage(slot)
+  }
+
+  // The card's own left-panel media: a video if it has one, otherwise its
+  // photo. A Lottie/range panel has neither and never renders the CTA.
+  _cardSlot(card) {
+    const video = card.dataset.cardVideo || ""
+    const image = card.dataset.cardImage || ""
+    if (!video && !image) return null
+    const type = video ? "video" : "image"
+    const el = card.querySelector(type === "video" ? ".split-left-video" : ".split-left-img")
+    return {
+      kind: "card", index: null, type, card, el, measureEl: el,
+      url: video || image,
+      x: this._cardFocal(card, "cardFocalX"),
+      y: this._cardFocal(card, "cardFocalY")
+    }
+  }
+
+  // One tap-card statement's picture. Targets .rotate-card-media (the
+  // server-rendered markup) and falls back to the .rotate-card itself, which
+  // is where type_panel_controller's client-side rebuild paints instead.
+  _tapOptionSlot(card, index) {
+    const url = this._parseUrls(card.dataset.cardOptionImages)[index]
+    if (!url) return null
+    const rotateCard = card.querySelectorAll(".rotate-card")[index]
+    const focal = this._optionFocals(card)[index] || {}
+    return {
+      kind: "tapOption", index, type: "image", card, url,
+      el: rotateCard?.querySelector(".rotate-card-media") || rotateCard || null,
+      // The stack, not the card: tap-stack gives every .rotate-card a resting
+      // transform (translate/scale/rotate), and a rotated box measures wider
+      // and shorter than the card actually is. Every card fills the stack
+      // (position:absolute; inset:0), which carries no transform of its own.
+      measureEl: rotateCard?.closest(".rotate-card-stack") || rotateCard || null,
+      x: this._clampPercent(focal.x),
+      y: this._clampPercent(focal.y)
+    }
+  }
+
+  _cardFocal(card, key) {
+    return this._clampPercent(card?.dataset?.[key])
+  }
+
+  // Centre for anything that isn't a number — never 0, which would silently
+  // pin the frame to an edge (the same posture as Survey.sanitize_focal_percent).
+  _clampPercent(value) {
+    const n = Number(value)
+    return Number.isFinite(n) ? Math.round(Math.min(100, Math.max(0, n))) : 50
+  }
+
+  _optionFocals(card) {
+    try {
+      const focals = JSON.parse(card?.dataset?.cardOptionFocals || "[]")
+      return Array.isArray(focals) ? focals : []
+    } catch (_e) {
+      return []
+    }
+  }
+
+  // Both media types are laid out the same way — cover-fit inside the frame —
+  // so the drag maths only needs the natural size, which is read without ever
+  // touching a canvas. That is what keeps a cross-origin photo repositionable.
+  _mountPosImage(slot) {
+    if (this.hasPosVideoTarget) { this.posVideoTarget.hidden = true; this.posVideoTarget.removeAttribute("src") }
+    if (!this.hasPosImgTarget) return
+    this.posImgTarget.hidden = false
+    this.posImgTarget.style.backgroundImage = `url('${String(slot.url).replace(/'/g, "\\'")}')`
+    this._paintPos()
+    const img = new Image()
+    img.onload = () => this._measurePos(img.naturalWidth, img.naturalHeight)
+    // A picture that won't load leaves the axes unmeasured, so dragging does
+    // nothing rather than flinging the frame around on bogus numbers.
+    img.src = slot.url
+  }
+
+  _mountPosVideo(slot) {
+    if (this.hasPosImgTarget) { this.posImgTarget.hidden = true; this.posImgTarget.style.backgroundImage = "" }
+    if (!this.hasPosVideoTarget) return
+    const vid = this.posVideoTarget
+    vid.hidden = false
+    vid.src = slot.url
+    this._paintPos()
+    vid.onloadedmetadata = () => this._measurePos(vid.videoWidth, vid.videoHeight)
+    // A moving preview is the honest one — the framing is being chosen against
+    // the clip, not its first frame. Autoplay refusal just leaves it paused.
+    vid.play?.()?.catch(() => { /* paused preview is fine */ })
+  }
+
+  // Natural size + the frame's measured box give the cover-fit overflow on
+  // each axis: how many pixels of the picture are hidden there. Zero overflow
+  // means that axis isn't cropped at all, and dragging it is a no-op.
+  _measurePos(naturalW, naturalH) {
+    if (!this.hasPosFrameTarget || !(naturalW > 0) || !(naturalH > 0)) return
+    const rect = this.posFrameTarget.getBoundingClientRect()
+    const fw = rect.width, fh = rect.height
+    if (!(fw > 0) || !(fh > 0)) return
+    const scale = Math.max(fw / naturalW, fh / naturalH)
+    this._posOverflowX = Math.max(0, naturalW * scale - fw)
+    this._posOverflowY = Math.max(0, naturalH * scale - fh)
+  }
+
+  _paintPos() {
+    const value = `${this._posX}% ${this._posY}%`
+    if (this.hasPosImgTarget)   this.posImgTarget.style.backgroundPosition = value
+    if (this.hasPosVideoTarget) this.posVideoTarget.style.objectPosition = value
+  }
+
+  posDragStart(event) {
+    if (!this._posSlot) return
+    event.preventDefault()
+    try { this.posFrameTarget.setPointerCapture?.(event.pointerId) } catch (_e) { /* no-op */ }
+    this._posDragging = true
+    this._posDragStartX = event.clientX
+    this._posDragStartY = event.clientY
+    this._posOriginX = this._posX
+    this._posOriginY = this._posY
+  }
+
+  // Dragging RIGHT moves the picture right, revealing more of its left side —
+  // which is a SMALLER background-position percentage. Hence the subtraction:
+  // the picture follows the pointer, which is the only behaviour that reads as
+  // "drag the image", and it matches the mobile-header drag above.
+  posDrag(event) {
+    if (!this._posDragging) return
+    event.preventDefault()
+    const overX = this._posOverflowX || 0
+    const overY = this._posOverflowY || 0
+    if (overX > 0) {
+      this._posX = this._clampPercent(this._posOriginX - ((event.clientX - this._posDragStartX) / overX) * 100)
+    }
+    if (overY > 0) {
+      this._posY = this._clampPercent(this._posOriginY - ((event.clientY - this._posDragStartY) / overY) * 100)
+    }
+    this._paintPos()
+  }
+
+  posDragEnd(event) {
+    if (!this._posDragging) return
+    this._posDragging = false
+    try { this.posFrameTarget.releasePointerCapture?.(event.pointerId) } catch (_e) { /* no-op */ }
+  }
+
+  // Save: the card only learns about the new framing here, so backing out
+  // needs no undo — the stage is the preview, not the card.
+  posApply(event) {
+    event?.preventDefault()
+    const slot = this._posSlot
+    if (!slot) return
+    if (slot.kind === "tapOption") this._writeOptionFocal(slot.card, slot.index, this._posX, this._posY)
+    else this._writeCardFocal(slot.card, this._posX, this._posY)
+    this._notifyDirty()
+    this.close()
+  }
+
+  posCancel(event) {
+    event?.preventDefault()
+    this.close()
+  }
+
+  // Hand off to the destructive stage, for the media that can take it. Coming
+  // back out of it returns here rather than closing the modal — the creator
+  // asked to reframe, not to leave.
+  posToCrop(event) {
+    event?.preventDefault()
+    const slot = this._posSlot
+    if (!slot || slot.type !== "image" || !this._croppable(slot.url)) return
+    this._cropFromPos = true
+    this._showPosStage(false)
+    this._beginAdjustCrop(slot)
+  }
+
+  _showPosStage(show) {
+    if (this.hasPosStageTarget) this.posStageTarget.hidden = !show
+    this._takeOverModal(show)
+    if (show) return
+    // Stop the preview the moment the stage stands down: a <video> left with a
+    // src goes on buffering behind a hidden element.
+    if (this.hasPosVideoTarget) {
+      this.posVideoTarget.pause?.()
+      this.posVideoTarget.onloadedmetadata = null
+      this.posVideoTarget.removeAttribute("src")
+      this.posVideoTarget.load?.()
+    }
+  }
+
+  _closePosStage() {
+    this._showPosStage(false)
+    this._setModalTitle("default")
+    this._posSlot = null
+    this._posDragging = false
+    this._posOverflowX = 0
+    this._posOverflowY = 0
+    this._cropFromPos = false
+    if (this.hasPosImgTarget) this.posImgTarget.style.backgroundImage = ""
+  }
+
+  // The card hero's focal pair. Written onto the row (what autosave reads) and
+  // painted straight onto the live panel, so the two can never disagree.
+  _writeCardFocal(card, x, y) {
+    if (!card) return
+    this._setFocalDataset(card, x, y)
+    this._paintCardFocal(card)
+  }
+
+  _setFocalDataset(card, x, y) {
+    // 50 is the default everywhere — stored as nothing, so a reset-to-centre
+    // leaves no attribute for the serialiser or the sanitiser to carry.
+    if (this._clampPercent(x) === 50) delete card.dataset.cardFocalX
+    else card.dataset.cardFocalX = String(this._clampPercent(x))
+    if (this._clampPercent(y) === 50) delete card.dataset.cardFocalY
+    else card.dataset.cardFocalY = String(this._clampPercent(y))
+  }
+
+  // Both media elements read the same two custom properties (see
+  // .split-left-img / .split-left-video), so one painter covers photo and video.
+  _paintCardFocal(card) {
+    const x = this._cardFocal(card, "cardFocalX")
+    const y = this._cardFocal(card, "cardFocalY")
+    card.querySelectorAll(".split-left-img, .split-left-video").forEach(el => {
+      el.style.setProperty("--focal-x", `${x}%`)
+      el.style.setProperty("--focal-y", `${y}%`)
+    })
+  }
+
+  // One statement's focal pair, positional against option_images exactly like
+  // the images themselves. A centred slot is stored as null rather than a
+  // {50,50} pair, so an untouched deck serialises to nothing.
+  _writeOptionFocal(card, index, x, y) {
+    if (!card || !Number.isInteger(index)) return
+    const focals = this._optionFocals(card)
+    while (focals.length <= index) focals.push(null)
+    const cx = this._clampPercent(x)
+    const cy = this._clampPercent(y)
+    focals[index] = (cx === 50 && cy === 50) ? null : { x: cx, y: cy }
+    this._storeOptionFocals(card, focals)
+    this._paintOptionFocal(card, index, cx, cy)
+  }
+
+  _storeOptionFocals(card, focals) {
+    while (focals.length && focals[focals.length - 1] == null) focals.pop()
+    if (focals.length) card.dataset.cardOptionFocals = JSON.stringify(focals)
+    else delete card.dataset.cardOptionFocals
+  }
+
+  // The statement's media layer is painted with the `background` SHORTHAND
+  // (server render and client rebuild alike), so setting the longhand after it
+  // is what moves the picture without disturbing its url or its white base.
+  _paintOptionFocal(card, index, x, y) {
+    const rotateCard = card.querySelectorAll(".rotate-card")[index]
+    if (!rotateCard) return
+    const target = rotateCard.querySelector(".rotate-card-media") || rotateCard
+    target.style.backgroundPosition = `${x}% ${y}%`
   }
 
   _readAsDataUrl(file, done = this._stashPending.bind(this)) {
@@ -1546,11 +1927,22 @@ export default class extends Controller {
     images[index] = url || ""
     card.dataset.cardOptionImages = JSON.stringify(images)
 
+    // A different picture in the slot — or none — has nothing to do with where
+    // the old one was framed, so that statement's stored position goes with it.
+    const focals = this._optionFocals(card)
+    if (index < focals.length) {
+      focals[index] = null
+      this._storeOptionFocals(card, focals)
+    }
+    this._syncTapAdjustBtn(card, index)
+
     const rotateCard = card.querySelectorAll(".rotate-card")[index]
     if (!rotateCard) return
     const target = rotateCard.querySelector(".rotate-card-media") || rotateCard
     if (url) {
-      target.style.background = `#fff url('${url.replace(/'/g, "\\'")}') center/cover no-repeat`
+      // The shorthand resets background-position with it, which is exactly
+      // right here: the slot is back to centre.
+      target.style.background = `#fff url('${url.replace(/'/g, "\\'")}') 50% 50%/cover no-repeat`
     } else {
       const [ a, b ] = this.constructor.TAP_OPTION_FILLS[index % this.constructor.TAP_OPTION_FILLS.length]
       target.style.background = `linear-gradient(135deg,${a},${b})`
@@ -1558,9 +1950,13 @@ export default class extends Controller {
   }
 
   _setCardImage(card, url, credit = "", creditUrl = "", media = {}) {
-    // A different picture has a different subject, so an old mobile-header
-    // focal point is meaningless against it — back to centre.
-    if (card) delete card.dataset.cardFocalY
+    // A different picture has a different subject, so an old focal point is
+    // meaningless against it — back to centre on both axes. A re-crop lands
+    // here too, and its framing is baked into the new pixels.
+    if (card) {
+      delete card.dataset.cardFocalX
+      delete card.dataset.cardFocalY
+    }
     // "Animate asset" is a preference, not tied to one specific photo, so it
     // survives swapping to a different picture — cleared only when the card
     // ends up with no picture at all.
@@ -1602,6 +1998,10 @@ export default class extends Controller {
         left.prepend(imgEl)
       }
       imgEl.style.backgroundImage = `url('${url.replace(/'/g, "\\'")}')`
+      // Back to centre on the element too — the dataset was cleared above, and
+      // a stale --focal-* left inline would frame the new picture by the old
+      // one's rules until the next server render.
+      this._paintCardFocal(card)
       if (!ovEl) {
         ovEl = document.createElement("div")
         ovEl.className = "split-left-overlay"
@@ -1616,17 +2016,25 @@ export default class extends Controller {
     }
   }
 
-  // The "Adjust crop" fab is server-rendered on photo-capable cards and
-  // shown only while the card carries a photo the crop stage can actually
-  // reopen — same-origin (a stored path or data URL), because drawing a
-  // cross-origin image (a Pexels pick) taints the canvas and the final
-  // encode throws. Kept in sync here so a just-applied upload gets its fab
-  // without waiting for the next server render.
+  // The "Reposition" fab is server-rendered on media-capable cards and shown
+  // whenever the card actually carries media. No origin test any more: the
+  // stage it opens repositions rather than re-encodes, so a Pexels photo and a
+  // video are as adjustable as an upload — the same-origin rule now gates only
+  // the "Crop & zoom" button inside it. Kept in sync here so just-applied
+  // media gets its fab without waiting for the next server render.
   _syncAdjustFab(card) {
-    const fab = card?.querySelector(".adjust-crop-fab")
+    const fab = card?.querySelector(".media-adjust-fab")
     if (!fab) return
-    const url = card.dataset.cardImage || ""
-    fab.hidden = !(url.startsWith("/") || url.startsWith("data:"))
+    fab.hidden = !(card.dataset.cardImage || card.dataset.cardVideo)
+  }
+
+  // The same rule for one tap statement's chip: it exists only where there is
+  // a picture to move (a statement with no image renders a gradient).
+  _syncTapAdjustBtn(card, index) {
+    const rotateCard = card?.querySelectorAll(".rotate-card")?.[index]
+    const btn = rotateCard?.querySelector(".tap-card-adjust-btn")
+    if (!btn) return
+    btn.hidden = !this._parseUrls(card.dataset.cardOptionImages)[index]
   }
 
   // Swap a card's left panel to an autoplaying video, mirroring the server
@@ -1635,6 +2043,12 @@ export default class extends Controller {
     card.dataset.cardVideo = video || ""
     card.dataset.cardVideoPoster = poster || ""
     card.dataset.cardImage = ""
+    // Different footage, different subject — the focal pair goes back to
+    // centre exactly as it does for a swapped photo. The new <video> below is
+    // built without inline properties, so it starts centred either way; this
+    // keeps the row saying the same thing.
+    delete card.dataset.cardFocalX
+    delete card.dataset.cardFocalY
     // No photo, no re-crop record — see _setCardImage.
     delete card.dataset.cardImageSource
     delete card.dataset.cardImageCrop
@@ -1743,13 +2157,16 @@ export default class extends Controller {
     frame.addEventListener("pointercancel", stop)
   }
 
+  // Shares the reposition stage's writer, so the two controls that can move a
+  // card's photo vertically leave the row in exactly the same state — this one
+  // simply holds the horizontal axis where it already was.
   _writeFocal(y) {
     const card = this._activeCard
     if (!card) return
-    card.dataset.cardFocalY = String(y)
-    // Repaint the card's own hero at once — the custom property is what the
+    this._setFocalDataset(card, this._cardFocal(card, "cardFocalX"), y)
+    // Repaint the card's own hero at once — the custom properties are what the
     // mobile and device frames crop against.
-    card.querySelector(".split-left-img")?.style.setProperty("--focal-y", `${y}%`)
+    this._paintCardFocal(card)
     this._notifyDirty()
   }
 
@@ -1907,6 +2324,10 @@ export default class extends Controller {
   _setCardLottie(card, url) {
     card.dataset.cardLottie = url || ""
     card.dataset.cardImage = ""
+    // An animation fills the panel on its own terms — there is no cover-crop
+    // for a focal point to move, so the card stops carrying one.
+    delete card.dataset.cardFocalX
+    delete card.dataset.cardFocalY
     // No photo, no re-crop record — see _setCardImage.
     delete card.dataset.cardImageSource
     delete card.dataset.cardImageCrop

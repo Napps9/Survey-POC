@@ -1045,6 +1045,13 @@ pl:
     focal_label: "Pozycja nagłówka mobilnego"
     focal_hint: "Przeciągnij w górę lub w dół"
     focal_note: "Dotyczy tylko nagłówka na telefonach — pełny obraz jest zachowany, więc możesz to zmienić w każdej chwili."
+    reposition: "Zmień położenie"
+    reposition_title: "Zmień kadr multimediów tej karty — przeciągnij, aby przesunąć, albo przytnij i powiększ zdjęcie"
+    reposition_statement_title: "Przesuń lub przytnij obraz tego stwierdzenia"
+    reposition_hint: "Przeciągnij obraz, aby wybrać, co pokazuje kadr. Całe zdjęcie zostaje zachowane, więc możesz to zmienić w dowolnym momencie."
+    reposition_hint_video: "Przeciągnij film, aby wybrać, co pokazuje kadr. Filmy można przesuwać, ale nie da się ich przycinać."
+    reposition_crop: "Przytnij i powiększ"
+    reposition_apply: "Zapisz położenie"
     required_chip: 'Wymagane'
     ty_title_label: 'Tytuł podziękowania'
     ty_body_label: 'Wiadomość podziękowania'

@@ -315,13 +315,44 @@ module ApplicationHelper
     "background:linear-gradient(135deg, #{BrandPalette.lighten(hex, 0.18)}, #{hex});"
   end
 
-  # Where the card's image sits vertically in the mobile header strip, as a
-  # percentage for background-position. 50 (centre) unless the creator has
-  # dragged it.
+  # Where the card's media sits inside whatever frame crops it, as percentages
+  # for background-position (a photo) or object-position (a video). 50 (centre)
+  # on an axis the creator hasn't dragged.
+  #
+  # Vertical bites where the frame is wider than the media — the mobile header
+  # strip and the editor's device frames. Horizontal bites the other way round,
+  # which is the ordinary desktop panel: a 9:16 photo in a taller-than-9:16
+  # column is cropped left and right, and until this axis existed there was no
+  # way to say which side to keep.
   def card_focal_y(card)
+    card_focal_axis(card, "focal_y")
+  end
+
+  def card_focal_x(card)
+    card_focal_axis(card, "focal_x")
+  end
+
+  def card_focal_axis(card, key)
     return 50 unless card.is_a?(Hash)
-    y = card["focal_y"]
-    y.presence ? y.to_f.clamp(0, 100).round : 50
+    v = card[key]
+    v.presence ? v.to_f.clamp(0, 100).round : 50
+  end
+
+  # The pair as custom properties, for the elements whose CSS reads them. Emitted
+  # whole rather than only when moved: the editor rewrites these live as the
+  # creator drags, and a property that isn't on the element to start with has
+  # nothing for the fallback to be replaced on.
+  def card_focal_style(card)
+    "--focal-x: #{card_focal_x(card)}%; --focal-y: #{card_focal_y(card)}%;"
+  end
+
+  # One tap-card statement's reposition, as the `position` term of the
+  # `background` shorthand its media layer is painted with. "50% 50%" (centre,
+  # the historic value) unless that statement has been dragged.
+  def option_focal_position(card, index)
+    focal = Array(card.is_a?(Hash) ? card["option_focals"] : nil)[index]
+    return "50% 50%" unless focal.is_a?(Hash)
+    "#{card_focal_axis(focal, 'x')}% #{card_focal_axis(focal, 'y')}%"
   end
 
   # A card's animation backdrop, as an inline style for .split-left. An image

@@ -1,15 +1,18 @@
 require "application_system_test_case"
 require "chunky_png"
 
-# "Adjust crop" (Feedback 17): re-edit an applied image's crop instead of
-# removing and re-uploading. The crop stage's single final encode destroys
-# the pixels outside the frame, so cropApply now also keeps the uncropped
-# original (image_source) and the crop's place in it (image_crop, fractions
-# of the natural size); openAdjustCrop reopens the stage seeded from both —
-# which is what makes zooming back OUT possible at all. A legacy card (a
-# Skip'd upload, anything pre-feature) has no source: Adjust still opens,
-# against the stored image itself, and says plainly that it can only
-# reposition or zoom in.
+# Re-cropping an applied image instead of removing and re-uploading it
+# (Feedback 17). The crop stage's single final encode destroys the pixels
+# outside the frame, so cropApply also keeps the uncropped original
+# (image_source) and the crop's place in it (image_crop, fractions of the
+# natural size); reopening the stage seeds from both — which is what makes
+# zooming back OUT possible at all. A legacy card (a Skip'd upload, anything
+# pre-feature) has no source: it still opens, against the stored image itself,
+# and says plainly that it can only reposition or zoom in.
+#
+# The stage is reached through Reposition → "Crop & zoom" now, rather than by
+# its own fab: crop is the half of reframing that only a same-origin still can
+# have, so it sits behind the one that every image and video can.
 #
 # Upload mechanics (Node#set, PointerEvents, the rAF waits) follow
 # image_crop_test.rb — see the comments there for why each is what it is.
@@ -64,6 +67,14 @@ class ImageRecropTest < ApplicationSystemTestCase
     )
   end
 
+  # Reposition is the entry point; "Crop & zoom" is the hand-off inside it.
+  def open_crop_via_reposition
+    find(".survey-card-wrap[data-card-type='open_ended'] .media-adjust-fab").click
+    assert_selector "[data-media-picker-target='posStage']", visible: true
+    click_button "Crop & zoom"
+    wait_for_crop_stage
+  end
+
   def apply_and_wait
     click_button "Apply"
     assert_no_selector ".media-modal-backdrop", visible: true
@@ -115,7 +126,7 @@ class ImageRecropTest < ApplicationSystemTestCase
 
       # The fab revealed itself for the just-applied image — no server render
       # has happened since the page loaded without one.
-      assert_selector ".survey-card-wrap[data-card-type='open_ended'] .adjust-crop-fab", visible: true
+      assert_selector ".survey-card-wrap[data-card-type='open_ended'] .media-adjust-fab", visible: true
 
       # …and autosave will carry the record: the serializer reads it off the
       # card's dataset the same way it reads the image itself.
@@ -134,8 +145,7 @@ class ImageRecropTest < ApplicationSystemTestCase
 
       # Adjust: the stage reopens seeded to the stored crop — zoomed in past
       # cover-fit, exactly where "Use this crop" left it.
-      find(".survey-card-wrap[data-card-type='open_ended'] .adjust-crop-fab").click
-      wait_for_crop_stage
+      open_crop_via_reposition
       seeded = evaluate_script("(() => { const c = #{picker_controller_js}; return c._cropScale / c._cropMinScale })()")
       assert_in_delta 1.6, seeded, 0.1,
                       "Adjust should reopen AT the stored crop, not reset to cover-fit"
@@ -173,8 +183,7 @@ class ImageRecropTest < ApplicationSystemTestCase
 
       # Adjust still works — against the stored image, which caps zoom-out —
       # and the stage says so instead of a slider that silently stops.
-      find(".survey-card-wrap[data-card-type='open_ended'] .adjust-crop-fab").click
-      wait_for_crop_stage
+      open_crop_via_reposition
       assert_selector "[data-media-picker-target='cropHintLegacy']", visible: true
       hidden = evaluate_script("document.querySelector(\"[data-media-picker-target='cropHint']\").hidden")
       assert hidden, "the ordinary hint should stand aside for the legacy one"
@@ -182,12 +191,18 @@ class ImageRecropTest < ApplicationSystemTestCase
       assert_equal "Cancel", skip_label,
                    "with nothing pending, skipping the Adjust stage is backing out — the button must say so"
 
-      # Cancel leaves the card exactly as it came.
+      # Cancel steps BACK to the reposition stage it was reached from — the
+      # creator asked to reframe, not to leave the modal — and a second cancel
+      # leaves the card exactly as it came.
       before = card_dataset("cardImage")
+      click_button "Cancel"
+      assert_selector "[data-media-picker-target='posStage']", visible: true
+      assert_no_selector "[data-media-picker-target='cropStage']", visible: true
       click_button "Cancel"
       assert_no_selector ".media-modal-backdrop", visible: true
       assert_equal before, card_dataset("cardImage")
       assert card_dataset("cardImageSource").blank?
+      refute card_dataset("cardFocalX").present?, "backing out must not reposition the card either"
     end
   end
 end

@@ -15,12 +15,6 @@
   has_media  = has_video || has_img
   credit_word = has_video ? "Video by" : "Photo by"
   animate_asset = card["animate_asset"] == true
-  # "Adjust crop" only works on a photo the crop stage can redraw: same-origin
-  # (a stored path or inline data URL) — a Pexels URL taints the canvas and
-  # the final encode throws. media_picker#_syncAdjustFab applies the same rule
-  # client-side when the photo changes without a server render.
-  can_adjust_crop = editable && has_img && !has_video &&
-                    card["image"].to_s.match?(%r{\A(/|data:)})
 %>
 
 <%# The animation backdrop (card["media_bg"]) paints only where an animation
@@ -50,19 +44,29 @@
     <% if has_video %>
       <%# Autoplaying, looped, muted card video. preload="none" + poster keeps
           off-screen cards at zero bytes; the autoplay-video controller plays
-          only while the card is on screen and pauses otherwise. %>
+          only while the card is on screen and pauses otherwise.
+
+          A landscape clip in a portrait panel is cropped exactly like a photo,
+          so it reads the same focal pair — via object-position, since the video
+          is a real element rather than a painted background. Cropping it is not
+          on the table (there is no canvas re-encode for a video), which is why
+          "no crop on the videos" costs nothing: repositioning is the whole of
+          what a video needs. %>
       <video class="split-left-video"<%= " data-card-media".html_safe if editable %>
              muted loop playsinline autoplay preload="none"
              data-controller="autoplay-video"
+             style="<%= card_focal_style(card) %>"
              <% if card["video_poster"].present? %>poster="<%= card["video_poster"] %>"<% end %>>
         <source src="<%= card["video"] %>" type="video/mp4">
       </video>
     <% else %>
-      <%# --focal-y only bites where the frame crops vertically — the mobile
-          header strip — so desktop is unaffected by it. %>
+      <%# Each axis bites only where the frame crops that way: --focal-y in the
+          mobile header strip and the device frames, --focal-x in the ordinary
+          desktop panel. Both are always emitted so the editor's live drag has
+          a property to rewrite. %>
       <div class="split-left-img"<%= " data-card-media".html_safe if editable %>
            data-controller="bg-image-healer"
-           style="background-image:url('<%= card["image"] %>'); --focal-y: <%= card_focal_y(card) %>%;"></div>
+           style="background-image:url('<%= card["image"] %>'); <%= card_focal_style(card) %>"></div>
     <% end %>
     <div class="split-left-overlay"<%= " data-card-media".html_safe if editable %>></div>
     <%# Subtle creator credit (Pexels picks). Doubles as the link back to
@@ -139,11 +143,12 @@
         </button>
       </div>
     <% elsif has_media %>
-      <%# A photo card gets a second control: reopen the crop stage against
-          the kept original (or the image itself, for legacy cards) instead
-          of remove-and-reupload — Feedback 17. Rendered for video cards too
-          but hidden, so swapping video → photo in the editor finds it ready
-          (the same reason the design prompt below stays in the DOM). %>
+      <%# A card with media gets a second control: reframe what is already
+          there instead of remove-and-reupload — Feedback 17, widened to "every
+          image and piece of content", which is why it is no longer gated on
+          the picture having been an upload. Drag to reposition works on any
+          photo and on a video; the crop-and-zoom hand-off inside the stage is
+          the part that needs a same-origin still. %>
       <div class="split-left-cta-row">
         <button type="button" class="add-media-fab"
                 data-action="click->media-picker#open"
@@ -151,11 +156,16 @@
           <span class="add-media-fab-plus">＋</span>
           <span><%= t("editor.change_media") %></span>
         </button>
-        <button type="button" class="add-bg-fab adjust-crop-fab"
-                data-action="click->media-picker#openAdjustCrop"
-                title="<%= t("editor.adjust_crop_title", default: "Reframe this card's photo — move and zoom the crop") %>"
-                <%= "hidden".html_safe unless can_adjust_crop %>>
-          <span><%= t("editor.adjust_crop", default: "Adjust crop") %></span>
+        <%# Always shown in this branch: reaching it means the panel carries a
+            photo or a video, and repositioning is a stored background/object
+            position rather than a re-encode — so unlike the crop it opens onto,
+            it works on a Pexels URL and on a clip just as well as an upload.
+            media_picker#_syncAdjustFab applies the same rule client-side when
+            the media changes without a server render. %>
+        <button type="button" class="add-bg-fab media-adjust-fab"
+                data-action="click->media-picker#openAdjust"
+                title="<%= t("editor.reposition_title", default: "Reframe this card's media — drag to reposition, or crop and zoom a photo") %>">
+          <span><%= t("editor.reposition", default: "Reposition") %></span>
         </button>
       </div>
     <% else %>
@@ -166,15 +176,15 @@
         <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
         <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
       </button>
-      <%# Hidden until an upload lands on this card without a server render —
+      <%# Hidden until media lands on this card without a server render —
           media_picker#_syncAdjustFab reveals it, the same stays-in-the-DOM
           contract as the design prompt above. %>
       <div class="split-left-cta-row">
-        <button type="button" class="add-bg-fab adjust-crop-fab"
-                data-action="click->media-picker#openAdjustCrop"
-                title="<%= t("editor.adjust_crop_title", default: "Reframe this card's photo — move and zoom the crop") %>"
+        <button type="button" class="add-bg-fab media-adjust-fab"
+                data-action="click->media-picker#openAdjust"
+                title="<%= t("editor.reposition_title", default: "Reframe this card's media — drag to reposition, or crop and zoom a photo") %>"
                 hidden>
-          <span><%= t("editor.adjust_crop", default: "Adjust crop") %></span>
+          <span><%= t("editor.reposition", default: "Reposition") %></span>
         </button>
       </div>
     <% end %>

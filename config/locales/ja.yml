@@ -1043,6 +1043,13 @@ ja:
     focal_label: "モバイルヘッダーの位置"
     focal_hint: "上下にドラッグ"
     focal_note: "スマートフォンのヘッダーにのみ影響します。元の画像はそのまま残るので、いつでも変更できます。"
+    reposition: "位置を調整"
+    reposition_title: "このカードのメディアを再構図する — ドラッグして位置を変えるか、写真を切り抜いて拡大します"
+    reposition_statement_title: "この文の画像の位置調整または切り抜き"
+    reposition_hint: "画像をドラッグして、枠に表示する部分を選びます。元の画像はそのまま保持されるので、いつでも変更できます。"
+    reposition_hint_video: "動画をドラッグして、枠に表示する部分を選びます。動画は位置の調整はできますが、切り抜きはできません。"
+    reposition_crop: "切り抜き・拡大"
+    reposition_apply: "位置を保存"
     required_chip: '必須'
     ty_title_label: 'サンクスのタイトル'
     ty_body_label: 'サンクスのメッセージ'

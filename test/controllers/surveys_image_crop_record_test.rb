@@ -112,4 +112,45 @@ class SurveysImageCropRecordTest < ActionDispatch::IntegrationTest
     assert_equal SOURCE, card["image_source"]
     assert_nil card["image_crop"]
   end
+
+  # ── The reposition, through the same PATCH ────────────────────────────────
+  # Crop is the reframing only a same-origin still can have; reposition is the
+  # one everything can, which is why it — not the crop — is what "reposition
+  # every image and piece of content" is built on.
+
+  PEXELS_PHOTO = "https://images.pexels.com/photos/9/pexels-photo-9.jpeg".freeze
+  PEXELS_CLIP  = "https://videos.pexels.com/video-files/9/hd.mp4".freeze
+
+  test "a card's focal pair survives a save, on a photo and on a video alike" do
+    card = patch_cards([ { type: "multiple_choice", text: "Q", options: [ "A" ],
+                           image: PEXELS_PHOTO, focal_x: 22, focal_y: 78 } ])
+    assert_equal 22, card["focal_x"], "a stock photo is exactly what the crop stage cannot reframe"
+    assert_equal 78, card["focal_y"]
+
+    card = patch_cards([ { type: "multiple_choice", text: "Q", options: [ "A" ],
+                           video: PEXELS_CLIP, focal_x: 12, focal_y: 34 } ])
+    assert_equal 12, card["focal_x"]
+    assert_equal 34, card["focal_y"]
+    assert_equal PEXELS_CLIP, card["video"]
+  end
+
+  test "per-statement repositions survive a save, aligned with their images" do
+    card = patch_cards([ { type: "tap_card", text: "Q", options: %w[a b],
+                           option_images: [ PEXELS_PHOTO, PEXELS_PHOTO ],
+                           option_focals: [ nil, { x: 15, y: 85 } ] } ])
+
+    assert_equal [ nil, { "x" => 15, "y" => 85 } ], card["option_focals"]
+  end
+
+  test "a populate/shuffle pick clears the previous picture's framing too" do
+    # Same reasoning as the re-crop record above: a focal point describes one
+    # photograph's subject, and on the next picture it is a shove, not a
+    # setting.
+    card = { "image" => IMAGE, "focal_x" => 10, "focal_y" => 90 }
+    AssetPopulator.new(@survey).apply_card_media(card, { "image" => PEXELS_PHOTO })
+
+    assert_equal PEXELS_PHOTO, card["image"]
+    assert_nil card["focal_x"]
+    assert_nil card["focal_y"]
+  end
 end

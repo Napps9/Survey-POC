@@ -1043,6 +1043,13 @@ de:
     focal_label: "Position der mobilen Kopfzeile"
     focal_hint: "Nach oben oder unten ziehen"
     focal_note: "Betrifft nur die Kopfzeile auf Telefonen — das vollständige Bild bleibt erhalten, du kannst das jederzeit ändern."
+    reposition: "Neu positionieren"
+    reposition_title: "Medien dieser Karte neu ausrichten — zum Verschieben ziehen oder ein Foto zuschneiden und zoomen"
+    reposition_statement_title: "Bild dieser Aussage neu positionieren oder zuschneiden"
+    reposition_hint: "Ziehe das Bild, um zu bestimmen, was der Rahmen zeigt. Das ganze Bild bleibt erhalten, du kannst das jederzeit ändern."
+    reposition_hint_video: "Ziehe das Video, um zu bestimmen, was der Rahmen zeigt. Videos lassen sich verschieben, aber nicht zuschneiden."
+    reposition_crop: "Zuschneiden & zoomen"
+    reposition_apply: "Position speichern"
     required_chip: 'Pflicht'
     ty_title_label: 'Titel der Dankeschön-Seite'
     ty_body_label: 'Nachricht der Dankeschön-Seite'

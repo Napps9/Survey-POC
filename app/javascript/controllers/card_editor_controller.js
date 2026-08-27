@@ -50,9 +50,10 @@ export default class extends Controller {
     }
   }
 
-  // Splice the doomed statement's image out of the card's positional array, so
-  // the array and the statements stay aligned. Called BEFORE the node is
-  // removed, while its position among its siblings is still readable.
+  // Splice the doomed statement's image — and the reposition that belongs to
+  // it — out of the card's positional arrays, so they and the statements stay
+  // aligned. Called BEFORE the node is removed, while its position among its
+  // siblings is still readable.
   _dropOptionImageAt(item) {
     const card = item.closest("[data-survey-editor-target='card']")
     if (!card) return
@@ -60,6 +61,20 @@ export default class extends Controller {
     const siblings = Array.from(card.querySelectorAll(".rotate-card"))
     const index = siblings.indexOf(item)
     if (index < 0) return
+
+    // option_focals shifts for exactly the reason option_images does: leave it
+    // and every remaining statement inherits the framing of the one before it,
+    // invisibly until a reload. Trailing nulls are trimmed off with it, so a
+    // card whose only repositioned statement has just gone stops carrying the
+    // attribute at all.
+    let focals = []
+    try { focals = JSON.parse(card.dataset.cardOptionFocals || "[]") } catch (_) { focals = [] }
+    if (Array.isArray(focals) && index < focals.length) {
+      focals.splice(index, 1)
+      while (focals.length && focals[focals.length - 1] == null) focals.pop()
+      if (focals.length) card.dataset.cardOptionFocals = JSON.stringify(focals)
+      else delete card.dataset.cardOptionFocals
+    }
 
     let images = []
     try { images = JSON.parse(card.dataset.cardOptionImages || "[]") } catch (_) { return }
@@ -115,9 +130,19 @@ export default class extends Controller {
     const mediaBg = newImage
       ? `#fff url('${newImage}') center/cover no-repeat`
       : `linear-gradient(135deg,${SWIPE_FILLS[n % SWIPE_FILLS.length].join(",")})`
+    // Both image chips, matching _card_component.html.erb and type_panel's
+    // rebuild. This markup used to carry only the delete ×, so a statement
+    // added in the editor was the one statement whose picture could not be
+    // changed — or, now, repositioned — until the page was reloaded.
     card.innerHTML = `
       <div class="rotate-card-media" style="background:${mediaBg}"></div>
       <div class="rotate-card-statement"><span contenteditable="true">New statement</span></div>
+      <button type="button" class="tap-card-image-btn" data-action="click->media-picker#openTapOption" data-media-picker-option-index="${n}" title="${esc(t("editor.change_statement_image_title"))}" aria-label="${esc(t("editor.change_statement_image_title"))}">
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
+      </button>
+      <button type="button" class="tap-card-adjust-btn" data-action="click->media-picker#openAdjust" data-media-picker-option-index="${n}" title="${esc(t("editor.reposition_statement_title"))}" aria-label="${esc(t("editor.reposition_statement_title"))}"${newImage ? "" : " hidden"}>
+        <span aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"></path><path d="M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3"></path></svg></span>
+      </button>
       <button type="button" class="tap-card-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
     `
     stack.appendChild(card)

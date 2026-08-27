@@ -29,6 +29,13 @@ class I18nJsExportTest < ActionDispatch::IntegrationTest
 
     # curated editor/player keys the consent-gate builder mirrors from the ERB
     assert_equal I18n.t("editor.consent_agreement_kicker"), data.dig("editor", "consent_agreement_kicker")
+    # The tap-card statement chips. Both are built client-side — by
+    # type_panel's tap_card COMPONENT on a type switch and by
+    # card_editor#addTapOption on a new statement — so a slice that loses
+    # either turns the chip's tooltip into "editor.reposition_statement_title"
+    # with nothing else visibly wrong.
+    assert_equal I18n.t("editor.change_statement_image_title"), data.dig("editor", "change_statement_image_title")
+    assert_equal I18n.t("editor.reposition_statement_title"), data.dig("editor", "reposition_statement_title")
     assert_equal I18n.t("player.consent_agree"), data.dig("player", "consent_agree")
     assert_equal I18n.t("player.visit_website"), data.dig("player", "visit_website")
   end

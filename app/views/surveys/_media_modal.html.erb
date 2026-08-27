@@ -6,7 +6,16 @@
   <div class="media-modal" data-media-picker-target="modal">
 
     <div class="media-modal-head">
-      <div class="media-modal-title">Add media</div>
+      <%# The head stays put while a stage takes over the body, so it is the one
+          thing telling a creator which of the modal's jobs they are in. It used
+          to read "Add media" through the crop stage as well, which is how you
+          end up cropping under a heading for something you are not doing.
+          media-picker swaps it per stage and puts it back on close. %>
+      <div class="media-modal-title"
+           data-media-picker-target="modalTitle"
+           data-default-label="Add media"
+           data-reposition-label="<%= t("editor.reposition", default: "Reposition") %>"
+           data-crop-label="<%= t("editor.reposition_crop", default: "Crop & zoom") %>">Add media</div>
       <button type="button" class="media-modal-close"
               data-action="click->media-picker#close"
               aria-label="Close">✕</button>
@@ -305,6 +314,40 @@
               data-media-picker-target="applyBtn"
               data-action="click->media-picker#applyImage"
               disabled>Apply</button>
+    </div>
+
+    <%# Reposition stage — the entry point for "Reposition" on a card panel and
+        for the chip beside a tap statement's image. Unlike the crop stage it
+        re-encodes nothing: it stores WHERE the media sits in the frame, which
+        is the only reframing a cross-origin photo or a video can have, and is
+        why every image on a card can now be moved rather than only uploads.
+        The frame is sized to the real slot the media fills, so the drag is
+        what the card will show. "Crop & zoom" hands off to the stage below,
+        and is present only for a same-origin still. %>
+    <div class="media-pos-stage" data-media-picker-target="posStage" hidden>
+      <div class="media-pos-frame"
+           data-media-picker-target="posFrame"
+           data-action="pointerdown->media-picker#posDragStart pointermove->media-picker#posDrag pointerup->media-picker#posDragEnd pointercancel->media-picker#posDragEnd">
+        <div class="media-pos-img" data-media-picker-target="posImg" hidden></div>
+        <video class="media-pos-video" data-media-picker-target="posVideo"
+               muted loop playsinline preload="metadata" hidden></video>
+      </div>
+      <%# Two hints rather than one built in JS, the same way the crop stage
+          carries its legacy note: the strings stay in the locale files and out
+          of the browser payload. The video one says plainly why there is no
+          Crop button beside it. %>
+      <div class="media-pos-hint" data-media-picker-target="posHint"><%= t("editor.reposition_hint", default: "Drag the picture to choose what the frame shows. The whole image is kept, so you can change this any time.") %></div>
+      <div class="media-pos-hint" data-media-picker-target="posHintVideo" hidden><%= t("editor.reposition_hint_video", default: "Drag the video to choose what the frame shows. Videos can be repositioned but not cropped.") %></div>
+      <div class="media-pos-actions">
+        <button type="button" class="media-btn-ghost media-pos-crop-btn"
+                data-media-picker-target="posCropBtn"
+                data-action="click->media-picker#posToCrop"
+                hidden><%= t("editor.reposition_crop", default: "Crop & zoom") %></button>
+        <button type="button" class="media-btn-ghost"
+                data-action="click->media-picker#posCancel"><%= t("editor.crop_cancel", default: "Cancel") %></button>
+        <button type="button" class="media-btn-primary"
+                data-action="click->media-picker#posApply"><%= t("editor.reposition_apply", default: "Save position") %></button>
+      </div>
     </div>
 
     <%# Crop stage — shown after choosing an upload for a fixed-ratio slot

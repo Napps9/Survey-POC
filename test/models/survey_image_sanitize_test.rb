@@ -450,4 +450,104 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
                 "focal_y" => "top; background:url(evil)" } ]
     refute Survey.sanitize_cards_images!(cards).first.key?("focal_y")
   end
+
+  # ── The horizontal axis, and video (reposition, not crop) ──────────────
+  # "I need the ability in the editor to reposition every image and piece of
+  # content — at the moment I can only do it with uploads." The crop stage can
+  # only redraw a same-origin still, so a Pexels photo and a video had no
+  # reframing at all. A stored position has no such limit, which is why it is
+  # the axis that got widened rather than the crop.
+
+  test "focal_x is kept alongside focal_y on a card with an image" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH,
+                "focal_x" => 20, "focal_y" => 80 } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal 20, out["focal_x"]
+    assert_equal 80, out["focal_y"]
+  end
+
+  test "focal_x is clamped and rounded like focal_y" do
+    [ [ -40, 0 ], [ 33.4, 33 ], [ 180, 100 ] ].each do |given, want|
+      cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "focal_x" => given } ]
+      assert_equal want, Survey.sanitize_cards_images!(cards).first["focal_x"],
+                   "focal_x #{given.inspect} should clamp to #{want}"
+    end
+  end
+
+  test "a centred or junk focal_x is dropped rather than stored" do
+    [ 50, "left; background:url(evil)", nil ].each do |given|
+      cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => ASSET_PATH, "focal_x" => given } ]
+      refute Survey.sanitize_cards_images!(cards).first.key?("focal_x"),
+             "focal_x #{given.inspect} should not be stored"
+    end
+  end
+
+  # A Pexels photo is exactly the case the crop stage cannot serve — drawing it
+  # on a canvas taints the canvas — so it is the case a reposition has to.
+  test "a focal point survives on a card whose image is a remote Pexels URL" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => PEXELS_URL,
+                "focal_x" => 25, "focal_y" => 75 } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal 25, out["focal_x"]
+    assert_equal 75, out["focal_y"]
+  end
+
+  test "a focal point is kept on a video card, which can be moved but never cropped" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "video" => VIDEO_URL,
+                "focal_x" => 30, "focal_y" => 10 } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    assert_equal 30, out["focal_x"]
+    assert_equal 10, out["focal_y"]
+  end
+
+  test "a focal point dies with the media it describes" do
+    cards = [ { "type" => "multiple_choice", "text" => "Q", "video" => "https://evil.example.com/x.mp4",
+                "focal_x" => 30, "focal_y" => 10 } ]
+    out = Survey.sanitize_cards_images!(cards).first
+    refute out.key?("focal_x"), "a rejected video leaves nothing to position"
+    refute out.key?("focal_y")
+  end
+
+  # ── Per-statement repositions (option_focals) ──────────────────────────
+  # Positional against option_images, exactly like the images themselves.
+
+  test "option_focals keeps a moved statement and nils the rest" do
+    cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a b],
+                "option_images" => [ ASSET_PATH, PEXELS_URL ],
+                "option_focals" => [ nil, { "x" => 20, "y" => 90 } ] } ]
+    assert_equal [ nil, { "x" => 20, "y" => 90 } ],
+                 Survey.sanitize_cards_images!(cards).first["option_focals"]
+  end
+
+  test "option_focals fills in a missing axis rather than dropping the pair" do
+    cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a],
+                "option_images" => [ ASSET_PATH ], "option_focals" => [ { "y" => 12 } ] } ]
+    assert_equal [ { "x" => 50, "y" => 12 } ],
+                 Survey.sanitize_cards_images!(cards).first["option_focals"]
+  end
+
+  test "option_focals is bounded by the images it positions" do
+    cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a b],
+                "option_images" => [ ASSET_PATH, "" ],
+                "option_focals" => [ { "x" => 10, "y" => 10 }, { "x" => 90, "y" => 90 }, { "x" => 5, "y" => 5 } ] } ]
+    assert_equal [ { "x" => 10, "y" => 10 } ],
+                 Survey.sanitize_cards_images!(cards).first["option_focals"],
+                 "a slot with no picture, and a slot past the end, can't carry a position"
+  end
+
+  test "an all-centre or junk option_focals is dropped rather than stored" do
+    [ [ { "x" => 50, "y" => 50 } ], [ nil ], [ "50% 50%" ], "left", nil ].each do |given|
+      cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a],
+                  "option_images" => [ ASSET_PATH ], "option_focals" => given } ]
+      refute Survey.sanitize_cards_images!(cards).first.key?("option_focals"),
+             "option_focals #{given.inspect} says nothing and should not be stored"
+    end
+  end
+
+  test "option_focals dies with the images it positions" do
+    cards = [ { "type" => "tap_card", "text" => "Q", "options" => %w[a],
+                "option_images" => [ "https://evil.example.com/x.jpg" ],
+                "option_focals" => [ { "x" => 10, "y" => 10 } ] } ]
+    refute Survey.sanitize_cards_images!(cards).first.key?("option_focals")
+  end
 end

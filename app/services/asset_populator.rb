@@ -408,6 +408,9 @@ class AssetPopulator
         end
         if card["type"].to_s == "tap_card"
           new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
+          # Fresh statement pictures, so the per-statement repositions chosen
+          # for the old ones go with them — same reasoning as apply_card_media.
+          new_card.delete("option_focals")
         end
         if card["type"].to_s == "range"
           new_card["range_theme"] = pick_range_theme(idx)
@@ -439,9 +442,15 @@ class AssetPopulator
     # A populate/shuffle puts a DIFFERENT picture on the card, so the editor's
     # re-crop record (the pre-crop original of the old upload, and the crop
     # taken from it) describes pixels that are no longer there. Left behind,
-    # "Adjust crop" would reopen the previous photo underneath the new one.
+    # "Crop & zoom" would reopen the previous photo underneath the new one.
     card.delete("image_source")
     card.delete("image_crop")
+    # And the same for the reposition: a focal point is a statement about one
+    # photograph's subject. Carried onto the next picture it is not a setting,
+    # it is a shove — the new photo would arrive already off-centre for no
+    # reason the creator could see.
+    card.delete("focal_x")
+    card.delete("focal_y")
     if picked["video"].present?
       card["video"]        = picked["video"]
       card["video_poster"] = picked["video_poster"]

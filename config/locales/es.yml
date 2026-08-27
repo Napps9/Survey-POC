@@ -1043,6 +1043,13 @@ es:
     focal_label: "Posición del encabezado móvil"
     focal_hint: "Arrastra hacia arriba o abajo"
     focal_note: "Solo afecta al encabezado en móviles: se conserva la imagen completa, así que puedes cambiarlo cuando quieras."
+    reposition: "Reposicionar"
+    reposition_title: "Reencuadra el contenido de esta tarjeta: arrastra para reposicionar, o recorta y amplía una foto"
+    reposition_statement_title: "Reposicionar o recortar la imagen de esta afirmación"
+    reposition_hint: "Arrastra la imagen para elegir lo que muestra el marco. Se conserva la imagen completa, así que puedes cambiarlo cuando quieras."
+    reposition_hint_video: "Arrastra el vídeo para elegir lo que muestra el marco. Los vídeos se pueden reposicionar, pero no recortar."
+    reposition_crop: "Recortar y ampliar"
+    reposition_apply: "Guardar posición"
     required_chip: 'Obligatoria'
     ty_title_label: 'Título de agradecimiento'
     ty_body_label: 'Mensaje de agradecimiento'
