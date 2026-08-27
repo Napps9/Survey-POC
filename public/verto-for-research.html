@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- verto-for-research one-pager · build 2026-08-27-a · view-source and check this line to confirm
+<!-- verto-for-research one-pager · build 2026-08-27-b · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-08-27-a">
+<html lang="en" data-build="2026-08-27-b">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -974,6 +974,34 @@
   .device-row .phone-mockup{ flex: 0 0 clamp(140px, 22%, 200px); }
   .device-row .phone-caption{ font-size: 0.72rem; }
 
+  /* The ask. See the submit handler for why this composes a mail rather than
+     posting anywhere. */
+  .ask-form{ display: grid; gap: 0.85rem; margin-top: 1.3rem; text-align: left; }
+  .ask-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+  .ask-form label{
+    display: grid; gap: 0.3rem;
+    font-size: 0.8rem; font-weight: 600; color: var(--text);
+  }
+  .ask-form input, .ask-form textarea{
+    font: inherit; font-weight: 400;
+    padding: 0.6rem 0.7rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+  }
+  .ask-form textarea{ resize: vertical; }
+  .ask-form input:focus-visible, .ask-form textarea:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .ask-form .btn{ justify-self: start; margin-top: 0.2rem; }
+  .ask-fallback{ font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+
+  @media (max-width: 640px){
+    .ask-row{ grid-template-columns: 1fr; }
+  }
+
   /* Copy that only makes sense on one of the two layouts. */
   .on-mobile{ display: none; }
 
@@ -1079,14 +1107,14 @@
     <a href="#finish" class="nav-link">High Completion Rates</a>
     <a href="#how" class="nav-link">How it works</a>
     <a href="#limits" class="nav-link">What we don't do</a>
-    <a href="#honest" class="nav-link">What we haven't done</a>
+    <a href="#ask" class="nav-link">Get in Touch</a>
   </nav>
   <main>
 
     <div class="hero">
       <div class="eyebrow">VertoNow · A proposal for Strategic Analytics</div>
       <h1>VertoNow turns your interview<br><span>into a three-minute link.</span></h1>
-      <p class="sub">For firms that run their own primary research. Your 100&#8211;150 depth interviews don't change, but contact list also gets a second way in to answer.</p>
+      <p class="sub">Your 100&#8211;150 depth interviews don't change, but contact list also gets a second way in to answer.</p>
       <div class="hero-ctas">
         <a href="#try" class="btn btn-primary">Play a live one &#8594;</a>
         <span class="hero-note">3 minutes, right here on this page.</span>
@@ -1208,16 +1236,32 @@
       </div>
     </section>
 
-    <section id="honest">
-      <div class="section-index">05 &#8212; What we haven't done</div>
-      <h2>What we haven't done</h2>
-
-      <p class="lede">Those completion rates are consumer and education. We have not yet run one against a list of industrial specifiers, and we're not going to pretend that ice cream predicts fluid sealing.</p>
+    <section id="ask">
+      <div class="section-index">05 &#8212; Get in Touch</div>
+      <h2>Get in Touch today</h2>
 
       <div class="cta-panel">
-        <h3>That's why we build the first one free</h3>
-        <p>We want that number as much as you do, and you should see it before you commit to anything.</p>
-        <a href="mailto:michael@playverto.com?subject=VertoNow%20for%20Strategic%20Analytics" class="btn btn-primary">Get started with Michael &#8594;</a>
+        <h3>We build the first one free</h3>
+        <p>You should see your own completion rate before you commit to anything.</p>
+
+        <form class="ask-form" id="askForm">
+          <div class="ask-row">
+            <label>Name
+              <input type="text" name="name" required autocomplete="name">
+            </label>
+            <label>Company
+              <input type="text" name="company" autocomplete="organization">
+            </label>
+          </div>
+          <label>Email
+            <input type="email" name="email" required autocomplete="email">
+          </label>
+          <label>What would you like to measure?
+            <textarea name="message" rows="3"></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary">Get in touch &#8594;</button>
+          <p class="ask-fallback">Or email <a href="mailto:michael@playverto.com">michael@playverto.com</a> directly.</p>
+        </form>
       </div>
     </section>
 
@@ -1231,7 +1275,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('Verto for research one-pager · build 2026-08-27-a');
+  console.info('Verto for research one-pager · build 2026-08-27-b');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
@@ -1634,6 +1678,29 @@
   }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
 
   sections.forEach(s => observer.observe(s));
+  // The ask has no server to post to: this page is opened from disk at least as
+  // often as it is served, so a form posting to app.playverto.com would be
+  // cross-origin from a downloaded copy and simply fail for the reader most
+  // likely to have been sent it. Composing a mail works identically in both
+  // places, and adds no unauthenticated endpoint that could be used to send
+  // mail in Play Verto's name. The visible mailto beneath is the fallback for
+  // anyone whose browser can't hand off to a mail client.
+  const askForm = document.getElementById('askForm');
+  askForm?.addEventListener('submit', (e) => {
+    e.preventDefault();                       // required fields are already enforced
+    const f = new FormData(askForm);
+    const val = (k) => (f.get(k) || '').toString().trim();
+    const body = [
+      'Name: ' + val('name'),
+      'Company: ' + val('company'),
+      'Email: ' + val('email'),
+      '',
+      val('message')
+    ].join('\n');
+    window.location.href = 'mailto:michael@playverto.com'
+      + '?subject=' + encodeURIComponent('VertoNow enquiry \u2014 ' + (val('company') || val('name')))
+      + '&body=' + encodeURIComponent(body);
+  });
 </script>
 </body>
 </html>
