@@ -81,6 +81,15 @@ he:
     token_enabled_label: 'שאלה זו מזכה בנקודות'
     token_award_hint: "ניתנות רק על מענה"
     token_checkpoint_placeholder: "מציג את הנקודות שהשחקן צבר עד כה."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "מספר התשובות שניתן לבחור"
+    max_choices_all: "הכול"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "בחרו עד %{n}"
     eyebrow:
       range: "גרור את המחוון"
       rating: "הקש כדי לדרג"
@@ -491,6 +500,7 @@ he:
         option_long: "קצר את «%{opt}» ל-%{max} תווים או פחות."
         phone_hero: "%{n} אריחים — בטלפון תמונת הכרטיס תיעלם כדי לפנות להם מקום. פחות מ-7 שומר על שניהם."
         phone_scroll: "%{n} אריחים — יותר מדי לטלפון: האפשרויות ייגללו והתמונה תיעלם. כוון ל-6 או פחות."
+        max_choices_below_correct: "מוגבל ל-%{n} תשובות אך %{correct} מסומנות כנכונות — אי אפשר לסמן את הקבוצה הנכונה."
         page_empty: "הוסף לפחות עמוד אחד לסיפור."
         page_ok: "%{n} עמודים — בטווח האידיאלי %{min}–%{max}."
         page_many: "%{n} עמודים — קצר ל-%{max} או פחות כדי שהסיפור לא יימשך."

@@ -81,6 +81,15 @@ uk:
     token_enabled_label: 'Це питання нараховує бали'
     token_award_hint: "Нараховуються просто за відповідь"
     token_checkpoint_placeholder: "Показує бали, які гравець зібрав на цей момент."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Скільки відповідей можна обрати"
+    max_choices_all: "Усі"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Оберіть не більше %{n}"
     eyebrow:
       range: "Перетягніть повзунок"
       rating: "Торкніться, щоб оцінити"
@@ -491,6 +500,7 @@ uk:
         option_long: "Скоротіть «%{opt}» до %{max} символів або менше."
         phone_hero: "%{n} плиток — на телефоні зображення картки прибирається, щоб вони вмістилися. Менше 7 зберігає обидва."
         phone_scroll: "%{n} плиток — забагато для телефона: варіанти прокручуються, а зображення зникає. Орієнтуйтеся на 6 або менше."
+        max_choices_below_correct: "Обмеження — %{n} відповіді, але правильними позначено %{correct}: обрати правильний набір неможливо."
         page_empty: "Додайте до історії принаймні одну сторінку."
         page_ok: "%{n} стор. — в ідеальному діапазоні %{min}–%{max}."
         page_many: "%{n} стор. — скоротіть до %{max} або менше, щоб історія не затягувалася."

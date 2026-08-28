@@ -81,6 +81,15 @@ ar:
     token_enabled_label: 'هذا السؤال يمنح نقاطًا'
     token_award_hint: "تُمنح لمجرد الإجابة"
     token_checkpoint_placeholder: "يعرض النقاط التي جمعها اللاعب حتى الآن."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "عدد الإجابات المسموح باختيارها"
+    max_choices_all: "الكل"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "اختر ما يصل إلى %{n}"
     eyebrow:
       range: "اسحب شريط التمرير"
       rating: "اضغط للتقييم"
@@ -491,6 +500,7 @@ ar:
         option_long: "اختصر «%{opt}» إلى %{max} حرفًا أو أقل."
         phone_hero: "%{n} مربعات — سيحذف الهاتف صورة البطاقة لعرضها. أقل من 7 يبقي الاثنين."
         phone_scroll: "%{n} مربعات — كثيرة على الهاتف: ستحتاج الخيارات إلى التمرير وتختفي صورة البطاقة. استهدف 6 أو أقل."
+        max_choices_below_correct: "الحد الأقصى %{n} إجابات لكن %{correct} مُعلَّمة صحيحة — لا أحد يستطيع اختيار المجموعة الصحيحة."
         page_empty: "أضف صفحة واحدة على الأقل إلى القصة."
         page_ok: "%{n} صفحات — ضمن النطاق المثالي %{min}–%{max}."
         page_many: "%{n} صفحات — قلّصها إلى %{max} أو أقل حتى لا تطول القصة."

@@ -81,6 +81,15 @@ id:
     token_enabled_label: 'Pertanyaan ini memberi poin'
     token_award_hint: "Didapat hanya karena menjawab"
     token_checkpoint_placeholder: "Menampilkan poin yang telah dikumpulkan pemain sejauh ini."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Jawaban yang boleh dipilih"
+    max_choices_all: "Semua"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Pilih maksimal %{n}"
     eyebrow:
       range: "Seret slider"
       rating: "Ketuk untuk menilai"
@@ -491,6 +500,7 @@ id:
         option_long: "Persingkat “%{opt}” menjadi %{max} karakter atau kurang."
         phone_hero: "%{n} ubin — di ponsel gambar kartu dilepas agar muat. Kurang dari 7 mempertahankan keduanya."
         phone_scroll: "%{n} ubin — terlalu banyak untuk ponsel: opsi harus digulir dan gambar kartu hilang. Targetkan 6 atau kurang."
+        max_choices_below_correct: "Dibatasi %{n} jawaban, tetapi %{correct} ditandai benar — kombinasi yang benar tak bisa dipilih."
         page_empty: "Tambahkan setidaknya satu halaman ke cerita."
         page_ok: "%{n} halaman — dalam rentang ideal %{min}–%{max}."
         page_many: "%{n} halaman — pangkas jadi %{max} atau kurang agar cerita tidak bertele-tele."

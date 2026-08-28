@@ -81,6 +81,15 @@ nl:
     token_enabled_label: 'Deze vraag geeft punten'
     token_award_hint: "Verdiend door simpelweg te antwoorden"
     token_checkpoint_placeholder: "Toont de punten die een speler tot nu toe heeft verzameld."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Antwoorden die ze mogen kiezen"
+    max_choices_all: "Alle"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Kies er maximaal %{n}"
     eyebrow:
       range: "Sleep de schuifregelaar"
       rating: "Tik om te beoordelen"
@@ -491,6 +500,7 @@ nl:
         option_long: "Kort “%{opt}” in tot %{max} tekens of minder."
         phone_hero: "%{n} tegels — op een telefoon vervalt de kaartafbeelding om ze te laten passen. Minder dan 7 behoudt beide."
         phone_scroll: "%{n} tegels — te veel voor een telefoon: de opties scrollen en de kaartafbeelding vervalt. Streef naar 6 of minder."
+        max_choices_below_correct: "Beperkt tot %{n} antwoorden, maar %{correct} zijn als juist gemarkeerd — de juiste set is niet aan te vinken."
         page_empty: "Voeg minstens één pagina toe aan het verhaal."
         page_ok: "%{n} pagina's — binnen het ideale bereik %{min}–%{max}."
         page_many: "%{n} pagina's — beperk tot %{max} of minder zodat het verhaal niet gaat slepen."

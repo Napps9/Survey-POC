@@ -81,6 +81,15 @@ xh:
     token_enabled_label: 'Lo mbuzo unika amanqaku'
     token_award_hint: "Anikwa nje ngokuphendula"
     token_checkpoint_placeholder: "Ibonisa amanqaku umdlali awakhile ukuza kuthi ga ngoku."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Iimpendulo abanokuzikhetha"
+    max_choices_all: "Zonke"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Khetha ukuya kuma-%{n}"
     eyebrow:
       range: "Tsala isilayidi"
       rating: "Chukumisa ukumisela isiqingatha"
@@ -507,6 +516,7 @@ xh:
         option_long: "Finyeza “%{opt}” ukuya kutsho kwiimpawu ezingu-%{max} okanye ngaphantsi."
         phone_hero: "Amaxande angu-%{n} — kwifowuni umfanekiso wekhadi uya kususwa ukuze afakeke. Ngaphantsi kwe-7 kugcina zombini."
         phone_scroll: "Amaxande angu-%{n} — maninzi kakhulu kwifowuni: iinketho ziya kutyibiliza kwaye umfanekiso wekhadi uzokushiywa. Jonga ku-6 okanye ngaphantsi."
+        max_choices_below_correct: "Kunomda weempendulo ezingu-%{n} kodwa ezingu-%{correct} ziphawulwe njengezichanekileyo — akukho namnye onokukhetha iseti echanekileyo."
         page_empty: "Yongeza ubuncinane iphepha elinye kwibali."
         page_ok: "Amaphepha angu-%{n} — phakathi kwe-%{min}–%{max} eyeyona ilungileyo."
         page_many: "Amaphepha angu-%{n} — nciphisa ukuya kutsho ku-%{max} okanye ngaphantsi ukuze ibali lingabi lide kakhulu."

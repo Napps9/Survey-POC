@@ -81,6 +81,15 @@ ru:
     token_enabled_label: 'Этот вопрос начисляет баллы'
     token_award_hint: "Начисляются просто за ответ"
     token_checkpoint_placeholder: "Показывает баллы, которые игрок набрал на данный момент."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Сколько ответов можно выбрать"
+    max_choices_all: "Все"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Выберите не более %{n}"
     eyebrow:
       range: "Перетащите ползунок"
       rating: "Нажмите, чтобы оценить"
@@ -491,6 +500,7 @@ ru:
         option_long: "Сократите «%{opt}» до %{max} символов или меньше."
         phone_hero: "%{n} плиток — на телефоне изображение карточки убирается, чтобы они поместились. Меньше 7 сохраняет и то и другое."
         phone_scroll: "%{n} плиток — слишком много для телефона: варианты прокручиваются, изображение убирается. Оставьте 6 или меньше."
+        max_choices_below_correct: "Ограничение — %{n} ответа, но правильными отмечены %{correct}: выбрать верный набор невозможно."
         page_empty: "Добавьте в историю хотя бы одну страницу."
         page_ok: "%{n} стр. — в идеальном диапазоне %{min}–%{max}."
         page_many: "%{n} стр. — сократите до %{max} или меньше, чтобы история не затягивалась."

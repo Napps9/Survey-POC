@@ -73,6 +73,10 @@
      <% if card['common_question_id'].present? %>data-card-common-question-id="<%= card['common_question_id'] %>"<% end %>
      <% if card['common_question_set_id'].present? %>data-card-common-question-set-id="<%= card['common_question_set_id'] %>"<% end %>
      <% if card['range_theme'].present? %>data-card-range-theme="<%= card['range_theme'] %>"<% end %>
+     <%# How many answers a respondent may tick on this card. Absent = no limit,
+         which is what keeps "as many as there are answers" true when the option
+         list grows — see Survey::MULTI_SELECT_TYPES. %>
+     <% if card['max_choices'].present? %>data-card-max-choices="<%= card['max_choices'] %>"<% end %>
      <% if card['slider_axis'].present? %>data-card-slider-axis="<%= card['slider_axis'] %>"<% end %>
      data-card-competency="<%= card['competency'].to_s %>"
      data-card-outcome="<%= card['outcome'].to_s %>"

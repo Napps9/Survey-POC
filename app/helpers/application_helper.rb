@@ -253,7 +253,13 @@ module ApplicationHelper
       CardTypes.all.each_with_object({}) do |(key, attrs), out|
         next if attrs["eyebrow"].blank?
         out[key] = I18n.t("card.eyebrow.#{key}", locale: loc, default: attrs["eyebrow"])
-      end
+      end.merge(
+        # A capped multi-select's caption names the cap instead of the type, so
+        # the JS writers need the TEMPLATE per locale — they interpolate it
+        # themselves (lib/card_eyebrow.js). Keyed with a leading underscore
+        # because every other key here is a real card type and none has one.
+        "_max" => I18n.t("card.eyebrow_max", locale: loc, default: "Choose up to %{n}")
+      )
     end
   end
 

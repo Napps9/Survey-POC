@@ -81,6 +81,15 @@ ko:
     token_enabled_label: '이 문항은 점수를 부여합니다'
     token_award_hint: "답변만 해도 받을 수 있어요"
     token_checkpoint_placeholder: "플레이어가 지금까지 모은 포인트를 보여줍니다."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "선택할 수 있는 답변 수"
+    max_choices_all: "전체"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "최대 %{n}개 선택"
     eyebrow:
       range: "슬라이더를 드래그하세요"
       rating: "탭해서 평가하세요"
@@ -491,6 +500,7 @@ ko:
         option_long: "“%{opt}”을(를) %{max}자 이하로 줄이세요."
         phone_hero: "%{n}개 타일 — 휴대폰에서는 이를 담기 위해 카드 이미지가 사라집니다. 7개 미만이면 둘 다 유지됩니다."
         phone_scroll: "%{n}개 타일 — 휴대폰에는 너무 많습니다. 선택지가 스크롤되고 카드 이미지도 사라집니다. 6개 이하를 권합니다."
+        max_choices_below_correct: "답변은 %{n}개까지인데 정답은 %{correct}개입니다 — 정답 조합을 고를 수 없습니다."
         page_empty: "스토리에 최소 한 페이지를 추가하세요."
         page_ok: "%{n}페이지 — 이상적인 범위 %{min}–%{max} 이내입니다."
         page_many: "%{n}페이지 — 스토리가 늘어지지 않도록 %{max}페이지 이하로 줄이세요."

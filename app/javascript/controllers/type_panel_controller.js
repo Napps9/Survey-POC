@@ -9,6 +9,7 @@ import { resolveResponses, fans } from "lib/tap_scales"
 import { injectIcons } from "lib/option_icons"
 import { optionMediaStyle } from "lib/option_media"
 import { t } from "lib/i18n"
+import { cardEyebrow, MULTI_SELECT_TYPES } from "lib/card_eyebrow"
 
 
 
@@ -193,7 +194,7 @@ function fitTier(score) {
 // HTML builders for the right-side interactive component on each card
 const COMPONENTS = {
   multiple_choice: (opts, ctx = {}) => choiceListHtml(opts, "single", ctx.optionStyles),
-  select_many:     (opts, ctx = {}) => choiceListHtml(opts, "multi", ctx.optionStyles),
+  select_many:     (opts, ctx = {}) => choiceListHtml(opts, "multi", ctx.optionStyles, ctx.maxChoices),
   prioritise:      (opts, ctx = {}) => prioritiseHtml(opts, ctx.optionStyles),
 
   yes_no: (opts, ctx = {}) => {
@@ -206,7 +207,7 @@ const COMPONENTS = {
   },
 
   select_one_grid:  (opts, ctx = {}) => gridHtml(opts, "single", ctx.optionStyles),
-  select_many_grid: (opts, ctx = {}) => gridHtml(opts, "multi", ctx.optionStyles),
+  select_many_grid: (opts, ctx = {}) => gridHtml(opts, "multi", ctx.optionStyles, ctx.maxChoices),
 
   // Mirrors the "when tap_card" branch in _card_component.html.erb. It had
   // drifted badly — a bare <span> where the partial has a media layer and a
@@ -473,20 +474,20 @@ function prioritiseHtml(opts, styles = []) {
     </ul>`
 }
 
-function choiceListHtml(opts, mode, styles = []) {
+function choiceListHtml(opts, mode, styles = [], max = 0) {
   return `
     <ul class="choice-list choice-list--${mode}" data-controller="picker card-editor"
-        data-picker-mode-value="${mode}">
+        data-picker-mode-value="${mode}" data-picker-max-value="${max || 0}">
       ${opts.map((o, i) => choiceListItemHtml(o, i, mode, styles[i])).join("")}${addOptionBtnHtml()}
     </ul>`
 }
 
-function gridHtml(opts, mode, styles = []) {
+function gridHtml(opts, mode, styles = [], max = 0) {
   // Always two columns — three shrinks the tiles and labels too far, whatever
   // the option count (keep in step with _card_component's grid branch).
   return `
     <ul class="choice-grid choice-grid--${mode} choice-grid-2" data-controller="picker"
-        data-picker-mode-value="${mode}">
+        data-picker-mode-value="${mode}" data-picker-max-value="${max || 0}">
       ${opts.map((o, i) => choiceGridItemHtml(o, i, styles[i])).join("")}
     </ul>`
 }
@@ -1242,9 +1243,17 @@ export default class extends Controller {
     const badge = card.querySelector(".s-badge")
     if (badge) { badge.textContent = meta.badge; badge.className = `s-badge ${meta.css}` }
 
+    // A tick ceiling belongs to the multi-select types alone, so leaving the
+    // old type's number on the card would have the picker — and the caption
+    // below — go on advertising a cap the new type can't honour. The server
+    // sanitiser would drop it on the next save; the creator is looking at the
+    // card NOW.
+    if (!MULTI_SELECT_TYPES.includes(type)) delete card.dataset.cardMaxChoices
+
     const eyebrow = card.querySelector(".q-eyebrow")
     if (eyebrow) {
-      eyebrow.textContent = (this.eyebrows[this.defaultLocaleValue] || {})[type] || meta.eyebrow
+      eyebrow.textContent = cardEyebrow(this.eyebrows, this.defaultLocaleValue, type,
+                                        card.dataset.cardMaxChoices, meta.eyebrow)
     }
 
     // 2. Swap the interactive component HTML on the RIGHT panel
@@ -1259,6 +1268,9 @@ export default class extends Controller {
         rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,
         rangeTheme:      card.dataset.cardRangeTheme || "",
+        // Only the two multi-select builders read this; it is cleared above for
+        // every other type, so a switch away drops the cap with the markup.
+        maxChoices:      parseInt(card.dataset.cardMaxChoices, 10) || 0,
         sliderAxis:      card.dataset.cardSliderAxis || "auto",
         pages:           this._pagesFor(card, type),
         optionImages:    this._optionImagesFor(card, type),

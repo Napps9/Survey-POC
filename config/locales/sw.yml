@@ -81,6 +81,15 @@ sw:
     token_enabled_label: 'Swali hili linatoa pointi'
     token_award_hint: "Zinatolewa kwa kujibu tu"
     token_checkpoint_placeholder: "Inaonyesha pointi ambazo mchezaji amekusanya hadi sasa."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Majibu wanayoweza kuchagua"
+    max_choices_all: "Zote"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Chagua hadi %{n}"
     eyebrow:
       range: "Buruta kitelezi"
       rating: "Gusa ili kukadiria"
@@ -491,6 +500,7 @@ sw:
         option_long: "Fupisha “%{opt}” hadi herufi %{max} au chini."
         phone_hero: "Vigae %{n} — kwenye simu picha ya kadi itaondolewa ili vitoshee. Chini ya 7 huhifadhi vyote viwili."
         phone_scroll: "Vigae %{n} — vingi mno kwa simu: chaguo zitasogezwa na picha ya kadi itaondoka. Lenga 6 au chini."
+        max_choices_below_correct: "Imewekewa kikomo cha majibu %{n} lakini %{correct} yamewekwa alama ya usahihi — hakuna anayeweza kuchagua seti sahihi."
         page_empty: "Ongeza angalau ukurasa mmoja kwenye hadithi."
         page_ok: "Kurasa %{n} — ndani ya wastani bora wa %{min}–%{max}."
         page_many: "Kurasa %{n} — punguza hadi %{max} au chini ili hadithi isiwe ndefu mno."

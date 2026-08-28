@@ -81,6 +81,15 @@ es:
     token_enabled_label: 'Esta pregunta otorga puntos'
     token_award_hint: "Se otorgan solo por responder"
     token_checkpoint_placeholder: "Muestra los puntos que un jugador ha acumulado hasta ahora."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Respuestas que pueden elegir"
+    max_choices_all: "Todas"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Elige hasta %{n}"
     eyebrow:
       range: "Arrastra el control deslizante"
       rating: "Toca para calificar"
@@ -491,6 +500,7 @@ es:
         option_long: "Acorta “%{opt}” a %{max} caracteres o menos."
         phone_hero: "%{n} fichas — en el móvil se pierde la imagen de la tarjeta para que quepan. Menos de 7 conserva ambas."
         phone_scroll: "%{n} fichas — demasiadas para un móvil: las opciones se desplazan y la imagen desaparece. Apunta a 6 o menos."
+        max_choices_below_correct: "Limitado a %{n} respuestas, pero hay %{correct} marcadas como correctas: nadie puede marcar el conjunto correcto."
         page_empty: "Añade al menos una página a la historia."
         page_ok: "%{n} páginas — dentro del ideal %{min}–%{max}."
         page_many: "%{n} páginas — reduce a %{max} o menos para que la historia no se alargue."

@@ -125,8 +125,22 @@
   # editor swaps this client-side when a translation tab is switched — see
   # survey_editor_controller.js _writeCard, fed by the #card-eyebrows-i18n
   # blob emitted in surveys/show.html.erb.
-  eyebrow = t("card.eyebrow.#{type}", locale: display_locale,
-              default: CardTypes.eyebrow(type).presence || type.tr("_", " "))
+  # A capped multi-select names its ceiling instead of its type — the how-to
+  # line IS how a respondent learns the rule (the player refuses the extra tap
+  # in silence). Read straight from the card, so the two JS renderers that
+  # rewrite this element client-side have the same input; see lib/card_eyebrow.js.
+  # Re-checked against the card's own options rather than trusted, exactly as
+  # Survey#max_choices_at does for the answers that come back: a ceiling at or
+  # above the option count is no ceiling, and a respondent must never be told
+  # about a rule this page won't enforce.
+  max_choices = Survey::MULTI_SELECT_TYPES.include?(type) ? card["max_choices"].to_i : 0
+  max_choices = 0 unless max_choices.between?(Survey::MIN_MAX_CHOICES, Array(card["options"]).length - 1)
+  eyebrow = if max_choices.positive?
+    t("card.eyebrow_max", n: max_choices, locale: display_locale, default: "Choose up to %{n}")
+  else
+    t("card.eyebrow.#{type}", locale: display_locale,
+      default: CardTypes.eyebrow(type).presence || type.tr("_", " "))
+  end
 
   # A tap card's response scale — the 2-6 answers each statement is judged on,
   # resolved for the language this card is being shown in. Computed up here
@@ -178,7 +192,8 @@
       <ul class="choice-list choice-list--<%= multi ? 'multi' : 'single' %>"
           <%= editable ? "".html_safe : tag.attributes(role: multi ? "group" : "radiogroup") %>
           data-controller="<%= picker_controllers %>"
-          data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
+          data-picker-mode-value="<%= multi ? 'multi' : 'single' %>"
+          data-picker-max-value="<%= multi ? max_choices : 0 %>">
         <% items.each_with_index do |opt, i| %>
           <% style = option_style_at(card, i) %>
           <li class="choice-list-item pick-item"
@@ -294,7 +309,8 @@
       <ul class="choice-grid choice-grid--<%= multi ? 'multi' : 'single' %> choice-grid-2"
           <%= editable ? "".html_safe : tag.attributes(role: multi ? "group" : "radiogroup") %>
           data-controller="picker"
-          data-picker-mode-value="<%= multi ? 'multi' : 'single' %>">
+          data-picker-mode-value="<%= multi ? 'multi' : 'single' %>"
+          data-picker-max-value="<%= multi ? max_choices : 0 %>">
         <% opts.each_with_index do |opt, i| %>
           <% style = option_style_at(card, i) %>
           <li class="choice-card"

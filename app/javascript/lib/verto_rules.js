@@ -200,6 +200,9 @@ export function analyzeCard(card) {
   const phoneCheck = card.demographic ? null : phoneFitCheck(card)
   if (phoneCheck) checks.push(phoneCheck)
 
+  const capCheck = maxChoicesCheck(card)
+  if (capCheck) checks.push(capCheck)
+
   // Every paged type, not just scenario. A no-op today — analyzeCard returns
   // null for non-questions above and consent_gate is one — but the rule being
   // expressed is "does this card have pages", and writing it as a literal type
@@ -283,6 +286,22 @@ function phoneFitCheck(card) {
   if (n >= PHONE_FIT_LIMIT) return check("phone", INFO, t("editor.rules.phone_scroll", { n }))
   if (n >= PHONE_HERO_LIMIT) return check("phone", INFO, t("editor.rules.phone_hero", { n }))
   return null
+}
+
+// A capped multi-select that is also a quiz question. QuizGrading.correct?
+// requires an EXACT set match on these types (app/lib/quiz_grading.rb), so a
+// cap below the number of answers marked correct makes the card impossible to
+// get right — the respondent physically cannot tick the set that would score.
+// Nothing else catches this: both halves are individually valid, and the trap
+// is only in their combination.
+//
+// RED, not a tip: unlike the phone-fit advice above, there is no reading of
+// this the creator might have intended.
+function maxChoicesCheck(card) {
+  const max = parseInt(card.maxChoices, 10) || 0
+  const correct = parseInt(card.correctCount, 10) || 0
+  if (max < 2 || correct <= max) return null
+  return check("max_choices", RED, t("editor.rules.max_choices_below_correct", { n: max, correct }))
 }
 
 // §2 — answer labels within their per-type budget (see OPTION_LIMITS).

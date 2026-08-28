@@ -81,6 +81,15 @@ vi:
     token_enabled_label: 'Câu hỏi này có điểm'
     token_award_hint: "Chỉ cần trả lời là được cộng điểm"
     token_checkpoint_placeholder: "Hiển thị số điểm người chơi đã thu thập được cho đến nay."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Số câu trả lời được chọn"
+    max_choices_all: "Tất cả"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Chọn tối đa %{n}"
     eyebrow:
       range: "Kéo thanh trượt"
       rating: "Chạm để đánh giá"
@@ -491,6 +500,7 @@ vi:
         option_long: "Rút gọn “%{opt}” còn %{max} ký tự hoặc ít hơn."
         phone_hero: "%{n} ô — trên điện thoại, ảnh thẻ sẽ bị bỏ để vừa chỗ. Dưới 7 thì giữ được cả hai."
         phone_scroll: "%{n} ô — quá nhiều cho điện thoại: các lựa chọn phải cuộn và ảnh thẻ bị bỏ. Hãy nhắm 6 hoặc ít hơn."
+        max_choices_below_correct: "Giới hạn %{n} câu trả lời nhưng có %{correct} đáp án đúng — không ai chọn được bộ đúng."
         page_empty: "Thêm ít nhất một trang vào câu chuyện."
         page_ok: "%{n} trang — trong khoảng lý tưởng %{min}–%{max}."
         page_many: "%{n} trang — rút gọn còn %{max} trang trở xuống để câu chuyện không bị lê thê."

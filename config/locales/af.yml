@@ -82,6 +82,15 @@ af:
     token_enabled_label: "Hierdie vraag ken punte toe"
     token_award_hint: "Toegeken net vir antwoord gee"
     token_checkpoint_placeholder: "Wys die punte wat 'n speler tot dusver ingesamel het."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Antwoorde wat hulle kan kies"
+    max_choices_all: "Alles"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Kies tot %{n}"
     eyebrow:
       range: "Sleep die skuifknoppie"
       rating: "Tik om te gradeer"
@@ -492,6 +501,7 @@ af:
         option_long: "Verkort “%{opt}” tot %{max} karakters of minder."
         phone_hero: "%{n} teëls — 'n foon sal die kaart se prent laat val om hulle te laat pas. Minder as 7 hou albei."
         phone_scroll: "%{n} teëls — te veel vir 'n foon: die opsies rol en die kaart se prent verdwyn. Mik vir 6 of minder."
+        max_choices_below_correct: "Beperk tot %{n} antwoorde, maar %{correct} is as korrek gemerk — niemand kan die regte stel kies nie."
         page_empty: "Voeg minstens een bladsy by die storie."
         page_ok: "%{n} bladsye — binne die ideale %{min}–%{max}."
         page_many: "%{n} bladsye — verminder tot %{max} of minder sodat die storie nie sleep nie."

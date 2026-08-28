@@ -83,6 +83,15 @@ tn:
     token_enabled_label: 'Potso e e naya dintlha'
     token_award_hint: "Di newa fela ka go araba"
     token_checkpoint_placeholder: "E bontsha dintlha tse motshameka a di kgobokantseng go fitlha jaanong."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Dikarabo tse ba ka di tlhophang"
+    max_choices_all: "Tsotlhe"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Tlhopha go fitlha go %{n}"
     eyebrow:
       range: "Goga sekgoga"
       rating: "Tobetsa go lekanyetsa"
@@ -507,6 +516,7 @@ tn:
         option_long: "Khutshwafatsa “%{opt}” go nna ditlhaka tse %{max} kgotsa go le kwa tlase."
         phone_hero: "Ditshwantsho tse %{n} — mogala o tla tlosa setshwantsho sa karata gore di kgone go tsena. Fa go le kwa tlase ga 7 go boloka tsotlhe."
         phone_scroll: "Ditshwantsho tse %{n} — di dintsi thata mo mogaleng: ditlhopho di sunthiwa mme setshwantsho sa karata se a tswa. Lebisa go 6 kgotsa go le kwa tlase."
+        max_choices_below_correct: "E lekanyeditswe dikarabo tse %{n} mme tse %{correct} di tshwailwe e le tse di siameng — ga go na ope yo o ka tlhophang setlhopha se se siameng."
         page_empty: "Oketsa bonnye tsebe e le nngwe mo pading."
         page_ok: "Ditsebe tse %{n} — mo tekanong e e siameng ya %{min}–%{max}."
         page_many: "Ditsebe tse %{n} — fokotsetsa go %{max} kgotsa go le kwa tlase gore pading e seka ya diega."

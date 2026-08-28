@@ -18,7 +18,22 @@ import { haptic } from "lib/haptics"
 // can focus but never hear the state of is barely better than none.
 export default class extends Controller {
   static targets = ["item"]
-  static values  = { mode: { type: String, default: "single" } }
+  // `max` is the multi-select tick ceiling (Survey#max_choices, 0 = no limit).
+  // Read only in multi mode: single-select already picks exactly one.
+  static values  = { mode: { type: String, default: "single" }, max: { type: Number, default: 0 } }
+
+  // A card restored from saved progress arrives with its selections already in
+  // the DOM, so the dimming has to be computed rather than waiting for a tap.
+  connect() {
+    this.syncCap()
+  }
+
+  // The editor rewrites data-picker-max-value when a creator moves the cap, and
+  // Stimulus observes that mutation asynchronously — so this, not a call at the
+  // point of the write, is what makes the preview follow.
+  maxValueChanged() {
+    this.syncCap()
+  }
 
   // Enter and Space are what a keyboard user presses on a radio or checkbox.
   // Space is also page-scroll, so it must be prevented once it's been handled.
@@ -35,12 +50,45 @@ export default class extends Controller {
     event.stopPropagation() // don't also select/apply the type underneath
     const item = event.currentTarget
     if (this.modeValue === "multi") {
-      this.setSelected(item, item.dataset.selected !== "true")
+      const on = item.dataset.selected !== "true"
+      // At the ceiling the extra tap does nothing at all — no selection, no
+      // haptic, no event. Unticking is always allowed, which is what makes the
+      // cap navigable rather than a dead end: the way past it is to give one up.
+      if (on && this._atCap()) return
+      this.setSelected(item, on)
     } else {
       this.itemTargets.forEach((el) => this.setSelected(el, el === item))
     }
+    this.syncCap()
     haptic()
     this.dispatch("pick", { detail: { mode: this.modeValue } })
+  }
+
+  // Mark the list as full so CSS can dim what can no longer be picked. Public
+  // because player_controller#_applyValue writes data-selected straight onto
+  // the items when it restores an answer, bypassing setSelected entirely.
+  syncCap() {
+    if (this.modeValue !== "multi") return
+    // No cap (or the cap just lifted): leave nothing behind for the CSS to dim.
+    if (this.maxValue < 2) {
+      delete this.element.dataset.atCap
+      this.itemTargets.forEach((el) => el.removeAttribute("aria-disabled"))
+      return
+    }
+    const full = this._atCap()
+    this.element.dataset.atCap = full ? "true" : "false"
+    // Not purely visual: an option a respondent cannot choose has to say so to
+    // a screen reader too. Selected items stay enabled — unticking is the way
+    // back under the cap.
+    this.itemTargets.forEach((el) => {
+      const spare = !full || el.dataset.selected === "true"
+      spare ? el.removeAttribute("aria-disabled") : el.setAttribute("aria-disabled", "true")
+    })
+  }
+
+  _atCap() {
+    if (this.maxValue < 2) return false
+    return this.itemTargets.filter((el) => el.dataset.selected === "true").length >= this.maxValue
   }
 
   setSelected(item, on) {

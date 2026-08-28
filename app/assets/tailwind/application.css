@@ -2853,6 +2853,24 @@
   paint-order: stroke fill;
 }
 
+/* ── Multi-select at its tick ceiling ────────────── */
+/* A card can cap how many answers a respondent picks (Survey#max_choices, set
+   in the editor's Answer Type tab). picker#syncCap puts data-at-cap on the list
+   once it is full; what is left goes visibly inert so the refused tap reads as
+   a rule rather than a broken control. The eyebrow above the question has
+   already said what the rule is ("Choose up to 3"), which is what keeps this
+   from being a surprise.
+
+   Deliberately narrower than .other-active's blanket dim above: the picks the
+   respondent HAS made must stay at full strength — they are the answer, and
+   unticking one is the way back under the cap. */
+[data-at-cap="true"] .pick-item[data-selected="false"],
+[data-at-cap="true"] .choice-card[data-selected="false"] {
+  opacity: 0.4;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
 /* ── Rich-text toolbar (editor chrome) ───────────── */
 .rich-text-toolbar {
   position: fixed; z-index: 95;

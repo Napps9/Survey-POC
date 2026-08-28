@@ -81,6 +81,15 @@ tr:
     token_enabled_label: 'Bu soru puan verir'
     token_award_hint: "Sadece cevap verdiğiniz için kazanılır"
     token_checkpoint_placeholder: "Bir oyuncunun şimdiye kadar topladığı puanları gösterir."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Seçebilecekleri yanıt sayısı"
+    max_choices_all: "Tümü"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "En fazla %{n} tane seçin"
     eyebrow:
       range: "Kaydırıcıyı sürükleyin"
       rating: "Puanlamak için dokunun"
@@ -491,6 +500,7 @@ tr:
         option_long: "“%{opt}” ifadesini %{max} karaktere veya altına indirin."
         phone_hero: "%{n} kutucuk — telefonda sığdırmak için kart görseli kaldırılır. 7'den azı ikisini de korur."
         phone_scroll: "%{n} kutucuk — bir telefon için fazla: seçenekler kaydırılır ve kart görseli kalkar. 6 veya altını hedefleyin."
+        max_choices_below_correct: "Yanıtlar %{n} ile sınırlı ama %{correct} tanesi doğru işaretli — doğru küme hiç seçilemez."
         page_empty: "Hikayeye en az bir sayfa ekle."
         page_ok: "%{n} sayfa — ideal aralık olan %{min}–%{max} içinde."
         page_many: "%{n} sayfa — hikaye uzamasın diye %{max} veya daha aza indir."

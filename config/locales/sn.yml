@@ -80,6 +80,15 @@ sn:
     token_enabled_label: 'Mubvunzo uyu unopa mapoinzi'
     token_award_hint: "Anopiwa nekungopindura chete"
     token_checkpoint_placeholder: "Inoratidza mapoinzi ayakaunganidzwa nemutambi kusvika parizvino."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Mhinduro dzavanogona kusarudza"
+    max_choices_all: "Dzose"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Sarudza kusvika pa%{n}"
     eyebrow:
       range: "Zvuzvurudza Cherengo"
       rating: "Dzvanya Kuti Uongorore"
@@ -495,6 +504,7 @@ sn:
         option_long: "Pfupisa “%{opt}” kusvika kumavara %{max} kana zvishoma."
         phone_hero: "Zvigadziko %{n} — foni ichabvisa mufananidzo wekadhi kuti zvikwane. Zvishoma pane 7 zvinochengeta zvose zviri zviviri."
         phone_scroll: "Zvigadziko %{n} — zvakawanda zvikuru pafoni: sarudzo dzinotsvedza uye mufananidzo wekadhi unobva. Nangira ku6 kana zvishoma."
+        max_choices_below_correct: "Yakaganhurirwa pamhinduro %{n} asi %{correct} dzakanyorwa sedzakarurama — hapana angasarudza seti chaiyo."
         page_empty: "Wedzera peji rimwe chete kunyaya."
         page_ok: "Mapeji %{n} — mukati mezvakakodzera %{min}–%{max}."
         page_many: "Mapeji %{n} — chetesa kusvika ku%{max} kana zvishoma kuti nyaya irege kureba zvisingafadzi."

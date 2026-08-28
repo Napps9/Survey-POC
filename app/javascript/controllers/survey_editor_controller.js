@@ -8,6 +8,7 @@ import { NON_QUESTION_TYPES } from "lib/question_types"
 import { OPTION_STYLE_TYPES } from "lib/option_style_types"
 import { styleFromRow } from "lib/option_styles"
 import { hasFormatting } from "lib/rich_text"
+import { cardEyebrow, MULTI_SELECT_TYPES } from "lib/card_eyebrow"
 
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
@@ -44,6 +45,7 @@ const OPTION_LABEL_SELECTORS = {
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
     "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale",
+                    "maxChoices", "maxChoicesPicker",
                     "recallToggle", "panelRecall", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
@@ -844,7 +846,8 @@ export default class extends Controller {
     // from the eyebrows blob for the locale being shown.
     const eyebrowEl = cardEl.querySelector(".q-eyebrow")
     if (eyebrowEl && locale) {
-      const caption = (this._eyebrows[locale] || {})[cardEl.dataset.cardType]
+      const caption = cardEyebrow(this._eyebrows, locale, cardEl.dataset.cardType,
+                                  cardEl.dataset.cardMaxChoices)
       if (caption) eyebrowEl.textContent = caption
     }
     this.refreshCard(cardEl)
@@ -1141,6 +1144,15 @@ export default class extends Controller {
       // Read by analyzeVerto's code_after_ask_once check. Without this line
       // that check is dead code that always passes.
       askOnce: cardEl.dataset.cardAskOnce === "true",
+      // Read by analyzeCard's capped-quiz check — a cap below the number of
+      // correct answers makes a graded card impossible to get right. Counted
+      // only on a QUIZ: a deck that has quiz turned off can still be carrying
+      // `correct` marks from when it was on, and nothing grades them, so the
+      // trap the check describes doesn't exist there.
+      maxChoices: parseInt(cardEl.dataset.cardMaxChoices, 10) || 0,
+      correctCount: this.quizValue
+        ? cardEl.querySelectorAll('[data-picker-target="item"][data-correct="true"]').length
+        : 0,
       // Demographic cards are exempt from the option-shape rules (their
       // option lists are platform-set taxonomies) — see verto_rules.js.
       demographic: cardEl.dataset.cardDemographic === "true"
@@ -1494,6 +1506,7 @@ export default class extends Controller {
     if (this.hasPanelRequiredTarget) this.panelRequiredTarget.checked = card.dataset.cardRequired === "true"
     if (this.hasPanelAskOnceTarget)  this.panelAskOnceTarget.checked  = card.dataset.cardAskOnce === "true"
     this._syncResponseScale(card)
+    this._syncMaxChoices(card)
   }
 
   // The strip's ＋ and × change the same number the picker reports, so the
@@ -1533,6 +1546,90 @@ export default class extends Controller {
     if (!editor) return
     editor.setResponsePreset(count)
     this._syncResponseScale(card)
+    this.markDirty()
+  }
+
+  // The option list moves under this picker constantly — a ＋ or a × on a
+  // select_many, a type switch on a grid (which has no add/remove affordance
+  // of its own, so a switch is the ONLY thing that changes its count). Either
+  // way a picker still offering "up to 4" on a card down to three answers is
+  // the picker disagreeing with the card it points at, so it re-ranges on both
+  // events. Same defect syncResponseScaleEvent exists for.
+  syncMaxChoicesEvent(event) {
+    const from = event.target?.closest?.("[data-survey-editor-target='card']")
+    const card = this._selectedCard()
+    // A type switch dispatches from the PANEL rather than the card, so there is
+    // no owning card to match against — fall back to the selection, which is
+    // the card the panel is pointing at.
+    if (card && (!from || from === card)) this._syncMaxChoices(card)
+  }
+
+  // The 2…N cap picker: select-many types only, buttons built from the card's
+  // LIVE option count rather than a fixed preset list (the tap scale above can
+  // be server-rendered because TapScales is a constant; this range is per-card).
+  //
+  // The last button is "All" and carries 0, meaning no stored key at all. That
+  // is the whole reason a limit isn't stored as the option count: "as many as
+  // there are answers" has to keep being true when a sixth answer is added.
+  _syncMaxChoices(card) {
+    if (!this.hasMaxChoicesTarget || !this.hasMaxChoicesPickerTarget) return
+    const type  = card?.dataset.cardType
+    const count = MULTI_SELECT_TYPES.includes(type)
+      ? this._optionEls(card).map(el => el.textContent.trim()).filter(Boolean).length
+      : 0
+    // Below three there is no cap to offer: the only legal values are 2…N-1.
+    this.maxChoicesTarget.hidden = count < 3
+    if (count < 3) return
+
+    // A cap the option list has shrunk past is no cap at all — the server
+    // sanitiser drops it on the next save, so correct the DOM now rather than
+    // let the card advertise a ceiling that won't survive.
+    let current = parseInt(card.dataset.cardMaxChoices, 10) || 0
+    if (current < 2 || current >= count) {
+      current = 0
+      delete card.dataset.cardMaxChoices
+    }
+
+    const wanted = [ ...Array(count - 2).keys() ].map(i => i + 2).concat([ 0 ])
+    const rendered = Array.from(this.maxChoicesPickerTarget.querySelectorAll(".response-scale-btn"))
+      .map(b => Number(b.dataset.maxChoices))
+    if (String(rendered) !== String(wanted)) {
+      this.maxChoicesPickerTarget.innerHTML = wanted.map(n => `
+        <button type="button" class="response-scale-btn" data-max-choices="${n}"
+                data-action="click->survey-editor#setMaxChoices">${n || t("card.max_choices_all")}</button>`).join("")
+    }
+    this.maxChoicesPickerTarget.querySelectorAll(".response-scale-btn").forEach((btn) => {
+      const on = Number(btn.dataset.maxChoices) === current
+      btn.classList.toggle("is-active", on)
+      btn.setAttribute("aria-pressed", String(on))
+    })
+  }
+
+  // Set (or with "All", clear) the selected card's cap. The how-to line above
+  // the question is the ONLY place a respondent learns the rule — the player
+  // refuses the extra tap in silence — so it is rewritten here rather than
+  // waiting for a reload.
+  setMaxChoices(event) {
+    const card = this._selectedCard()
+    if (!card) return
+    const n = Number(event.currentTarget.dataset.maxChoices) || 0
+    if (n >= 2) card.dataset.cardMaxChoices = String(n)
+    else delete card.dataset.cardMaxChoices
+
+    const eyebrowEl = card.querySelector(".q-eyebrow")
+    if (eyebrowEl) {
+      eyebrowEl.textContent = cardEyebrow(this._eyebrows, this._activeLocale,
+                                          card.dataset.cardType, card.dataset.cardMaxChoices,
+                                          eyebrowEl.textContent)
+    }
+    // The player's own picker reads this off the list element, and the editor
+    // card is the same markup — keep the preview honest about its own rule.
+    // picker#maxValueChanged does the repaint; writing the attribute is enough.
+    card.querySelectorAll("[data-picker-mode-value='multi']").forEach(ul => {
+      ul.dataset.pickerMaxValue = String(n)
+    })
+    this._syncMaxChoices(card)
+    this.refreshCard(card)
     this.markDirty()
   }
 
@@ -1798,6 +1895,13 @@ export default class extends Controller {
       if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme
       // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
       if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
+      // Select-many cards may cap how many answers a respondent ticks. Only
+      // emitted when a cap is actually set — absent is "as many as there are
+      // answers", and the server re-checks it against the option list it
+      // receives (Survey.sanitize_cards_images!).
+      if (MULTI_SELECT_TYPES.includes(type) && card.dataset.cardMaxChoices) {
+        out.max_choices = parseInt(card.dataset.cardMaxChoices, 10)
+      }
 
       // Range labels are POSITIONAL — each one names a fixed stop on a 5-point
       // track, so a blank is an unnamed stop, not an option to discard.

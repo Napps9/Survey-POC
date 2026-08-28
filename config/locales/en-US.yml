@@ -91,6 +91,15 @@ en-US:
     token_enabled_label: 'This question awards points'
     token_award_hint: "Awarded just for answering"
     token_checkpoint_placeholder: "Shows the points a player has collected so far."
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "Answers they can pick"
+    max_choices_all: "All"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "Choose up to %{n}"
     eyebrow:
       range: "Drag the slider"
       rating: "Tap to rate"
@@ -515,6 +524,7 @@ en-US:
         option_long: "Shorten “%{opt}” to %{max} characters or fewer."
         phone_hero: "%{n} tiles — a phone will drop the card image to fit them. Fewer than 7 keeps both."
         phone_scroll: "%{n} tiles — too many for a phone: the options scroll and the card image goes. Aim for 6 or fewer."
+        max_choices_below_correct: "Capped at %{n} answers but %{correct} are marked correct — nobody can tick the right set."
         page_empty: "Add at least one page to the story."
         page_ok: "%{n} pages — within the ideal %{min}–%{max}."
         page_many: "%{n} pages — trim to %{max} or fewer so the story doesn't drag."

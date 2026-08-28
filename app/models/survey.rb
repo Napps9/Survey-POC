@@ -296,6 +296,14 @@ class Survey < ApplicationRecord
   # scale, swipe and free-text types have no per-option tile to style.
   OPTION_STYLE_TYPES = %w[multiple_choice select_many prioritise yes_no select_one_grid select_many_grid scenario].freeze
 
+  # The two types a respondent can tick more than one answer on, and so the
+  # only two a choice CEILING means anything on. Every other type is
+  # single-answer by construction — `max_choices` is dropped anywhere else.
+  MULTI_SELECT_TYPES = %w[select_many select_many_grid].freeze
+  # Below two a "limit" is just single-select wearing a checkbox, and the type
+  # to reach for is multiple_choice.
+  MIN_MAX_CHOICES = 2
+
   # ── Verto typeface ───────────────────────────────────────────────────────
   # The font a Verto is set in, picked in the Design panel beside its colours.
   # Deliberately the SAME seven families the rich-text toolbar already offers
@@ -1043,6 +1051,26 @@ class Survey < ApplicationRecord
         end
       end
 
+      # Per-card ceiling on how many options a respondent may tick. ABSENT means
+      # no limit, and storing the absence rather than the number is the
+      # load-bearing part: "as many as there are answers" has to stay true when
+      # the creator adds a sixth option later. A max at or above the option count
+      # therefore isn't a cap at all, and is dropped.
+      #
+      # Clamping against a SIBLING field is new — every other numeric card field
+      # bounds itself against a constant. The consequence is that the key is
+      # re-decided on every save, which is exactly what stops a cap of 4
+      # outliving the two options that justified it.
+      if c.key?("max_choices")
+        n = c["max_choices"].to_i
+        if MULTI_SELECT_TYPES.include?(c["type"].to_s) &&
+           n >= MIN_MAX_CHOICES && n < Array(c["options"]).length
+          c["max_choices"] = n
+        else
+          c.delete("max_choices")
+        end
+      end
+
       # Explicit "this question awards no points". Coerced to a real boolean
       # because TokenGrading.awarding? tests for `false` exactly — a "false"
       # string arriving from JSON would otherwise read as truthy and award. Only
@@ -1700,6 +1728,40 @@ class Survey < ApplicationRecord
       clamped["value"] = entry["value"].first(limit) if entry["value"].is_a?(String)
       clamped["other"] = entry["other"].first(limit) if entry["other"].is_a?(String)
       out[key] = clamped
+    end
+  end
+
+  # ── Choice limits ──────────────────────────────────────────────────────────
+
+  # The tick ceiling for the card at `index`, or nil where there is none.
+  # Re-checked against the card's live options rather than trusted, for the same
+  # reason the sanitiser re-decides the key on every save: a deck edited between
+  # a cap being set and an answer arriving must not leave a ceiling standing that
+  # the card no longer justifies.
+  def max_choices_at(index)
+    card = Array(cards)[index.to_i]
+    return nil unless card.is_a?(Hash) && MULTI_SELECT_TYPES.include?(card["type"].to_s)
+
+    n = card["max_choices"].to_i
+    n.between?(MIN_MAX_CHOICES, Array(card["options"]).length - 1) ? n : nil
+  end
+
+  # Trim any selection that arrives over its card's ceiling.
+  #
+  # Same posture as clamp_free_text above, and the same reason: the player
+  # refuses the extra tap, but a refusal in the browser is a courtesy and this
+  # endpoint is public JSON. Array answers had no length bound of ANY kind
+  # before this — clamp_free_text only touches Strings.
+  #
+  # Keeps the leading N in the order they arrived, which is the DOM order the
+  # player's _read produces, so what survives reads as the first N the
+  # respondent picked rather than an arbitrary subset.
+  def clamp_selection_count(answers)
+    return answers unless answers.is_a?(Hash)
+
+    answers.each_with_object({}) do |(key, entry), out|
+      max = entry.is_a?(Hash) && entry["value"].is_a?(Array) ? max_choices_at(key) : nil
+      out[key] = max ? entry.merge("value" => entry["value"].first(max)) : entry
     end
   end
 

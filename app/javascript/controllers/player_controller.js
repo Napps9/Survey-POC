@@ -2523,7 +2523,18 @@ export default class extends Controller {
     if ([ "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid", "scenario" ].includes(type)) {
       const set = new Set((Array.isArray(value) ? value : [ value ]).map(v => String(v ?? "").trim()))
       card.querySelectorAll('[data-picker-target="item"]').forEach(el => {
-        if (set.has((el.dataset.canonical || "").trim())) el.dataset.selected = "true"
+        if (!set.has((el.dataset.canonical || "").trim())) return
+        el.dataset.selected = "true"
+        // picker#setSelected is bypassed here (we're writing the dataset
+        // directly), so its aria half has to be done by hand or a restored
+        // card reads as entirely unchecked to a screen reader.
+        if (el.hasAttribute("role")) el.setAttribute("aria-checked", "true")
+      })
+      // A capped multi-select restored at its ceiling must come back DIMMED —
+      // the picker computes that from the selections, and nothing has told it
+      // they changed.
+      card.querySelectorAll('[data-controller~="picker"]').forEach(ul => {
+        this.application.getControllerForElementAndIdentifier(ul, "picker")?.syncCap()
       })
     } else if (type === "open_ended") {
       const loc = card.querySelector(".location-search-value")

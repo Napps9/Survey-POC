@@ -81,6 +81,15 @@ hi:
     token_enabled_label: 'यह प्रश्न अंक देता है'
     token_award_hint: "सिर्फ़ उत्तर देने पर मिलते हैं"
     token_checkpoint_placeholder: "दिखाता है कि खिलाड़ी ने अब तक कितने अंक अर्जित किए हैं।"
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "वे कितने उत्तर चुन सकते हैं"
+    max_choices_all: "सभी"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "अधिकतम %{n} चुनें"
     eyebrow:
       range: "स्लाइडर खींचें"
       rating: "रेटिंग के लिए टैप करें"
@@ -491,6 +500,7 @@ hi:
         option_long: "“%{opt}” को %{max} अक्षर या कम करें."
         phone_hero: "%{n} टाइलें — फ़ोन पर इन्हें दिखाने के लिए कार्ड की छवि हट जाएगी. 7 से कम रखें तो दोनों रहेंगे."
         phone_scroll: "%{n} टाइलें — फ़ोन के लिए बहुत ज़्यादा: विकल्प स्क्रॉल होंगे और छवि हट जाएगी. 6 या कम रखें."
+        max_choices_below_correct: "%{n} उत्तरों की सीमा है, पर %{correct} सही चिह्नित हैं — सही सेट चुना ही नहीं जा सकता।"
         page_empty: "कहानी में कम से कम एक पेज जोड़ें."
         page_ok: "%{n} पेज — आदर्श %{min}–%{max} की सीमा में."
         page_many: "%{n} पेज — कहानी को खिंचने से बचाने के लिए %{max} या उससे कम करें."

@@ -97,7 +97,7 @@
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
      data-survey-editor-live-value="<%= @survey.editing_locked? %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
-     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus setup-status:progress->survey-editor#setupStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
+     data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus setup-status:progress->survey-editor#setupStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncResponseScaleEvent card-editor:changed->survey-editor#syncMaxChoicesEvent type-panel:changed->survey-editor#syncMaxChoicesEvent focusout->survey-editor#syncBranchingEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
      <%# Define the (potentially large) background data URL ONCE here; the card
          feed and preview overlay below inherit --brand-bg-image rather than
          each inlining the full data URL. Palette vars stay scoped to those
@@ -711,6 +711,20 @@
                         data-action="click->survey-editor#setResponseScale"><%= n %></button>
               <% end %>
             </div>
+          </div>
+
+          <%# Select-many cards only: the most answers a respondent may tick.
+              Unlike the tap scale above, the buttons are NOT server-rendered —
+              the range is 2…N off this card's own option count, which the
+              creator changes while the panel is open, so survey-editor builds
+              the strip and re-ranges it on every option add or delete. The last
+              button is the default and reads "All": it means no stored limit at
+              all, so a card that later grows a sixth option still offers six. %>
+          <div class="card-flag-scale" data-survey-editor-target="maxChoices" hidden>
+            <span class="card-flag-label"><%= t("card.max_choices_label") %></span>
+            <div class="response-scale-picker" role="group"
+                 data-survey-editor-target="maxChoicesPicker"
+                 aria-label="<%= t("card.max_choices_label") %>"></div>
           </div>
         </div>
 

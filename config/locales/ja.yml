@@ -81,6 +81,15 @@ ja:
     token_enabled_label: 'この質問はポイントを付与します'
     token_award_hint: "回答するだけで獲得できます"
     token_checkpoint_placeholder: "プレイヤーがこれまでに集めたポイントを表示します。"
+    # How many options a respondent may tick on a select-many card, and the
+    # "no limit" end of that picker. ABSENT on the card means no limit, so the
+    # last button reads as a word rather than the option count — see
+    # Survey::MULTI_SELECT_TYPES.
+    max_choices_label: "選べる回答の数"
+    max_choices_all: "すべて"
+    # The eyebrow above a CAPPED select-many card, in place of the per-type
+    # caption below. Never interpolated with 1 — the floor is two.
+    eyebrow_max: "%{n}つまで選んでください"
     eyebrow:
       range: "スライダーをドラッグ"
       rating: "タップして評価"
@@ -491,6 +500,7 @@ ja:
         option_long: "「%{opt}」を%{max}文字以下に短くしてください。"
         phone_hero: "%{n}個のタイル — スマートフォンでは収めるためにカード画像が省かれます。7個未満なら両方残ります。"
         phone_scroll: "%{n}個のタイル — スマートフォンには多すぎます。選択肢がスクロールし、カード画像も省かれます。6個以下を目安に。"
+        max_choices_below_correct: "回答は%{n}件までですが、正解が%{correct}件あります — 正しい組み合わせを選べません。"
         page_empty: "ストーリーに少なくとも1ページ追加してください。"
         page_ok: "%{n}ページ — 理想的な%{min}〜%{max}の範囲内です。"
         page_many: "%{n}ページ — ストーリーが長引かないよう%{max}ページ以下に減らしましょう。"
