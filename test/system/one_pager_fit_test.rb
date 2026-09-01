@@ -140,7 +140,11 @@ class OnePagerFitTest < ApplicationSystemTestCase
                                        width: 390, height: 900, deviceScaleFactor: 1, mobile: true)
       begin
         visit "#{origin}#{probe_url}"
-        assert_selector "#demoMockup", wait: 15
+        # Waiting on the demo would be wrong here: verto-for-research hides its
+        # whole Try it section below 860px, deliberately, so a phone doesn't
+        # download a player it will never show. The benefits list is the
+        # readiness signal both pages render at this width.
+        assert_selector ".benefits li", minimum: 1, wait: 15
 
         widths = page.evaluate_script(<<~JS)
           ({ scroll: document.documentElement.scrollWidth,
@@ -162,6 +166,22 @@ class OnePagerFitTest < ApplicationSystemTestCase
         panned.each do |p|
           assert_equal "auto", p["overflow"], "a wide screenshot isn't in a scrollable frame"
         end
+
+        # Whatever a page chooses to show on a phone, it must not download a
+        # player it doesn't show — an iframe inside display:none still fetches
+        # its src. The two pages differ here (verto-for-research hides its Try
+        # it section entirely, vertonow keeps the player full-width), so this
+        # pins the rule rather than either page's answer to it.
+        demo = page.evaluate_script(<<~JS)
+          (() => {
+            const m = document.getElementById('demoMockup');
+            return { shown: !!(m && m.getBoundingClientRect().height > 0),
+                     iframe: !!document.querySelector('.screen-embed, .phone-screen-embed') };
+          })()
+        JS
+        refute demo["iframe"] && !demo["shown"],
+          "the demo is hidden at this width but its iframe was created anyway — that is a " \
+          "whole player fetched over mobile data for something the reader never sees"
       ensure
         page.driver.browser.page.command("Emulation.clearDeviceMetricsOverride")
       end
