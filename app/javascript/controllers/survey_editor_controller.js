@@ -42,6 +42,12 @@ const OPTION_LABEL_SELECTORS = {
   scenario: ".pick-text"
 }
 
+// Token-award rows are keyed by canonical option label, so the types whose
+// labels are edited live in the card need their rows rebuilt as options change
+// (see syncTokenRowsFor) — yes_no's canonicals are fixed, the flat-award types
+// key nothing on labels, and tap_card is handled separately (statements).
+const TOKEN_SYNCED_TYPES = [ "multiple_choice", "select_many", "select_one_grid", "select_many_grid", "scenario" ]
+
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
     "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale",
@@ -100,11 +106,20 @@ export default class extends Controller {
     document.addEventListener("visibilitychange", this._visibilityHandler = () => {
       if (document.visibilityState === "hidden") this.flushSave()
     })
+    // The editor page also carries full-page POST→redirect forms (the
+    // Tokenisation panel's toggle, token types, intro picker, the leaderboard
+    // block…), and Turbo drives them: pagehide/beforeunload never fire, so an
+    // edit still inside the 1.5s debounce was silently discarded and the
+    // re-render restored DB state. Capture on WINDOW — Turbo's
+    // FormSubmitObserver listens at document capture, and window capture
+    // fires first — hold the form, finish the save, then resubmit.
+    window.addEventListener("submit", this._submitFlushHandler = (e) => this._flushBeforeSubmit(e), true)
   }
 
   disconnect() {
     window.removeEventListener("pagehide", this._flushHandler)
     window.removeEventListener("beforeunload", this._flushHandler)
+    window.removeEventListener("submit", this._submitFlushHandler, true)
     document.removeEventListener("visibilitychange", this._visibilityHandler)
     document.removeEventListener("keydown", this._undoHandler)
     this._hideLabelCount()
@@ -593,6 +608,11 @@ export default class extends Controller {
     // Restored cards keep their translations: without seeding, the next
     // autosave wrote the restored card back monolingual (the BUG-030 shape).
     this.seedCardStore(card, cardJson)
+    // Every other insertion path registers the card's quiz/token/logic blocks
+    // with type-panel; without this the restored card's token controls — kept
+    // display:none while in-card — could never be relocated into the sidebar,
+    // so they were unreachable and unreadable for good.
+    this._typePanel()?.registerCard(card)
     this._renumberAndPersist()
     return card
   }
@@ -648,6 +668,28 @@ export default class extends Controller {
     if (event?.type === "beforeunload") {
       event.preventDefault()
       event.returnValue = ""
+    }
+  }
+
+  // A pending edit must land before any of the editor page's own forms
+  // navigates it away (Turbo intercepts them, so the unload flush above never
+  // runs). Fail-open on purpose: if the save errors the form still proceeds —
+  // that is exactly today's behaviour — and _flushingSubmit lets the resubmit
+  // pass straight through to Turbo instead of looping back in here.
+  async _flushBeforeSubmit(event) {
+    if (this._flushingSubmit) return
+    if (!this._dirty || this.liveValue) return
+    const form = event.target
+    if (!(form instanceof HTMLFormElement) || !this.element.contains(form)) return
+    event.preventDefault()
+    event.stopPropagation()
+    this._flushingSubmit = true
+    clearTimeout(this._saveTimer)
+    try {
+      await this._doSave()
+    } finally {
+      form.requestSubmit(event.submitter || undefined)
+      this._flushingSubmit = false
     }
   }
 
@@ -2120,7 +2162,12 @@ export default class extends Controller {
     // runtime primitive) — see _compileFlows / FlowCompiler.
     this._compileFlows(cards)
 
-    return { title: this.titleValue, description: this.descriptionValue, cards, flows: this.flowsList() }
+    return { title: this.titleValue, description: this.descriptionValue, cards, flows: this.flowsList(),
+             // Whether this page could see token controls at all: they render
+             // only when tokenisation is on at page load, so a page from
+             // before it was switched on provably knows nothing about tokens
+             // and the server must not read its silence as deletion.
+             tokens_authoritative: !!this.tokenisationValue }
   }
 
   // ── Quiz: correct-answer marking ─────────────────────────────────────────
@@ -2300,6 +2347,130 @@ export default class extends Controller {
       default:
         return {}
     }
+  }
+
+  // Mirror of syncBranchingEvent for the token award rows, which have the same
+  // staleness: rendered once server-side, keyed by canonical option label /
+  // tap statement. Without this, renaming an option orphaned its amounts — the
+  // next autosave wrote `tokens` under the OLD label, the inputs read back 0,
+  // and TokenGrading matched nothing while the card still claimed to award.
+  syncTokenRowsEvent(event) {
+    const card = event.target?.closest?.("[data-survey-editor-target='card']")
+    if (!card) return
+    if (event.type === "focusout" &&
+        !event.target.closest?.(".pick-text, .choice-label, .rotate-card span[contenteditable]")) return
+    this.syncTokenRowsFor(card)
+  }
+
+  syncTokenRowsFor(cardEl) {
+    if (!this.tokenisationValue || !cardEl) return
+    // Canonicals are PRIMARY-language labels; a rename on a translation tab is
+    // a translation, not a re-key.
+    if (this._activeLocale !== this.defaultLocaleValue) return
+    const type = cardEl.dataset.cardType
+    if (type === "tap_card") return this._syncTapTokenRows(cardEl)
+    if (!TOKEN_SYNCED_TYPES.includes(type)) return
+
+    const scope   = this._tokenScope(cardEl)
+    const section = scope.querySelector('[data-token-mode-section="per_answer"]')
+    if (!section) return
+
+    // Prior amounts per option — by uid (survives renames), then by label,
+    // then by position, exactly like syncBranchingFor.
+    const byUid = new Map(), byLabel = new Map(), byIndex = []
+    section.querySelectorAll(".token-award-row[data-canonical]").forEach(row => {
+      const inputs = row.querySelector(".token-inputs")
+      const amt    = inputs ? this._tokenAmounts(inputs) : {}
+      byIndex.push(amt)
+      if (row.dataset.optUid) byUid.set(row.dataset.optUid, amt)
+      byLabel.set((row.dataset.canonical || "").trim(), amt)
+    })
+
+    // Fresh inputs are cloned from the completion row, which is always
+    // server-rendered with one input per token type whatever mode is showing —
+    // no client-side copy of the token-type table needed.
+    const template = scope.querySelectorAll('[data-token-mode-section="completion"] .token-amount-input')
+    if (!template.length) return
+
+    section.textContent = ""
+    this._optionEls(cardEl).forEach((optEl, i) => {
+      const label = optEl.textContent.trim()
+      if (!label) return
+      let uid = optEl.dataset.optUid
+      if (!uid) { uid = String(this._optUidSeq = (this._optUidSeq || 0) + 1); optEl.dataset.optUid = uid }
+      const amt = byUid.has(uid) ? byUid.get(uid)
+                : byLabel.has(label) ? byLabel.get(label)
+                : (byIndex[i] || {})
+      section.appendChild(this._tokenAwardRow(uid, label, amt, template))
+    })
+  }
+
+  // One per-answer award row, matching _card_component.html.erb's markup.
+  _tokenAwardRow(uid, label, amounts, template) {
+    const row = document.createElement("div")
+    row.className = "token-award-row"
+    row.dataset.canonical = label
+    row.dataset.optUid = uid
+    const shown = document.createElement("span")
+    shown.className = "token-award-label"
+    shown.textContent = label
+    const inputs = document.createElement("div")
+    inputs.className = "token-inputs"
+    template.forEach(tpl => {
+      const input = tpl.cloneNode(false)
+      input.value = amounts[input.dataset.tokenId] || 0
+      inputs.appendChild(input)
+    })
+    row.append(shown, inputs)
+    return row
+  }
+
+  // tap_card keys amounts by statement, with per-direction blocks inside each
+  // row — same carry discipline, whole-row clone as the template.
+  _syncTapTokenRows(cardEl) {
+    const scope = this._tokenScope(cardEl)
+    const rows  = [ ...scope.querySelectorAll(".token-tap-row") ]
+    if (!rows.length) return
+
+    const harvest = row => {
+      const dirs = {}
+      row.querySelectorAll(".token-inputs").forEach(block => {
+        if (block.dataset.direction) dirs[block.dataset.direction] = this._tokenAmounts(block)
+      })
+      return dirs
+    }
+    const byUid = new Map(), byLabel = new Map(), byIndex = []
+    rows.forEach(row => {
+      const dirs = harvest(row)
+      byIndex.push(dirs)
+      if (row.dataset.optUid) byUid.set(row.dataset.optUid, dirs)
+      byLabel.set((row.dataset.statement || "").trim(), dirs)
+    })
+
+    const templateRow = rows[0]
+    const parent = templateRow.parentElement
+    rows.forEach(row => row.remove())
+    this._optionEls(cardEl).forEach((optEl, i) => {
+      const label = optEl.textContent.trim()
+      if (!label) return
+      let uid = optEl.dataset.optUid
+      if (!uid) { uid = String(this._optUidSeq = (this._optUidSeq || 0) + 1); optEl.dataset.optUid = uid }
+      const dirs = byUid.has(uid) ? byUid.get(uid)
+                 : byLabel.has(label) ? byLabel.get(label)
+                 : (byIndex[i] || {})
+      const row = templateRow.cloneNode(true)
+      row.dataset.statement = label
+      row.dataset.optUid = uid
+      row.querySelector(".token-award-label").textContent = label
+      row.querySelectorAll(".token-inputs").forEach(block => {
+        const dir = block.dataset.direction
+        block.querySelectorAll(".token-amount-input").forEach(input => {
+          input.dataset.tokenStatement = label
+          input.value = (dirs[dir] || {})[input.dataset.tokenId] || 0
+        })
+      })
+      parent.appendChild(row)
+    })
   }
 
   // ── Flows: first-class named branches ───────────────────────────────────

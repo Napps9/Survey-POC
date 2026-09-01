@@ -744,15 +744,36 @@ export default class extends Controller {
     this._tokenBlocks = new WeakMap()
     this._logicBlocks = new WeakMap()
     this.cardTargets.forEach(c => this.registerCard(c))
+    // A Turbo snapshot can restore with a card's blocks still relocated into
+    // the sidebar slots (or the parking div), where the per-card lookup above
+    // cannot see them: the rebuilt WeakMaps come back empty for that card,
+    // _tokenScope falls back to the card, reads nothing, and the next autosave
+    // writes the card without its token keys. Sweep strays home by the
+    // owner-cid stamp registerCard leaves on every block.
+    this.element.querySelectorAll(
+      ".quiz-correct-block[data-owner-cid], .token-award-block[data-owner-cid], .logic-branch-block[data-owner-cid]"
+    ).forEach(block => {
+      if (block.closest(".survey-card-wrap")) return
+      const card = this.element.querySelector(
+        `.survey-card-wrap[data-card-cid="${CSS.escape(block.dataset.ownerCid)}"]`)
+      if (!card) return
+      card.appendChild(block)
+      this.registerCard(card)
+    })
   }
 
   registerCard(card) {
+    const cid = card.dataset.cardCid
+    const remember = (map, block) => {
+      map.set(card, block)
+      if (cid) block.dataset.ownerCid = cid
+    }
     const quiz = card.querySelector(".quiz-correct-block")
-    if (quiz) this._quizBlocks.set(card, quiz)
+    if (quiz) remember(this._quizBlocks, quiz)
     const tokens = card.querySelector(".token-award-block")
-    if (tokens) this._tokenBlocks.set(card, tokens)
+    if (tokens) remember(this._tokenBlocks, tokens)
     const logic = card.querySelector(".logic-branch-block")
-    if (logic) this._logicBlocks.set(card, logic)
+    if (logic) remember(this._logicBlocks, logic)
   }
 
   quizBlockFor(card)  { return this._quizBlocks?.get(card) }

@@ -756,6 +756,39 @@ class Survey < ApplicationRecord
     end
   end
 
+  # Per-card token config, wiped by the same client-silence shape keep_setup_media
+  # exists for: the editor renders token controls only while tokenisation is on,
+  # so a page loaded before the switch was flipped rebuilds every card with no
+  # token keys at all — and cards replace wholesale, so one autosave from that
+  # page deleted a deck's amounts for good. The client now says whether it could
+  # see the controls (serialize's tokens_authoritative); when it could not, the
+  # stored values win, by cid. When it could, absence is meaningful — all-zero
+  # amounts serialize as no key — so nothing may be merged back (that would make
+  # amounts un-deletable).
+  TOKEN_SETTING_KEYS = %w[tokens token_award token_award_mode tokens_enabled].freeze
+
+  def self.keep_token_settings(stored, incoming)
+    by_cid = Array(stored).each_with_object({}) do |card, h|
+      next unless card.is_a?(Hash)
+      cid = card["cid"].to_s
+      h[cid] = card if cid.present?
+    end
+    return incoming if by_cid.empty?
+
+    Array(incoming).map do |card|
+      next card unless card.is_a?(Hash)
+      was = by_cid[card["cid"].to_s]
+      next card unless was.is_a?(Hash)
+
+      c = card.dup
+      TOKEN_SETTING_KEYS.each do |key|
+        c.delete(key)
+        c[key] = was[key] unless was[key].nil?
+      end
+      c
+    end
+  end
+
   # A card's left panel holds a photo OR a video OR an animation. Any of the
   # three means the card has been given its imagery and nothing should overwrite
   # it — the same test AssetPopulator uses to decide what a fill-only run skips.

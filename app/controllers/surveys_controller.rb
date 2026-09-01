@@ -421,6 +421,15 @@ class SurveysController < ApplicationController
     attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")
       attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
+      # Token config mirrors the setup-media carry below: the editor renders
+      # token controls only when tokenisation is on, so a page loaded while it
+      # was off rebuilds cards with no token keys — silence from a client that
+      # provably could not see them, not a decision to delete. Absent flag
+      # (an older client) preserves too; only a client that saw the controls
+      # may zero them.
+      unless ActiveModel::Type::Boolean.new.cast(payload["tokens_authoritative"])
+        attrs[:cards] = Survey.keep_token_settings(survey.cards, attrs[:cards])
+      end
       # An import's creator is in the editor while FinishVertoSetupJob is still
       # filling in imagery behind them. The editor rebuilds every card from the
       # DOM, and the DOM has no pictures in it yet, so its silence about them is
