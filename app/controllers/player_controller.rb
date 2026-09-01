@@ -371,7 +371,11 @@ class PlayerController < ApplicationController
     render json: { ok: false, error: "Invalid session." }, status: :forbidden
   rescue => e
     ErrorReporting.report("PlayerController##{action_name}", e)
-    render json: { ok: false, error: "Something went wrong recording your response." }, status: :unprocessable_entity
+    # 500, not 422, for the same reason #submit does it: a transient fault must
+    # look RETRYABLE to the service worker. Its queue drops non-retryable 4xx,
+    # so a queued consent DECLINE that hit a hiccup here was silently discarded
+    # — and the purge the respondent asked for never ran.
+    render json: { ok: false, error: "Something went wrong recording your response." }, status: :internal_server_error
   end
 
   # Quiz: record + grade one card as the player advances, returning that card's

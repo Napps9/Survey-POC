@@ -11,7 +11,10 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     get pwa_service_worker_path(format: :js)
     assert_response :success
     assert_match %r{\Atext/javascript}, response.content_type
-    assert_includes response.body, '"playverto-v40"'
+    # v41: submit-queue retries gained exponential backoff + Retry-After, and
+    # the opportunistic drain is rate-limited — worker behaviour changed, so
+    # the version moves (and delivers the new worker same-visit).
+    assert_includes response.body, '"playverto-v41"'
   end
 
   test "the worker can reach the Pexels CDNs it refetches card art from" do

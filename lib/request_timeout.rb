@@ -178,13 +178,31 @@ module RequestTimeout
     private
 
       def build(app, seconds)
-        # wait_timeout is off deliberately. It only engages when the proxy sets
-        # X-Request-Start, but when it does, rack-timeout *reduces* the
-        # service timeout to whatever is left of the wait budget
-        # (service_past_wait defaults to false) — which would silently clamp the
-        # slow tier's four minutes down to well under one. Off, service_timeout
-        # means exactly what it says on every tier.
-        Rack::Timeout.new(app, service_timeout: seconds, wait_timeout: false)
+        # wait_timeout is off by default, deliberately. It only engages when
+        # the proxy sets X-Request-Start, but when it does, rack-timeout
+        # *reduces* the service timeout to whatever is left of the wait budget
+        # (service_past_wait defaults to false) — which would silently clamp
+        # the slow tier's four minutes down to well under one. Off,
+        # service_timeout means exactly what it says on every tier.
+        #
+        # REQUEST_WAIT_TIMEOUT (seconds) opts into request SHEDDING for a
+        # high-load window: under saturation, clients abandon at their own
+        # timeouts (the player's service worker gives up on HTML at 3.5s)
+        # while Puma keeps dequeuing and fully serving those dead requests —
+        # goodput collapses to zero at 100% busy. With a wait budget, a
+        # request that already sat in the queue longer than the client would
+        # wait is dropped on arrival instead of served into the void.
+        # service_past_wait: true keeps each tier's service_timeout intact
+        # (shed stale requests, never clamp live ones). Only meaningful when
+        # the fronting proxy stamps X-Request-Start — verify that on the
+        # scratch environment before relying on it for an event.
+        wait = ENV["REQUEST_WAIT_TIMEOUT"].to_i
+        if wait.positive?
+          Rack::Timeout.new(app, service_timeout: seconds,
+                                 wait_timeout: wait, service_past_wait: true)
+        else
+          Rack::Timeout.new(app, service_timeout: seconds, wait_timeout: false)
+        end
       end
   end
 end

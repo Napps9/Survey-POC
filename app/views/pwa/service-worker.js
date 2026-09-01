@@ -31,7 +31,7 @@
 // and nobody else: every already-registered worker kept enforcing the old
 // policy, kept refusing to fetch card art, and would have done so indefinitely.
 // Changing this constant is what forces the reinstall that picks the policy up.
-const CACHE_VERSION = "playverto-v40"
+const CACHE_VERSION = "playverto-v41"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -43,6 +43,17 @@ const IDB_STORE = "pending_submits"
 // Without a cap an item that can never land is retried on every same-origin GET
 // for the life of the browser profile.
 const MAX_QUEUE_ATTEMPTS = 25
+
+// Retry pacing. A drain used to re-fire every queued item at page-request rate
+// with no delay — under a server brownout, fifty thousand clients doing that
+// IS the outage. Failed deliveries now back off exponentially with jitter
+// (5s, 10s, 20s … capped at 5 min), and a 429's Retry-After is honoured when
+// the server names a wait. The opportunistic same-origin-GET drain (the iOS
+// fallback for missing Background Sync) is rate-limited too; Background Sync
+// and explicit page messages still drain immediately.
+const RETRY_BASE_MS         = 5_000
+const RETRY_MAX_MS          = 300_000
+const DRAIN_MIN_INTERVAL_MS = 30_000
 
 // ── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -95,8 +106,11 @@ self.addEventListener("fetch", (event) => {
   // its way past.
   if (req.destination === "video" || req.destination === "audio" || req.headers.has("range")) return
 
-  // Opportunistic queue drain on any same-origin GET (iOS fallback).
-  if (url.origin === self.location.origin) event.waitUntil(drainQueue())
+  // Opportunistic queue drain on same-origin GETs (iOS fallback), rate-limited:
+  // a page with N subresources used to kick the drain N times per navigation.
+  if (url.origin === self.location.origin && Date.now() - _lastDrainAt >= DRAIN_MIN_INTERVAL_MS) {
+    event.waitUntil(drainQueue())
+  }
 
   // Player HTML — network-first so edits and unpublishes are seen on the next
   // ordinary visit; the cache only answers when the network can't, which keeps
@@ -323,11 +337,22 @@ async function handleSubmit(req) {
     return queueSubmit(clone) // genuinely offline: no response at all
   }
   if (res.ok || !retryable(res.status)) return res // 4xx goes to the page as-is
-  return queueSubmit(clone)
+  // The server answered "try again later" — schedule the first retry with
+  // backoff (honouring Retry-After on a 429) instead of racing back in.
+  return queueSubmit(clone, retryDelayMs(0, res.headers.get("Retry-After")))
 }
 
-async function queueSubmit(clone) {
-  try { await enqueueSubmit(clone) } catch (e) { /* best effort */ }
+// How long a failed delivery waits before its next attempt: exponential with
+// full jitter, floored by whatever Retry-After the server named.
+function retryDelayMs(backoffs, retryAfterHeader) {
+  const exp    = Math.min(RETRY_BASE_MS * 2 ** backoffs, RETRY_MAX_MS)
+  const jitter = Math.random() * exp
+  const named  = Number(retryAfterHeader) * 1000 // NaN unless a seconds value
+  return Math.max(exp / 2 + jitter / 2, Number.isFinite(named) ? named : 0)
+}
+
+async function queueSubmit(clone, delayMs = 0) {
+  try { await enqueueSubmit(clone, delayMs) } catch (e) { /* best effort */ }
   if (self.registration && self.registration.sync) {
     try { await self.registration.sync.register("playverto-submit") } catch (e) { /* unsupported */ }
   }
@@ -360,13 +385,13 @@ function openDB() {
   })
 }
 
-async function enqueueSubmit(req) {
+async function enqueueSubmit(req, delayMs = 0) {
   const body = await req.text()
   const url  = req.url
   const db   = await openDB()
   return new Promise((resolve, reject) => {
     const tx = db.transaction(IDB_STORE, "readwrite")
-    tx.objectStore(IDB_STORE).add({ url, body, ts: Date.now() })
+    tx.objectStore(IDB_STORE).add({ url, body, ts: Date.now(), nextAt: Date.now() + delayMs })
     tx.oncomplete = () => resolve()
     tx.onerror    = () => reject(tx.error)
   })
@@ -393,8 +418,8 @@ async function deleteQueued(id) {
   })
 }
 
-// Record a failed delivery attempt so drainQueue can eventually give up.
-async function bumpQueuedAttempts(id, attempts) {
+// Merge fields (attempt counters, the next-retry timestamp) into a queued row.
+async function updateQueued(id, patch) {
   const db = await openDB()
   return new Promise((resolve, reject) => {
     const tx    = db.transaction(IDB_STORE, "readwrite")
@@ -402,7 +427,7 @@ async function bumpQueuedAttempts(id, attempts) {
     const get   = store.get(id)
     get.onsuccess = () => {
       const row = get.result
-      if (row) { row.attempts = attempts; store.put(row) }
+      if (row) store.put(Object.assign(row, patch))
     }
     tx.oncomplete = () => resolve()
     tx.onerror    = () => reject(tx.error)
@@ -410,12 +435,16 @@ async function bumpQueuedAttempts(id, attempts) {
 }
 
 let _draining = false
+let _lastDrainAt = 0
 async function drainQueue() {
   if (_draining) return
   _draining = true
+  _lastDrainAt = Date.now()
   try {
     const items = await readAllQueued()
     for (const item of items) {
+      // Still inside its backoff window — not this drain's business.
+      if (item.nextAt && item.nextAt > Date.now()) continue
       try {
         const res = await fetch(item.url, {
           method: "POST",
@@ -425,7 +454,17 @@ async function drainQueue() {
         // Drop it on success OR on anything that will never succeed. Keeping
         // only-on-ok meant a Verto unpublished mid-flight left an item retried
         // on every same-origin GET, forever, on that respondent's device.
-        if (res.ok || !retryable(res.status)) await deleteQueued(item.id)
+        if (res.ok || !retryable(res.status)) { await deleteQueued(item.id); continue }
+        // The server ANSWERED "try again later" (429/5xx) — back off
+        // exponentially, honouring Retry-After. This is not the can-never-land
+        // case the attempts budget below exists for, so it doesn't burn it:
+        // an overloaded server must never cost a respondent their saved
+        // submit, and the backoff bounds the retry rate on its own.
+        const backoffs = (item.backoffs || 0) + 1
+        await updateQueued(item.id, {
+          backoffs,
+          nextAt: Date.now() + retryDelayMs(backoffs, res.headers.get("Retry-After"))
+        })
       } catch (_) {
         // The fetch threw — usually because the device is offline, which is
         // the exact case the queue exists to survive. The attempts budget must
@@ -440,7 +479,10 @@ async function drainQueue() {
         if (self.navigator && self.navigator.onLine === false) continue
         const attempts = (item.attempts || 0) + 1
         if (attempts >= MAX_QUEUE_ATTEMPTS) await deleteQueued(item.id)
-        else await bumpQueuedAttempts(item.id, attempts)
+        else await updateQueued(item.id, {
+          attempts,
+          nextAt: Date.now() + retryDelayMs(attempts, null)
+        })
       }
     }
   } finally {
