@@ -8,8 +8,14 @@ services:
     # CMD (rails server) binds to $PORT via config/puma.rb. libvips is also
     # available here for Active Storage image variants.
     runtime: docker
+    # Live deployment facts (owner-confirmed 2026-09-01): the running web
+    # service and database are BOTH in Frankfurt (EU Central) — this file
+    # previously said oregon, which was stale against reality. A blueprint
+    # that lies about region is exactly what recreates a service on the
+    # wrong continent during an incident; keep these fields matching the
+    # dashboard.
     plan: starter
-    region: oregon
+    region: frankfurt
     branch: Main
     # Deploys are triggered by CI's `deploy` job POSTing this service's Deploy
     # Hook the moment every check is green (see .github/workflows/ci.yml), so
@@ -160,7 +166,7 @@ services:
       - key: LOCATIONIQ_API_KEY
         sync: false
       - key: LOCATIONIQ_REGION
-        value: us1
+        value: eu1
       # App-wide outbound cap for the geocoder (SharedRateLimiter, P1-11). The
       # per-IP rate_limit on #location_search bounds one respondent; this bounds
       # the whole app, which is what the provider's usage policy is written
@@ -198,5 +204,9 @@ services:
 
 databases:
   - name: survey-poc-db
-    plan: starter
-    region: oregon
+    # The live database ("PlayVertoNow", PostgreSQL 18) runs Basic-256mb in
+    # Frankfurt — owner-confirmed 2026-09-01. If a blueprint sync rejects the
+    # plan name, read the exact enum off the dashboard; do not fall back to
+    # "starter"/"oregon", both were stale fictions.
+    plan: basic-256mb
+    region: frankfurt

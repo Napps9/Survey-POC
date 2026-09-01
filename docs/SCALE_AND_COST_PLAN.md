@@ -68,12 +68,11 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
 ## 3. What remains, in order (needs dashboards/accounts)
 
-1. **Before anything else, and unrelated to the event**: copy
-   `SECRET_KEY_BASE` + the three `ACTIVE_RECORD_ENCRYPTION_*` values from
-   Render into a password manager (see `docs/ENCRYPTION_KEYS.md`). The
-   Frankfurt migration below is exactly the "service recreation" that makes
-   losing them unrecoverable. Confirm Postgres backup retention; test a
-   restore.
+1. **Done 2026-09-01**: the four `generateValue` secrets (`SECRET_KEY_BASE`
+   + the three `ACTIVE_RECORD_ENCRYPTION_*` values) are backed up outside
+   Render (see `docs/ENCRYPTION_KEYS.md`). Still owed: confirm Postgres
+   backup retention off the dashboard, record `SHOW max_connections;`, and
+   test a restore.
 2. **Scratch environment + baseline load test** (`test/load/README.md`).
    Never against production — the harness is a denial-of-service by design.
 3. **Active Storage → Cloudflare R2** (EU jurisdiction;
@@ -90,16 +89,18 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
    `public_file_server.headers`, `asset_host`, Thruster.
 5. **Rails.cache + Action Cable → Render Key Value (Valkey)** (add the redis
    gem; switch on a quiet day — rate-limit counters reset at the flip).
-6. **Frankfurt + scale-out**, in this order: Solid Queue out of Puma (a
+6. **Scale-out** — no region migration: the live web service AND database
+   are already in Frankfurt (owner-confirmed 2026-09-01; `render.yaml` was
+   stale and has been corrected on this branch, the DB is `Basic-256mb`,
+   PostgreSQL 18). Remaining order: Solid Queue out of Puma (a
    `config/puma.rb` change — it is hard-enabled in production) **before**
    `WEB_CONCURRENCY=4`; drop the `+12` from the pool (see the note in
    `config/database.yml` — the app exhausts connections at three instances
-   otherwise); PgBouncer with **direct** URLs for migrations, Blazer and the
-   worker (advisory locks and session `SET`s are unsafe through transaction
-   pooling); create the Frankfurt service by **copying** secrets, never
-   `generateValue`; cutover runbook with an Oregon write-freeze and the CI
-   deploy hook repointed. Re-tune the 512 MB memory regime for the new
-   instance size.
+   otherwise, and Basic-256mb's `max_connections` is far below the planning
+   figures until the event-day resize); PgBouncer with **direct** URLs for
+   migrations, Blazer and the worker (advisory locks and session `SET`s are
+   unsafe through transaction pooling). Re-tune the 512 MB memory regime for
+   the new instance size.
 7. **Proof run at 1.5× peak** (125 arrivals/s, 50k-row table) — gate: zero
    5xx, p95 < 1 s on submit, flat leaderboard/results latency, bounded
    brownout echo, no health flaps, no autovacuum cliff.
