@@ -18,7 +18,12 @@ deleted afterwards.
 1. Create a scratch Render web service + Postgres from this repo's
    `render.yaml` (any branch), or run the app locally against Postgres.
    Configure it like production for the scenario under test (instance plan,
-   `WEB_CONCURRENCY`, `RAILS_MAX_THREADS`, PgBouncer on/off).
+   `WEB_CONCURRENCY`, `RAILS_MAX_THREADS`, PgBouncer on/off) — **plus
+   `PLAYER_RATE_LIMIT_SCALE=1000`**, which production does not set. The
+   player endpoints rate-limit per IP (consent's 30/min is the tightest) and
+   k6 drives the whole burst from a handful of runner IPs, so without the
+   scale-up ~99% of requests 429 inside the first minute (observed
+   2026-09-01: 36 successful page loads, then a wall of 429s).
 2. Seed it — **the O(N) endpoints are invisible on an empty table**, so the
    responses table must be at full target size before any number means
    anything:
