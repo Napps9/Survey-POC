@@ -77,8 +77,13 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
    restore-test artifact — restore it into the scratch DB when that exists),
    another the day before any event or migration-heavy deploy, and longer-term
    a scheduled export to our own bucket so a copy lives outside Render (P1-2).
-   Still owed: `SHOW max_connections;` (read it off the scratch DB at the same
-   tier). Also observed on the
+   **`max_connections` = 103** — measured 2026-09-01 on the scratch DB at the
+   same tier (Basic-256mb) production runs. With ~3 slots reserved for
+   superuser, the usable budget is ~100: today's single-instance shape (pool
+   threads+12 = 15) is comfortable, but the scale-out shape is not — 6
+   instances at `WEB_CONCURRENCY=4` need ~170 even after the pool-formula fix,
+   so PgBouncer and/or the event-day tier resize is a hard prerequisite, not
+   headroom. Also observed on the
    live instance: the built-in Connection Pool (PgBouncer) toggle exists and
    is off (flip it only in the scale-out stage, after the pool-formula
    change), and inbound Postgres access is open to 0.0.0.0/0 — deliberate
@@ -107,7 +112,8 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
    `config/puma.rb` change — it is hard-enabled in production) **before**
    `WEB_CONCURRENCY=4`; drop the `+12` from the pool (see the note in
    `config/database.yml` — the app exhausts connections at three instances
-   otherwise, and Basic-256mb's `max_connections` is far below the planning
+   otherwise, and Basic-256mb's measured `max_connections` of 103 is far
+   below the planning
    figures until the event-day resize); PgBouncer with **direct** URLs for
    migrations, Blazer and the worker (advisory locks and session `SET`s are
    unsafe through transaction pooling). Re-tune the 512 MB memory regime for
@@ -161,8 +167,9 @@ Real Postgres compute tiers (read off the live instance's Plan page —
 | Anthropic, respondent path (plain Verto) | 0 |
 
 The tier change restarts the database — it happens the day before, in the
-runbook, never mid-event. The one number still unread:
-`SHOW max_connections;` (comes free with the scratch environment).
+runbook, never mid-event. `max_connections` at the current tier is **103**
+(measured on the scratch DB, 2026-09-01); read it again after the event-day
+resize, since the whole scale-out connection budget hangs off it.
 
 **The infrastructure delta for 50,000 people is under twenty dollars. The
 cost is the engineering — most of which is now on this branch.**
