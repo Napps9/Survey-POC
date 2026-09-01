@@ -55,6 +55,9 @@ class ResultsExportXlsxTest < ActiveSupport::TestCase
     xml = sheet1_xml(ResultsExportXlsx.new(@export, summary: false).to_stream)
     assert_includes xml, "<t>Favourite colour?</t>"
     assert_includes xml, "<t>Blue</t>"
+    # The responder-grouping columns ride the same header row.
+    assert_includes xml, "<t>Responder</t>"
+    assert_includes xml, "<t>Device group</t>"
   end
 
   test "the summary workbook carries the question and an option count" do

@@ -61,6 +61,13 @@ class RespondentDataController < ApplicationController
       @survey.contact_details.where(key_digest: digests).delete_all
       @survey.player_aliases.where(key_digest: digests).delete_all
     end
+    # The export's Responder name hangs off respondent_code_digest the same
+    # way. Purged even when other rows still share the code (a session-token
+    # erasure of one run): a stored name is this identity's data, so it goes
+    # with the erased rows; survivors re-mint on the next export — losing no
+    # rows, and (names being digest-derived) usually the same name.
+    code_digests = responses.map(&:respondent_code_digest).compact.uniq
+    @survey.respondent_aliases.where(code_digest: code_digests).delete_all if code_digests.any?
 
     responses.destroy_all
     redirect_to survey_respondent_data_path(@survey),

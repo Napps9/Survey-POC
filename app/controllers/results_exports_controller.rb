@@ -34,9 +34,10 @@ class ResultsExportsController < ApplicationController
     response.headers["Content-Disposition"] = ActionDispatch::Http::ContentDisposition.format(disposition: "attachment", filename: filename)
     response.headers["X-Accel-Buffering"]   = "no"
 
-    # Stream the CSV row-by-row so neither the full table nor the generated CSV
-    # string is held in memory; raw-response rows are pulled from the DB in
-    # batches inside export.each_row. Lead with a UTF-8 BOM for Excel.
+    # Stream the CSV row-by-row so the generated CSV string is never held in
+    # memory. Raw-response rows are buffered once inside export.each_row to be
+    # grouped by responder — the same footprint the XLSX/Sheets paths already
+    # have. Lead with a UTF-8 BOM for Excel.
     self.response_body = Enumerator.new do |out|
       out << "﻿"
       export.each_row(summary: summary) { |row| out << CSV.generate_line(row) }

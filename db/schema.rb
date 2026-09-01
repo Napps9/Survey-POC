@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_093000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_130000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -613,6 +613,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_093000) do
     t.check_constraint "status IN ('pending', 'running', 'succeeded', 'failed')", name: "chk_report_renders_status"
   end
 
+  create_table "respondent_aliases", force: :cascade do |t|
+    t.string "anon_name", null: false
+    t.string "code_digest", null: false
+    t.datetime "created_at", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "anon_name"], name: "index_respondent_aliases_on_survey_id_and_anon_name", unique: true
+    t.index ["survey_id", "code_digest"], name: "index_respondent_aliases_on_survey_id_and_code_digest", unique: true
+    t.index ["survey_id"], name: "index_respondent_aliases_on_survey_id"
+  end
+
   create_table "responses", force: :cascade do |t|
     t.boolean "answered", default: false, null: false
     t.json "answers", default: {}, null: false
@@ -1022,6 +1033,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_093000) do
   add_foreign_key "portfolios", "funders"
   add_foreign_key "report_renders", "surveys"
   add_foreign_key "report_renders", "users"
+  add_foreign_key "respondent_aliases", "surveys"
   add_foreign_key "responses", "survey_links"
   add_foreign_key "responses", "survey_shares"
   add_foreign_key "responses", "survey_waves"

@@ -31,6 +31,9 @@ class Survey < ApplicationRecord
   # Derived rows (see LeaderboardStanding) — delete_all, not destroy: there are
   # no callbacks to run and a big board would destroy row-by-row for nothing.
   has_many :leaderboard_standings, dependent: :delete_all
+  # Same contract as player_aliases for the responder names the export and
+  # results page group by.
+  has_many :respondent_aliases, dependent: :destroy
   has_many :contact_details, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in

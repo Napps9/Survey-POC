@@ -102,6 +102,33 @@ class ResultsExportsTest < ActionDispatch::IntegrationTest
     ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_CLIENT_SECRET"] = prev
   end
 
+  test "the CSV groups a responder's runs under one minted name, and never leaks a digest" do
+    digest = @survey.respondent_code_digest("sam14")
+    early  = @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", locale: "en",
+                                       respondent_code_digest: digest, created_at: 3.days.ago,
+                                       answers: { "0" => { "type" => "multiple_choice", "value" => "Green" } })
+    late   = @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", locale: "en",
+                                       respondent_code_digest: digest, created_at: 1.day.ago,
+                                       answers: { "0" => { "type" => "multiple_choice", "value" => "Blue" } })
+
+    get survey_results_export_path(@survey, kind: "responses")
+    assert_response :success
+
+    parsed = CSV.parse(response.body.delete_prefix("﻿"), headers: true)
+    assert_includes parsed.headers, "Responder"
+    assert_includes parsed.headers, "Device group"
+
+    rows  = parsed.map { |r| r }
+    coded = rows.select { |r| r["Responder"].present? }
+    assert_equal [ early.id.to_s, late.id.to_s ], coded.map { |r| r["Response ID"] },
+                 "one responder's runs sit together, in play order"
+    assert_equal 1, coded.map { |r| r["Responder"] }.uniq.size
+    assert rows.last["Responder"].blank?, "the uncoded setup response trails the named group"
+
+    assert_not_includes response.body, digest
+    assert_not_includes response.body, "sam14"
+  end
+
   test "results include partial (started) responders, excluding those who answered nothing" do
     # answered the question but never reached Submit — must now be counted
     @survey.responses.create!(session_token: SecureRandom.uuid, status: "started", locale: "en",

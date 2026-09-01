@@ -9,8 +9,16 @@
 # `answers` is untrusted client JSON keyed by card index ("0", "1", …) with the
 # shape { "type", "value", "other"? }; every accessor guards nil / wrong types.
 class ResultsExport
+  # "Device" is the device KIND (phone/desktop); "Device group" is the
+  # leaderboard's anonymous browser identity — rows sharing one came from the
+  # same browser. "Responder" is the anonymous name for a respondent-code
+  # identity. Both are minted names (PlayerAlias / RespondentAlias), never the
+  # digests: a digest is a stable cross-export handle on a hashed value, and
+  # the leak tests hold this file to never emitting one.
   RESPONSE_HEADER = [ "Response ID", "Submitted at", "Source", "Language",
-                      "Duration (seconds)", "Device" ].freeze
+                      "Duration (seconds)", "Device", "Responder", "Device group" ].freeze
+  RESPONDER_COLUMN    = RESPONSE_HEADER.index("Responder")
+  DEVICE_GROUP_COLUMN = RESPONSE_HEADER.index("Device group")
   SUMMARY_HEADER  = [ "Card #", "Card type", "Question", "Answer option", "Count", "Percentage", "Total answers" ].freeze
   CHOICE_TYPES    = %w[multiple_choice yes_no select_one_grid select_many select_many_grid scenario].freeze
 
@@ -38,28 +46,77 @@ class ResultsExport
     [].tap { |rows| each_summary_row { |row| rows << row } }
   end
 
-  # Streaming entry point for the CSV download: yields one already-sanitized
-  # row at a time so the controller never holds the whole table (or the whole
-  # generated CSV string) in memory. For raw responses this pulls the DB rows
-  # in batches via find_each rather than loading them all at once.
+  # Entry point for the CSV download: yields one already-sanitized row at a
+  # time, so the controller never holds the generated CSV string in memory.
+  # Response rows are buffered once internally to be grouped by responder
+  # (see each_response_row); the summary path streams as before.
   def each_row(summary:, &block)
     summary ? each_summary_row(&block) : each_response_row(&block)
   end
 
   private
 
+  # One row per response, grouped by responder: a coded responder's runs sit
+  # together (responders in name order, runs in play order), then every
+  # uncoded row in today's chronological order — so a deck with no codes
+  # exports byte-identically ordered to before the grouping existed.
+  #
+  # Rows are buffered as plain cell arrays before yielding: find_each cannot
+  # honour a custom ORDER BY, and a SQL ORDER BY over the nullable digest
+  # would sort NULLs differently on SQLite and Postgres. The buffer holds
+  # formatted cells (never AR objects), which puts this path's peak memory
+  # where the Sheets/XLSX paths already are — both materialise every row.
   def each_response_row
     yield csv_safe_row(RESPONSE_HEADER + question_cards.map { |card, _idx| question_text(card) })
+
+    buffered = []
     each_export_response do |response|
       answers = response.answers.is_a?(Hash) ? response.answers : {}
-      yield csv_safe_row([
+      cells = [
         response.id,
         response.created_at&.strftime("%Y-%m-%d %H:%M"),
         source_label(response),
         response.locale,
         response.duration_seconds,
-        response.device_kind
-      ] + question_cards.map { |card, idx| format_answer(card, answers[idx.to_s]) })
+        response.device_kind,
+        # Filled from the minted-name maps below. The placeholders are nil —
+        # never the digests — so a fill bug cannot leak one into a cell.
+        nil,
+        nil
+      ] + question_cards.map { |card, idx| format_answer(card, answers[idx.to_s]) }
+      buffered << { cells: cells,
+                    code_digest: response.respondent_code_digest.presence,
+                    device_digest: response.player_key_digest.presence,
+                    at: response.created_at || Time.at(0),
+                    id: response.id }
+    end
+
+    responder_names = alias_names(buffered.map { |row| row[:code_digest] },
+                                  RespondentAlias, :code_digest)
+    device_names    = alias_names(buffered.map { |row| row[:device_digest] },
+                                  PlayerAlias, :key_digest)
+
+    buffered.each do |row|
+      row[:cells][RESPONDER_COLUMN]    = responder_names[row[:code_digest]] || ""
+      row[:cells][DEVICE_GROUP_COLUMN] = device_names[row[:device_digest]] || ""
+    end
+
+    # Names are unique per survey, so the responder name alone is the group
+    # key; blank names (no code) sort behind every named group.
+    buffered.sort_by! do |row|
+      name = row[:cells][RESPONDER_COLUMN]
+      [ name.empty? ? 1 : 0, name, row[:at], row[:id] ]
+    end
+
+    buffered.each { |row| yield csv_safe_row(row[:cells]) }
+  end
+
+  # digest → minted anonymous name for every distinct digest in the buffered
+  # rows. Minting is idempotent and happens at read time (the leaderboard's
+  # posture), so the first export of a Verto names everyone it lists.
+  def alias_names(digests, model, digest_key)
+    digests.compact.uniq.index_with do |digest|
+      model.ensure_for!(:survey => @survey, digest_key => digest).anon_name
     end
   end
 
@@ -85,7 +142,8 @@ class ResultsExport
     if @responses.respond_to?(:find_each)
       @responses.reorder(nil)
         .select(:id, :created_at, :locale, :survey_share_id, :answers,
-                :started_at, :completed_at, :device_kind)
+                :started_at, :completed_at, :device_kind,
+                :respondent_code_digest, :player_key_digest)
         .find_each(batch_size: 500, &block)
     else
       @responses.each(&block)
