@@ -1122,6 +1122,40 @@ class SurveysController < ApplicationController
         aggregate_results(Array(@survey.cards), latest_seg[:scope])
       )
     end
+
+    # Responders — whole-Verto and filter-independent like the two cards
+    # above, because spanning waves/dates/segments is the whole point of a
+    # respondent code. Counts only, wearing the same minted names as the
+    # export's Responder column; the admin-gated respondent-data page stays
+    # the per-person drill-down. Grouped queries take .reorder(nil) so the
+    # base scope's ORDER BY never rides into a GROUP BY (the Postgres shape
+    # SQLite lets through).
+    responder_scope = @survey.responses.where(answered: true)
+                             .where.not(respondent_code_digest: nil)
+    plays = responder_scope.reorder(nil).group(:respondent_code_digest).count
+    if plays.any?
+      @responders_total = plays.size
+      last_played = responder_scope.reorder(nil).group(:respondent_code_digest).maximum(:created_at)
+      if @survey.waved?
+        # Wave 1 stays implicit (nil survey_wave_id) until waves exist — fold
+        # nil into the position-1 wave, resolve_result_segments' rule.
+        wave_one = @survey.survey_waves.order(:position).first&.id
+        waves_by_digest = responder_scope.reorder(nil)
+          .group(:respondent_code_digest, :survey_wave_id).count
+          .each_with_object(Hash.new { |h, k| h[k] = Set.new }) do |((digest, wave_id), _n), acc|
+            acc[digest] << (wave_id || wave_one)
+          end
+        @responder_wave_count = @survey.survey_waves.size
+      end
+      top = plays.sort_by { |digest, n| [ -n, -last_played[digest].to_i, digest ] }
+                 .first(RESULTS_LEADERBOARD_ROWS)
+      @responders = top.map do |digest, n|
+        { name: RespondentAlias.ensure_for!(survey: @survey, code_digest: digest).anon_name,
+          plays: n,
+          waves: waves_by_digest && waves_by_digest[digest].size,
+          last_played: last_played[digest] }
+      end
+    end
     render :results, layout: "fullscreen"
   end
 

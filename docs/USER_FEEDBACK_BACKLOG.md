@@ -355,8 +355,10 @@ per-survey salt, never the plaintext, so the creator cannot read it and it is
 only comparable within that Verto. Index `[survey_id, respondent_code_digest]`.
 Repeat participation creates a **new** response row sharing a digest (the unique
 index is on `session_token`, which stays the row key) — precisely what
-longitudinal comparison needs. Creator sees "N respondents returned" and
-wave-over-wave comparisons, never a code.
+longitudinal comparison needs. Creator sees "N respondents returned",
+wave-over-wave comparisons, and per-responder groupings under minted anonymous
+names (the export's Responder column, the results Responders card) — never a
+code or a digest.
 
 **Free-text character limit (S).** Today: hardcoded 200
 (`_card_component.html.erb:595-603`), **advisory only** — no `maxlength`, no

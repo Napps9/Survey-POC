@@ -454,6 +454,47 @@
             </div>
           <% end %>
 
+          <%# ── Responders (creator's view) ── Deliberately ABOVE the
+              date/segment pills for the same reason as its neighbours: a
+              responder's runs span waves, dates and segments — spanning them
+              is what the code exists to do — so this must not read as
+              filtered. Counts only: the grouped ANSWERS live in the export's
+              Responder column, and the admin-gated respondent-data page is
+              the per-person drill-down. Never on the public share page,
+              which renders only _result_cards. %>
+          <% if @responders.present? %>
+            <div class="s-card" style="cursor:default;overflow:visible;margin-bottom:10px;">
+              <div class="s-card-header" style="padding:9px 14px;gap:10px;">
+                <span class="s-badge" style="background:rgba(12,167,255,0.15);color:#0CA7FF;">🔑 Responders</span>
+                <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:#01EACB;">
+                  <%= @responders_total %> responder<%= @responders_total == 1 ? "" : "s" %>
+                </span>
+              </div>
+              <div style="padding:10px 16px 12px;">
+                <% @responders.each_with_index do |r, i| %>
+                  <div style="display:flex;align-items:center;gap:10px;padding:5px 0;<%= 'border-top:1px solid rgba(255,255,255,0.06);' if i.positive? %>">
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= r[:name] %></span>
+                    <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:#fff;white-space:nowrap;"><%= pluralize(r[:plays], "play") %></span>
+                    <% if r[:waves] %>
+                      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.55);min-width:86px;text-align:right;white-space:nowrap;"><%= r[:waves] %> of <%= @responder_wave_count %> wave<%= @responder_wave_count == 1 ? "" : "s" %></span>
+                    <% end %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.45);min-width:78px;text-align:right;white-space:nowrap;"><%= r[:last_played].strftime("%-d %b %Y") %></span>
+                  </div>
+                <% end %>
+                <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
+                  <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.55);">
+                    Names are system-made and anonymous — never the code a respondent typed. The same names group the export's Responder column.
+                  </span>
+                  <% if @responders_total > @responders.size %>
+                    <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-2xs);color:rgba(255,255,255,0.55);">
+                      Showing the top <%= @responders.size %> of <%= @responders_total %>.
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
           <%# ── Leaderboard (creator's view) ── Deliberately ABOVE the
               date/segment pills: the board is whole-Verto (identities span
               the filters, and the retake policy already decides which runs

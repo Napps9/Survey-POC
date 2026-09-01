@@ -135,6 +135,11 @@ entering a code is required to proceed wherever the card or pre-screen
 appears, yet the code is only as good as the respondent's memory, and
 nothing stops a throwaway entry they can never reproduce.
 
+Creators also see per-responder groupings — the export's Responder column
+and the results page's Responders card — but only under minted anonymous
+names (`RespondentAlias`, erased with the responses they name): never the
+code, its digest, or anything derived from either.
+
 ## Related
 
 - Consent enforcement: `Survey#default_consent_gate?` (P0-6)
