@@ -464,45 +464,51 @@ class PlayerController < ApplicationController
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
     return render json: { ok: false, error: "Not a quiz" }, status: :forbidden unless @survey.quiz?
 
-    max    = QuizGrading.graded_indices(@survey.cards).size
-    graded = Array(@survey.cards).each_with_index.select { |card, _idx| QuizGrading.graded?(card) }
+    # Cached like #results: every finisher's score screen re-graded every
+    # response per graded card per request; now the O(responses × graded)
+    # pass runs at most once per cache window.
+    payload = cached_aggregate(:scores) do
+      max    = QuizGrading.graded_indices(@survey.cards).size
+      graded = Array(@survey.cards).each_with_index.select { |card, _idx| QuizGrading.graded?(card) }
 
-    # Small-cell suppression (P1-14), as on #results. A per-question
-    # correct-rate over one other person is that person's answer sheet: "100%
-    # got Q3 right" with a total of 1 says exactly what they scored.
-    scored = @survey.responses.where(status: "completed").where.not(score: nil)
-    if scored.count < Response::MIN_REGION_SAMPLE_SIZE
-      return render json: { ok: true, suppressed: true, total: scored.count, max: max,
-                            average: 0.0, distribution: [], per_question: [] }
-    end
-
-    # One batched pass: score histogram, total/average, and per-question correct
-    # counts together — instead of loading every scored response into memory and
-    # re-scanning the set once per graded card.
-    dist        = Hash.new(0)
-    correct_by  = Hash.new(0)
-    total       = 0
-    score_sum   = 0
-    @survey.responses.where(status: "completed").where.not(score: nil)
-      .select(:id, :score, :answers).find_each(batch_size: 500) do |r|
-        total     += 1
-        score_sum += r.score
-        dist[r.score] += 1
-        answers = r.answers || {}
-        graded.each do |card, idx|
-          correct_by[idx] += 1 if QuizGrading.correct?(card, answers[idx.to_s]&.dig("value"))
+      # Small-cell suppression (P1-14), as on #results. A per-question
+      # correct-rate over one other person is that person's answer sheet: "100%
+      # got Q3 right" with a total of 1 says exactly what they scored.
+      scored = @survey.responses.where(status: "completed").where.not(score: nil)
+      if scored.count < Response::MIN_REGION_SAMPLE_SIZE
+        { suppressed: true, total: scored.count, max: max,
+          average: 0.0, distribution: [], per_question: [] }
+      else
+        # One batched pass: score histogram, total/average, and per-question
+        # correct counts together — instead of loading every scored response
+        # into memory and re-scanning the set once per graded card.
+        dist        = Hash.new(0)
+        correct_by  = Hash.new(0)
+        total       = 0
+        score_sum   = 0
+        scored.select(:id, :score, :answers).find_each(batch_size: 500) do |r|
+          total     += 1
+          score_sum += r.score
+          dist[r.score] += 1
+          answers = r.answers || {}
+          graded.each do |card, idx|
+            correct_by[idx] += 1 if QuizGrading.correct?(card, answers[idx.to_s]&.dig("value"))
+          end
         end
-      end
-    avg = total.positive? ? (score_sum.to_f / total).round(1) : 0.0
+        avg = total.positive? ? (score_sum.to_f / total).round(1) : 0.0
 
-    per_question = graded.map do |card, idx|
-      { index: idx, prompt: card["text"], correct: correct_by[idx],
-        pct: total.positive? ? (correct_by[idx] * 100.0 / total).round : 0 }
+        per_question = graded.map do |card, idx|
+          { index: idx, prompt: card["text"], correct: correct_by[idx],
+            pct: total.positive? ? (correct_by[idx] * 100.0 / total).round : 0 }
+        end
+
+        { total: total, max: max, average: avg,
+          distribution: (0..max).map { |s| { score: s, count: dist[s] } },
+          per_question: per_question }
+      end
     end
 
-    render json: { ok: true, total:, max:, average: avg,
-                   distribution: (0..max).map { |s| { score: s, count: dist[s] } },
-                   per_question: }
+    render json: { ok: true }.merge(payload)
   end
 
   # How many standings rows the board shows. "You" rides along even from
@@ -586,24 +592,33 @@ class PlayerController < ApplicationController
       return render json: { ok: false, error: "Comparison not enabled" }, status: :forbidden
     end
 
-    # Every responder (answered ≥1 question), not only those who reached Submit —
-    # so a respondent compares against all the answers collected per question,
-    # matching the creator Results screen. Each row is tallied off its own
-    # answers, so partial responses just count toward the questions they reached.
-    responses = @survey.responses.where(answered: true)
-    total     = responses.count
+    # The aggregation is cached for a few seconds (see cached_aggregate): this
+    # endpoint deserialises every answered response's answers JSON per compute,
+    # and at burst scale computing per request made it O(total responses) per
+    # viewer. The access guards above stay OUTSIDE the cache — the link still
+    # decides who may read; only the link-independent payload is shared.
+    payload = cached_aggregate(:results) do
+      # Every responder (answered ≥1 question), not only those who reached
+      # Submit — so a respondent compares against all the answers collected per
+      # question, matching the creator Results screen. Each row is tallied off
+      # its own answers, so partial responses count toward what they reached.
+      responses = @survey.responses.where(answered: true)
+      total     = responses.count
 
-    # Small-cell suppression (P1-14). #regions has enforced this from the start;
-    # #results did not, so on a Verto with one or two responders the comparison
-    # a respondent is shown IS the other respondent's answers, attributable to
-    # them by anyone who knows who else was asked. Same threshold and same
-    # reasoning as the map — see Response::MIN_REGION_SAMPLE_SIZE.
-    if total < Response::MIN_REGION_SAMPLE_SIZE
-      return render json: { ok: true, suppressed: true, total_responses: total, results: [] }
+      # Small-cell suppression (P1-14). #regions has enforced this from the
+      # start; #results did not, so on a Verto with one or two responders the
+      # comparison a respondent is shown IS the other respondent's answers,
+      # attributable to them by anyone who knows who else was asked. Same
+      # threshold and same reasoning as the map — Response::MIN_REGION_SAMPLE_SIZE.
+      if total < Response::MIN_REGION_SAMPLE_SIZE
+        { suppressed: true, total_responses: total, results: [] }
+      else
+        { total_responses: total,
+          results: aggregate_rows(responses) + token_comparison_rows(responses) }
+      end
     end
 
-    render json: { ok: true, total_responses: total,
-                   results: aggregate_rows(responses) + token_comparison_rows(responses) }
+    render json: { ok: true }.merge(payload)
   end
 
   # Per-country aggregates for the post-finish map view: one entry per country
@@ -620,29 +635,39 @@ class PlayerController < ApplicationController
       return render json: { ok: false, error: "Regional comparison not enabled" }, status: :forbidden
     end
 
-    # Every responder (answered ≥1 question), not only completers — consistent
-    # with the results comparison above. Only the columns the country grouping
-    # + per-country aggregation read, so rows aren't loaded with all their columns.
-    tagged = @survey.responses.where(answered: true).where.not(region_country: nil)
-                    .select(:id, :region_country, :answers)
-    groups = tagged.group_by(&:region_country)
-    # Small-cell suppression: a country with fewer than MIN_REGION_SAMPLE_SIZE
-    # respondents never appears on the map/list — see Response for why. Two
-    # respondents self-declaring different sub-regions of the same country
-    # (e.g. "Yorkshire" and "London") count together in one GB group here —
-    # display/aggregation is country-level only; region_label stays on the
-    # Response row but isn't grouped on.
-    rows = groups.filter_map do |country, rs|
-      next if rs.size < Response::MIN_REGION_SAMPLE_SIZE
-      {
-        id:           country,
-        country:      country,
-        country_name: WorldRegions.name_for(country),
-        responders:   rs.size,
-        results:      aggregate_rows(rs)
-      }
-    end.sort_by { |r| -r[:responders] }
-    render json: { ok: true, total_tagged: tagged.size, regions: rows }
+    # Cached like #results, and computed in bounded memory: the old shape
+    # loaded EVERY region-tagged response (answers JSON included) into one
+    # in-memory group_by — a straight OOM vector on a big Verto. Now a grouped
+    # SQL COUNT picks the qualifying countries, and each one aggregates
+    # through the concern's batched pass (indexed on [survey_id,
+    # region_country]), so at most one batch of rows is resident at a time.
+    payload = cached_aggregate(:regions) do
+      # Every responder (answered ≥1 question), not only completers —
+      # consistent with the results comparison above.
+      tagged = @survey.responses.where(answered: true).where.not(region_country: nil)
+      counts = tagged.group(:region_country).count
+
+      # Small-cell suppression: a country with fewer than
+      # MIN_REGION_SAMPLE_SIZE respondents never appears on the map/list — see
+      # Response for why. Two respondents self-declaring different sub-regions
+      # of the same country (e.g. "Yorkshire" and "London") count together in
+      # one GB group here — display/aggregation is country-level only;
+      # region_label stays on the Response row but isn't grouped on.
+      rows = counts.filter_map do |country, responders|
+        next if responders < Response::MIN_REGION_SAMPLE_SIZE
+        {
+          id:           country,
+          country:      country,
+          country_name: WorldRegions.name_for(country),
+          responders:   responders,
+          results:      aggregate_rows(tagged.where(region_country: country))
+        }
+      end.sort_by { |r| -r[:responders] }
+
+      { total_tagged: counts.values.sum, regions: rows }
+    end
+
+    render json: { ok: true }.merge(payload)
   end
 
   # Satnav-style location search backing the welcome-card intake: forwards a
@@ -965,6 +990,25 @@ class PlayerController < ApplicationController
   end
 
   # The flat row shape the player JS renders comparisons from.
+  # A short shared cache over the public aggregate endpoints (#results,
+  # #regions, #scores). These recompute over every answered/completed response
+  # and are hit by respondents, so at burst scale the compute must be per
+  # WINDOW, not per viewer: a few seconds of staleness is invisible on a
+  # results screen and is the same freshness contract the live counter and the
+  # leaderboard snapshot already set. race_condition_ttl serves the just-
+  # expired value while ONE caller recomputes, so a burst arriving at expiry
+  # can't stampede the aggregation. Keyed on updated_at so a deck edit or
+  # republish never serves the previous deck's aggregates. Access guards stay
+  # in the actions, outside the cache — only link-independent payloads live
+  # here. (In test the null cache store makes fetch a pass-through.)
+  PLAYER_AGGREGATE_TTL = 10.seconds
+
+  def cached_aggregate(kind, &block)
+    Rails.cache.fetch([ "player-agg", kind, @survey.id, @survey.updated_at.to_f ],
+                      expires_in: PLAYER_AGGREGATE_TTL,
+                      race_condition_ttl: 30.seconds, &block)
+  end
+
   def aggregate_rows(responses)
     aggregate_results(Array(@survey.cards), responses).map.with_index do |row, idx|
       {
