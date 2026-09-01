@@ -118,12 +118,13 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
 ## 4. Event day
 
-- **Grow database storage FIRST (days before, not event day):** the live
-  instance showed **67% of 1 GB used with storage autoscaling disabled**
-  (2026-09-01). The event adds ~150 MB of rows plus index growth, WAL churn
-  and solid_cable retention — disk-full mid-event is a total outage. Raise it
-  to 10 GB+ (storage is $0.30/GB/mo and can only ever be increased, never
-  shrunk) or enable storage autoscaling.
+- **Database storage: DONE 2026-09-01 — raised 1 GB → 10 GB** (was 67% full).
+  Two Render rules to plan around: storage changes are limited to **once per
+  12 hours** (so there is NO emergency mid-event bump — size days ahead), and
+  autoscaling, if enabled, fires at 90% full, +50% rounded to 5 GB, also max
+  once per 12 h. Worth enabling as a backstop; the fixed raise is the primary
+  control. Real tier prices off the dashboard: 0.1c-256mb $6, 0.5c-1g $19,
+  1c-2g $40/mo (24 tiers total; the event tier gets read off the same list).
 - **Freeze deploys**: a green push to `Main` auto-deploys via CI's hook — mid
   event that is a migration plus a rolling restart. Disable the hook (or gate
   the CI job) for the window.
