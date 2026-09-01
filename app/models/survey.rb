@@ -28,6 +28,9 @@ class Survey < ApplicationRecord
   # The leaderboard's anonymous names. Scoped to the Verto (a name is an
   # identity on ONE board) and gone with it.
   has_many :player_aliases, dependent: :destroy
+  # Derived rows (see LeaderboardStanding) — delete_all, not destroy: there are
+  # no callbacks to run and a big board would destroy row-by-row for nothing.
+  has_many :leaderboard_standings, dependent: :delete_all
   has_many :contact_details, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in

@@ -46,6 +46,23 @@ module TokenLeaderboard
     entries.sort_by { |e| [ -e[:total], e[:achieved_at] || Time.at(0), e[:key_digest] ] }
   end
 
+  # One identity's entry computed from THEIR rows only — an indexed per-digest
+  # query, not a board scan. Used to splice a fresh finisher into a snapshot
+  # whose debounced refresh hasn't landed yet. nil when they have no completed
+  # run.
+  def entry_for_digest(survey, digest)
+    list = survey.responses.where(status: "completed", player_key_digest: digest)
+                 .select(:id, :token_totals, :completed_at, :created_at)
+                 .map do |resp|
+      totals = resp.token_totals.is_a?(Hash) ? resp.token_totals : {}
+      { total: totals.values.sum(&:to_i), at: resp.completed_at || resp.created_at, id: resp.id }
+    end
+    return nil if list.empty?
+
+    list.sort_by! { |r| [ r[:at] || Time.at(0), r[:id] ] }
+    entry_for(survey.leaderboard_retake_policy, digest, list)
+  end
+
   # One identity's board entry under the survey's retake policy. `list` is that
   # identity's completed runs, oldest first.
   #

@@ -1089,9 +1089,14 @@ class SurveysController < ApplicationController
     # nothing any respondent was shown. Same read-time alias backfill as the
     # player endpoint, bounded to the rendered rows.
     if @survey.leaderboard_active?
-      standings = TokenLeaderboard.standings(@survey)
-      @leaderboard_player_count = standings.size
-      @leaderboard = standings.first(RESULTS_LEADERBOARD_ROWS)
+      # Same precomputed snapshot the player endpoint reads (LeaderboardStanding)
+      # — the creator's results page must not re-scan every completed response
+      # while a burst is finishing.
+      LeaderboardStanding.bootstrap!(@survey)
+      @leaderboard_player_count = @survey.leaderboard_standings.maximum(:rank).to_i
+      @leaderboard = @survey.leaderboard_standings.order(:rank)
+                            .limit(RESULTS_LEADERBOARD_ROWS)
+                            .map { |s| { key_digest: s.key_digest, total: s.total, achieved_at: s.achieved_at } }
       digests = @leaderboard.map { |e| e[:key_digest] }
       digests.each { |d| PlayerAlias.ensure_for!(survey: @survey, key_digest: d) }
       @leaderboard_names = @survey.player_aliases.where(key_digest: digests)

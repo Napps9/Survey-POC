@@ -520,7 +520,13 @@ class PlayerController < ApplicationController
       return render json: { ok: false, error: "Leaderboard not enabled" }, status: :forbidden
     end
 
-    standings = TokenLeaderboard.standings(@survey)
+    # The board is read from the precomputed LeaderboardStanding snapshot —
+    # this endpoint auto-fires for every finisher, and recomputing standings
+    # per request was O(total responses) per respondent. The snapshot trails
+    # reality by RefreshLeaderboardStandingsJob's debounce (a few seconds).
+    LeaderboardStanding.bootstrap!(@survey)
+    top = @survey.leaderboard_standings.order(:rank).limit(LEADERBOARD_TOP).to_a
+    total_players = @survey.leaderboard_standings.maximum(:rank).to_i
 
     # Resolve "you": the saved row's digest once this session has written, else
     # the raw key the client sent — a recognised returner opening a fresh
@@ -528,26 +534,46 @@ class PlayerController < ApplicationController
     token = params[:session_token].to_s
     resp  = token.present? ? @survey.responses.find_by(session_token: token) : nil
     you_digest = resp&.player_key_digest.presence || @survey.player_key_digest(params[:player_key])
-    you_index  = you_digest ? standings.index { |e| e[:key_digest] == you_digest } : nil
+    you_row    = you_digest ? @survey.leaderboard_standings.find_by(key_digest: you_digest) : nil
+    own        = you_digest ? TokenLeaderboard.entry_for_digest(@survey, you_digest) : nil
+
+    # "You" is always computed live from YOUR rows (an indexed per-digest
+    # query) — a finisher or retaker must never be shown a pre-refresh total
+    # of their own. Only the board around you trails by the debounce window:
+    # your rank comes from the snapshot when it already agrees, and is
+    # estimated against it when you've beaten your own refresh here.
+    you = if own
+      if you_row && you_row.total == own[:total]
+        { rank: you_row.rank, total: own[:total], of: total_players }
+      else
+        total_players += 1 unless you_row
+        rank = @survey.leaderboard_standings.where.not(key_digest: you_digest)
+                      .where("total > ?", own[:total]).count + 1
+        { rank: rank, total: own[:total], of: total_players }
+      end
+    elsif you_row
+      # Rows mid-purge but still on the snapshot — serve what the board shows.
+      { rank: you_row.rank, total: you_row.total, of: total_players }
+    end
 
     # Read-time backfill: name everyone about to be rendered (≤11 idempotent
     # finds). Submit already minted most of them; this covers identities from
     # before a mid-flight enable, and seeded rows.
-    top = standings.first(LEADERBOARD_TOP)
-    shown = top.map { |e| e[:key_digest] }
-    shown |= [ you_digest ] if you_index
+    shown = top.map(&:key_digest)
+    shown |= [ you_digest ] if you
     shown.each { |digest| PlayerAlias.ensure_for!(survey: @survey, key_digest: digest) }
     names = @survey.player_aliases.where(key_digest: shown).pluck(:key_digest, :anon_name).to_h
 
-    entries = top.each_with_index.map do |e, i|
-      { rank: i + 1, name: names[e[:key_digest]], total: e[:total], you: e[:key_digest] == you_digest }
+    entries = top.map do |s|
+      yours = s.key_digest == you_digest
+      # Keep your own visible row coherent with the live "you" total when the
+      # snapshot hasn't caught up with your latest run yet.
+      { rank: s.rank, name: names[s.key_digest],
+        total: yours && you ? you[:total] : s.total, you: yours }
     end
-    you = if you_index
-      { rank: you_index + 1, name: names[you_digest],
-        total: standings[you_index][:total], of: standings.size }
-    end
+    you[:name] = names[you_digest] if you
     render json: { ok: true, policy: @survey.leaderboard_retake_policy,
-                   total_players: standings.size, entries:, you: }
+                   total_players:, entries:, you: }
   end
 
   def results

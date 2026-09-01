@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_26_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -475,6 +475,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_26_120000) do
     t.index ["partnership_id"], name: "index_invites_on_partnership_id"
     t.index ["token"], name: "index_invites_on_token", unique: true
     t.check_constraint "kind IN ('member', 'partner', 'licensee')", name: "chk_invites_kind"
+  end
+
+  create_table "leaderboard_standings", force: :cascade do |t|
+    t.datetime "achieved_at"
+    t.datetime "created_at", null: false
+    t.string "key_digest", null: false
+    t.integer "rank", null: false
+    t.integer "survey_id", null: false
+    t.integer "total", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "key_digest"], name: "index_leaderboard_standings_on_survey_id_and_key_digest", unique: true
+    t.index ["survey_id", "rank"], name: "index_leaderboard_standings_on_survey_id_and_rank", unique: true
+    t.index ["survey_id", "total"], name: "index_leaderboard_standings_on_survey_id_and_total"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -992,6 +1005,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_26_120000) do
   add_foreign_key "invites", "organisations"
   add_foreign_key "invites", "partnerships"
   add_foreign_key "invites", "users", column: "invited_by_id"
+  add_foreign_key "leaderboard_standings", "surveys"
   add_foreign_key "memberships", "organisations"
   add_foreign_key "memberships", "users"
   add_foreign_key "partnership_common_question_sets", "common_question_sets"

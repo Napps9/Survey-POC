@@ -37,6 +37,13 @@ class Response < ApplicationRecord
   # those are what broadcast, at most twice per respondent.
   after_commit :broadcast_results_activity, on: [ :create, :update ]
 
+  # Keep the precomputed leaderboard (LeaderboardStanding) trailing reality by
+  # at most a few seconds. Same posture as the broadcast above: fires only on
+  # the transitions that change a board — a run completing, or an identity
+  # vanishing (the consent-decline purge nils player_key_digest) — and a cache
+  # debounce coalesces a burst of finishers into one refresh per window.
+  after_commit :refresh_leaderboard_standings, on: [ :create, :update ]
+
   # How long the respondent took, in whole seconds, or nil until both ends are
   # stamped. Derived rather than stored so there's no third column to keep in
   # sync with the two timestamps.
@@ -140,5 +147,28 @@ class Response < ApplicationRecord
     # A live counter is a nicety. It must never be able to fail the write that
     # stored a respondent's answers.
     ErrorReporting.report("Response#broadcast_results_activity", e, survey_id: survey_id)
+  end
+
+  REFRESH_STANDINGS_DEBOUNCE = 3.seconds
+
+  def refresh_leaderboard_standings
+    relevant = (saved_change_to_status? && status == "completed") ||
+               (saved_change_to_player_key_digest? && status == "completed")
+    return unless relevant
+    return unless player_key_digest.present? || saved_change_to_player_key_digest?
+    return unless survey.leaderboard_active?
+
+    # unless_exist makes the cache write a claim on this window: the first
+    # finisher schedules the refresh, everyone else inside the window skips.
+    # The job runs AFTER the window closes, so the trailing completion is
+    # always captured; when the key expires the next finisher opens a new one.
+    claimed = Rails.cache.write("leaderboard-refresh:#{survey_id}", 1,
+                                unless_exist: true, expires_in: REFRESH_STANDINGS_DEBOUNCE)
+    return unless claimed
+
+    RefreshLeaderboardStandingsJob.set(wait: REFRESH_STANDINGS_DEBOUNCE).perform_later(survey_id)
+  rescue => e
+    # Derived data — never allowed to fail the write that stored the answers.
+    ErrorReporting.report("Response#refresh_leaderboard_standings", e, survey_id: survey_id)
   end
 end
