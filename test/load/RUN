@@ -1,5 +1,6 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
+# Run 2: smoke retry — scratch now sets PLAYER_RATE_LIMIT_SCALE=1000.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 ARRIVALS_PER_S=10
