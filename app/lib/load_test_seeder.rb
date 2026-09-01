@@ -44,6 +44,13 @@ class LoadTestSeeder
 
   REGIONS = [ "GB", "FR", "DE", "ES", "IE", nil ].freeze
 
+  # Organisations our own seeders create. db/seeds.rb runs on every deploy
+  # (the entrypoint's db:prepare), so a freshly-provisioned scratch database
+  # already holds the "playverto" org before this seeder ever runs; the
+  # DemoSeeder slugs are equally ours. These are recognisable seed artifacts,
+  # not evidence of real accounts — anything OUTSIDE this list is.
+  SEEDED_SLUGS = [ "playverto", DemoSeeder::ORG_SLUG, DemoSeeder::PARTNER_SLUG ].freeze
+
   class << self
     def run!(responses:, batch_size: 1_000, io: $stdout)
       unless ENV["LOAD_TEST_SEED"] == "1"
@@ -54,8 +61,10 @@ class LoadTestSeeder
       # The flag says "I meant to run the seeder"; this check says "and this is
       # actually a scratch database". A mispasted DATABASE_URL pointing at
       # production nearly slipped through once — an env var can lie about what
-      # it is, but a database holding real organisations cannot.
-      foreign = Organisation.where.not(slug: ORG_SLUG)
+      # it is, but a database holding real organisations cannot. Production
+      # always carries client organisations beyond the seeded ones, so
+      # exempting our own seeders' fixed slugs keeps the tripwire intact.
+      foreign = Organisation.where.not(slug: [ ORG_SLUG, *SEEDED_SLUGS ])
       if foreign.exists?
         raise "LoadTestSeeder refuses: this database already holds " \
               "#{foreign.count} organisation(s) that are not the load-test org " \

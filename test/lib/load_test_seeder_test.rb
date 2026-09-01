@@ -71,4 +71,16 @@ class LoadTestSeederTest < ActiveSupport::TestCase
     assert_equal before, survey.responses.order(:id).pluck(:id, :updated_at)
     assert_nil Organisation.find_by(slug: LoadTestSeeder::ORG_SLUG), "the refusal must come before any write"
   end
+
+  test "tolerates the organisations our own seeders create" do
+    # The scratch environment's entrypoint runs db:prepare, which seeds the
+    # "playverto" org on every deploy — the guard must not refuse the very
+    # database it was built for. DemoSeeder's fixed slugs are equally ours.
+    LoadTestSeeder::SEEDED_SLUGS.each do |slug|
+      Organisation.create!(name: slug.titleize, slug: slug)
+    end
+
+    result = with_seed_flag("1") { LoadTestSeeder.run!(responses: 2, io: StringIO.new) }
+    assert_equal 2, result[:inserted]
+  end
 end
