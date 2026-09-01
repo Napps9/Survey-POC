@@ -141,17 +141,28 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
   or drop the card — at 2 req/s app-wide it silently returns nothing at 50k.
 - Afterwards: scale back down (2 × Standard web, baseline Postgres tier).
 
-## 5. Cost (list prices, Aug 2026 — confirm the two soft lines on dashboards)
+## 5. Cost (dashboard-confirmed prices, 2026-09-01)
+
+Real Postgres compute tiers (read off the live instance's Plan page —
+24 tiers, $0 free → $11,000/mo at 128c-1TB). The ones that matter here:
+
+| Tier | Price | Role |
+|---|---|---|
+| 0.1c-256mb | $6/mo | today's tier |
+| 0.5c-1g | $19/mo | steady-state candidate once real volume exists |
+| 1c-4g | $55/mo | steady-state with headroom |
+| **4c-16g** | **$200/mo** | **event-day tier (recommended)** — 4 vCPU for ~800 writes/s, 16 GB puts it in the top connection band |
+| 8c-32g | $400/mo | conservative alternative if the 1.5× proof run says so |
 
 | | $/month |
 |---|---|
-| Steady state (Pro workspace, 2×Standard + worker, Basic-4gb PG, Key Value, CDN/R2 free tiers) | **~185** |
-| Per event (8×Pro Plus ~4 h + Postgres resized for the day, second-prorated) | **+~25–30** |
+| Steady state (Pro workspace $25, 2×Standard web + worker $57, Postgres 0.5c-1g→1c-4g $19–55, 10 GB storage $3, Key Value ~$10, CDN/R2 ~$0) | **~$115–150** |
+| Per event (8×Pro Plus ~4 h ≈ $8 + Postgres at 4c-16g for the day ≈ $7, second-prorated) | **+~$15–20** |
 | Anthropic, respondent path (plain Verto) | 0 |
 
-Soft lines to confirm before quoting a client: the mid-tier Postgres price
-(~$500/mo interpolated for the event-day tier) and the actual
-`max_connections` of the chosen tier (`SHOW max_connections;`).
+The tier change restarts the database — it happens the day before, in the
+runbook, never mid-event. The one number still unread:
+`SHOW max_connections;` (comes free with the scratch environment).
 
-**The infrastructure delta for 50,000 people is ~$30. The cost is the
-engineering — most of which is now on this branch.**
+**The infrastructure delta for 50,000 people is under twenty dollars. The
+cost is the engineering — most of which is now on this branch.**
