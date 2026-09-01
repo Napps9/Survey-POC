@@ -377,7 +377,6 @@ const COMPONENTS = {
         <div class="respondent-code-note">${esc(t("player.respondent_code_note"))}</div>
         <div class="play-consent-actions">
           <button type="button" class="play-consent-agree" tabindex="-1">${esc(t("player.respondent_code_continue"))}</button>
-          <button type="button" class="play-consent-decline" tabindex="-1">${esc(t("player.respondent_code_skip"))}</button>
         </div>
       </div>`,
 

@@ -266,7 +266,6 @@ ja:
     respondent_code_placeholder: '例: sam14'
     respondent_code_note: 'この内容は当方では見られません。一方向ハッシュとして保存され、次回あなたの回答と照合するためだけに使われます。'
     respondent_code_continue: '続ける'
-    respondent_code_skip: 'スキップ'
     contact_title: "連絡先を残す"
     contact_body: "連絡を取り合いたい場合は、あなたのことを教えてください。任意です — 回答とは別に保管されます。"
     contact_name: "名前"

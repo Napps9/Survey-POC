@@ -266,7 +266,6 @@ vi:
     respondent_code_placeholder: 'vd. sam14'
     respondent_code_note: 'Chúng tôi không bao giờ thấy mã này — nó được lưu dưới dạng băm một chiều, chỉ để đối chiếu câu trả lời của bạn với chính bạn lần sau.'
     respondent_code_continue: 'Tiếp tục'
-    respondent_code_skip: 'Bỏ qua'
     contact_title: "Để lại thông tin của bạn"
     contact_body: "Nếu bạn muốn giữ liên lạc, hãy cho chúng tôi biết bạn là ai. Không bắt buộc — và được lưu tách biệt với câu trả lời của bạn."
     contact_name: "Tên"

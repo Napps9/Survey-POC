@@ -266,7 +266,6 @@ hi:
     respondent_code_placeholder: 'उदा. sam14'
     respondent_code_note: 'हम इसे कभी नहीं देखते — यह एकतरफ़ा हैश के रूप में सहेजा जाता है, केवल इसलिए कि अगली बार आपके उत्तर आपके ही उत्तरों से मिलाए जा सकें।'
     respondent_code_continue: 'जारी रखें'
-    respondent_code_skip: 'छोड़ें'
     contact_title: "अपना विवरण छोड़ें"
     contact_body: "अगर आप संपर्क में रहना चाहें, तो बताएं कि आप कौन हैं। वैकल्पिक — और आपके उत्तरों से अलग रखा जाता है।"
     contact_name: "नाम"

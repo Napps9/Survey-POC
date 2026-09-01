@@ -130,8 +130,10 @@ That is a product decision, not a bug fix, and it is not made here.
 
 The `respondent_code` card narrows the gap where a creator uses it — a
 respondent who chose a code has a handle on their own rows, and
-`RespondentDataController` already accepts one — but it does not close it: the
-code is optional, skippable, and only as good as the respondent's memory.
+`RespondentDataController` already accepts one — but it does not close it:
+entering a code is required to proceed wherever the card or pre-screen
+appears, yet the code is only as good as the respondent's memory, and
+nothing stops a throwaway entry they can never reproduce.
 
 ## Related
 

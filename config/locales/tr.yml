@@ -266,7 +266,6 @@ tr:
     respondent_code_placeholder: 'örn. sam14'
     respondent_code_note: 'Bunu hiç görmüyoruz — tek yönlü bir özet olarak saklanır, yalnızca yanıtlarınız bir sonraki kez kendi yanıtlarınızla eşleştirilebilsin diye.'
     respondent_code_continue: 'Devam'
-    respondent_code_skip: 'Atla'
     contact_title: "Bilgilerinizi bırakın"
     contact_body: "İletişimde kalmak isterseniz bize kim olduğunuzu söyleyin. İsteğe bağlı — ve yanıtlarınızdan ayrı saklanır."
     contact_name: "Ad"

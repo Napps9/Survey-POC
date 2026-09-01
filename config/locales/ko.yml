@@ -266,7 +266,6 @@ ko:
     respondent_code_placeholder: '예: sam14'
     respondent_code_note: '저희는 이 값을 볼 수 없습니다. 단방향 해시로 저장되며, 다음에 본인의 답변과 연결하는 데만 사용됩니다.'
     respondent_code_continue: '계속'
-    respondent_code_skip: '건너뛰기'
     contact_title: "연락처 남기기"
     contact_body: "계속 소식을 받고 싶다면 누구신지 알려주세요. 선택 사항이며 답변과는 별도로 보관됩니다."
     contact_name: "이름"

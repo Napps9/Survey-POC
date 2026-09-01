@@ -932,43 +932,37 @@ export default class extends Controller {
   // what keeps the identity).
   async submitRespondentCode() {
     const entered = (this.hasRespondentCodeTarget ? this.respondentCodeTarget.value : "").trim()
-    if (entered) {
-      this._respondentCode = entered
-      this._buzz()
-      // Recall, when the creator turned it on: ask the server whether this
-      // identity has already answered any of this deck's ask-once questions
-      // somewhere else. Until now "asked once" was a promise made to a BROWSER
-      // (localStorage plus a device-minted uuid), so a new phone asked
-      // everything again — which is the opposite of what the setting says.
-      //
-      // The deck cannot advance until the answer is in — a card seeded AFTER
-      // the respondent has walked past it is a card they answered twice. So
-      // the wait is real, and a wait a respondent cannot see is a button they
-      // think is broken. Hence the busy state, and hence _recall's short
-      // timeout: the fallback (ask the question again) is cheap.
-      this._setCodeBusy(true)
-      try {
-        this._applyRecall(await this._recall(entered))
-      } finally {
-        this._setCodeBusy(false)
-      }
+    // There is no skip and no blank pass-through: the code step is
+    // hard-required wherever it appears — creators hang study IDs on it, and
+    // an empty Continue would be a skip under another name. Refusing here
+    // still performs no save: a code alone must not create a response row.
+    if (!entered) {
+      this._showRequiredHint(this.cardTargets[this.currentValue])
+      return
+    }
+    this._respondentCode = entered
+    this._buzz()
+    // Recall, when the creator turned it on: ask the server whether this
+    // identity has already answered any of this deck's ask-once questions
+    // somewhere else. Until now "asked once" was a promise made to a BROWSER
+    // (localStorage plus a device-minted uuid), so a new phone asked
+    // everything again — which is the opposite of what the setting says.
+    //
+    // The deck cannot advance until the answer is in — a card seeded AFTER
+    // the respondent has walked past it is a card they answered twice. So
+    // the wait is real, and a wait a respondent cannot see is a button they
+    // think is broken. Hence the busy state, and hence _recall's short
+    // timeout: the fallback (ask the question again) is cheap.
+    this._setCodeBusy(true)
+    try {
+      this._applyRecall(await this._recall(entered))
+    } finally {
+      this._setCodeBusy(false)
     }
     // Deliberately does NOT save here. _saveProgress refuses to create a row
     // before there's a real answer, so that someone who opens a Verto and leaves
     // isn't counted as a respondent — a code on its own shouldn't change that.
     // It rides along with the first genuine save instead (see _payload).
-    this.next()
-  }
-
-  skipRespondentCode() {
-    // Per-RUN, and deliberately not persisted — unlike the contact gate's
-    // _markContactDone, which is. The contact gate is a first-visit register;
-    // a code someone declined once should still be offered next time in case
-    // they change their mind.
-    //
-    // It also clears nothing already seeded from this device's own store:
-    // "I'd rather not link my runs" is not "forget what this browser knows".
-    this._respondentCode = null
     this.next()
   }
 

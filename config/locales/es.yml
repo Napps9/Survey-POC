@@ -266,7 +266,6 @@ es:
     respondent_code_placeholder: 'p. ej. sam14'
     respondent_code_note: 'Nunca lo vemos: se guarda como un hash de una sola dirección, solo para poder emparejar tus respuestas con las tuyas la próxima vez.'
     respondent_code_continue: 'Continuar'
-    respondent_code_skip: 'Omitir'
     contact_title: "Deja tus datos"
     contact_body: "Si quieres que sigamos en contacto, dinos quién eres. Opcional — y se guarda aparte de tus respuestas."
     contact_name: "Nombre"

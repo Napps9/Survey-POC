@@ -266,7 +266,6 @@ sw:
     respondent_code_placeholder: 'k.m. sam14'
     respondent_code_note: 'Hatuuoni kamwe — huhifadhiwa kama hashi ya njia moja, ili majibu yako yalinganishwe na yako mwenyewe wakati ujao.'
     respondent_code_continue: 'Endelea'
-    respondent_code_skip: 'Ruka'
     contact_title: "Acha maelezo yako"
     contact_body: "Ukipenda tuendelee kuwasiliana, tuambie wewe ni nani. Si lazima — na huhifadhiwa mbali na majibu yako."
     contact_name: "Jina"

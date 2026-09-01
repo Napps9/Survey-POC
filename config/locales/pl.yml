@@ -266,7 +266,6 @@ pl:
     respondent_code_placeholder: 'np. sam14'
     respondent_code_note: 'Nigdy go nie widzimy — jest zapisywany jako jednokierunkowy skrót, tylko po to, aby następnym razem powiązać Twoje odpowiedzi z Twoimi.'
     respondent_code_continue: 'Kontynuuj'
-    respondent_code_skip: 'Pomiń'
     contact_title: "Zostaw swoje dane"
     contact_body: "Jeśli chcesz pozostać w kontakcie, powiedz nam, kim jesteś. Opcjonalne — przechowywane osobno od Twoich odpowiedzi."
     contact_name: "Imię i nazwisko"

@@ -88,33 +88,30 @@ class RespondentCodeRecallSystemTest < ApplicationSystemTestCase
     assert_equal first.respondent_code_digest, second.respondent_code_digest
   end
 
-  test "skipping the code asks the question again, and skipping is per-run" do
+  # The code step is hard-required — the Skip affordance was removed on the
+  # owner's decision (2026-09-01): creators hang study IDs on this card, and a
+  # skippable ID question is not an ID question. The card's own buttons are the
+  # only way off it (SELF_DRIVING_TYPES hides the deck nav), so no skip plus a
+  # refused blank means no code, no progress.
+  test "the code card offers no skip and refuses a blank continue" do
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
     assert_selector ".preview-card.active", wait: 5
-
-    find(".preview-card.active .play-consent-decline").click
-    # No code means no identity to recall against, so the ask-once question has
-    # to be asked. (assert_text takes no custom message — a second positional
-    # is read as a Capybara element type.)
-    assert_text "Which industry do you work in?"
-
-    find(".choice-list-item", text: "Tech").click
-    find(".preview-btn-next").click
-    find(".choice-list-item", text: "Great").click
-    find(".preview-btn-finish").click
-    assert_selector ".preview-thankyou.active", wait: 8
-
-    row = wait_for_response(count: 1)
-    assert_nil row.respondent_code_digest, "skipping records no identity at all"
-
-    # A fresh session on the same device: the card is offered again. Skipping is
-    # NOT persisted, deliberately — unlike the contact gate, which is a
-    # first-visit register. Someone who declined once may change their mind.
-    page.execute_script("sessionStorage.clear()")
-    visit "/play/#{@survey.publish_token}"
-    assert_selector ".preview-card.active", wait: 5
     assert_text "Make up a code you'll remember"
+
+    assert_no_selector ".preview-card.active .play-consent-decline"
+
+    find(".preview-card.active .play-consent-agree").click
+    assert_selector ".preview-required-hint:not(.hidden)"
+    assert_no_text "Which industry do you work in?"
+    # Refusing a blank must not have created a row — a code prompt alone is
+    # not participation.
+    assert_equal 0, @survey.responses.count
+
+    find(".preview-card.active .respondent-code-input").set(CODE)
+    find(".preview-card.active .play-consent-agree").click
+    assert_text "Which industry do you work in?"
+    assert_no_selector ".preview-required-hint:not(.hidden)"
   end
 
   private

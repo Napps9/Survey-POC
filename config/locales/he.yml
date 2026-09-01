@@ -266,7 +266,6 @@ he:
     respondent_code_placeholder: 'לדוגמה sam14'
     respondent_code_note: 'אנחנו לא רואים אותו — הוא נשמר כגיבוב חד-כיווני, רק כדי שנוכל להתאים את התשובות שלכם לשלכם בפעם הבאה.'
     respondent_code_continue: 'המשך'
-    respondent_code_skip: 'דלגו'
     contact_title: "השאירו את הפרטים שלכם"
     contact_body: "אם תרצו להישאר בקשר, ספרו לנו מי אתם. לא חובה — והפרטים נשמרים בנפרד מהתשובות שלכם."
     contact_name: "שם"

@@ -266,7 +266,6 @@ de:
     respondent_code_placeholder: 'z. B. sam14'
     respondent_code_note: 'Wir sehen ihn nie — er wird als Einweg-Hash gespeichert, nur damit Ihre Antworten beim nächsten Mal Ihren eigenen zugeordnet werden können.'
     respondent_code_continue: 'Weiter'
-    respondent_code_skip: 'Überspringen'
     contact_title: "Deine Kontaktdaten"
     contact_body: "Wenn du in Kontakt bleiben möchtest, sag uns, wer du bist. Optional — und getrennt von deinen Antworten aufbewahrt."
     contact_name: "Name"

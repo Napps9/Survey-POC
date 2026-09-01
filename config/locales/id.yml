@@ -266,7 +266,6 @@ id:
     respondent_code_placeholder: 'mis. sam14'
     respondent_code_note: 'Kami tidak pernah melihatnya — disimpan sebagai hash satu arah, hanya agar jawaban Anda dapat dicocokkan dengan jawaban Anda sendiri berikutnya.'
     respondent_code_continue: 'Lanjutkan'
-    respondent_code_skip: 'Lewati'
     contact_title: "Tinggalkan data Anda"
     contact_body: "Jika ingin tetap terhubung, beri tahu kami siapa Anda. Opsional — dan disimpan terpisah dari jawaban Anda."
     contact_name: "Nama"

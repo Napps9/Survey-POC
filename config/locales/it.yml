@@ -266,7 +266,6 @@ it:
     respondent_code_placeholder: 'es. sam14'
     respondent_code_note: 'Non lo vediamo mai: è salvato come hash a senso unico, solo per poter collegare le tue risposte alle tue la prossima volta.'
     respondent_code_continue: 'Continua'
-    respondent_code_skip: 'Salta'
     contact_title: "Lascia i tuoi dati"
     contact_body: "Se vuoi restare in contatto, dicci chi sei. Facoltativo — e conservato separatamente dalle tue risposte."
     contact_name: "Nome"
