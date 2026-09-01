@@ -5,7 +5,16 @@
 # hostnames that look like production.
 name: Load test (scratch only)
 
+# Two triggers for the same job:
+#   * workflow_dispatch — the Actions-tab button. Only works once this file
+#     exists on the default branch (GitHub registers dispatchable workflows
+#     from there).
+#   * push touching test/load/RUN — works from any branch immediately, which
+#     is how runs are fired while this workflow lives on a feature branch.
+#     RUN holds KEY=VALUE lines mirroring the dispatch inputs.
 on:
+  push:
+    paths: [ "test/load/RUN" ]
   workflow_dispatch:
     inputs:
       base_url:
@@ -44,16 +53,38 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Refuse production hostnames
+      - uses: actions/checkout@v4
+
+      - name: Resolve parameters
         env:
-          BASE_URL: ${{ inputs.base_url }}
+          IN_BASE_URL: ${{ inputs.base_url }}
+          IN_TOKEN: ${{ inputs.token }}
+          IN_ARRIVALS: ${{ inputs.arrivals_per_s }}
+          IN_RAMP: ${{ inputs.ramp_s }}
+          IN_HOLD: ${{ inputs.hold_s }}
+          IN_DWELL: ${{ inputs.dwell_scale }}
+          IN_BROWNOUT: ${{ inputs.brownout }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            grep -E '^[A-Z_]+=' test/load/RUN >> "$GITHUB_ENV"
+          else
+            {
+              echo "BASE_URL=$IN_BASE_URL"
+              echo "TOKEN=$IN_TOKEN"
+              echo "ARRIVALS_PER_S=$IN_ARRIVALS"
+              echo "RAMP_S=$IN_RAMP"
+              echo "HOLD_S=$IN_HOLD"
+              echo "DWELL_SCALE=$IN_DWELL"
+              echo "BROWNOUT=$IN_BROWNOUT"
+            } >> "$GITHUB_ENV"
+          fi
+
+      - name: Refuse production hostnames
         run: |
           case "$BASE_URL" in
             *playverto.com*|*survey-poc.onrender.com*)
               echo "::error::base_url looks like production. Refusing." && exit 1 ;;
           esac
-
-      - uses: actions/checkout@v4
 
       - name: Install k6
         run: |
@@ -62,14 +93,6 @@ jobs:
           ./k6 version
 
       - name: Run k6
-        env:
-          BASE_URL: ${{ inputs.base_url }}
-          TOKEN: ${{ inputs.token }}
-          ARRIVALS_PER_S: ${{ inputs.arrivals_per_s }}
-          RAMP_S: ${{ inputs.ramp_s }}
-          HOLD_S: ${{ inputs.hold_s }}
-          DWELL_SCALE: ${{ inputs.dwell_scale }}
-          BROWNOUT: ${{ inputs.brownout }}
         run: |
           ./k6 run --summary-export=k6-summary.json \
             --summary-trend-stats "avg,min,med,p(90),p(95),p(99),max" \
