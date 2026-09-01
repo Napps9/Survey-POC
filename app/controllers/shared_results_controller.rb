@@ -40,15 +40,19 @@ class SharedResultsController < ApplicationController
 
   before_action :set_survey
 
-  rate_limit to: 120, within: 1.minute, only: %i[ show report ],
+  # Distinct `name:`s or the three limits share one per-IP counter (Rails
+  # keys on [scope, name, ip] and name defaults to nil) — a viewer polling
+  # render_status would otherwise burn the page's own 120/min budget. Same
+  # bug class the k6 baseline caught in PlayerController.
+  rate_limit to: 120, within: 1.minute, only: %i[ show report ], name: "reads",
              with: -> { render plain: "Too many requests — please slow down.", status: :too_many_requests }
-  rate_limit to: 30, within: 1.minute, only: :render_status,
+  rate_limit to: 30, within: 1.minute, only: :render_status, name: "render_status",
              with: -> { render json: { ok: false, error: "Too many requests." }, status: :too_many_requests }
   # Every call either reuses an in-flight/recent render or spawns a
   # wkhtmltopdf job (100-200MB transient) — tighter than the owner's
   # equivalent (ReportRendersController#create) because nobody signed this
   # request.
-  rate_limit to: 5, within: 1.minute, only: :create_render,
+  rate_limit to: 5, within: 1.minute, only: :create_render, name: "create_render",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
   # GET /results/:token

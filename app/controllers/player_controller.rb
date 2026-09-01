@@ -20,21 +20,29 @@ class PlayerController < ApplicationController
   # are deliberately NOT scaled — one is a code-guessing oracle bounded for
   # privacy, the other spends LocationIQ quota; neither is part of a bigger
   # crowd's legitimate traffic.
+  #
+  # Every declaration carries a distinct `name:` because Rails keys the
+  # counter on ["rate-limit", controller_path, name, ip] — with no name,
+  # every rate_limit in one controller shares a SINGLE counter, so ordinary
+  # page traffic from a shared IP burned the consent budget (30/min) for
+  # everyone behind it. The k6 baseline caught this: successes per endpoint
+  # decayed in journey order (consent 32, submit 18, leaderboard 0) as one
+  # counter climbed past each declaration's limit in turn.
   RATE_LIMIT_SCALE = ENV.fetch("PLAYER_RATE_LIMIT_SCALE", "1").to_i.clamp(1, 100_000)
-  rate_limit to: 60 * RATE_LIMIT_SCALE, within: 1.minute, only: :submit,
+  rate_limit to: 60 * RATE_LIMIT_SCALE, within: 1.minute, only: :submit, name: "submit",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
-  rate_limit to: 300 * RATE_LIMIT_SCALE, within: 1.minute, only: [ :progress, :grade ],
+  rate_limit to: 300 * RATE_LIMIT_SCALE, within: 1.minute, only: [ :progress, :grade ], name: "progress",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # Public read endpoints that aggregate over the whole response set — cap them
   # too, so they can't be hammered as a memory-amplification vector. Generous:
   # a respondent hits each once after finishing.
-  rate_limit to: 120 * RATE_LIMIT_SCALE, within: 1.minute, only: [ :results, :scores, :regions, :leaderboard ],
+  rate_limit to: 120 * RATE_LIMIT_SCALE, within: 1.minute, only: [ :results, :scores, :regions, :leaderboard ], name: "reads",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # Consent is written at most twice per legitimate session (a decline, or a
   # decline followed by an explicit re-agree), and declining PURGES the
   # response — so an uncapped endpoint was an unauthenticated, repeatable
   # destruction primitive keyed only by a session token.
-  rate_limit to: 30 * RATE_LIMIT_SCALE, within: 1.minute, only: :consent,
+  rate_limit to: 30 * RATE_LIMIT_SCALE, within: 1.minute, only: :consent, name: "consent",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # Recall is the one endpoint here that can return ANOTHER person's answers,
   # and the key to it is a code chosen to be memorable — which is to say
@@ -43,11 +51,11 @@ class PlayerController < ApplicationController
   # budgets in #recall_budget_ok? bound the thing this cap cannot see: how many
   # DISTINCT codes one caller tries, and how often one code is tried from
   # anywhere.
-  rate_limit to: 10, within: 1.minute, only: :recall,
+  rate_limit to: 10, within: 1.minute, only: :recall, name: "recall",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # A respondent's autocomplete keystrokes are debounced client-side, so a
   # generous per-minute cap here only guards against a runaway client/bot.
-  rate_limit to: 30, within: 1.minute, only: :location_search,
+  rate_limit to: 30, within: 1.minute, only: :location_search, name: "location_search",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
 
   # How many respondent-facing Claude calls may be in flight in this process.
@@ -114,7 +122,7 @@ class PlayerController < ApplicationController
   before_action :load_survey_and_share, except: :test_show
   # A tester opening a shared link is read-only traffic; aligned with the
   # other public read endpoints above.
-  rate_limit to: 120, within: 1.minute, only: %i[ test_show live_test_show ]
+  rate_limit to: 120, within: 1.minute, only: %i[ test_show live_test_show ], name: "test_show"
 
   # GET /test/:token — Test Mode. The exact respondent experience (drafts
   # included) with every recording endpoint blanked, shareable without

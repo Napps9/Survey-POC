@@ -21,7 +21,7 @@
 
 import http from "k6/http";
 import { check, sleep } from "k6";
-import { Trend } from "k6/metrics";
+import { Trend, Counter } from "k6/metrics";
 
 const BASE = __ENV.BASE_URL;
 const TOKEN = __ENV.TOKEN;
@@ -37,6 +37,32 @@ const DWELL = Number(__ENV.DWELL_SCALE || 0.05);
 
 const play = `${BASE}/play/${TOKEN}`;
 const journeyTime = new Trend("journey_duration", true);
+
+// Status-class counters, because the end-of-run summary only says "failed",
+// not WHO failed the request — a 429 from the app, a 403 from an edge
+// protection layer, and a network error are three different diagnoses.
+const status2xx = new Counter("status_2xx");
+const status429 = new Counter("status_429");
+const status403 = new Counter("status_403");
+const status4xx = new Counter("status_4xx_other");
+const status5xx = new Counter("status_5xx");
+const statusNet = new Counter("status_network_error");
+
+function note(res, endpoint) {
+  if (res.status >= 200 && res.status < 400) status2xx.add(1);
+  else if (res.status === 429) status429.add(1);
+  else if (res.status === 403) status403.add(1);
+  else if (res.status >= 500) status5xx.add(1);
+  else if (res.status >= 400) status4xx.add(1);
+  else statusNet.add(1);
+  // A thin sample of failure bodies — enough to identify the responder
+  // (our JSON error vs an edge HTML page) without flooding the log.
+  if (res.status !== 200 && (__VU % 40) === 1 && __ITER === 0) {
+    const body = String(res.body || "").replace(/\s+/g, " ").slice(0, 160);
+    console.log(`[diag] ${endpoint} status=${res.status} server=${res.headers["Server"] || "?"} cf-ray=${res.headers["Cf-Ray"] || "-"} retry-after=${res.headers["Retry-After"] || "-"} body: ${body}`);
+  }
+  return res;
+}
 
 export const options = {
   scenarios: {
@@ -101,15 +127,15 @@ export function journey() {
   const i = __VU * 1000 + __ITER;
 
   // 1. The page + PWA fetches (the dynamic requests; /assets belong to the CDN).
-  const page = http.get(play, { tags: { endpoint: "show" } });
+  const page = note(http.get(play, { tags: { endpoint: "show" } }), "show");
   check(page, { "show 200": (r) => r.status === 200 });
-  http.get(`${play}/manifest`, { tags: { endpoint: "manifest" } });
-  http.get(`${BASE}/service-worker`, { tags: { endpoint: "service_worker" } });
+  note(http.get(`${play}/manifest`, { tags: { endpoint: "manifest" } }), "manifest");
+  note(http.get(`${BASE}/service-worker`, { tags: { endpoint: "service_worker" } }), "service_worker");
   sleep(60 * DWELL);
 
   // 2. Consent.
-  const consent = http.post(`${play}/consent`, JSON.stringify({ session_token: session, agreed: true }),
-    { headers: JSON_HEADERS, tags: { endpoint: "consent" } });
+  const consent = note(http.post(`${play}/consent`, JSON.stringify({ session_token: session, agreed: true }),
+    { headers: JSON_HEADERS, tags: { endpoint: "consent" } }), "consent");
   check(consent, { "consent ok": (r) => r.status === 200 });
   sleep(30 * DWELL);
 
@@ -117,20 +143,20 @@ export function journey() {
   //    against player_controller.js's _registered guard).
   const partial = answers(i);
   const midway = { "1": partial["1"], "2": partial["2"] };
-  const progress = http.post(`${play}/progress`, payload(session, midway, playerKey),
-    { headers: JSON_HEADERS, tags: { endpoint: "progress" } });
+  const progress = note(http.post(`${play}/progress`, payload(session, midway, playerKey),
+    { headers: JSON_HEADERS, tags: { endpoint: "progress" } }), "progress");
   check(progress, { "progress ok": (r) => r.status === 200 });
   sleep(120 * DWELL);
 
   // 4. Submit the full deck.
-  const submit = http.post(`${play}/submit`, payload(session, partial, playerKey),
-    { headers: JSON_HEADERS, tags: { endpoint: "submit" } });
+  const submit = note(http.post(`${play}/submit`, payload(session, partial, playerKey),
+    { headers: JSON_HEADERS, tags: { endpoint: "submit" } }), "submit");
   check(submit, { "submit ok": (r) => r.status === 200 });
   sleep(5 * DWELL);
 
   // 5. The auto-fired leaderboard on the thank-you screen.
-  const lb = http.get(`${play}/leaderboard?session_token=${session}&player_key=${encodeURIComponent(playerKey)}`,
-    { tags: { endpoint: "leaderboard" } });
+  const lb = note(http.get(`${play}/leaderboard?session_token=${session}&player_key=${encodeURIComponent(playerKey)}`,
+    { tags: { endpoint: "leaderboard" } }), "leaderboard");
   check(lb, {
     "leaderboard 200": (r) => r.status === 200,
     "leaderboard has entries": (r) => {
@@ -147,6 +173,6 @@ export function retryEcho() {
   const session = sessionToken();
   const body = payload(session, answers(__ITER), null);
   for (let n = 0; n < 3; n++) {
-    http.post(`${play}/submit`, body, { headers: JSON_HEADERS, tags: { endpoint: "retry_echo" } });
+    note(http.post(`${play}/submit`, body, { headers: JSON_HEADERS, tags: { endpoint: "retry_echo" } }), "retry_echo");
   }
 }
