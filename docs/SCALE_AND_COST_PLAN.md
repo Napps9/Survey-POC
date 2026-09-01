@@ -122,8 +122,8 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
   Two Render rules to plan around: storage changes are limited to **once per
   12 hours** (so there is NO emergency mid-event bump — size days ahead), and
   autoscaling, if enabled, fires at 90% full, +50% rounded to 5 GB, also max
-  once per 12 h. Worth enabling as a backstop; the fixed raise is the primary
-  control. Real tier prices off the dashboard: 0.1c-256mb $6, 0.5c-1g $19,
+  once per 12 h. **Autoscaling enabled 2026-09-01**; the fixed raise stays the
+  primary control. Real tier prices off the dashboard: 0.1c-256mb $6, 0.5c-1g $19,
   1c-2g $40/mo (24 tiers total; the event tier gets read off the same list).
 - **Freeze deploys**: a green push to `Main` auto-deploys via CI's hook — mid
   event that is a migration plus a rolling restart. Disable the hook (or gate
