@@ -24,4 +24,17 @@ production:
   # dispatcher, the scheduler, the supervisor's maintenance task and Solid
   # Cable's poller. 3 + 12 leaves comfortable slack for all of them while
   # staying far under Render Postgres' connection limit with one instance.
+  # NOTE for scale-out: the +12 exists ONLY because Solid Queue is in-process.
+  # At WEB_CONCURRENCY=4 it is 4 pools of (threads+12) PER INSTANCE and the
+  # app exhausts the database's connection limit at three instances — moving
+  # Solid Queue to its own service and dropping the +12 is a prerequisite for
+  # running more than one instance (see docs scale plan).
   pool: <%= Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) + 12 %>
+  # Bound any single statement so one pathological query can't hold a
+  # connection through a burst (P1-4). Generous on purpose — the aggregate
+  # jobs legitimately scan big Vertos. Migrations and other long maintenance
+  # override per-command: DB_STATEMENT_TIMEOUT=600s (render.yaml's
+  # preDeployCommand does). Postgres-only; the sqlite dev/test blocks above
+  # have their own busy-timeout.
+  variables:
+    statement_timeout: <%= ENV.fetch("DB_STATEMENT_TIMEOUT", "30s") %>

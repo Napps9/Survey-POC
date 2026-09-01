@@ -51,7 +51,11 @@ class PlayerController < ApplicationController
   # reverse. Same formula (leave two threads for ordinary requests), tunable on
   # its own so respondent and creator AI can be balanced independently.
   AI_GRADE_POOL = SlotPool.new(
-    [ (ENV["AI_GRADE_SLOTS"].presence&.to_i || (Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) - 2)), 1 ].max
+    # An explicit AI_GRADE_SLOTS=0 means OFF — it's the event-day degrade
+    # switch, so it must actually degrade (the old [n, 1].max floor quietly
+    # kept one slot per process alive). Only the derived default is floored.
+    ENV["AI_GRADE_SLOTS"].presence&.to_i&.clamp(0, 64) ||
+      [ Integer(ENV.fetch("RAILS_MAX_THREADS", 3)) - 2, 1 ].max
   )
 
   # Respondents don't pick their browser the way a creator does — they open a

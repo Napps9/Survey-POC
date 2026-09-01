@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_01_093000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -656,7 +656,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_090000) do
     t.index ["survey_id", "region_country"], name: "index_responses_on_survey_and_region_country"
     t.index ["survey_id", "respondent_code_digest"], name: "index_responses_on_survey_and_respondent_code"
     t.index ["survey_id", "survey_wave_id"], name: "index_responses_on_survey_id_and_survey_wave_id"
-    t.index ["survey_id"], name: "index_responses_on_survey_id"
     t.index ["survey_link_id"], name: "index_responses_on_survey_link_id"
     t.index ["survey_share_id"], name: "index_responses_on_survey_share_id"
     t.check_constraint "status IN ('started', 'completed')", name: "chk_responses_status"

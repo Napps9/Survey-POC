@@ -192,6 +192,9 @@ class ConsentDeclinePurgeTest < ActionDispatch::IntegrationTest
 
     stub_method(ResultsActivity, :broadcast, ->(survey) { broadcasts << survey.id }) do
       decline
+      # The transition schedules a coalesced BroadcastResultsActivityJob; the
+      # broadcast itself happens when the job performs.
+      drain_enqueued_jobs
     end
 
     assert_includes broadcasts, @survey.id,

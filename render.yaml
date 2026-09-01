@@ -29,7 +29,10 @@ services:
     # blocks the deploy (old instance keeps serving) instead of taking the
     # running instance down on its next restart. Redundant but harmless
     # until then - db:prepare is idempotent.
-    preDeployCommand: bundle exec rails db:prepare
+    # DB_STATEMENT_TIMEOUT lifts the app's 30s statement bound
+    # (config/database.yml) for migrations only — an index build on a big
+    # responses table legitimately takes longer than a request query ever may.
+    preDeployCommand: DB_STATEMENT_TIMEOUT=600s bundle exec rails db:prepare
     # Persistent disk for Active Storage (organisation logos + the per-account
     # brand asset library). config.active_storage.service = :local writes to
     # Rails.root/storage = /rails/storage (WORKDIR is /rails), so the disk is

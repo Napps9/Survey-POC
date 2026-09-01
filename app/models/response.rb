@@ -142,7 +142,16 @@ class Response < ApplicationRecord
     # that broadcast. Still silent for an empty session that never answered.
     return unless answered? || saved_change_to_answered?
 
-    ResultsActivity.broadcast(survey)
+    # Off the request thread and coalesced: the broadcast used to run its two
+    # COUNTs, a partial render and a cable INSERT inline here, twice per
+    # respondent, whether or not anyone was watching. Same claim-a-window
+    # debounce as the standings refresh below — one broadcast per survey per
+    # window, fired after the window closes so the last transition is captured.
+    claimed = Rails.cache.write("results-activity:#{survey_id}", 1,
+                                unless_exist: true, expires_in: REFRESH_STANDINGS_DEBOUNCE)
+    return unless claimed
+
+    BroadcastResultsActivityJob.set(wait: REFRESH_STANDINGS_DEBOUNCE).perform_later(survey_id)
   rescue => e
     # A live counter is a nicety. It must never be able to fail the write that
     # stored a respondent's answers.

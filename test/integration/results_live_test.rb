@@ -127,8 +127,16 @@ class ResultsLiveTest < ActionDispatch::IntegrationTest
   # what these tests are about is WHICH saves announce themselves, not how
   # turbo-rails names a stream internally.
   def broadcasts_during
+    # Only jobs enqueued INSIDE the block count — setup writes queue their own
+    # coalesced broadcasts, which are not the saves under test.
+    clear_enqueued_jobs
     count = 0
-    stub_method(ResultsActivity, :broadcast, ->(*) { count += 1 }) { yield }
+    stub_method(ResultsActivity, :broadcast, ->(*) { count += 1 }) do
+      yield
+      # The transition enqueues a coalesced BroadcastResultsActivityJob; the
+      # broadcast itself happens when the job performs.
+      drain_enqueued_jobs
+    end
     count
   end
 
