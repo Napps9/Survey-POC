@@ -70,9 +70,15 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
 1. **Done 2026-09-01**: the four `generateValue` secrets (`SECRET_KEY_BASE`
    + the three `ACTIVE_RECORD_ENCRYPTION_*` values) are backed up outside
-   Render (see `docs/ENCRYPTION_KEYS.md`). Still owed: backup retention from
-   the dashboard's Recovery page, `SHOW max_connections;` (or read it off the
-   scratch DB at the same tier), and a restore test. Also observed on the
+   Render (see `docs/ENCRYPTION_KEYS.md`). **Backups (confirmed 2026-09-01):**
+   Point-in-Time Recovery to any timestamp in the past **3 days** (7 days once
+   the workspace is Pro — the same upgrade autoscaling needs), plus manual
+   Exports retained >=7 days. Routine: create an export now (it becomes the
+   restore-test artifact — restore it into the scratch DB when that exists),
+   another the day before any event or migration-heavy deploy, and longer-term
+   a scheduled export to our own bucket so a copy lives outside Render (P1-2).
+   Still owed: `SHOW max_connections;` (read it off the scratch DB at the same
+   tier). Also observed on the
    live instance: the built-in Connection Pool (PgBouncer) toggle exists and
    is off (flip it only in the scale-out stage, after the pool-formula
    change), and inbound Postgres access is open to 0.0.0.0/0 — deliberate
