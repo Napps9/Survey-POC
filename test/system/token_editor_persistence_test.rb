@@ -41,6 +41,19 @@ class TokenEditorPersistenceTest < ApplicationSystemTestCase
     visit survey_path(@survey)
     dismiss_cookie_banner
     assert_text "Pick one"
+    # Importmap loads modules progressively, and the gestures below start the
+    # moment the text is on screen — faster than any human. Wait until the
+    # survey-editor controller is connected, or the input events fire before
+    # markDirty/the submit interceptor exist to hear them.
+    Timeout.timeout(10) do
+      sleep 0.1 until evaluate_script(<<~JS)
+        (() => {
+          const app  = window.Stimulus || window.application
+          const root = document.querySelector('[data-controller~="survey-editor"]')
+          return !!(app && root && app.getControllerForElementAndIdentifier(root, "survey-editor"))
+        })()
+      JS
+    end
   end
 
   def stored_tokens
