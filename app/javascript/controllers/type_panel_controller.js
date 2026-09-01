@@ -3,7 +3,7 @@ import { ROUTABLE_TYPES } from "lib/routable_types"
 import { PAGED_TYPES, isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
 import { DEFAULT_OPTIONS, defaultOptionsFor } from "lib/default_options"
-import { choiceListItemHtml, prioritiseItemHtml, choiceGridItemHtml, addOptionBtnHtml } from "lib/choice_templates"
+import { choiceListItemHtml, prioritiseItemHtml, choiceGridItemHtml, yesNoItemHtml, addOptionBtnHtml } from "lib/choice_templates"
 import { tapResponseStripHtml, tapGlyphSvg } from "lib/tap_response_templates"
 import { resolveResponses, fans } from "lib/tap_scales"
 import { injectIcons } from "lib/option_icons"
@@ -202,7 +202,7 @@ const COMPONENTS = {
     const styles = ctx.optionStyles || []
     return `
     <ul class="choice-list choice-list--yesno" data-controller="picker" data-picker-mode-value="single">
-      ${[[labels[0], 1], [labels[1], 4]].map(([label, bg], i) => yesNoItemHtml(label, bg, styles[i])).join("")}
+      ${[[labels[0], 1, "Yes"], [labels[1], 4, "No"]].map(([label, bg, canonical], i) => yesNoItemHtml(label, bg, styles[i], { canonical, quiz: ctx.quiz })).join("")}
     </ul>`
   },
 
@@ -1277,6 +1277,8 @@ export default class extends Controller {
         optionFocals:    this._optionFocalsFor(card),
         optionStyles:    this._optionStylesFor(card),
         responses:       this._responsesFor(card),
+        // yes_no's builder renders the quiz mark-correct button itself.
+        quiz:            this.quizValue,
         // Kept off the card's own dataset because it is only ever read here;
         // the select the builder renders is what owns it from then on.
         charLimit:       parseInt(card.querySelector("[data-char-limit]")?.value, 10) || undefined

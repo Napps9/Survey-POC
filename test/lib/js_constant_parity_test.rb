@@ -328,6 +328,53 @@ class JsConstantParityTest < ActiveSupport::TestCase
                  "(see welcome_card), so an omission stays distinguishable from a decision."
   end
 
+  # The hole the builder-key test above cannot see: the KEY can exist while the
+  # identifier behind it does not. COMPONENTS.yes_no called `yesNoItemHtml`,
+  # which lib/choice_templates exports — and this file never imported. Importmap
+  # ships source, nothing compiles, so the miss surfaced only as a click-time
+  # ReferenceError inside applyType: "Yes / No" showed in every picker and
+  # silently did nothing when applied (Stimulus swallows action errors into
+  # handleError). This asserts every bare identifier the file calls is imported,
+  # defined in the file, or a recognised JS global — extend the globals list
+  # when a new browser API is legitimately adopted.
+  test "type_panel_controller calls only identifiers it imports or defines" do
+    code = js("controllers/type_panel_controller.js").gsub(%r{//.*$}, "")
+
+    imported = code.scan(/^import\s*\{([^}]*)\}/).flatten
+                   .flat_map { |list| list.split(",") }
+                   .map { |name| name.split(/\s+as\s+/).last.strip }
+                   .reject(&:empty?)
+    imported += code.scan(/^import\s+(\w+)\s+from/).flatten
+
+    defined = code.scan(/(?:function|const|let|var)\s+([A-Za-z_$][\w$]*)/).flatten
+    # Class/object method definitions look like calls at line start; their
+    # names count as defined (calls to them go through `this.`/the table).
+    defined += code.scan(/^\s*(?:static\s+|async\s+|get\s+|set\s+)*#?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{/).flatten
+
+    globals = %w[
+      if for while switch catch return typeof await function
+      Array Boolean CustomEvent Date Error Event JSON Map Math Number Object
+      Promise RegExp Set String WeakMap WeakSet
+      clearTimeout setTimeout clearInterval setInterval fetch
+      requestAnimationFrame cancelAnimationFrame structuredClone
+      parseFloat parseInt isNaN alert confirm
+    ]
+    # CSS/SVG functions inside the builders' template strings — not JS calls.
+    globals += %w[var url scale rotate translate calc rgb rgba]
+
+    known   = (imported + defined + globals).to_set
+    # No whitespace before the paren: prose inside the builders' strings reads
+    # "richer data (the ORDER…)", and a space-tolerant scan flags it.
+    called  = code.scan(/(?<![.\w$#])(?<!new )([A-Za-z_$][\w$]*)\(/).flatten.uniq
+    unknown = called.reject { |name| known.include?(name) }
+
+    assert_empty unknown,
+                 "type_panel_controller.js calls #{unknown.inspect} without importing or " \
+                 "defining them. In an importmap app that is not a build error — it is a " \
+                 "ReferenceError at click time, and Stimulus swallows it, so the button " \
+                 "just silently does nothing (how yes_no shipped unpickable)."
+  end
+
   # The original defect, stated directly: `type === "scenario"` where the rule is
   # "is this a paged type".
   #

@@ -105,6 +105,35 @@ class TypeReapplyTest < ApplicationSystemTestCase
                  "the autosave that follows a type change persisted the reverted labels"
   end
 
+  # COMPONENTS.yes_no called a template this file never imported, so applying
+  # the type threw ReferenceError mid-_applyToCard: the picker tile highlighted,
+  # nothing else happened (Stimulus swallows action errors), and the card was
+  # left half-applied — badge rewritten, dataset.cardType not. The rebuilt rows
+  # must also carry data-canonical: the serializer keys a yes/no quiz answer on
+  # it, not on the display label.
+  test "yes/no can actually be applied, with canonical keys on the rebuilt rows" do
+    open_editor
+    reapply_type("yes_no")
+
+    canonicals = evaluate_script(<<~JS)
+      (() => Array.from(document.querySelectorAll(
+                "[data-card-cid='c1'] .choice-list--yesno .choice-list-item"))
+              .map(el => el.dataset.canonical))()
+    JS
+    assert_equal %w[Yes No], canonicals,
+                 "the yes/no rebuild rendered no rows (the builder threw?) or rows " \
+                 "without the canonical keys grading is stored under"
+
+    assert_equal "yes_no",
+                 evaluate_script("document.querySelector(\"[data-card-cid='c1']\").dataset.cardType"),
+                 "the type switch aborted mid-apply and left the card half-applied"
+
+    # A type change marks the editor dirty, so the rebuild reaches the server.
+    sleep 3
+    assert_equal "yes_no", @survey.reload.cards.find { |c| c["cid"] == "c1" }["type"],
+                 "the applied type never reached the server"
+  end
+
   # The behaviour the snapshot exists for, which must keep working: switching to
   # a type with no options and back restores what was there.
   test "switching away to a type with no options and back restores the labels" do

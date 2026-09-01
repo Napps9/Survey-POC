@@ -85,14 +85,23 @@ export function choiceGridItemHtml(label, i, style = null) {
 }
 
 // A yes/no row: fixed pair, fixed tile colours (1 = green, 4 = red), no
-// delete button — the pair is not user-extensible.
-export function yesNoItemHtml(label, bg, style = null) {
+// delete button — the pair is not user-extensible. `canonical` must be the
+// stable "Yes"/"No" key whatever the display label says: the serializer
+// reads data-canonical for yes_no quiz answers, and grading is keyed on it.
+// `quiz` mirrors the server's mark-correct button so a client-rebuilt card
+// can still have its correct answer marked before the next reload.
+export function yesNoItemHtml(label, bg, style = null, { canonical = null, quiz = false } = {}) {
+  const canonicalAttr = canonical ? ` data-canonical="${esc(canonical)}"` : ""
+  const markCorrect = quiz
+    ? `
+          <button type="button" class="mark-correct" data-picker-mode="single" data-action="click->survey-editor#toggleCorrect" title="${esc(t("card.mark_correct"))}">✓</button>`
+    : ""
   return `
         <li class="choice-list-item pick-item" data-picker-target="item"
-            data-action="click->picker#pick" data-selected="false"${styleAttrs(style)}>
+            data-action="click->picker#pick" data-selected="false"${canonicalAttr} data-correct="false"${styleAttrs(style)}>
           <div class="choice-list-tile choice-bg-${bg}" style="${esc(tileStyle(style))}">${tileInner(style)}</div>
           <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
-          <span class="choice-list-tick pick-dot">✓</span>
+          <span class="choice-list-tick pick-dot">✓</span>${markCorrect}
           ${styleBtnHtml()}
         </li>`
 }
