@@ -35,6 +35,46 @@ class OnePagerFitTest < ApplicationSystemTestCase
     )
   end
 
+  # The two pages moved the live Verto apart. vertonow taps whichever device
+  # isn't holding it; verto-for-research shows one device at a time and picks
+  # with a tab, because sharing the row cost the laptop a quarter of its width
+  # and the Verto inside came out too small to read. The contract is identical
+  # either way — one live frame, and the session moves across — so the
+  # assertions stay shared and only the gesture is per page. Detected from the
+  # page rather than keyed to its filename, so a third fork picks the right one.
+  def move_demo_to(device)
+    if has_selector?(".device-tab", wait: 0)
+      find(".device-tab[data-device='#{device}']").click
+    else
+      find(device == "phone" ? "#phonePlayOverlay" : "#laptopPlayOverlay").click
+    end
+  end
+
+  # With the phone live, a page that keeps both devices on screen shows a "bring
+  # it back" scrim, which has to sit on the screen glass and nowhere else.
+  # `.laptop-overlay` reaches that position by overriding the `inset: 10px` it
+  # inherits from `.device-overlay` — and `inset` is a shorthand for all four
+  # offsets, so declaring it *after* left/top silently resets them to auto and
+  # the scrim lands at its static position, hanging off the side of the laptop.
+  # That shipped once.
+  def assert_scrim_covers_the_glass
+    scrim = page.evaluate_script(<<~JS)
+      (() => {
+        const o = document.getElementById('laptopPlayOverlay');
+        const m = document.getElementById('demoMockup');
+        const r = o.getBoundingClientRect(), mr = m.getBoundingClientRect();
+        return { dx: r.x - (mr.x + mr.width * 0.124),
+                 dy: r.y - (mr.y + mr.height * 0.031),
+                 dw: r.width - mr.width * 0.7515,
+                 dh: r.height - mr.height * 0.69 };
+      })()
+    JS
+    assert_in_delta 0, scrim["dx"], 1.5, "the scrim is offset horizontally from the laptop's screen"
+    assert_in_delta 0, scrim["dy"], 1.5, "the scrim is offset vertically from the laptop's screen"
+    assert_in_delta 0, scrim["dw"], 1.5, "the scrim isn't the width of the laptop's screen"
+    assert_in_delta 0, scrim["dh"], 1.5, "the scrim isn't the height of the laptop's screen"
+  end
+
   ONE_PAGERS.each do |pager|
     probe_url = "/__fit_probe_#{File.basename(pager, '.html')}.html"
 
@@ -70,16 +110,15 @@ class OnePagerFitTest < ApplicationSystemTestCase
       FileUtils.rm_f(Rails.root.join(probe_path(pager)))
     end
 
-    test "#{pager}: the phone takes the live Verto on tap, and hands it back" do
+    test "#{pager}: the live Verto moves to the phone and back, one frame at a time" do
       survey = published_survey
       origin = Capybara.current_session.server.base_url
       serve_probe_copy(pager, origin, survey.publish_token)
 
       visit "#{origin}#{probe_url}"
       assert_selector "#demoMockup.is-live", wait: 15
-      assert_selector "#phonePlayOverlay", visible: :visible
 
-      find("#phonePlayOverlay").click
+      move_demo_to("phone")
       assert_selector "#phoneMockup.is-live", wait: 15
       # ONE live frame at a time — the whole point (shared session token).
       assert_no_selector "#demoMockup.is-live"
@@ -97,30 +136,11 @@ class OnePagerFitTest < ApplicationSystemTestCase
         assert_selector "[data-card-type]", minimum: 1, wait: 10
       end
 
-      # With the phone live, the laptop shows a "bring it back" scrim, which has
-      # to sit on the screen glass and nowhere else. `.laptop-overlay` reaches
-      # that position by overriding the `inset: 10px` it inherits from
-      # `.device-overlay` — and `inset` is a shorthand for all four offsets, so
-      # declaring it *after* left/top silently resets them to auto and the scrim
-      # lands at its static position, hanging off the side of the laptop. That
-      # shipped once.
-      scrim = page.evaluate_script(<<~JS)
-        (() => {
-          const o = document.getElementById('laptopPlayOverlay');
-          const m = document.getElementById('demoMockup');
-          const r = o.getBoundingClientRect(), mr = m.getBoundingClientRect();
-          return { dx: r.x - (mr.x + mr.width * 0.124),
-                   dy: r.y - (mr.y + mr.height * 0.031),
-                   dw: r.width - mr.width * 0.7515,
-                   dh: r.height - mr.height * 0.69 };
-        })()
-      JS
-      assert_in_delta 0, scrim["dx"], 1.5, "the scrim is offset horizontally from the laptop's screen"
-      assert_in_delta 0, scrim["dy"], 1.5, "the scrim is offset vertically from the laptop's screen"
-      assert_in_delta 0, scrim["dw"], 1.5, "the scrim isn't the width of the laptop's screen"
-      assert_in_delta 0, scrim["dh"], 1.5, "the scrim isn't the height of the laptop's screen"
+      # Only where both devices stay on screen: a page that shows one at a time
+      # has no laptop to put a scrim on.
+      assert_scrim_covers_the_glass if has_selector?("#laptopPlayOverlay", visible: :visible, wait: 0)
 
-      find("#laptopPlayOverlay").click
+      move_demo_to("laptop")
       assert_selector "#demoMockup.is-live", wait: 15
       assert_no_selector "#phoneMockup.is-live"
       assert_no_selector ".phone-screen-embed"
@@ -185,6 +205,41 @@ class OnePagerFitTest < ApplicationSystemTestCase
       ensure
         page.driver.browser.page.command("Emulation.clearDeviceMetricsOverride")
       end
+    ensure
+      FileUtils.rm_f(Rails.root.join(probe_path(pager)))
+    end
+
+    # The complaint that produced the tabs: sharing the row with the phone put
+    # verto-for-research at 0.36, which renders a desktop layout's 16px body
+    # text at about 7px on screen — reported as unreadable, and fairly.
+    #
+    # Three measured points set the floor. 0.362 was called unreadable; 0.428
+    # is vertonow, which has shipped that way without complaint; 0.481 is
+    # verto-for-research with the laptop alone on the stage. 0.40 sits between
+    # the known-bad and the known-acceptable, so it catches a return to sharing
+    # the row without being brittle about either page's exact layout.
+    #
+    # A floor on the scale rather than on any width, because scale is what a
+    # reader actually experiences.
+    test "#{pager}: the Verto is scaled large enough to read" do
+      survey = published_survey
+      origin = Capybara.current_session.server.base_url
+      serve_probe_copy(pager, origin, survey.publish_token)
+
+      visit "#{origin}#{probe_url}"
+      assert_selector "#demoMockup.is-live", wait: 15
+
+      scale = page.evaluate_script(<<~JS)
+        (() => {
+          const m = document.getElementById('demoMockup');
+          // 0.69 is the glass's share of the mockup's height; 780 is the
+          // logical viewport the frame is given (EMBED_H).
+          return (m.getBoundingClientRect().height * 0.69) / 780;
+        })()
+      JS
+      assert_operator scale, :>=, 0.40,
+        "the embedded Verto is scaled to #{scale.round(3)}; 0.362 was reported unreadable, so " \
+        "anything approaching it means the laptop has lost width to something again"
     ensure
       FileUtils.rm_f(Rails.root.join(probe_path(pager)))
     end
