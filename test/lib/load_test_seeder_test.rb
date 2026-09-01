@@ -49,7 +49,10 @@ class LoadTestSeederTest < ActiveSupport::TestCase
     end
   end
 
-  test "never deletes or mutates rows it did not create" do
+  test "refuses a database that already holds real organisations, touching nothing" do
+    # The env flag proves intent; this guard proves the TARGET. A mispasted
+    # DATABASE_URL pointing at production must stop the seeder dead, however
+    # the environment is labelled.
     org = Organisation.create!(name: "Bystander", slug: "bystander-#{SecureRandom.hex(3)}")
     survey = org.surveys.create!(
       title: "Untouched", theme: "t", audience_age: "all", key_insight: "k",
@@ -60,9 +63,12 @@ class LoadTestSeederTest < ActiveSupport::TestCase
     survey.responses.create!(session_token: "bystander-row", answers: {}, status: "completed")
     before = survey.responses.order(:id).pluck(:id, :updated_at)
 
-    with_seed_flag("1") { LoadTestSeeder.run!(responses: 3, io: StringIO.new) }
+    err = with_seed_flag("1") do
+      assert_raises(RuntimeError) { LoadTestSeeder.run!(responses: 3, io: StringIO.new) }
+    end
 
+    assert_match(/scratch database/, err.message)
     assert_equal before, survey.responses.order(:id).pluck(:id, :updated_at)
-    assert Organisation.exists?(org.id)
+    assert_nil Organisation.find_by(slug: LoadTestSeeder::ORG_SLUG), "the refusal must come before any write"
   end
 end

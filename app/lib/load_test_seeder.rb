@@ -51,6 +51,18 @@ class LoadTestSeeder
               "for throwaway load-test databases only (see test/load/README.md)."
       end
 
+      # The flag says "I meant to run the seeder"; this check says "and this is
+      # actually a scratch database". A mispasted DATABASE_URL pointing at
+      # production nearly slipped through once — an env var can lie about what
+      # it is, but a database holding real organisations cannot.
+      foreign = Organisation.where.not(slug: ORG_SLUG)
+      if foreign.exists?
+        raise "LoadTestSeeder refuses: this database already holds " \
+              "#{foreign.count} organisation(s) that are not the load-test org " \
+              "(e.g. #{foreign.first.slug.inspect}). It only ever runs against " \
+              "a scratch database — check DATABASE_URL."
+      end
+
       survey   = find_or_create_survey!
       inserted = insert_responses!(survey, count: responses, batch_size: batch_size, io: io)
 
