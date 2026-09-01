@@ -70,9 +70,14 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
 1. **Done 2026-09-01**: the four `generateValue` secrets (`SECRET_KEY_BASE`
    + the three `ACTIVE_RECORD_ENCRYPTION_*` values) are backed up outside
-   Render (see `docs/ENCRYPTION_KEYS.md`). Still owed: confirm Postgres
-   backup retention off the dashboard, record `SHOW max_connections;`, and
-   test a restore.
+   Render (see `docs/ENCRYPTION_KEYS.md`). Still owed: backup retention from
+   the dashboard's Recovery page, `SHOW max_connections;` (or read it off the
+   scratch DB at the same tier), and a restore test. Also observed on the
+   live instance: the built-in Connection Pool (PgBouncer) toggle exists and
+   is off (flip it only in the scale-out stage, after the pool-formula
+   change), and inbound Postgres access is open to 0.0.0.0/0 — deliberate
+   for workstation imports, but tighten to specific IPs when the workflow
+   allows.
 2. **Scratch environment + baseline load test** (`test/load/README.md`).
    Never against production — the harness is a denial-of-service by design.
 3. **Active Storage → Cloudflare R2** (EU jurisdiction;
@@ -107,6 +112,12 @@ token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
 ## 4. Event day
 
+- **Grow database storage FIRST (days before, not event day):** the live
+  instance showed **67% of 1 GB used with storage autoscaling disabled**
+  (2026-09-01). The event adds ~150 MB of rows plus index growth, WAL churn
+  and solid_cable retention — disk-full mid-event is a total outage. Raise it
+  to 10 GB+ (storage is $0.30/GB/mo and can only ever be increased, never
+  shrunk) or enable storage autoscaling.
 - **Freeze deploys**: a green push to `Main` auto-deploys via CI's hook — mid
   event that is a migration plus a rolling restart. Disable the hook (or gate
   the CI job) for the window.
