@@ -2,7 +2,9 @@ require "test_helper"
 
 # The leaderboard's anonymous names: assigned once per identity, unique per
 # board, never editable (there is no update path to test — that absence IS the
-# contract). This locks the assignment rules.
+# contract). Names are derived deterministically from the identity digest so
+# assignment never has to probe the table for a free name — the unique index
+# is the only collision check. This locks the assignment rules.
 class PlayerAliasTest < ActiveSupport::TestCase
   def setup
     org = Organisation.create!(name: "O", slug: "pa-#{SecureRandom.hex(3)}")
@@ -29,31 +31,53 @@ class PlayerAliasTest < ActiveSupport::TestCase
     assert_includes AnonNames::ANIMALS, animal
   end
 
-  test "two identities never share a name — a saturated pool falls back to a numbered variant" do
-    stub_method(AnonNames, :sample, "Clever Axolotl") do
-      assert_equal "Clever Axolotl",   PlayerAlias.ensure_for!(survey: @survey, key_digest: "d1").anon_name
-      assert_equal "Clever Axolotl 2", PlayerAlias.ensure_for!(survey: @survey, key_digest: "d2").anon_name
-      assert_equal "Clever Axolotl 3", PlayerAlias.ensure_for!(survey: @survey, key_digest: "d3").anon_name
+  test "the name is a pure function of the digest — no randomness in assignment" do
+    assert_equal PlayerAlias.derived_name_for("d1"), PlayerAlias.derived_name_for("d1")
+    refute_equal PlayerAlias.derived_name_for("d1"), PlayerAlias.derived_name_for("d2"),
+                 "different digests should (near-)always derive different names"
+  end
+
+  test "two identities never share a name — a base-pair collision falls back to a numbered variant" do
+    base = PlayerAlias.derived_name_for("d1")
+    # Force every digest onto the same base pair, the way a saturated pool
+    # behaves, by pinning attempt 0; later attempts run the real derivation.
+    collide = ->(digest, attempt = 0) do
+      attempt.zero? ? base : "#{base} #{2 + Digest::SHA256.hexdigest("#{digest}:#{attempt}").to_i(16) % 9_998}"
     end
+
+    names = stub_method(PlayerAlias, :derived_name_for, collide) do
+      %w[d1 d2 d3].map { |d| PlayerAlias.ensure_for!(survey: @survey, key_digest: d).anon_name }
+    end
+
+    assert_equal base, names.first
+    assert_equal 3, names.uniq.length, "all three identities must end up with distinct names"
+    names[1..].each { |n| assert_match(/\A#{Regexp.escape(base)} \d+\z/, n, "fallback is a numbered variant") }
   end
 
   test "uniqueness is per board — the same name can appear on two different Vertos" do
-    stub_method(AnonNames, :sample, "Snoozy Marmot") do
-      assert_equal "Snoozy Marmot", PlayerAlias.ensure_for!(survey: @survey, key_digest: "d1").anon_name
-      assert_equal "Snoozy Marmot", PlayerAlias.ensure_for!(survey: @other, key_digest: "d1").anon_name
-    end
+    a = PlayerAlias.ensure_for!(survey: @survey, key_digest: "d1").anon_name
+    b = PlayerAlias.ensure_for!(survey: @other,  key_digest: "d1").anon_name
+
+    assert_equal a, b, "derivation is per digest, so the same identity reads the same on any board"
+  end
+
+  test "a crowded board assigns everyone a unique name without a probe loop" do
+    names = 150.times.map { |i| PlayerAlias.ensure_for!(survey: @survey, key_digest: "crowd-#{i}").anon_name }
+
+    assert_equal 150, names.uniq.length
+    assert_equal 150, @survey.player_aliases.count
   end
 
   test "a digest race resolves to whoever inserted first" do
     digest = "d-race"
     interloper = nil
     # Simulate the concurrent request landing between our find and our insert.
-    sneaky = ->(survey) do
-      interloper ||= PlayerAlias.create!(survey: survey, key_digest: digest, anon_name: "Prior Winner")
+    sneaky = ->(_digest, _attempt = 0) do
+      interloper ||= PlayerAlias.create!(survey: @survey, key_digest: digest, anon_name: "Prior Winner")
       "Late Loser"
     end
 
-    row = stub_method(PlayerAlias, :fresh_name_for, sneaky) do
+    row = stub_method(PlayerAlias, :derived_name_for, sneaky) do
       PlayerAlias.ensure_for!(survey: @survey, key_digest: digest)
     end
 
