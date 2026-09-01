@@ -676,6 +676,7 @@ module ApplicationHelper
     lib/visible_band
     lib/page_limits
     lib/viewport_height
+    lib/question_types
   ].freeze
 
   def player_module_preload_paths

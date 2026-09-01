@@ -83,6 +83,7 @@ tn:
     token_enabled_label: 'Potso e e naya dintlha'
     token_award_hint: "Di newa fela ka go araba"
     token_checkpoint_placeholder: "E bontsha dintlha tse motshameka a di kgobokantseng go fitlha jaanong."
+    points_intro_placeholder: "E bolelela batshameki go sa le gale ka dintlha tse di leng teng."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -130,6 +131,7 @@ tn:
       contact_form: "TSHWAELANO"
       welcome_card: "KARATA YA TAMOGELO"
       token_checkpoint: "KGATO YA DINTLHA"
+      points_intro: "MATSENO A DINTLHA"
       consent_gate: "TUMELANO"
       respondent_code: "KHOUTU YA MOARABI"
     panel_label:
@@ -159,6 +161,7 @@ tn:
       open_ended: "Mokwalo o Gololesegileng"
       welcome_card: "Tamogelo"
       token_checkpoint: "Kgato ya Dintlha"
+      points_intro: "Matseno a dintlha"
       prioritise: "Rulaganya ka Thato"
       scenario: "Tiragalo"
   ask_submission_mailer:
@@ -316,6 +319,7 @@ tn:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1102,6 +1106,7 @@ tn:
     tab_tokens: 'Tokeni'
     note_limit_split_hint: "Morago ga ditlhaka tse %{n} go a patana mo karateng ya matseno — baya dintlha mo karateng ya tsona."
     respondent_code_card_note: "Verto e e na le karata ya Khoutu ya moarabi mo pakeng, ka jalo khoutu e kokoanngwa koo mme tlhophiso e ga e na seabe."
+    points_intro_card_note: "Verto eno e na le karata ya Matseno a dintlha mo dekeng, ka jalo matseno a dintlha a bonala teng mme tlhopho eno ga e na tlamorago."
     tab_logic: 'Tlhaloganyo le ditsela'
     flows_title: 'Ditsela'
     flows_intro: 'Ditlhopha tse di neilweng maina tsa dikarata tse karabo e e neetsweng tsela e ka tsenang mo go tsona — sk. diseto tsa dipotso tsa UK, UAE le USA tse di kopanang gape kgotsa tsa fela ka ditsebe tsa tsona.'

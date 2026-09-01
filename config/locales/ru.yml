@@ -81,6 +81,7 @@ ru:
     token_enabled_label: 'Этот вопрос начисляет баллы'
     token_award_hint: "Начисляются просто за ответ"
     token_checkpoint_placeholder: "Показывает баллы, которые игрок набрал на данный момент."
+    points_intro_placeholder: "Заранее сообщает игрокам о доступных баллах."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ ru:
       contact_form: "КОНТАКТ"
       welcome_card: "ПРИВЕТСТВЕННАЯ КАРТОЧКА"
       token_checkpoint: "КОНТРОЛЬНАЯ ТОЧКА"
+      points_intro: "ВСТУПЛЕНИЕ О БАЛЛАХ"
       consent_gate: "СОГЛАСИЕ"
       respondent_code: "КОД УЧАСТНИКА"
     panel_label:
@@ -149,6 +151,7 @@ ru:
       open_ended: "Свободный текст"
       welcome_card: "Приветствие"
       token_checkpoint: "Контрольная точка"
+      points_intro: "Вступление о баллах"
       prioritise: "Приоритеты"
       scenario: "Сценарий"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ ru:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1082,6 +1086,7 @@ ru:
     tab_tokens: 'Токенизация'
     note_limit_split_hint: "После %{n} символов текст становится тесным на вводной карточке — вынесите подробности на отдельную карточку."
     respondent_code_card_note: "В колоде этого Verto есть карточка кода участника, поэтому код собирается там, и эта настройка ни на что не влияет."
+    points_intro_card_note: "В колоде этого Verto есть карточка «Вступление о баллах», поэтому вступление показывается там, и этот выбор не действует."
     tab_logic: 'Логика и потоки'
     flows_title: "Потоки"
     flows_intro: "Именованные группы карточек, куда ведёт направленный ответ — например, наборы вопросов для UK, ОАЭ и США, которые затем сходятся или заканчиваются на своих экранах."

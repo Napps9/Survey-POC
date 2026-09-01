@@ -81,6 +81,7 @@ ar:
     token_enabled_label: 'هذا السؤال يمنح نقاطًا'
     token_award_hint: "تُمنح لمجرد الإجابة"
     token_checkpoint_placeholder: "يعرض النقاط التي جمعها اللاعب حتى الآن."
+    points_intro_placeholder: "يخبر اللاعبين مسبقًا بالنقاط المتاحة."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ ar:
       contact_form: "تواصل"
       welcome_card: "بطاقة ترحيب"
       token_checkpoint: "نقطة تحقق"
+      points_intro: "مقدمة النقاط"
       consent_gate: "موافقة"
       respondent_code: "رمز المشارك"
     panel_label:
@@ -149,6 +151,7 @@ ar:
       open_ended: "نص حر"
       welcome_card: "ترحيب"
       token_checkpoint: "نقطة تحقق من النقاط"
+      points_intro: "مقدمة النقاط"
       prioritise: "ترتيب الأولوية"
       scenario: "سيناريو"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ ar:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ ar:
     tab_tokens: 'الترميز'
     note_limit_split_hint: "بعد %{n} حرفًا يصبح النص مزدحمًا على بطاقة المقدمة — ضع التفاصيل في بطاقة خاصة بها بدلاً من ذلك."
     respondent_code_card_note: "يحتوي هذا الـ Verto على بطاقة رمز المشارك ضمن المجموعة، لذا يُجمع الرمز هناك بدلاً من ذلك ولا تأثير لهذا الإعداد."
+    points_intro_card_note: "يحتوي هذا الـ Verto على بطاقة مقدمة النقاط ضمن المجموعة، لذا تظهر مقدمة النقاط هناك بدلاً من ذلك ولا تأثير لهذا الخيار."
     tab_logic: 'المنطق والمسارات'
     flows_title: "المسارات"
     flows_intro: "مجموعات بطاقات مسمّاة تقود إليها إجابة موجَّهة — مثل مجموعات أسئلة للمملكة المتحدة والإمارات وأمريكا تلتقي لاحقًا أو تنتهي بشاشاتها الخاصة."

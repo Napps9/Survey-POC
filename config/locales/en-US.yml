@@ -91,6 +91,7 @@ en-US:
     token_enabled_label: 'This question awards points'
     token_award_hint: "Awarded just for answering"
     token_checkpoint_placeholder: "Shows the points a player has collected so far."
+    points_intro_placeholder: "Tells players up front about the points on offer."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -138,6 +139,7 @@ en-US:
       contact_form: "CONTACT"
       welcome_card: "WELCOME CARD"
       token_checkpoint: "CHECKPOINT"
+      points_intro: "POINTS INTRO"
       consent_gate: "CONSENT"
       respondent_code: "RESPONDENT CODE"
     panel_label:
@@ -167,6 +169,7 @@ en-US:
       open_ended: "Freeform"
       welcome_card: "Welcome"
       token_checkpoint: "Points Checkpoint"
+      points_intro: "Points Intro"
       prioritise: "Prioritize"
       scenario: "Scenario"
   ask_submission_mailer:
@@ -324,6 +327,7 @@ en-US:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1112,6 +1116,7 @@ en-US:
     tab_tokens: 'Tokenization'
     note_limit_split_hint: "Past %{n} characters this gets cramped on the intro card — put the detail on its own card instead."
     respondent_code_card_note: "This Verto has a Respondent code card in the deck, so the code is collected there instead and this setting has no effect."
+    points_intro_card_note: "This Verto has a Points Intro card in the deck, so the points intro appears there instead and this picker has no effect."
     tab_logic: 'Logic & flows'
     flows_title: 'Flows'
     flows_intro: 'Named groups of cards a routed answer can enter — e.g. UK, UAE and USA question sets that converge back or finish on their own screens.'

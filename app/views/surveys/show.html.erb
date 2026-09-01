@@ -939,6 +939,14 @@
               <label style="display:block;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:5px;" for="token-intro-cid">
                 Show the points intro on
               </label>
+              <%# A Points Intro card supersedes this picker (Survey#token_intro_index
+                  returns nil while one is in the deck) — same note pattern as the
+                  respondent-code card vs its switch. update_settings only touches
+                  token_intro_cid when the param is present, so omitting the select
+                  keeps the stored cid for when the card is removed again. %>
+              <% if @survey.points_intro_card? %>
+                <div class="card-flag-note"><%= t("editor.points_intro_card_note") %></div>
+              <% else %>
               <select name="token_intro_cid" id="token-intro-cid"
                       onchange="this.form.requestSubmit()"
                       style="width:100%;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;">
@@ -949,6 +957,7 @@
                   </option>
                 <% end %>
               </select>
+              <% end %>
 
               <input type="hidden" name="token_reveal_enabled" value="0" />
               <label style="display:flex;align-items:flex-start;gap:10px;margin-top:12px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">

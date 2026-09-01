@@ -81,6 +81,7 @@ sw:
     token_enabled_label: 'Swali hili linatoa pointi'
     token_award_hint: "Zinatolewa kwa kujibu tu"
     token_checkpoint_placeholder: "Inaonyesha pointi ambazo mchezaji amekusanya hadi sasa."
+    points_intro_placeholder: "Inawaambia wachezaji mapema kuhusu pointi zinazotolewa."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ sw:
       contact_form: "MAWASILIANO"
       welcome_card: "KADI YA KARIBU"
       token_checkpoint: "KIPIMO"
+      points_intro: "UTANGULIZI WA POINTI"
       consent_gate: "RIDHAA"
       respondent_code: "MSIMBO WA MJIBU"
     panel_label:
@@ -149,6 +151,7 @@ sw:
       open_ended: "Maandishi huru"
       welcome_card: "Karibu"
       token_checkpoint: "Kipimo cha pointi"
+      points_intro: "Utangulizi wa pointi"
       prioritise: "Panga vipaumbele"
       scenario: "Hali"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ sw:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ sw:
     tab_tokens: 'Utoaji wa tokeni'
     note_limit_split_hint: "Zaidi ya herufi %{n} inakuwa finyu kwenye kadi ya utangulizi — weka maelezo kwenye kadi yake mwenyewe."
     respondent_code_card_note: "Verto hii ina kadi ya Msimbo wa mjibu kwenye deki, hivyo msimbo hukusanywa hapo na mpangilio huu hauna athari."
+    points_intro_card_note: "Verto hii ina kadi ya Utangulizi wa pointi kwenye deki, hivyo utangulizi wa pointi huonekana hapo na chaguo hili halina athari."
     tab_logic: 'Mantiki na mtiririko'
     flows_title: "Mitiririko"
     flows_intro: "Vikundi vya kadi vyenye majina ambavyo jibu lililoelekezwa huingia — mf. seti za maswali za UK, UAE na USA zinazoungana tena baadaye au kuishia kwenye skrini zao."

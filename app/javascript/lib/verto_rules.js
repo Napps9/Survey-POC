@@ -150,8 +150,8 @@ const TYPE_LABEL = {
   select_one_grid: "Pick one (grid)", select_many_grid: "Select many (grid)",
   tap_card: "Tap", range: "Range", rating: "Rating", nps: "NPS",
   yes_no: "Yes / No", open_ended: "Freeform", welcome_card: "Welcome",
-  token_checkpoint: "Points Checkpoint", prioritise: "Prioritise",
-  scenario: "Scenario"
+  token_checkpoint: "Points Checkpoint", points_intro: "Points Intro",
+  prioritise: "Prioritise", scenario: "Scenario"
 }
 
 const isQuestion = (c) => isQuestionType(c && c.type ? c.type : "")

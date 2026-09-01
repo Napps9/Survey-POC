@@ -81,6 +81,7 @@ pl:
     token_enabled_label: 'To pytanie przyznaje punkty'
     token_award_hint: "Przyznawane po prostu za odpowiedź"
     token_checkpoint_placeholder: "Pokazuje punkty, które gracz zebrał do tej pory."
+    points_intro_placeholder: "Z góry informuje graczy o punktach do zdobycia."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ pl:
       contact_form: "KONTAKT"
       welcome_card: "KARTA POWITALNA"
       token_checkpoint: "PUNKT KONTROLNY"
+      points_intro: "INTRO PUNKTÓW"
       consent_gate: "ZGODA"
       respondent_code: "KOD UCZESTNIKA"
     panel_label:
@@ -149,6 +151,7 @@ pl:
       open_ended: "Tekst otwarty"
       welcome_card: "Powitanie"
       token_checkpoint: "Punkt kontrolny"
+      points_intro: "Intro punktów"
       prioritise: "Priorytetyzuj"
       scenario: "Scenariusz"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ pl:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1082,6 +1086,7 @@ pl:
     tab_tokens: 'Tokenizacja'
     note_limit_split_hint: "Powyżej %{n} znaków robi się ciasno na karcie wprowadzającej — szczegóły lepiej umieścić na osobnej karcie."
     respondent_code_card_note: "Ten Verto ma w talii kartę Kod uczestnika, więc kod jest zbierany tam, a to ustawienie nie ma znaczenia."
+    points_intro_card_note: "To Verto ma w talii kartę Intro punktów, więc intro punktów pojawia się tam i ten wybór nie ma efektu."
     tab_logic: 'Logika i przepływy'
     flows_title: "Przepływy"
     flows_intro: "Nazwane grupy kart, do których trafia skierowana odpowiedź — np. zestawy pytań UK, ZEA i USA, które potem się schodzą lub kończą na własnych ekranach."

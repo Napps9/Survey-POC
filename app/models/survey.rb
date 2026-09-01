@@ -1282,8 +1282,26 @@ class Survey < ApplicationRecord
       c
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
        .then { |list| enforce_single_respondent_code(list, warnings: warnings) }
+       .then { |list| enforce_single_points_intro(list, warnings: warnings) }
        .then { |list| drop_retired_cards(list, warnings: warnings) }
        .then { |list| hoist_consent_gate(list, warnings: warnings) }
+  end
+
+  # At most one points-intro card per deck, same shape and same reasoning as
+  # enforce_single_welcome below: the intro is one message, and a second card
+  # would say it twice. Dropped with a warning rather than rejected, so a deck
+  # that somehow acquired two can still be saved.
+  def self.enforce_single_points_intro(list, warnings: nil)
+    seen = false
+    list.filter_map do |c|
+      next c unless c.is_a?(Hash) && c["type"].to_s == "points_intro"
+      if seen
+        warnings << "duplicate_points_intro" if warnings
+        next nil
+      end
+      seen = true
+      c
+    end
   end
 
   # At most one respondent-code card per deck, same shape and same reasoning as
@@ -1411,8 +1429,19 @@ class Survey < ApplicationRecord
   # editor's save path (the demo seeder, a raw import) can have no cids at all,
   # and the intro still has to appear. Falls back to the welcome card, where it
   # used to be hardcoded, then to the first card.
+  # Whether the deck carries a Points Intro card — the intro on a card of its
+  # own, superseding the picker below exactly as the respondent_code card
+  # supersedes its pre-screen switch.
+  def points_intro_card?
+    Array(cards).any? { |c| c.is_a?(Hash) && c["type"].to_s == "points_intro" }
+  end
+
   def token_intro_index
     return nil unless tokenisation_enabled?
+    # The card renders the intro itself (see _card_component.html.erb), so the
+    # inline copy renders nowhere while one is in the deck — and removing the
+    # card restores the previous inline placement, token_intro_cid untouched.
+    return nil if points_intro_card?
 
     list = Array(cards)
     return nil if list.empty?

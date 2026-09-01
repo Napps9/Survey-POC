@@ -81,6 +81,7 @@ ko:
     token_enabled_label: '이 문항은 점수를 부여합니다'
     token_award_hint: "답변만 해도 받을 수 있어요"
     token_checkpoint_placeholder: "플레이어가 지금까지 모은 포인트를 보여줍니다."
+    points_intro_placeholder: "획득할 수 있는 포인트를 플레이어에게 미리 알려줍니다."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ ko:
       contact_form: "연락처"
       welcome_card: "환영 카드"
       token_checkpoint: "체크포인트"
+      points_intro: "포인트 소개"
       consent_gate: "동의"
       respondent_code: "응답자 코드"
     panel_label:
@@ -149,6 +151,7 @@ ko:
       open_ended: "자유 서술"
       welcome_card: "환영"
       token_checkpoint: "포인트 체크포인트"
+      points_intro: "포인트 소개"
       prioritise: "우선순위 정하기"
       scenario: "시나리오"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ ko:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ ko:
     tab_tokens: '토큰화'
     note_limit_split_hint: "%{n}자를 넘으면 인트로 카드에서 빽빽해집니다 — 자세한 내용은 별도의 카드에 담으세요."
     respondent_code_card_note: "이 Verto의 덱에 응답자 코드 카드가 있어 코드는 그곳에서 수집되며, 이 설정은 적용되지 않습니다."
+    points_intro_card_note: "이 Verto의 덱에는 포인트 소개 카드가 있으므로 포인트 소개는 그곳에 표시되며 이 선택은 효과가 없습니다."
     tab_logic: '로직과 흐름'
     flows_title: "플로우"
     flows_intro: "라우팅된 답변이 들어가는 이름 있는 카드 그룹 — 예: 나중에 합류하거나 각자의 화면에서 끝나는 UK·UAE·USA 질문 세트."

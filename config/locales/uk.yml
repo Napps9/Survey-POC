@@ -81,6 +81,7 @@ uk:
     token_enabled_label: 'Це питання нараховує бали'
     token_award_hint: "Нараховуються просто за відповідь"
     token_checkpoint_placeholder: "Показує бали, які гравець зібрав на цей момент."
+    points_intro_placeholder: "Заздалегідь повідомляє гравцям про доступні бали."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ uk:
       contact_form: "КОНТАКТ"
       welcome_card: "ВІТАЛЬНА КАРТКА"
       token_checkpoint: "КОНТРОЛЬНА ТОЧКА"
+      points_intro: "ВСТУП ПРО БАЛИ"
       consent_gate: "ЗГОДА"
       respondent_code: "КОД УЧАСНИКА"
     panel_label:
@@ -149,6 +151,7 @@ uk:
       open_ended: "Вільний текст"
       welcome_card: "Привітання"
       token_checkpoint: "Контрольна точка"
+      points_intro: "Вступ про бали"
       prioritise: "Пріоритети"
       scenario: "Сценарій"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ uk:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1082,6 +1086,7 @@ uk:
     tab_tokens: 'Токенізація'
     note_limit_split_hint: "Після %{n} символів текст стає тісним на вступній картці — винесіть подробиці на окрему картку."
     respondent_code_card_note: "У колоді цього Verto є картка коду учасника, тож код збирається там, і це налаштування ні на що не впливає."
+    points_intro_card_note: "У колоді цього Verto є картка «Вступ про бали», тож вступ показується там, і цей вибір не діє."
     tab_logic: 'Логіка та потоки'
     flows_title: "Потоки"
     flows_intro: "Іменовані групи карток, куди веде спрямована відповідь — наприклад, набори питань для UK, ОАЕ та США, що потім сходяться або завершуються на власних екранах."

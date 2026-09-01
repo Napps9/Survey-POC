@@ -10,7 +10,7 @@
 //
 // Four copies of a list is four chances to miss one. There is one now, and
 // test/lib/js_constant_parity_test.rb asserts it matches the Ruby.
-export const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "consent_gate", "respondent_code" ]
+export const NON_QUESTION_TYPES = [ "welcome_card", "token_checkpoint", "points_intro", "consent_gate", "respondent_code" ]
 
 export function isQuestionType(type) {
   return !NON_QUESTION_TYPES.includes(type || "")

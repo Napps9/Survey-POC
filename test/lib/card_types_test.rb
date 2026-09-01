@@ -35,7 +35,7 @@ class CardTypesTest < ActiveSupport::TestCase
     assert CardTypes.pickable_for(s).any? { |key, _attrs| key == "consent_gate" }
   end
 
-  test "pickable_for hides token_checkpoint unless the Verto is tokenised" do
+  test "pickable_for hides token_checkpoint and points_intro unless the Verto is tokenised" do
     org = Organisation.create!(name: "O", slug: "o-#{SecureRandom.hex(3)}")
     plain = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
                                  default_locale: "en", locales: [ "en" ], cards: [])
@@ -43,9 +43,23 @@ class CardTypesTest < ActiveSupport::TestCase
                                      default_locale: "en", locales: [ "en" ], cards: [],
                                      tokenisation_enabled: true)
 
-    refute CardTypes.pickable_for(plain).any? { |key, _attrs| key == "token_checkpoint" }
-    assert CardTypes.pickable_for(tokenised).any? { |key, _attrs| key == "token_checkpoint" }
-    refute CardTypes.pickable_for(nil).any? { |key, _attrs| key == "token_checkpoint" }
+    %w[token_checkpoint points_intro].each do |type|
+      refute CardTypes.pickable_for(plain).any? { |key, _attrs| key == type }, "#{type} offered untokenised"
+      assert CardTypes.pickable_for(tokenised).any? { |key, _attrs| key == type }, "#{type} missing tokenised"
+      refute CardTypes.pickable_for(nil).any? { |key, _attrs| key == type }, "#{type} offered with no survey"
+    end
+  end
+
+  test "pickable_for offers points_intro only while the deck has none" do
+    org = Organisation.create!(name: "O", slug: "o-#{SecureRandom.hex(3)}")
+    s = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                            default_locale: "en", locales: [ "en" ],
+                            tokenisation_enabled: true,
+                            cards: [ { "type" => "points_intro", "cid" => "pi" } ])
+
+    refute CardTypes.pickable_for(s).any? { |key, _attrs| key == "points_intro" },
+           "a second points_intro cannot survive the save (enforce_single_points_intro), " \
+           "so offering it is offering a card that cannot survive"
   end
 
   # ── badge/panel_label: i18n-aware, YAML-value default (2.7) ────────────────

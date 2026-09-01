@@ -81,6 +81,7 @@ fr:
     token_enabled_label: 'Cette question donne des points'
     token_award_hint: "Attribués juste pour avoir répondu"
     token_checkpoint_placeholder: "Affiche les points qu'un joueur a collectés jusqu'à présent."
+    points_intro_placeholder: "Annonce d'emblée aux joueurs les points à gagner."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ fr:
       contact_form: "CONTACT"
       welcome_card: "CARTE D'ACCUEIL"
       token_checkpoint: "BILAN"
+      points_intro: "INTRO DES POINTS"
       consent_gate: "CONSENTEMENT"
       respondent_code: "CODE PARTICIPANT"
     panel_label:
@@ -149,6 +151,7 @@ fr:
       open_ended: "Texte libre"
       welcome_card: "Accueil"
       token_checkpoint: "Bilan des points"
+      points_intro: "Intro des points"
       prioritise: "Prioriser"
       scenario: "Scénario"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ fr:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ fr:
     tab_tokens: 'Tokenisation'
     note_limit_split_hint: "Au-delà de %{n} caractères, c'est à l'étroit sur la carte d'introduction — mettez plutôt le détail sur sa propre carte."
     respondent_code_card_note: "Ce Verto contient une carte Code participant : le code est collecté là, et ce réglage n'a aucun effet."
+    points_intro_card_note: "Ce Verto contient une carte Intro des points : l'intro des points s'affiche là, et ce sélecteur n'a aucun effet."
     tab_logic: 'Logique et parcours'
     flows_title: "Flux"
     flows_intro: "Groupes de cartes nommés où mène une réponse routée — p. ex. des séries de questions UK, EAU et USA qui convergent ensuite ou finissent sur leurs propres écrans."

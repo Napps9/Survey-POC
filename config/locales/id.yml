@@ -81,6 +81,7 @@ id:
     token_enabled_label: 'Pertanyaan ini memberi poin'
     token_award_hint: "Didapat hanya karena menjawab"
     token_checkpoint_placeholder: "Menampilkan poin yang telah dikumpulkan pemain sejauh ini."
+    points_intro_placeholder: "Memberi tahu pemain sejak awal tentang poin yang ditawarkan."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ id:
       contact_form: "KONTAK"
       welcome_card: "KARTU SAMBUTAN"
       token_checkpoint: "PATOK UJI"
+      points_intro: "INTRO POIN"
       consent_gate: "PERSETUJUAN"
       respondent_code: "KODE RESPONDEN"
     panel_label:
@@ -149,6 +151,7 @@ id:
       open_ended: "Teks bebas"
       welcome_card: "Sambutan"
       token_checkpoint: "Patok Poin"
+      points_intro: "Intro Poin"
       prioritise: "Prioritaskan"
       scenario: "Skenario"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ id:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ id:
     tab_tokens: 'Tokenisasi'
     note_limit_split_hint: "Lebih dari %{n} karakter akan terlihat sesak di kartu intro — taruh detailnya di kartu tersendiri."
     respondent_code_card_note: "Verto ini memiliki kartu Kode responden di dek, jadi kode dikumpulkan di sana dan pengaturan ini tidak berpengaruh."
+    points_intro_card_note: "Verto ini memiliki kartu Intro Poin di dek, jadi intro poin muncul di sana dan pilihan ini tidak berpengaruh."
     tab_logic: 'Logika & alur'
     flows_title: "Alur"
     flows_intro: "Kelompok kartu bernama yang dimasuki jawaban yang dirutekan — mis. set pertanyaan UK, UEA, dan AS yang kemudian bergabung kembali atau berakhir di layarnya sendiri."

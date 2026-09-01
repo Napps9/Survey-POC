@@ -81,6 +81,7 @@ nl:
     token_enabled_label: 'Deze vraag geeft punten'
     token_award_hint: "Verdiend door simpelweg te antwoorden"
     token_checkpoint_placeholder: "Toont de punten die een speler tot nu toe heeft verzameld."
+    points_intro_placeholder: "Vertelt spelers vooraf welke punten er te verdienen zijn."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ nl:
       contact_form: "CONTACT"
       welcome_card: "WELKOMSTKAART"
       token_checkpoint: "CHECKPOINT"
+      points_intro: "PUNTEN-INTRO"
       consent_gate: "TOESTEMMING"
       respondent_code: "RESPONDENTCODE"
     panel_label:
@@ -149,6 +151,7 @@ nl:
       open_ended: "Vrije tekst"
       welcome_card: "Welkom"
       token_checkpoint: "Puntenstand"
+      points_intro: "Punten-intro"
       prioritise: "Prioriteren"
       scenario: "Scenario"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ nl:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ nl:
     tab_tokens: 'Tokenisatie'
     note_limit_split_hint: "Boven %{n} tekens wordt het krap op de introkaart — zet de details liever op een eigen kaart."
     respondent_code_card_note: "Deze Verto heeft een kaart Respondentcode in het deck, dus de code wordt daar verzameld en deze instelling heeft geen effect."
+    points_intro_card_note: "Deze Verto heeft een Punten-intro-kaart in het deck, dus de punten-intro verschijnt daar en deze keuze heeft geen effect."
     tab_logic: 'Logica & flows'
     flows_title: "Flows"
     flows_intro: "Benoemde kaartgroepen waar een gerouteerd antwoord in terechtkomt — bijv. vragensets voor UK, VAE en VS die daarna samenkomen of op eigen schermen eindigen."

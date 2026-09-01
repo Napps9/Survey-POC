@@ -102,6 +102,48 @@ class TokenisationOptionsTest < ActionDispatch::IntegrationTest
     assert_select "[data-card-cid='c_welcome'] .welcome-intake-tokens", false
   end
 
+  # ── The Points Intro card supersedes the picker ───────────────────────────
+
+  test "a points_intro card takes over from the inline intro" do
+    s = tokenised
+    s.update!(cards: s.cards + [ { "type" => "points_intro", "cid" => "c_pi", "text" => "Points!" } ])
+
+    assert s.points_intro_card?
+    assert_nil s.reload.token_intro_index, "the card renders the intro itself; the picker has no say"
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select ".welcome-intake-tokens", count: 1
+    assert_select "[data-card-cid='c_pi'] .welcome-intake-tokens"
+    assert_select "[data-card-cid='c_welcome'] .welcome-intake-tokens", false
+
+    s.update!(cards: s.cards.reject { |c| c["cid"] == "c_pi" })
+    assert_equal 0, s.reload.token_intro_index,
+                 "removing the card restores the previous inline placement — " \
+                 "token_intro_cid is left stored, not cleared"
+  end
+
+  test "a points_intro card shows nothing when tokenisation is off" do
+    s = tokenised(tokenisation_enabled: false)
+    s.update!(cards: s.cards + [ { "type" => "points_intro", "cid" => "c_pi" } ])
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+    assert_select ".welcome-intake-tokens", count: 0
+  end
+
+  test "a deck keeps only its first points_intro card" do
+    warnings = []
+    cards = Survey.sanitize_cards_images!(
+      [ { "type" => "points_intro", "cid" => "pi1" },
+        { "type" => "points_intro", "cid" => "pi2" },
+        { "type" => "open_ended", "text" => "Q", "cid" => "q" } ], warnings: warnings)
+
+    assert_equal %w[pi1 q], cards.map { |c| c["cid"] },
+                 "the second intro says the same thing twice — dropped, keeping the first"
+    assert_includes warnings, "duplicate_points_intro"
+  end
+
   test "update_settings moves the intro, and ignores a cid not in the deck" do
     sign_in!
     s = tokenised

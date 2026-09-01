@@ -81,6 +81,7 @@ vi:
     token_enabled_label: 'Câu hỏi này có điểm'
     token_award_hint: "Chỉ cần trả lời là được cộng điểm"
     token_checkpoint_placeholder: "Hiển thị số điểm người chơi đã thu thập được cho đến nay."
+    points_intro_placeholder: "Cho người chơi biết trước về số điểm có thể nhận."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ vi:
       contact_form: "LIÊN HỆ"
       welcome_card: "THẺ CHÀO MỪNG"
       token_checkpoint: "ĐIỂM KIỂM TRA"
+      points_intro: "GIỚI THIỆU ĐIỂM"
       consent_gate: "ĐỒNG Ý"
       respondent_code: "MÃ NGƯỜI TRẢ LỜI"
     panel_label:
@@ -149,6 +151,7 @@ vi:
       open_ended: "Văn bản tự do"
       welcome_card: "Chào mừng"
       token_checkpoint: "Điểm kiểm tra"
+      points_intro: "Giới thiệu điểm"
       prioritise: "Ưu tiên"
       scenario: "Tình huống"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ vi:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ vi:
     tab_tokens: 'Mã hóa token'
     note_limit_split_hint: "Quá %{n} ký tự sẽ bị chật trên thẻ giới thiệu — hãy đưa phần chi tiết sang một thẻ riêng."
     respondent_code_card_note: "Verto này có thẻ Mã người trả lời trong bộ thẻ, nên mã được thu thập ở đó và cài đặt này không có tác dụng."
+    points_intro_card_note: "Verto này có thẻ Giới thiệu điểm trong bộ bài, nên phần giới thiệu điểm hiển thị ở đó và lựa chọn này không có tác dụng."
     tab_logic: 'Logic & luồng'
     flows_title: "Luồng"
     flows_intro: "Nhóm thẻ có tên mà câu trả lời được định tuyến sẽ đi vào — vd. bộ câu hỏi UK, UAE và USA rồi hội tụ lại hoặc kết thúc trên màn hình riêng."

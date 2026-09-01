@@ -81,6 +81,7 @@ zu:
     token_enabled_label: 'Lo mbuzo unikeza amaphoyinti'
     token_award_hint: "Anikezwa ngokuphendula nje"
     token_checkpoint_placeholder: "Ibonisa amaphoyinti umdlali asewaqoqile kuze kube manje."
+    points_intro_placeholder: "Sitshela abadlali kusenesikhathi ngamaphoyinti atholakalayo."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -128,6 +129,7 @@ zu:
       contact_form: "UXHUMANO"
       welcome_card: "IKHADI LOKWAMUKELA"
       token_checkpoint: "ISIGABA SOKUHLOLA"
+      points_intro: "ISINGENISO SAMAPHOYINTI"
       consent_gate: "IMVUME"
       respondent_code: "IKHODI YOMPHENDULI"
     panel_label:
@@ -157,6 +159,7 @@ zu:
       open_ended: "Okuvulekile"
       welcome_card: "Ukwamukela"
       token_checkpoint: "Isigaba Samaphoyinti"
+      points_intro: "Isingeniso Samaphoyinti"
       prioritise: "Beka izigaba zokubaluleka"
       scenario: "Isibonelo"
   ask_submission_mailer:
@@ -314,6 +317,7 @@ zu:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1100,6 +1104,7 @@ zu:
     tab_tokens: 'Ukuthokheniza'
     note_limit_split_hint: "Ngaphezu kwezinhlamvu ezingu-%{n} kuyaminyana ekhadini lesingeniso — beka imininingwane ekhadini layo."
     respondent_code_card_note: "Le Verto inekhadi leKhodi yomphenduli kudekhi, ngakho ikhodi iqoqwa lapho futhi lesi silungiselelo asinamthelela."
+    points_intro_card_note: "Le Verto inekhadi leSingeniso samaphoyinti kudekhi, ngakho isingeniso samaphoyinti sivela lapho futhi lokhu kukhetha akunamthelela."
     tab_logic: 'Ukubonga & izinhlelo'
     flows_title: 'Izinhlelo'
     flows_intro: 'Amaqembu amakhadi anamagama lapho impendulo eqondisiwe ingangena — isb. iseti zemibuzo ze-UK, UAE ne-USA ezihlangana ngemuva noma ziphelele ezikrinini zazo.'

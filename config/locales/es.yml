@@ -81,6 +81,7 @@ es:
     token_enabled_label: 'Esta pregunta otorga puntos'
     token_award_hint: "Se otorgan solo por responder"
     token_checkpoint_placeholder: "Muestra los puntos que un jugador ha acumulado hasta ahora."
+    points_intro_placeholder: "Informa a los jugadores de antemano sobre los puntos en juego."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ es:
       contact_form: "CONTACTO"
       welcome_card: "TARJETA DE BIENVENIDA"
       token_checkpoint: "PUNTO DE CONTROL"
+      points_intro: "INTRO DE PUNTOS"
       consent_gate: "CONSENTIMIENTO"
       respondent_code: "CÓDIGO DE PARTICIPANTE"
     panel_label:
@@ -149,6 +151,7 @@ es:
       open_ended: "Texto libre"
       welcome_card: "Bienvenida"
       token_checkpoint: "Punto de control"
+      points_intro: "Intro de puntos"
       prioritise: "Priorizar"
       scenario: "Escenario"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ es:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ es:
     tab_tokens: 'Tokenización'
     note_limit_split_hint: "Más allá de %{n} caracteres queda apretado en la tarjeta de introducción: pon el detalle en su propia tarjeta."
     respondent_code_card_note: "Este Verto tiene una tarjeta de código de participante en el mazo, así que el código se recoge ahí y este ajuste no tiene efecto."
+    points_intro_card_note: "Este Verto tiene una tarjeta de Intro de puntos en el mazo, así que la intro de puntos aparece ahí y este selector no tiene efecto."
     tab_logic: 'Lógica y flujos'
     flows_title: "Flujos"
     flows_intro: "Grupos de tarjetas con nombre a los que llega una respuesta enrutada — p. ej. sets de preguntas para UK, EAU y EE. UU. que convergen de nuevo o terminan en sus propias pantallas."

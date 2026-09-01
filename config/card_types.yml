@@ -202,6 +202,24 @@ token_checkpoint:
   picker_icon:  "🏆"
   pickable:     true
 
+# The points intro, as a card of its own. The intro pills used to render INSIDE
+# whichever card token_intro_cid names, and a fixed-height card paid for them
+# out of its own content. As a real card the intro gets a whole card, and it
+# supersedes the picker the same way respondent_code supersedes its switch:
+# Survey#token_intro_index returns nil while one is in the deck, so there is
+# exactly one copy of the intro wherever it lives.
+points_intro:
+  badge:        "POINTS INTRO"
+  badge_css:    "sb-welcome"
+  accent:       "#01EACB"
+  panel_label:  ""
+  eyebrow:      ""
+  picker_name:  "Points Intro"
+  picker_desc:  "Explains the points on offer — no answer required"
+  explainer:    "Gives the points intro a card of its own instead of squeezing it onto another card. Only available once Tokenisation is on; while this card is in the deck it replaces the inline intro wherever the picker points."
+  picker_icon:  "🎯"
+  pickable:     true
+
 # Multi-page consent, as a real card in the deck. The survey-level consent gate
 # (consent_text + consent_image) is a single pseudo-card pinned before the
 # welcome card and can't be paged or reordered; this can do both, because it's an

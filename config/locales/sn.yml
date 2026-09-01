@@ -80,6 +80,7 @@ sn:
     token_enabled_label: 'Mubvunzo uyu unopa mapoinzi'
     token_award_hint: "Anopiwa nekungopindura chete"
     token_checkpoint_placeholder: "Inoratidza mapoinzi ayakaunganidzwa nemutambi kusvika parizvino."
+    points_intro_placeholder: "Inoudza vatambi pakutanga nezvezvibodzwa zviripo."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -122,6 +123,7 @@ sn:
       contact_form: "KUBATANA"
       welcome_card: "KADHI REKUGAMUCHIRA"
       token_checkpoint: "CHEKIPOINTI"
+      points_intro: "SUMO YEZVIBODZWA"
       consent_gate: "MVUMO"
       respondent_code: "KODHI YEMUPINDURI"
     panel_label:
@@ -151,6 +153,7 @@ sn:
       open_ended: "Runyoro Rwakasununguka"
       welcome_card: "Kugamuchira"
       token_checkpoint: "Cheki Pondo Yemapoinzi"
+      points_intro: "Sumo yezvibodzwa"
       prioritise: "Ronga Nekukosha"
       scenario: "Mamiriro"
   ask_submission_mailer:
@@ -304,6 +307,7 @@ sn:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1090,6 +1094,7 @@ sn:
     tab_tokens: 'Kuisa Mapoinzi'
     note_limit_split_hint: "Kupfuura mavara %{n} zvinotanga kumanikana pakadhi rekutanga — isai ruzivo rwakadzama pakadhi rakazvimirira."
     respondent_code_card_note: "Verto iyi ine kadhi reKodhi yemupinduri mudhaki, saka kodhi inotorwa ipapo uye chirongwa ichi hachina basa."
+    points_intro_card_note: "Verto iyi ine kadhi reSumo yezvibodzwa mudheki, saka sumo yezvibodzwa inoonekwa ipapo uye sarudzo iyi haina simba."
     tab_logic: 'Fungiro Nemifambiro'
     flows_title: 'Mifambiro'
     flows_intro: 'Mapoka emakadhi ane mazita anogona kupindwa nemhinduro yakanongedzwa — semuenzaniso, seti dzemibvunzo dzeUK, UAE neUSA dzinodzokerana kana kupedzera pazvidzitiro zvazvo.'

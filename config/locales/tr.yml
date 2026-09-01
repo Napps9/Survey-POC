@@ -81,6 +81,7 @@ tr:
     token_enabled_label: 'Bu soru puan verir'
     token_award_hint: "Sadece cevap verdiğiniz için kazanılır"
     token_checkpoint_placeholder: "Bir oyuncunun şimdiye kadar topladığı puanları gösterir."
+    points_intro_placeholder: "Oyunculara sunulan puanları baştan bildirir."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ tr:
       contact_form: "İLETİŞİM"
       welcome_card: "KARŞILAMA KARTI"
       token_checkpoint: "KONTROL NOKTASI"
+      points_intro: "PUAN TANITIMI"
       consent_gate: "ONAY"
       respondent_code: "KATILIMCI KODU"
     panel_label:
@@ -149,6 +151,7 @@ tr:
       open_ended: "Serbest metin"
       welcome_card: "Karşılama"
       token_checkpoint: "Puan Kontrol Noktası"
+      points_intro: "Puan Tanıtımı"
       prioritise: "Önceliklendir"
       scenario: "Senaryo"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ tr:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ tr:
     tab_tokens: 'Jetonlaştırma'
     note_limit_split_hint: "%{n} karakteri geçince tanıtım kartında sıkışık görünür — ayrıntıyı kendi kartına koyun."
     respondent_code_card_note: "Bu Verto'nun destesinde bir Katılımcı kodu kartı var; kod orada toplanır ve bu ayarın etkisi olmaz."
+    points_intro_card_note: "Bu Verto'nun destesinde bir Puan Tanıtımı kartı var, bu yüzden puan tanıtımı orada görünür ve bu seçimin bir etkisi yoktur."
     tab_logic: 'Mantık ve akışlar'
     flows_title: "Akışlar"
     flows_intro: "Yönlendirilen bir yanıtın girdiği adlandırılmış kart grupları — ör. sonradan birleşen ya da kendi ekranlarında biten UK, BAE ve ABD soru setleri."

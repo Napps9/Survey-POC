@@ -81,6 +81,7 @@ xh:
     token_enabled_label: 'Lo mbuzo unika amanqaku'
     token_award_hint: "Anikwa nje ngokuphendula"
     token_checkpoint_placeholder: "Ibonisa amanqaku umdlali awakhile ukuza kuthi ga ngoku."
+    points_intro_placeholder: "Ixelela abadlali kwangaphambili ngamanqaku akhoyo."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -129,6 +130,7 @@ xh:
       contact_form: "UNXIBELELWANO"
       welcome_card: "IKHADI LOKWAMKELA"
       token_checkpoint: "INDAWO YOKUJONGA"
+      points_intro: "INTSHAYELELO YAMANQAKU"
       consent_gate: "IMVUME"
       respondent_code: "IKHOWUDI YOMPHENDULI"
     panel_label:
@@ -158,6 +160,7 @@ xh:
       open_ended: "Umbhalo ovulekileyo"
       welcome_card: "Ukwamkela"
       token_checkpoint: "Indawo yokujonga amanqaku"
+      points_intro: "Intshayelelo yamanqaku"
       prioritise: "Lungelelanisa ngokobubaluleko"
       scenario: "Imeko"
   ask_submission_mailer:
@@ -316,6 +319,7 @@ xh:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1102,6 +1106,7 @@ xh:
     tab_tokens: 'Ukunikwa kweetoken'
     note_limit_split_hint: "Ngaphaya kweempawu ezingu-%{n} kuya kucinana kwikhadi lentshayelelo — beka iinkcukacha kwikhadi lazo."
     respondent_code_card_note: "Le Verto inekhadi leKhowudi yomphenduli kwipakethi, ngoko ikhowudi iqokelelwa apho kwaye le seti ayinampembelelo."
+    points_intro_card_note: "Le Verto inekhadi leNtshayelelo yamanqaku kwidekhi, ngoko intshayelelo yamanqaku ibonakala apho kwaye olu khetho alunasiphumo."
     tab_logic: 'Ingqiqo neendlela'
     flows_title: 'Iindlela zolwakhiwo'
     flows_intro: 'Amaqela amakhadi anamagama apho impendulo ekhonjiweyo inokungena — umz. izethu zemibuzo zeUK, iUAE neUSA ezidibana kwakhona okanye ziphele kwizikrini zazo.'

@@ -81,6 +81,7 @@ he:
     token_enabled_label: 'שאלה זו מזכה בנקודות'
     token_award_hint: "ניתנות רק על מענה"
     token_checkpoint_placeholder: "מציג את הנקודות שהשחקן צבר עד כה."
+    points_intro_placeholder: "מספר לשחקנים מראש על הנקודות המוצעות."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ he:
       contact_form: "יצירת קשר"
       welcome_card: "כרטיס פתיחה"
       token_checkpoint: "נקודת ביקורת"
+      points_intro: "מבוא נקודות"
       consent_gate: "הסכמה"
       respondent_code: "קוד משיב"
     panel_label:
@@ -149,6 +151,7 @@ he:
       open_ended: "טקסט חופשי"
       welcome_card: "ברוכים הבאים"
       token_checkpoint: "מצב נקודות"
+      points_intro: "מבוא נקודות"
       prioritise: "תעדוף"
       scenario: "תרחיש"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ he:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ he:
     tab_tokens: 'טוקניזציה'
     note_limit_split_hint: "מעל %{n} תווים זה נדחס בכרטיס הפתיחה — עדיף לשים את הפירוט בכרטיס נפרד."
     respondent_code_card_note: "ל-Verto הזה יש כרטיס קוד משיב בחפיסה, כך שהקוד נאסף שם ולהגדרה הזו אין השפעה."
+    points_intro_card_note: "ל-Verto הזה יש כרטיס מבוא נקודות בחפיסה, ולכן מבוא הנקודות מופיע שם ולבחירה הזו אין השפעה."
     tab_logic: 'לוגיקה וזרימות'
     flows_title: "מסלולים"
     flows_intro: "קבוצות כרטיסים בעלות שם שאליהן מגיעה תשובה מנותבת — למשל סטים של שאלות ל-UK, איחוד האמירויות וארצות הברית שמתאחדים בהמשך או מסתיימים במסכים משלהם."

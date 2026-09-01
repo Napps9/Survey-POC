@@ -213,10 +213,16 @@ class ShowcaseVertoSeeder
   def cards
     DemographicQuestions.append_to([
       welcome_card, consent_card, code_card, router_card,
-      # Lane A — people who play.
-      grid_one_card, rating_card, tap_card,
-      # Lane B — people who watch.
-      grid_many_card, nps_card, scenario_card,
+      # Lane A — people who play. Opens on the points promise: the intro used
+      # to render inline on the welcome card, but a points_intro card in the
+      # deck supersedes that (Survey#token_intro_index), and the lanes are
+      # where the deck can afford a screen each — §1.1's green band tops out
+      # at 16 cards on the longest path, and the spine already spends them.
+      points_intro_card, grid_one_card, rating_card, tap_card,
+      # Lane B — people who watch. Closes on the checkpoint before rejoining,
+      # for the same length arithmetic: one milestone screen per lane keeps
+      # both lanes at four and the longest path at sixteen.
+      grid_many_card, nps_card, scenario_card, checkpoint_card,
       # Rejoin: everyone plays the rest. open_ended sits BEFORE select_many
       # rather than last, because the demographic tail append_to adds below
       # opens with two open_ended cards (birth year, location) — ending the
@@ -224,7 +230,7 @@ class ShowcaseVertoSeeder
       # showcase_verto_seeder_test §1.4 enforces. The retired contact card used
       # to sit in that gap and hide the adjacency.
       range_card, prioritise_card, yes_no_card,
-      open_ended_card, select_many_card, checkpoint_card
+      open_ended_card, select_many_card
     ]).then { |list| image_demographic_tail(list) }
   end
 
@@ -279,7 +285,7 @@ class ShowcaseVertoSeeder
       "text" => "Make up a code you'll remember",
       "description" => "Part of the demonstration: a code like this is how a Verto matches the " \
                        "same person across repeat runs without ever knowing who they are. Only a " \
-                       "one-way hash is stored. Skip it if you'd rather.",
+                       "one-way hash is stored.",
       "image" => asset("left-panel", "sports-people-desktop-2.jpg") }
   end
 
@@ -303,9 +309,9 @@ class ShowcaseVertoSeeder
       "logic" => {
         "routes" => [
           { "match" => { "op" => "equals", "value" => "I play regularly" },
-            "to" => { "card" => "c_grid_one" } },
+            "to" => { "card" => "c_points_intro" } },
           { "match" => { "op" => "equals", "value" => "I play now and then" },
-            "to" => { "card" => "c_grid_one" } }
+            "to" => { "card" => "c_points_intro" } }
         ],
         "default" => { "card" => "c_grid_many" }
       } }
@@ -313,9 +319,18 @@ class ShowcaseVertoSeeder
 
   # ── Lane A: people who play ──────────────────────────────────────────────
 
+  # The lane head, so it carries the lane_label and the router's routes point
+  # here. Its presence in the deck is what supersedes the inline intro the
+  # welcome card used to host.
+  def points_intro_card
+    { "cid" => "c_points_intro", "type" => "points_intro", "flow_id" => "f_players",
+      "lane_label" => "Plays sport",
+      "text" => "Points are on offer as you go.",
+      "image" => asset("select-art", "select-icon-3.jpg") }
+  end
+
   def grid_one_card
     { "cid" => "c_grid_one", "type" => "select_one_grid", "flow_id" => "f_players",
-      "lane_label" => "Plays sport",
       "text" => "How often do you play in a typical month?",
       "options" => [ "Once a month", "Two or three times", "Weekly", "Most days" ],
       "option_styles" => [
@@ -405,7 +420,15 @@ class ShowcaseVertoSeeder
         { "color" => "#4f7cff", "emoji" => "🛋️" }
       ],
       "image" => asset("left-panel", "sports-people-desktop-1.jpg"),
-      "tokens" => { "Go along and see" => { "pt" => 4 }, "Give it a miss" => { "pt" => 4 } },
+      "tokens" => { "Go along and see" => { "pt" => 4 }, "Give it a miss" => { "pt" => 4 } } }
+  end
+
+  # Lane B's closing milestone — the flow's exit rewires it onto the rejoin,
+  # and the explicit next matches what FlowCompiler would write anyway.
+  def checkpoint_card
+    { "cid" => "c_checkpoint", "type" => "token_checkpoint", "flow_id" => "f_supporters",
+      "text" => "Nice one — here's what you've collected so far.",
+      "image" => asset("select-art", "select-icon-8.jpg"),
       "next" => { "card" => "c_range" } }
   end
 
@@ -478,11 +501,6 @@ class ShowcaseVertoSeeder
       "token_award" => { "pt" => 5 } }
   end
 
-  def checkpoint_card
-    { "cid" => "c_checkpoint", "type" => "token_checkpoint",
-      "text" => "Nice one — here's what you've collected so far.",
-      "image" => asset("select-art", "select-icon-8.jpg") }
-  end
 
   # ── simulated respondents ────────────────────────────────────────────────
 

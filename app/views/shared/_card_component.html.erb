@@ -975,6 +975,19 @@
         <div class="token-checkpoint-placeholder"><%= t("card.token_checkpoint_placeholder") %></div>
       <% end %>
 
+    <% when "points_intro" %>
+      <%# The points intro, on a card of its own. The pills used to render
+          inside whichever card token_intro_index named, and the fixed-height
+          card paid for them out of its own content (.mt-2 is the panel's only
+          shrinkable child). While this card is in the deck token_intro_index
+          returns nil, so the inline copy renders nowhere and the intro exists
+          exactly once. Tokenisation off ⇒ nothing to advertise ⇒ no pills. %>
+      <% if mode == :player %>
+        <%= render "player/token_intro" if @survey&.tokenisation_enabled? %>
+      <% else %>
+        <div class="token-checkpoint-placeholder"><%= t("card.points_intro_placeholder") %></div>
+      <% end %>
+
     <% when "respondent_code" %>
       <%# The respondent code, as a card the creator can place anywhere.
           Identical mechanics to the survey-level pre-screen it supersedes

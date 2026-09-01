@@ -3,6 +3,7 @@ import { t } from "lib/i18n"
 import { haptic } from "lib/haptics"
 import { presetFor, DEFAULT_TAP_COUNT } from "lib/tap_scales"
 import { visibleBandEnd } from "lib/visible_band"
+import { NON_QUESTION_TYPES } from "lib/question_types"
 
 const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
@@ -1903,7 +1904,7 @@ export default class extends Controller {
     const list = this.regionDetailListTarget
     list.innerHTML = ""
     ;(region.results || []).forEach(row => {
-      if (row.type === "welcome_card" || row.type === "token_checkpoint") return
+      if (NON_QUESTION_TYPES.includes(row.type)) return
       const mine = this._answers[String(row.index)]?.value
       list.appendChild(this._buildRow(row, mine))
     })
@@ -2060,7 +2061,7 @@ export default class extends Controller {
     const list = this.comparisonListTarget
     list.innerHTML = ""
     ;(data.results || []).forEach(row => {
-      if (row.type === "welcome_card" || row.type === "token_checkpoint") return
+      if (NON_QUESTION_TYPES.includes(row.type)) return
       // Tokenisation: synthetic rows appended by PlayerController#results
       // (folding "compare your tokens" into this same panel) aren't keyed to
       // a card index — "mine" is this session's own final total instead.

@@ -81,6 +81,7 @@ hi:
     token_enabled_label: 'यह प्रश्न अंक देता है'
     token_award_hint: "सिर्फ़ उत्तर देने पर मिलते हैं"
     token_checkpoint_placeholder: "दिखाता है कि खिलाड़ी ने अब तक कितने अंक अर्जित किए हैं।"
+    points_intro_placeholder: "खिलाड़ियों को पहले ही बताता है कि कौन से पॉइंट मिल सकते हैं।"
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ hi:
       contact_form: "संपर्क"
       welcome_card: "स्वागत कार्ड"
       token_checkpoint: "चेकपॉइंट"
+      points_intro: "पॉइंट परिचय"
       consent_gate: "सहमति"
       respondent_code: "प्रतिभागी कोड"
     panel_label:
@@ -149,6 +151,7 @@ hi:
       open_ended: "स्वतंत्र पाठ"
       welcome_card: "स्वागत"
       token_checkpoint: "पॉइंट्स चेकपॉइंट"
+      points_intro: "पॉइंट परिचय"
       prioritise: "प्राथमिकता तय करें"
       scenario: "परिदृश्य"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ hi:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ hi:
     tab_tokens: 'टोकन प्रणाली'
     note_limit_split_hint: "%{n} अक्षरों से आगे यह इंट्रो कार्ड पर भर जाता है — बेहतर है कि विवरण को अलग कार्ड पर रखें।"
     respondent_code_card_note: "इस Verto के डेक में प्रतिभागी कोड कार्ड है, इसलिए कोड वहीं लिया जाता है और इस सेटिंग का कोई असर नहीं होता।"
+    points_intro_card_note: "इस Verto के डेक में पॉइंट परिचय कार्ड है, इसलिए पॉइंट परिचय वहीं दिखता है और इस चयन का कोई प्रभाव नहीं है।"
     tab_logic: 'लॉजिक और फ़्लो'
     flows_title: "फ़्लो"
     flows_intro: "नाम वाले कार्ड समूह जिनमें रूट किया गया जवाब जाता है — जैसे UK, UAE और USA के सवाल-सेट जो बाद में मिल जाते हैं या अपनी स्क्रीन पर ख़त्म होते हैं।"

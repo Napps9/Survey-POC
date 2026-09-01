@@ -83,6 +83,7 @@ st:
     token_enabled_label: 'Potso ena e fana ka lintlha'
     token_award_hint: "Di fumanwa feela ka ho araba"
     token_checkpoint_placeholder: "E bontsha lintlha tseo sebapadi se ntseng se di bokeletse ho fihlela jwale."
+    points_intro_placeholder: "Se bolella libapali esale pele ka lintlha tse fumanehang."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -130,6 +131,7 @@ st:
       contact_form: "DINTLHA TSA KGOKAHANO"
       welcome_card: "KARETE YA KAMOHELO"
       token_checkpoint: "TEKO YA LINTLHA"
+      points_intro: "SELELEKELA SA LINTLHA"
       consent_gate: "TUMELLO"
       respondent_code: "KHOUTU YA MOARABI"
     panel_label:
@@ -159,6 +161,7 @@ st:
       open_ended: "Mongolo o Mahala"
       welcome_card: "Kamohelo"
       token_checkpoint: "Teko ya Lintlha"
+      points_intro: "Selelekela sa lintlha"
       prioritise: "Beha Thato"
       scenario: "Boemo"
   ask_submission_mailer:
@@ -316,6 +319,7 @@ st:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1102,6 +1106,7 @@ st:
     tab_tokens: "Ts'ebediso ya Ditokene"
     note_limit_split_hint: "Ka mora ditlhaku tse %{n} ho ba hlophehileng karengoaneng ya selelekela — beha dintlha karengoaneng ya tsona."
     respondent_code_card_note: "Verto ena e na le karengoana ya Khoutu ya moarabi ka har'a dekele, kahoo khoutu e bokelloa moo 'me tlhophiso ena ha e na phello."
+    points_intro_card_note: "Verto ena e na le karete ea Selelekela sa lintlha ka har'a deki, kahoo selelekela sa lintlha se hlaha moo 'me khetho ena ha e na phello."
     tab_logic: 'Tsamaiso le Diphallo'
     flows_title: 'Diphallo'
     flows_intro: 'Dihlopha tse nang le mabitso tsa dikarete tseo karabo e lebisitsweng e ka di kenang — mohlala, disete tsa dipotso tsa UK, UAE le USA tse kopanang hape kapa tse fellang ka diskrini tsa tsona.'

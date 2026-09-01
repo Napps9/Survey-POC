@@ -27,6 +27,7 @@ export const DEFAULT_OPTIONS = {
   open_ended:       [],
   welcome_card:     [],
   token_checkpoint: [],
+  points_intro:     [],
   consent_gate:     [],
   respondent_code:  []
 }

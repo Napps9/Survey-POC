@@ -464,6 +464,11 @@ const COMPONENTS = {
   // consent_gate defect (BUG-015), in the one other type that had the same gap.
   token_checkpoint: () => `
     <div class="token-checkpoint-placeholder">${esc(t("card.token_checkpoint_placeholder"))}</div>`,
+
+  // Points Intro — the pills are server-rendered (player/_token_intro), so the
+  // editor shows the same placeholder contract as token_checkpoint above.
+  points_intro: () => `
+    <div class="token-checkpoint-placeholder">${esc(t("card.points_intro_placeholder"))}</div>`,
 }
 
 function prioritiseHtml(opts, styles = []) {

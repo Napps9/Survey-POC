@@ -81,6 +81,7 @@ ja:
     token_enabled_label: 'この質問はポイントを付与します'
     token_award_hint: "回答するだけで獲得できます"
     token_checkpoint_placeholder: "プレイヤーがこれまでに集めたポイントを表示します。"
+    points_intro_placeholder: "獲得できるポイントを最初にプレイヤーへ知らせます。"
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ ja:
       contact_form: "連絡先"
       welcome_card: "ウェルカムカード"
       token_checkpoint: "チェックポイント"
+      points_intro: "ポイント紹介"
       consent_gate: "同意"
       respondent_code: "回答者コード"
     panel_label:
@@ -149,6 +151,7 @@ ja:
       open_ended: "自由記述"
       welcome_card: "ウェルカム"
       token_checkpoint: "ポイントチェックポイント"
+      points_intro: "ポイント紹介"
       prioritise: "優先順位付け"
       scenario: "シナリオ"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ ja:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ ja:
     tab_tokens: 'トークン化'
     note_limit_split_hint: "%{n}文字を超えるとイントロカードで窮屈になります — 詳細は専用のカードに置いてください。"
     respondent_code_card_note: "この Verto のデッキには回答者コードのカードがあるため、コードはそちらで収集され、この設定は効果がありません。"
+    points_intro_card_note: "この Verto のデッキにはポイント紹介のカードがあるため、ポイント紹介はそちらに表示され、この選択は効果がありません。"
     tab_logic: 'ロジックとフロー'
     flows_title: "フロー"
     flows_intro: "ルーティングされた回答が入る名前付きカードグループ。例:UK・UAE・USAの質問セットが後で合流するか、それぞれの画面で終了します。"

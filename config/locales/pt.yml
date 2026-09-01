@@ -81,6 +81,7 @@ pt:
     token_enabled_label: 'Esta pergunta atribui pontos'
     token_award_hint: "Atribuídos só por responder"
     token_checkpoint_placeholder: "Mostra os pontos que um jogador já reuniu."
+    points_intro_placeholder: "Informa os jogadores desde o início sobre os pontos em jogo."
     # How many options a respondent may tick on a select-many card, and the
     # "no limit" end of that picker. ABSENT on the card means no limit, so the
     # last button reads as a word rather than the option count — see
@@ -120,6 +121,7 @@ pt:
       contact_form: "CONTATO"
       welcome_card: "CARTÃO DE BOAS-VINDAS"
       token_checkpoint: "PONTO DE CONTROLO"
+      points_intro: "INTRO DE PONTOS"
       consent_gate: "CONSENTIMENTO"
       respondent_code: "CÓDIGO DO PARTICIPANTE"
     panel_label:
@@ -149,6 +151,7 @@ pt:
       open_ended: "Texto livre"
       welcome_card: "Boas-vindas"
       token_checkpoint: "Ponto de controlo"
+      points_intro: "Intro de pontos"
       prioritise: "Priorizar"
       scenario: "Cenário"
   ask_submission_mailer:
@@ -300,6 +303,7 @@ pt:
     open_ended: []
     welcome_card: []
     token_checkpoint: []
+    points_intro: []
     consent_gate: []
     respondent_code: []
   js:
@@ -1080,6 +1084,7 @@ pt:
     tab_tokens: 'Tokenização'
     note_limit_split_hint: "Acima de %{n} caracteres fica apertado no cartão de introdução — coloque o detalhe num cartão próprio."
     respondent_code_card_note: "Este Verto tem um cartão Código do participante no baralho, por isso o código é recolhido aí e esta definição não tem efeito."
+    points_intro_card_note: "Este Verto tem um cartão de Intro de pontos no baralho, por isso a intro de pontos aparece lá e esta escolha não tem efeito."
     tab_logic: 'Lógica e fluxos'
     flows_title: "Fluxos"
     flows_intro: "Grupos de cartões com nome onde uma resposta encaminhada entra — p. ex. conjuntos de perguntas UK, EAU e EUA que depois convergem ou terminam em ecrãs próprios."
