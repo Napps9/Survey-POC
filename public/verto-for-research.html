@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- verto-for-research one-pager · build 2026-08-27-b · view-source and check this line to confirm
+<!-- verto-for-research one-pager · build 2026-08-27-e · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-08-27-b">
+<html lang="en" data-build="2026-08-27-e">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1002,12 +1002,27 @@
     .ask-row{ grid-template-columns: 1fr; }
   }
 
+  /* The ask's button sits on a row with its note, the way the hero's does,
+     rather than stacked above it. */
+  .ask-ctas{ display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 0.2rem; }
+  .ask-ctas .ask-fallback{ align-self: center; font-size: 0.85rem; }
+
+  /* One button scrolls to the demo, the other opens it: section 01 is hidden
+     below 860px, so on a phone there is nothing on the page to scroll to. */
+  .hero-cta-mobile{ display: none; }
+
   /* Copy that only makes sense on one of the two layouts. */
   .on-mobile{ display: none; }
 
   @media (max-width: 860px){
     .on-desktop{ display: none; }
     .on-mobile{ display: inline; }
+
+    /* The whole Try it section goes on a phone. Its CTA and note go with it —
+       see .hero-cta-mobile, which opens the Verto instead of scrolling. */
+    #try{ display: none; }
+    .hero-cta-desktop{ display: none; }
+    .hero-cta-mobile{ display: inline-flex; }
 
     .device-row{ margin: 2rem 0; }
 
@@ -1112,12 +1127,12 @@
   <main>
 
     <div class="hero">
-      <div class="eyebrow">VertoNow · A proposal for Strategic Analytics</div>
-      <h1>VertoNow turns your interview<br><span>into a three-minute link.</span></h1>
+      <h1>VertoNow turns your interview<br><span>into a three-minute experience.</span></h1>
       <p class="sub">Your 100&#8211;150 depth interviews don't change, but contact list also gets a second way in to answer.</p>
       <div class="hero-ctas">
-        <a href="#try" class="btn btn-primary">Play a live one &#8594;</a>
-        <span class="hero-note">3 minutes, right here on this page.</span>
+        <a href="#try" class="btn btn-primary hero-cta-desktop">Play a live one &#8594;</a>
+        <a href="https://app.playverto.com/play/kB3GD2q2TEnVDxwOSI8Yqn67" target="_blank" rel="noopener" class="btn btn-primary hero-cta-mobile">Play a live one &#8594;</a>
+        <span class="hero-note"><span class="on-desktop">3 minutes, right here on this page.</span><span class="on-mobile">3 minutes, on your phone.</span></span>
       </div>
     </div>
 
@@ -1126,21 +1141,21 @@
         <div class="num">01</div>
         <div>
           <h3>Finish the quota quicker</h3>
-          <p>Three minutes on their own phone, whenever suits them. A convenient, frictionless option gets more of the list answered, sooner &#8212; no diary, no call to schedule.</p>
+          <p>Three minutes on your responders own phone, whenever suits them. A convenient, frictionless option gets more of the responders to answer, and fill your quota sooner.</p>
         </div>
       </li>
       <li>
         <div class="num">02</div>
         <div>
-          <h3>Turn a "not now" into an answer</h3>
+          <h3>Turn a "not now" into a response</h3>
           <p>An "I'm too busy" or "not now" rejection becomes a link they can fill out in their own time, rather than the end of the conversation.</p>
         </div>
       </li>
       <li>
         <div class="num">03</div>
         <div>
-          <h3>Points and a leaderboard, if you want them</h3>
-          <p>A Verto can award points as people answer and rank them against everyone else &#8212; motivation built into the experience itself.</p>
+          <h3>Offer the same rewards as you do today</h3>
+          <p>Keep the same rewards and offers that you do with phone interviews with VertoNow. All of your responders can claim their rewards at the end of the experience.</p>
         </div>
       </li>
     </ul>
@@ -1259,8 +1274,10 @@
           <label>What would you like to measure?
             <textarea name="message" rows="3"></textarea>
           </label>
-          <button type="submit" class="btn btn-primary">Get in touch &#8594;</button>
-          <p class="ask-fallback">Or email <a href="mailto:michael@playverto.com">michael@playverto.com</a> directly.</p>
+          <div class="ask-ctas">
+            <button type="submit" class="btn btn-primary">Get in touch &#8594;</button>
+            <span class="ask-fallback">Or email <a href="mailto:michael@playverto.com">michael@playverto.com</a> directly.</span>
+          </div>
         </form>
       </div>
     </section>
@@ -1275,7 +1292,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('Verto for research one-pager · build 2026-08-27-b');
+  console.info('Verto for research one-pager · build 2026-08-27-e');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');
@@ -1661,7 +1678,10 @@
     window.addEventListener('resize', () => { fitEmbed(); fitPhoneEmbed(); });
   }
 
-  activateDevice('laptop');
+  // Section 01 is display:none below 860px, and a hidden iframe still fetches
+  // its src — so without this a phone downloads the whole player for a section
+  // it will never show. Boot only if the mockup is actually laid out.
+  if (mockup && mockup.getBoundingClientRect().height > 0) activateDevice('laptop');
 
   // Scroll-spy nav highlighting
   const links = document.querySelectorAll('.nav-link');
