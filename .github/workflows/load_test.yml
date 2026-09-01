@@ -1,0 +1,86 @@
+# Drives the k6 load-test harness (test/load/journey.js) from a GitHub-hosted
+# runner, so nobody needs k6 on a local machine. Dispatch-only — it never runs
+# on push. The scratch environment it targets is throwaway by procedure
+# (test/load/README.md); both the guard step here and the script itself refuse
+# hostnames that look like production.
+name: Load test (scratch only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Scratch base URL — NEVER production"
+        required: true
+        default: "https://vertonow.onrender.com"
+      token:
+        description: "Publish token of the Load Test Verto"
+        required: true
+      arrivals_per_s:
+        description: "Peak respondent arrivals per second (event 83, proof 125)"
+        required: false
+        default: "10"
+      ramp_s:
+        description: "Seconds ramping 0 -> peak"
+        required: false
+        default: "60"
+      hold_s:
+        description: "Seconds holding peak"
+        required: false
+        default: "300"
+      dwell_scale:
+        description: "Think-time multiplier (0.05 compressed, 1.0 realistic)"
+        required: false
+        default: "0.05"
+      brownout:
+        description: "1 adds the retry-echo brownout scenario"
+        required: false
+        default: "0"
+
+permissions:
+  contents: read
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Refuse production hostnames
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          case "$BASE_URL" in
+            *playverto.com*|*survey-poc.onrender.com*)
+              echo "::error::base_url looks like production. Refusing." && exit 1 ;;
+          esac
+
+      - uses: actions/checkout@v4
+
+      - name: Install k6
+        run: |
+          curl -fsSL -o k6.tgz https://github.com/grafana/k6/releases/download/v1.1.0/k6-v1.1.0-linux-amd64.tar.gz
+          tar -xzf k6.tgz --strip-components=1
+          ./k6 version
+
+      - name: Run k6
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+          TOKEN: ${{ inputs.token }}
+          ARRIVALS_PER_S: ${{ inputs.arrivals_per_s }}
+          RAMP_S: ${{ inputs.ramp_s }}
+          HOLD_S: ${{ inputs.hold_s }}
+          DWELL_SCALE: ${{ inputs.dwell_scale }}
+          BROWNOUT: ${{ inputs.brownout }}
+        run: |
+          ./k6 run --summary-export=k6-summary.json \
+            --summary-trend-stats "avg,min,med,p(90),p(95),p(99),max" \
+            test/load/journey.js 2>&1 | tee k6-output.txt
+          exit "${PIPESTATUS[0]}"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results-${{ github.run_id }}
+          path: |
+            k6-summary.json
+            k6-output.txt

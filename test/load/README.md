@@ -61,6 +61,16 @@ same request *rate* shape, far fewer VUs. For the final rehearsal use
 `DWELL_SCALE=1` (real ~4–5 min dwell; needs ~25–30k VUs at 83/s — a large
 runner or k6 distributed mode) so connection-concurrency effects are real.
 
+### From GitHub Actions (no local machine needed)
+
+`.github/workflows/load_test.yml` runs the same script from a GitHub-hosted
+runner: Actions tab → "Load test (scratch only)" → Run workflow, or dispatch
+it via the API. Inputs mirror the env knobs above; the guard step refuses
+production-looking hostnames before k6 even starts. The full text output and
+`k6-summary.json` are uploaded as a run artifact. A standard runner handles
+the compressed-dwell profiles (~1,200 concurrent VUs at 83/s); the
+`DWELL_SCALE=1` rehearsal still needs a bigger machine.
+
 ## What to record per run
 
 - k6 summary: per-endpoint p50/p95/p99, `http_req_failed`, `journey_duration`.
