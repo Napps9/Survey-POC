@@ -91,8 +91,9 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 6 | 2 | 0 failed, medians 2–5 s | Single-flight refresh live. The one-off 50k background build shared the box with requests; busy-retry chains could stack (fixed: retries coalesce behind the debounce claim). |
 | 7 | 2 | 0 failed, **~1 s median on every endpoint** (min 120–155 ms) | Board built, nothing else running. Web CPU only **25–30%**, memory 20% (Render Metrics) — yet uniform queueing. **Database** Metrics: **CPU pinned at 100% of its 0.1-CPU limit**, memory 60–80% of 256 MB, disk **1,500–2,000 write ops/s**; the same Postgres tier production runs (and it had **OOM-crashed** during run 4). 55 app queries per journey (+~10 cache/rate-limit in prod); the leaderboard read was 23 → batched alias lookup → 12. |
 | 8 | 1 | 0 failed, median **228 ms** (show 481, submit 293, progress 233, leaderboard 266), p95 839 ms | Half the load, a quarter of the latency: the classic knee of a saturated resource — the DB was still touching 100% CPU at ~6 req/s. Healthy service time ≈ 70 ms server-side for the API endpoints, ≈ 320 ms for the 150 KB page. |
+| 9 | 2 | 0 failed, median **297 ms** (show 501, submit 362, progress 312, leaderboard 449), p95 0.8–1.0 s, no queueing | **Stage 5 A/B against run 7** — identical load and the same 0.1-CPU database; the only change is `REDIS_URL` (Rails.cache + `rate_limit` counters on Render Key Value, free tier). Medians ÷3, p95 ÷5, journeys ran at pure think-time. The cache and rate-limit writes were the bulk of what saturated Postgres. |
 
-Standing conclusions: (1) **five** production fixes came out of the harness
+Standing conclusions: (0) **Stage 5 is proven** — run 9 vs run 7 above; production should get `REDIS_URL` (a Frankfurt Key Value instance) on a quiet day, before any web scale-out; (1) **five** production fixes came out of the harness
 — named rate limits, the scale knob, the whole-board refresh, the rebuild
 storm, the per-name leaderboard lookups; (2) the play page weighs ~150 KB, so
 the CDN/page-trim stage is load-bearing at 83 arrivals/s (~7 GB of HTML per
