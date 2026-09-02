@@ -557,8 +557,11 @@ class PlayerController < ApplicationController
     # per request was O(total responses) per respondent. The snapshot trails
     # reality by RefreshLeaderboardStandingsJob's debounce (a few seconds).
     LeaderboardStanding.bootstrap!(@survey)
-    top = @survey.leaderboard_standings.order(:rank).limit(LEADERBOARD_TOP).to_a
-    total_players = @survey.leaderboard_standings.maximum(:rank).to_i
+    top = @survey.leaderboard_standings.ranked.limit(LEADERBOARD_TOP).to_a
+    total_players = @survey.leaderboard_standings.count
+    # Rank is positional in `ranked` order — never stored, so a refresh only
+    # ever touches the identities that changed.
+    top_rank = top.each_with_index.to_h { |s, i| [ s.key_digest, i + 1 ] }
 
     # Resolve "you": the saved row's digest once this session has written, else
     # the raw key the client sent — a recognised returner opening a fresh
@@ -575,17 +578,15 @@ class PlayerController < ApplicationController
     # your rank comes from the snapshot when it already agrees, and is
     # estimated against it when you've beaten your own refresh here.
     you = if own
-      if you_row && you_row.total == own[:total]
-        { rank: you_row.rank, total: own[:total], of: total_players }
-      else
-        total_players += 1 unless you_row
-        rank = @survey.leaderboard_standings.where.not(key_digest: you_digest)
-                      .where("total > ?", own[:total]).count + 1
-        { rank: rank, total: own[:total], of: total_players }
-      end
+      total_players += 1 unless you_row
+      rank = LeaderboardStanding.rank_of(@survey, total: own[:total],
+                                         achieved_at: own[:achieved_at], key_digest: you_digest)
+      { rank: rank, total: own[:total], of: total_players }
     elsif you_row
       # Rows mid-purge but still on the snapshot — serve what the board shows.
-      { rank: you_row.rank, total: you_row.total, of: total_players }
+      rank = LeaderboardStanding.rank_of(@survey, total: you_row.total,
+                                         achieved_at: you_row.achieved_at, key_digest: you_digest)
+      { rank: rank, total: you_row.total, of: total_players }
     end
 
     # Read-time backfill: name everyone about to be rendered (≤11 idempotent
@@ -600,7 +601,7 @@ class PlayerController < ApplicationController
       yours = s.key_digest == you_digest
       # Keep your own visible row coherent with the live "you" total when the
       # snapshot hasn't caught up with your latest run yet.
-      { rank: s.rank, name: names[s.key_digest],
+      { rank: top_rank[s.key_digest], name: names[s.key_digest],
         total: yours && you ? you[:total] : s.total, you: yours }
     end
     you[:name] = names[you_digest] if you

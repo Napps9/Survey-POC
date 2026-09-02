@@ -36,11 +36,16 @@ graded quiz cards, requests triple (~21–22/respondent) — resize to ~15–17.
 
 ## 2. What has already shipped (code, this branch)
 
-- **Leaderboard is precomputed** (`LeaderboardStanding` +
-  `RefreshLeaderboardStandingsJob`): completions coalesce into one standings
-  scan per 3 s window; the per-finisher read is indexed and measured **flat
-  (~28 ms) from 300 to 10,000 identities**. "You" is always live from your own
-  rows.
+- **Leaderboard is precomputed and refreshed incrementally**
+  (`LeaderboardStanding` + `RefreshLeaderboardStandingsJob`): completions
+  coalesce into one refresh per 3 s window, and that refresh upserts only the
+  identities whose responses changed since the snapshot's own high-water
+  mark (rank is derived at read time from the indexed `total`, never
+  stored). The first version rewrote the whole board per window — the load
+  test measured that at 50k identities as an OOM on a 512 MB instance and
+  ~30k row writes/s on Postgres for the event. The per-finisher read is
+  indexed and measured **flat (~28 ms) from 300 to 10,000 identities**.
+  "You" is always live from your own rows.
 - **Anonymous names derive from the digest** (`PlayerAlias`): no probe loop;
   the unique index is the only collision check.
 - **`/results`, `/regions`, `/scores` are cached per 10 s window**
