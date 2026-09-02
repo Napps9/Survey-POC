@@ -505,8 +505,8 @@
                 <span class="s-badge" style="background:rgba(245,158,11,0.15);color:#F59E0B;">🏆 Leaderboard</span>
                 <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);">
                   <%= { "accumulate" => "Retakes add points",
-                        "no_redo"    => "One play each",
-                        "restart"    => "Retakes restart points" }[@survey.leaderboard_retake_policy] %>
+                        "no_redo"    => "First run counts",
+                        "restart"    => "Latest run counts" }[@survey.leaderboard_retake_policy] %><%= " · No retests" if @survey.no_retests? %>
                 </span>
                 <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:<%= @leaderboard_player_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
                   <%= @leaderboard_player_count %> player<%= @leaderboard_player_count == 1 ? "" : "s" %>

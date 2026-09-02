@@ -297,6 +297,7 @@ en:
     tokens_welcome_note: "You'll earn points as you answer each question — you can't go back and change an answer to earn more."
     leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
     play_again: "Play again"
+    next_person: "Next person"
     font_size: "Text size"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
@@ -399,6 +400,7 @@ en:
       leaderboard_queued: "You're on the board once you're back online — your score is saved."
       leaderboard_empty: "Be the first on the board!"
       already_played: "You've already played this Verto — here's how the board stands."
+      already_played_plain: "You've already taken this Verto — thank you."
     editor:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"

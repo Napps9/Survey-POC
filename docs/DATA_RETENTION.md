@@ -27,6 +27,7 @@ A `responses` row can hold:
 | `score`, `quiz_max`, `token_totals` | Quiz and token scoring |
 | `session_token` | A random per-session UUID minted in the browser |
 | `respondent_code_digest` | HMAC of a code the respondent chose, if the creator enabled codes |
+| `player_key_digest` | HMAC of a random key the browser minted for this Verto; recorded only where a feature needs a per-device identity — the leaderboard, the contact gate, ask-once questions, or No retests on a Verto that collects no respondent code |
 
 No email address, name or account is attached to a response. There used to be
 one deliberate, creator-chosen exception — the **contact card**

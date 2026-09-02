@@ -297,6 +297,7 @@ st:
     tokens_welcome_note: "O tla fumana lintlha ha o araba potso ka nngwe — o ke ke wa kgutla morao wa fetola karabo ho fumana tse ding tse ngata."
     leaderboard_teaser: "Bobokelli ba lintlha tse phahameng ba fihla lethathamong la baetapele qetellong!"
     play_again: "Bapala hape"
+    next_person: "Motho e latelang"
     font_size: "Boholo ba mongolo"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
@@ -399,6 +400,7 @@ st:
       leaderboard_queued: "O tla hlaha lethathamong hang ha o kgutlela inthaneteng — lintlha tsa hao di bolokilwe."
       leaderboard_empty: "Eba wa pele lethathamong!"
       already_played: "O se o bapetse Verto ena — sena ke kamoo lethathamo le emeng kateng."
+      already_played_plain: "O se o phethile Verto ena — rea leboha."
     editor:
       delete_card_confirm: "Hlakola karete ena?"
       save_to_library: "Boloka hape polokelong ya letshwao la ka"

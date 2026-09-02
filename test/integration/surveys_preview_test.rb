@@ -33,12 +33,15 @@ class SurveysPreviewTest < ActionDispatch::IntegrationTest
     org = sign_in_to_org("live")
     s   = org.surveys.create!(title: "Live", theme: "Live", audience_age: "all", key_insight: "x",
                               default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              no_retests: true, respondent_code_enabled: true,
                               publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
 
     get preview_survey_path(s)
     assert_response :success
     assert_match 'data-player-progress-url-value=""', response.body
     assert_match 'data-player-submit-url-value=""', response.body
+    assert_match 'data-player-eligibility-url-value=""', response.body,
+                 "preview must not ask the live eligibility endpoint about anyone's code"
   end
 
   test "preview is scoped to the owning organisation" do

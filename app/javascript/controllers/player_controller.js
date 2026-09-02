@@ -100,7 +100,20 @@ export default class extends Controller {
     // board (and the durable player key) out of those contexts.
     leaderboard: { type: Boolean, default: false },
     leaderboardUrl: { type: String, default: "" },
-    retakePolicy: { type: String, default: "accumulate" },
+    // No going back: once the respondent moves on from a card its answer is
+    // final — Back is hidden, the card is locked, and every advance is saved
+    // so the server (locked_merge) holds each answer it pins.
+    noGoingBack: { type: Boolean, default: false },
+    // No retests: "" (off), "code" (the respondent code is the identity; the
+    // server refuses at the code step and on every write) or "device" (no
+    // code is collected, so the durable player key plus the local played
+    // marker stand in). Never both — see Survey#retest_basis.
+    noRetests: { type: String, default: "" },
+    // The open wave's position ("1" while wave 1 is implicit). Keys the local
+    // played marker, so starting a new wave frees every device.
+    wave: { type: String, default: "" },
+    // Blank unless the identity is the code — and in owner preview / Test Mode.
+    eligibilityUrl: { type: String, default: "" },
     // Answer-branching: when on, next()/back() follow the answer-logic graph
     // instead of stepping linearly. Off ⇒ byte-identical linear behaviour.
     logic: { type: Boolean, default: false },
@@ -189,9 +202,11 @@ export default class extends Controller {
     // or any ask-once question — for contacts it is the only bridge between
     // the volunteered details and the pseudonymous responses, and for
     // ask-once it is the identity the "asked once" promise is made to
-    // (Survey#player_identity_active? mirrors this server-side).
+    // (Survey#player_identity_active? mirrors this server-side). No retests
+    // on a Verto that collects no code needs it too — the device is then the
+    // only identity it can check.
     this._hasAskOnce = this.cardTargets.some(c => c.dataset.cardAskOnce === "true")
-    if (this.leaderboardValue || this.contactValue || this._hasAskOnce) {
+    if (this.leaderboardValue || this.contactValue || this._hasAskOnce || this.noRetestsValue === "device") {
       this._playerKey = this._ensurePlayerKey()
     }
     this._nextLabel   = this.hasNextBtnTarget   ? this.nextBtnTarget.textContent   : ""
@@ -212,12 +227,14 @@ export default class extends Controller {
     if (this.logicValue) {
       this._cidIndex = new Map(this.cardTargets.map((c, i) => [c.dataset.cardCid, i]))
     }
-    // No-redo gate: a device that already finished lands straight on the board
-    // instead of replaying a run the standings would ignore. Best-effort by
-    // design — cleared storage gets someone back in, and the server-side
-    // aggregation ignoring extra runs is the real enforcement.
-    if (this.leaderboardValue && this.leaderboardUrlValue &&
-        this.retakePolicyValue === "no_redo" && this._playedBefore()) {
+    // No retests, device basis: a device that already finished this wave lands
+    // on the thank-you screen (with the board, where there is one) instead of
+    // starting a run the server would refuse. Best-effort by design — cleared
+    // storage gets someone back in, and the server's refusal of the first
+    // write is the backstop. On the code basis the device must NOT gate: the
+    // next pupil on a shared classroom tablet has their own code, and a
+    // returning code is told so at the code step instead (_eligibility).
+    if (this.noRetestsValue === "device" && this.submitUrlValue && this._playedBefore()) {
       // The board, not the questions — there is nothing left to consent to,
       // and a banner over the standings would shadow them for no one's
       // benefit. Cleared without recording anything.
@@ -955,10 +972,21 @@ export default class extends Controller {
     // think is broken. Hence the busy state, and hence _recall's short
     // timeout: the fallback (ask the question again) is cheap.
     this._setCodeBusy(true)
+    let blocked = false
     try {
-      this._applyRecall(await this._recall(entered))
+      // No retests, code basis: a code that already finished this wave is
+      // told so here, before a single answer is given. The server would
+      // refuse the first save regardless — this is the honest version.
+      blocked = await this._eligibility(entered)
+      if (!blocked) this._applyRecall(await this._recall(entered))
     } finally {
       this._setCodeBusy(false)
+    }
+    if (blocked) {
+      this._respondentCode = null
+      this._clearConsentPending()
+      this._showAlreadyPlayed()
+      return
     }
     // Deliberately does NOT save here. _saveProgress refuses to create a row
     // before there's a real answer, so that someone who opens a Verto and leaves
@@ -977,6 +1005,26 @@ export default class extends Controller {
     card.setAttribute("aria-busy", busy ? "true" : "false")
     card.querySelectorAll(".play-consent-agree, .play-consent-decline")
         .forEach(btn => { btn.disabled = busy })
+  }
+
+  // No retests, code basis: has this code already finished the current wave?
+  // False on every failure — the server refuses the first write regardless,
+  // so a Verto that can't reach the network simply gets there one card later.
+  async _eligibility(code) {
+    if (!this.eligibilityUrlValue) return false
+    try {
+      const res = await fetch(this.eligibilityUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_token: this._sessionToken, respondent_code: code }),
+        signal: AbortSignal.timeout(2000)
+      })
+      if (!res.ok) return false
+      const data = await res.json()
+      return !!(data && data.blocked)
+    } catch (_e) {
+      return false
+    }
   }
 
   // Ask-once answers this person gave under the same code, from the server.
@@ -1103,6 +1151,9 @@ export default class extends Controller {
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
     this._applyTokenEarn(this.currentValue)
+    // No going back: the card being left is final — lock it as the token
+    // reveal does, so it reads as settled if it is ever seen again.
+    if (this.noGoingBackValue) this._lockInputs(this.cardTargets[this.currentValue])
     this._saveProgress()
     this._advance()
   }
@@ -1130,6 +1181,10 @@ export default class extends Controller {
   back() {
     // Scenario: retrace pages before leaving the card, symmetric with next().
     if (this._scenarioTurn(this.currentValue, -1)) return
+    // No going back: the footer Back is hidden (_update), so this is belt and
+    // braces for anything else that might call it. After the scenario turn on
+    // purpose — re-reading a story page changes no answer.
+    if (this.noGoingBackValue) return
     // Which way the next _update() should animate. Set here rather than derived
     // from the index, because under logic the index can move either way on a
     // forward step — it's the respondent's intent that decides the direction,
@@ -1206,6 +1261,7 @@ export default class extends Controller {
     this._capture(this.currentValue)
     if (!this._requireGuard(this.currentValue)) return
     this._applyTokenEarn(this.currentValue)
+    if (this.noGoingBackValue) this._lockInputs(this.cardTargets[this.currentValue])
     // Logic Vertos resolve the answer graph even on Finish — the terminal
     // card's chosen answer may still route onward, or to a specific end screen.
     if (this.logicValue) { await this._advanceLogic(); return }
@@ -1239,6 +1295,10 @@ export default class extends Controller {
       })
       const data = await res.clone().json().catch(() => null)
       if (!res.ok) {
+        // No retests: another run under this identity finished this wave
+        // first (another device, or a code typed here after a reload). The
+        // refused screen, not the "closed" pill — the Verto is open.
+        if (data && data.code === "already_played") { this._refuseRetake(); return }
         // The Verto was unpublished, closed or deleted while this respondent
         // had the page open — the player HTML is served stale-while-revalidate,
         // so that is an ordinary thing to happen mid-session. Nothing was
@@ -1267,12 +1327,10 @@ export default class extends Controller {
     } finally {
       if (this.hasFinishBtnTarget) this.finishBtnTarget.dataset.disabled = "false"
     }
-    // The no-redo gate's marker. Set even when queued — the service worker
+    // No retests' device marker. Set even when queued — the service worker
     // will deliver that run, so this device HAS played. Not on rejected:
     // nothing was stored, so the door stays open.
-    if (this.leaderboardValue && !rejected) {
-      try { localStorage.setItem(`verto_played_${this.submitUrlValue}`, "1") } catch (_) { /* storage blocked */ }
-    }
+    if (!rejected) this._markPlayed()
     this._showThankyou(queued, rejected)
   }
 
@@ -1471,17 +1529,50 @@ export default class extends Controller {
     }
   }
 
+  // The device's "finished this wave" marker (No retests, device basis).
+  // Byte-identical to the pre-wave key while wave 1 is implicit, so devices
+  // gated before waves existed stay gated; a later wave gets its own key,
+  // which is what re-admits every device when the owner starts one.
+  _playedKey() {
+    const w = this.waveValue
+    return (w && w !== "1") ? `verto_played_${this.submitUrlValue}_w${w}` : `verto_played_${this.submitUrlValue}`
+  }
+
   _playedBefore() {
     try {
-      return !!localStorage.getItem(`verto_played_${this.submitUrlValue}`)
+      return !!localStorage.getItem(this._playedKey())
     } catch (_) {
       return false
     }
   }
 
-  // Play again (accumulate/restart only — the button isn't rendered under
-  // no_redo). A fresh session token means a fresh response row; the durable
-  // player key survives, so the runs group under the same identity and name.
+  // Only on the device basis, and only for a live run: owner preview and Test
+  // Mode carry a blank submit URL and must never write a shared key.
+  _markPlayed() {
+    if (this.noRetestsValue !== "device" || !this.submitUrlValue) return
+    try { localStorage.setItem(this._playedKey(), "1") } catch (_) { /* storage blocked */ }
+  }
+
+  // The server refused a run as a retake: mark this device (device basis only)
+  // and land on the refused screen. Nothing was stored.
+  _refuseRetake() {
+    this._markPlayed()
+    this._showAlreadyPlayed()
+  }
+
+  // Whether a non-OK response is No retests' refusal (one constant body), as
+  // opposed to a closed Verto or a fault.
+  async _alreadyPlayed(res) {
+    const body = await res.clone().json().catch(() => null)
+    return !!(body && body.code === "already_played")
+  }
+
+  // Play again (hidden under No retests, and under the first-run-counts policy
+  // where a replay could not move the board) and "Next person" (a Verto whose
+  // No retests identity is the code) share these mechanics: a fresh session
+  // token means a fresh response row, so the next pupil on a shared device
+  // never writes onto the last one's. The durable player key survives, so a
+  // replayer's runs group under the same identity and name.
   // A reload rather than in-place state surgery: connect() is the only place
   // the deck's state machine starts clean.
   playAgain() {
@@ -1490,13 +1581,16 @@ export default class extends Controller {
   }
 
   // Register this session as a responder once it has ≥1 real answer, so people
-  // who answer something then leave are still counted. Fire once on success.
+  // who answer something then leave are still counted. Fires once on success —
+  // except under No going back, where every advance is saved: the server can
+  // only pin an answer it holds (locked_merge), so "the card you left is
+  // final" needs each answer on the server before the next card is shown.
   async _saveProgress() {
     // After a decline nothing more may leave this device — the server refuses
     // it now (403), but not sending is the behaviour the respondent was
     // promised, not merely being refused.
     if (this._declined) return
-    if (this._registered || !this.progressUrlValue) return
+    if ((this._registered && !this.noGoingBackValue) || !this.progressUrlValue) return
     const hasAnswer = Object.values(this._answers).some(a => this._isAnswerGiven(a))
     if (!hasAnswer) return
     try {
@@ -1505,7 +1599,11 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(this._payload())
       })
-      if (res.ok) this._registered = true
+      if (res.ok) { this._registered = true; return }
+      // No retests: a completed run under this identity already exists in the
+      // current wave (a code delivered mid-deck, or a device the marker
+      // missed). Nothing was stored; land on the refused screen.
+      if (await this._alreadyPlayed(res)) this._refuseRetake()
     } catch (_) { /* retry on the next navigation */ }
   }
 
@@ -2289,7 +2387,9 @@ export default class extends Controller {
       : idx + 1 - offset
     this.progressTarget.textContent = t("player.progress", { n, total })
     this.element.style.setProperty("--player-progress", `${Math.min(100, Math.round((n / total) * 100))}%`)
-    this.backBtnTarget.classList.remove("hidden")
+    // No going back removes the button outright (`hidden`); the `invisible`
+    // ghost below means "nowhere to go", not "not allowed".
+    this.backBtnTarget.classList.toggle("hidden", this.noGoingBackValue)
     // Don't allow stepping back onto a leading gate once past it (the
     // respondent-code card), or off the start of the visited path under logic.
     this.backBtnTarget.classList.toggle("invisible", this.logicValue ? this._path.length <= 1 : idx === offset)
@@ -2418,7 +2518,12 @@ export default class extends Controller {
       // so tapping "Check answer" did nothing at all — no error, no hint, no
       // retry prompt — and the respondent was stuck on the card with a dead
       // button and no answers saved.
-      if (!res.ok) return { failed: true, gone: res.status === 410 }
+      if (!res.ok) {
+        // No retests: this identity already finished the wave. Land on the
+        // refused screen and report a failure so the card never advances.
+        if (await this._alreadyPlayed(res)) { this._refuseRetake(); return { failed: true } }
+        return { failed: true, gone: res.status === 410 }
+      }
       const data = await res.json()
       if (!data.ok) return { failed: true }
       if (!data.graded) return null // genuinely nothing to grade — carry on
@@ -2964,10 +3069,11 @@ export default class extends Controller {
       </div>`
   }
 
-  // The no-redo landing for a device that already finished: the thank-you
-  // screen with the live board and an explanatory pill, no replay. This
-  // session holds no tallies, so the quiz/token result cards stay hidden and
-  // nothing is submitted.
+  // The No retests landing for an identity that already finished this wave:
+  // the thank-you screen — with the live board where there is one — and an
+  // explanatory pill, no replay. This session holds no tallies, so the
+  // quiz/token result cards stay hidden and nothing is submitted. The pill
+  // never names the wave or the identity.
   _showAlreadyPlayed() {
     this.cardTargets.forEach(c => c.classList.remove("active"))
     this.thankyouTarget.classList.add("active")
@@ -2978,7 +3084,7 @@ export default class extends Controller {
     if (this.hasThankyouMainTarget && !this.thankyouMainTarget.querySelector(".preview-queued-pill")) {
       const pill = document.createElement("div")
       pill.className = "preview-queued-pill"
-      pill.textContent = t("player.already_played")
+      pill.textContent = t(this.leaderboardUrlValue ? "player.already_played" : "player.already_played_plain")
       this.thankyouMainTarget.appendChild(pill)
     }
     this._renderLeaderboard()

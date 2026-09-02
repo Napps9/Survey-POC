@@ -287,6 +287,7 @@ pt:
     tokens_welcome_note: "Vai ganhar pontos a cada pergunta respondida — não pode voltar atrás e mudar uma resposta para ganhar mais."
     leaderboard_teaser: "Quem junta mais pontos entra no placar no final!"
     play_again: "Jogar de novo"
+    next_person: "Próxima pessoa"
     font_size: "Tamanho do texto"
   defaults:
     range: ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"]
@@ -383,6 +384,7 @@ pt:
       leaderboard_queued: "Você entra no placar assim que voltar a ficar on-line — sua pontuação está salva."
       leaderboard_empty: "Seja a primeira pessoa no placar!"
       already_played: "Você já jogou este Verto — veja como está o placar."
+      already_played_plain: "Já respondeu a este Verto — obrigado."
     editor:
       delete_card_confirm: Eliminar este cartão?
       save_to_library: "Salvar também na minha biblioteca de marca"

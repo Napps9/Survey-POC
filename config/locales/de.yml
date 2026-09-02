@@ -287,6 +287,7 @@ de:
     tokens_welcome_note: "Bei jeder Antwort sammelst du Punkte — du kannst nicht zurückgehen und eine Antwort ändern, um mehr zu bekommen."
     leaderboard_teaser: "Die besten Punktesammler landen am Ende auf der Bestenliste!"
     play_again: "Nochmal spielen"
+    next_person: "Nächste Person"
     font_size: "Textgröße"
   defaults:
     range: ["Stimme überhaupt nicht zu", "Stimme nicht zu", "Neutral", "Stimme zu", "Stimme voll zu"]
@@ -383,6 +384,7 @@ de:
       leaderboard_queued: "Sobald du wieder online bist, stehst du auf der Liste — dein Ergebnis ist gespeichert."
       leaderboard_empty: "Sei die erste Person auf der Liste!"
       already_played: "Du hast diesen Verto schon gespielt — so steht die Liste gerade."
+      already_played_plain: "Du hast diesen Verto schon ausgefüllt — danke."
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"

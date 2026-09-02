@@ -287,6 +287,7 @@ es:
     tokens_welcome_note: "Ganarás puntos al responder cada pregunta — no puedes volver atrás y cambiar una respuesta para ganar más."
     leaderboard_teaser: "¡Quienes más puntos reúnen entran en la tabla de clasificación al final!"
     play_again: "Jugar otra vez"
+    next_person: "Siguiente persona"
     font_size: "Tamaño del texto"
   defaults:
     range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
@@ -383,6 +384,7 @@ es:
       leaderboard_queued: "Aparecerás en la tabla cuando vuelvas a estar en línea — tu puntuación está guardada."
       leaderboard_empty: "¡Sé la primera persona en la tabla!"
       already_played: "Ya jugaste este Verto — así va la tabla."
+      already_played_plain: "Ya has completado este Verto — gracias."
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
       save_to_library: "Guardar también en mi biblioteca de marca"

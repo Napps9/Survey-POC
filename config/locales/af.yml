@@ -288,6 +288,7 @@ af:
     tokens_welcome_note: "Jy verdien punte terwyl jy elke vraag beantwoord — jy kan nie teruggaan en 'n antwoord verander om meer te verdien nie."
     leaderboard_teaser: "Die beste puntinsamelaars maak die ranglys aan die einde!"
     play_again: "Speel weer"
+    next_person: "Volgende persoon"
     font_size: "Teksgrootte"
   defaults:
     range: ["Stem heeltemal nie saam nie", "Stem nie saam nie", "Neutraal", "Stem saam", "Stem heeltemal saam"]
@@ -384,6 +385,7 @@ af:
       leaderboard_queued: "Jy's op die ranglys sodra jy weer aanlyn is — jou telling is gestoor."
       leaderboard_empty: "Wees die eerste op die ranglys!"
       already_played: "Jy het reeds hierdie Verto gespeel — so lyk die ranglys nou."
+      already_played_plain: "Jy het hierdie Verto reeds voltooi — dankie."
     editor:
       delete_card_confirm: "Vee hierdie kaart uit?"
       save_to_library: "Stoor ook in my handelsmerkbiblioteek"

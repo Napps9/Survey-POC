@@ -287,6 +287,7 @@ it:
     tokens_welcome_note: "Guadagnerai punti rispondendo a ogni domanda — non puoi tornare indietro e cambiare una risposta per guadagnarne altri."
     leaderboard_teaser: "Chi raccoglie più punti entra in classifica alla fine!"
     play_again: "Gioca ancora"
+    next_person: "Prossima persona"
     font_size: "Dimensione testo"
   defaults:
     range: ["Per niente d'accordo", "In disaccordo", "Neutrale", "D'accordo", "Completamente d'accordo"]
@@ -383,6 +384,7 @@ it:
       leaderboard_queued: "Entrerai in classifica appena torni online — il tuo punteggio è salvato."
       leaderboard_empty: "Sii il primo in classifica!"
       already_played: "Hai già giocato questo Verto — ecco la classifica attuale."
+      already_played_plain: "Hai già completato questo Verto — grazie."
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"

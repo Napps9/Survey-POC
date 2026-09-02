@@ -972,9 +972,10 @@
               <label style="display:flex;align-items:flex-start;gap:10px;margin-top:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
                 <input type="checkbox" name="token_back_nav_enabled" value="1"
                        <%= "checked" if @survey.token_back_nav_enabled? %>
+                       <%= "disabled" if @survey.no_going_back? %>
                        onchange="this.form.requestSubmit()"
                        style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-                <span>Let players go back and answer a points question they skipped. A question they already answered stays locked either way.</span>
+                <span>Let players go back and answer a points question they skipped. A question they already answered stays locked either way.<% if @survey.no_going_back? %> <em style="color:rgba(255,255,255,0.55);">Off while No going back is on (Publish → While they answer).</em><% end %></span>
               </label>
 
               <input type="hidden" name="token_hud_enabled" value="0" />
@@ -1053,12 +1054,12 @@
               <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0 24px;" do %>
                 <input type="hidden" name="return_tab" value="tokens" />
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:6px;">
-                  When someone plays again<%= " — 🔒 locked while the Verto is live" if live_locked %>
+                  How repeat plays score<%= " — 🔒 locked while the Verto is live" if live_locked %>
                 </div>
                 <% [
-                  [ "accumulate", "Gain points", "Retakes add to their total, so they can climb the board." ],
-                  [ "no_redo",    "No redos",    "One play each. A returning player lands straight on the board." ],
-                  [ "restart",    "Restart points", "A retake wipes their old score and starts over." ]
+                  [ "accumulate", "Gain points",       "Every finished play adds to their total, so they can climb the board." ],
+                  [ "no_redo",    "First run counts",  "Only their first finished play scores. Later plays are kept as answers but don't move the board." ],
+                  [ "restart",    "Latest run counts", "Each finished play replaces their old score." ]
                 ].each do |value, name, hint| %>
                   <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
                     <input type="radio" name="leaderboard_retake_policy" value="<%= value %>"
@@ -1069,6 +1070,12 @@
                     <span><strong style="font-weight:normal;color:#fff;"><%= name %></strong> — <%= hint %></span>
                   </label>
                 <% end %>
+                <%# The board is not per wave (TokenLeaderboard reads every completed
+                    run), so a before/after study on a tokenised deck has to pick
+                    its scoring deliberately. %>
+                <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.45);line-height:1.45;">
+                  Whether they can play again at all is set under Publish → Repeat participation &amp; waves (No retests). The board is not per wave: with No retests on, pick Gain points or Latest run counts if a second wave should move it.
+                </div>
               <% end %>
             <% end %>
           <% end %>
@@ -1341,6 +1348,26 @@
                   method: :post,
                   form: { style: "margin:0;" },
                   style: "width:100%;padding:10px;border-radius:12px;background:rgba(255,250,119,0.85);color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;" %>
+          <% end %>
+        </details>
+
+        <%# Play rules — how respondents may move through the deck. Independent
+            of tokens and the board: the server (PlayerController#locked_merge)
+            enforces them on every Verto. Off by default, and deliberately
+            editable while live (see the presentation-switch loop in
+            SurveysController#update_settings). %>
+        <details class="publish-block">
+          <summary class="publish-block-title">While they answer <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="no_going_back" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="no_going_back" value="1"
+                     <%= "checked" if @survey.no_going_back? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span><strong style="font-weight:normal;color:#fff;">No going back</strong> — once respondents move on from a question their answer is final. The Back button is hidden and a later change is refused by the server. Story pages inside a card can still be re-read.</span>
+            </label>
+            <div class="card-flag-note" style="margin-left:24px;">Applies to every question, points or not.</div>
           <% end %>
         </details>
 
@@ -1620,6 +1647,30 @@
             <% end %>
           <% end %>
 
+          <%# No retests — one completed run per person per wave. It lives here
+              because both halves of it do: the identity it checks (the code
+              above, else the device) and the reset that re-admits everyone
+              (the wave button below). Survey#retest_basis decides the identity;
+              PlayerController#refuse_if_retest and #eligibility enforce it. %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:12px 0 0;" do %>
+            <input type="hidden" name="no_retests" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="no_retests" value="1"
+                     <%= "checked" if @survey.no_retests? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span><strong style="font-weight:normal;color:#fff;">No retests</strong> — each person can finish this Verto once per wave. They're matched by their respondent code when you collect one, otherwise by the device they used. Start the next wave below to let everyone take it again — that's how a before/after study works.</span>
+            </label>
+            <% if @survey.respondent_code_active? %>
+              <div class="card-flag-note" style="margin-left:24px;">Someone entering a code that has already finished this wave is told so — leave this off if that must stay private. The thank-you screen offers a "Next person" button for shared devices.</div>
+              <% if @survey.respondent_code_card? %>
+                <div class="card-flag-note" style="margin-left:24px;">Put the respondent-code card first: answers given before it are saved before the check can run.</div>
+              <% end %>
+            <% else %>
+              <div class="card-flag-note" style="margin-left:24px;">Without respondent codes this is checked per device only — turn codes on above so it also holds when someone changes phone or browser.</div>
+            <% end %>
+          <% end %>
+
           <%# Waves — run the same Verto again, replay don't duplicate. %>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
             <% if @survey.waved? %>
@@ -1641,14 +1692,14 @@
               </div>
             <% end %>
             <%= form_with url: survey_waves_path(@survey), method: :post, local: true,
-                  data: { turbo_confirm: @survey.waved? ? "Start the next wave? #{@survey.current_wave&.display_label} closes to new responses immediately." : "Start wave 2? Every response so far becomes Wave 1, closed to new responses from now on." },
+                  data: { turbo_confirm: (@survey.waved? ? "Start the next wave? #{@survey.current_wave&.display_label} closes to new responses immediately." : "Start wave 2? Every response so far becomes Wave 1, closed to new responses from now on.") + (@survey.no_retests? ? " Everyone can take it again in the new wave." : "") },
                   style: "margin:0;" do %>
               <button type="submit" style="width:100%;padding:9px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">
                 <%= @survey.waved? ? "Start next wave" : "Start wave 2" %>
               </button>
             <% end %>
             <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);line-height:1.45;">
-              Run the same Verto again to measure change — don't duplicate it, start a new wave on this one. Turn on respondent codes above first, so people who come back can be matched to their own earlier answers.
+              Run the same Verto again to measure change — don't duplicate it, start a new wave on this one. Turn on respondent codes above first, so people who come back can be matched to their own earlier answers. Turn on No retests if each person should answer only once per wave.
             </div>
           </div>
         </details>

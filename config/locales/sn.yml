@@ -289,6 +289,7 @@ sn:
     tokens_welcome_note: "Uchawana mapoinzi paunopindura mubvunzo mumwe nemumwe — haugoni kudzokera shure kuchinja mhinduro kuti uwane akawanda."
     leaderboard_teaser: "Vaunganidzi vemapoinzi vepamusoro vanopinda pabhodhi remhedzisiro pakupera!"
     play_again: "Tamba Zvakare"
+    next_person: "Munhu anotevera"
     font_size: "Hukuru hweRunyoro"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Positional; keep every array's length exact.
@@ -387,6 +388,7 @@ sn:
       leaderboard_queued: "Uchave pabhodhi kana wadzokera pane inetiweki — zvibodzwa zvako zvachengetwa."
       leaderboard_empty: "Iva wekutanga pabhodhi!"
       already_played: "Watotamba Verto iyi — heino kuti bhodhi rakamira sei."
+      already_played_plain: "Wakatopedza Verto iyi kare — tinotenda."
     editor:
       delete_card_confirm: "Bvisa kadhi iri?"
       save_to_library: "Chengetedzawo mulaibhurari yangu yechiratidzo"

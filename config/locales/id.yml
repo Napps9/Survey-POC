@@ -287,6 +287,7 @@ id:
     tokens_welcome_note: "Kamu akan mendapatkan poin setiap menjawab pertanyaan — kamu tidak bisa kembali dan mengubah jawaban untuk mendapatkan lebih banyak."
     leaderboard_teaser: "Pengumpul poin terbanyak masuk papan peringkat di akhir!"
     play_again: "Main lagi"
+    next_person: "Orang berikutnya"
     font_size: "Ukuran teks"
   defaults:
     range: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"]
@@ -383,6 +384,7 @@ id:
       leaderboard_queued: "Kamu akan masuk papan begitu kembali online — skormu sudah tersimpan."
       leaderboard_empty: "Jadilah yang pertama di papan!"
       already_played: "Kamu sudah memainkan Verto ini — beginilah papan saat ini."
+      already_played_plain: "Anda sudah mengisi Verto ini — terima kasih."
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"

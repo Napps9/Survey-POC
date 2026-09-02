@@ -79,6 +79,13 @@
   recall_url = (@survey.respondent_code_recall? && !preview_mode && play_token.present?) ?
                  recall_survey_url(play_token) : ""
 
+  # No retests on a code-collecting Verto: the code step asks whether this code
+  # has already finished the current wave. Blank on the device basis (the local
+  # marker decides there) and, like every endpoint above, in owner preview and
+  # Test Mode.
+  eligibility_url = (@survey.retest_basis == "code" && !preview_mode && play_token.present?) ?
+                      eligibility_survey_url(play_token) : ""
+
   # Tokenisation: a card's token config is public (rendered straight into the
   # page), so the running total is computed entirely client-side — no
   # grade-style round trip needed. The server only recomputes the
@@ -135,7 +142,10 @@
      data-player-leaderboard-value="<%= leaderboard_mode %>"
      data-player-leaderboard-url-value="<%= leaderboard_url %>"
      data-player-contact-value="<%= @survey.contact_form_enabled? %>"
-     data-player-retake-policy-value="<%= @survey.leaderboard_retake_policy %>"
+     data-player-no-going-back-value="<%= @survey.no_going_back? %>"
+     data-player-no-retests-value="<%= @survey.retest_basis %>"
+     data-player-wave-value="<%= @survey.current_wave&.position || 1 %>"
+     data-player-eligibility-url-value="<%= eligibility_url %>"
      data-player-logic-value="<%= logic_mode %>"
      data-player-end-screens-value="<%= @survey.end_screens_list.to_json %>"
      data-player-forward-label-value="<%= t('player.visit_website') %>"
@@ -439,13 +449,27 @@
           <% end %>
 
           <%# Play again — the retake the leaderboard exists to reward. Only
-              where a retake can change the standings: under no_redo a second
-              run is ignored, so offering one would be a lie. %>
-          <% if leaderboard_mode && !@survey.leaderboard_no_redo? %>
+              where a retake is allowed at all (No retests refuses it) AND can
+              change the standings: under first-run-counts a second run is
+              ignored, so offering one would be a lie. %>
+          <% if leaderboard_mode && !@survey.no_retests? && !@survey.leaderboard_no_redo? %>
             <button type="button"
                     data-action="click->player#playAgain"
                     class="play-end-btn">
               🔁 <%= t("player.play_again") %>
+            </button>
+          <% end %>
+
+          <%# Next person — No retests on a code-collecting Verto hides Play
+              again, but a shared classroom device still needs a hand-over: the
+              finished tab keeps its session token, so the next pupil would
+              otherwise write onto this run's row. Same mechanics as Play again
+              (fresh token, reload); the next code gets its own row. %>
+          <% if @survey.retest_basis == "code" %>
+            <button type="button"
+                    data-action="click->player#playAgain"
+                    class="play-end-btn">
+              🙋 <%= t("player.next_person") %>
             </button>
           <% end %>
         </div>

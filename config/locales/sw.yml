@@ -287,6 +287,7 @@ sw:
     tokens_welcome_note: "Utapata pointi kila unapojibu swali — huwezi kurudi nyuma na kubadilisha jibu ili kupata zaidi."
     leaderboard_teaser: "Wakusanyaji bora wa pointi huingia kwenye ubao wa wanaoongoza mwishoni!"
     play_again: "Cheza tena"
+    next_person: "Mtu anayefuata"
     font_size: "Ukubwa wa maandishi"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
@@ -383,6 +384,7 @@ sw:
       leaderboard_queued: "Utaonekana kwenye ubao mara urudipo mtandaoni — alama zako zimehifadhiwa."
       leaderboard_empty: "Kuwa wa kwanza kwenye ubao!"
       already_played: "Umeshacheza Verto hii — hivi ndivyo ubao ulivyo sasa."
+      already_played_plain: "Umeshakamilisha Verto hii — asante."
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"

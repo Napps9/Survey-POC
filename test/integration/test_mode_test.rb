@@ -13,6 +13,9 @@ class TestModeTest < ActionDispatch::IntegrationTest
     @survey = @org.surveys.create!(
       title: "S", theme: "Sports", audience_age: "all", key_insight: "x",
       default_locale: "en", locales: [ "en" ],
+      # No retests with codes wires one more -url-value (eligibility); the
+      # sweeps below must prove it blank here like every other endpoint.
+      no_retests: true, respondent_code_enabled: true,
       cards: [ { "type" => "welcome_card", "title" => "hi" },
                { "type" => "multiple_choice", "text" => "Pick", "options" => %w[a b] } ]
     )

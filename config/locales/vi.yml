@@ -287,6 +287,7 @@ vi:
     tokens_welcome_note: "Bạn sẽ nhận điểm khi trả lời mỗi câu hỏi — bạn không thể quay lại và đổi câu trả lời để nhận thêm điểm."
     leaderboard_teaser: "Người gom nhiều điểm nhất sẽ vào bảng xếp hạng ở cuối!"
     play_again: "Chơi lại"
+    next_person: "Người tiếp theo"
     font_size: "Cỡ chữ"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
@@ -383,6 +384,7 @@ vi:
       leaderboard_queued: "Bạn sẽ có mặt trên bảng ngay khi trực tuyến trở lại — điểm của bạn đã được lưu."
       leaderboard_empty: "Hãy là người đầu tiên trên bảng!"
       already_played: "Bạn đã chơi Verto này rồi — đây là bảng xếp hạng hiện tại."
+      already_played_plain: "Bạn đã hoàn thành Verto này rồi — cảm ơn bạn."
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"

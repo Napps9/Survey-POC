@@ -417,7 +417,7 @@ Plus, per phase:
   Chromium) for the consent card, token reveal, back-nav rule and page-turn.
   **Any player-rendering change requires a `CACHE_VERSION` bump** or it silently
   won't reach returning respondents.
-- **Locales:** every new UI string must be added to all **19** files in
+- **Locales:** every new UI string must be added to all **26** files in
   `config/locales/`.
 
 # Open questions — and how I'll proceed without answers

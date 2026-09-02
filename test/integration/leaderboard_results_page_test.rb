@@ -64,6 +64,15 @@ class LeaderboardResultsPageTest < ActionDispatch::IntegrationTest
     assert_match ">9<", response.body, "accumulate sums the runs"
   end
 
+  test "the policy label is scoring-only, with the No retests rule named beside it" do
+    s = board_survey(leaderboard_retake_policy: "no_redo", no_retests: true)
+    finish! s, key: "once", total: 4
+
+    get survey_results_path(s)
+    assert_match "First run counts · No retests", response.body
+    assert_no_match(/One play each/, response.body)
+  end
+
   test "the section is bounded and says so" do
     s = board_survey
     25.times { |i| finish! s, key: "p#{i}", total: 30 - i }

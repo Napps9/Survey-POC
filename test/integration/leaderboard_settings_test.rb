@@ -68,6 +68,8 @@ class LeaderboardSettingsTest < ActionDispatch::IntegrationTest
     get survey_path(s)
     assert_select "input[name='leaderboard_enabled']"
     assert_select "input[name='leaderboard_retake_policy']", count: 3
+    assert_match "First run counts", response.body, "the old 'No redos' now describes scoring only"
+    assert_match "Whether they can play again at all is set under Publish", response.body
 
     plain = tokenised(publish_token: nil, published_at: nil, tokenisation_enabled: false)
     get survey_path(plain)

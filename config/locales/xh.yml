@@ -296,6 +296,7 @@ xh:
     tokens_welcome_note: "Uya kufumana amanqaku njengoko uphendula umbuzo ngamnye — awunakubuyela umva utshintshe impendulo ukuze ufumane amanye."
     leaderboard_teaser: "Abaqokeleli abaphambili bamanqaku bafikelela kuluhlu lwabaphambili ekugqibeleni!"
     play_again: "Dlala kwakhona"
+    next_person: "Umntu olandelayo"
     font_size: "Ubungakanani bombhalo"
   # Umxholo wesikhundla iKHADI entsha yohlobo ngalunye eqala ngawo — iinketho
   # zempendulo, iileyibhile zomlinganiselo, iingxelo. Ngokungafaniyo
@@ -399,6 +400,7 @@ xh:
       leaderboard_queued: "Uya kubonakala kuluhlu xa ubuyela kwi-intanethi — amanqaku akho agciniwe."
       leaderboard_empty: "Yiba ngowokuqala kuluhlu!"
       already_played: "Sowuyidlele le Verto — nantsi indlela uluhlu lujongeka ngayo."
+      already_played_plain: "Sele uyigqibile le Verto — enkosi."
     editor:
       delete_card_confirm: "Cima eli khadi?"
       save_to_library: "Kwakhona gcina kwithala lam lophawu"

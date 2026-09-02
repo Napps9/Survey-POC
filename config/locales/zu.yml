@@ -295,6 +295,7 @@ zu:
     tokens_welcome_note: "Uzothola amaphoyinti njalo uma uphendula umbuzo — ngeke ukwazi ukubuyela emuva ushintshe impendulo ukuze uthole okwengeziwe."
     leaderboard_teaser: "Abaqoqi bamaphoyinti abaphambili bafinyelela ebhodini labaholayo ekugcineni!"
     play_again: "Dlala futhi"
+    next_person: "Umuntu olandelayo"
     font_size: "Usayizi wombhalo"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
@@ -397,6 +398,7 @@ zu:
       leaderboard_queued: "Uzoba sebhodini uma usubuyele kuxhumo lwe-inthanethi — amaphuzu akho alondoloziwe."
       leaderboard_empty: "Yiba ngowokuqala ebhodini!"
       already_played: "Usuyidlalile le-Verto — nakhu indlela ibhodi elimi ngayo."
+      already_played_plain: "Usuyiqedile le Verto — siyabonga."
     editor:
       delete_card_confirm: "Susa leli khadi?"
       save_to_library: "Londoloza futhi kulayibrari yami yamabhrendi"

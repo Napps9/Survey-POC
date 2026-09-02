@@ -287,6 +287,7 @@ nl:
     tokens_welcome_note: "Je verdient punten bij elke vraag die je beantwoordt — je kunt niet terug om een antwoord te wijzigen en zo meer te verdienen."
     leaderboard_teaser: "De beste puntenverzamelaars komen aan het einde op het scorebord!"
     play_again: "Opnieuw spelen"
+    next_person: "Volgende persoon"
     font_size: "Tekstgrootte"
   defaults:
     range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
@@ -383,6 +384,7 @@ nl:
       leaderboard_queued: "Zodra je weer online bent, sta je op het bord — je score is opgeslagen."
       leaderboard_empty: "Wees de eerste op het bord!"
       already_played: "Je hebt deze Verto al gespeeld — zo staat het bord er nu voor."
+      already_played_plain: "Je hebt deze Verto al ingevuld — bedankt."
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"

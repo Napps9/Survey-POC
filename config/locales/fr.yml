@@ -287,6 +287,7 @@ fr:
     tokens_welcome_note: "Vous gagnerez des points à chaque question — vous ne pouvez pas revenir en arrière et modifier une réponse pour en gagner plus."
     leaderboard_teaser: "Les meilleurs collectionneurs de points entrent au classement à la fin !"
     play_again: "Rejouer"
+    next_person: "Personne suivante"
     font_size: "Taille du texte"
   defaults:
     range: ["Pas du tout d'accord", "Pas d'accord", "Neutre", "D'accord", "Tout à fait d'accord"]
@@ -383,6 +384,7 @@ fr:
       leaderboard_queued: "Vous rejoindrez le classement dès votre retour en ligne — votre score est enregistré."
       leaderboard_empty: "Soyez le premier au classement !"
       already_played: "Vous avez déjà joué ce Verto — voici le classement actuel."
+      already_played_plain: "Vous avez déjà répondu à ce Verto — merci."
     editor:
       delete_card_confirm: Supprimer cette carte ?
       save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"

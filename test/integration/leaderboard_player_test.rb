@@ -18,14 +18,14 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     { "type" => "rating", "text" => "Rate it", "token_award" => { "coal" => 3 } }
   ].freeze
 
-  def board_survey(leaderboard_enabled: true, tokenisation_enabled: true, policy: "accumulate")
+  def board_survey(leaderboard_enabled: true, tokenisation_enabled: true, policy: "accumulate", **attrs)
     org = Organisation.create!(name: "O", slug: "lb-#{SecureRandom.hex(3)}")
     org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
                         default_locale: "en", locales: [ "en" ], cards: CARDS,
                         tokenisation_enabled: tokenisation_enabled, token_types: TOKEN_TYPES,
                         leaderboard_enabled: leaderboard_enabled,
                         leaderboard_retake_policy: policy,
-                        publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+                        publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current, **attrs)
   end
 
   def json_post(path, payload)
@@ -168,7 +168,9 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     get play_survey_path(s.publish_token)
     assert_response :success
     assert_select "[data-player-leaderboard-value='true']"
-    assert_select "[data-player-retake-policy-value='accumulate']"
+    assert_select "[data-player-retake-policy-value]", false,
+      "the policy is scoring-only now — the player has nothing to read from it"
+    assert_select "[data-player-no-retests-value='']"
     assert_select "[data-player-target='leaderboard']", count: 1
     assert_select ".leaderboard-tease", count: 1, text: /🏆/
     assert_select "[data-action='click->player#playAgain']", count: 1
@@ -177,6 +179,22 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     get play_survey_path(no_redo.publish_token)
     assert_select "[data-action='click->player#playAgain']", false,
       "a retake the standings would ignore must not be offered"
+
+    gated = board_survey(no_retests: true)
+    get play_survey_path(gated.publish_token)
+    assert_select "[data-action='click->player#playAgain']", false,
+      "a retake the server would refuse must not be offered either"
+    assert_select "[data-player-no-retests-value='device']"
+    assert_select "[data-player-wave-value='1']"
+    assert_select "[data-player-eligibility-url-value='']", count: 1 # no code, no code step to ask at
+
+    gated.update!(respondent_code_enabled: true)
+    gated.start_next_wave!
+    get play_survey_path(gated.publish_token)
+    assert_select "[data-player-no-retests-value='code']"
+    assert_select "[data-player-wave-value='2']"
+    assert_select "[data-player-eligibility-url-value=?]", eligibility_survey_url(gated.publish_token)
+    assert_select "[data-action='click->player#playAgain']", count: 1, text: /Next person/
 
     off = board_survey(leaderboard_enabled: false)
     get play_survey_path(off.publish_token)
