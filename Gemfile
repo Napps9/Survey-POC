@@ -65,7 +65,7 @@ gem "bootsnap", require: false
 # Anthropic Claude SDK
 gem "anthropic", "~> 1.40"
 gem "csv"
-gem "rubyzip", "~> 2.3", require: "zip" # bulk brand-asset import (extract a zip of images)
+gem "rubyzip", "~> 3.4", require: "zip" # bulk brand-asset import (extract a zip of images)
 
 # Scannable QR for a published Verto's share panel. Pure Ruby (no native
 # extension, nothing to install in the Docker image) and renders SVG markup
