@@ -28,8 +28,9 @@ class Response < ApplicationRecord
   # add_answered_to_responses migration.
   before_save :sync_answered
 
-  # Live results. Deliberately NOT on every save: /progress writes on each card,
-  # so a single respondent saves a dozen times and broadcasting each one would
+  # Live results. Deliberately NOT on every save: /progress can write on every
+  # card (it does under No going back), so a single respondent may save a dozen
+  # times and broadcasting each one would
   # put a burst of renders on the instance for no new information.
   #
   # Only two transitions actually change what a creator sees — a response

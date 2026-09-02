@@ -114,13 +114,16 @@ class SurveyDuplicateTest < ActionDispatch::IntegrationTest
     original = @org.surveys.create!(title: "T", theme: "Theme", audience_age: "all", key_insight: "k",
                                      default_locale: "en", locales: [ "en" ], cards: CARDS.map(&:dup),
                                      tokenisation_enabled: true,
-                                     leaderboard_enabled: true, leaderboard_retake_policy: "no_redo")
+                                     leaderboard_enabled: true, leaderboard_retake_policy: "no_redo",
+                                     no_going_back: true, no_retests: true)
 
     post duplicate_survey_path(original)
     copy = @org.surveys.order(:id).last
 
     assert copy.leaderboard_enabled?, "duplicate! must carry the new columns or Duplicate silently drops them"
     assert_equal "no_redo", copy.leaderboard_retake_policy
+    assert copy.no_going_back?, "a play rule is part of the instrument's design"
+    assert copy.no_retests?
   end
 
   test "results-report columns are not copied" do

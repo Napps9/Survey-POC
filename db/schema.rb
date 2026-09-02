@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_01_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -897,6 +897,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_01_130000) do
     t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false
+    t.boolean "no_going_back", default: false, null: false
+    t.boolean "no_retests", default: false, null: false
     t.integer "organisation_id", null: false
     t.string "publish_token"
     t.datetime "published_at"

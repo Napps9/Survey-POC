@@ -3,7 +3,7 @@ class PlayerController < ApplicationController
   layout "fullscreen"
   skip_before_action :require_authentication
   skip_before_action :set_current_organisation
-  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall ]
+  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall, :eligibility ]
 
   # Public, unauthenticated write endpoints — cap per-IP request rate so one
   # source can't flood responses (results poisoning / storage abuse). Limits are
@@ -32,8 +32,9 @@ class PlayerController < ApplicationController
   # the per-IP cap is deliberately far below anything legitimate. Two further
   # budgets in #recall_budget_ok? bound the thing this cap cannot see: how many
   # DISTINCT codes one caller tries, and how often one code is tried from
-  # anywhere.
-  rate_limit to: 10, within: 1.minute, only: :recall,
+  # anywhere. Eligibility (No retests) answers one bit about a code and is
+  # capped the same way for the same reason.
+  rate_limit to: 10, within: 1.minute, only: [ :recall, :eligibility ],
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # A respondent's autocomplete keystrokes are debounced client-side, so a
   # generous per-minute cap here only guards against a runaway client/bot.
@@ -229,6 +230,7 @@ class PlayerController < ApplicationController
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
     apply_player_key(resp, data["player_key"])
+    return if refuse_if_retest(resp)
     apply_contact(data)
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
@@ -261,6 +263,7 @@ class PlayerController < ApplicationController
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
     apply_respondent_code(resp, data["respondent_code"])
     apply_player_key(resp, data["player_key"])
+    return if refuse_if_retest(resp)
     apply_contact(data)
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
@@ -339,6 +342,43 @@ class PlayerController < ApplicationController
     render json: { ok: true, answers: {} }
   end
 
+  # POST /play/:token/eligibility
+  #
+  # Whether the code just typed may still take this Verto in the current wave
+  # (Survey#retest_blocked?). Kept apart from /recall on purpose: recall must
+  # never confirm a code, while the one bit this returns — "that code has a
+  # COMPLETED run in the CURRENT wave" — is the whole point of No retests, and
+  # the creator switches it on knowingly (the panel says so). Everything else
+  # reads identically: unknown code, blank code, a code that finished only in
+  # an earlier wave, a started-but-unfinished run, the flag off, the device
+  # basis, a spent budget and any exception all answer `blocked: false`. Never
+  # writes a row — the response built here is a probe for the wave stamp.
+  def eligibility
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+
+    data    = JSON.parse(request.body.read)
+    blocked = false
+    if @survey.retest_basis == "code"
+      resp = find_or_init_response(data["session_token"].presence || SecureRandom.uuid)
+      apply_respondent_code(resp, data["respondent_code"])
+      digest  = resp.respondent_code_digest
+      blocked = digest.present? &&
+                code_budget_ok?("retest", digest, per_ip: MAX_RETEST_CODES_PER_IP, per_code: MAX_RETEST_PER_CODE) &&
+                @survey.retest_blocked?(resp)
+    end
+
+    render json: { ok: true, blocked: blocked }
+  rescue JSON::ParserError
+    render json: { ok: false, error: "Malformed request body." }, status: :bad_request
+  rescue CrossSurveyToken
+    render json: { ok: false, error: "Invalid session." }, status: :forbidden
+  rescue => e
+    # Deliberately generic: an exception message here could carry the code.
+    ErrorReporting.report("PlayerController#eligibility", e)
+    render json: { ok: true, blocked: false }
+  end
+
   def consent
     return render json: { ok: false }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
@@ -395,7 +435,12 @@ class PlayerController < ApplicationController
     return if refuse_if_declined(resp)
     first_time = !answered?(stored_answers(resp)[idx.to_s])
     resp.answers = locked_merge(stored_answers(resp), data["answers"] || {})
+    # The code rides the grade payload like every other save; it used to be
+    # dropped here, so a quiz that collected codes recorded none for a
+    # respondent who never hit /progress.
+    apply_respondent_code(resp, data["respondent_code"])
     apply_player_key(resp, data["player_key"])
+    return if refuse_if_retest(resp)
     ai_normalize_open_ended_answer!(resp, idx) if first_time
     sync_region_from_answers!(resp)
     sync_demographics_from_answers!(resp)
@@ -544,7 +589,7 @@ class PlayerController < ApplicationController
 
     # Resolve "you": the saved row's digest once this session has written, else
     # the raw key the client sent — a recognised returner opening a fresh
-    # session (no_redo's straight-to-board path) has a key but no row yet.
+    # session (No retests' straight-to-board landing) has a key but no row yet.
     token = params[:session_token].to_s
     resp  = token.present? ? @survey.responses.find_by(session_token: token) : nil
     you_digest = resp&.player_key_digest.presence || @survey.player_key_digest(params[:player_key])
@@ -784,6 +829,38 @@ class PlayerController < ApplicationController
     true
   end
 
+  # No retests: one completed run per identity per wave (Survey#retest_blocked?).
+  # Runs after the digests are applied and before save!, so a refused run never
+  # creates or completes a row. On the code basis the distinct-code budget is
+  # spent only by the write that first attaches the code to this row — a
+  # reload or replay of a row that already carries its digest is a retry, not
+  # a guess — and a spent budget fails OPEN: the oracle closes (always 200)
+  # and the run is stored exactly as it was before this feature existed.
+  # Constant body whichever identity matched: no digest, code, wave or count
+  # ever appears. 403 on purpose — the service worker retries only 429/5xx,
+  # so a refusal is never replayed.
+  def refuse_if_retest(resp)
+    return false unless @survey.no_retests?
+
+    if @survey.retest_basis == "code"
+      digest = resp.respondent_code_digest
+      return false if digest.blank?
+      if identity_attaching?(resp) &&
+         !code_budget_ok?("retest", digest, per_ip: MAX_RETEST_CODES_PER_IP, per_code: MAX_RETEST_PER_CODE)
+        return false
+      end
+    end
+    return false unless @survey.retest_blocked?(resp)
+
+    render json: { ok: false, code: "already_played", error: "You've already taken this Verto." }, status: :forbidden
+    true
+  end
+
+  # Whether this write is the one attaching an identity to the row.
+  def identity_attaching?(resp)
+    resp.new_record? || resp.respondent_code_digest_changed? || resp.player_key_digest_changed?
+  end
+
   # Record the respondent's self-invented code as a digest. The plaintext is used
   # to compute the HMAC and then dropped on the floor — it is never assigned to
   # the record, never logged (see filter_parameter_logging) and never returned.
@@ -816,20 +893,33 @@ class PlayerController < ApplicationController
   #              still runs out.
   MAX_RECALL_CODES_PER_IP = 12
   MAX_RECALL_PER_CODE     = 20
+  # No retests spends its own budget (same shape, own prefix) on every
+  # code-based decision — eligibility plus the first write that attaches the
+  # code, about two per run — and a whole classroom legitimately sits behind
+  # one NAT address trying one code each, hence the wider allowance.
+  MAX_RETEST_CODES_PER_IP = 60
+  MAX_RETEST_PER_CODE     = 20
 
   def recall_budget_ok?(digest)
-    ip_key = "recall:#{@survey.id}:ip:#{request.remote_ip}:#{digest}"
+    code_budget_ok?("recall", digest, per_ip: MAX_RECALL_CODES_PER_IP, per_code: MAX_RECALL_PER_CODE)
+  end
+
+  def code_budget_ok?(prefix, digest, per_ip:, per_code:)
+    ip_key = "#{prefix}:#{@survey.id}:ip:#{request.remote_ip}:#{digest}"
     # A repeat of the SAME code from the same IP is a retry, not a new guess —
     # it must not spend the distinct-code budget. The marker is what makes the
     # count distinct.
+    # The marker is written only for an admitted code: marking a refused one
+    # would let its retry skip this block and pass, which turned the distinct
+    # budget into "two tries per code" instead of a ceiling.
     unless Rails.cache.exist?(ip_key)
+      tried = Rails.cache.increment("#{prefix}:#{@survey.id}:ip:#{request.remote_ip}", 1, expires_in: 1.hour)
+      return false if tried && tried > per_ip
       Rails.cache.write(ip_key, true, expires_in: 1.hour)
-      tried = Rails.cache.increment("recall:#{@survey.id}:ip:#{request.remote_ip}", 1, expires_in: 1.hour)
-      return false if tried && tried > MAX_RECALL_CODES_PER_IP
     end
 
-    asked = Rails.cache.increment("recall:#{@survey.id}:code:#{digest}", 1, expires_in: 1.hour)
-    return false if asked && asked > MAX_RECALL_PER_CODE
+    asked = Rails.cache.increment("#{prefix}:#{@survey.id}:code:#{digest}", 1, expires_in: 1.hour)
+    return false if asked && asked > per_code
 
     true
   end
@@ -881,7 +971,7 @@ class PlayerController < ApplicationController
   end
 
   # First-touch metadata for the response. Both are `||=` on purpose: /progress
-  # fires on every card, a refresh reuses the same session_token, and an offline
+  # can fire on every card, a refresh reuses the same session_token, and an offline
   # submit can replay hours later — none of which should move the clock back to
   # the start or relabel the device.
   def stamp_started_metadata(resp)
@@ -900,7 +990,10 @@ class PlayerController < ApplicationController
   # back and change an answer to earn more tokens (or fix a wrong quiz
   # answer). Non-graded, non-awarding (measurement) cards and not-yet-answered
   # cards take the incoming value as normal. A plain Verto (neither quiz nor
-  # tokenised) merges nothing (incoming wins outright).
+  # tokenised) merges nothing (incoming wins outright) — unless it has No
+  # going back on, which pins EVERY answered card on any Verto: the player
+  # hides Back and saves each advance, and this is what makes that promise
+  # hold against a reload, a replay or a crafted request.
   def locked_merge(stored, incoming)
     # Every write path goes through here, so it's the one place free text has to
     # be bounded — the client's maxlength is a courtesy, and this endpoint is
@@ -908,11 +1001,11 @@ class PlayerController < ApplicationController
     incoming = @survey.clamp_free_text(incoming.is_a?(Hash) ? incoming : {})
     incoming = @survey.clamp_selection_count(incoming)
     incoming = @survey.drop_retired_answers(incoming)
-    return incoming unless @survey.quiz? || @survey.tokenisation_enabled?
+    return incoming unless @survey.quiz? || @survey.tokenisation_enabled? || @survey.no_going_back?
     stored = stored.is_a?(Hash) ? stored : {}
     merged = incoming.dup
     Array(@survey.cards).each_with_index do |card, idx|
-      next unless QuizGrading.graded?(card) || TokenGrading.awarding?(card)
+      next unless @survey.no_going_back? || QuizGrading.graded?(card) || TokenGrading.awarding?(card)
       key = idx.to_s
       merged[key] = stored[key] if answered?(stored[key])
     end

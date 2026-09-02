@@ -1724,6 +1724,38 @@ class Survey < ApplicationRecord
              .count
   end
 
+  # Which identity "No retests" is checked against. The respondent code is the
+  # study identity — one person across devices — so it is the ONLY basis on a
+  # Verto that collects one; the per-device player key is the fallback for a
+  # Verto that does not. Never both: OR-ing them would refuse the second pupil
+  # on a shared classroom tablet for the first pupil's run.
+  def retest_basis
+    return nil unless no_retests?
+    respondent_code_active? ? "code" : "device"
+  end
+
+  # One completed run per identity per wave. `current_wave` is nil while wave 1
+  # is implicit, and new rows are stamped the same way (PlayerController#
+  # find_or_init_response), so nil here means IS NULL on both engines and
+  # matches exactly the implicit-wave rows; start_next_wave! backfills them
+  # into a real wave 1 before it opens the next, which is what re-admits
+  # everyone. The row being written is excluded so a replayed submit of the
+  # same completed row (offline queue, double tap) stays idempotent. Digests
+  # never leave this method.
+  def retest_blocked?(resp)
+    basis = retest_basis
+    return false unless basis
+
+    column = basis == "code" ? :respondent_code_digest : :player_key_digest
+    digest = resp.public_send(column)
+    # Never `where(column: nil)`: IS NULL would match every digest-less row.
+    return false if digest.blank?
+
+    scope = responses.where(status: "completed", survey_wave_id: current_wave&.id, column => digest)
+    scope = scope.where.not(id: resp.id) if resp.persisted?
+    scope.exists?
+  end
+
   # ── Recently deleted cards ─────────────────────────────────────────────────
   # A bounded ring buffer of cards removed from the deck, so a deletion survives
   # the page reload that in-session undo can't. Not a versioning gem: the need is
@@ -1928,7 +1960,10 @@ class Survey < ApplicationRecord
       consent_image_credit:    consent_image_credit,
       consent_image_credit_url: consent_image_credit_url,
       leaderboard_enabled:     leaderboard_enabled,
-      leaderboard_retake_policy: leaderboard_retake_policy
+      leaderboard_retake_policy: leaderboard_retake_policy,
+      # Study-design rules a duplicated instrument must keep.
+      no_going_back:           no_going_back,
+      no_retests:              no_retests
     ).tap { |copy| copy_card_attachments_to(copy) }
   end
 
@@ -2292,9 +2327,14 @@ class Survey < ApplicationRecord
   #
   #   accumulate — retakes add to the total (the default: the most game-like
   #                reading of "play again", and the least surprising).
-  #   no_redo    — one play each; the player skips a recognised returner
-  #                straight to the board, and aggregation ignores stray extras.
-  #   restart    — a retake wipes the old score and starts over.
+  #   no_redo    — the FIRST completed run counts; later runs are stored as
+  #                answers but never move the board.
+  #   restart    — the latest completed run counts.
+  #
+  # Scoring only. Whether a retake is allowed at all is `no_retests` (one
+  # completed run per person per wave) and whether an answer can be changed
+  # mid-run is `no_going_back` — both independent of the board, and the
+  # player no longer reads this policy.
   LEADERBOARD_RETAKE_POLICIES = %w[accumulate no_redo restart].freeze
 
   # The column carries a database CHECK (P2-8), and the coverage rule in
@@ -2341,8 +2381,10 @@ class Survey < ApplicationRecord
   # contact row and the pseudonymous responses; ask-once questions need it
   # because "asked once" is a promise made to an identity, and each run's
   # response carries the remembered answer under that identity's digest.
+  # No retests on a Verto that collects no respondent code needs it too: the
+  # device is then the only identity it can check.
   def player_identity_active?
-    leaderboard_active? || contact_form_enabled? || ask_once_cards?
+    leaderboard_active? || contact_form_enabled? || ask_once_cards? || retest_basis == "device"
   end
 
   # Any question the creator marked "ask once per person" — skipped on repeat

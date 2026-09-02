@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   # respondent's code travels in the body, and a code in a URL lands in server
   # logs, in Referer headers and in the service worker's page cache.
   post "play/:token/recall", to: "player#recall", as: :recall_survey
+  # No retests: may this code still take the current wave? POST for the same
+  # reason as recall — the code travels in the body.
+  post "play/:token/eligibility", to: "player#eligibility", as: :eligibility_survey
   get  "play/:token/quiz_state", to: "player#quiz_state", as: :quiz_state_survey
   get  "play/:token/scores", to: "player#scores", as: :player_scores
   get  "play/:token/results", to: "player#results", as: :player_results

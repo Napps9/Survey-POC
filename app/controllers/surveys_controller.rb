@@ -831,11 +831,15 @@ class SurveysController < ApplicationController
     # deliberately NOT in SETTINGS_LOCKED_IN_USE. None of them re-scores an
     # answer or changes what anyone agreed to; they only affect what a
     # respondent is shown from here on. leaderboard_enabled belongs here too:
-    # the standings are computed at read time from data that exists either way,
-    # so the toggle only shows or hides them.
+    # the standings are a snapshot of data that is collected either way, so
+    # the toggle only shows or hides them. no_going_back and no_retests are
+    # play rules rather than presentation, but they belong here for the same
+    # reason: neither re-scores an answer or changes what anyone agreed to,
+    # and No retests is MEANT to be switched between waves of a live Verto.
     %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
-       chrome_follows_verto_language auto_detect_language contact_form_enabled].each do |flag|
+       chrome_follows_verto_language auto_detect_language contact_form_enabled
+       no_going_back no_retests].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end

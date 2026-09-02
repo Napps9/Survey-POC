@@ -67,9 +67,10 @@ module TokenLeaderboard
   # identity's completed runs, oldest first.
   #
   #   accumulate — retakes add up; the total was "achieved" at the latest run.
-  #   no_redo    — the first completed run counts; later rows are stored (the
-  #                client gate is best-effort) but ignored here, which is the
-  #                real enforcement.
+  #   no_redo    — the first completed run counts; later rows are stored but
+  #                ignored here. Whether a retake is allowed at all is the
+  #                survey's `no_retests` rule, refused server-side; this only
+  #                decides how the runs that exist score.
   #   restart    — a retake wipes the old score; the latest run counts.
   def entry_for(policy, digest, list)
     case policy

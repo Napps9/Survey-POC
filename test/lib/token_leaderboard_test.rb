@@ -50,7 +50,8 @@ class TokenLeaderboardTest < ActiveSupport::TestCase
 
     assert_equal 1, rows.size
     assert_equal 4, rows.first[:total],
-      "aggregation is the real no-redo enforcement — the client gate is best-effort"
+      "the policy is scoring only: whether a retake may happen at all is the survey's " \
+      "no_retests rule, so a stray extra row must simply not count"
   end
 
   test "ties order by who reached the total first" do
