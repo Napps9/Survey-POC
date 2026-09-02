@@ -1112,6 +1112,32 @@
                   Whether they can play again at all is set under Publish → Repeat participation &amp; waves (No retests). The board is not per wave: with No retests on, pick Gain points or Latest run counts if a second wave should move it.
                 </div>
               <% end %>
+
+              <%# What the board ranks by. Only worth asking with two or more
+                  token types — with one, "all" and that type are the same
+                  order. Scoring rule, so it locks with the policy
+                  (SETTINGS_LOCKED_IN_USE); every row shows every type's total
+                  regardless, this only decides the order. %>
+              <% if @survey.token_types.size >= 2 %>
+                <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:14px 0 0 24px;" do %>
+                  <input type="hidden" name="return_tab" value="tokens" />
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:6px;">
+                    Rank the board by<%= " — 🔒 locked while the Verto is live" if live_locked %>
+                  </div>
+                  <% options = [ [ "all", "All points combined", "One total across every token type." ] ] +
+                       @survey.token_types.map { |tt| [ tt["id"], "#{tt['icon']} #{tt['name']}", "Only this type decides the order. The others still show on every row." ] } %>
+                  <% options.each do |value, name, hint| %>
+                    <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                      <input type="radio" name="leaderboard_rank_by" value="<%= value %>"
+                             <%= "checked" if @survey.leaderboard_rank_by == value %>
+                             <%= "disabled" if live_locked %>
+                             onchange="this.form.requestSubmit()"
+                             style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                      <span><strong style="font-weight:normal;color:#fff;"><%= name %></strong> — <%= hint %></span>
+                    </label>
+                  <% end %>
+                <% end %>
+              <% end %>
             <% end %>
           <% end %>
         </div>

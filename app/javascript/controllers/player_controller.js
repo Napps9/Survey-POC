@@ -3052,14 +3052,15 @@ export default class extends Controller {
       const data = await res.json()
       const entries = data.entries || []
       const youListed = entries.some(e => e.you)
-      let rows = entries.map(e => this._leaderboardRow(e.rank, e.name, e.total, e.you)).join("")
+      const rankBy = data.rank_by
+      let rows = entries.map(e => this._leaderboardRow(e.rank, e.name, e.total, e.you, e.totals, rankBy)).join("")
       // Your row is always ON the board, "You" badge beside the anonymous
       // name. From below the visible top it rides in after a gap marker, so a
       // mid-table player sees their placement as a row, not just a sentence
       // about it.
       if (data.you && !youListed) {
         rows += `<div class="leaderboard-gap" aria-hidden="true">⋯</div>` +
-                this._leaderboardRow(data.you.rank, data.you.name, data.you.total, true)
+                this._leaderboardRow(data.you.rank, data.you.name, data.you.total, true, data.you.totals, rankBy)
       }
       let self = ""
       if (data.you) {
@@ -3076,14 +3077,28 @@ export default class extends Controller {
   }
 
   // One board row. The "You" badge sits directly beside the anonymous name so
-  // a player can find themselves without reading the footnote lines.
-  _leaderboardRow(rank, name, total, you) {
+  // a player can find themselves without reading the footnote lines. `total`
+  // is what the board ranks by — the sum of everything, or one token type
+  // (rankBy), whose icon then prefixes the figure so the column reads as
+  // "⚫ 3" rather than an unexplained 3. With two or more types, `totals`
+  // becomes a small breakdown line under the name: every type's figure, so a
+  // coal board still shows the gold. Its own span, never inside
+  // .leaderboard-name, which the You-row test reads as the bare name.
+  _leaderboardRow(rank, name, total, you, totals = null, rankBy = "all") {
     const badge = you ? `<span class="leaderboard-you-badge">${this._esc(t("player.leaderboard_you"))}</span>` : ""
+    const types = this.tokenTypesValue || []
+    const basis = rankBy && rankBy !== "all" ? types.find(tt => String(tt.id) === String(rankBy)) : null
+    const figure = `${basis ? this._esc(basis.icon) + " " : ""}${this._fmtTokens(total)}`
+    const breakdown = (types.length > 1 && totals)
+      ? `<span class="leaderboard-breakdown">${types.map(tt => `${this._esc(tt.icon)} ${this._fmtTokens(totals[tt.id] || 0)}`).join(" · ")}</span>`
+      : ""
     return `
       <div class="leaderboard-row${you ? " is-you" : ""}">
         <span class="leaderboard-rank">${Number(rank) || 0}</span>
-        <span class="leaderboard-name">${this._esc(name)}${badge}</span>
-        <span class="leaderboard-total">${Number(total) || 0}</span>
+        <span class="leaderboard-who">
+          <span class="leaderboard-name">${this._esc(name)}${badge}</span>${breakdown}
+        </span>
+        <span class="leaderboard-total">${figure}</span>
       </div>`
   }
 

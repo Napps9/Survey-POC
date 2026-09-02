@@ -35,6 +35,39 @@ class LeaderboardResultsPageTest < ActionDispatch::IntegrationTest
                              answers: { "0" => { "type" => "multiple_choice", "value" => "Pizza" } })
   end
 
+  TWO_TYPES = [ { "id" => "gold", "name" => "Gold", "icon" => "🪙" },
+                { "id" => "coal", "name" => "Coal", "icon" => "⚫" } ].freeze
+
+  # Mirrors the player's board: with two or more types every row carries each
+  # type's total, and a board ranked by one type says so in its header and
+  # prefixes the ranked figure with that type's icon.
+  test "with two types the rows show each type's total, and a ranked-by-type board says which" do
+    s = board_survey(token_types: TWO_TYPES, leaderboard_rank_by: "coal")
+    s.responses.create!(session_token: SecureRandom.uuid, status: "completed", completed_at: 2.hours.ago,
+                        player_key_digest: s.player_key_digest("rich"),
+                        token_totals: { "gold" => 50000, "coal" => 1 },
+                        answers: { "0" => { "type" => "multiple_choice", "value" => "Pizza" } })
+    s.responses.create!(session_token: SecureRandom.uuid, status: "completed", completed_at: 1.hour.ago,
+                        player_key_digest: s.player_key_digest("miner"),
+                        token_totals: { "gold" => 2, "coal" => 4 },
+                        answers: { "0" => { "type" => "multiple_choice", "value" => "Pizza" } })
+
+    get survey_results_path(s)
+    assert_response :success
+    assert_match "ranked by ⚫ Coal", response.body
+    assert_match "🪙 50,000 · ⚫ 1", response.body, "the breakdown line, formatted"
+    assert_match "🪙 2 · ⚫ 4", response.body
+    assert_match "⚫ 4", response.body, "the ranked figure wears the basis icon"
+
+    names = s.player_aliases.order(:id).pluck(:key_digest, :anon_name).to_h
+    assert response.body.index(names[s.player_key_digest("miner")]) < response.body.index(names[s.player_key_digest("rich")]),
+           "4 coal ranks above 1 coal, whatever the gold"
+
+    s.update_columns(leaderboard_rank_by: "all")
+    get survey_results_path(s)
+    assert_no_match(/ranked by/, response.body, "the sum of everything needs no explanation")
+  end
+
   test "the results page lists the standings with anonymous names, best first" do
     s = board_survey
     finish! s, key: "second", total: 3, at: 2.hours.ago

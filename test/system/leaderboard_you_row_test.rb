@@ -44,6 +44,40 @@ class LeaderboardYouRowTest < ApplicationSystemTestCase
     assert_selector ".leaderboard-card .leaderboard-row", wait: 10
   end
 
+  TWO_TYPES = [ { "id" => "gold", "name" => "Gold", "icon" => "🪙" },
+                { "id" => "coal", "name" => "Coal", "icon" => "⚫" } ].freeze
+
+  # Two currencies, ranked by one: the row's big figure is the coal (with its
+  # icon, so the column explains itself) and the breakdown under the name
+  # still shows the gold. Rendered client-side, so only a browser can pin it.
+  test "a board ranked by one type shows that type's figure and every type's total under the name" do
+    org = Organisation.create!(name: "O", slug: "lby-#{SecureRandom.hex(3)}")
+    survey = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                                 default_locale: "en", locales: [ "en" ],
+                                 cards: [ { "type" => "multiple_choice", "text" => "Pick one", "options" => %w[Pizza Salad],
+                                            "tokens" => { "Pizza" => { "gold" => 5, "coal" => 1 } } } ],
+                                 tokenisation_enabled: true, token_types: TWO_TYPES,
+                                 leaderboard_enabled: true, leaderboard_rank_by: "coal",
+                                 publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", completed_at: 1.hour.ago,
+                             player_key_digest: survey.player_key_digest("seed"),
+                             token_totals: { "gold" => 0, "coal" => 3 },
+                             answers: { "0" => { "type" => "multiple_choice", "value" => "Pizza" } })
+
+    finish_a_play!(survey)
+
+    within ".leaderboard-card" do
+      assert_selector ".leaderboard-row", count: 2
+      rows = all(".leaderboard-row .leaderboard-total").map(&:text)
+      assert_equal [ "⚫ 3", "⚫ 1" ], rows, "coal decides the order and wears its icon"
+      within ".leaderboard-row.is-you" do
+        assert_selector ".leaderboard-breakdown", text: "🪙 5 · ⚫ 1"
+        name = find(".leaderboard-name").text.sub(/you\z/i, "").strip
+        assert name.split(" ").length >= 2, "the breakdown must not leak into the name, got #{name.inspect}"
+      end
+    end
+  end
+
   test "a top-ten finisher gets the You badge beside their anonymous name, inline" do
     survey = board_survey
     seed_players!(survey, 3, top_total: 50)

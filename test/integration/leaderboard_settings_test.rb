@@ -74,6 +74,26 @@ class LeaderboardSettingsTest < ActionDispatch::IntegrationTest
     assert_equal "t2", s.reload.leaderboard_rank_by, "changing the basis re-ranks standings respondents were shown"
   end
 
+  test "the Rank-by radios appear only with two or more types, and lock with the policy" do
+    one_type = tokenised(publish_token: nil, published_at: nil, leaderboard_enabled: true)
+    get survey_path(one_type)
+    assert_select "input[name='leaderboard_rank_by']", false, "one type: the sum and the type are the same order"
+
+    s = tokenised(publish_token: nil, published_at: nil, leaderboard_enabled: true, token_types: TYPES + [ COAL ])
+    get survey_path(s)
+    assert_select "input[name='leaderboard_rank_by']", count: 3
+    assert_select "input[name='leaderboard_rank_by'][value='all'][checked]", count: 1
+    assert_match "⚫ Coal", response.body
+    assert_select "input[name='leaderboard_rank_by'][disabled]", false
+
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    s.responses.create!(session_token: SecureRandom.uuid, status: "completed",
+                        answers: { "0" => { "type" => "yes_no", "value" => "Yes" } })
+    get survey_path(s)
+    assert_select "input[name='leaderboard_rank_by'][disabled]", count: 3
+    assert_select "input[name='leaderboard_retake_policy']", { count: 3 }, "the policy radios are untouched"
+  end
+
   test "removing the ranked type from a draft falls back to all points" do
     s = tokenised(publish_token: nil, published_at: nil, token_types: TYPES + [ COAL ], leaderboard_rank_by: "t2")
     assert_equal "t2", s.leaderboard_rank_by

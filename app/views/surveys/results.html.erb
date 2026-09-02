@@ -506,7 +506,7 @@
                 <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);">
                   <%= { "accumulate" => "Retakes add points",
                         "no_redo"    => "First run counts",
-                        "restart"    => "Latest run counts" }[@survey.leaderboard_retake_policy] %><%= " · No retests" if @survey.no_retests? %>
+                        "restart"    => "Latest run counts" }[@survey.leaderboard_retake_policy] %><%= " · No retests" if @survey.no_retests? %><% if (rank_type = @survey.leaderboard_rank_type) %> · ranked by <%= rank_type["icon"] %> <%= rank_type["name"] %><% end %>
                 </span>
                 <span style="margin-left:auto;font-family:'Alata',sans-serif;font-size: var(--text-sm);color:<%= @leaderboard_player_count > 0 ? '#01EACB' : 'rgba(255,255,255,0.2)' %>;">
                   <%= @leaderboard_player_count %> player<%= @leaderboard_player_count == 1 ? "" : "s" %>
@@ -521,8 +521,17 @@
                   <% @leaderboard.each_with_index do |entry, i| %>
                     <div style="display:flex;align-items:center;gap:10px;padding:5px 0;<%= 'border-top:1px solid rgba(255,255,255,0.06);' if i.positive? %>">
                       <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.75);min-width:1.8em;text-align:right;"><%= i + 1 %></span>
-                      <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#fff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= @leaderboard_names[entry[:key_digest]] %></span>
-                      <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;"><%= entry[:total] %></span>
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;">
+                        <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><%= @leaderboard_names[entry[:key_digest]] %></span>
+                        <%# The breakdown mirrors the player's board: every type's total,
+                            so a board ranked by one type still shows the others. %>
+                        <% if @survey.token_types.size >= 2 && entry[:totals].is_a?(Hash) %>
+                          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            <%= @survey.token_types.map { |tt| "#{tt['icon']} #{number_with_delimiter(entry[:totals][tt['id']].to_i)}" }.join(" · ") %>
+                          </span>
+                        <% end %>
+                      </span>
+                      <span style="font-family:'Alata',sans-serif;font-size: var(--text-md);color:#fff;white-space:nowrap;"><%= "#{rank_type['icon']} " if rank_type %><%= number_with_delimiter(entry[:total]) %></span>
                     </div>
                   <% end %>
                   <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">

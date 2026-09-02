@@ -10402,9 +10402,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "Alata", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.75);
   min-width: 1.5em; text-align: end;
 }
+/* Name plus, with two or more token types, the per-type breakdown under it.
+   The column takes the row's flexible width; the name keeps its ellipsis. */
+.leaderboard-who {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;
+}
 .leaderboard-name {
   font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: #fff;
-  flex: 1; min-width: 0; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Every type's total ("🪙 500,000 · ⚫ 3") beneath the name, so a board
+   ranked by one type still shows the others. 0.75 alpha like the rank
+   numeral: the smallest text on the board, held to the same margin. */
+.leaderboard-breakdown {
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.75);
+  text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .leaderboard-you-badge {
   font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.06em;
@@ -10412,7 +10424,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   background: var(--brand-cta, #01EACB); border-radius: 100px;
   padding: 1px 8px; margin-inline-start: 8px; vertical-align: middle;
 }
-.leaderboard-total { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; }
+.leaderboard-total { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; white-space: nowrap; }
 /* The break between the visible top of the board and your own appended row
    (aria-hidden "⋯" — decorative, but held to the text floor anyway so it
    never reads as a smudge). */
