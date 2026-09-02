@@ -86,15 +86,18 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 1 | 10 | 99% failed | Per-IP rate limits walled off the single runner IP — **and** exposed that every unnamed `rate_limit` in a controller shares one counter (successes decayed in journey order: consent 32, submit 18, leaderboard 0). Fixed: `name:` on every limit (PlayerController, SharedResultsController); `PLAYER_RATE_LIMIT_SCALE` knob. |
 | 2 | 10 | 99% failed, same shape | Deploy race: the run started before the knob build was live. |
 | 3 | 10 | 97% failed | **0 × 429** — knob verified. 9,284 × 5xx (Cloudflare 502, origin not answering) + 1,404 × 60 s timeouts. Healthy requests: median 367 ms end-to-end (~200 ms after the network floor). |
-| 4 | 2 | 90% failed | Same collapse at ~14 req/s total; `show` median 6.4 s. **An instance that cannot serve 14 req/s is not a capacity data point** — it is undersized (Free tier, 0.1 CPU) or restart-looping. Instance plan unconfirmed at time of writing; the Render Events/Metrics tabs for 09:06–09:12 UTC settle it. |
+| 4 | 2 | 90% failed | Same collapse at ~14 req/s total; `show` median 6.4 s. Render Events for the window: **"Ran out of memory (used over 512MB)"** + crash loop on a 0.5c-512mb Starter; CPU never above 60%. Cause: `LeaderboardStanding.refresh!` rewrote the whole 50k-row board every 3 s window inside the web process. Fixed: incremental upserts, read-time rank, `rank` column dropped. |
+| 5 | 2 | 0.10% failed, **~12 s median on every endpoint** | On the resized 1c-2g (prod's 2 GB shape) with the incremental refresh: no OOM, board serving. Uniform latency across endpoints of very different cost = queueing: the full rebuild of the 50k seeded board ran in one transaction, so every 3-second job saw "no snapshot" and started another — overlapping rebuilds holding the GVL. Fixed: `surveys.leaderboard_refreshed_at` watermark + per-batch commits, single-flight cache claim (`:busy` → job retries), first-read bootstrap inline only ≤ 2,000 identities, else via the job. |
 
-Standing conclusions so far: (1) two production bugs fixed for free;
-(2) the play page weighs ~150 KB, so the CDN/page-trim stage is load-bearing
-at 83 arrivals/s (~7 GB of HTML per event); (3) every service-time number
-above is **provisional** until the scratch instance is production-shaped —
-next run goes on a Standard (prod's 2 GB shape) for the baseline, then one
-Pro Plus with `WEB_CONCURRENCY=4`/`RAILS_MAX_THREADS=5` ramped to failure
-for the per-instance ceiling that sizes the fleet.
+Standing conclusions so far: (1) **four** production fixes came out of the
+harness before any capacity number did — named rate limits, the scale knob,
+the whole-board refresh, the rebuild storm; (2) the play page weighs
+~150 KB, so the CDN/page-trim stage is load-bearing at 83 arrivals/s (~7 GB
+of HTML per event); (3) healthy per-request floor is ~160–250 ms end-to-end
+from a US runner (≈ 60–100 ms server-side), but no clean median exists yet —
+run 6 (2/s, single-flight code) is the baseline, run 7 (10/s) the first
+stress point, then one Pro Plus with `WEB_CONCURRENCY=4`/`RAILS_MAX_THREADS=5`
+ramped to failure for the per-instance ceiling that sizes the fleet.
 
 ## 3. What remains, in order (needs dashboards/accounts)
 
