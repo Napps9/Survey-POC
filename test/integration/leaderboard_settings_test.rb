@@ -56,6 +56,32 @@ class LeaderboardSettingsTest < ActionDispatch::IntegrationTest
       "flipping the policy rewrites standings respondents were already shown"
   end
 
+  COAL = { "id" => "t2", "icon" => "⚫", "name" => "Coal" }.freeze
+
+  test "the ranking basis round-trips while a draft, normalises an unknown id, and locks once live" do
+    s = tokenised(publish_token: nil, published_at: nil, leaderboard_enabled: true, token_types: TYPES + [ COAL ])
+    assert_equal "all", s.leaderboard_rank_by, "the sum of everything — the original board"
+
+    post survey_settings_path(s), params: { leaderboard_rank_by: "t2" }
+    assert_equal "t2", s.reload.leaderboard_rank_by
+    post survey_settings_path(s), params: { leaderboard_rank_by: "diamonds" }
+    assert_equal "all", s.reload.leaderboard_rank_by, "an unknown id falls back to all points, never errors"
+
+    post survey_settings_path(s), params: { leaderboard_rank_by: "t2" }
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    post survey_settings_path(s), params: { leaderboard_rank_by: "all" }
+    follow_redirect!
+    assert_equal "t2", s.reload.leaderboard_rank_by, "changing the basis re-ranks standings respondents were shown"
+  end
+
+  test "removing the ranked type from a draft falls back to all points" do
+    s = tokenised(publish_token: nil, published_at: nil, token_types: TYPES + [ COAL ], leaderboard_rank_by: "t2")
+    assert_equal "t2", s.leaderboard_rank_by
+
+    s.update!(token_types: TYPES)
+    assert_equal "all", s.reload.leaderboard_rank_by
+  end
+
   test "an unknown policy normalizes to the default rather than erroring" do
     s = tokenised(publish_token: nil, published_at: nil,
                   leaderboard_enabled: true, leaderboard_retake_policy: "no_redo")

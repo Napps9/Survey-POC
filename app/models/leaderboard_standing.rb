@@ -22,7 +22,7 @@ class LeaderboardStanding < ApplicationRecord
     entries = TokenLeaderboard.standings(survey)
     now = Time.current
     rows = entries.each_with_index.map do |e, i|
-      { survey_id: survey.id, key_digest: e[:key_digest], total: e[:total],
+      { survey_id: survey.id, key_digest: e[:key_digest], total: e[:total], totals: e[:totals],
         achieved_at: e[:achieved_at], rank: i + 1, created_at: now, updated_at: now }
     end
 

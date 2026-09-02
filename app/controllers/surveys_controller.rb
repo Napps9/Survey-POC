@@ -111,12 +111,13 @@ class SurveysController < ApplicationController
   #
   # `leaderboard_retake_policy` IS here: flipping it silently rewrites standings
   # respondents have already been shown (accumulate→restart collapses a
-  # three-run total to one run), exactly like the scoring switches.
-  # `leaderboard_enabled` is not — it only shows or hides a board computed at
-  # read time.
+  # three-run total to one run), exactly like the scoring switches — and so is
+  # `leaderboard_rank_by`, which re-orders the whole board (coal instead of
+  # the sum). `leaderboard_enabled` is not — it only shows or hides a board
+  # computed at read time.
   SETTINGS_LOCKED_IN_USE = %i[
     consent_text consent_image consent_image_credit consent_image_credit_url
-    tokenisation_enabled token_types quiz leaderboard_retake_policy
+    tokenisation_enabled token_types quiz leaderboard_retake_policy leaderboard_rank_by
     capture_postcode
   ].freeze
 
@@ -855,6 +856,10 @@ class SurveysController < ApplicationController
       attrs[:leaderboard_retake_policy] =
         Survey.normalize_leaderboard_retake_policy(params[:leaderboard_retake_policy])
     end
+    if params.key?(:leaderboard_rank_by)
+      attrs[:leaderboard_rank_by] =
+        Survey.normalize_leaderboard_rank_by(params[:leaderboard_rank_by], @survey.token_type_ids)
+    end
     # Unlike the presentation switches above, this one DOES change what's
     # collected — toggling it mid-collection would ask different respondents
     # a different question, so it's in SETTINGS_LOCKED_IN_USE rather than the
@@ -1108,7 +1113,7 @@ class SurveysController < ApplicationController
       @leaderboard_player_count = @survey.leaderboard_standings.maximum(:rank).to_i
       @leaderboard = @survey.leaderboard_standings.order(:rank)
                             .limit(RESULTS_LEADERBOARD_ROWS)
-                            .map { |s| { key_digest: s.key_digest, total: s.total, achieved_at: s.achieved_at } }
+                            .map { |s| { key_digest: s.key_digest, total: s.total, totals: s.totals, achieved_at: s.achieved_at } }
       digests = @leaderboard.map { |e| e[:key_digest] }
       digests.each { |d| PlayerAlias.ensure_for!(survey: @survey, key_digest: d) }
       @leaderboard_names = @survey.player_aliases.where(key_digest: digests)

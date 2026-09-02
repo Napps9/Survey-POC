@@ -102,6 +102,32 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     assert_equal 2, body["entries"].map { |e| e["name"] }.uniq.size
   end
 
+  test "entries and you carry each type's total, and the payload names the basis" do
+    s = board_survey
+    play! s, player_key: "alpha", answer: "Pizza" # 5 gold
+    play! s, player_key: "beta",  answer: "Salad" # 2 gold + 1 coal
+
+    get player_leaderboard_path(s.publish_token), params: { player_key: "beta" }
+    body = JSON.parse(response.body)
+    assert_equal "all", body["rank_by"]
+    assert_equal({ "gold" => 5, "coal" => 0 }, body["entries"].first["totals"], "zero for a type never earned")
+    assert_equal({ "gold" => 2, "coal" => 1 }, body["you"]["totals"])
+  end
+
+  test "ranking by one type reorders the board, and the live you row follows the same basis" do
+    s = board_survey(leaderboard_rank_by: "coal")
+    play! s, player_key: "alpha", answer: "Pizza" # 5 gold, 0 coal
+    play! s, player_key: "beta",  answer: "Salad" # 2 gold, 1 coal
+
+    get player_leaderboard_path(s.publish_token), params: { player_key: "beta" }
+    body = JSON.parse(response.body)
+    assert_equal "coal", body["rank_by"]
+    assert_equal [ 1, 0 ], body["entries"].map { |e| e["total"] }, "coal decides the order; gold is ignored"
+    assert_equal 1, body["you"]["rank"]
+    assert_equal 1, body["you"]["total"]
+    assert_equal({ "gold" => 2, "coal" => 1 }, body["you"]["totals"], "the breakdown still shows the gold")
+  end
+
   test "retakes accumulate under the default policy, and the name never changes" do
     s = board_survey
     play! s, player_key: "gamer", answer: "Salad" # 3

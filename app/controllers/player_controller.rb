@@ -601,18 +601,20 @@ class PlayerController < ApplicationController
     # of their own. Only the board around you trails by the debounce window:
     # your rank comes from the snapshot when it already agrees, and is
     # estimated against it when you've beaten your own refresh here.
+    # `total` is the basis the board ranks by (Survey#leaderboard_rank_by);
+    # `totals` is every type's figure for the row's breakdown.
     you = if own
       if you_row && you_row.total == own[:total]
-        { rank: you_row.rank, total: own[:total], of: total_players }
+        { rank: you_row.rank, total: own[:total], totals: own[:totals], of: total_players }
       else
         total_players += 1 unless you_row
         rank = @survey.leaderboard_standings.where.not(key_digest: you_digest)
                       .where("total > ?", own[:total]).count + 1
-        { rank: rank, total: own[:total], of: total_players }
+        { rank: rank, total: own[:total], totals: own[:totals], of: total_players }
       end
     elsif you_row
       # Rows mid-purge but still on the snapshot — serve what the board shows.
-      { rank: you_row.rank, total: you_row.total, of: total_players }
+      { rank: you_row.rank, total: you_row.total, totals: you_row.totals, of: total_players }
     end
 
     # Read-time backfill: name everyone about to be rendered (≤11 idempotent
@@ -628,10 +630,12 @@ class PlayerController < ApplicationController
       # Keep your own visible row coherent with the live "you" total when the
       # snapshot hasn't caught up with your latest run yet.
       { rank: s.rank, name: names[s.key_digest],
-        total: yours && you ? you[:total] : s.total, you: yours }
+        total: yours && you ? you[:total] : s.total,
+        totals: yours && you ? you[:totals] : s.totals, you: yours }
     end
     you[:name] = names[you_digest] if you
     render json: { ok: true, policy: @survey.leaderboard_retake_policy,
+                   rank_by: @survey.leaderboard_rank_by,
                    total_players:, entries:, you: }
   end
 

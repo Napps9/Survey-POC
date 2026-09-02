@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_02_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_140000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -484,6 +484,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_130000) do
     t.integer "rank", null: false
     t.integer "survey_id", null: false
     t.integer "total", default: 0, null: false
+    t.json "totals", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["survey_id", "key_digest"], name: "index_leaderboard_standings_on_survey_id_and_key_digest", unique: true
     t.index ["survey_id", "rank"], name: "index_leaderboard_standings_on_survey_id_and_rank", unique: true
@@ -894,6 +895,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_130000) do
     t.text "key_insight"
     t.boolean "leaderboard_enabled", default: false, null: false
     t.string "leaderboard_note"
+    t.string "leaderboard_rank_by", default: "all", null: false
     t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false

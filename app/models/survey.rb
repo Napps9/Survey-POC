@@ -1989,6 +1989,7 @@ class Survey < ApplicationRecord
       consent_image_credit_url: consent_image_credit_url,
       leaderboard_enabled:     leaderboard_enabled,
       leaderboard_retake_policy: leaderboard_retake_policy,
+      leaderboard_rank_by:     leaderboard_rank_by,
       # Study-design rules a duplicated instrument must keep.
       no_going_back:           no_going_back,
       no_retests:              no_retests
@@ -2370,6 +2371,33 @@ class Survey < ApplicationRecord
   # in the model — a bad value should surface as a validation error, not a raw
   # database exception.
   validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
+
+  # What the board RANKS BY: "all" — one total across every token type, the
+  # original board — or one of this Verto's token type ids, when the types are
+  # different currencies (CO2 saved, lives) whose sum means nothing. Every row
+  # still shows each type's total; this only decides the order. No CHECK
+  # constraint, deliberately: the values are creator-defined ids, so the model
+  # normalises instead and an unknown or removed id falls back to "all". Locked
+  # once live (SETTINGS_LOCKED_IN_USE) for the policy's reason — changing the
+  # basis re-ranks standings respondents have already been shown.
+  before_validation :coerce_leaderboard_rank_by
+  validates :leaderboard_rank_by, presence: true
+
+  def self.normalize_leaderboard_rank_by(value, type_ids)
+    value = value.to_s
+    Array(type_ids).include?(value) ? value : "all"
+  end
+
+  def coerce_leaderboard_rank_by
+    self.leaderboard_rank_by = Survey.normalize_leaderboard_rank_by(leaderboard_rank_by, token_type_ids)
+  end
+
+  def leaderboard_ranks_by_type? = leaderboard_rank_by != "all"
+
+  # The token type the board ranks by, or nil under "all".
+  def leaderboard_rank_type
+    Array(token_types).find { |t| t["id"] == leaderboard_rank_by }
+  end
 
   # THE GDPR WALL, scoped to where it bites (owner's call, 2026-08-24): a
   # contact form may sit alongside age, location, gender and heritage, but
