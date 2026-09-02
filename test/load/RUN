@@ -1,7 +1,7 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 6: 2/s baseline with the single-flight, watermarked refresh live
-# (run 5 queued ~12 s behind overlapping full rebuilds of the 50k board).
+# Run 7: 2/s steady state — board already built, busy retries coalesced
+# (run 6 shared the CPU with the one-off 50k background build).
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 ARRIVALS_PER_S=2
