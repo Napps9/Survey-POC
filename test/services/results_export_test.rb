@@ -64,6 +64,39 @@ class ResultsExportTest < ActiveSupport::TestCase
     refute_includes header, "Welcome"
   end
 
+  SOURCE_COL = ResultsExport::RESPONSE_HEADER.index("Source")
+
+  # Which address a response came in on. A custom link names itself; recalling
+  # the link keeps the name on its old rows; deleting it (nullify) drops them
+  # back to the Verto's own address.
+  test "the Source column names the custom link a response came through" do
+    link = @survey.survey_links.create!(name: "Newsletter", slug: "rex-news-#{SecureRandom.hex(2)}")
+    via_link = @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", locale: "en",
+                                         survey_link: link,
+                                         answers: { "1" => { "type" => "multiple_choice", "value" => "Red" } })
+    rebuild_export!
+
+    rows = @export.response_rows.drop(1)
+    assert_equal [ "Direct link", "Direct link", "Newsletter" ], rows.map { |r| r[SOURCE_COL] },
+                 "the plain rows keep the Verto's own label; the link row carries its name"
+
+    link.update!(active: false)
+    rebuild_export!
+    assert_equal "Newsletter", @export.response_rows.last[SOURCE_COL], "a recalled link still labels its old responses"
+
+    link.destroy
+    rebuild_export!
+    assert_equal "Direct link", @export.response_rows.last[SOURCE_COL],
+                 "a deleted link nullifies its stamp, so the row reads as the Verto's own again"
+    assert_nil via_link.reload.survey_link_id
+  end
+
+  def rebuild_export!
+    responses  = @survey.responses.where(status: "completed").order(:created_at)
+    aggregated = AGG.build(Array(@survey.cards), responses)
+    @export    = ResultsExport.new(survey: @survey, responses: responses, aggregated: aggregated)
+  end
+
   test "response_rows formats each card type and the Other free-text" do
     rows = @export.response_rows
     assert_equal 3, rows.size # header + 2 responses

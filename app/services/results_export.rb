@@ -141,7 +141,7 @@ class ResultsExport
   def each_export_response(&block)
     if @responses.respond_to?(:find_each)
       @responses.reorder(nil)
-        .select(:id, :created_at, :locale, :survey_share_id, :answers,
+        .select(:id, :created_at, :locale, :survey_share_id, :survey_link_id, :answers,
                 :started_at, :completed_at, :device_kind,
                 :respondent_code_digest, :player_key_digest)
         .find_each(batch_size: 500, &block)
@@ -164,10 +164,23 @@ class ResultsExport
   end
 
   # Maps a response back to a human label for which link it came through,
-  # mirroring the results-screen segment labels.
+  # mirroring the results-screen segment labels: a named custom link, else a
+  # partner share, else the Verto's own address. A response carries at most one
+  # of the two ids (PlayerController#load_survey_and_share resolves a share OR
+  # a link), so the order here is a tie-break, not a policy.
   def source_label(response)
+    if response.survey_link_id && (name = link_labels[response.survey_link_id])
+      return name
+    end
     return "Direct link" if response.survey_share_id.nil?
     share_labels[response.survey_share_id] || "Partner"
+  end
+
+  # Every link, recalled ones included — a paused link's old responses still
+  # point at it. A deleted link nullifies (SurveyLink has_many :responses,
+  # dependent: :nullify), so those rows read "Direct link" again.
+  def link_labels
+    @link_labels ||= @survey.survey_links.pluck(:id, :name).to_h
   end
 
   def share_labels

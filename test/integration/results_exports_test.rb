@@ -28,6 +28,28 @@ class ResultsExportsTest < ActionDispatch::IntegrationTest
     assert_match "Blue", response.body
   end
 
+  # The research-assistant case: several people administer one Verto through
+  # their own custom links, and a batch has to be identifiable afterwards. The
+  # stamp already existed; this is it reaching the CSV, and the link segment
+  # scoping the export to that one batch.
+  test "a response through a custom link exports its link name, and the link segment exports only that batch" do
+    link = @survey.survey_links.create!(name: "RA Sam", slug: "ra-sam-#{SecureRandom.hex(2)}")
+    post progress_survey_path(link.slug),
+         params: { session_token: "via-link", answers: { "0" => { "type" => "multiple_choice", "value" => "Green" } } }.to_json,
+         headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+
+    get survey_results_export_path(@survey, kind: "responses")
+    rows = CSV.parse(response.body.delete_prefix("\xEF\xBB\xBF".b.force_encoding("UTF-8")))
+    source = rows.first.index("Source")
+    assert_equal [ "Direct link", "RA Sam" ].sort, rows.drop(1).map { |r| r[source] }.sort
+
+    get survey_results_export_path(@survey, kind: "responses", segment: "link_#{link.id}")
+    rows = CSV.parse(response.body.delete_prefix("\xEF\xBB\xBF".b.force_encoding("UTF-8")))
+    assert_equal 1, rows.drop(1).size, "the link's segment exports that batch alone"
+    assert_equal "RA Sam", rows.last[source]
+  end
+
   test "downloads the aggregated summary CSV" do
     get survey_results_export_path(@survey, kind: "summary")
     assert_response :success

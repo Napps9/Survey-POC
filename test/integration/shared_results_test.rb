@@ -253,6 +253,33 @@ class SharedResultsTest < ActionDispatch::IntegrationTest
     assert_match "3 responses", response.body # wave 2's own count, not the whole Verto's 5
   end
 
+  # Custom links are the one segment kind the public page does NOT get: a
+  # link's name is the owner's internal label for an audience ("RA Sam"), and
+  # the shared token is for strangers. An unknown segment id falls back to
+  # Overall, so a guessed link_N URL shows nothing extra either.
+  test "custom-link segments stay off the shared page" do
+    link = @survey.survey_links.create!(name: "RA Sam", slug: "ra-sam-#{SecureRandom.hex(2)}")
+    add_plain_responses(2, value: "Blue")
+    @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", answered: true,
+                              survey_link: link, answers: { "1" => { "type" => "multiple_choice", "value" => "Green" } })
+    token = enable_share!
+    delete session_path
+
+    get shared_results_path(token)
+    assert_response :success
+    assert_no_match(/RA Sam/, response.body)
+    assert_select "a.seg-pill[href*='segment=link_']", false
+
+    get shared_results_path(token, segment: "link_#{link.id}")
+    assert_response :success
+    assert_no_match(/RA Sam/, response.body)
+    assert_match "3 responses", response.body, "falls back to Overall — every response, not the link's batch"
+
+    sign_in
+    get survey_results_path(@survey)
+    assert_match "RA Sam", response.body, "the owner's own page still has the pill"
+  end
+
   # ── Report: cached-only, never generates ───────────────────────────────────
 
   test "the report page 404s when there's no cached report yet" do
