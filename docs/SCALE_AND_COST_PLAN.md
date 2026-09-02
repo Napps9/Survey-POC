@@ -92,6 +92,20 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 7 | 2 | 0 failed, **~1 s median on every endpoint** (min 120–155 ms) | Board built, nothing else running. Web CPU only **25–30%**, memory 20% (Render Metrics) — yet uniform queueing. **Database** Metrics: **CPU pinned at 100% of its 0.1-CPU limit**, memory 60–80% of 256 MB, disk **1,500–2,000 write ops/s**; the same Postgres tier production runs (and it had **OOM-crashed** during run 4). 55 app queries per journey (+~10 cache/rate-limit in prod); the leaderboard read was 23 → batched alias lookup → 12. |
 | 8 | 1 | 0 failed, median **228 ms** (show 481, submit 293, progress 233, leaderboard 266), p95 839 ms | Half the load, a quarter of the latency: the classic knee of a saturated resource — the DB was still touching 100% CPU at ~6 req/s. Healthy service time ≈ 70 ms server-side for the API endpoints, ≈ 320 ms for the 150 KB page. |
 | 9 | 2 | 0 failed, median **297 ms** (show 501, submit 362, progress 312, leaderboard 449), p95 0.8–1.0 s, no queueing | **Stage 5 A/B against run 7** — identical load and the same 0.1-CPU database; the only change is `REDIS_URL` (Rails.cache + `rate_limit` counters on Render Key Value, free tier). Medians ÷3, p95 ÷5, journeys ran at pure think-time. The cache and rate-limit writes were the bulk of what saturated Postgres. |
+| 10 | 10 | **all thresholds green** — 0/24,143 failed, median 151 ms, p95 370 ms, journeys at pure think-time | Scratch DB resized to **4c-16g** + Key Value cache, still ONE 1c-2g web box (3 Puma threads). The day-one melt rate (97% failed in run 3) now runs clean with headroom. |
+| 11 | 20 | **all thresholds green** — 0/39,893 failed, median 161 ms, p95 371 ms | ~120 req/s sustained on the single small box; no queueing. |
+| 12 | 40 | 0 failed but **saturated**: median 6.9 s, p95 8.8 s, uniform across endpoints; served **160 req/s** (22.8 journeys/s) against ~240 offered, 3,171 iterations dropped | The 1c-2g box's ceiling: **~160 req/s ≈ 23 arrivals/s**, and it degrades by queueing, not by failing. 3 threads ÷ ~19 ms per request ≈ 158 req/s, so it is probably **thread-limited, not CPU-limited** — the web CPU graph for 16:39–16:45 UTC decides, and Pro Plus (4 workers × 5 threads = 20 slots) tests how far that scales per instance. |
+
+**Measured capacity (2026-09-02):** with Key Value carrying the cache and
+rate-limit counters and the database on 4c-16g, a single 1c-2g web instance
+(3 Puma threads) sustains **~160 req/s ≈ 23 respondent arrivals/s** and
+degrades gracefully (queueing, zero errors) beyond it. Healthy server-side
+service time ≈ 20–40 ms for the API endpoints and ≈ 200 ms for the 150 KB
+page. Naive fleet arithmetic for the 83 arrivals/s event peak: **4 such
+instances at saturation, 6–7 at 65% utilisation** — i.e. $25/mo-class boxes,
+not the 6 × Pro Plus the pre-measurement plan assumed. The Pro Plus run
+(WEB_CONCURRENCY=4, RAILS_MAX_THREADS=5) is still worth doing because if the
+small box is thread-limited, one Pro Plus may carry ~5–6× as much.
 
 Standing conclusions: (0) **Stage 5 is proven** — run 9 vs run 7 above; production should get `REDIS_URL` (a Frankfurt Key Value instance) on a quiet day, before any web scale-out; (1) **five** production fixes came out of the harness
 — named rate limits, the scale knob, the whole-board refresh, the rebuild
