@@ -1,11 +1,11 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 9: 2/s with Rails.cache + rate limits on Key Value (REDIS_URL);
-# DB still Basic-256mb (0.1 CPU) to isolate Stage 5's effect vs run 7.
+# Run 10: 10/s — the day-one melt rate — with Key Value cache and the DB on
+# 4c-16g. Measures the 1-vCPU web box itself with the database out of the way.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
-ARRIVALS_PER_S=2
+ARRIVALS_PER_S=10
 RAMP_S=60
-HOLD_S=240
+HOLD_S=300
 DWELL_SCALE=0.05
 BROWNOUT=0
