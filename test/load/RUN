@@ -1,7 +1,7 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 5: clean healthy-path baseline on the resized 1c-2g scratch instance
-# (runs 3–4 OOM-looped a 512 MB box under the old whole-board refresh).
+# Run 6: 2/s baseline with the single-flight, watermarked refresh live
+# (run 5 queued ~12 s behind overlapping full rebuilds of the 50k board).
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 ARRIVALS_PER_S=2
