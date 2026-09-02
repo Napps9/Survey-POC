@@ -4,7 +4,9 @@
   is_q     = CardTypes.question?(type)
   progress = total_q > 0 && is_q ? ((q_idx.to_f / total_q) * 100).round : 5
   eyebrow  = CardTypes.eyebrow(type).presence || type.tr('_', ' ')
-  live     = @survey&.editing_locked?
+  # The lock as this REQUEST sees it (LiveEditing), not the model's own — an
+  # allowed account editing a live Verto gets the full chrome back.
+  live     = @survey.present? && editing_locked?(@survey)
 %>
 
 <div class="survey-card-wrap"

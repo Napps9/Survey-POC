@@ -1124,6 +1124,7 @@ sn:
     remove: 'Bvisa'
     animation_theme: "Animeshoni"
     live_locked_bar: "Verto iyi iri pachena — mibvunzo yakakiiwa kudzivirira hunhu hwedhata."
+    live_edit_bar: "Kugadzirisa Verto iri pachena — kutamisa, kuwedzera kana kubvisa mibvunzo kunokanganisa mhinduro dzatounganidzwa."
     live_results: "Ona Mhedzisiro →"
     publish_confirm: "Buritsa Verto iyi? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     questions: "mibvunzo"
@@ -1147,6 +1148,7 @@ sn:
     add_design_sub: "Wedzera mufananidzo kuti upe kadhi iri upenyu"
     live: "PACHENA"
     live_warning: "Verto iyi iri pachena, saka mibvunzo yayo yakakiiwa — mupinduri wese anopindura Verto imwe chete, izvo zvinochengetedza kuti mhedzisiro yako igoenzaniswa. Unoda shanduko? Gadzira Verto itsva."
+    live_edit_warning: "Verto iyi iri pachena, asi akaunti yako inogona kuigadzirisa zvakadaro. Mhinduro dzinochengetwa zvichienderana nechinzvimbo chemubvunzo wega wega, saka kuwedzera, kubvisa kana kurongazve mibvunzo kunoita kuti mhinduro dzakatounganidzwa dzinongedzere kumibvunzo isiriyo, uye kushandura mazwi esarudzo kunoshandura zita remhinduro iro yakanyorwa pasi paro. Gadzirisa mazwi ipapo paunogona — kana mibvunzo pachayo ichida kuchinja, Verto itsva inochengetedza mhedzisiro yeiyi isina kukanganiswa."
     got_it: "Ndazvinzwisisa"
     add_question: "Wedzera Mubvunzo"
     cards:

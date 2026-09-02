@@ -29,8 +29,10 @@ module AggregatesSurveyResults
         # Mirror the old `filter_map { ...dig("value") }`: drop nil/false only
         # (so 0 and "" are kept, exactly as before).
         unless value.nil? || value == false
-          st[:value_count] += 1
-          accumulate_value(st, types[idx], value)
+          # Counted only if it was banked: a wrong-shaped answer at a scale
+          # index (see scalar_answer?) is dropped from the tallies AND from the
+          # card's total, so the header never says "2 answers" over one bar.
+          st[:value_count] += 1 if accumulate_value(st, types[idx], value)
         end
         other = a["other"]
         st[:other_texts] << other if other.respond_to?(:presence) && other.presence
@@ -58,11 +60,18 @@ module AggregatesSurveyResults
   # and the historic yes/unsure/no are both tap cards, and a tally seeded with
   # the wrong set drops every answer it has no slot for.
   def new_card_state(type, card = nil)
-    st = { value_count: 0, other_texts: [], counts: Hash.new(0), texts: [], sum: 0.0 }
+    # sum_count is the number of answers actually banked into sum — the same as
+    # value_count except when a wrong-shaped answer is skipped (scalar_answer?),
+    # so a rating average never divides by an answer it didn't add.
+    st = { value_count: 0, other_texts: [], counts: Hash.new(0), texts: [], sum: 0.0, sum_count: 0 }
     st[:response_keys] = TapScales.keys_for(card) if type == "tap_card"
     st
   end
 
+  # Returns whether the value was accepted for this card's tally. Every branch
+  # accepts — including the no-op ones, whose totals have always counted the
+  # answer — except a scale card handed a wrong-shaped value, which is refused
+  # rather than coerced (scalar_answer?).
   def accumulate_value(st, type, value)
     case type
     when "multiple_choice", "yes_no", "select_one_grid", "scenario"
@@ -87,10 +96,13 @@ module AggregatesSurveyResults
         end
       end
     when "range", "nps"
+      return false unless scalar_answer?(value)
       st[:counts][value.to_i] += 1
     when "rating"
+      return false unless scalar_answer?(value)
       st[:counts][value.to_i] += 1
       st[:sum] += value.to_f
+      st[:sum_count] += 1
     when "open_ended"
       str = value.to_s
       st[:texts] << str unless str.blank?
@@ -99,6 +111,18 @@ module AggregatesSurveyResults
       # a lead table rather than counting anything.
       st[:texts] << value if value.is_a?(Hash) && value.present?
     end
+    true
+  end
+
+  # A scale answer is a number (or the string of one). Anything else at a
+  # range/nps/rating index — a select_many's array, a tap card's hash — is an
+  # answer recorded against a DIFFERENT card that used to sit at this position,
+  # which a deck edited under the live-edit override (LiveEditAccess) can leave
+  # behind. It is skipped rather than coerced: Array#to_i would 500 the whole
+  # results page, and re-pointed answers are the owner's accepted cost, not a
+  # reason the page can't render.
+  def scalar_answer?(value)
+    value.is_a?(Numeric) || value.is_a?(String)
   end
 
   def finalize_card(card, type, st, total_responses)
@@ -119,7 +143,7 @@ module AggregatesSurveyResults
     when "range", "nps"
       base.merge(total: st[:value_count] + other_count, counts: st[:counts])
     when "rating"
-      avg = st[:value_count].positive? ? (st[:sum] / st[:value_count]).round(1) : 0.0
+      avg = st[:sum_count].positive? ? (st[:sum] / st[:sum_count]).round(1) : 0.0
       base.merge(total: st[:value_count] + other_count, counts: st[:counts], avg:)
     when "open_ended"
       base.merge(total: st[:value_count] + other_count, texts: st[:texts])

@@ -1114,6 +1114,7 @@ pt:
     remove: 'Remover'
     animation_theme: "Animação"
     live_locked_bar: "Este Verto está no ar — as perguntas estão bloqueadas para proteger a qualidade dos dados."
+    live_edit_bar: "A editar um Verto no ar — mover, adicionar ou remover perguntas desalinha as respostas já recolhidas."
     live_results: "Ver resultados →"
     publish_confirm: "Publicar este Verto? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     questions: perguntas
@@ -1137,6 +1138,7 @@ pt:
     add_design_sub: Adicione uma imagem para dar vida a este cartão
     live: AO VIVO
     live_warning: "Este Verto está no ar, por isso as perguntas estão bloqueadas — todos respondem exatamente ao mesmo Verto, mantendo os resultados comparáveis. Precisa de alterações? Crie um novo Verto."
+    live_edit_warning: "Este Verto está no ar e, mesmo assim, a sua conta pode editá-lo. As respostas são guardadas pela posição de cada pergunta, por isso adicionar, remover ou reordenar perguntas reatribui as respostas já recolhidas a outras perguntas, e reformular uma opção altera a chave de resposta sob a qual as respostas ficaram registadas. Corrija a redação no próprio lugar sempre que puder — se as perguntas em si precisarem de mudar, um novo Verto mantém intactos os resultados deste."
     got_it: Entendido
     add_question: Adicionar pergunta
     cards:

@@ -1121,6 +1121,7 @@ af:
     remove: "Verwyder"
     animation_theme: "Animasie"
     live_locked_bar: "Hierdie Verto is regstreeks — vrae is gesluit om datagehalte te beskerm."
+    live_edit_bar: "Jy wysig 'n regstreekse Verto — om vrae te verskuif, by te voeg of te verwyder, herkoppel reeds ingesamelde antwoorde."
     live_results: "Bekyk resultate →"
     publish_confirm: "Publiseer hierdie Verto? Sodra dit regstreeks is, word sy vrae gesluit en kan nie gewysig word nie — maak seker alles lees presies soos jy dit wil hê."
     questions: "vrae"
@@ -1144,6 +1145,7 @@ af:
     add_design_sub: "Voeg 'n prent by om hierdie kaart tot lewe te bring"
     live: "REGSTREEKS"
     live_warning: "Hierdie Verto is regstreeks, so sy vrae is gesluit — elke respondent beantwoord presies dieselfde Verto, wat jou resultate vergelykbaar hou. Verandering nodig? Skep 'n nuwe Verto."
+    live_edit_warning: "Hierdie Verto is regstreeks, en jou rekening kan dit nogtans wysig. Antwoorde word volgens elke vraag se posisie gestoor, so om vrae by te voeg, te verwyder of te herrangskik laat reeds ingesamelde antwoorde na ander vrae wys, en om 'n opsie te herformuleer verander die antwoordsleutel waaronder dit aangeteken is. Maak bewoording ter plaatse reg waar jy kan — as die vrae self moet verander, hou 'n nuwe Verto hierdie een se resultate ongeskonde."
     got_it: "Verstaan"
     add_question: "Voeg vraag by"
     cards:

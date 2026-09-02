@@ -49,6 +49,28 @@ class AggregatesSurveyResultsTest < ActiveSupport::TestCase
     ]
   end
 
+  # A deck edited under the live-edit override (LiveEditAccess) can leave an
+  # answer recorded against a different card at a scale card's index — a
+  # select_many's array, a tap card's hash. Those are skipped: Array#to_i would
+  # take the whole results page down, and re-pointed answers are the accepted
+  # cost of that override, not a reason results can't render.
+  test "a wrong-shaped answer at a scale index is skipped rather than crashing" do
+    responses = [
+      resp({ "2" => { "value" => %w[X Y] }, "3" => { "value" => { "Statement 1" => "yes" } } }),
+      resp({ "2" => { "value" => 4 },       "3" => { "value" => "2" } })
+    ]
+    rows = nil
+    assert_nothing_raised { rows = @agg.run(CARDS, responses) }
+
+    rating = rows[2]
+    assert_equal({ 4 => 1 }, rating[:counts].to_h)
+    assert_equal 4.0, rating[:avg]
+    assert_equal 1, rating[:total], "the skipped answer must not be counted over a single bar"
+    range = rows[3]
+    assert_equal({ 2 => 1 }, range[:counts].to_h)
+    assert_equal 1, range[:total]
+  end
+
   test "prioritise banks each option's rank and totals responders" do
     responses = [
       resp({ "7" => { "value" => %w[A B C] } }), # A=1 B=2 C=3

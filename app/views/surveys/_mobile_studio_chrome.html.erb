@@ -8,7 +8,7 @@
     right column (a bottom sheet at phone width), add/duplicate/delete run
     the active card's own rail buttons, rename mirrors into the desktop
     title span. This partial owns markup, never behaviour. %>
-<% live_locked = @survey.editing_locked? %>
+<% live_locked = editing_locked?(@survey) %>
 <div class="m-chrome" data-mobile-studio-target="chrome">
 
   <%# ── Top bar: back · title (tap to rename) · preview · more ── %>

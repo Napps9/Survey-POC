@@ -85,7 +85,10 @@ class SurveysController < ApplicationController
   # Structural edits are refused while a Verto is live, and stay refused once it
   # has responses even after being unpublished — answers are keyed by card
   # index, so a deck change would misalign what's already stored. See
-  # Survey#editing_locked?.
+  # Survey#editing_locked?. Every guard below asks `editing_locked?(survey)`
+  # (the LiveEditing concern) rather than the model directly: it is the same
+  # answer for everyone except the accounts LiveEditAccess lets past the lock,
+  # who edit live Vertos knowingly, with the editor warning them what it costs.
   # Deliberately a method, not a constant. `t` isn't available in a class body,
   # and a constant would resolve once at boot and pin every creator to whatever
   # locale happened to be active then — the exact thing P2-2 is undoing.
@@ -402,7 +405,7 @@ class SurveysController < ApplicationController
 
   def update
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     payload = JSON.parse(request.body.read)
@@ -420,7 +423,12 @@ class SurveysController < ApplicationController
     attrs[:description] = payload["description"] if payload.key?("description")
     attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")
-      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
+      # A locked deck only reaches this line under the live-edit override
+      # (LiveEditing). It keeps its existing shape: the sanitiser's passes that
+      # remove or move a card already in the deck are skipped, so the first
+      # autosave after fixing a typo can't quietly re-point stored answers.
+      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings,
+                                                    structural: !survey.editing_locked?)
       # Token config mirrors the setup-media carry below: the editor renders
       # token controls only when tokenisation is on, so a page loaded while it
       # was off rebuilds cards with no token keys — silence from a client that
@@ -664,7 +672,7 @@ class SurveysController < ApplicationController
   # is never blocked from applying an image by a storage hiccup.
   def card_image
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -686,7 +694,7 @@ class SurveysController < ApplicationController
   # survives the cards sanitiser, so a failure here means "not applied".
   def card_lottie
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -928,7 +936,7 @@ class SurveysController < ApplicationController
     # silently drops half of what was asked for is harder to reason about than
     # one that plainly didn't happen. In practice each of these forms submits a
     # single field, so nothing legitimate gets caught alongside.
-    if @survey.editing_locked? && (attrs.keys & SETTINGS_LOCKED_IN_USE).any?
+    if editing_locked?(@survey) && (attrs.keys & SETTINGS_LOCKED_IN_USE).any?
       respond_to do |format|
         format.html { redirect_to survey_path(@survey, panel: "publish"), alert: settings_locked_message }
         format.json { render json: { ok: false, error: settings_locked_message }, status: :locked }
@@ -969,7 +977,7 @@ class SurveysController < ApplicationController
 
   def shuffle_assets
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return redirect_to survey_path(survey), alert: editing_locked_message
     end
     # The optional direction prompt belongs to THIS click and is not stored:
@@ -1190,7 +1198,7 @@ class SurveysController < ApplicationController
   # Generates a single new question card using Claude, renders its HTML partial.
   def generate_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -1222,7 +1230,7 @@ class SurveysController < ApplicationController
   # wires the answer; autosave persists the lot (same contract as generate_card).
   def generate_flow
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     body   = JSON.parse(request.body.read)
@@ -1262,7 +1270,7 @@ class SurveysController < ApplicationController
   # takes it out of the bin at that point.
   def restore_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -1289,7 +1297,7 @@ class SurveysController < ApplicationController
   # in place and the traffic light turns green.
   def optimise_card
     @survey = survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     body = JSON.parse(request.body.read)
@@ -1338,7 +1346,7 @@ class SurveysController < ApplicationController
   # Renders the HTML partial for a given card JSON (used by "Start from Blank" flow).
   def render_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     card   = JSON.parse(request.body.read)
@@ -1362,7 +1370,7 @@ class SurveysController < ApplicationController
   # shape so the client's seedCardStore receives the i18n prefill.
   def add_demographic_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -1445,7 +1453,9 @@ class SurveysController < ApplicationController
     # nobody has answered yet. That is exactly when rewriting an options list is
     # safe: there are no stored demographic_heritage values to orphan. Once a
     # Verto is live its audience is settled along with the rest of its content.
-    if @survey.editing_locked?
+    # (Unless the account is allowed past the lock — see LiveEditing — in which
+    # case the rewrite is theirs to own, like every other live edit.)
+    if editing_locked?(@survey)
       return redirect_to survey_path(@survey, panel: "publish"), alert: settings_locked_message
     end
 

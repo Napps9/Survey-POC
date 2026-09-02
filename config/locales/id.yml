@@ -1114,6 +1114,7 @@ id:
     remove: 'Hapus'
     animation_theme: "Animasi"
     live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."
+    live_edit_bar: "Mengedit Verto yang live — memindah, menambah atau menghapus pertanyaan akan menggeser tanggapan yang sudah terkumpul."
     live_results: "Lihat hasil →"
     publish_confirm: "Terbitkan Verto ini? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     questions: pertanyaan
@@ -1137,6 +1138,7 @@ id:
     add_design_sub: Tambahkan gambar untuk menghidupkan kartu ini
     live: LIVE
     live_warning: "Verto ini sedang live, jadi pertanyaannya terkunci — setiap responden menjawab Verto yang persis sama, sehingga hasilmu tetap sebanding. Perlu perubahan? Buat Verto baru."
+    live_edit_warning: "Verto ini sedang live, dan akunmu tetap bisa mengeditnya. Jawaban disimpan berdasarkan posisi tiap pertanyaan, jadi menambah, menghapus, atau mengubah urutan pertanyaan akan mengalihkan tanggapan yang sudah terkumpul ke pertanyaan yang salah, dan mengubah kata-kata sebuah opsi akan mengubah label jawaban yang dipakai saat tanggapan itu dicatat. Perbaiki kata-katanya langsung di tempat bila bisa — jika pertanyaannya sendiri perlu diubah, Verto baru akan menjaga hasil Verto ini tetap utuh."
     got_it: Mengerti
     add_question: Tambah pertanyaan
     cards:

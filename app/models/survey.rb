@@ -59,16 +59,21 @@ class Survey < ApplicationRecord
 
   # Range cards are always a 5-point scale (see RANGE_POINTS). Enforced on the
   # way in so every authoring path is covered by one rule, and skipped once a
-  # Verto is live: a stored answer is an INDEX into the scale it was collected
-  # on, so resizing a published card's options would silently re-point every
-  # response already gathered. Published Vertos are locked for editing anyway.
-  before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !published? }
+  # Verto is live or has been answered: a stored answer is an INDEX into the
+  # scale it was collected on, so resizing an answered card's options would
+  # silently re-point every response already gathered. Guarded on
+  # editing_locked? rather than published? because a deck CAN reach a save with
+  # responses behind it — an account LiveEditAccess allows past the lock saves
+  # live and closed decks — and what protects the stored answers is that the
+  # normaliser never touches a card anyone has answered, not that the save is
+  # refused.
+  before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !editing_locked? }
 
   # An option label's own emoji belongs in that option's icon tile, not beside
   # its words. Same guard as above and for the same reason: an option label is
-  # the answer key for responses already collected, so a live Verto is never
-  # rewritten. See hoist_option_label_emoji! for the full rules.
-  before_save :hoist_option_label_emoji, if: -> { will_save_change_to_cards? && !published? }
+  # the answer key for responses already collected, so an answered Verto is
+  # never rewritten. See hoist_option_label_emoji! for the full rules.
+  before_save :hoist_option_label_emoji, if: -> { will_save_change_to_cards? && !editing_locked? }
 
   # Inline base64 images never reach a column. CardImageStore and the backfill
   # task moved the EXISTING data-URLs out (P1-7), but the door stayed open:
@@ -803,7 +808,17 @@ class Survey < ApplicationRecord
     card["image"].present? || card["video"].present? || card["lottie"].present?
   end
 
-  def self.sanitize_cards_images!(cards, warnings: nil)
+  # `structural: false` keeps a deck's existing SHAPE: the two passes at the
+  # tail that remove or move a card already in the deck (drop_retired_cards,
+  # hoist_consent_gate) are skipped. SurveysController#update passes it for a
+  # locked deck saved by an account LiveEditAccess allows past the lock — the
+  # editor promised that person that fixing wording in place is safe, and a
+  # save that quietly pulled out a retired card or moved the consent gate would
+  # re-point every later stored answer behind that promise. The enforce_single_*
+  # passes still run: on a deck that was normalised as a draft they can only
+  # ever drop a duplicate the editor has JUST added, which puts every card back
+  # where its answers already are.
+  def self.sanitize_cards_images!(cards, warnings: nil, structural: true)
     Array(ensure_cids!(cards)).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
@@ -1289,8 +1304,8 @@ class Survey < ApplicationRecord
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
        .then { |list| enforce_single_respondent_code(list, warnings: warnings) }
        .then { |list| enforce_single_points_intro(list, warnings: warnings) }
-       .then { |list| drop_retired_cards(list, warnings: warnings) }
-       .then { |list| hoist_consent_gate(list, warnings: warnings) }
+       .then { |list| structural ? drop_retired_cards(list, warnings: warnings) : list }
+       .then { |list| structural ? hoist_consent_gate(list, warnings: warnings) : list }
   end
 
   # At most one points-intro card per deck, same shape and same reasoning as
@@ -1335,7 +1350,10 @@ class Survey < ApplicationRecord
   # editor's save path and #update refuses any edit to a Verto that is
   # published or has responses (editing_locked?) — so a deck reaching here has
   # no stored answers for the renumbering to misalign. Live decks keep their
-  # copy and the player skips it instead.
+  # copy and the player skips it instead. An account allowed past the lock
+  # (LiveEditAccess) saves a live deck through sanitize_cards_images! too, so
+  # #update passes `structural: false` for a locked deck and this pass is
+  # skipped: the retired card stays exactly where the stored answers expect it.
   #
   # Dropped with a warning rather than a 422, for the same reason
   # enforce_single_welcome drops: decks holding a retired card already exist,
@@ -1387,7 +1405,10 @@ class Survey < ApplicationRecord
   # Only reached from the editor's save path, and #update refuses any edit to a
   # Verto that is published or already has responses (editing_locked?), so a
   # deck being reordered here can have no stored answers to misalign — which
-  # matters, because answers are keyed by card index.
+  # matters, because answers are keyed by card index. An account LiveEditAccess
+  # allows past the lock can save a locked deck, so for one #update passes
+  # `structural: false` to sanitize_cards_images! and this hoist is skipped —
+  # an existing gate stays where the stored answers expect it.
   def self.hoist_consent_gate(list, warnings: nil)
     gate_at = list.index { |c| c.is_a?(Hash) && c["type"].to_s == "consent_gate" }
     return list if gate_at.nil?
@@ -1555,6 +1576,13 @@ class Survey < ApplicationRecord
   # card index, so adding, removing or reordering cards silently misaligns every
   # later answer already stored. This — not published? — is the real editing
   # boundary, and every write path guards on it.
+  #
+  # A fact about the VERTO, not about who is asking. The one exception — the
+  # accounts LiveEditAccess allows to edit a locked deck knowingly — is applied
+  # at the controller boundary (LiveEditing#editing_locked?(survey)), so this
+  # predicate keeps answering what it always did and the model's own guards
+  # (switch_primary_locale!, the normalisers above that skip a locked deck)
+  # don't need to know the override exists.
   def editing_locked?
     published? || responses.exists?
   end

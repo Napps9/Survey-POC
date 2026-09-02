@@ -1136,6 +1136,7 @@ st:
     remove: 'Tlosa'
     animation_theme: "Motsamao"
     live_locked_bar: "Verto ena e a phela — dipotso di notlelehile ho sireletsa boleng ba datha."
+    live_edit_bar: "O fetola Verto e phelang — ho suthisa, ho eketsa kapa ho tlosa dipotso ho fetola moo dikarabo tse bokelletsweng di supang."
     live_results: "Sheba diphetho →"
     publish_confirm: "Phatlalatsa Verto ena? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     questions: "dipotso"
@@ -1159,6 +1160,7 @@ st:
     add_design_sub: "Kenya setshwantsho ho fa karete ena bophelo"
     live: "E A PHELA"
     live_warning: "Verto ena e a phela, kahoo dipotso tsa yona di notlelehile — moarabi ka mong o araba Verto e tshwanang ka botlalo, e leng se etsang hore diphetho tsa hao di dule di ka bapiswa. O hloka diphetoho? Theha Verto e ntjha."
+    live_edit_warning: "Verto ena e a phela, mme akhaonto ya hao e ka e fetola leha ho le jwalo. Dikarabo di bolokwa ho ya ka sebaka sa potso ka nngwe, kahoo ho kenya, ho tlosa kapa ho hlophisa dipotso hape ho lebisa dikarabo tse seng di bokelletswe dipotsong tse ding, mme ho fetola mantswe a khetho ho fetola lebitso la karabo leo e ngodisitsweng ka tlasa lona. Lokisa mantswe hona moo a leng teng ha o kgona — haeba dipotso ka botsona di hloka ho fetoha, Verto e ntjha e boloka diphetho tsa ena di sa angwa."
     got_it: "Ke Utlwisitse"
     add_question: "Kenya potso"
     cards:

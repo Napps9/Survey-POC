@@ -1146,6 +1146,7 @@ en-US:
     remove: 'Remove'
     animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."
+    live_edit_bar: "Editing a live Verto — moving, adding or removing questions re-points answers already collected."
     live_results: "View results →"
     publish_confirm: "Publish this Verto? Once it's live, its questions are locked and can't be edited — make sure everything reads exactly as you want."
     questions: "questions"
@@ -1169,6 +1170,7 @@ en-US:
     add_design_sub: "Add an image to bring this card to life"
     live: "LIVE"
     live_warning: "This Verto is live, so its questions are locked — every responder answers exactly the same Verto, which keeps your results comparable. Need changes? Create a new Verto."
+    live_edit_warning: "This Verto is live, and your account can edit it anyway. Answers are stored against each question's position, so adding, removing or reordering questions re-points responses already collected, and rewording an option changes the answer key it was recorded under. Fix wording in place where you can — if the questions themselves need to change, a new Verto keeps this one's results intact."
     got_it: "Got it"
     add_question: "Add question"
     cards:

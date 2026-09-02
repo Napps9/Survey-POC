@@ -1114,6 +1114,7 @@ tr:
     remove: 'Kaldır'
     animation_theme: "Animasyon"
     live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."
+    live_edit_bar: "Yayındaki Verto düzenleniyor — soru taşımak, eklemek ya da silmek toplanmış yanıtları başka sorulara kaydırır."
     live_results: "Sonuçları gör →"
     publish_confirm: "Bu Verto yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."
     questions: sorular
@@ -1137,6 +1138,7 @@ tr:
     add_design_sub: Bu karta hayat vermek için bir resim ekleyin
     live: CANLI
     live_warning: "Bu Verto yayında, bu yüzden soruları kilitli — herkes tam olarak aynı Verto'yu yanıtlar, böylece sonuçların karşılaştırılabilir kalır. Değişiklik mi gerekiyor? Yeni bir Verto oluştur."
+    live_edit_warning: "Bu Verto yayında, ancak hesabın onu yine de düzenleyebiliyor. Yanıtlar her sorunun sırasına göre saklanır; bu yüzden soru eklemek, kaldırmak ya da yeniden sıralamak hâlihazırda toplanmış yanıtları başka sorulara kaydırır, bir seçeneğin ifadesini değiştirmek ise yanıtların kaydedildiği anahtarı da değiştirir. Mümkün olduğunda ifadeleri yerinde düzelt — soruların kendisinin değişmesi gerekiyorsa yeni bir Verto, bunun sonuçlarını olduğu gibi korur."
     got_it: Anladım
     add_question: Soru ekle
     cards:

@@ -1114,6 +1114,7 @@ fr:
     remove: 'Retirer'
     animation_theme: "Animation"
     live_locked_bar: "Ce Verto est en ligne — les questions sont verrouillées pour protéger la qualité des données."
+    live_edit_bar: "Vous modifiez un Verto en ligne — déplacer, ajouter ou retirer des questions décale les réponses déjà recueillies."
     live_results: "Voir les résultats →"
     publish_confirm: "Publier ce Verto ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     questions: questions
@@ -1137,6 +1138,7 @@ fr:
     add_design_sub: Ajoutez une image pour donner vie à cette carte
     live: EN LIGNE
     live_warning: "Ce Verto est en ligne, ses questions sont donc verrouillées — chaque répondant répond exactement au même Verto, ce qui garde vos résultats comparables. Besoin de changements ? Créez un nouveau Verto."
+    live_edit_warning: "Ce Verto est en ligne, mais votre compte peut tout de même le modifier. Les réponses sont enregistrées selon la position de chaque question : ajouter, supprimer ou réordonner des questions réaffecte donc à d'autres questions les réponses déjà recueillies, et reformuler une option change le libellé sous lequel ses réponses ont été enregistrées. Corrigez la formulation sur place lorsque c'est possible — si ce sont les questions elles-mêmes qui doivent changer, un nouveau Verto garde intacts les résultats de celui-ci."
     got_it: Compris
     add_question: Ajouter une question
     cards:

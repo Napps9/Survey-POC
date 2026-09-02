@@ -1114,6 +1114,7 @@ sw:
     remove: 'Ondoa'
     animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."
+    live_edit_bar: "Unahariri Verto iliyo hewani — kuhamisha, kuongeza au kuondoa maswali kunapotosha majibu yaliyokusanywa."
     live_results: "Ona matokeo →"
     publish_confirm: "Chapisha Verto hii? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     questions: maswali
@@ -1137,6 +1138,7 @@ sw:
     add_design_sub: Ongeza picha ili kuipa kadi hii uhai
     live: HAI
     live_warning: "Verto hii iko hewani, kwa hivyo maswali yake yamefungwa — kila mjibu anajibu Verto ile ile kabisa, hivyo matokeo yako yanabaki kulinganishwa. Unahitaji mabadiliko? Unda Verto mpya."
+    live_edit_warning: "Verto hii iko hewani, na akaunti yako inaweza kuihariri hata hivyo. Majibu huhifadhiwa kulingana na nafasi ya kila swali, hivyo kuongeza, kuondoa au kupanga upya maswali huelekeza majibu yaliyokusanywa tayari kwenye maswali mengine, na kubadilisha maneno ya chaguo hubadilisha lebo ambayo majibu yake yalirekodiwa chini yake. Rekebisha maneno mahali yalipo unapoweza — ikiwa maswali yenyewe yanahitaji kubadilika, Verto mpya huhifadhi matokeo ya hii yakiwa kamili."
     got_it: Nimeelewa
     add_question: Ongeza swali
     cards:

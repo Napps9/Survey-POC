@@ -1134,6 +1134,7 @@ zu:
     remove: 'Susa'
     animation_theme: "Isixhihixhihi"
     live_locked_bar: "Le-Verto isesikhundleni — imibuzo ivaliwe ukuvikela izinga lekhwalithi yedatha."
+    live_edit_bar: "Uhlela i-Verto esesikhundleni — ukuhambisa, ukwengeza noma ukususa imibuzo kuqondisa kabusha izimpendulo eseziqoqiwe."
     live_results: "Buka imiphumela →"
     publish_confirm: "Shicilela le-Verto? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     questions: "imibuzo"
@@ -1157,6 +1158,7 @@ zu:
     add_design_sub: "Engeza isithombe ukuze uphe leli khadi ukuphila"
     live: "SEKUSEBENZA"
     live_warning: "Le-Verto isesikhundleni, ngakho imibuzo yayo ivaliwe — umphenduli ngamunye uphendula i-Verto efanayo ncamashí, okugcina imiphumela yakho iqhathaniseka. Udinga izinguquko? Dala i-Verto entsha."
+    live_edit_warning: "Le-Verto isesikhundleni, futhi i-akhawunti yakho iyakwazi ukuyihlela noma kunjalo. Izimpendulo zigcinwa ngokwendawo yombuzo ngamunye, ngakho ukwengeza, ukususa noma ukuhlela kabusha imibuzo kushintsha imibuzo ekhonjwa yizimpendulo esezivele ziqoqiwe, futhi ukushintsha amazwi enketho kushintsha ilebula impendulo eyabhalwa ngaphansi kwalo. Lungisa amazwi endaweni yawo lapho ukwazi khona — uma imibuzo uqobo lwayo idinga ukushintshwa, i-Verto entsha igcina imiphumela yale iphelele."
     got_it: "Kulungile"
     add_question: "Engeza umbuzo"
     cards:

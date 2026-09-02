@@ -1114,6 +1114,7 @@ de:
     remove: 'Entfernen'
     animation_theme: "Animation"
     live_locked_bar: "Dieses Verto ist live — die Fragen sind gesperrt, um die Datenqualität zu schützen."
+    live_edit_bar: "Du bearbeitest ein Live-Verto — Fragen verschieben, hinzufügen oder löschen ordnet bereits gesammelte Antworten neu zu."
     live_results: "Ergebnisse ansehen →"
     publish_confirm: "Dieses Verto veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     questions: Fragen
@@ -1137,6 +1138,7 @@ de:
     add_design_sub: Füge ein Bild hinzu, um diese Karte zum Leben zu erwecken
     live: LIVE
     live_warning: "Dieses Verto ist live, daher sind seine Fragen gesperrt — alle Befragten beantworten exakt dasselbe Verto, was deine Ergebnisse vergleichbar hält. Änderungen nötig? Erstelle ein neues Verto."
+    live_edit_warning: "Dieses Verto ist live, und dein Konto kann es trotzdem bearbeiten. Antworten werden anhand der Position jeder Frage gespeichert, daher verschiebt das Hinzufügen, Entfernen oder Neuanordnen von Fragen bereits gesammelte Antworten auf andere Fragen, und das Umformulieren einer Option ändert den Antwortschlüssel, unter dem die Antworten dazu erfasst wurden. Korrigiere Formulierungen, wo möglich, direkt an Ort und Stelle — wenn sich die Fragen selbst ändern müssen, lässt ein neues Verto die Ergebnisse dieses Vertos unangetastet."
     got_it: Verstanden
     add_question: Frage hinzufügen
     cards:

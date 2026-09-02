@@ -1136,6 +1136,7 @@ xh:
     remove: 'Susa'
     animation_theme: "Ushukumo"
     live_locked_bar: "Le Verto iyasebenza — imibuzo icinyiwe ukukhusela umgangatho wedatha."
+    live_edit_bar: "Uhlela iVerto esebenzayo — ukushenxisa, ukongeza okanye ukususa imibuzo kuphambukisa iimpendulo eziqokelelweyo."
     live_results: "Jonga iziphumo →"
     publish_confirm: "Papasha le Verto? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     questions: "imibuzo"
@@ -1159,6 +1160,7 @@ xh:
     add_design_sub: "Yongeza umfanekiso ukunika eli khadi ubomi"
     live: "IYASEBENZA"
     live_warning: "Le Verto iyasebenza, ngoko imibuzo yayo icinyiwe — umphenduli ngamnye uphendula le Verto kanye ngendlela efanayo, oko kugcina iziphumo zakho zithelekiseka. Ufuna utshintsho? Yenza iVerto entsha."
+    live_edit_warning: "Le Verto iyasebenza, kwaye iakhawunti yakho inokuyihlela nangona kunjalo. Iimpendulo zigcinwa ngokwendawo ekuyo umbuzo ngamnye, ngoko ukongeza, ukususa okanye ukulungelelanisa kwakhona imibuzo kwenza iimpendulo esele ziqokelelwe zikhombe kwimibuzo eyahlukileyo, kwaye ukutshintsha amagama okhetho kutshintsha igama impendulo eyabhaliswa phantsi kwalo. Lungisa amagama endaweni yawo apho unako — ukuba yimibuzo ngokwayo ekufuneka itshintshe, iVerto entsha igcina iziphumo zale Verto zingachaphazelekanga."
     got_it: "Ndiyavuma"
     add_question: "Yongeza umbuzo"
     cards:

@@ -1116,6 +1116,7 @@ pl:
     remove: 'Usuń'
     animation_theme: "Animacja"
     live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."
+    live_edit_bar: "Edycja Verto na żywo — przenoszenie, dodawanie lub usuwanie pytań zmieni przypisanie zebranych odpowiedzi."
     live_results: "Zobacz wyniki →"
     publish_confirm: "Opublikować to Verto? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     questions: pytań
@@ -1139,6 +1140,7 @@ pl:
     add_design_sub: Dodaj obraz, aby ożywić tę kartę
     live: NA ŻYWO
     live_warning: "To Verto jest na żywo, więc jego pytania są zablokowane — każdy respondent odpowiada na dokładnie to samo Verto, dzięki czemu wyniki pozostają porównywalne. Potrzebujesz zmian? Utwórz nowe Verto."
+    live_edit_warning: "To Verto jest na żywo, a Twoje konto może je mimo to edytować. Odpowiedzi są zapisywane według pozycji każdego pytania, więc dodanie, usunięcie lub zmiana kolejności pytań przypisze już zebrane odpowiedzi do innych pytań, a przeredagowanie opcji zmienia klucz odpowiedzi, pod którym została ona zapisana. Tam, gdzie to możliwe, poprawiaj sformułowania bezpośrednio w istniejących pytaniach — jeśli trzeba zmienić same pytania, nowe Verto pozostawi wyniki obecnego nienaruszone."
     got_it: Rozumiem
     add_question: Dodaj pytanie
     cards:

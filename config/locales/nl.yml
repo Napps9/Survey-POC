@@ -1114,6 +1114,7 @@ nl:
     remove: 'Verwijderen'
     animation_theme: "Animatie"
     live_locked_bar: "Deze Verto is live — vragen zijn vergrendeld om de datakwaliteit te beschermen."
+    live_edit_bar: "Je bewerkt een live Verto — vragen verplaatsen, toevoegen of verwijderen verschuift al verzamelde antwoorden."
     live_results: "Bekijk resultaten →"
     publish_confirm: "Deze Verto publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     questions: vragen
@@ -1137,6 +1138,7 @@ nl:
     add_design_sub: Voeg een afbeelding toe om deze kaart tot leven te brengen
     live: LIVE
     live_warning: "Deze Verto is live, dus de vragen zijn vergrendeld — iedereen beantwoordt exact dezelfde Verto, zodat je resultaten vergelijkbaar blijven. Wijzigingen nodig? Maak een nieuwe Verto."
+    live_edit_warning: "Deze Verto is live, maar jouw account kan hem toch bewerken. Antwoorden worden opgeslagen op de positie van elke vraag, dus vragen toevoegen, verwijderen of herschikken laat al verzamelde reacties naar een andere vraag wijzen, en een optie herformuleren verandert het label waaronder dat antwoord is vastgelegd. Verbeter de formulering waar mogelijk ter plekke — moeten de vragen zelf veranderen, dan laat een nieuwe Verto de resultaten van deze Verto intact."
     got_it: Begrepen
     add_question: Vraag toevoegen
     cards:

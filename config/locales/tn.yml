@@ -1136,6 +1136,7 @@ tn:
     remove: 'Tlosa'
     animation_theme: "Tshakgamiso"
     live_locked_bar: "Verto e e teng mo tirisong — dipotso di tswaletswe go sireletsa boleng jwa data."
+    live_edit_bar: "O baakanya Verto e e teng mo tirisong — go sutisa, go oketsa kgotsa go tlosa dipotso go tlhakanya dikarabo tse di kgobokantsweng."
     live_results: "Bona diphetho →"
     publish_confirm: "Phasaladitsa Verto e? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     questions: "dipotso"
@@ -1159,6 +1160,7 @@ tn:
     add_design_sub: "Oketsa setshwantsho go tlisa botshelo mo karateng e"
     live: "E TSHEDILE"
     live_warning: "Verto e e teng mo tirisong, ka jalo dipotso tsa yona di tswaletswe — moarabi mongwe le mongwe o araba Verto e le nngwe tota, mme se boloka diphetho tsa gago di kgona go bapisiwa. O tlhoka diphetogo? Tlhama Verto e ntšha."
+    live_edit_warning: "Verto e e teng mo tirisong, mme akhaonto ya gago e kgona go e baakanya le fa go ntse jalo. Dikarabo di bolokwa go ya ka boemo jwa potso nngwe le nngwe, ka jalo go oketsa, go tlosa kgotsa go rulaganya dipotso gape go dira gore dikarabo tse di setseng di kgobokantswe di supe dipotso tse di sa siamang, mme go fetola mafoko a tlhopho go fetola leina la karabo le dikarabo di neng di kwadilwe ka fa tlase ga lone. Baakanya mafoko mo a leng teng fa o kgona — fa dipotso ka botsona di tlhoka go fetoga, Verto e ntšha e boloka diphetho tsa eno di sa amiwa."
     got_it: "Ke a tlhaloganya"
     add_question: "Oketsa potso"
     cards:

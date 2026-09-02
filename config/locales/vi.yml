@@ -1114,6 +1114,7 @@ vi:
     remove: 'Gỡ bỏ'
     animation_theme: "Hoạt ảnh"
     live_locked_bar: "Verto này đang hoạt động — câu hỏi bị khóa để bảo vệ chất lượng dữ liệu."
+    live_edit_bar: "Chỉnh sửa Verto đang hoạt động — di chuyển, thêm hoặc xóa câu hỏi sẽ làm phản hồi đã thu thập gắn sai câu hỏi."
     live_results: "Xem kết quả →"
     publish_confirm: "Đăng Verto này? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     questions: câu hỏi
@@ -1137,6 +1138,7 @@ vi:
     add_design_sub: Thêm hình ảnh để thẻ này sống động hơn
     live: TRỰC TIẾP
     live_warning: "Verto này đang hoạt động nên các câu hỏi đã bị khóa — mọi người trả lời đúng cùng một Verto, giúp kết quả luôn so sánh được. Cần thay đổi? Hãy tạo Verto mới."
+    live_edit_warning: "Verto này đang hoạt động, nhưng tài khoản của bạn vẫn có thể chỉnh sửa. Câu trả lời được lưu theo vị trí của từng câu hỏi, nên việc thêm, xóa hoặc đổi thứ tự câu hỏi sẽ làm các phản hồi đã thu thập bị gán sang câu hỏi khác, còn việc sửa lời một lựa chọn sẽ làm thay đổi khóa câu trả lời mà lựa chọn đó đã được ghi nhận theo. Hãy sửa câu chữ tại chỗ khi có thể — nếu bản thân các câu hỏi cần thay đổi, tạo Verto mới sẽ giữ nguyên kết quả của Verto này."
     got_it: Đã hiểu
     add_question: Thêm câu hỏi
     cards:
