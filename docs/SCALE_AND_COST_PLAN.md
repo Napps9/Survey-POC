@@ -66,6 +66,31 @@ graded quiz cards, requests triple (~21–22/respondent) — resize to ~15–17.
 Deliberately deferred until the load test says they matter: caching the
 token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
+### 2b. Load-test log (scratch env, 2026-09-01 → 02)
+
+Setup: scratch web service `vertonow.onrender.com` (hand-made, builds this
+branch, single instance, `WEB_CONCURRENCY` unset) + scratch Basic-256mb
+Postgres (`max_connections` 103), 50,000 seeded responses. k6 runs from
+GitHub Actions (`.github/workflows/load_test.yml`, fired by pushing
+`test/load/RUN`) — one US runner IP, ~160 ms network floor to Frankfurt.
+`.onrender.com` is fronted by Cloudflare, so an origin that stops answering
+surfaces as **Cloudflare 502s**, not app errors.
+
+| Run | Arrivals/s | Outcome | What it taught |
+|---|---|---|---|
+| 1 | 10 | 99% failed | Per-IP rate limits walled off the single runner IP — **and** exposed that every unnamed `rate_limit` in a controller shares one counter (successes decayed in journey order: consent 32, submit 18, leaderboard 0). Fixed: `name:` on every limit (PlayerController, SharedResultsController); `PLAYER_RATE_LIMIT_SCALE` knob. |
+| 2 | 10 | 99% failed, same shape | Deploy race: the run started before the knob build was live. |
+| 3 | 10 | 97% failed | **0 × 429** — knob verified. 9,284 × 5xx (Cloudflare 502, origin not answering) + 1,404 × 60 s timeouts. Healthy requests: median 367 ms end-to-end (~200 ms after the network floor). |
+| 4 | 2 | 90% failed | Same collapse at ~14 req/s total; `show` median 6.4 s. **An instance that cannot serve 14 req/s is not a capacity data point** — it is undersized (Free tier, 0.1 CPU) or restart-looping. Instance plan unconfirmed at time of writing; the Render Events/Metrics tabs for 09:06–09:12 UTC settle it. |
+
+Standing conclusions so far: (1) two production bugs fixed for free;
+(2) the play page weighs ~150 KB, so the CDN/page-trim stage is load-bearing
+at 83 arrivals/s (~7 GB of HTML per event); (3) every service-time number
+above is **provisional** until the scratch instance is production-shaped —
+next run goes on a Standard (prod's 2 GB shape) for the baseline, then one
+Pro Plus with `WEB_CONCURRENCY=4`/`RAILS_MAX_THREADS=5` ramped to failure
+for the per-instance ceiling that sizes the fleet.
+
 ## 3. What remains, in order (needs dashboards/accounts)
 
 1. **Done 2026-09-01**: the four `generateValue` secrets (`SECRET_KEY_BASE`

@@ -129,8 +129,12 @@ export function journey() {
   // 1. The page + PWA fetches (the dynamic requests; /assets belong to the CDN).
   const page = note(http.get(play, { tags: { endpoint: "show" } }), "show");
   check(page, { "show 200": (r) => r.status === 200 });
-  note(http.get(`${play}/manifest`, { tags: { endpoint: "manifest" } }), "manifest");
-  note(http.get(`${BASE}/service-worker`, { tags: { endpoint: "service_worker" } }), "service_worker");
+  // Browsers fetch these with Accept: */*; with no Accept at all Rails picks
+  // :html and the .js/.json templates 500 with MissingTemplate — a harness
+  // artifact, not a server fault (seen as status=500 samples in runs 3–4).
+  const anyType = { headers: { Accept: "*/*" } };
+  note(http.get(`${play}/manifest`, { ...anyType, tags: { endpoint: "manifest" } }), "manifest");
+  note(http.get(`${BASE}/service-worker`, { ...anyType, tags: { endpoint: "service_worker" } }), "service_worker");
   sleep(60 * DWELL);
 
   // 2. Consent.
