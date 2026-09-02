@@ -11,9 +11,21 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
+# Install base packages.
+#
+# The second line is wkhtmltopdf's runtime: the wkhtmltopdf-binary gem ships a
+# statically-linked Qt but still dynamically links libjpeg62, libpng16,
+# libXrender, libX11, fontconfig and freetype (`ldd` on its debian_12 binary),
+# none of which ruby:slim carries — and fontconfig needs at least one font
+# installed or every glyph renders as a box. fonts-liberation is the
+# metric-compatible Arial/Helvetica substitute the report stylesheet asks
+# for. Without these every PDF render in production died at exec with
+# "error while loading shared libraries", which the job surfaced only as
+# "We couldn't build that PDF" (CI runs on Ubuntu runners that already have
+# them, so the suite never saw it).
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 \
+      fonts-liberation libfontconfig1 libfreetype6 libjpeg62-turbo libpng16-16 libx11-6 libxrender1 && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment
@@ -54,6 +66,16 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
+
+# Inflate the wkhtmltopdf binary now, while we're still root. The gem stores
+# it gzipped and its launcher inflates it into the gem's own bin/ directory on
+# first use — a directory owned by root under BUNDLE_PATH, which the uid-1000
+# app user below can't write, so the first render in production raised
+# Errno::EACCES instead of a PDF. Running --version here also execs the real
+# binary, so a missing shared library fails the image build rather than the
+# first download someone tries. Resolved through Gem.bin_path, which is
+# exactly how config/initializers/wicked_pdf.rb finds it at runtime.
+RUN bundle exec ruby -e 'exec Gem.bin_path("wkhtmltopdf-binary", "wkhtmltopdf"), "--version"'
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \

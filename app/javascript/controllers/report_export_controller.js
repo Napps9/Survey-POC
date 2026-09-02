@@ -209,8 +209,12 @@ export default class extends Controller {
       })
       const data = await res.json().catch(() => ({}))
       if (data.ok && data.url) {
+        // The open happens after an await, which Safari (and Chrome, once the
+        // click's activation has expired) treats as a popup and blocks — so
+        // the status carries the link too, and the export is never "saved"
+        // to a tab that quietly failed to open.
         window.open(data.url, "_blank", "noopener")
-        this._setDrive("Saved to Drive ✓")
+        this._setDriveLink("Saved to Drive ✓", data.url)
       } else if (data.reconnect && data.connect_url) {
         this._setDrive("Connecting Google…")
         window.location.href = data.connect_url
@@ -288,4 +292,15 @@ export default class extends Controller {
 
   _setStatus(text) { if (this.hasStatusTarget) this.statusTarget.textContent = text }
   _setDrive(text)  { if (this.hasDriveStatusTarget) this.driveStatusTarget.textContent = text }
+
+  _setDriveLink(text, url) {
+    if (!this.hasDriveStatusTarget) return
+    this.driveStatusTarget.textContent = `${text} `
+    const a = document.createElement("a")
+    a.href = url
+    a.target = "_blank"
+    a.rel = "noopener"
+    a.textContent = "Open the Doc"
+    this.driveStatusTarget.appendChild(a)
+  }
 }
