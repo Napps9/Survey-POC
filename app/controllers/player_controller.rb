@@ -594,8 +594,16 @@ class PlayerController < ApplicationController
     # before a mid-flight enable, and seeded rows.
     shown = top.map(&:key_digest)
     shown |= [ you_digest ] if you
-    shown.each { |digest| PlayerAlias.ensure_for!(survey: @survey, key_digest: digest) }
-    names = @survey.player_aliases.where(key_digest: shown).pluck(:key_digest, :anon_name).to_h
+    # One batched lookup first; mint only the names that are genuinely
+    # missing. Submit already named nearly everyone, so in steady state this
+    # is a single query — the load test counted 11 per-digest finds here on
+    # every board read, a third of the endpoint's database round-trips.
+    names   = @survey.player_aliases.where(key_digest: shown).pluck(:key_digest, :anon_name).to_h
+    missing = shown - names.keys
+    if missing.any?
+      missing.each { |digest| PlayerAlias.ensure_for!(survey: @survey, key_digest: digest) }
+      names = @survey.player_aliases.where(key_digest: shown).pluck(:key_digest, :anon_name).to_h
+    end
 
     entries = top.map do |s|
       yours = s.key_digest == you_digest
