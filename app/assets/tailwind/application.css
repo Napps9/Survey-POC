@@ -2564,6 +2564,16 @@
 }
 .choice-list-label { flex: 1; }
 .choice-list-tick { margin-left: auto; }
+/* "Show the points on each answer" (Survey#token_amounts_shown): what an
+   option is worth, beside its label, before it is picked. A sibling of the
+   label, not inside it (see _card_component's token_badge). */
+.token-option-badge {
+  display: inline-flex; align-items: center; flex-shrink: 0;
+  white-space: nowrap;
+  padding: 2px 8px; border-radius: 999px;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.3;
+  color: #1C2034; background: rgba(0,0,0,0.06);
+}
 
 /* ── Long option lists (7+) ────────────────────────
    COUNT_RULES flags 6+ in the editor, but imported decks legitimately exceed
@@ -2805,6 +2815,13 @@
   font-weight: 700;
 }
 .choice-card[data-selected="true"] .choice-tick { display: flex; }
+/* On a grid tile the badge is an overlay in the top-left corner (the tick
+   owns the top-right), so the tile's geometry is untouched. */
+.choice-card-bg .token-option-badge {
+  position: absolute; left: 8px; top: 8px;
+  font-size: 11px; padding: 1px 7px;
+  background: rgba(255,255,255,0.9); box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
 /* Per-type accents: single-pick grids show a radio-style ring on every tile
    at rest, multi-pick grids a checkbox-style square — the dot/square metaphor
    of the list types, visible before any selection. Filled on pick. */

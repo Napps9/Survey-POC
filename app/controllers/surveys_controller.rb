@@ -836,7 +836,7 @@ class SurveysController < ApplicationController
     # play rules rather than presentation, but they belong here for the same
     # reason: neither re-scores an answer or changes what anyone agreed to,
     # and No retests is MEANT to be switched between waves of a live Verto.
-    %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
+    %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled token_amounts_shown share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
        chrome_follows_verto_language auto_detect_language contact_form_enabled
        no_going_back no_retests].each do |flag|
