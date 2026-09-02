@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- verto-for-research one-pager · build 2026-09-01-c · view-source and check this line to confirm
+<!-- verto-for-research one-pager · build 2026-09-02-a · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible) -->
-<html lang="en" data-build="2026-09-01-c">
+<html lang="en" data-build="2026-09-02-a">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1034,7 +1034,19 @@
   /* Copy that only makes sense on one of the two layouts. */
   .on-mobile{ display: none; }
 
-  @media (max-width: 860px){
+  /* Who gets the in-page demo. Width alone can't answer this: a phone held
+     sideways is 932 CSS px (iPhone 15 Pro Max) and an iPad in landscape is
+     1024, so a width-only rule handed the laptop mockup to exactly the readers
+     it was meant to spare — reported from the field, 2026-09-02, as "people on
+     mobile are getting demos and they shouldn't be".
+
+     `pointer: coarse` is the honest test, because the thing being asked is
+     "is this a touch device", not "how wide is the window". It reads the
+     PRIMARY pointer, so a laptop with a touchscreen (fine pointer, coarse
+     any-pointer) still counts as desktop and keeps the demo. The width arm
+     stays for a narrowed desktop window, where the mockup genuinely doesn't
+     fit. */
+  @media (max-width: 860px), (pointer: coarse){
     .on-desktop{ display: none; }
     .on-mobile{ display: inline; }
 
@@ -1044,6 +1056,13 @@
     .hero-cta-desktop{ display: none; }
     .hero-cta-mobile{ display: inline-flex; }
 
+    /* ...and so does the nav entry that points at it. The sidenav only appears
+       above 860px, so between 860 and the tablet widths this link survived its
+       own section and scrolled to nothing. */
+    .nav-link[href="#try"]{ display: none; }
+  }
+
+  @media (max-width: 860px){
 
     /* The screenshots are dense dashboards. Shrunk to a phone's width they are
        decoration; at a legible width inside a pannable frame they are still
@@ -1316,7 +1335,7 @@
 <script>
   // Which copy of this page is running — so "nothing changed" can be checked
   // rather than guessed at.
-  console.info('Verto for research one-pager · build 2026-09-01-c');
+  console.info('Verto for research one-pager · build 2026-09-02-a');
 
   // Theme toggle
   const themeToggle = document.getElementById('themeToggle');

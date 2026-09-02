@@ -269,4 +269,78 @@ class OnePagerFitTest < ApplicationSystemTestCase
       FileUtils.rm_f(Rails.root.join(probe_path(pager)))
     end
   end
+
+  # verto-for-research only: vertonow deliberately keeps its player on a phone,
+  # full-width, so this is one page's answer rather than a rule for both.
+  #
+  # The client proposal hides its Try it section on mobile — no laptop mockup,
+  # no player fetched over mobile data. That was expressed as `max-width: 860px`
+  # for a while, which quietly failed the moment anyone turned a phone sideways:
+  # an iPhone 15 Pro Max in landscape is 932 CSS px, an iPad in landscape 1024,
+  # so the readers the rule existed to spare were exactly the ones getting the
+  # demo. Reported from the field on 2026-09-02 — "people on mobile are getting
+  # demos and they shouldn't be" — and invisible to anyone testing in portrait.
+  #
+  # So the gate is `pointer: coarse`, and this test emulates touch rather than
+  # only resizing: device metrics with `mobile: true` do NOT by themselves make
+  # that media query match, which would make a width-only regression pass here.
+  TOUCH_SIZES = [
+    [ 390, 844, "phone portrait" ],
+    [ 932, 430, "phone landscape" ],
+    [ 1024, 768, "tablet landscape" ],
+    [ 1366, 1024, "large tablet landscape" ]
+  ].freeze
+
+  TOUCH_SIZES.each do |width, height, label|
+    test "verto-for-research: no demo reaches a touch device (#{label}, #{width}px)" do
+      pager = "verto-for-research.html"
+      survey = published_survey
+      origin = Capybara.current_session.server.base_url
+      serve_probe_copy(pager, origin, survey.publish_token)
+
+      cdp = page.driver.browser.page
+      cdp.command("Emulation.setDeviceMetricsOverride",
+                  width: width, height: height, deviceScaleFactor: 1, mobile: true)
+      cdp.command("Emulation.setTouchEmulationEnabled", enabled: true, maxTouchPoints: 5)
+      begin
+        visit "#{origin}/__fit_probe_verto-for-research.html"
+        assert_selector ".benefits li", minimum: 1, wait: 15
+
+        state = page.evaluate_script(<<~JS)
+          (() => {
+            const t = document.getElementById('try');
+            const navTry = document.querySelector('.nav-link[href="#try"]');
+            const shown = (el) => !!(el && el.getBoundingClientRect().height > 0);
+            return { coarse: matchMedia('(pointer: coarse)').matches,
+                     try: shown(t), navTry: shown(navTry),
+                     iframe: !!document.querySelector('.screen-embed, .phone-screen-embed'),
+                     ctas: [...document.querySelectorAll('.hero-ctas a')]
+                             .filter(shown).map(a => a.getAttribute('href')) };
+          })()
+        JS
+
+        assert state["coarse"],
+          "touch emulation didn't take, so this ran as a desktop and proves nothing"
+        refute state["try"], "the Try it section is on screen for a touch device"
+        refute state["iframe"],
+          "a player iframe was created on a touch device — that is the whole page's " \
+          "worth of player fetched over mobile data for something nobody can see"
+
+        # The section and everything pointing at it travel together: a surviving
+        # link to a display:none section scrolls nowhere, which is how the nav
+        # entry outlived its section between 860px and the tablet widths.
+        refute state["navTry"], "the nav still links to #try, which is hidden here"
+        assert_equal [], state["ctas"].grep(/\A#try\z/),
+          "the hero button still scrolls to #try, which is hidden here"
+        assert_equal 1, state["ctas"].length, "expected exactly one hero CTA to be visible"
+        assert_match %r{\Ahttps://app\.playverto\.com/play/}, state["ctas"].first,
+          "a touch reader's only CTA must open the real Verto, since there is none in the page"
+      ensure
+        cdp.command("Emulation.clearDeviceMetricsOverride")
+        cdp.command("Emulation.setTouchEmulationEnabled", enabled: false)
+      end
+    ensure
+      FileUtils.rm_f(Rails.root.join(probe_path("verto-for-research.html")))
+    end
+  end
 end
