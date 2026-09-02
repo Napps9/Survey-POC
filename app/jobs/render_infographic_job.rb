@@ -19,7 +19,9 @@ class RenderInfographicJob < ApplicationJob
   def perform(report_render_id)
     render = ReportRender.find_by(id: report_render_id)
     return unless render
-    return if render.finished? || render.status == "running"
+    # "running" is a previous attempt whose process died mid-render, not a
+    # duplicate — see RenderReportPdfJob. Redo it.
+    return if render.finished?
 
     render.start!
     survey = render.survey

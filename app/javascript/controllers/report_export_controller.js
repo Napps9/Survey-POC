@@ -256,13 +256,12 @@ export default class extends Controller {
 
     try {
       const csrf = document.querySelector('meta[name="csrf-token"]')?.content
-      const res  = await fetch(url, {
+      const data = await this._fetchJson(url, {
         method: "POST",
         headers: { "Accept": "application/json", "Content-Type": "application/json",
                    ...(csrf ? { "X-CSRF-Token": csrf } : {}) },
         body: JSON.stringify({ kind })
       })
-      const data = await res.json()
       if (!data.ok) throw new Error(data.error || "Couldn't start the download")
 
       const href = await this._awaitRender(data.poll_url)
@@ -278,16 +277,66 @@ export default class extends Controller {
   }
 
   // Resolves to the download URL, or throws with a reason to show.
+  //
+  // A poll that comes back without JSON is not, on its own, a failed render:
+  // the instance restarts on every deploy (and the memory watchdog can restart
+  // it too), during which the host answers every request with its own HTML
+  // 502/503 page, and the render row is still there on the other side of the
+  // restart. So a transient answer is retried until the deadline; only a
+  // definite one — the row says failed, the session is gone — ends the wait.
   async _awaitRender(pollUrl) {
     const deadline = Date.now() + 120000 // the render itself is seconds; this is a backstop
+    let transient = 0
     while (Date.now() < deadline) {
-      const res  = await fetch(pollUrl, { headers: { "Accept": "application/json" } })
-      const data = await res.json()
+      let data
+      try {
+        data = await this._fetchJson(pollUrl, { headers: { "Accept": "application/json" } })
+        transient = 0
+      } catch (err) {
+        if (!err.transient || ++transient > 8) throw err
+        await new Promise(r => setTimeout(r, 3000))
+        continue
+      }
       if (data.download_url) return data.download_url
       if (data.status === "failed") throw new Error(data.error || "That file couldn't be built.")
+      if (data.ok === false) throw new Error(data.error || "That download expired — please try again.")
       await new Promise(r => setTimeout(r, 1200))
     }
     throw new Error("That took longer than expected — please try again.")
+  }
+
+  // fetch + JSON, with every way a request comes back WITHOUT JSON turned into
+  // a message a person can act on instead of "Unexpected token '<'": a
+  // redirect to the sign-in page (the session expired while the modal was
+  // open), the host's own 502/503 page while the instance restarts, a Rails
+  // error page. Transient ones are marked so a poll can wait them out.
+  async _fetchJson(url, init) {
+    let res
+    try {
+      res = await fetch(url, init)
+    } catch (_) {
+      throw this._transient("Couldn't reach the server — check your connection and try again.")
+    }
+    const type = res.headers.get("content-type") || ""
+    if (type.includes("application/json")) {
+      try { return await res.json() } catch (_) { /* fall through to the page cases */ }
+    }
+    if (res.redirected || res.url.includes("/session/new")) {
+      throw new Error("Your session has expired — reload the page and sign in again.")
+    }
+    if (res.status === 502 || res.status === 503 || res.status === 504) {
+      throw this._transient(`The app is restarting (HTTP ${res.status}) — try again in a minute.`)
+    }
+    if (res.status === 429) {
+      throw this._transient("Too many requests — try again in a moment.")
+    }
+    throw new Error(`The server answered with a page instead of data (HTTP ${res.status}) — please try again.`)
+  }
+
+  _transient(message) {
+    const err = new Error(message)
+    err.transient = true
+    return err
   }
 
   _setStatus(text) { if (this.hasStatusTarget) this.statusTarget.textContent = text }

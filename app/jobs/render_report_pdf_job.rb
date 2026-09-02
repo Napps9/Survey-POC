@@ -17,7 +17,12 @@ class RenderReportPdfJob < ApplicationJob
   def perform(report_render_id)
     render = ReportRender.find_by(id: report_render_id)
     return unless render
-    return if render.finished? || render.status == "running"
+    # A row already "running" isn't a duplicate to skip — each row is enqueued
+    # exactly once, so this job seeing it running means the previous attempt's
+    # process died mid-render (a deploy or memory-watchdog restart, both of
+    # which release the claimed job for re-delivery) and the render must be
+    # redone, or the row sits "running" until stale? fails it 5 minutes later.
+    return if render.finished?
 
     render.start!
     survey = render.survey
