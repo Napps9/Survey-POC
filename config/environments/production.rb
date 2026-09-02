@@ -67,14 +67,35 @@ Rails.application.configure do
   # want to log everything, set the level to "debug".
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
-  # Rails.cache on the primary database (see config/cache.yml). Without this the
-  # store fell back to a per-process, in-memory default, which quietly made
-  # every `rate_limit` in the app weaker than it reads: counters lived in one
-  # Puma process and were wiped by each deploy and each memory-watchdog restart.
-  # This line is also what carries the store to the throttles — `rate_limit`
+  # Rails.cache — and with it every `rate_limit` counter, because `rate_limit`
   # resolves `store:` from ActionController::Base.cache_store, which Rails
   # derives from this during initialization, before the controllers load.
-  config.cache_store = :solid_cache_store
+  #
+  # Two backends:
+  #   * REDIS_URL set  → Render Key Value (Valkey): in-memory, no fsync, off the
+  #     answer database. The load test (docs/SCALE_AND_COST_PLAN.md §2b) found
+  #     the 0.1-CPU Postgres pinned at 100% by Solid Cache entries and
+  #     rate-limit counter writes at ~2 arrivals/s while the web tier idled —
+  #     this is the fix for that. Short timeouts plus an error handler: a cache
+  #     hiccup degrades to "uncached" (and rate limits to "open"), it never
+  #     fails a respondent's request.
+  #   * otherwise      → Solid Cache on the primary database (config/cache.yml),
+  #     the previous arrangement and still what production runs until the var
+  #     is set. Without an explicit store Rails falls back to a per-process
+  #     memory store, which quietly made every rate limit weaker than it
+  #     reads: counters lived in one Puma process and were wiped by each
+  #     deploy and each memory-watchdog restart.
+  config.cache_store = if ENV["REDIS_URL"].present?
+    [ :redis_cache_store, {
+      url: ENV["REDIS_URL"],
+      connect_timeout: 1, read_timeout: 0.5, write_timeout: 0.5, reconnect_attempts: 1,
+      error_handler: ->(method:, returning:, exception:) {
+        ErrorReporting.report("redis_cache_store", exception, method: method, returning: returning.inspect)
+      }
+    } ]
+  else
+    :solid_cache_store
+  end
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # Solid Queue on the primary database — see CreateSolidQueueTables for why the

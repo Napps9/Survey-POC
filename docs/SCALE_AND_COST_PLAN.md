@@ -111,6 +111,15 @@ then 2/s → 10/s again, then the Pro Plus web ceiling.
 
 ## 3. What remains, in order (needs dashboards/accounts)
 
+- **Stage 5 code is on the branch**: `config.cache_store` switches to Render
+  Key Value (Valkey) whenever `REDIS_URL` is set, and `rate_limit` counters
+  follow it (they resolve their store from `cache_store`). Solid Cable and
+  Solid Queue stay on Postgres. Needs: a Key Value instance in Frankfurt
+  (free 25 MB is ample for counters + the small aggregate cache) and
+  `REDIS_URL` on the web service — scratch first, production after the
+  scratch rerun shows the DB CPU dropping off the graph. Counters reset to
+  zero at the flip; do it on a quiet day.
+
 1. **Done 2026-09-01**: the four `generateValue` secrets (`SECRET_KEY_BASE`
    + the three `ACTIVE_RECORD_ENCRYPTION_*` values) are backed up outside
    Render (see `docs/ENCRYPTION_KEYS.md`). **Backups (confirmed 2026-09-01):**

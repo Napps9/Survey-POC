@@ -24,8 +24,11 @@ gem "turbo-rails"
 gem "stimulus-rails"
 # Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
 gem "tailwindcss-rails"
-# Use Redis adapter to run Action Cable in production
-# gem "redis", ">= 4.0.1"
+# Redis client for Rails.cache on Render Key Value (Valkey) when REDIS_URL is
+# set — the load test showed the 0.1-CPU Postgres saturated by Solid Cache and
+# rate-limit counter writes long before the web tier worked hard. Action Cable
+# and Solid Queue stay on the database.
+gem "redis", "~> 5.4"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
