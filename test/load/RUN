@@ -1,10 +1,10 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 8: 1/s half-load — does the ~1 s median at 2/s halve (CPU-bound queue)
-# or stay (something else in the process)? Capacity curve for a 1-vCPU box.
+# Run 9: 2/s with Rails.cache + rate limits on Key Value (REDIS_URL);
+# DB still Basic-256mb (0.1 CPU) to isolate Stage 5's effect vs run 7.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
-ARRIVALS_PER_S=1
+ARRIVALS_PER_S=2
 RAMP_S=60
 HOLD_S=240
 DWELL_SCALE=0.05
