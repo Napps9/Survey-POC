@@ -2142,6 +2142,9 @@
 }
 .token-reveal.is-earned { background: rgba(1,234,203,0.10); border-color: rgba(1,234,203,0.38); }
 .token-reveal.is-none   { background: rgba(0,0,0,0.04);     border-color: rgba(0,0,0,0.10); }
+/* A net loss (tokens as lives): the same box, tinted the other way. */
+.token-reveal.is-lost   { background: rgba(220,38,38,0.08);  border-color: rgba(220,38,38,0.32); }
+.token-reveal.is-lost .token-reveal-head { color: #B42318; }
 .token-reveal-head {
   font-family: "Alata", sans-serif; font-size: 14px; letter-spacing: 0.02em;
   color: #0B7F6E;
@@ -2571,7 +2574,7 @@
   display: inline-flex; align-items: center; flex-shrink: 0;
   white-space: nowrap;
   padding: 2px 8px; border-radius: 999px;
-  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.3;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 16px;
   color: #1C2034; background: rgba(0,0,0,0.06);
 }
 

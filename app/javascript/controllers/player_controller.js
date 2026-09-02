@@ -2892,16 +2892,21 @@ export default class extends Controller {
     const host = card.querySelector(".split-right") || card
     host.querySelectorAll(".token-reveal").forEach(el => el.remove())
 
+    // Losses show too: a negative award (tokens as lives, a wrong turn costing
+    // a heart) used to be dropped here while still lowering the total, so the
+    // respondent saw the number fall with no explanation. Zero stays silent.
     const types = this.tokenTypesValue
     const rows  = Object.entries(earned)
-      .filter(([ , amount ]) => Number(amount) > 0)
+      .filter(([ , amount ]) => Number(amount) !== 0)
       .map(([ id, amount ]) => {
         const meta = types.find(t => String(t.id) === String(id))
-        return `${meta?.icon || "★"} ${meta?.name || ""} +${amount}`.trim()
+        const sign = Number(amount) > 0 ? "+" : ""
+        return `${meta?.icon || "★"} ${meta?.name || ""} ${sign}${this._fmtTokens(amount)}`.trim()
       })
+    const net = Object.values(earned).reduce((sum, v) => sum + (Number(v) || 0), 0)
 
     const box = document.createElement("div")
-    box.className = `token-reveal ${rows.length ? "is-earned" : "is-none"}`
+    box.className = `token-reveal ${rows.length ? (net < 0 ? "is-lost" : "is-earned") : "is-none"}`
     const head = document.createElement("div")
     head.className = "token-reveal-head"
     head.textContent = rows.length ? t("player.tokens_earned") : t("player.tokens_earned_none")
@@ -2973,11 +2978,24 @@ export default class extends Controller {
     }
   }
 
+  // Every token number the player shows goes through here: thousands
+  // separators in the respondent's own language ("500,000", "500.000"), a
+  // plain hyphen-minus for a negative total (what toLocaleString emits, and
+  // what the server-rendered option badges use — number_with_delimiter).
+  _fmtTokens(n) {
+    const v = Number(n) || 0
+    try {
+      return v.toLocaleString(this.localeValue || undefined)
+    } catch (_) {
+      return v.toLocaleString()
+    }
+  }
+
   _renderTokenChip() {
     if (!this.hasTokenScoreChipTarget || !this.tokenTypesValue.length) return
     this.tokenScoreChipTarget.classList.remove("hidden")
     this.tokenScoreChipTarget.innerHTML = this.tokenTypesValue.map(tt =>
-      `<span class="token-score-pill">${this._esc(tt.icon)} ${this._tokenTotals[tt.id] || 0}</span>`
+      `<span class="token-score-pill">${this._esc(tt.icon)} ${this._fmtTokens(this._tokenTotals[tt.id] || 0)}</span>`
     ).join("")
     this._fitFooter() // points chips share the bar with the labels
   }
@@ -2993,7 +3011,7 @@ export default class extends Controller {
     body.innerHTML = this.tokenTypesValue.map(tt => `
       <div class="token-checkpoint-row">
         <span class="token-checkpoint-icon">${this._esc(tt.icon)}</span>
-        <span class="token-checkpoint-amount">${this._tokenTotals[tt.id] || 0}</span>
+        <span class="token-checkpoint-amount">${this._fmtTokens(this._tokenTotals[tt.id] || 0)}</span>
         <span class="token-checkpoint-name">${this._esc(tt.name)}</span>
       </div>`).join("")
   }
@@ -3006,7 +3024,7 @@ export default class extends Controller {
       this.tokenTypesValue.map(tt => `
         <div class="token-result-row">
           <span class="token-result-icon">${this._esc(tt.icon)}</span>
-          <span class="token-result-amount">${this._tokenTotals[tt.id] || 0}</span>
+          <span class="token-result-amount">${this._fmtTokens(this._tokenTotals[tt.id] || 0)}</span>
           <span class="token-result-name">${this._esc(tt.name)}</span>
         </div>`).join("")
   }
