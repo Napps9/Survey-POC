@@ -137,6 +137,20 @@ class LeaderboardStandingTest < ActiveSupport::TestCase
     end
   end
 
+  test "busy retries coalesce: one pending retry per debounce window, not one per busy job" do
+    complete!("d1", "A")
+    clear_enqueued_jobs
+
+    with_held_refresh_claim do
+      # A retry is already scheduled for this window (the debounce claim is
+      # held) — a second busy job must not add another.
+      Rails.cache.write("leaderboard-refresh:#{@survey.id}", 1)
+      assert_no_enqueued_jobs(only: RefreshLeaderboardStandingsJob) do
+        RefreshLeaderboardStandingsJob.perform_now(@survey.id)
+      end
+    end
+  end
+
   test "bootstrap! builds a small board inline and hands a big one to the job" do
     complete!("d1", "A")
     complete!("d2", "B")

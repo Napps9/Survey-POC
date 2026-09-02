@@ -19,8 +19,14 @@ class RefreshLeaderboardStandingsJob < ApplicationJob
 
     # Another refresh is mid-flight (a big first build, or the previous
     # window's pass overrunning). The finishers this window carried are still
-    # in the responses table, so try again after one debounce — bounded by
-    # the running refresh's own lifetime.
+    # in the responses table, so try again after one debounce — through the
+    # same claim Response uses to enqueue, so however many busy jobs stack up
+    # behind a long build there is only ever ONE retry pending per window,
+    # not a chain per job.
+    claimed = Rails.cache.write("leaderboard-refresh:#{survey_id}", 1,
+                                unless_exist: true, expires_in: Response::REFRESH_STANDINGS_DEBOUNCE)
+    return unless claimed
+
     self.class.set(wait: Response::REFRESH_STANDINGS_DEBOUNCE).perform_later(survey_id)
   end
 end
