@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_02_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -881,6 +881,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_100000) do
     t.text "key_insight"
     t.boolean "leaderboard_enabled", default: false, null: false
     t.string "leaderboard_note"
+    t.datetime "leaderboard_refreshed_at"
     t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false
