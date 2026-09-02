@@ -1,11 +1,11 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 10: 10/s — the day-one melt rate — with Key Value cache and the DB on
-# 4c-16g. Measures the 1-vCPU web box itself with the database out of the way.
+# Run 11: 20/s (~120 req/s) on the single 1c-2g box — hunting the 1-vCPU
+# ceiling now that the database (4c-16g) and cache (Key Value) are out of the way.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
-ARRIVALS_PER_S=10
+ARRIVALS_PER_S=20
 RAMP_S=60
-HOLD_S=300
+HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
