@@ -88,16 +88,26 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 3 | 10 | 97% failed | **0 × 429** — knob verified. 9,284 × 5xx (Cloudflare 502, origin not answering) + 1,404 × 60 s timeouts. Healthy requests: median 367 ms end-to-end (~200 ms after the network floor). |
 | 4 | 2 | 90% failed | Same collapse at ~14 req/s total; `show` median 6.4 s. Render Events for the window: **"Ran out of memory (used over 512MB)"** + crash loop on a 0.5c-512mb Starter; CPU never above 60%. Cause: `LeaderboardStanding.refresh!` rewrote the whole 50k-row board every 3 s window inside the web process. Fixed: incremental upserts, read-time rank, `rank` column dropped. |
 | 5 | 2 | 0.10% failed, **~12 s median on every endpoint** | On the resized 1c-2g (prod's 2 GB shape) with the incremental refresh: no OOM, board serving. Uniform latency across endpoints of very different cost = queueing: the full rebuild of the 50k seeded board ran in one transaction, so every 3-second job saw "no snapshot" and started another — overlapping rebuilds holding the GVL. Fixed: `surveys.leaderboard_refreshed_at` watermark + per-batch commits, single-flight cache claim (`:busy` → job retries), first-read bootstrap inline only ≤ 2,000 identities, else via the job. |
+| 6 | 2 | 0 failed, medians 2–5 s | Single-flight refresh live. The one-off 50k background build shared the box with requests; busy-retry chains could stack (fixed: retries coalesce behind the debounce claim). |
+| 7 | 2 | 0 failed, **~1 s median on every endpoint** (min 120–155 ms) | Board built, nothing else running. Web CPU only **25–30%**, memory 20% (Render Metrics) — yet uniform queueing. **Database** Metrics: **CPU pinned at 100% of its 0.1-CPU limit**, memory 60–80% of 256 MB, disk **1,500–2,000 write ops/s**; the same Postgres tier production runs (and it had **OOM-crashed** during run 4). 55 app queries per journey (+~10 cache/rate-limit in prod); the leaderboard read was 23 → batched alias lookup → 12. |
+| 8 | 1 | 0 failed, median **228 ms** (show 481, submit 293, progress 233, leaderboard 266), p95 839 ms | Half the load, a quarter of the latency: the classic knee of a saturated resource — the DB was still touching 100% CPU at ~6 req/s. Healthy service time ≈ 70 ms server-side for the API endpoints, ≈ 320 ms for the 150 KB page. |
 
-Standing conclusions so far: (1) **four** production fixes came out of the
-harness before any capacity number did — named rate limits, the scale knob,
-the whole-board refresh, the rebuild storm; (2) the play page weighs
-~150 KB, so the CDN/page-trim stage is load-bearing at 83 arrivals/s (~7 GB
-of HTML per event); (3) healthy per-request floor is ~160–250 ms end-to-end
-from a US runner (≈ 60–100 ms server-side), but no clean median exists yet —
-run 6 (2/s, single-flight code) is the baseline, run 7 (10/s) the first
-stress point, then one Pro Plus with `WEB_CONCURRENCY=4`/`RAILS_MAX_THREADS=5`
-ramped to failure for the per-instance ceiling that sizes the fleet.
+Standing conclusions: (1) **five** production fixes came out of the harness
+— named rate limits, the scale knob, the whole-board refresh, the rebuild
+storm, the per-name leaderboard lookups; (2) the play page weighs ~150 KB, so
+the CDN/page-trim stage is load-bearing at 83 arrivals/s (~7 GB of HTML per
+event); (3) **the database is the first wall, not the web tier.** A
+Basic-256mb Postgres (0.1 CPU, 256 MB — production's tier) saturates at
+~1–2 arrivals/s with the web instance three-quarters idle, and it OOM-crashed
+under a 2/s burst. Every respondent request writes to it several times
+(Solid Cache entries, rate-limit counters, Solid Queue rows, the response
+itself). Ordering consequence for the plan: **DB tier + Stage 5 (cache and
+rate-limit counters onto Key Value/Valkey) come BEFORE any web scale-out** —
+more web instances against this database would change nothing. Measured
+healthy service times: ~70 ms server-side for consent/progress/submit/
+leaderboard, ~320 ms for the page (≈ 160 ms of every k6 number is US→Frankfurt
+network). Next: scratch DB on a real tier + Key Value for cache/rate limits,
+then 2/s → 10/s again, then the Pro Plus web ceiling.
 
 ## 3. What remains, in order (needs dashboards/accounts)
 
