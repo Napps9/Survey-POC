@@ -98,7 +98,8 @@ module CardTypes
   #
   # Retiring is not deleting, and the difference is the whole design. Answers
   # are keyed by card INDEX, and a Verto that has collected any is locked
-  # against structural edits (Survey#editing_locked?) precisely so nothing can
+  # against structural edits (Survey#editing_locked?; only the accounts
+  # LiveEditAccess names may edit one anyway) precisely so nothing can
   # renumber them. So a retired card is left exactly where it sits in a live
   # deck — pulling it out would shift every later answer already stored — and
   # is instead made inert: never offered (pickable: false), dropped from any

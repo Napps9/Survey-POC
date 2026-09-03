@@ -58,7 +58,10 @@ class SharedResultsController < ApplicationController
   # GET /results/:token
   def show
     @date_range = params[:range].presence
-    base, @segments, @active_segment = resolve_result_segments(@survey, params[:segment], @date_range)
+    # links: false — custom-link names are the owner's internal audience labels
+    # (see ResolvesResultSegments#result_segments); a crafted ?segment=link_N
+    # falls back to Overall like any unknown id.
+    base, @segments, @active_segment = resolve_result_segments(@survey, params[:segment], @date_range, links: false)
     @overall_total = base.count
     @total         = @active_segment[:count]
     @aggregated    = aggregate_results(Array(@survey.cards), @active_segment[:scope])

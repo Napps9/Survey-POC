@@ -1,6 +1,31 @@
 require "test_helper"
 
 class SurveyTest < ActiveSupport::TestCase
+  # ── sanitize_cards_images! structural: false ───────────────────────────────
+  # SurveysController#update passes this for a locked deck saved under the
+  # live-edit override: the passes that remove or move a card already in the
+  # deck are skipped, so a wording fix can't quietly re-point stored answers.
+  # The duplicate-collapsing passes still run.
+
+  test "structural: false keeps a retired card and an out-of-place consent gate where they are" do
+    cards = [
+      { "type" => "welcome_card", "title" => "hi" },
+      { "type" => "yes_no", "text" => "Q", "options" => %w[Yes No] },
+      { "type" => "consent_gate", "text" => "Agree?" },
+      { "type" => "welcome_card", "title" => "a duplicate the editor just added" }
+    ]
+    # No card type is retired today, so stand one in: yes_no plays the part.
+    stub_method(CardTypes, :retired?, ->(type, *) { type.to_s == "yes_no" }) do
+      kept = Survey.sanitize_cards_images!(cards.map(&:dup), structural: false)
+      assert_equal %w[welcome_card yes_no consent_gate], kept.map { |c| c["type"] },
+                   "retired card kept, gate left in place, the duplicate welcome still collapsed"
+
+      normalised = Survey.sanitize_cards_images!(cards.map(&:dup))
+      assert_equal %w[welcome_card consent_gate], normalised.map { |c| c["type"] },
+                   "the default is still the full housekeeping a draft gets"
+    end
+  end
+
   # ── sanitize_background_image ──────────────────────────────────────────────
 
   test "accepts an app-rooted asset image path" do

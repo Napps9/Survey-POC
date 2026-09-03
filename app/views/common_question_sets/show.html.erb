@@ -32,11 +32,17 @@
               style: "padding:9px 16px;border-radius:100px;background:rgba(97,91,245,0.18);color:#fff;border:1px solid rgba(97,91,245,0.4);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;" do %>
           <%= t("common_questions.view_results", default: "Aggregated results →") %>
         <% end %>
-        <%= button_to common_question_set_path(@set), method: :delete,
-              data: { turbo_confirm: t("common_questions.delete_confirm", default: "Delete this set? Existing Vertos keep their snapshot.") },
-              form: { style: "margin:0;" },
-              style: "padding:9px 16px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.18);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" do %>
-          <%= t("common_questions.delete", default: "Delete") %>
+        <%# Every form on this page changes the set, and a viewer changes
+            nothing: they get the questions as text and the results link.
+            CommonQuestionSetsController refuses the endpoints on the same
+            answer, so this is the courtesy half, not the enforcement. %>
+        <% if can_edit_vertos? %>
+          <%= button_to common_question_set_path(@set), method: :delete,
+                data: { turbo_confirm: t("common_questions.delete_confirm", default: "Delete this set? Existing Vertos keep their snapshot.") },
+                form: { style: "margin:0;" },
+                style: "padding:9px 16px;border-radius:100px;background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.18);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;" do %>
+            <%= t("common_questions.delete", default: "Delete") %>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -54,6 +60,17 @@
         <div style="display:flex;gap:14px;padding:16px 18px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
           <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(97,91,245,0.18);color:#615BF5;display:flex;align-items:center;justify-content:center;font-family:'Alata',sans-serif;font-size:14px;font-weight:700;"><%= format('%02d', i + 1) %></div>
 
+          <% unless can_edit_vertos? %>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:#fff;line-height:1.5;"><%= q.text %></div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
+                <span><%= CardTypes.pickable.dig(q.card_type, "picker_name") || q.card_type %></span>
+                <% if q.options.present? %>
+                  <span style="font-size: var(--text-2xs);color:rgba(255,255,255,0.4);"><%= q.options.size %> options</span>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
           <%= form_with url: update_question_common_question_set_path(@set, question_id: q.id), method: :patch,
                 html: { style: "flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;" } do %>
             <textarea name="text" rows="2"
@@ -82,6 +99,7 @@
                 form: { style: "margin:0;align-self:flex-start;" },
                 style: "background:transparent;color:rgba(255,255,255,0.4);border:none;font-size:18px;cursor:pointer;line-height:1;padding:4px 8px;",
                 title: t("common_questions.delete_question", default: "Delete question") do %>×<% end %>
+          <% end %>
         </div>
       <% end %>
 
@@ -93,15 +111,17 @@
     </div>
 
     <%# ── Add question form ── %>
-    <%= form_with url: add_question_common_question_set_path(@set), method: :post,
-          html: { style: "display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;" } do %>
-      <textarea name="text" rows="2"
-                placeholder="<%= t('common_questions.add_placeholder', default: 'Type a new question — we\'ll pick the best answer type.') %>"
-                style="flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;resize:vertical;line-height:1.5;"></textarea>
-      <button type="submit"
-              style="padding:12px 22px;border-radius:100px;background:#615BF5;color:#fff;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;align-self:flex-start;">
-        <%= t("common_questions.add_question", default: "Add question") %>
-      </button>
+    <% if can_edit_vertos? %>
+      <%= form_with url: add_question_common_question_set_path(@set), method: :post,
+            html: { style: "display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;" } do %>
+        <textarea name="text" rows="2"
+                  placeholder="<%= t('common_questions.add_placeholder', default: 'Type a new question — we\'ll pick the best answer type.') %>"
+                  style="flex:1;min-width:240px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 14px;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);outline:none;resize:vertical;line-height:1.5;"></textarea>
+        <button type="submit"
+                style="padding:12px 22px;border-radius:100px;background:#615BF5;color:#fff;border:none;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);cursor:pointer;align-self:flex-start;">
+          <%= t("common_questions.add_question", default: "Add question") %>
+        </button>
+      <% end %>
     <% end %>
 
     <%# ── Affected Vertos ── %>
@@ -113,7 +133,9 @@
         </p>
         <div style="display:flex;flex-direction:column;gap:6px;">
           <% @affected_surveys.each do |s| %>
-            <%= link_to survey_path(s),
+            <%# The editor for anyone who can edit; a viewer's door into a
+                Verto is its results, the same as the command palette. %>
+            <%= link_to (can_edit_vertos? ? survey_path(s) : survey_results_path(s)),
                   style: "display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;" do %>
               <span><%= s.title.presence || s.theme.presence || "Untitled Verto" %></span>
               <span style="color:rgba(255,255,255,0.4);font-size: var(--text-2xs);"><%= s.publish_token.present? ? "Live" : "Draft" %></span>

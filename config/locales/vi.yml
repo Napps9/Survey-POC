@@ -206,6 +206,8 @@ vi:
     repeat_new_password: Nhập lại mật khẩu mới
     set_submit: Lưu mật khẩu mới
   results:
+    share_paused_by_admin: "Đã bị quản trị viên tạm dừng — liên kết sẽ hoạt động trở lại khi họ tiếp tục."
+    share_not_enabled: "Chưa được chia sẻ — quản trị viên của tài khoản bạn có thể bật chia sẻ kết quả."
     title: Kết quả
     editor: "← Trình chỉnh sửa"
     ask_verto: Hỏi Verto
@@ -287,6 +289,7 @@ vi:
     tokens_welcome_note: "Bạn sẽ nhận điểm khi trả lời mỗi câu hỏi — bạn không thể quay lại và đổi câu trả lời để nhận thêm điểm."
     leaderboard_teaser: "Người gom nhiều điểm nhất sẽ vào bảng xếp hạng ở cuối!"
     play_again: "Chơi lại"
+    next_person: "Người tiếp theo"
     font_size: "Cỡ chữ"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
@@ -383,6 +386,7 @@ vi:
       leaderboard_queued: "Bạn sẽ có mặt trên bảng ngay khi trực tuyến trở lại — điểm của bạn đã được lưu."
       leaderboard_empty: "Hãy là người đầu tiên trên bảng!"
       already_played: "Bạn đã chơi Verto này rồi — đây là bảng xếp hạng hiện tại."
+      already_played_plain: "Bạn đã hoàn thành Verto này rồi — cảm ơn bạn."
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
@@ -657,6 +661,7 @@ vi:
     switch_workspace: "Chuyển không gian làm việc"
     role_admin: "Quản trị viên"
     role_member: "Thành viên"
+    role_viewer: "Người xem"
     members: Thành viên
     sign_out: Đăng xuất
   partnerships:
@@ -1112,6 +1117,7 @@ vi:
     remove: 'Gỡ bỏ'
     animation_theme: "Hoạt ảnh"
     live_locked_bar: "Verto này đang hoạt động — câu hỏi bị khóa để bảo vệ chất lượng dữ liệu."
+    live_edit_bar: "Chỉnh sửa Verto đang hoạt động — di chuyển, thêm hoặc xóa câu hỏi sẽ làm phản hồi đã thu thập gắn sai câu hỏi."
     live_results: "Xem kết quả →"
     publish_confirm: "Đăng Verto này? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     questions: câu hỏi
@@ -1135,6 +1141,7 @@ vi:
     add_design_sub: Thêm hình ảnh để thẻ này sống động hơn
     live: TRỰC TIẾP
     live_warning: "Verto này đang hoạt động nên các câu hỏi đã bị khóa — mọi người trả lời đúng cùng một Verto, giúp kết quả luôn so sánh được. Cần thay đổi? Hãy tạo Verto mới."
+    live_edit_warning: "Verto này đang hoạt động, nhưng tài khoản của bạn vẫn có thể chỉnh sửa. Câu trả lời được lưu theo vị trí của từng câu hỏi, nên việc thêm, xóa hoặc đổi thứ tự câu hỏi sẽ làm các phản hồi đã thu thập bị gán sang câu hỏi khác, còn việc sửa lời một lựa chọn sẽ làm thay đổi khóa câu trả lời mà lựa chọn đó đã được ghi nhận theo. Hãy sửa câu chữ tại chỗ khi có thể — nếu bản thân các câu hỏi cần thay đổi, tạo Verto mới sẽ giữ nguyên kết quả của Verto này."
     got_it: Đã hiểu
     add_question: Thêm câu hỏi
     cards:
@@ -1305,6 +1312,7 @@ vi:
     empty_cta: Tạo Verto đầu tiên của bạn →
     empty_title_managed: "Chưa có Verto nào"
     empty_body_managed: "Nhóm Playverto của bạn đăng Vertos tại đây. Chúng sẽ xuất hiện ngay khi cái đầu tiên sẵn sàng."
+    empty_body_viewer: "Vertos của nhóm bạn sẽ xuất hiện tại đây ngay khi cái đầu tiên được tạo — sẵn sàng để bạn chia sẻ và xem kết quả."
     section_live: Trực tiếp
     section_drafts: Bản nháp
     section_archived: Đã lưu trữ
@@ -1677,6 +1685,7 @@ vi:
       no_organisation: "Không tìm thấy tổ chức nào."
       not_authorised: "Không có quyền."
       verto_creation_disabled: "Tài khoản của bạn không tạo Vertos — nhóm Playverto sẽ tạo giúp bạn."
+      viewer_read_only: "Người xem có thể chia sẻ Vertos và xem kết quả, nhưng không thể tạo hoặc chỉnh sửa chúng."
     partnership_common_question_sets:
       creator_only: "Chỉ người tạo nhóm đối tác mới có thể làm điều đó."
       partnership_not_found: "Không tìm thấy nhóm đối tác."

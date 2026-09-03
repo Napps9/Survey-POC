@@ -2142,6 +2142,9 @@
 }
 .token-reveal.is-earned { background: rgba(1,234,203,0.10); border-color: rgba(1,234,203,0.38); }
 .token-reveal.is-none   { background: rgba(0,0,0,0.04);     border-color: rgba(0,0,0,0.10); }
+/* A net loss (tokens as lives): the same box, tinted the other way. */
+.token-reveal.is-lost   { background: rgba(220,38,38,0.08);  border-color: rgba(220,38,38,0.32); }
+.token-reveal.is-lost .token-reveal-head { color: #B42318; }
 .token-reveal-head {
   font-family: "Alata", sans-serif; font-size: 14px; letter-spacing: 0.02em;
   color: #0B7F6E;
@@ -2564,6 +2567,16 @@
 }
 .choice-list-label { flex: 1; }
 .choice-list-tick { margin-left: auto; }
+/* "Show the points on each answer" (Survey#token_amounts_shown): what an
+   option is worth, beside its label, before it is picked. A sibling of the
+   label, not inside it (see _card_component's token_badge). */
+.token-option-badge {
+  display: inline-flex; align-items: center; flex-shrink: 0;
+  white-space: nowrap;
+  padding: 2px 8px; border-radius: 999px;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 16px;
+  color: #1C2034; background: rgba(0,0,0,0.06);
+}
 
 /* ── Long option lists (7+) ────────────────────────
    COUNT_RULES flags 6+ in the editor, but imported decks legitimately exceed
@@ -2805,6 +2818,13 @@
   font-weight: 700;
 }
 .choice-card[data-selected="true"] .choice-tick { display: flex; }
+/* On a grid tile the badge is an overlay in the top-left corner (the tick
+   owns the top-right), so the tile's geometry is untouched. */
+.choice-card-bg .token-option-badge {
+  position: absolute; left: 8px; top: 8px;
+  font-size: 11px; padding: 1px 7px;
+  background: rgba(255,255,255,0.9); box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
 /* Per-type accents: single-pick grids show a radio-style ring on every tile
    at rest, multi-pick grids a checkbox-style square — the dot/square metaphor
    of the list types, visible before any selection. Filled on pick. */
@@ -10382,9 +10402,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "Alata", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.75);
   min-width: 1.5em; text-align: end;
 }
+/* Name plus, with two or more token types, the per-type breakdown under it.
+   The column takes the row's flexible width; the name keeps its ellipsis. */
+.leaderboard-who {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;
+}
 .leaderboard-name {
   font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: #fff;
-  flex: 1; min-width: 0; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Every type's total ("🪙 500,000 · ⚫ 3") beneath the name, so a board
+   ranked by one type still shows the others. 0.75 alpha like the rank
+   numeral: the smallest text on the board, held to the same margin. */
+.leaderboard-breakdown {
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.75);
+  text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .leaderboard-you-badge {
   font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.06em;
@@ -10392,7 +10424,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   background: var(--brand-cta, #01EACB); border-radius: 100px;
   padding: 1px 8px; margin-inline-start: 8px; vertical-align: middle;
 }
-.leaderboard-total { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; }
+.leaderboard-total { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; white-space: nowrap; }
 /* The break between the visible top of the board and your own appended row
    (aria-hidden "⋯" — decorative, but held to the text floor anyway so it
    never reads as a smudge). */

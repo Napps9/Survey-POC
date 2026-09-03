@@ -206,6 +206,8 @@ pl:
     repeat_new_password: Powtórz nowe hasło
     set_submit: Zapisz nowe hasło
   results:
+    share_paused_by_admin: "Wstrzymane przez administratora — link znów zadziała, gdy je wznowi."
+    share_not_enabled: "Jeszcze nieudostępnione — administrator Twojego konta może włączyć udostępnianie wyników."
     title: Wyniki
     editor: "← Edytor"
     ask_verto: Zapytaj Verto
@@ -287,6 +289,7 @@ pl:
     tokens_welcome_note: "Będziesz zdobywać punkty za każdą odpowiedź — nie możesz cofnąć się i zmienić odpowiedzi, aby zdobyć ich więcej."
     leaderboard_teaser: "Najlepsi zbieracze punktów trafiają na koniec do rankingu!"
     play_again: "Zagraj jeszcze raz"
+    next_person: "Następna osoba"
     font_size: "Rozmiar tekstu"
   defaults:
     range: ["Zdecydowanie się nie zgadzam", "Nie zgadzam się", "Neutralnie", "Zgadzam się", "Zdecydowanie się zgadzam"]
@@ -383,6 +386,7 @@ pl:
       leaderboard_queued: "Znajdziesz się w rankingu, gdy wrócisz online — twój wynik jest zapisany."
       leaderboard_empty: "Bądź pierwszą osobą w rankingu!"
       already_played: "Ten Verto masz już za sobą — tak wygląda ranking."
+      already_played_plain: "Ten Verto został już przez Ciebie wypełniony — dziękujemy."
     editor:
       delete_card_confirm: Usunąć tę kartę?
       save_to_library: "Zapisz też w mojej bibliotece marki"
@@ -657,6 +661,7 @@ pl:
     switch_workspace: "Zmień przestrzeń roboczą"
     role_admin: "Administrator"
     role_member: "Członek"
+    role_viewer: "Przeglądający"
     members: Członkowie
     sign_out: Wyloguj się
   partnerships:
@@ -1114,6 +1119,7 @@ pl:
     remove: 'Usuń'
     animation_theme: "Animacja"
     live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."
+    live_edit_bar: "Edycja Verto na żywo — przenoszenie, dodawanie lub usuwanie pytań zmieni przypisanie zebranych odpowiedzi."
     live_results: "Zobacz wyniki →"
     publish_confirm: "Opublikować to Verto? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     questions: pytań
@@ -1137,6 +1143,7 @@ pl:
     add_design_sub: Dodaj obraz, aby ożywić tę kartę
     live: NA ŻYWO
     live_warning: "To Verto jest na żywo, więc jego pytania są zablokowane — każdy respondent odpowiada na dokładnie to samo Verto, dzięki czemu wyniki pozostają porównywalne. Potrzebujesz zmian? Utwórz nowe Verto."
+    live_edit_warning: "To Verto jest na żywo, a Twoje konto może je mimo to edytować. Odpowiedzi są zapisywane według pozycji każdego pytania, więc dodanie, usunięcie lub zmiana kolejności pytań przypisze już zebrane odpowiedzi do innych pytań, a przeredagowanie opcji zmienia klucz odpowiedzi, pod którym została ona zapisana. Tam, gdzie to możliwe, poprawiaj sformułowania bezpośrednio w istniejących pytaniach — jeśli trzeba zmienić same pytania, nowe Verto pozostawi wyniki obecnego nienaruszone."
     got_it: Rozumiem
     add_question: Dodaj pytanie
     cards:
@@ -1307,6 +1314,7 @@ pl:
     empty_cta: Utwórz swoje pierwsze Verto →
     empty_title_managed: "Nie ma jeszcze żadnych Vertos"
     empty_body_managed: "Zespół Playverto publikuje tutaj Vertos. Pojawią się, gdy tylko pierwszy będzie gotowy."
+    empty_body_viewer: "Vertos Twojego zespołu pojawią się tutaj, gdy tylko powstanie pierwszy — gotowe do udostępnienia i sprawdzenia wyników."
     section_live: Na żywo
     section_drafts: Wersje robocze
     section_archived: Zarchiwizowane
@@ -1684,6 +1692,7 @@ pl:
       no_organisation: "Nie znaleziono organizacji."
       not_authorised: "Brak uprawnień."
       verto_creation_disabled: "Twoje konto nie tworzy Vertos — tworzy je dla Ciebie zespół Playverto."
+      viewer_read_only: "Przeglądający mogą udostępniać Vertos i widzieć ich wyniki, ale nie mogą ich tworzyć ani edytować."
     partnership_common_question_sets:
       creator_only: "Może to zrobić tylko twórca partnerstwa."
       partnership_not_found: "Nie znaleziono partnerstwa."

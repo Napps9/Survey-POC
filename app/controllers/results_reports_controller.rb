@@ -5,6 +5,12 @@
 class ResultsReportsController < ApplicationController
   include GeneratesResultsReport
 
+  # Reading the report (and having one generated) is seeing results, which
+  # every role does. Rewriting its text by hand is editing, which a viewer
+  # doesn't — the results page draws no Edit button for them, and this is the
+  # half that holds when the button isn't there.
+  gate_verto_editing only: %i[ update ]
+
   # Persist an edited report. Syncing results_report_response_count to the
   # CURRENT completed count is what keeps the edit alive: the count-keyed cache
   # only regenerates (overwriting the edit) once responses genuinely change

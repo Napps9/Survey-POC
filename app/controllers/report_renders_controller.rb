@@ -47,6 +47,15 @@ class ReportRendersController < ApplicationController
 
   private
 
+  # Every action here answers a fetch that parses JSON. The default for a
+  # missing session is a redirect to the sign-in page, which fetch follows
+  # and hands the modal as HTML — "Unexpected token '<'" is what a creator
+  # saw when their session lapsed with the report open. Say what happened.
+  def request_authentication
+    render json: { ok: false, error: "Your session has expired — reload the page and sign in again." },
+           status: :unauthorized
+  end
+
   def job_for(kind)
     kind == "infographic" ? RenderInfographicJob : RenderReportPdfJob
   end

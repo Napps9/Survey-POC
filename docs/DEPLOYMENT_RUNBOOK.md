@@ -240,3 +240,20 @@ can't be changed after the fact.
    `before_send` hook in `config/initializers/sentry.rb` strips it —
    confirm this, since respondent birth date/location must never appear in
    a captured event).
+
+## 6. Editing a live Verto (the owner's override)
+
+A live or answered Verto's deck is frozen for everyone (`Survey#editing_locked?`
+— answers are keyed by card position, so a structural edit re-points them),
+except for the accounts in `LIVE_EDIT_USER_EMAILS` (`app/lib/live_edit_access.rb`).
+Unlike the Blazer allowlist this one has a **default — `nick@playverto.com`** —
+so the owner's override works without anything being set in Render. Setting the
+variable replaces that default outright: a comma/space-separated list widens or
+narrows it, an empty value switches the override off for everyone. The account
+must also have a **verified email address** (the same proof publishing needs):
+sign-up is open, so on a database without the owner's row the default address
+could otherwise be claimed by whoever registered it first. It grants nothing
+else: organisation scoping is unchanged, and the primary-language switch stays
+locked because the model refuses it itself. An allowed account sees an amber
+"editing a live Verto" bar and a warning modal in place of the lock; the risk
+it describes is real, so keep the list short.

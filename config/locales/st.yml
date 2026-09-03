@@ -216,6 +216,8 @@ st:
     repeat_new_password: "Pheta phasewete e ntjha"
     set_submit: "Boloka phasewete e ntjha"
   results:
+    share_paused_by_admin: "E emisitswe ke motsamaisi — sehokelo se tla sebetsa hape hang ha a se tsosolosa."
+    share_not_enabled: "Ha e so arolelanwe — motsamaisi wa akhaonto ya hao a ka bulela ho arolelana diphetho."
     title: "Diphetho"
     editor: "← Mohlophisi"
     ask_verto: "Botsa Verto"
@@ -297,6 +299,7 @@ st:
     tokens_welcome_note: "O tla fumana lintlha ha o araba potso ka nngwe — o ke ke wa kgutla morao wa fetola karabo ho fumana tse ding tse ngata."
     leaderboard_teaser: "Bobokelli ba lintlha tse phahameng ba fihla lethathamong la baetapele qetellong!"
     play_again: "Bapala hape"
+    next_person: "Motho e latelang"
     font_size: "Boholo ba mongolo"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
@@ -399,6 +402,7 @@ st:
       leaderboard_queued: "O tla hlaha lethathamong hang ha o kgutlela inthaneteng — lintlha tsa hao di bolokilwe."
       leaderboard_empty: "Eba wa pele lethathamong!"
       already_played: "O se o bapetse Verto ena — sena ke kamoo lethathamo le emeng kateng."
+      already_played_plain: "O se o phethile Verto ena — rea leboha."
     editor:
       delete_card_confirm: "Hlakola karete ena?"
       save_to_library: "Boloka hape polokelong ya letshwao la ka"
@@ -673,6 +677,7 @@ st:
     switch_workspace: "Fetola sebaka sa mosebetsi"
     role_admin: "Molaodi"
     role_member: "Setho"
+    role_viewer: "Mosheba"
     members: "Ditho"
     sign_out: "Tswa"
   partnerships:
@@ -1134,6 +1139,7 @@ st:
     remove: 'Tlosa'
     animation_theme: "Motsamao"
     live_locked_bar: "Verto ena e a phela — dipotso di notlelehile ho sireletsa boleng ba datha."
+    live_edit_bar: "O fetola Verto e phelang — ho suthisa, ho eketsa kapa ho tlosa dipotso ho fetola moo dikarabo tse bokelletsweng di supang."
     live_results: "Sheba diphetho →"
     publish_confirm: "Phatlalatsa Verto ena? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     questions: "dipotso"
@@ -1157,6 +1163,7 @@ st:
     add_design_sub: "Kenya setshwantsho ho fa karete ena bophelo"
     live: "E A PHELA"
     live_warning: "Verto ena e a phela, kahoo dipotso tsa yona di notlelehile — moarabi ka mong o araba Verto e tshwanang ka botlalo, e leng se etsang hore diphetho tsa hao di dule di ka bapiswa. O hloka diphetoho? Theha Verto e ntjha."
+    live_edit_warning: "Verto ena e a phela, mme akhaonto ya hao e ka e fetola leha ho le jwalo. Dikarabo di bolokwa ho ya ka sebaka sa potso ka nngwe, kahoo ho kenya, ho tlosa kapa ho hlophisa dipotso hape ho lebisa dikarabo tse seng di bokelletswe dipotsong tse ding, mme ho fetola mantswe a khetho ho fetola lebitso la karabo leo e ngodisitsweng ka tlasa lona. Lokisa mantswe hona moo a leng teng ha o kgona — haeba dipotso ka botsona di hloka ho fetoha, Verto e ntjha e boloka diphetho tsa ena di sa angwa."
     got_it: "Ke Utlwisitse"
     add_question: "Kenya potso"
     cards:
@@ -1327,6 +1334,7 @@ st:
     empty_cta: "Theha Verto ya hao ya pele →"
     empty_title_managed: "Ha ho diVerto ho fihlela jwale"
     empty_body_managed: "Sehlopha sa hao sa Playverto se phatlalatsa diVerto mona. Di tla hlaha hang ha ya pele e loketse."
+    empty_body_viewer: "DiVerto tsa sehlopha sa hao di tla hlaha mona hang ha ya pele e thehilwe — di loketse hore o di arolelane le ho bona diphetho."
     section_live: "E A Phela"
     section_drafts: "Meralo"
     section_archived: "Tse Bolokilweng"
@@ -1715,6 +1723,7 @@ st:
       no_organisation: "Ha ho mokgatlo o fumanweng."
       not_authorised: "Ha o na tumello."
       verto_creation_disabled: "Akhaonto ya hao ha e thehe diVerto — sehlopha sa hao sa Playverto se di u thehela."
+      viewer_read_only: "Basheba ba ka arolelana diVerto le ho bona diphetho tsa tsona, empa ba ke ke ba di theha kapa ba di fetola."
     partnership_common_question_sets:
       creator_only: "Ke motheha wa selekane feela ya ka etsang seo."
       partnership_not_found: "Selekane ha se a fumanwa."

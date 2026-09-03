@@ -13,7 +13,7 @@
   <div class="flow-warnings" data-flows-target="warnings" style="display:none;"></div>
   <div class="flow-list" data-flows-target="list"></div>
   <div class="flow-legacy" data-flows-target="legacy" style="display:none;"></div>
-  <% unless @survey.editing_locked? %>
+  <% unless editing_locked?(@survey) %>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button type="button" class="flow-new-btn" data-action="click->flows#newFlow">＋ <%= t("editor.flows_new") %></button>
       <button type="button" class="flow-new-btn" data-action="click->flows#openGenerate">✨ <%= t("editor.flows_generate") %></button>

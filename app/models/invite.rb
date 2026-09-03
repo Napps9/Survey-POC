@@ -10,6 +10,12 @@ class Invite < ApplicationRecord
 
   validates :partnership, presence: true, if: :partner?
   validates :funder, presence: true, if: :licensee?
+  # The role an accepted invite mints (InvitesController#accept_member_invite
+  # copies it straight onto the membership). The controller already whitelists
+  # what it accepts; this is the model's own word on it, so an invite written
+  # by any other path can't carry a role the membership constraint would then
+  # refuse at the worst moment — when the invitee clicks the link.
+  validates :role, inclusion: { in: Membership::ROLES }
 
   # Defence in depth for P1-10. Every controller that creates an invite already
   # downcases first, and User carries the same declaration — which in Rails 8

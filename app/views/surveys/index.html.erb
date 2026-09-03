@@ -242,7 +242,16 @@
           <div>
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-3xl);color:#fff;margin-bottom:8px;"><%= can_create_vertos? ? t("dashboard.empty_title") : t("dashboard.empty_title_managed") %></div>
             <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-md);color:rgba(255,255,255,0.4);max-width:320px;line-height:1.6;">
-              <%= can_create_vertos? ? t("dashboard.empty_body") : t("dashboard.empty_body_managed") %>
+              <%# Three readings of "nothing here yet": create one (a creator),
+                  wait for Playverto (a managed account), wait for a colleague
+                  (a viewer, whose own account may well be able to create). %>
+              <% if can_create_vertos? %>
+                <%= t("dashboard.empty_body") %>
+              <% elsif can_edit_vertos? %>
+                <%= t("dashboard.empty_body_managed") %>
+              <% else %>
+                <%= t("dashboard.empty_body_viewer") %>
+              <% end %>
             </div>
           </div>
           <%# No CTA for a managed account. The absence is the message: an empty

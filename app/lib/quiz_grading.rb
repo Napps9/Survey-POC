@@ -52,6 +52,12 @@ module QuizGrading
       tap_correct?(correct, value, TapScales.keys_for(card))
     when *SCALES
       return false if blank_value?(value)
+      # Only a number (or the string of one) can be graded against a scale. An
+      # array or hash here is an answer to whatever card used to sit at this
+      # index — possible once a deck is edited under the live-edit override
+      # (LiveEditAccess) — and Array#to_i would 500 /progress and /submit for
+      # every respondent mid-run. Wrong-shaped is simply not correct.
+      return false unless value.is_a?(Numeric) || value.is_a?(String)
       (value.to_i - correct.to_i).abs <= card["correct_tolerance"].to_i
     when "open_ended"
       return false if value.to_s.strip.empty?

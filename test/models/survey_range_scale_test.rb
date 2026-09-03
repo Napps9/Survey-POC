@@ -175,6 +175,22 @@ class SurveyRangeScaleTest < ActiveSupport::TestCase
     assert_equal 4, s.reload.cards[0]["options"].size
   end
 
+  # Same invariant once the Verto is CLOSED (taken down after collecting
+  # answers): the guard is editing_locked?, not published?, because an account
+  # LiveEditAccess allows past the lock can save such a deck — and the answers
+  # already stored against this card must not be re-pointed by a normaliser
+  # touching a card the editor didn't.
+  test "a closed Verto's scale is left alone too" do
+    s = survey_with([ range(%w[SD D A SA]) ], published: true)
+    s.responses.create!(session_token: SecureRandom.uuid, answers: { "0" => { "value" => 2 } },
+                        answered: true, status: "completed")
+    s.update!(unpublished_at: Time.current)
+    assert s.closed?
+
+    s.update!(cards: [ range(%w[SD D A SA]), { "type" => "open_ended", "text" => "Why?" } ])
+    assert_equal 4, s.reload.cards[0]["options"].size
+  end
+
   test "saving an unrelated attribute does not rewrite the cards" do
     s = survey_with([ range(%w[SD D N A SA]) ])
     before = s.reload.cards

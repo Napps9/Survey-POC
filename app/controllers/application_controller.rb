@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Authentication
   include OrganisationScope
+  include LiveEditing
   allow_browser versions: :modern
 
   around_action :switch_locale

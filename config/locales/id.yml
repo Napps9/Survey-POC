@@ -206,6 +206,8 @@ id:
     repeat_new_password: Ulangi kata sandi baru
     set_submit: Simpan kata sandi baru
   results:
+    share_paused_by_admin: "Dijeda oleh admin — tautan akan berfungsi lagi begitu mereka melanjutkannya."
+    share_not_enabled: "Belum dibagikan — admin akun Anda dapat mengaktifkan berbagi hasil."
     title: Hasil
     editor: "← Editor"
     ask_verto: Tanya Verto
@@ -287,6 +289,7 @@ id:
     tokens_welcome_note: "Kamu akan mendapatkan poin setiap menjawab pertanyaan — kamu tidak bisa kembali dan mengubah jawaban untuk mendapatkan lebih banyak."
     leaderboard_teaser: "Pengumpul poin terbanyak masuk papan peringkat di akhir!"
     play_again: "Main lagi"
+    next_person: "Orang berikutnya"
     font_size: "Ukuran teks"
   defaults:
     range: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"]
@@ -383,6 +386,7 @@ id:
       leaderboard_queued: "Kamu akan masuk papan begitu kembali online — skormu sudah tersimpan."
       leaderboard_empty: "Jadilah yang pertama di papan!"
       already_played: "Kamu sudah memainkan Verto ini — beginilah papan saat ini."
+      already_played_plain: "Anda sudah mengisi Verto ini — terima kasih."
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
@@ -657,6 +661,7 @@ id:
     switch_workspace: "Ganti ruang kerja"
     role_admin: "Admin"
     role_member: "Anggota"
+    role_viewer: "Pelihat"
     members: Anggota
     sign_out: Keluar
   partnerships:
@@ -1112,6 +1117,7 @@ id:
     remove: 'Hapus'
     animation_theme: "Animasi"
     live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."
+    live_edit_bar: "Mengedit Verto yang live — memindah, menambah atau menghapus pertanyaan akan menggeser tanggapan yang sudah terkumpul."
     live_results: "Lihat hasil →"
     publish_confirm: "Terbitkan Verto ini? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     questions: pertanyaan
@@ -1135,6 +1141,7 @@ id:
     add_design_sub: Tambahkan gambar untuk menghidupkan kartu ini
     live: LIVE
     live_warning: "Verto ini sedang live, jadi pertanyaannya terkunci — setiap responden menjawab Verto yang persis sama, sehingga hasilmu tetap sebanding. Perlu perubahan? Buat Verto baru."
+    live_edit_warning: "Verto ini sedang live, dan akunmu tetap bisa mengeditnya. Jawaban disimpan berdasarkan posisi tiap pertanyaan, jadi menambah, menghapus, atau mengubah urutan pertanyaan akan mengalihkan tanggapan yang sudah terkumpul ke pertanyaan yang salah, dan mengubah kata-kata sebuah opsi akan mengubah label jawaban yang dipakai saat tanggapan itu dicatat. Perbaiki kata-katanya langsung di tempat bila bisa — jika pertanyaannya sendiri perlu diubah, Verto baru akan menjaga hasil Verto ini tetap utuh."
     got_it: Mengerti
     add_question: Tambah pertanyaan
     cards:
@@ -1305,6 +1312,7 @@ id:
     empty_cta: Buat Verto pertama Anda →
     empty_title_managed: "Belum ada Verto"
     empty_body_managed: "Tim Playverto Anda menerbitkan Vertos di sini. Semuanya akan muncul begitu yang pertama siap."
+    empty_body_viewer: "Vertos tim Anda akan muncul di sini begitu yang pertama dibuat — siap untuk Anda bagikan dan lihat hasilnya."
     section_live: Live
     section_drafts: Draf
     section_archived: Diarsipkan
@@ -1677,6 +1685,7 @@ id:
       no_organisation: "Tidak ada organisasi yang ditemukan."
       not_authorised: "Tidak diizinkan."
       verto_creation_disabled: "Akun Anda tidak membuat Vertos — tim Playverto Anda yang membuatnya untuk Anda."
+      viewer_read_only: "Pelihat dapat membagikan Vertos dan melihat hasilnya, tetapi tidak dapat membuat atau mengeditnya."
     partnership_common_question_sets:
       creator_only: "Hanya pembuat kemitraan yang dapat melakukan itu."
       partnership_not_found: "Kemitraan tidak ditemukan."

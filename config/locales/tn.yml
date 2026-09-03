@@ -216,6 +216,8 @@ tn:
     repeat_new_password: "Boeletsa lefoko-sephiri le lesha"
     set_submit: "Boloka lefoko-sephiri le lesha"
   results:
+    share_paused_by_admin: "E emisitswe ke motsamaisi — kgokelo e tla dira gape fela fa a e tswelela."
+    share_not_enabled: "Ga e ise e abelanwe — motsamaisi wa akhaonto ya gago a ka bulela go abelana dipholo."
     title: "Diphetho"
     editor: "← Sefetodi"
     ask_verto: "Ask Verto"
@@ -297,6 +299,7 @@ tn:
     tokens_welcome_note: "O tla fitlhela dintlha fa o araba potso nngwe le nngwe — o ka se kgone go boela morago wa fetola karabo go fitlhela tse dingwe."
     leaderboard_teaser: "Bakgobokantshi ba dintlha tse dintsi ba tsena mo lenaaneng la baetapele kwa bokhutlong!"
     play_again: "Tshameka gape"
+    next_person: "Motho yo o latelang"
     font_size: "Bogolo jwa mokwalo"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
@@ -399,6 +402,7 @@ tn:
       leaderboard_queued: "O tla nna mo lenaaneng fa o sena go boa mo inthaneteng — dintlha tsa gago di bolokilwe."
       leaderboard_empty: "Nna wa ntlha mo lenaaneng!"
       already_played: "O setse o tshamekile Verto e — ke ka fa lenaane le eme ka teng."
+      already_played_plain: "O setse o feditse Verto e — re a leboga."
     editor:
       delete_card_confirm: "Phimola karata e?"
       save_to_library: "Boloka gape mo laeboraring ya me ya letshwao"
@@ -673,6 +677,7 @@ tn:
     switch_workspace: "Fetola lefelo la tiro"
     role_admin: "Molaodi"
     role_member: "Leloko"
+    role_viewer: "Molebi"
     members: "Maloko"
     sign_out: "Tswa"
   partnerships:
@@ -1134,6 +1139,7 @@ tn:
     remove: 'Tlosa'
     animation_theme: "Tshakgamiso"
     live_locked_bar: "Verto e e teng mo tirisong — dipotso di tswaletswe go sireletsa boleng jwa data."
+    live_edit_bar: "O baakanya Verto e e teng mo tirisong — go sutisa, go oketsa kgotsa go tlosa dipotso go tlhakanya dikarabo tse di kgobokantsweng."
     live_results: "Bona diphetho →"
     publish_confirm: "Phasaladitsa Verto e? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     questions: "dipotso"
@@ -1157,6 +1163,7 @@ tn:
     add_design_sub: "Oketsa setshwantsho go tlisa botshelo mo karateng e"
     live: "E TSHEDILE"
     live_warning: "Verto e e teng mo tirisong, ka jalo dipotso tsa yona di tswaletswe — moarabi mongwe le mongwe o araba Verto e le nngwe tota, mme se boloka diphetho tsa gago di kgona go bapisiwa. O tlhoka diphetogo? Tlhama Verto e ntšha."
+    live_edit_warning: "Verto e e teng mo tirisong, mme akhaonto ya gago e kgona go e baakanya le fa go ntse jalo. Dikarabo di bolokwa go ya ka boemo jwa potso nngwe le nngwe, ka jalo go oketsa, go tlosa kgotsa go rulaganya dipotso gape go dira gore dikarabo tse di setseng di kgobokantswe di supe dipotso tse di sa siamang, mme go fetola mafoko a tlhopho go fetola leina la karabo le dikarabo di neng di kwadilwe ka fa tlase ga lone. Baakanya mafoko mo a leng teng fa o kgona — fa dipotso ka botsona di tlhoka go fetoga, Verto e ntšha e boloka diphetho tsa eno di sa amiwa."
     got_it: "Ke a tlhaloganya"
     add_question: "Oketsa potso"
     cards:
@@ -1327,6 +1334,7 @@ tn:
     empty_cta: "Tlhama Verto ya gago ya ntlha →"
     empty_title_managed: "Ga go na Vertos go fitlha jaanong"
     empty_body_managed: "Setlhopha sa gago sa Playverto se phasalatsa Vertos fano. Di tla bonala fela fa ya ntlha e siame."
+    empty_body_viewer: "Vertos tsa setlhopha sa gago di tla bonala fano fela fa ya ntlha e tlhamilwe — di siametse gore o di abelane le go bona dipholo."
     section_live: "E Teng"
     section_drafts: "Dintlhamo"
     section_archived: "Tse di Bolokilweng"
@@ -1715,6 +1723,7 @@ tn:
       no_organisation: "Ga go na mokgatlho o o fitlhetsweng."
       not_authorised: "Ga o na tetlelelo."
       verto_creation_disabled: "Akhaonto ya gago ga e tlhame Vertos — setlhopha sa gago sa Playverto se di go tlhamela."
+      viewer_read_only: "Balebi ba ka abelana Vertos le go bona dipholo tsa tsona, mme ga ba kgone go di tlhama kgotsa go di fetola."
     partnership_common_question_sets:
       creator_only: "Ke motlhami wa kgolagano fela yo o ka dirang seo."
       partnership_not_found: "Kgolagano ga e a fitlhelwa."

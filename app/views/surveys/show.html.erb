@@ -89,13 +89,16 @@
      data-flows-generate-url-value="<%= generate_survey_flow_path(@survey) %>"
      data-survey-editor-logic-config-value="<%= { continue: 'Continue (default flow)', finishPrefix: 'Finish', ends: @survey.end_screens_list.map { |e| { id: e['id'], label: e['title'] } } }.to_json %>"
      data-journey-ends-value="<%= @survey.end_screens_list.map { |e| { id: e['id'], title: e['title'] } }.to_json %>"
-     data-journey-editable-value="<%= !@survey.editing_locked? %>"
+     data-journey-editable-value="<%= !editing_locked?(@survey) %>"
      data-type-panel-quiz-value="<%= @survey.quiz? %>"
      data-type-panel-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-type-panel-logic-value="<%= @survey.logic? %>"
      data-type-panel-default-locale-value="<%= @survey.default_locale %>"
      data-survey-editor-optimise-url-value="<%= optimise_survey_card_path(@survey) %>"
-     data-survey-editor-live-value="<%= @survey.editing_locked? %>"
+     <%# The lock as THIS account sees it (LiveEditing), not the model's own:
+         liveValue is what switches autosave and every structural action off
+         client-side, so an account allowed past the lock needs it false. %>
+     data-survey-editor-live-value="<%= editing_locked?(@survey) %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus setup-status:progress->survey-editor#setupStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncTokenRowsEvent card-editor:changed->survey-editor#syncResponseScaleEvent card-editor:changed->survey-editor#syncMaxChoicesEvent type-panel:changed->survey-editor#syncMaxChoicesEvent focusout->survey-editor#syncBranchingEvent focusout->survey-editor#syncTokenRowsEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
      <%# Define the (potentially large) background data URL ONCE here; the card
@@ -124,10 +127,22 @@
     <%# ── LEFT: Cards column ── %>
     <div class="flex flex-col overflow-hidden" data-controller="device-frame">
 
-      <%# Warns that structural editing is off. Keyed on editing_locked?, not
-          published?: a Verto unpublished AFTER collecting responses stays
-          frozen, because answers are keyed by card index. %>
-      <% if @survey.editing_locked? %>
+      <%# Two lock states, one modal shape. `live_locked` is the lock as THIS
+          account sees it (LiveEditing): the Verto's own lock unless the account
+          is allowed past it. Keyed on editing_locked?, not published?: a Verto
+          unpublished AFTER collecting responses stays frozen, because answers
+          are keyed by card index.
+
+            locked     → the Verto is frozen for this account: structural
+                         editing is off, and the modal says so.
+            live edit  → the Verto IS live/answered but this account may edit
+                         it anyway: the modal warns what a structural change
+                         does to answers already collected, because nothing
+                         else will. %>
+      <% live_locked = editing_locked?(@survey) %>
+      <% live_edit   = !live_locked && @survey.editing_locked? %>
+
+      <% if live_locked || live_edit %>
         <div class="live-warning-overlay"
              data-controller="live-warning"
              data-action="click->live-warning#backdropClick">
@@ -139,7 +154,7 @@
                       data-action="click->live-warning#dismiss" aria-label="Close">✕</button>
             </div>
             <div class="live-warning-body">
-              <%= t("editor.live_warning") %>
+              <%= live_edit ? t("editor.live_edit_warning") : t("editor.live_warning") %>
             </div>
             <div class="live-warning-foot">
               <%= link_to t("editor.live_results"), survey_results_path(@survey),
@@ -152,8 +167,6 @@
         </div>
       <% end %>
 
-      <% live_locked = @survey.editing_locked? %>
-
       <% if live_locked %>
         <%# Live = read-only: a slim lock bar, and the feed below is inert.
             The server rejects every content mutation regardless. %>
@@ -163,6 +176,19 @@
           </span>
           <%= link_to t("editor.live_results"), survey_results_path(@survey),
                 style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#fff;text-decoration:underline;text-underline-offset:3px;" %>
+        </div>
+      <% elsif live_edit %>
+        <%# Live edit override: the same slim bar, in caution amber rather than
+            lock pink, and it stays for the whole session — the modal above can
+            be dismissed, this can't. No results link here: the person came to
+            edit (the modal offers results), and the bar has to stay clear of
+            the pinned Verto-score pill on its right. Everything below renders
+            exactly as it does for a draft; the server accepts the edits. %>
+        <div data-live-edit-bar
+             style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 14px;background:rgba(255,194,75,0.1);border-bottom:1px solid rgba(255,194,75,0.35);">
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FFC24B;">
+            ⚠️ <%= t("editor.live_edit_bar") %>
+          </span>
         </div>
       <% end %>
 
@@ -968,13 +994,23 @@
                 <span>Show what each answer earned as players move on, not just the running total.</span>
               </label>
 
+              <input type="hidden" name="token_amounts_shown" value="0" />
+              <label style="display:flex;align-items:flex-start;gap:10px;margin-top:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                <input type="checkbox" name="token_amounts_shown" value="1"
+                       <%= "checked" if @survey.token_amounts_shown? %>
+                       onchange="this.form.requestSubmit()"
+                       style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                <span>Show the points on each answer before players choose — a small “🪙 5” beside every option that awards something. Off, an answer's value is only revealed after moving on (the switch above).</span>
+              </label>
+
               <input type="hidden" name="token_back_nav_enabled" value="0" />
               <label style="display:flex;align-items:flex-start;gap:10px;margin-top:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
                 <input type="checkbox" name="token_back_nav_enabled" value="1"
                        <%= "checked" if @survey.token_back_nav_enabled? %>
+                       <%= "disabled" if @survey.no_going_back? %>
                        onchange="this.form.requestSubmit()"
                        style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
-                <span>Let players go back and answer a points question they skipped. A question they already answered stays locked either way.</span>
+                <span>Let players go back and answer a points question they skipped. A question they already answered stays locked either way.<% if @survey.no_going_back? %> <em style="color:rgba(255,255,255,0.55);">Off while No going back is on (Publish → While they answer).</em><% end %></span>
               </label>
 
               <input type="hidden" name="token_hud_enabled" value="0" />
@@ -1053,12 +1089,12 @@
               <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0 24px;" do %>
                 <input type="hidden" name="return_tab" value="tokens" />
                 <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:6px;">
-                  When someone plays again<%= " — 🔒 locked while the Verto is live" if live_locked %>
+                  How repeat plays score<%= " — 🔒 locked while the Verto is live" if live_locked %>
                 </div>
                 <% [
-                  [ "accumulate", "Gain points", "Retakes add to their total, so they can climb the board." ],
-                  [ "no_redo",    "No redos",    "One play each. A returning player lands straight on the board." ],
-                  [ "restart",    "Restart points", "A retake wipes their old score and starts over." ]
+                  [ "accumulate", "Gain points",       "Every finished play adds to their total, so they can climb the board." ],
+                  [ "no_redo",    "First run counts",  "Only their first finished play scores. Later plays are kept as answers but don't move the board." ],
+                  [ "restart",    "Latest run counts", "Each finished play replaces their old score." ]
                 ].each do |value, name, hint| %>
                   <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
                     <input type="radio" name="leaderboard_retake_policy" value="<%= value %>"
@@ -1068,6 +1104,38 @@
                            style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
                     <span><strong style="font-weight:normal;color:#fff;"><%= name %></strong> — <%= hint %></span>
                   </label>
+                <% end %>
+                <%# The board is not per wave (TokenLeaderboard reads every completed
+                    run), so a before/after study on a tokenised deck has to pick
+                    its scoring deliberately. %>
+                <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.45);line-height:1.45;">
+                  Whether they can play again at all is set under Publish → Repeat participation &amp; waves (No retests). The board is not per wave: with No retests on, pick Gain points or Latest run counts if a second wave should move it.
+                </div>
+              <% end %>
+
+              <%# What the board ranks by. Only worth asking with two or more
+                  token types — with one, "all" and that type are the same
+                  order. Scoring rule, so it locks with the policy
+                  (SETTINGS_LOCKED_IN_USE); every row shows every type's total
+                  regardless, this only decides the order. %>
+              <% if @survey.token_types.size >= 2 %>
+                <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:14px 0 0 24px;" do %>
+                  <input type="hidden" name="return_tab" value="tokens" />
+                  <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin-bottom:6px;">
+                    Rank the board by<%= " — 🔒 locked while the Verto is live" if live_locked %>
+                  </div>
+                  <% options = [ [ "all", "All points combined", "One total across every token type." ] ] +
+                       @survey.token_types.map { |tt| [ tt["id"], "#{tt['icon']} #{tt['name']}", "Only this type decides the order. The others still show on every row." ] } %>
+                  <% options.each do |value, name, hint| %>
+                    <label style="display:flex;align-items:flex-start;gap:10px;margin-top:8px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+                      <input type="radio" name="leaderboard_rank_by" value="<%= value %>"
+                             <%= "checked" if @survey.leaderboard_rank_by == value %>
+                             <%= "disabled" if live_locked %>
+                             onchange="this.form.requestSubmit()"
+                             style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+                      <span><strong style="font-weight:normal;color:#fff;"><%= name %></strong> — <%= hint %></span>
+                    </label>
+                  <% end %>
                 <% end %>
               <% end %>
             <% end %>
@@ -1264,10 +1332,17 @@
                     style: "width:100%;padding:10px;border-radius:12px;background:transparent;color:#FFC24B;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:1px solid rgba(255,194,75,0.5);cursor:pointer;",
                     form: { style: "margin:0;", data: { turbo_confirm:
                       has_responses ?
-                        "Close this Verto? The link stops working and no new responses come in. Your results are kept, and the questions stay locked." :
+                        (live_edit ?
+                          "Close this Verto? The link stops working and no new responses come in. Your results are kept; your account can still edit the questions, and changes re-point the answers already stored." :
+                          "Close this Verto? The link stops working and no new responses come in. Your results are kept, and the questions stay locked.") :
                         "Unpublish this Verto? The link stops working and it becomes an editable draft again. Publishing later restores the same link." } } %>
               <div style="margin-top:8px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
-                <% if has_responses %>
+                <%# `live_edit` (set beside the lock bar above): for the account
+                    the amber bar is inviting to edit, "the questions stay
+                    locked" would be false — say what is actually true. %>
+                <% if has_responses && live_edit %>
+                  Stops new responses. Results are kept; your account can still edit the questions, and any change re-points the answers already stored against card positions.
+                <% elsif has_responses %>
                   Stops new responses. Results are kept and the questions stay locked, because answers are stored against card positions.
                 <% else %>
                   Nobody has answered yet, so this goes back to a draft you can edit. The same link comes back if you publish again.
@@ -1281,7 +1356,9 @@
               <%= @survey.closed? ? "Closed — not accepting responses" : "Unpublished — back to draft" %>
             </div>
             <div style="margin-bottom:10px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);line-height:1.45;">
-              <% if @survey.closed? %>
+              <% if @survey.closed? && live_edit %>
+                The link is switched off and no new responses come in. Your results are still here; your account can still edit the questions, and any change re-points the answers already stored.
+              <% elsif @survey.closed? %>
                 The link is switched off and no new responses come in. Your results are still here, and the questions stay locked.
               <% else %>
                 The link is switched off and this is an editable draft again.
@@ -1344,6 +1421,26 @@
           <% end %>
         </details>
 
+        <%# Play rules — how respondents may move through the deck. Independent
+            of tokens and the board: the server (PlayerController#locked_merge)
+            enforces them on every Verto. Off by default, and deliberately
+            editable while live (see the presentation-switch loop in
+            SurveysController#update_settings). %>
+        <details class="publish-block">
+          <summary class="publish-block-title">While they answer <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="no_going_back" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="no_going_back" value="1"
+                     <%= "checked" if @survey.no_going_back? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span><strong style="font-weight:normal;color:#fff;">No going back</strong> — once respondents move on from a question their answer is final. The Back button is hidden and a later change is refused by the server. Story pages inside a card can still be re-read.</span>
+            </label>
+            <div class="card-flag-note" style="margin-left:24px;">Applies to every question, points or not.</div>
+          <% end %>
+        </details>
+
         <%# What the respondent can do once they've finished. Both were
             hardcoded on for every published Verto, so both default to ON and
             this panel only lets a creator turn them off — defaulting either to
@@ -1381,7 +1478,12 @@
         <details class="publish-block">
           <summary class="publish-block-title">Language <span class="pub-chev">⌄</span></summary>
 
-          <% primary_locked = live_locked || @survey.responses.exists? %>
+          <%# The MODEL's lock, deliberately, not this account's (live_locked):
+              Survey#switch_primary_locale! refuses a live or answered Verto
+              itself — canonical option labels are the answer key — and the
+              live-edit override (LiveEditing) doesn't reach into the model.
+              Offering the select would only bounce back with language_error. %>
+          <% primary_locked = @survey.editing_locked? %>
           <%= form_with url: survey_languages_path(@survey), method: :post, local: true, style: "margin:0 0 12px;" do %>
             <div style="font-family:'Alata',sans-serif;font-size: var(--text-sm);text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:6px;">Primary language</div>
             <select name="default_locale" onchange="this.form.requestSubmit()"
@@ -1620,6 +1722,30 @@
             <% end %>
           <% end %>
 
+          <%# No retests — one completed run per person per wave. It lives here
+              because both halves of it do: the identity it checks (the code
+              above, else the device) and the reset that re-admits everyone
+              (the wave button below). Survey#retest_basis decides the identity;
+              PlayerController#refuse_if_retest and #eligibility enforce it. %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:12px 0 0;" do %>
+            <input type="hidden" name="no_retests" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="no_retests" value="1"
+                     <%= "checked" if @survey.no_retests? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span><strong style="font-weight:normal;color:#fff;">No retests</strong> — each person can finish this Verto once per wave. They're matched by their respondent code when you collect one, otherwise by the device they used. Start the next wave below to let everyone take it again — that's how a before/after study works.</span>
+            </label>
+            <% if @survey.respondent_code_active? %>
+              <div class="card-flag-note" style="margin-left:24px;">Someone entering a code that has already finished this wave is told so — leave this off if that must stay private. The thank-you screen offers a "Next person" button for shared devices.</div>
+              <% if @survey.respondent_code_card? %>
+                <div class="card-flag-note" style="margin-left:24px;">Put the respondent-code card first: answers given before it are saved before the check can run.</div>
+              <% end %>
+            <% else %>
+              <div class="card-flag-note" style="margin-left:24px;">Without respondent codes this is checked per device only — turn codes on above so it also holds when someone changes phone or browser.</div>
+            <% end %>
+          <% end %>
+
           <%# Waves — run the same Verto again, replay don't duplicate. %>
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);">
             <% if @survey.waved? %>
@@ -1641,14 +1767,14 @@
               </div>
             <% end %>
             <%= form_with url: survey_waves_path(@survey), method: :post, local: true,
-                  data: { turbo_confirm: @survey.waved? ? "Start the next wave? #{@survey.current_wave&.display_label} closes to new responses immediately." : "Start wave 2? Every response so far becomes Wave 1, closed to new responses from now on." },
+                  data: { turbo_confirm: (@survey.waved? ? "Start the next wave? #{@survey.current_wave&.display_label} closes to new responses immediately." : "Start wave 2? Every response so far becomes Wave 1, closed to new responses from now on.") + (@survey.no_retests? ? " Everyone can take it again in the new wave." : "") },
                   style: "margin:0;" do %>
               <button type="submit" style="width:100%;padding:9px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);cursor:pointer;">
                 <%= @survey.waved? ? "Start next wave" : "Start wave 2" %>
               </button>
             <% end %>
             <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(255,255,255,0.4);line-height:1.45;">
-              Run the same Verto again to measure change — don't duplicate it, start a new wave on this one. Turn on respondent codes above first, so people who come back can be matched to their own earlier answers.
+              Run the same Verto again to measure change — don't duplicate it, start a new wave on this one. Turn on respondent codes above first, so people who come back can be matched to their own earlier answers. Turn on No retests if each person should answer only once per wave.
             </div>
           </div>
         </details>
@@ -2210,7 +2336,9 @@
     <div class="emoji-picker-grid" data-emoji-picker-target="grid"></div>
   </div>
 
-  <% if @survey.logic? && !@survey.editing_locked? %><%= render "surveys/generate_flow_modal" %><% end %>
+  <%# The request-level lock (LiveEditing), like the flow panel's Generate button
+      that opens this — an allowed account on a live Verto gets both or neither. %>
+  <% if @survey.logic? && !editing_locked?(@survey) %><%= render "surveys/generate_flow_modal" %><% end %>
   <% if @survey.logic? %><%= render "surveys/journey" %><% end %>
 
   <%# Share panel — the dashboard's modal reused verbatim: the dock's Share

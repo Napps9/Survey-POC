@@ -50,6 +50,35 @@
   # award for completing the question at all — see TokenGrading.completion_award?.
   token_award_mode = card["token_award_mode"].to_s == "completion" ? "completion" : "per_answer"
 
+  # "Show the points on each answer": a badge per option naming what it is
+  # worth, rendered server-side and only for respondents (mode == :player
+  # covers /play, owner preview and Test Mode; the editor shows the amount
+  # inputs instead, the dashboard mini-preview shows neither). Only choice
+  # types have per-option amounts — flat awards (range, rating…) and
+  # completion-mode cards earn for answering at all, so there is nothing per
+  # option to show — and tap cards are out for now: their awards are per
+  # statement × response direction, a table the swipe card has no room for.
+  show_amounts = mode == :player && !!tokens_on && !!@survey&.token_amounts_shown? &&
+                 token_types.any? && TokenGrading::CHOICE.include?(type) &&
+                 TokenGrading.awarding?(card) && !TokenGrading.completion_award?(card)
+  # Always a SIBLING of the label, never inside .pick-text/.choice-label: the
+  # player falls back to the label's textContent to identify an option
+  # (_canonicalOf), and a badge inside it would corrupt that. Not aria-hidden —
+  # the amount is part of the choice — but with a spoken label that says the
+  # token's name rather than its emoji.
+  token_badge = lambda do |canon_label|
+    next "".html_safe unless show_amounts
+    amounts = tokens_map[canon_label.to_s]
+    next "".html_safe unless amounts.is_a?(Hash)
+    parts = token_types.filter_map do |tt|
+      n = amounts[tt["id"]].to_i
+      [ "#{tt['icon']} #{number_with_delimiter(n)}", "#{number_with_delimiter(n)} #{tt['name']}" ] unless n.zero?
+    end
+    next "".html_safe if parts.empty?
+    tag.span(parts.map(&:first).join(" · "), class: "token-option-badge",
+             aria: { label: parts.map(&:last).join(", ") })
+  end
+
   # Logic / answer-branching: every option-bearing card can route each answer
   # to a different card, flow or end screen (LogicGraph::ROUTABLE). Editor-only
   # chrome (like the quiz/token controls); the player follows the same routes
@@ -206,6 +235,7 @@
               <%= pick_a11y.call(multi) %>>
             <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
+            <%= token_badge.call(canon[i]) %>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
@@ -288,6 +318,7 @@
               <%= pick_a11y.call(false) %>>
             <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon_label, keyword_fallback: false, index: i) %></div>
             <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
+            <%= token_badge.call(canon_label) %>
             <span class="choice-list-tick pick-dot">✓</span>
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="single"
@@ -325,6 +356,7 @@
               <%= option_tile_icon(style, canon[i], index: i) %>
               <div class="choice-overlay"></div>
               <div class="choice-tick">✓</div>
+              <%= token_badge.call(canon[i]) %>
               <% if quiz_mode %>
                 <button type="button" class="mark-correct mark-correct-grid" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
                         data-action="click->survey-editor#toggleCorrect" title="<%= t('card.mark_correct') %>">✓</button>
@@ -522,6 +554,7 @@
                       <%= pick_a11y.call(false) %>>
                     <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
                     <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+                    <%= token_badge.call(canon[i]) %>
                     <span class="choice-list-tick pick-dot">✓</span>
                     <% if quiz_mode %>
                       <button type="button" class="mark-correct" data-picker-mode="single"

@@ -65,7 +65,10 @@ reconstruct a card client-side.
 **Playing.** `/play/:token` is a PWA served through a Service Worker —
 network-first with an offline cache fallback for the player HTML. Answers are
 keyed by **card index**, which is why a deck
-freezes once responses exist — see `Survey#editing_locked?`.
+freezes once responses exist — see `Survey#editing_locked?`. The verified
+accounts in `LIVE_EDIT_USER_EMAILS` (`LiveEditAccess`; the owner by default)
+may edit a frozen deck anyway, with the editor warning what that does to
+stored answers.
 
 **Analysing.** Live results over Action Cable, streamed AI summaries and chat, a
 generated report with PDF and Google Docs/Sheets export, and cross-Verto

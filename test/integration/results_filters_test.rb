@@ -38,6 +38,31 @@ class ResultsFiltersTest < ActionDispatch::IntegrationTest
     segments.map { |s| s[:id] }
   end
 
+  # ── Custom links ──────────────────────────────────────────────────────────
+  # One pill per link, in creation order, zero-count links included (a fresh
+  # research assistant's link shows as 0, not nothing) and recalled links kept.
+
+  test "every custom link is a segment, in order, counted, even at zero" do
+    assert_empty segment_ids.grep(/\Alink_/), "no links, no link pills"
+
+    a = @survey.survey_links.create!(name: "RA Ana", slug: "ra-ana-#{SecureRandom.hex(2)}")
+    b = @survey.survey_links.create!(name: "RA Ben", slug: "ra-ben-#{SecureRandom.hex(2)}")
+    2.times { @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", survey_link: a, answers: { "0" => { "value" => "Yes" } }) }
+
+    _base, segments, = resolve_result_segments(@survey, nil, nil)
+    links = segments.select { |s| s[:id].start_with?("link_") }
+    assert_equal [ "link_#{a.id}", "link_#{b.id}" ], links.map { |s| s[:id] }
+    assert_equal [ 2, 0 ], links.map { |s| s[:count] }
+    assert_equal [ "🔗 RA Ana", "🔗 RA Ben" ], links.map { |s| s[:label] }
+
+    b.update!(active: false)
+    assert_includes segment_ids, "link_#{b.id}", "a recalled link keeps its segment — its old responses still point at it"
+
+    get survey_results_path(@survey, segment: "link_#{a.id}")
+    assert_response :success
+    assert_select "a.seg-pill[aria-current='true']", text: /🔗 RA Ana/
+  end
+
   test "a gender with enough responses becomes a segment" do
     add_responses(MIN, gender: "Female")
     assert_includes segment_ids, "gender_female"

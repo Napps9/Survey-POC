@@ -206,6 +206,8 @@ sw:
     repeat_new_password: Rudia nenosiri jipya
     set_submit: Hifadhi nenosiri jipya
   results:
+    share_paused_by_admin: "Imesitishwa na msimamizi — kiungo kitafanya kazi tena mara tu atakapokiendeleza."
+    share_not_enabled: "Bado haijashirikiwa — msimamizi wa akaunti yako anaweza kuwasha kushiriki matokeo."
     title: Matokeo
     editor: "← Mhariri"
     ask_verto: Muulize Verto
@@ -287,6 +289,7 @@ sw:
     tokens_welcome_note: "Utapata pointi kila unapojibu swali — huwezi kurudi nyuma na kubadilisha jibu ili kupata zaidi."
     leaderboard_teaser: "Wakusanyaji bora wa pointi huingia kwenye ubao wa wanaoongoza mwishoni!"
     play_again: "Cheza tena"
+    next_person: "Mtu anayefuata"
     font_size: "Ukubwa wa maandishi"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
@@ -383,6 +386,7 @@ sw:
       leaderboard_queued: "Utaonekana kwenye ubao mara urudipo mtandaoni — alama zako zimehifadhiwa."
       leaderboard_empty: "Kuwa wa kwanza kwenye ubao!"
       already_played: "Umeshacheza Verto hii — hivi ndivyo ubao ulivyo sasa."
+      already_played_plain: "Umeshakamilisha Verto hii — asante."
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
@@ -657,6 +661,7 @@ sw:
     switch_workspace: "Badilisha nafasi ya kazi"
     role_admin: "Msimamizi"
     role_member: "Mwanachama"
+    role_viewer: "Mtazamaji"
     members: Wanachama
     sign_out: Toka
   partnerships:
@@ -1112,6 +1117,7 @@ sw:
     remove: 'Ondoa'
     animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."
+    live_edit_bar: "Unahariri Verto iliyo hewani — kuhamisha, kuongeza au kuondoa maswali kunapotosha majibu yaliyokusanywa."
     live_results: "Ona matokeo →"
     publish_confirm: "Chapisha Verto hii? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     questions: maswali
@@ -1135,6 +1141,7 @@ sw:
     add_design_sub: Ongeza picha ili kuipa kadi hii uhai
     live: HAI
     live_warning: "Verto hii iko hewani, kwa hivyo maswali yake yamefungwa — kila mjibu anajibu Verto ile ile kabisa, hivyo matokeo yako yanabaki kulinganishwa. Unahitaji mabadiliko? Unda Verto mpya."
+    live_edit_warning: "Verto hii iko hewani, na akaunti yako inaweza kuihariri hata hivyo. Majibu huhifadhiwa kulingana na nafasi ya kila swali, hivyo kuongeza, kuondoa au kupanga upya maswali huelekeza majibu yaliyokusanywa tayari kwenye maswali mengine, na kubadilisha maneno ya chaguo hubadilisha lebo ambayo majibu yake yalirekodiwa chini yake. Rekebisha maneno mahali yalipo unapoweza — ikiwa maswali yenyewe yanahitaji kubadilika, Verto mpya huhifadhi matokeo ya hii yakiwa kamili."
     got_it: Nimeelewa
     add_question: Ongeza swali
     cards:
@@ -1305,6 +1312,7 @@ sw:
     empty_cta: Unda Verto yako ya kwanza →
     empty_title_managed: "Bado hakuna Verto"
     empty_body_managed: "Timu yako ya Playverto huchapisha Vertos hapa. Zitaonekana mara tu ya kwanza itakapokuwa tayari."
+    empty_body_viewer: "Vertos za timu yako zitaonekana hapa mara tu ya kwanza itakapotengenezwa — tayari kwa wewe kushiriki na kuona matokeo."
     section_live: Hai
     section_drafts: Rasimu
     section_archived: Yaliyohifadhiwa
@@ -1678,6 +1686,7 @@ sw:
       no_organisation: "Hakuna shirika lililopatikana."
       not_authorised: "Huna ruhusa."
       verto_creation_disabled: "Akaunti yako haitengenezi Vertos — timu yako ya Playverto huzitengeneza kwa niaba yako."
+      viewer_read_only: "Watazamaji wanaweza kushiriki Vertos na kuona matokeo yake, lakini hawawezi kuzitengeneza wala kuzihariri."
     partnership_common_question_sets:
       creator_only: "Ni mwanzilishi wa ushirikiano pekee anayeweza kufanya hilo."
       partnership_not_found: "Ushirikiano haukupatikana."

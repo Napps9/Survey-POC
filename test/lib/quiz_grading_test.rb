@@ -17,6 +17,21 @@ class QuizGradingTest < ActiveSupport::TestCase
     assert QuizGrading.graded?(card("tap_card", { "Earth is flat" => "no" }))
   end
 
+  # A deck edited under the live-edit override (LiveEditAccess) can leave a
+  # select_many array or a tap hash at a scale card's index. Wrong-shaped is
+  # not correct — and must not raise, since grading runs on /progress and
+  # /submit for every respondent mid-run.
+  test "a wrong-shaped answer to a scale card is simply wrong, never an exception" do
+    %w[range nps rating].each do |type|
+      c = card(type, 3)
+      assert QuizGrading.correct?(c, 3)
+      assert QuizGrading.correct?(c, "3")
+      refute QuizGrading.correct?(c, %w[A B]), "#{type}: an array is not a scale answer"
+      refute QuizGrading.correct?(c, { "Statement" => "yes" }), "#{type}: a hash is not a scale answer"
+      refute QuizGrading.correct?(c, true)
+    end
+  end
+
   test "single-choice / yes-no / image-grid / scenario grade by exact canonical match" do
     %w[multiple_choice yes_no select_one_grid scenario].each do |type|
       c = card(type, "Blue")

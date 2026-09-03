@@ -86,6 +86,22 @@ class SurveyOptionLabelEmojiTest < ActiveSupport::TestCase
                  "a live deck's labels are the answer key for responses already collected"
   end
 
+  # A CLOSED Verto (taken down after collecting answers) is never rewritten
+  # either: the guard is editing_locked?, not published?, because an account
+  # LiveEditAccess allows past the lock can save such a deck.
+  test "a closed Verto is never rewritten" do
+    s = build([ { "type" => "multiple_choice", "text" => "Q", "options" => [ "🎯 Pay off debt" ] } ],
+              publish_token: SecureRandom.hex(8), published_at: Time.current)
+    s.responses.create!(session_token: SecureRandom.uuid, answers: { "0" => { "value" => "🎯 Pay off debt" } },
+                        answered: true, status: "completed")
+    s.update!(unpublished_at: Time.current)
+    assert s.closed?
+
+    s.update!(cards: s.cards + [ { "type" => "open_ended", "text" => "Why?" } ])
+    assert_equal [ "🎯 Pay off debt" ], s.reload.cards.first["options"],
+                 "the label is still the answer key for the response already stored"
+  end
+
   test "an emoji-only label keeps its emoji" do
     s = build([ { "type" => "multiple_choice", "text" => "Q", "options" => [ "🎯", "Real option" ] } ])
     card = s.reload.cards.first

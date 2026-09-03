@@ -224,6 +224,8 @@ en-US:
     repeat_new_password: "Repeat new password"
     set_submit: "Save new password"
   results:
+    share_paused_by_admin: "Paused by an admin — the link works again once they resume it."
+    share_not_enabled: "Not shared yet — an admin of your account can turn on results sharing."
     title: "Results"
     editor: "← Editor"
     ask_verto: "Ask Verto"
@@ -305,6 +307,7 @@ en-US:
     tokens_welcome_note: "You'll earn points as you answer each question — you can't go back and change an answer to earn more."
     leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
     play_again: "Play again"
+    next_person: "Next person"
     font_size: "Text size"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
@@ -407,6 +410,7 @@ en-US:
       leaderboard_queued: "You're on the board once you're back online — your score is saved."
       leaderboard_empty: "Be the first on the board!"
       already_played: "You've already played this Verto — here's how the board stands."
+      already_played_plain: "You've already taken this Verto — thank you."
     editor:
       delete_card_confirm: "Delete this card?"
       save_to_library: "Also save to my brand library"
@@ -681,6 +685,7 @@ en-US:
     switch_workspace: "Switch workspace"
     role_admin: "Admin"
     role_member: "Member"
+    role_viewer: "Viewer"
     members: "Members"
     sign_out: "Sign out"
   partnerships:
@@ -1144,6 +1149,7 @@ en-US:
     remove: 'Remove'
     animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."
+    live_edit_bar: "Editing a live Verto — moving, adding or removing questions re-points answers already collected."
     live_results: "View results →"
     publish_confirm: "Publish this Verto? Once it's live, its questions are locked and can't be edited — make sure everything reads exactly as you want."
     questions: "questions"
@@ -1167,6 +1173,7 @@ en-US:
     add_design_sub: "Add an image to bring this card to life"
     live: "LIVE"
     live_warning: "This Verto is live, so its questions are locked — every responder answers exactly the same Verto, which keeps your results comparable. Need changes? Create a new Verto."
+    live_edit_warning: "This Verto is live, and your account can edit it anyway. Answers are stored against each question's position, so adding, removing or reordering questions re-points responses already collected, and rewording an option changes the answer key it was recorded under. Fix wording in place where you can — if the questions themselves need to change, a new Verto keeps this one's results intact."
     got_it: "Got it"
     add_question: "Add question"
     cards:
@@ -1337,6 +1344,7 @@ en-US:
     empty_cta: "Create your first Verto →"
     empty_title_managed: "No Vertos yet"
     empty_body_managed: "Your Playverto team publishes Vertos here. They'll appear as soon as the first one is ready."
+    empty_body_viewer: "Your team's Vertos will appear here as soon as the first one is created — ready for you to share and see the results."
     section_live: "Live"
     section_drafts: "Drafts"
     section_archived: "Archived"
@@ -1727,6 +1735,7 @@ en-US:
       no_organisation: "No organization found."
       not_authorised: "Not authorized."
       verto_creation_disabled: "Your account doesn't create Vertos — your Playverto team creates them for you."
+      viewer_read_only: "Viewers can share Vertos and see their results, but can't create or edit them."
     partnership_common_question_sets:
       creator_only: "Only the partnership creator can do that."
       partnership_not_found: "Partnership not found."

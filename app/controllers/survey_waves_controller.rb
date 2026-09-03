@@ -12,8 +12,11 @@
 # (deciding who gets EXTERNAL visibility into results — an account-level
 # call), starting a wave grants no new visibility to anyone outside the
 # org. It only reorganises how existing responses are segmented going
-# forward, the same "any editor can touch it" bar as update_settings.
+# forward, the same "any editor can touch it" bar as update_settings — which
+# is also why a viewer is refused: it changes the Verto, and a viewer's role
+# is to share and read it.
 class SurveyWavesController < ApplicationController
+  gate_verto_editing only: %i[ create update ]
   before_action :set_survey
 
   # POST /surveys/:survey_id/waves — start the next wave, materialising the

@@ -27,6 +27,7 @@ A `responses` row can hold:
 | `score`, `quiz_max`, `token_totals` | Quiz and token scoring |
 | `session_token` | A random per-session UUID minted in the browser |
 | `respondent_code_digest` | HMAC of a code the respondent chose, if the creator enabled codes |
+| `player_key_digest` | HMAC of a random key the browser minted for this Verto; recorded only where a feature needs a per-device identity — the leaderboard, the contact gate, ask-once questions, or No retests on a Verto that collects no respondent code |
 
 No email address, name or account is attached to a response. There used to be
 one deliberate, creator-chosen exception — the **contact card**
@@ -134,6 +135,11 @@ respondent who chose a code has a handle on their own rows, and
 entering a code is required to proceed wherever the card or pre-screen
 appears, yet the code is only as good as the respondent's memory, and
 nothing stops a throwaway entry they can never reproduce.
+
+Creators also see per-responder groupings — the export's Responder column
+and the results page's Responders card — but only under minted anonymous
+names (`RespondentAlias`, erased with the responses they name): never the
+code, its digest, or anything derived from either.
 
 ## Related
 

@@ -28,10 +28,14 @@
 
         <div style="margin-bottom:32px;">
           <label style="display:block;font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);margin-bottom:8px;text-transform:uppercase;">Role</label>
+          <%# Listed in ascending order of what each role may do, so the list
+              reads as a ladder. Member stays the default: it is what an
+              invite meant before Viewer existed. %>
           <%= f.select :role,
-                [["Member — can create and view Vertos", "member"],
+                [["Viewer — can share Vertos and see results", "viewer"],
+                 ["Member — can also create and edit Vertos", "member"],
                  ["Admin — can also manage members", "admin"]],
-                { selected: "member" },
+                { selected: params[:role].presence_in(Membership::ROLES) || "member" },
                 class: "form-input" %>
         </div>
 

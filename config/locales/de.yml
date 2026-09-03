@@ -206,6 +206,8 @@ de:
     repeat_new_password: Neues Passwort wiederholen
     set_submit: Neues Passwort speichern
   results:
+    share_paused_by_admin: "Von einem Admin pausiert — der Link funktioniert wieder, sobald er fortgesetzt wird."
+    share_not_enabled: "Noch nicht geteilt — ein Admin deines Kontos kann das Teilen der Ergebnisse einschalten."
     title: Ergebnisse
     editor: "← Editor"
     ask_verto: Verto fragen
@@ -287,6 +289,7 @@ de:
     tokens_welcome_note: "Bei jeder Antwort sammelst du Punkte — du kannst nicht zurückgehen und eine Antwort ändern, um mehr zu bekommen."
     leaderboard_teaser: "Die besten Punktesammler landen am Ende auf der Bestenliste!"
     play_again: "Nochmal spielen"
+    next_person: "Nächste Person"
     font_size: "Textgröße"
   defaults:
     range: ["Stimme überhaupt nicht zu", "Stimme nicht zu", "Neutral", "Stimme zu", "Stimme voll zu"]
@@ -383,6 +386,7 @@ de:
       leaderboard_queued: "Sobald du wieder online bist, stehst du auf der Liste — dein Ergebnis ist gespeichert."
       leaderboard_empty: "Sei die erste Person auf der Liste!"
       already_played: "Du hast diesen Verto schon gespielt — so steht die Liste gerade."
+      already_played_plain: "Du hast diesen Verto schon ausgefüllt — danke."
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"
@@ -657,6 +661,7 @@ de:
     switch_workspace: "Arbeitsbereich wechseln"
     role_admin: "Admin"
     role_member: "Mitglied"
+    role_viewer: "Betrachter"
     members: Mitglieder
     sign_out: Abmelden
   partnerships:
@@ -1112,6 +1117,7 @@ de:
     remove: 'Entfernen'
     animation_theme: "Animation"
     live_locked_bar: "Dieses Verto ist live — die Fragen sind gesperrt, um die Datenqualität zu schützen."
+    live_edit_bar: "Du bearbeitest ein Live-Verto — Fragen verschieben, hinzufügen oder löschen ordnet bereits gesammelte Antworten neu zu."
     live_results: "Ergebnisse ansehen →"
     publish_confirm: "Dieses Verto veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     questions: Fragen
@@ -1135,6 +1141,7 @@ de:
     add_design_sub: Füge ein Bild hinzu, um diese Karte zum Leben zu erwecken
     live: LIVE
     live_warning: "Dieses Verto ist live, daher sind seine Fragen gesperrt — alle Befragten beantworten exakt dasselbe Verto, was deine Ergebnisse vergleichbar hält. Änderungen nötig? Erstelle ein neues Verto."
+    live_edit_warning: "Dieses Verto ist live, und dein Konto kann es trotzdem bearbeiten. Antworten werden anhand der Position jeder Frage gespeichert, daher verschiebt das Hinzufügen, Entfernen oder Neuanordnen von Fragen bereits gesammelte Antworten auf andere Fragen, und das Umformulieren einer Option ändert den Antwortschlüssel, unter dem die Antworten dazu erfasst wurden. Korrigiere Formulierungen, wo möglich, direkt an Ort und Stelle — wenn sich die Fragen selbst ändern müssen, lässt ein neues Verto die Ergebnisse dieses Vertos unangetastet."
     got_it: Verstanden
     add_question: Frage hinzufügen
     cards:
@@ -1305,6 +1312,7 @@ de:
     empty_cta: Erstelle dein erstes Verto →
     empty_title_managed: "Noch keine Vertos"
     empty_body_managed: "Dein Playverto-Team veröffentlicht hier Vertos. Sie erscheinen, sobald das erste fertig ist."
+    empty_body_viewer: "Die Vertos deines Teams erscheinen hier, sobald das erste erstellt ist — bereit zum Teilen und zum Ansehen der Ergebnisse."
     section_live: Live
     section_drafts: Entwürfe
     section_archived: Archiviert
@@ -1718,6 +1726,7 @@ de:
       no_organisation: "Keine Organisation gefunden."
       not_authorised: "Nicht berechtigt."
       verto_creation_disabled: "Dein Konto erstellt keine Vertos — dein Playverto-Team erstellt sie für dich."
+      viewer_read_only: "Betrachter können Vertos teilen und ihre Ergebnisse sehen, aber keine erstellen oder bearbeiten."
     sessions:
       rate_limited: "Bitte versuche es später erneut."
       invalid_credentials: "Versuche es mit einer anderen E-Mail-Adresse oder einem anderen Passwort."

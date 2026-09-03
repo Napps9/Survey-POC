@@ -206,6 +206,8 @@ it:
     repeat_new_password: Ripeti nuova password
     set_submit: Salva nuova password
   results:
+    share_paused_by_admin: "In pausa per scelta di un amministratore: il link tornerà a funzionare quando lo riattiverà."
+    share_not_enabled: "Non ancora condiviso: un amministratore del tuo account può attivare la condivisione dei risultati."
     title: Risultati
     editor: "← Editor"
     ask_verto: Chiedi a Verto
@@ -287,6 +289,7 @@ it:
     tokens_welcome_note: "Guadagnerai punti rispondendo a ogni domanda — non puoi tornare indietro e cambiare una risposta per guadagnarne altri."
     leaderboard_teaser: "Chi raccoglie più punti entra in classifica alla fine!"
     play_again: "Gioca ancora"
+    next_person: "Prossima persona"
     font_size: "Dimensione testo"
   defaults:
     range: ["Per niente d'accordo", "In disaccordo", "Neutrale", "D'accordo", "Completamente d'accordo"]
@@ -383,6 +386,7 @@ it:
       leaderboard_queued: "Entrerai in classifica appena torni online — il tuo punteggio è salvato."
       leaderboard_empty: "Sii il primo in classifica!"
       already_played: "Hai già giocato questo Verto — ecco la classifica attuale."
+      already_played_plain: "Hai già completato questo Verto — grazie."
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"
@@ -657,6 +661,7 @@ it:
     switch_workspace: "Cambia spazio di lavoro"
     role_admin: "Amministratore"
     role_member: "Membro"
+    role_viewer: "Lettore"
     members: Membri
     sign_out: Esci
   partnerships:
@@ -1112,6 +1117,7 @@ it:
     remove: 'Rimuovi'
     animation_theme: "Animazione"
     live_locked_bar: "Questo Verto è live — le domande sono bloccate per proteggere la qualità dei dati."
+    live_edit_bar: "Verto live in modifica — spostare, aggiungere o rimuovere domande riassocia le risposte già raccolte."
     live_results: "Vedi risultati →"
     publish_confirm: "Pubblicare questo Verto? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."
     questions: domande
@@ -1135,6 +1141,7 @@ it:
     add_design_sub: Aggiungi un'immagine per dare vita a questa carta
     live: LIVE
     live_warning: "Questo Verto è live, quindi le sue domande sono bloccate — ogni rispondente risponde esattamente allo stesso Verto, mantenendo i risultati comparabili. Servono modifiche? Crea un nuovo Verto."
+    live_edit_warning: "Questo Verto è live, ma il tuo account può comunque modificarlo. Le risposte sono salvate in base alla posizione di ciascuna domanda, quindi aggiungere, rimuovere o riordinare le domande riassocia le risposte già raccolte a domande diverse, e riformulare un'opzione cambia la chiave di risposta con cui è stata registrata. Dove puoi, limitati a correggere il testo esistente — se sono le domande stesse a dover cambiare, un nuovo Verto lascia intatti i risultati di questo."
     got_it: Capito
     add_question: Aggiungi domanda
     cards:
@@ -1305,6 +1312,7 @@ it:
     empty_cta: Crea il tuo primo Verto →
     empty_title_managed: "Nessun Verto per ora"
     empty_body_managed: "Il tuo team Playverto pubblica qui i Vertos. Appariranno non appena il primo sarà pronto."
+    empty_body_viewer: "I Vertos del tuo team appariranno qui non appena verrà creato il primo: pronti da condividere e per vederne i risultati."
     section_live: Live
     section_drafts: Bozze
     section_archived: Archiviati
@@ -1718,6 +1726,7 @@ it:
       no_organisation: "Nessuna organizzazione trovata."
       not_authorised: "Non autorizzato."
       verto_creation_disabled: "Il tuo account non crea Vertos: il tuo team Playverto li crea per te."
+      viewer_read_only: "I lettori possono condividere i Vertos e vederne i risultati, ma non possono crearli né modificarli."
     sessions:
       rate_limited: "Riprova più tardi."
       invalid_credentials: "Prova con un altro indirizzo email o un'altra password."

@@ -194,6 +194,41 @@ class RespondentDataTest < ActionDispatch::IntegrationTest
     assert Response.exists?(session_token: @token)
   end
 
+  test "erasure takes the responder's export alias with it" do
+    @survey.update!(respondent_code_enabled: true)
+    digest = @survey.respondent_code_digest("Sam 14")
+    resp   = @survey.responses.create!(session_token: SecureRandom.uuid, respondent_code_digest: digest,
+                                       status: "completed", answers: {})
+    RespondentAlias.ensure_for!(survey: @survey, code_digest: digest)
+
+    login(@admin)
+    delete survey_respondent_data_path(@survey, respondent_code: "sam14")
+
+    assert_nil Response.find_by(id: resp.id)
+    assert_not RespondentAlias.exists?(survey_id: @survey.id, code_digest: digest),
+               "the minted name is that person's data too — erased with their rows"
+  end
+
+  test "a session-token erasure of one run still purges the shared responder alias" do
+    # Deliberate: the name a creator has seen for this identity dies with the
+    # erased row even though sibling runs survive; the survivors re-mint a
+    # fresh pseudonym on the next export rather than keeping a label that once
+    # pointed at erased data.
+    @survey.update!(respondent_code_enabled: true)
+    digest   = @survey.respondent_code_digest("Sam 14")
+    erased   = @survey.responses.create!(session_token: SecureRandom.uuid, respondent_code_digest: digest,
+                                         status: "completed", answers: {})
+    survivor = @survey.responses.create!(session_token: SecureRandom.uuid, respondent_code_digest: digest,
+                                         status: "completed", answers: {})
+    RespondentAlias.ensure_for!(survey: @survey, code_digest: digest)
+
+    login(@admin)
+    delete survey_respondent_data_path(@survey, session_token: erased.session_token)
+
+    assert Response.exists?(id: survivor.id)
+    assert_not RespondentAlias.exists?(survey_id: @survey.id, code_digest: digest)
+  end
+
   test "erasing nothing does not claim to have erased something" do
     login(@admin)
     assert_no_difference -> { @survey.responses.count } do

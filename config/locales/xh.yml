@@ -215,6 +215,8 @@ xh:
     repeat_new_password: "Phinda iphasiwedi entsha"
     set_submit: "Gcina iphasiwedi entsha"
   results:
+    share_paused_by_admin: "Imiswe okwethutyana ngumlawuli — ikhonkco liya kusebenza kwakhona xa eliqhubeka."
+    share_not_enabled: "Ayikabelwana ngayo okwangoku — umlawuli we-akhawunti yakho angavula ukwabelana ngeziphumo."
     title: "Iziphumo"
     editor: "← Umhleli"
     ask_verto: "Ask Verto"
@@ -296,6 +298,7 @@ xh:
     tokens_welcome_note: "Uya kufumana amanqaku njengoko uphendula umbuzo ngamnye — awunakubuyela umva utshintshe impendulo ukuze ufumane amanye."
     leaderboard_teaser: "Abaqokeleli abaphambili bamanqaku bafikelela kuluhlu lwabaphambili ekugqibeleni!"
     play_again: "Dlala kwakhona"
+    next_person: "Umntu olandelayo"
     font_size: "Ubungakanani bombhalo"
   # Umxholo wesikhundla iKHADI entsha yohlobo ngalunye eqala ngawo — iinketho
   # zempendulo, iileyibhile zomlinganiselo, iingxelo. Ngokungafaniyo
@@ -399,6 +402,7 @@ xh:
       leaderboard_queued: "Uya kubonakala kuluhlu xa ubuyela kwi-intanethi — amanqaku akho agciniwe."
       leaderboard_empty: "Yiba ngowokuqala kuluhlu!"
       already_played: "Sowuyidlele le Verto — nantsi indlela uluhlu lujongeka ngayo."
+      already_played_plain: "Sele uyigqibile le Verto — enkosi."
     editor:
       delete_card_confirm: "Cima eli khadi?"
       save_to_library: "Kwakhona gcina kwithala lam lophawu"
@@ -673,6 +677,7 @@ xh:
     switch_workspace: "Tshintsha indawo yokusebenza"
     role_admin: "Umlawuli"
     role_member: "Ilungu"
+    role_viewer: "Umboneli"
     members: "Amalungu"
     sign_out: "Phuma"
   partnerships:
@@ -1134,6 +1139,7 @@ xh:
     remove: 'Susa'
     animation_theme: "Ushukumo"
     live_locked_bar: "Le Verto iyasebenza — imibuzo icinyiwe ukukhusela umgangatho wedatha."
+    live_edit_bar: "Uhlela iVerto esebenzayo — ukushenxisa, ukongeza okanye ukususa imibuzo kuphambukisa iimpendulo eziqokelelweyo."
     live_results: "Jonga iziphumo →"
     publish_confirm: "Papasha le Verto? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     questions: "imibuzo"
@@ -1157,6 +1163,7 @@ xh:
     add_design_sub: "Yongeza umfanekiso ukunika eli khadi ubomi"
     live: "IYASEBENZA"
     live_warning: "Le Verto iyasebenza, ngoko imibuzo yayo icinyiwe — umphenduli ngamnye uphendula le Verto kanye ngendlela efanayo, oko kugcina iziphumo zakho zithelekiseka. Ufuna utshintsho? Yenza iVerto entsha."
+    live_edit_warning: "Le Verto iyasebenza, kwaye iakhawunti yakho inokuyihlela nangona kunjalo. Iimpendulo zigcinwa ngokwendawo ekuyo umbuzo ngamnye, ngoko ukongeza, ukususa okanye ukulungelelanisa kwakhona imibuzo kwenza iimpendulo esele ziqokelelwe zikhombe kwimibuzo eyahlukileyo, kwaye ukutshintsha amagama okhetho kutshintsha igama impendulo eyabhaliswa phantsi kwalo. Lungisa amagama endaweni yawo apho unako — ukuba yimibuzo ngokwayo ekufuneka itshintshe, iVerto entsha igcina iziphumo zale Verto zingachaphazelekanga."
     got_it: "Ndiyavuma"
     add_question: "Yongeza umbuzo"
     cards:
@@ -1327,6 +1334,7 @@ xh:
     empty_cta: "Yenza iVerto yakho yokuqala →"
     empty_title_managed: "Akukho ii-Vertos okwangoku"
     empty_body_managed: "Iqela lakho lasePlayverto lipapasha ii-Vertos apha. Ziya kubonakala nje ukuba eyokuqala ilungile."
+    empty_body_viewer: "Ii-Vertos zeqela lakho ziya kuvela apha nje ukuba eyokuqala yenziwe — zilungele ukuba wabelane ngazo kwaye ubone iziphumo."
     section_live: "Iyasebenza"
     section_drafts: "Uyilo"
     section_archived: "Igciniwe"
@@ -1717,6 +1725,7 @@ xh:
       no_organisation: "Akukho mbutho ufunyenweyo."
       not_authorised: "Akuvunyelwanga."
       verto_creation_disabled: "I-akhawunti yakho ayenzi ii-Vertos — iqela lakho lasePlayverto lizenzela wena."
+      viewer_read_only: "Ababoneli banokwabelana ngee-Vertos kwaye babone iziphumo zazo, kodwa abanakuzenza okanye bazihlele."
     partnership_common_question_sets:
       creator_only: "Ngumdali weqela lamaqabane kuphela onokwenza oko."
       partnership_not_found: "Iqela lamaqabane alifunyanwanga."

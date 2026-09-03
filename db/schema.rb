@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_03_090000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -483,6 +483,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
     t.string "key_digest", null: false
     t.integer "survey_id", null: false
     t.integer "total", default: 0, null: false
+    t.json "totals", default: {}, null: false
     t.datetime "updated_at", null: false
     t.index ["survey_id", "key_digest"], name: "index_leaderboard_standings_on_survey_id_and_key_digest", unique: true
     t.index ["survey_id", "total"], name: "index_leaderboard_standings_on_survey_id_and_total"
@@ -497,7 +498,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
     t.index ["organisation_id"], name: "index_memberships_on_organisation_id"
     t.index ["user_id", "organisation_id"], name: "index_memberships_on_user_id_and_organisation_id", unique: true
     t.index ["user_id"], name: "index_memberships_on_user_id"
-    t.check_constraint "role IN ('member', 'admin')", name: "chk_memberships_role"
+    t.check_constraint "role IN ('viewer', 'member', 'admin')", name: "chk_memberships_role"
   end
 
   create_table "organisations", force: :cascade do |t|
@@ -609,6 +610,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
     t.index ["user_id"], name: "index_report_renders_on_user_id"
     t.check_constraint "kind IN ('report', 'infographic')", name: "chk_report_renders_kind"
     t.check_constraint "status IN ('pending', 'running', 'succeeded', 'failed')", name: "chk_report_renders_status"
+  end
+
+  create_table "respondent_aliases", force: :cascade do |t|
+    t.string "anon_name", null: false
+    t.string "code_digest", null: false
+    t.datetime "created_at", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "anon_name"], name: "index_respondent_aliases_on_survey_id_and_anon_name", unique: true
+    t.index ["survey_id", "code_digest"], name: "index_respondent_aliases_on_survey_id_and_code_digest", unique: true
+    t.index ["survey_id"], name: "index_respondent_aliases_on_survey_id"
   end
 
   create_table "responses", force: :cascade do |t|
@@ -881,10 +893,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
     t.text "key_insight"
     t.boolean "leaderboard_enabled", default: false, null: false
     t.string "leaderboard_note"
+    t.string "leaderboard_rank_by", default: "all", null: false
     t.datetime "leaderboard_refreshed_at"
     t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false
+    t.boolean "no_going_back", default: false, null: false
+    t.boolean "no_retests", default: false, null: false
     t.integer "organisation_id", null: false
     t.string "publish_token"
     t.datetime "published_at"
@@ -912,6 +927,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
     t.string "thankyou_title"
     t.string "theme"
     t.string "title"
+    t.boolean "token_amounts_shown", default: false, null: false
     t.boolean "token_back_nav_enabled", default: false, null: false
     t.boolean "token_hud_enabled", default: true, null: false
     t.string "token_intro_cid"
@@ -1021,6 +1037,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_02_110000) do
   add_foreign_key "portfolios", "funders"
   add_foreign_key "report_renders", "surveys"
   add_foreign_key "report_renders", "users"
+  add_foreign_key "respondent_aliases", "surveys"
   add_foreign_key "responses", "survey_links"
   add_foreign_key "responses", "survey_shares"
   add_foreign_key "responses", "survey_waves"

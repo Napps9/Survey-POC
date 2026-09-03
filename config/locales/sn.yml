@@ -208,6 +208,8 @@ sn:
     repeat_new_password: "Dzokorora Pasiwedhi Itsva"
     set_submit: "Chengetedza Pasiwedhi Itsva"
   results:
+    share_paused_by_admin: "Yakamiswa nemutungamiri — chinongedzo chichashanda zvakare kana vachitangazve."
+    share_not_enabled: "Haisati yagoverwa — mutungamiri weakaunti yako anogona kubatidza kugoverwa kwemhinduro."
     title: "Mhedzisiro"
     editor: "← Chigadziriso"
     ask_verto: "Ask Verto"
@@ -289,6 +291,7 @@ sn:
     tokens_welcome_note: "Uchawana mapoinzi paunopindura mubvunzo mumwe nemumwe — haugoni kudzokera shure kuchinja mhinduro kuti uwane akawanda."
     leaderboard_teaser: "Vaunganidzi vemapoinzi vepamusoro vanopinda pabhodhi remhedzisiro pakupera!"
     play_again: "Tamba Zvakare"
+    next_person: "Munhu anotevera"
     font_size: "Hukuru hweRunyoro"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Positional; keep every array's length exact.
@@ -387,6 +390,7 @@ sn:
       leaderboard_queued: "Uchave pabhodhi kana wadzokera pane inetiweki — zvibodzwa zvako zvachengetwa."
       leaderboard_empty: "Iva wekutanga pabhodhi!"
       already_played: "Watotamba Verto iyi — heino kuti bhodhi rakamira sei."
+      already_played_plain: "Wakatopedza Verto iyi kare — tinotenda."
     editor:
       delete_card_confirm: "Bvisa kadhi iri?"
       save_to_library: "Chengetedzawo mulaibhurari yangu yechiratidzo"
@@ -661,6 +665,7 @@ sn:
     switch_workspace: "Chinja nzvimbo yebasa"
     role_admin: "Mutungamiriri"
     role_member: "Nhengo"
+    role_viewer: "Muoni"
     members: "Nhengo"
     sign_out: "Buda"
   partnerships:
@@ -1122,6 +1127,7 @@ sn:
     remove: 'Bvisa'
     animation_theme: "Animeshoni"
     live_locked_bar: "Verto iyi iri pachena — mibvunzo yakakiiwa kudzivirira hunhu hwedhata."
+    live_edit_bar: "Kugadzirisa Verto iri pachena — kutamisa, kuwedzera kana kubvisa mibvunzo kunokanganisa mhinduro dzatounganidzwa."
     live_results: "Ona Mhedzisiro →"
     publish_confirm: "Buritsa Verto iyi? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     questions: "mibvunzo"
@@ -1145,6 +1151,7 @@ sn:
     add_design_sub: "Wedzera mufananidzo kuti upe kadhi iri upenyu"
     live: "PACHENA"
     live_warning: "Verto iyi iri pachena, saka mibvunzo yayo yakakiiwa — mupinduri wese anopindura Verto imwe chete, izvo zvinochengetedza kuti mhedzisiro yako igoenzaniswa. Unoda shanduko? Gadzira Verto itsva."
+    live_edit_warning: "Verto iyi iri pachena, asi akaunti yako inogona kuigadzirisa zvakadaro. Mhinduro dzinochengetwa zvichienderana nechinzvimbo chemubvunzo wega wega, saka kuwedzera, kubvisa kana kurongazve mibvunzo kunoita kuti mhinduro dzakatounganidzwa dzinongedzere kumibvunzo isiriyo, uye kushandura mazwi esarudzo kunoshandura zita remhinduro iro yakanyorwa pasi paro. Gadzirisa mazwi ipapo paunogona — kana mibvunzo pachayo ichida kuchinja, Verto itsva inochengetedza mhedzisiro yeiyi isina kukanganiswa."
     got_it: "Ndazvinzwisisa"
     add_question: "Wedzera Mubvunzo"
     cards:
@@ -1315,6 +1322,7 @@ sn:
     empty_cta: "Gadzira Verto Yako Yekutanga →"
     empty_title_managed: "Hapana Vertos Parizvino"
     empty_body_managed: "Boka rako rePlayverto rinobudisa Vertos pano. Dzichaonekwa kana yekutanga yagadzirira."
+    empty_body_viewer: "Vertos dzeboka rako dzichaonekwa pano kana yekutanga yagadzirwa — dzakagadzirira kuti ugovere uye uone mhinduro."
     section_live: "Pachena"
     section_drafts: "Madhirafiti"
     section_archived: "Zvakachengetwa"
@@ -1688,6 +1696,7 @@ sn:
       no_organisation: "Hapana sangano rakawanikwa."
       not_authorised: "Hauna mvumo."
       verto_creation_disabled: "Akaunti yako haigadziri Vertos — boka rako rePlayverto rinozvigadzirira iwe."
+      viewer_read_only: "Vaoni vanogona kugovera Vertos uye kuona mhinduro dzadzo, asi havagoni kudzigadzira kana kudzichinja."
     partnership_common_question_sets:
       creator_only: "Mugadziri weushirikiano chete ndiye anogona kuita izvozvo."
       partnership_not_found: "Ushirikiano hahuna kuwanikwa."

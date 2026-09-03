@@ -31,6 +31,9 @@ class Survey < ApplicationRecord
   # Derived rows (see LeaderboardStanding) — delete_all, not destroy: there are
   # no callbacks to run and a big board would destroy row-by-row for nothing.
   has_many :leaderboard_standings, dependent: :delete_all
+  # Same contract as player_aliases for the responder names the export and
+  # results page group by.
+  has_many :respondent_aliases, dependent: :destroy
   has_many :contact_details, dependent: :destroy
 
   # Creator-uploaded card/background imagery. Previously these lived inline in
@@ -56,16 +59,21 @@ class Survey < ApplicationRecord
 
   # Range cards are always a 5-point scale (see RANGE_POINTS). Enforced on the
   # way in so every authoring path is covered by one rule, and skipped once a
-  # Verto is live: a stored answer is an INDEX into the scale it was collected
-  # on, so resizing a published card's options would silently re-point every
-  # response already gathered. Published Vertos are locked for editing anyway.
-  before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !published? }
+  # Verto is live or has been answered: a stored answer is an INDEX into the
+  # scale it was collected on, so resizing an answered card's options would
+  # silently re-point every response already gathered. Guarded on
+  # editing_locked? rather than published? because a deck CAN reach a save with
+  # responses behind it — an account LiveEditAccess allows past the lock saves
+  # live and closed decks — and what protects the stored answers is that the
+  # normaliser never touches a card anyone has answered, not that the save is
+  # refused.
+  before_save :enforce_range_scale, if: -> { will_save_change_to_cards? && !editing_locked? }
 
   # An option label's own emoji belongs in that option's icon tile, not beside
   # its words. Same guard as above and for the same reason: an option label is
-  # the answer key for responses already collected, so a live Verto is never
-  # rewritten. See hoist_option_label_emoji! for the full rules.
-  before_save :hoist_option_label_emoji, if: -> { will_save_change_to_cards? && !published? }
+  # the answer key for responses already collected, so an answered Verto is
+  # never rewritten. See hoist_option_label_emoji! for the full rules.
+  before_save :hoist_option_label_emoji, if: -> { will_save_change_to_cards? && !editing_locked? }
 
   # Inline base64 images never reach a column. CardImageStore and the backfill
   # task moved the EXISTING data-URLs out (P1-7), but the door stayed open:
@@ -800,7 +808,17 @@ class Survey < ApplicationRecord
     card["image"].present? || card["video"].present? || card["lottie"].present?
   end
 
-  def self.sanitize_cards_images!(cards, warnings: nil)
+  # `structural: false` keeps a deck's existing SHAPE: the two passes at the
+  # tail that remove or move a card already in the deck (drop_retired_cards,
+  # hoist_consent_gate) are skipped. SurveysController#update passes it for a
+  # locked deck saved by an account LiveEditAccess allows past the lock — the
+  # editor promised that person that fixing wording in place is safe, and a
+  # save that quietly pulled out a retired card or moved the consent gate would
+  # re-point every later stored answer behind that promise. The enforce_single_*
+  # passes still run: on a deck that was normalised as a draft they can only
+  # ever drop a duplicate the editor has JUST added, which puts every card back
+  # where its answers already are.
+  def self.sanitize_cards_images!(cards, warnings: nil, structural: true)
     Array(ensure_cids!(cards)).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
@@ -1286,8 +1304,8 @@ class Survey < ApplicationRecord
     end.then { |list| enforce_single_welcome(list, warnings: warnings) }
        .then { |list| enforce_single_respondent_code(list, warnings: warnings) }
        .then { |list| enforce_single_points_intro(list, warnings: warnings) }
-       .then { |list| drop_retired_cards(list, warnings: warnings) }
-       .then { |list| hoist_consent_gate(list, warnings: warnings) }
+       .then { |list| structural ? drop_retired_cards(list, warnings: warnings) : list }
+       .then { |list| structural ? hoist_consent_gate(list, warnings: warnings) : list }
   end
 
   # At most one points-intro card per deck, same shape and same reasoning as
@@ -1332,7 +1350,10 @@ class Survey < ApplicationRecord
   # editor's save path and #update refuses any edit to a Verto that is
   # published or has responses (editing_locked?) — so a deck reaching here has
   # no stored answers for the renumbering to misalign. Live decks keep their
-  # copy and the player skips it instead.
+  # copy and the player skips it instead. An account allowed past the lock
+  # (LiveEditAccess) saves a live deck through sanitize_cards_images! too, so
+  # #update passes `structural: false` for a locked deck and this pass is
+  # skipped: the retired card stays exactly where the stored answers expect it.
   #
   # Dropped with a warning rather than a 422, for the same reason
   # enforce_single_welcome drops: decks holding a retired card already exist,
@@ -1384,7 +1405,10 @@ class Survey < ApplicationRecord
   # Only reached from the editor's save path, and #update refuses any edit to a
   # Verto that is published or already has responses (editing_locked?), so a
   # deck being reordered here can have no stored answers to misalign — which
-  # matters, because answers are keyed by card index.
+  # matters, because answers are keyed by card index. An account LiveEditAccess
+  # allows past the lock can save a locked deck, so for one #update passes
+  # `structural: false` to sanitize_cards_images! and this hoist is skipped —
+  # an existing gate stays where the stored answers expect it.
   def self.hoist_consent_gate(list, warnings: nil)
     gate_at = list.index { |c| c.is_a?(Hash) && c["type"].to_s == "consent_gate" }
     return list if gate_at.nil?
@@ -1552,6 +1576,13 @@ class Survey < ApplicationRecord
   # card index, so adding, removing or reordering cards silently misaligns every
   # later answer already stored. This — not published? — is the real editing
   # boundary, and every write path guards on it.
+  #
+  # A fact about the VERTO, not about who is asking. The one exception — the
+  # accounts LiveEditAccess allows to edit a locked deck knowingly — is applied
+  # at the controller boundary (LiveEditing#editing_locked?(survey)), so this
+  # predicate keeps answering what it always did and the model's own guards
+  # (switch_primary_locale!, the normalisers above that skip a locked deck)
+  # don't need to know the override exists.
   def editing_locked?
     published? || responses.exists?
   end
@@ -1719,6 +1750,38 @@ class Survey < ApplicationRecord
              .where.not(respondent_code_digest: nil)
              .where(respondent_code_digest: responses.where(survey_wave_id: earlier_ids).select(:respondent_code_digest))
              .count
+  end
+
+  # Which identity "No retests" is checked against. The respondent code is the
+  # study identity — one person across devices — so it is the ONLY basis on a
+  # Verto that collects one; the per-device player key is the fallback for a
+  # Verto that does not. Never both: OR-ing them would refuse the second pupil
+  # on a shared classroom tablet for the first pupil's run.
+  def retest_basis
+    return nil unless no_retests?
+    respondent_code_active? ? "code" : "device"
+  end
+
+  # One completed run per identity per wave. `current_wave` is nil while wave 1
+  # is implicit, and new rows are stamped the same way (PlayerController#
+  # find_or_init_response), so nil here means IS NULL on both engines and
+  # matches exactly the implicit-wave rows; start_next_wave! backfills them
+  # into a real wave 1 before it opens the next, which is what re-admits
+  # everyone. The row being written is excluded so a replayed submit of the
+  # same completed row (offline queue, double tap) stays idempotent. Digests
+  # never leave this method.
+  def retest_blocked?(resp)
+    basis = retest_basis
+    return false unless basis
+
+    column = basis == "code" ? :respondent_code_digest : :player_key_digest
+    digest = resp.public_send(column)
+    # Never `where(column: nil)`: IS NULL would match every digest-less row.
+    return false if digest.blank?
+
+    scope = responses.where(status: "completed", survey_wave_id: current_wave&.id, column => digest)
+    scope = scope.where.not(id: resp.id) if resp.persisted?
+    scope.exists?
   end
 
   # ── Recently deleted cards ─────────────────────────────────────────────────
@@ -1925,7 +1988,11 @@ class Survey < ApplicationRecord
       consent_image_credit:    consent_image_credit,
       consent_image_credit_url: consent_image_credit_url,
       leaderboard_enabled:     leaderboard_enabled,
-      leaderboard_retake_policy: leaderboard_retake_policy
+      leaderboard_retake_policy: leaderboard_retake_policy,
+      leaderboard_rank_by:     leaderboard_rank_by,
+      # Study-design rules a duplicated instrument must keep.
+      no_going_back:           no_going_back,
+      no_retests:              no_retests
     ).tap { |copy| copy_card_attachments_to(copy) }
   end
 
@@ -2289,9 +2356,14 @@ class Survey < ApplicationRecord
   #
   #   accumulate — retakes add to the total (the default: the most game-like
   #                reading of "play again", and the least surprising).
-  #   no_redo    — one play each; the player skips a recognised returner
-  #                straight to the board, and aggregation ignores stray extras.
-  #   restart    — a retake wipes the old score and starts over.
+  #   no_redo    — the FIRST completed run counts; later runs are stored as
+  #                answers but never move the board.
+  #   restart    — the latest completed run counts.
+  #
+  # Scoring only. Whether a retake is allowed at all is `no_retests` (one
+  # completed run per person per wave) and whether an answer can be changed
+  # mid-run is `no_going_back` — both independent of the board, and the
+  # player no longer reads this policy.
   LEADERBOARD_RETAKE_POLICIES = %w[accumulate no_redo restart].freeze
 
   # The column carries a database CHECK (P2-8), and the coverage rule in
@@ -2299,6 +2371,33 @@ class Survey < ApplicationRecord
   # in the model — a bad value should surface as a validation error, not a raw
   # database exception.
   validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
+
+  # What the board RANKS BY: "all" — one total across every token type, the
+  # original board — or one of this Verto's token type ids, when the types are
+  # different currencies (CO2 saved, lives) whose sum means nothing. Every row
+  # still shows each type's total; this only decides the order. No CHECK
+  # constraint, deliberately: the values are creator-defined ids, so the model
+  # normalises instead and an unknown or removed id falls back to "all". Locked
+  # once live (SETTINGS_LOCKED_IN_USE) for the policy's reason — changing the
+  # basis re-ranks standings respondents have already been shown.
+  before_validation :coerce_leaderboard_rank_by
+  validates :leaderboard_rank_by, presence: true
+
+  def self.normalize_leaderboard_rank_by(value, type_ids)
+    value = value.to_s
+    Array(type_ids).include?(value) ? value : "all"
+  end
+
+  def coerce_leaderboard_rank_by
+    self.leaderboard_rank_by = Survey.normalize_leaderboard_rank_by(leaderboard_rank_by, token_type_ids)
+  end
+
+  def leaderboard_ranks_by_type? = leaderboard_rank_by != "all"
+
+  # The token type the board ranks by, or nil under "all".
+  def leaderboard_rank_type
+    Array(token_types).find { |t| t["id"] == leaderboard_rank_by }
+  end
 
   # THE GDPR WALL, scoped to where it bites (owner's call, 2026-08-24): a
   # contact form may sit alongside age, location, gender and heritage, but
@@ -2338,8 +2437,10 @@ class Survey < ApplicationRecord
   # contact row and the pseudonymous responses; ask-once questions need it
   # because "asked once" is a promise made to an identity, and each run's
   # response carries the remembered answer under that identity's digest.
+  # No retests on a Verto that collects no respondent code needs it too: the
+  # device is then the only identity it can check.
   def player_identity_active?
-    leaderboard_active? || contact_form_enabled? || ask_once_cards?
+    leaderboard_active? || contact_form_enabled? || ask_once_cards? || retest_basis == "device"
   end
 
   # Any question the creator marked "ask once per person" — skipped on repeat

@@ -91,6 +91,7 @@ class LeaderboardContrastTest < ActiveSupport::TestCase
       ".leaderboard-rank"  => "rank numeral (the smallest text on the board)",
       ".leaderboard-name"  => "player name",
       ".leaderboard-total" => "token total",
+      ".leaderboard-breakdown" => "per-type breakdown under the name",
       ".leaderboard-self"  => "\"you played as\" line",
       ".leaderboard-note"  => "queued/empty note",
       ".leaderboard-gap"   => "gap marker above your appended row"

@@ -114,14 +114,13 @@ class LeaderboardStanding < ApplicationRecord
   # rows (one indexed query) and upsert them. Identities in `digests` that
   # turn out to have no completed rows are left to purge_stale!.
   def self.upsert_entries!(survey, digests)
-    runs = Hash.new { |h, k| h[k] = [] }
+    runs     = Hash.new { |h, k| h[k] = [] }
+    rank_by  = survey.leaderboard_rank_by
+    type_ids = survey.token_type_ids
     survey.responses.where(status: "completed", player_key_digest: digests)
           .select(:id, :player_key_digest, :token_totals, :completed_at, :created_at)
           .each do |resp|
-      totals = resp.token_totals.is_a?(Hash) ? resp.token_totals : {}
-      runs[resp.player_key_digest] << { total: totals.values.sum(&:to_i),
-                                        at: resp.completed_at || resp.created_at,
-                                        id: resp.id }
+      runs[resp.player_key_digest] << TokenLeaderboard.run_for(resp, rank_by, type_ids)
     end
     return 0 if runs.empty?
 
@@ -130,7 +129,9 @@ class LeaderboardStanding < ApplicationRecord
     rows = runs.map do |digest, list|
       list.sort_by! { |r| [ r[:at] || Time.at(0), r[:id] ] }
       e = TokenLeaderboard.entry_for(policy, digest, list)
-      { survey_id: survey.id, key_digest: digest, total: e[:total],
+      # `total` is the basis the board ranks by (Survey#leaderboard_rank_by);
+      # `totals` is every declared type's figure for the row's breakdown.
+      { survey_id: survey.id, key_digest: digest, total: e[:total], totals: e[:totals],
         achieved_at: e[:achieved_at] || Time.at(0), created_at: now, updated_at: now }
     end
     upsert_all(rows, unique_by: [ :survey_id, :key_digest ], record_timestamps: false)

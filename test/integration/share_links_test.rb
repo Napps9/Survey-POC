@@ -42,15 +42,32 @@ class ShareLinksTest < ActionDispatch::IntegrationTest
     assert_select "[data-share-modal-target='modal']", 1
   end
 
-  test "a non-admin member gets no Share button and no panel" do
+  # Every role gets the button and the panel — handing the link on is what
+  # every seat is for (the viewer role exists for exactly that). What a
+  # non-admin does NOT get is any of the panel's forms: those post to
+  # admin-only endpoints, so they're drawn on the same answer. See
+  # viewer_role_test for the viewer's side of this.
+  test "a non-admin member gets the Share button and a read-only panel" do
     org = sign_in_org("member", role: "member")
     survey = published_survey(org)
 
     get root_path
-    assert_select "button[data-action='click->share-modal#open']", 0
+    assert_select "button[data-action='click->share-modal#open']", 1
 
     get share_survey_path(survey)
-    assert_redirected_to root_path
+    assert_response :success
+    assert_select "input#share-url-main[value=?]", play_survey_url(survey.publish_token)
+    assert_select "form", 0, "a non-admin's panel should carry no forms at all"
+  end
+
+  test "the link mutations stay admin-only for a non-admin member" do
+    org = sign_in_org("member-mut", role: "member")
+    survey = published_survey(org)
+
+    assert_no_difference "SurveyLink.count" do
+      post survey_links_path(survey), params: { name: "Nope" }
+      assert_redirected_to root_path
+    end
   end
 
   # ── The panel ─────────────────────────────────────────────────────────────

@@ -85,7 +85,10 @@ class SurveysController < ApplicationController
   # Structural edits are refused while a Verto is live, and stay refused once it
   # has responses even after being unpublished — answers are keyed by card
   # index, so a deck change would misalign what's already stored. See
-  # Survey#editing_locked?.
+  # Survey#editing_locked?. Every guard below asks `editing_locked?(survey)`
+  # (the LiveEditing concern) rather than the model directly: it is the same
+  # answer for everyone except the accounts LiveEditAccess lets past the lock,
+  # who edit live Vertos knowingly, with the editor warning them what it costs.
   # Deliberately a method, not a constant. `t` isn't available in a class body,
   # and a constant would resolve once at boot and pin every creator to whatever
   # locale happened to be active then — the exact thing P2-2 is undoing.
@@ -108,16 +111,33 @@ class SurveysController < ApplicationController
   #
   # `leaderboard_retake_policy` IS here: flipping it silently rewrites standings
   # respondents have already been shown (accumulate→restart collapses a
-  # three-run total to one run), exactly like the scoring switches.
-  # `leaderboard_enabled` is not — it only shows or hides a board computed at
-  # read time.
+  # three-run total to one run), exactly like the scoring switches — and so is
+  # `leaderboard_rank_by`, which re-orders the whole board (coal instead of
+  # the sum). `leaderboard_enabled` is not — it only shows or hides a board
+  # computed at read time.
   SETTINGS_LOCKED_IN_USE = %i[
     consent_text consent_image consent_image_credit consent_image_credit_url
-    tokenisation_enabled token_types quiz leaderboard_retake_policy
+    tokenisation_enabled token_types quiz leaderboard_retake_policy leaderboard_rank_by
     capture_postcode
   ].freeze
 
   def settings_locked_message = t("flash.surveys.settings_locked")
+
+  # A viewer (Membership#viewer?) shares Vertos and reads their results, and
+  # nothing else: every action that changes a Verto — its deck, its settings,
+  # its languages, whether it is live or in Test Mode — is refused at the door.
+  # The editor itself (#show) is in the list, because everything it does lands
+  # on one of the endpoints after it. Creation is gated separately above
+  # (creation implies editing, so those need no second entry), and the
+  # destructive set is admin-only below. What is left — index, preview, qr,
+  # results, results_compare — is exactly what a viewer is for. The coverage
+  # test in viewer_role_test.rb holds every action to one of these lists.
+  gate_verto_editing only: %i[ show update publish unpublish enable_test_link disable_test_link
+                               convert_to_test_mode update_settings update_languages
+                               update_audience_country card_image card_lottie moderate_image
+                               pexels_search shuffle_assets setup_status generate_card
+                               generate_flow restore_card optimise_card render_card
+                               add_demographic_card ]
 
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy, :contacts ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr, :contacts ]
@@ -402,7 +422,7 @@ class SurveysController < ApplicationController
 
   def update
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     payload = JSON.parse(request.body.read)
@@ -420,7 +440,12 @@ class SurveysController < ApplicationController
     attrs[:description] = payload["description"] if payload.key?("description")
     attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")
-      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings)
+      # A locked deck only reaches this line under the live-edit override
+      # (LiveEditing). It keeps its existing shape: the sanitiser's passes that
+      # remove or move a card already in the deck are skipped, so the first
+      # autosave after fixing a typo can't quietly re-point stored answers.
+      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings,
+                                                    structural: !survey.editing_locked?)
       # Token config mirrors the setup-media carry below: the editor renders
       # token controls only when tokenisation is on, so a page loaded while it
       # was off rebuilds cards with no token keys — silence from a client that
@@ -664,7 +689,7 @@ class SurveysController < ApplicationController
   # is never blocked from applying an image by a storage hiccup.
   def card_image
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -686,7 +711,7 @@ class SurveysController < ApplicationController
   # survives the cards sanitiser, so a failure here means "not applied".
   def card_lottie
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -831,17 +856,25 @@ class SurveysController < ApplicationController
     # deliberately NOT in SETTINGS_LOCKED_IN_USE. None of them re-scores an
     # answer or changes what anyone agreed to; they only affect what a
     # respondent is shown from here on. leaderboard_enabled belongs here too:
-    # the standings are computed at read time from data that exists either way,
-    # so the toggle only shows or hides them.
-    %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled share_enabled
+    # the standings are a snapshot of data that is collected either way, so
+    # the toggle only shows or hides them. no_going_back and no_retests are
+    # play rules rather than presentation, but they belong here for the same
+    # reason: neither re-scores an answer or changes what anyone agreed to,
+    # and No retests is MEANT to be switched between waves of a live Verto.
+    %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled token_amounts_shown share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
-       chrome_follows_verto_language auto_detect_language contact_form_enabled].each do |flag|
+       chrome_follows_verto_language auto_detect_language contact_form_enabled
+       no_going_back no_retests].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
     end
     if params.key?(:leaderboard_retake_policy)
       attrs[:leaderboard_retake_policy] =
         Survey.normalize_leaderboard_retake_policy(params[:leaderboard_retake_policy])
+    end
+    if params.key?(:leaderboard_rank_by)
+      attrs[:leaderboard_rank_by] =
+        Survey.normalize_leaderboard_rank_by(params[:leaderboard_rank_by], @survey.token_type_ids)
     end
     # Unlike the presentation switches above, this one DOES change what's
     # collected — toggling it mid-collection would ask different respondents
@@ -924,7 +957,7 @@ class SurveysController < ApplicationController
     # silently drops half of what was asked for is harder to reason about than
     # one that plainly didn't happen. In practice each of these forms submits a
     # single field, so nothing legitimate gets caught alongside.
-    if @survey.editing_locked? && (attrs.keys & SETTINGS_LOCKED_IN_USE).any?
+    if editing_locked?(@survey) && (attrs.keys & SETTINGS_LOCKED_IN_USE).any?
       respond_to do |format|
         format.html { redirect_to survey_path(@survey, panel: "publish"), alert: settings_locked_message }
         format.json { render json: { ok: false, error: settings_locked_message }, status: :locked }
@@ -965,7 +998,7 @@ class SurveysController < ApplicationController
 
   def shuffle_assets
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return redirect_to survey_path(survey), alert: editing_locked_message
     end
     # The optional direction prompt belongs to THIS click and is not stored:
@@ -1093,10 +1126,12 @@ class SurveysController < ApplicationController
       # — the creator's results page must not re-scan every completed response
       # while a burst is finishing.
       LeaderboardStanding.bootstrap!(@survey)
-      @leaderboard_player_count = @survey.leaderboard_standings.maximum(:rank).to_i
-      @leaderboard = @survey.leaderboard_standings.order(:rank)
+      # Rank is positional in `ranked` order — the snapshot stores none, so a
+      # refresh only ever touches the identities that changed.
+      @leaderboard_player_count = @survey.leaderboard_standings.count
+      @leaderboard = @survey.leaderboard_standings.ranked
                             .limit(RESULTS_LEADERBOARD_ROWS)
-                            .map { |s| { key_digest: s.key_digest, total: s.total, achieved_at: s.achieved_at } }
+                            .map { |s| { key_digest: s.key_digest, total: s.total, totals: s.totals, achieved_at: s.achieved_at } }
       digests = @leaderboard.map { |e| e[:key_digest] }
       digests.each { |d| PlayerAlias.ensure_for!(survey: @survey, key_digest: d) }
       @leaderboard_names = @survey.player_aliases.where(key_digest: digests)
@@ -1121,6 +1156,40 @@ class SurveysController < ApplicationController
         aggregate_results(Array(@survey.cards), baseline_seg[:scope]),
         aggregate_results(Array(@survey.cards), latest_seg[:scope])
       )
+    end
+
+    # Responders — whole-Verto and filter-independent like the two cards
+    # above, because spanning waves/dates/segments is the whole point of a
+    # respondent code. Counts only, wearing the same minted names as the
+    # export's Responder column; the admin-gated respondent-data page stays
+    # the per-person drill-down. Grouped queries take .reorder(nil) so the
+    # base scope's ORDER BY never rides into a GROUP BY (the Postgres shape
+    # SQLite lets through).
+    responder_scope = @survey.responses.where(answered: true)
+                             .where.not(respondent_code_digest: nil)
+    plays = responder_scope.reorder(nil).group(:respondent_code_digest).count
+    if plays.any?
+      @responders_total = plays.size
+      last_played = responder_scope.reorder(nil).group(:respondent_code_digest).maximum(:created_at)
+      if @survey.waved?
+        # Wave 1 stays implicit (nil survey_wave_id) until waves exist — fold
+        # nil into the position-1 wave, resolve_result_segments' rule.
+        wave_one = @survey.survey_waves.order(:position).first&.id
+        waves_by_digest = responder_scope.reorder(nil)
+          .group(:respondent_code_digest, :survey_wave_id).count
+          .each_with_object(Hash.new { |h, k| h[k] = Set.new }) do |((digest, wave_id), _n), acc|
+            acc[digest] << (wave_id || wave_one)
+          end
+        @responder_wave_count = @survey.survey_waves.size
+      end
+      top = plays.sort_by { |digest, n| [ -n, -last_played[digest].to_i, digest ] }
+                 .first(RESULTS_LEADERBOARD_ROWS)
+      @responders = top.map do |digest, n|
+        { name: RespondentAlias.ensure_for!(survey: @survey, code_digest: digest).anon_name,
+          plays: n,
+          waves: waves_by_digest && waves_by_digest[digest].size,
+          last_played: last_played[digest] }
+      end
     end
     render :results, layout: "fullscreen"
   end
@@ -1152,7 +1221,7 @@ class SurveysController < ApplicationController
   # Generates a single new question card using Claude, renders its HTML partial.
   def generate_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -1184,7 +1253,7 @@ class SurveysController < ApplicationController
   # wires the answer; autosave persists the lot (same contract as generate_card).
   def generate_flow
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     body   = JSON.parse(request.body.read)
@@ -1224,7 +1293,7 @@ class SurveysController < ApplicationController
   # takes it out of the bin at that point.
   def restore_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -1251,7 +1320,7 @@ class SurveysController < ApplicationController
   # in place and the traffic light turns green.
   def optimise_card
     @survey = survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     body = JSON.parse(request.body.read)
@@ -1300,7 +1369,7 @@ class SurveysController < ApplicationController
   # Renders the HTML partial for a given card JSON (used by "Start from Blank" flow).
   def render_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
     card   = JSON.parse(request.body.read)
@@ -1324,7 +1393,7 @@ class SurveysController < ApplicationController
   # shape so the client's seedCardStore receives the i18n prefill.
   def add_demographic_card
     survey = Current.organisation.surveys.kept.find(params[:id])
-    if survey.editing_locked?
+    if editing_locked?(survey)
       return render json: { ok: false, error: editing_locked_message }, status: :locked
     end
 
@@ -1407,7 +1476,9 @@ class SurveysController < ApplicationController
     # nobody has answered yet. That is exactly when rewriting an options list is
     # safe: there are no stored demographic_heritage values to orphan. Once a
     # Verto is live its audience is settled along with the rest of its content.
-    if @survey.editing_locked?
+    # (Unless the account is allowed past the lock — see LiveEditing — in which
+    # case the rewrite is theirs to own, like every other live edit.)
+    if editing_locked?(@survey)
       return redirect_to survey_path(@survey, panel: "publish"), alert: settings_locked_message
     end
 

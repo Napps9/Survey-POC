@@ -28,6 +28,20 @@ class ResultsReportsTest < ActionDispatch::IntegrationTest
     assert_equal 1, @survey.results_report_response_count
   end
 
+  # The modal parses these answers as JSON. A lapsed session used to redirect
+  # the fetch to the sign-in page, which parsed as "Unexpected token '<'".
+  test "a render request without a session gets a JSON 401, not the sign-in page" do
+    delete session_path
+    post survey_report_renders_path(@survey), params: { kind: "report" }, as: :json
+    assert_response :unauthorized
+    assert_equal "application/json", response.media_type
+    assert_match "session has expired", JSON.parse(response.body)["error"]
+
+    get report_render_path(1), headers: { "Accept" => "application/json" }
+    assert_response :unauthorized
+    assert_equal "application/json", response.media_type
+  end
+
   # The wkhtmltopdf render spawns a native process using 100-200MB transiently,
   # so it happens in a job now: ask for a render, wait for it, collect the file.
   test "requesting a PDF renders it in the background and serves a real file" do

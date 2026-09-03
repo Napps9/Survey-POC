@@ -5,11 +5,15 @@ module ResolvesResultSegments
 
   # Response segments for the results filter: always "Overall", plus a
   # "Direct link" and one entry per partner share when this Verto is shared,
-  # one entry per wave when it's been run more than once, and one entry per
-  # region tag when this Verto is region-tagged.
+  # one entry per custom link (SurveyLink) unless `links: false`, one entry per
+  # wave when it's been run more than once, and one entry per region tag when
+  # this Verto is region-tagged.
   # Each entry is { id:, label:, scope:, count: }. Shared by the results screen
   # and the CSV / Google Sheets exports so they all scope responses identically.
-  def result_segments(survey, base)
+  # The public shared-results page passes `links: false`: a link's name is the
+  # owner's own label for an audience (a research assistant, a newsletter), not
+  # something a stranger with the results token should read.
+  def result_segments(survey, base, links: true)
     segments = [ { id: "overall", label: "Overall", scope: base, count: base.count } ]
 
     shares = survey.survey_shares
@@ -27,6 +31,21 @@ module ResolvesResultSegments
         partnership_name = share.partnership_verto&.partnership&.name
         label = partnership_name ? "#{share.display_name} · #{partnership_name}" : share.display_name
         segments << { id: "share_#{share.id}", label: label, scope: scope, count: scope.count }
+      end
+    end
+
+    # Custom links (SurveyLink): structural groupings the owner made on purpose,
+    # like waves — no small-cell suppression, zero-count links stay ("0", not
+    # missing, so a freshly minted link shows up at once), recalled links stay
+    # (their old responses still point at them). The "Direct link" segment
+    # above is left alone: it means "not via a partner share" and so still
+    # counts link responses, matching SurveyLink's own contract that a link's
+    # answers are the Verto's own — the export names the link, the pill does
+    # not subtract it.
+    if links
+      survey.survey_links.ordered.each do |link|
+        scope = base.where(survey_link_id: link.id)
+        segments << { id: "link_#{link.id}", label: "🔗 #{link.name}", scope: scope, count: scope.count }
       end
     end
 
@@ -179,10 +198,10 @@ module ResolvesResultSegments
   # aggregator counts each card off its own answers, so an unfinished response
   # simply contributes to the questions it did reach. (Completion is still
   # surfaced separately as the dashboard's completion rate.)
-  def resolve_result_segments(survey, segment_param, range_param = nil)
+  def resolve_result_segments(survey, segment_param, range_param = nil, links: true)
     base     = survey.responses.where(answered: true).order(created_at: :desc)
     base     = apply_date_range(base, range_param)
-    segments = result_segments(survey, base)
+    segments = result_segments(survey, base, links: links)
     active   = segments.find { |s| s[:id] == segment_param } || segments.first
     [ base, segments, active ]
   end

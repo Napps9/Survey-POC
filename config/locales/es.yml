@@ -206,6 +206,8 @@ es:
     repeat_new_password: Repetir nueva contraseña
     set_submit: Guardar nueva contraseña
   results:
+    share_paused_by_admin: "Pausado por un administrador: el enlace volverá a funcionar cuando lo reanude."
+    share_not_enabled: "Aún no se comparte: un administrador de tu cuenta puede activar el uso compartido de resultados."
     title: Resultados
     editor: "← Editor"
     ask_verto: Preguntarle a Verto
@@ -287,6 +289,7 @@ es:
     tokens_welcome_note: "Ganarás puntos al responder cada pregunta — no puedes volver atrás y cambiar una respuesta para ganar más."
     leaderboard_teaser: "¡Quienes más puntos reúnen entran en la tabla de clasificación al final!"
     play_again: "Jugar otra vez"
+    next_person: "Siguiente persona"
     font_size: "Tamaño del texto"
   defaults:
     range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
@@ -383,6 +386,7 @@ es:
       leaderboard_queued: "Aparecerás en la tabla cuando vuelvas a estar en línea — tu puntuación está guardada."
       leaderboard_empty: "¡Sé la primera persona en la tabla!"
       already_played: "Ya jugaste este Verto — así va la tabla."
+      already_played_plain: "Ya has completado este Verto — gracias."
     editor:
       delete_card_confirm: "¿Eliminar esta tarjeta?"
       save_to_library: "Guardar también en mi biblioteca de marca"
@@ -657,6 +661,7 @@ es:
     switch_workspace: "Cambiar de espacio de trabajo"
     role_admin: "Administrador"
     role_member: "Miembro"
+    role_viewer: "Lector"
     members: Miembros
     sign_out: Cerrar sesión
   partnerships:
@@ -1112,6 +1117,7 @@ es:
     remove: 'Quitar'
     animation_theme: "Animación"
     live_locked_bar: "Este Verto está en vivo — las preguntas están bloqueadas para proteger la calidad de los datos."
+    live_edit_bar: "Editando un Verto en vivo — mover, añadir o quitar preguntas reasigna las respuestas ya recogidas."
     live_results: "Ver resultados →"
     publish_confirm: "¿Publicar este Verto? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."
     questions: preguntas
@@ -1135,6 +1141,7 @@ es:
     add_design_sub: Añade una imagen para darle vida a esta tarjeta
     live: EN VIVO
     live_warning: "Este Verto está en vivo, así que sus preguntas están bloqueadas: cada persona responde exactamente el mismo Verto, lo que mantiene tus resultados comparables. ¿Necesitas cambios? Crea un Verto nuevo."
+    live_edit_warning: "Este Verto está en vivo y, aun así, tu cuenta puede editarlo. Las respuestas se guardan según la posición de cada pregunta, así que añadir, quitar o reordenar preguntas hace que las respuestas ya recogidas apunten a otra pregunta, y reformular una opción cambia la clave de respuesta bajo la que quedó registrada. Siempre que puedas, corrige la redacción en su sitio — si lo que tiene que cambiar son las propias preguntas, un Verto nuevo mantiene intactos los resultados de este."
     got_it: Entendido
     add_question: Agregar pregunta
     cards:
@@ -1305,6 +1312,7 @@ es:
     empty_cta: Crea tu primer Verto →
     empty_title_managed: "Aún no hay Vertos"
     empty_body_managed: "Tu equipo de Playverto publica los Vertos aquí. Aparecerán en cuanto el primero esté listo."
+    empty_body_viewer: "Los Vertos de tu equipo aparecerán aquí en cuanto se cree el primero: listos para que los compartas y veas los resultados."
     section_live: Activos
     section_drafts: Borradores
     section_archived: Archivados
@@ -1718,6 +1726,7 @@ es:
       no_organisation: "No se encontró ninguna organización."
       not_authorised: "No autorizado."
       verto_creation_disabled: "Tu cuenta no crea Vertos: tu equipo de Playverto los crea por ti."
+      viewer_read_only: "Los lectores pueden compartir Vertos y ver sus resultados, pero no pueden crearlos ni editarlos."
     sessions:
       rate_limited: "Inténtalo de nuevo más tarde."
       invalid_credentials: "Prueba con otra dirección de correo electrónico o con otra contraseña."

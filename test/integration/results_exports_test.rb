@@ -28,6 +28,28 @@ class ResultsExportsTest < ActionDispatch::IntegrationTest
     assert_match "Blue", response.body
   end
 
+  # The research-assistant case: several people administer one Verto through
+  # their own custom links, and a batch has to be identifiable afterwards. The
+  # stamp already existed; this is it reaching the CSV, and the link segment
+  # scoping the export to that one batch.
+  test "a response through a custom link exports its link name, and the link segment exports only that batch" do
+    link = @survey.survey_links.create!(name: "RA Sam", slug: "ra-sam-#{SecureRandom.hex(2)}")
+    post progress_survey_path(link.slug),
+         params: { session_token: "via-link", answers: { "0" => { "type" => "multiple_choice", "value" => "Green" } } }.to_json,
+         headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+
+    get survey_results_export_path(@survey, kind: "responses")
+    rows = CSV.parse(response.body.delete_prefix("\xEF\xBB\xBF".b.force_encoding("UTF-8")))
+    source = rows.first.index("Source")
+    assert_equal [ "Direct link", "RA Sam" ].sort, rows.drop(1).map { |r| r[source] }.sort
+
+    get survey_results_export_path(@survey, kind: "responses", segment: "link_#{link.id}")
+    rows = CSV.parse(response.body.delete_prefix("\xEF\xBB\xBF".b.force_encoding("UTF-8")))
+    assert_equal 1, rows.drop(1).size, "the link's segment exports that batch alone"
+    assert_equal "RA Sam", rows.last[source]
+  end
+
   test "downloads the aggregated summary CSV" do
     get survey_results_export_path(@survey, kind: "summary")
     assert_response :success
@@ -100,6 +122,33 @@ class ResultsExportsTest < ActionDispatch::IntegrationTest
     assert_match survey_google_sheet_path(@survey, segment: "overall"), response.body
   ensure
     ENV["GOOGLE_CLIENT_ID"], ENV["GOOGLE_CLIENT_SECRET"] = prev
+  end
+
+  test "the CSV groups a responder's runs under one minted name, and never leaks a digest" do
+    digest = @survey.respondent_code_digest("sam14")
+    early  = @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", locale: "en",
+                                       respondent_code_digest: digest, created_at: 3.days.ago,
+                                       answers: { "0" => { "type" => "multiple_choice", "value" => "Green" } })
+    late   = @survey.responses.create!(session_token: SecureRandom.uuid, status: "completed", locale: "en",
+                                       respondent_code_digest: digest, created_at: 1.day.ago,
+                                       answers: { "0" => { "type" => "multiple_choice", "value" => "Blue" } })
+
+    get survey_results_export_path(@survey, kind: "responses")
+    assert_response :success
+
+    parsed = CSV.parse(response.body.delete_prefix("﻿"), headers: true)
+    assert_includes parsed.headers, "Responder"
+    assert_includes parsed.headers, "Device group"
+
+    rows  = parsed.map { |r| r }
+    coded = rows.select { |r| r["Responder"].present? }
+    assert_equal [ early.id.to_s, late.id.to_s ], coded.map { |r| r["Response ID"] },
+                 "one responder's runs sit together, in play order"
+    assert_equal 1, coded.map { |r| r["Responder"] }.uniq.size
+    assert rows.last["Responder"].blank?, "the uncoded setup response trails the named group"
+
+    assert_not_includes response.body, digest
+    assert_not_includes response.body, "sam14"
   end
 
   test "results include partial (started) responders, excluding those who answered nothing" do

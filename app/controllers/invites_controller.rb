@@ -27,7 +27,7 @@ class InvitesController < ApplicationController
 
   def create
     email = params[:email_address].to_s.strip.downcase
-    role  = params[:role].presence_in(%w[member admin]) || "member"
+    role  = params[:role].presence_in(Membership::ROLES) || "member"
 
     if email.blank?
       flash.now[:alert] = t("flash.invites.email_address_required")

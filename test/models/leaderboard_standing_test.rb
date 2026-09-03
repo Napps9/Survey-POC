@@ -49,6 +49,15 @@ class LeaderboardStandingTest < ActiveSupport::TestCase
     assert_equal "d-high", board.first.key_digest
   end
 
+  test "refresh! materialises each type's total beside the ranked one" do
+    complete!("d-high", "A")
+    LeaderboardStanding.refresh!(@survey)
+
+    row = @survey.leaderboard_standings.find_by!(key_digest: "d-high")
+    assert_equal 5, row.total
+    assert_equal({ "pts" => 5 }, row.totals)
+  end
+
   test "rank_of is the 1-based position in ranked order, ties to the earlier achiever" do
     t = Time.current
     complete!("d-first",  "A", at: t - 60)

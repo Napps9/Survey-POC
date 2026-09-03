@@ -206,6 +206,8 @@ ja:
     repeat_new_password: 新しいパスワードを再入力
     set_submit: 新しいパスワードを保存
   results:
+    share_paused_by_admin: "管理者によって一時停止中です。再開されるとリンクは再び有効になります。"
+    share_not_enabled: "まだ共有されていません。アカウントの管理者が結果の共有を有効にできます。"
     title: 結果
     editor: "← エディター"
     ask_verto: Vertoに聞く
@@ -287,6 +289,7 @@ ja:
     tokens_welcome_note: "各質問に答えるとポイントがもらえます — 一度答えると後で戻って変更し、さらに獲得することはできません。"
     leaderboard_teaser: "ポイントを多く集めた人は最後にリーダーボードに載ります!"
     play_again: "もう一度プレイ"
+    next_person: "次の人"
     font_size: "文字サイズ"
   defaults:
     range: ["全くそう思わない", "そう思わない", "どちらとも言えない", "そう思う", "強くそう思う"]
@@ -383,6 +386,7 @@ ja:
       leaderboard_queued: "オンラインに戻り次第ボードに載ります — スコアは保存済みです。"
       leaderboard_empty: "ボードの最初のひとりになろう!"
       already_played: "このVertoはプレイ済みです — 現在のボードはこちら。"
+      already_played_plain: "このVertoにはすでに回答済みです — ありがとうございました。"
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
@@ -657,6 +661,7 @@ ja:
     switch_workspace: "ワークスペースを切り替える"
     role_admin: "管理者"
     role_member: "メンバー"
+    role_viewer: "閲覧者"
     members: メンバー
     sign_out: ログアウト
   partnerships:
@@ -1112,6 +1117,7 @@ ja:
     remove: '削除'
     animation_theme: "アニメーション"
     live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"
+    live_edit_bar: "公開中のVertoを編集中 — 質問の移動・追加・削除で、収集済みの回答の対応がずれます。"
     live_results: "結果を見る →"
     publish_confirm: "このVertoを公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     questions: 質問
@@ -1135,6 +1141,7 @@ ja:
     add_design_sub: 画像を追加してカードを魅力的に
     live: ライブ
     live_warning: "このVertoは公開中のため、質問はロックされています — 全員がまったく同じVertoに回答するので、結果の比較可能性が保たれます。変更が必要なら、新しいVertoを作成してください。"
+    live_edit_warning: "このVertoは公開中ですが、あなたのアカウントではそれでも編集できます。回答は各質問の位置に対して保存されるため、質問を追加・削除・並べ替えると、すでに集まった回答が別の質問に紐づいてしまいます。また、選択肢の文言を書き換えると、回答が記録されていた回答キーも変わってしまいます。できる限り文言はその場で修正してください — 質問そのものを変える必要があるなら、新しいVertoを作成すれば、このVertoの結果はそのまま残ります。"
     got_it: 了解
     add_question: 質問を追加
     cards:
@@ -1305,6 +1312,7 @@ ja:
     empty_cta: 最初のVertoを作成 →
     empty_title_managed: "まだ Verto がありません"
     empty_body_managed: "Playverto チームがここに Verto を公開します。最初の 1 つが完成すると表示されます。"
+    empty_body_viewer: "チームの Verto は、最初の 1 つが作成されるとここに表示されます。共有したり結果を見たりできます。"
     section_live: ライブ
     section_drafts: 下書き
     section_archived: アーカイブ済み
@@ -1676,6 +1684,7 @@ ja:
       no_organisation: "組織が見つかりません。"
       not_authorised: "権限がありません。"
       verto_creation_disabled: "このアカウントでは Verto を作成できません。Playverto チームが代わりに作成します。"
+      viewer_read_only: "閲覧者は Verto を共有して結果を見ることはできますが、作成や編集はできません。"
     partnership_common_question_sets:
       creator_only: "この操作はパートナーシップの作成者のみが行えます。"
       partnership_not_found: "パートナーシップが見つかりません。"

@@ -151,6 +151,16 @@ that: push green.
   `bin/rails tailwindcss:build` before believing a local CSS-dependent system
   failure — 2026-08-14, a stale build made a passing fan-arc test look like a
   geometry bug in someone else's commit.
+- The PDF renders (report + share card) exec wkhtmltopdf from the
+  `wkhtmltopdf-binary` gem. The suite passes on Ubuntu runners because they
+  already carry its shared libraries; production is `ruby:slim`, which
+  doesn't, and the gem inflates its gzipped binary into the root-owned gem
+  dir on first use while the app runs as uid 1000. The `Dockerfile` installs
+  the libs and runs `bundle exec wkhtmltopdf --version` as root so the image
+  build fails if either regresses — a green suite says nothing about it.
+  The Drive export needs the **Google Drive API** enabled on the Cloud
+  project (the Sheets export only needs the Sheets API); a 403 there is
+  passed through to the modal rather than shown as "try again".
 - `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)
   with **network-first (3.5s timeout) + offline cache fallback** for the
   player HTML. Content/markup/CSS fixes therefore reach respondents on their
