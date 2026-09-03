@@ -100,16 +100,36 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 15 | **path probe**: `/up` at 400 req/s (2 generators × 200) | **Clean**: 43,998 requests, 0 failed, no dropped iterations; medians **183 ms / 106 ms** (the two runners sit in different regions — those are their network floors), p95 208 / 123 ms, max 744 ms; ~340 req/s averaged over ramp+hold, 400 req/s held | The path is innocent: Cloudflare → Render proxy → Puma → a pool checkout and one trivial database round-trip carries 400 req/s on the same 20-slot box with nothing queueing. So the ~185 req/s wall is in what the journeys do that `/up` does not: the heavier database work (response writes across 14 indexes, the leaderboard's two counts over the 50k board — measured locally at ~13 ms of DB CPU per board read), the Key Value round-trips (`rate_limit` on every request), or Ruby CPU in the app. Render's own graphs for 08:14–08:20 UTC (web CPU, database CPU, Key Value) split those three; the next probe splits the Key Value from the database. |
 | 16 | **stack probe**: `/play/:token/manifest` at 400 req/s (2 × 200) | **Queued**: combined **310 req/s** served, medians 3.1–3.3 s, p95 6.7 s, 0 failed, all `http_req_waiting`; both runners hit their 1,000-VU cap | The manifest is PlayerController's full stack — ApplicationController filters, the survey load, a 300-byte JSON render — with no writes, no rate-limit counter, no Key Value and no board. It walls at 310 req/s where the bare `ActionController::Base` health check ran 400 clean. So the ceiling is Ruby CPU per request in the app's own request stack, and the journeys (page render, response upserts, board counts) simply cost more of it per request: 20 slots ÷ 310 req/s = 65 ms per request in the box, ≈ 6.5 ms of CPU each across 2 vCPUs; the journeys work out at ≈ 11 ms. Web-CPU graph for 08:44–08:47 UTC confirms it if it sits at the 2-CPU line. What does NOT fit a pure-CPU story is run 12: the 1-vCPU box did 160 req/s of journeys, 85% of what 2 vCPUs did — either Standard instances burst above their 1 CPU, or 4 workers × 5 threads waste a good part of the second core (GVL, context switching, 4× GC). Either way the Pro box bought +17% for 3.4× the price. |
 
-**Measured capacity (2026-09-02):** with Key Value carrying the cache and
-rate-limit counters and the database on 4c-16g, a single 1c-2g web instance
-(3 Puma threads) sustains **~160 req/s ≈ 23 respondent arrivals/s** and
-degrades gracefully (queueing, zero errors) beyond it. Healthy server-side
-service time ≈ 20–40 ms for the API endpoints and ≈ 200 ms for the 150 KB
-page. Naive fleet arithmetic for the 83 arrivals/s event peak: **4 such
-instances at saturation, 6–7 at 65% utilisation** — i.e. $25/mo-class boxes,
-not the 6 × Pro Plus the pre-measurement plan assumed. The Pro Plus run
-(WEB_CONCURRENCY=4, RAILS_MAX_THREADS=5) is still worth doing because if the
-small box is thread-limited, one Pro Plus may carry ~5–6× as much.
+**Measured capacity (2026-09-03):** the ceiling is **Ruby CPU per request
+on the web instance**, not the database, the cache, the proxy path or the
+load generator (runs 13–16 exonerated each in turn). In-process profile of
+the journey against the load-test Verto (dev mode, so an upper bound; the
+proportions are what matter):
+
+| Endpoint | CPU/request | Payload |
+|---|---|---|
+| `/up` (bare controller) | 3.8 ms | 0 B |
+| `manifest` (PlayerController stack) | 7.0 ms | 376 B |
+| **`show` (the play page)** | **47.8 ms** | **149 KB** |
+| `consent` | 9.8 ms | 11 B |
+| `progress` | 9.2 ms | 42 B |
+| `submit` | 12.1 ms | 39 B |
+| `leaderboard` | 14.8 ms | 694 B |
+
+≈ 105 ms of CPU per journey in dev, of which the page render is **45%**; at
+production's ~0.75× that is ≈ 80 ms, and 2 vCPUs ÷ 80 ms ≈ 25 journeys/s —
+which is what the 2c-4g box did (26.7). Per instance, saturated: **2c-4g
+(Render Pro, 4 × 5 slots) ≈ 27 arrivals/s ≈ 187 req/s; 1c-2g (Standard,
+1 × 3) ≈ 23 arrivals/s ≈ 160 req/s** — the small box delivered 85% of the
+big one's throughput for 30% of its price, so either Standard instances
+burst well above their nominal CPU (its CPU graph for 2026-09-02
+16:39–16:45 UTC says) or 4 workers × 5 threads squander much of the second
+core; scale **out** with small boxes, not up. Fleet for the 83 arrivals/s
+event peak, as the app stands: **4 Pro at saturation / 5 at 65%**, or
+**4 Standard at saturation / 6 at 65%** (if the small box's figure holds
+sustained). The single biggest lever is the page: cache the rendered play
+page per Verto/locale (or serve it from the CDN, §1 stage 4) and the journey
+loses ~45% of its CPU, which roughly halves either fleet.
 
 Standing conclusions: (0) **Stage 5 is proven** — run 9 vs run 7 above; production should get `REDIS_URL` (a Frankfurt Key Value instance) on a quiet day, before any web scale-out; (1) **five** production fixes came out of the harness
 — named rate limits, the scale knob, the whole-board refresh, the rebuild
