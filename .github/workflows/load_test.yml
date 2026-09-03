@@ -54,6 +54,14 @@ on:
         description: "How many runners share the arrival rate (1–8)"
         required: false
         default: "1"
+      script:
+        description: "k6 script under test/load/ (journey.js = respondent journeys; ping.js = path-only probe of PING_PATH)"
+        required: false
+        default: "test/load/journey.js"
+      ping_path:
+        description: "ping.js only: the path to hit"
+        required: false
+        default: "/up"
 
 permissions:
   contents: read
@@ -72,6 +80,8 @@ jobs:
       dwell_scale:    ${{ steps.p.outputs.dwell_scale }}
       brownout:       ${{ steps.p.outputs.brownout }}
       generators:     ${{ steps.p.outputs.generators }}
+      script:         ${{ steps.p.outputs.script }}
+      ping_path:      ${{ steps.p.outputs.ping_path }}
       matrix:         ${{ steps.p.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
@@ -87,6 +97,8 @@ jobs:
           IN_DWELL: ${{ inputs.dwell_scale }}
           IN_BROWNOUT: ${{ inputs.brownout }}
           IN_GENERATORS: ${{ inputs.generators }}
+          IN_SCRIPT: ${{ inputs.script }}
+          IN_PING_PATH: ${{ inputs.ping_path }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "push" ]; then
             # Only bare KEY=VALUE lines are taken from RUN; comments and
@@ -97,13 +109,17 @@ jobs:
             BASE_URL="$IN_BASE_URL"; TOKEN="$IN_TOKEN"; ARRIVALS_PER_S="$IN_ARRIVALS"
             RAMP_S="$IN_RAMP"; HOLD_S="$IN_HOLD"; DWELL_SCALE="$IN_DWELL"
             BROWNOUT="$IN_BROWNOUT"; GENERATORS="$IN_GENERATORS"
+            SCRIPT="$IN_SCRIPT"; PING_PATH="$IN_PING_PATH"
           fi
           GENERATORS="${GENERATORS:-1}"
+          SCRIPT="${SCRIPT:-test/load/journey.js}"
+          PING_PATH="${PING_PATH:-/up}"
           case "$BASE_URL" in
             *playverto.com*|*survey-poc.onrender.com*)
               echo "::error::base_url looks like production. Refusing." && exit 1 ;;
           esac
           case "$GENERATORS" in [1-8]) ;; *) echo "::error::GENERATORS must be 1–8, got '$GENERATORS'" && exit 1 ;; esac
+          case "$SCRIPT" in test/load/*.js) [ -f "$SCRIPT" ] || { echo "::error::no such script '$SCRIPT'" && exit 1; } ;; *) echo "::error::SCRIPT must be a test/load/*.js file, got '$SCRIPT'" && exit 1 ;; esac
           case "$ARRIVALS_PER_S" in ''|*[!0-9]*) echo "::error::ARRIVALS_PER_S must be a whole number, got '$ARRIVALS_PER_S'" && exit 1 ;; esac
           {
             echo "base_url=$BASE_URL"
@@ -114,9 +130,11 @@ jobs:
             echo "dwell_scale=$DWELL_SCALE"
             echo "brownout=$BROWNOUT"
             echo "generators=$GENERATORS"
+            echo "script=$SCRIPT"
+            echo "ping_path=$PING_PATH"
             echo "matrix=[$(seq -s, 1 "$GENERATORS")]"
           } >> "$GITHUB_OUTPUT"
-          echo "$ARRIVALS_PER_S arrivals/s over $GENERATORS generator(s) against $BASE_URL (ramp ${RAMP_S}s, hold ${HOLD_S}s, dwell ${DWELL_SCALE})"
+          echo "$SCRIPT: $ARRIVALS_PER_S arrivals/s over $GENERATORS generator(s) against $BASE_URL (ramp ${RAMP_S}s, hold ${HOLD_S}s, dwell ${DWELL_SCALE})"
 
   k6:
     needs: plan
@@ -136,6 +154,8 @@ jobs:
       TOTAL_ARRIVALS_PER_S: ${{ needs.plan.outputs.arrivals_per_s }}
       GENERATORS: ${{ needs.plan.outputs.generators }}
       GENERATOR: ${{ matrix.generator }}
+      SCRIPT: ${{ needs.plan.outputs.script }}
+      PING_PATH: ${{ needs.plan.outputs.ping_path }}
     steps:
       - uses: actions/checkout@v4
 
@@ -168,7 +188,7 @@ jobs:
         run: |
           ./k6 run --summary-export=k6-summary.json --summary-mode=full \
             --summary-trend-stats "avg,min,med,p(90),p(95),p(99),max" \
-            test/load/journey.js 2>&1 | tee k6-output.txt
+            "$SCRIPT" 2>&1 | tee k6-output.txt
           exit "${PIPESTATUS[0]}"
 
       - name: Upload results

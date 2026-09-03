@@ -86,6 +86,14 @@ went: a queue that is `http_req_waiting` is the server's, one that is
 `http_req_blocked` is the runner's own. The `DWELL_SCALE=1` rehearsal still
 needs bigger machines than the standard runner.
 
+`SCRIPT=test/load/ping.js` (dispatch input `script`) swaps the journeys for
+the path-only probe: one cheap endpoint (`PING_PATH`, default `/up` — no
+database, cache or rate limit) at `ARRIVALS_PER_S` **requests** per second.
+Run it when the journeys hit a ceiling that does not move with the web box:
+if `/up` queues at the same rate the ceiling is the path (edge, proxy,
+accept queue); if it runs clean far above, the ceiling is in what the
+journeys touch (database, Key Value, the app).
+
 ## What to record per run
 
 - k6 summary: per-endpoint p50/p95/p99, `http_req_failed`, `journey_duration`.
