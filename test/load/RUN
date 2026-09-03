@@ -1,7 +1,7 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 12: 40/s (~240 req/s) on the single 1c-2g box — run 11 at 20/s was
-# fully green, so double again to find the 1-vCPU ceiling.
+# Run 13: 40/s on the 2c-4g box with WEB_CONCURRENCY=4 × RAILS_MAX_THREADS=5
+# (20 slots) — the rate the single 1-vCPU/3-thread box queued on in run 12.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 ARRIVALS_PER_S=40
