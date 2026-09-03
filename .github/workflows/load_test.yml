@@ -62,6 +62,10 @@ on:
         description: "ping.js only: the path to hit"
         required: false
         default: "/up"
+      skip:
+        description: "journey.js only: optional steps to drop, comma-separated (leaderboard, manifest, service_worker)"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -82,6 +86,7 @@ jobs:
       generators:     ${{ steps.p.outputs.generators }}
       script:         ${{ steps.p.outputs.script }}
       ping_path:      ${{ steps.p.outputs.ping_path }}
+      skip:           ${{ steps.p.outputs.skip }}
       matrix:         ${{ steps.p.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
@@ -99,6 +104,7 @@ jobs:
           IN_GENERATORS: ${{ inputs.generators }}
           IN_SCRIPT: ${{ inputs.script }}
           IN_PING_PATH: ${{ inputs.ping_path }}
+          IN_SKIP: ${{ inputs.skip }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "push" ]; then
             # Only bare KEY=VALUE lines are taken from RUN; comments and
@@ -109,7 +115,7 @@ jobs:
             BASE_URL="$IN_BASE_URL"; TOKEN="$IN_TOKEN"; ARRIVALS_PER_S="$IN_ARRIVALS"
             RAMP_S="$IN_RAMP"; HOLD_S="$IN_HOLD"; DWELL_SCALE="$IN_DWELL"
             BROWNOUT="$IN_BROWNOUT"; GENERATORS="$IN_GENERATORS"
-            SCRIPT="$IN_SCRIPT"; PING_PATH="$IN_PING_PATH"
+            SCRIPT="$IN_SCRIPT"; PING_PATH="$IN_PING_PATH"; SKIP="$IN_SKIP"
           fi
           GENERATORS="${GENERATORS:-1}"
           SCRIPT="${SCRIPT:-test/load/journey.js}"
@@ -132,6 +138,7 @@ jobs:
             echo "generators=$GENERATORS"
             echo "script=$SCRIPT"
             echo "ping_path=$PING_PATH"
+            echo "skip=${SKIP:-}"
             echo "matrix=[$(seq -s, 1 "$GENERATORS")]"
           } >> "$GITHUB_OUTPUT"
           echo "$SCRIPT: $ARRIVALS_PER_S arrivals/s over $GENERATORS generator(s) against $BASE_URL (ramp ${RAMP_S}s, hold ${HOLD_S}s, dwell ${DWELL_SCALE})"
@@ -156,6 +163,7 @@ jobs:
       GENERATOR: ${{ matrix.generator }}
       SCRIPT: ${{ needs.plan.outputs.script }}
       PING_PATH: ${{ needs.plan.outputs.ping_path }}
+      SKIP: ${{ needs.plan.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
 

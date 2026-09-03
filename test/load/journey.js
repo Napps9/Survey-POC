@@ -34,6 +34,15 @@ const ARRIVALS = Number(__ENV.ARRIVALS_PER_S || 10);
 const RAMP_S = Number(__ENV.RAMP_S || 60);
 const HOLD_S = Number(__ENV.HOLD_S || 300);
 const DWELL = Number(__ENV.DWELL_SCALE || 0.05);
+// SKIP=leaderboard,manifest,service_worker drops optional steps from the
+// journey so a ceiling can be attributed: the same arrival rate with the
+// board read removed tells whether the board's two counts over a big
+// snapshot are what the database is spending itself on. The writes
+// (consent, progress, submit) are never skippable — they ARE the journey.
+const SKIP = new Set(String(__ENV.SKIP || "").split(",").map((s) => s.trim()).filter(Boolean));
+for (const step of SKIP) {
+  if (![ "leaderboard", "manifest", "service_worker" ].includes(step)) throw new Error(`SKIP: unknown step '${step}'`);
+}
 
 const play = `${BASE}/play/${TOKEN}`;
 const journeyTime = new Trend("journey_duration", true);
@@ -133,8 +142,8 @@ export function journey() {
   // :html and the .js/.json templates 500 with MissingTemplate — a harness
   // artifact, not a server fault (seen as status=500 samples in runs 3–4).
   const anyType = { headers: { Accept: "*/*" } };
-  note(http.get(`${play}/manifest`, { ...anyType, tags: { endpoint: "manifest" } }), "manifest");
-  note(http.get(`${BASE}/service-worker`, { ...anyType, tags: { endpoint: "service_worker" } }), "service_worker");
+  if (!SKIP.has("manifest")) note(http.get(`${play}/manifest`, { ...anyType, tags: { endpoint: "manifest" } }), "manifest");
+  if (!SKIP.has("service_worker")) note(http.get(`${BASE}/service-worker`, { ...anyType, tags: { endpoint: "service_worker" } }), "service_worker");
   sleep(60 * DWELL);
 
   // 2. Consent.
@@ -159,14 +168,16 @@ export function journey() {
   sleep(5 * DWELL);
 
   // 5. The auto-fired leaderboard on the thank-you screen.
-  const lb = note(http.get(`${play}/leaderboard?session_token=${session}&player_key=${encodeURIComponent(playerKey)}`,
-    { tags: { endpoint: "leaderboard" } }), "leaderboard");
-  check(lb, {
-    "leaderboard 200": (r) => r.status === 200,
-    "leaderboard has entries": (r) => {
-      try { return Array.isArray(r.json().entries); } catch (_) { return false; }
-    },
-  });
+  if (!SKIP.has("leaderboard")) {
+    const lb = note(http.get(`${play}/leaderboard?session_token=${session}&player_key=${encodeURIComponent(playerKey)}`,
+      { tags: { endpoint: "leaderboard" } }), "leaderboard");
+    check(lb, {
+      "leaderboard 200": (r) => r.status === 200,
+      "leaderboard has entries": (r) => {
+        try { return Array.isArray(r.json().entries); } catch (_) { return false; }
+      },
+    });
+  }
 
   journeyTime.add(Date.now() - started);
 }

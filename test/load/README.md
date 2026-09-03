@@ -94,6 +94,12 @@ if `/up` queues at the same rate the ceiling is the path (edge, proxy,
 accept queue); if it runs clean far above, the ceiling is in what the
 journeys touch (database, Key Value, the app).
 
+`SKIP=leaderboard` (dispatch input `skip`; also `manifest`, `service_worker`,
+comma-separated) drops optional steps from the journey, so the same arrival
+rate can be re-run without the board read to see how much of a ceiling the
+board's two counts over a big snapshot account for. The writes are never
+skippable.
+
 ## What to record per run
 
 - k6 summary: per-endpoint p50/p95/p99, `http_req_failed`, `journey_duration`.
