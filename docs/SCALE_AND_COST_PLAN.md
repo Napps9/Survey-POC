@@ -30,9 +30,17 @@ harness, then:
 instances = peak_req_per_s × mean_service_time_s ÷ (WEB_CONCURRENCY × RAILS_MAX_THREADS × 0.65)
 ```
 
-At an assumed 100 ms on Pro Plus (4×5 = 20 slots, 65% target utilisation):
-**6 instances, pinned to 8 for the event window.** If the deck later gains
-graded quiz cards, requests triple (~21–22/respondent) — resize to ~15–17.
+**Measured (2026-09-03, §2b runs 10–16):** the binding resource is Ruby CPU
+per request, ≈ 80 ms per journey in production of which the 150 KB play page
+is ~45%. One 2c-4g Pro instance (4 × 5 slots) saturates at **~27
+arrivals/s**; one 1c-2g Standard instance (1 × 3) at **~23** — 85% of the
+throughput for 30% of the price, so scale out with small boxes. For the
+83/s peak, as the app stands: **5 Pro or 6 Standard instances at 65%
+utilisation** (4 of either at saturation). Caching the rendered play page
+per Verto/locale (or serving it from the CDN) removes ~45% of the CPU per
+journey and roughly halves either fleet — do that before buying instances.
+If the deck later gains graded quiz cards, requests triple
+(~21–22/respondent) — re-measure with the harness rather than extrapolate.
 
 ## 2. What has already shipped (code, this branch)
 
@@ -71,7 +79,7 @@ graded quiz cards, requests triple (~21–22/respondent) — resize to ~15–17.
 Deliberately deferred until the load test says they matter: caching the
 token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
-### 2b. Load-test log (scratch env, 2026-09-01 → 02)
+### 2b. Load-test log (scratch env, 2026-09-01 → 03)
 
 Setup: scratch web service `vertonow.onrender.com` (hand-made, builds this
 branch, single instance, `WEB_CONCURRENCY` unset) + scratch Basic-256mb
@@ -145,14 +153,17 @@ rate-limit counters onto Key Value/Valkey) come BEFORE any web scale-out** —
 more web instances against this database would change nothing. Measured
 healthy service times: ~70 ms server-side for consent/progress/submit/
 leaderboard, ~320 ms for the page (≈ 160 ms of every k6 number is US→Frankfurt
-network). Next: scratch DB on a real tier + Key Value for cache/rate limits,
-then 2/s → 10/s again, then the Pro Plus web ceiling.
+network). Those steps ran as runs 9–16 above; the wall that remains is
+Ruby CPU per request. Next: cache the rendered play page, re-run 40/s on
+one instance to measure the gain, then the 1.5× proof run (125 arrivals/s
+over 6–7 generators) against the event-day fleet.
 
 ## 3. What remains, in order (needs dashboards/accounts)
 
-- **Stage 5 code is on the branch**: `config.cache_store` switches to Render
-  Key Value (Valkey) whenever `REDIS_URL` is set, and `rate_limit` counters
-  follow it (they resolve their store from `cache_store`). Solid Cable and
+- **Stage 5 shipped (2026-09-03, proven on scratch — run 9 vs run 7)**:
+  `config.cache_store` switches to Render Key Value (Valkey) whenever
+  `REDIS_URL` is set, and `rate_limit` counters follow it (they resolve
+  their store from `cache_store`). Solid Cable and
   Solid Queue stay on Postgres. Needs: a Key Value instance in Frankfurt
   (free 25 MB is ample for counters + the small aggregate cache) and
   `REDIS_URL` on the web service — scratch first, production after the
@@ -182,6 +193,11 @@ then 2/s → 10/s again, then the Pro Plus web ceiling.
    allows.
 2. **Scratch environment + baseline load test** (`test/load/README.md`).
    Never against production — the harness is a denial-of-service by design.
+   **Done 2026-09-01 → 03** (§2b, sixteen runs): six production fixes, the
+   database and cache walls removed, and the web ceiling measured — Ruby
+   CPU per request, page render first. The scratch environment (web
+   `vertonow.onrender.com`, its Postgres and Key Value) is still up for the
+   page-cache re-measure and the proof run; scale it down between sessions.
 3. **Active Storage → Cloudflare R2** (EU jurisdiction;
    `request_checksum_calculation: "when_required"` — R2 rejects CRC32),
    migrate blobs **and their `service_name`**, then remove the disk from
@@ -199,9 +215,11 @@ then 2/s → 10/s again, then the Pro Plus web ceiling.
 6. **Scale-out** — no region migration: the live web service AND database
    are already in Frankfurt (owner-confirmed 2026-09-01; `render.yaml` was
    stale and has been corrected on this branch, the DB is `Basic-256mb`,
-   PostgreSQL 18). Remaining order: Solid Queue out of Puma (a
-   `config/puma.rb` change — it is hard-enabled in production) **before**
-   `WEB_CONCURRENCY=4`; drop the `+12` from the pool (see the note in
+   PostgreSQL 18). Measured 2026-09-03: several 1c-2g Standard instances at
+   1 × 3 beat one Pro at 4 × 5 on throughput per dollar (§1), so the fleet is
+   small boxes, and `WEB_CONCURRENCY=4` is only for a Pro box if one is used.
+   Remaining order: Solid Queue out of Puma (a `config/puma.rb` change — it
+   is hard-enabled in production) **before** any multi-worker instance; drop the `+12` from the pool (see the note in
    `config/database.yml` — the app exhausts connections at three instances
    otherwise, and Basic-256mb's measured `max_connections` of 103 is far
    below the planning
@@ -209,9 +227,9 @@ then 2/s → 10/s again, then the Pro Plus web ceiling.
    migrations, Blazer and the worker (advisory locks and session `SET`s are
    unsafe through transaction pooling). Re-tune the 512 MB memory regime for
    the new instance size.
-7. **Proof run at 1.5× peak** (125 arrivals/s, 50k-row table) — gate: zero
-   5xx, p95 < 1 s on submit, flat leaderboard/results latency, bounded
-   brownout echo, no health flaps, no autovacuum cliff.
+7. **Proof run at 1.5× peak** (125 arrivals/s over `GENERATORS=7`, 50k-row
+   table) — gate: zero 5xx, p95 < 1 s on submit, flat leaderboard/results
+   latency, bounded brownout echo, no health flaps, no autovacuum cliff.
 
 ## 4. Event day
 
@@ -254,7 +272,7 @@ Real Postgres compute tiers (read off the live instance's Plan page —
 | | $/month |
 |---|---|
 | Steady state (Pro workspace $25, 2×Standard web + worker $57, Postgres 0.5c-1g→1c-4g $19–55, 10 GB storage $3, Key Value ~$10, CDN/R2 ~$0) | **~$115–150** |
-| Per event (8×Pro Plus ~4 h ≈ $8 + Postgres at 4c-16g for the day ≈ $7, second-prorated) | **+~$15–20** |
+| Per event (6×Standard ~4 h ≈ $1, or 5×Pro ≈ $2.50; Postgres at 4c-16g for the day ≈ $7; Key Value free tier; all second-prorated) | **+~$10** |
 | Anthropic, respondent path (plain Verto) | 0 |
 
 The tier change restarts the database — it happens the day before, in the
