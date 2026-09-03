@@ -1,8 +1,14 @@
-# Drives the k6 load-test harness (test/load/journey.js) from a GitHub-hosted
-# runner, so nobody needs k6 on a local machine. Dispatch-only — it never runs
-# on push. The scratch environment it targets is throwaway by procedure
-# (test/load/README.md); both the guard step here and the script itself refuse
-# hostnames that look like production.
+# Drives the k6 load-test harness (test/load/journey.js) from GitHub-hosted
+# runners, so nobody needs k6 on a local machine. The scratch environment it
+# targets is throwaway by procedure (test/load/README.md); the plan job, the
+# k6 job and the script itself all refuse hostnames that look like production.
+#
+# Load can be split across several runners (GENERATORS=N): one GitHub runner
+# is a single source IP with two shared vCPUs, and runs 12 and 13 found the
+# same ~160–180 req/s ceiling against two very different web boxes, so a
+# single generator is itself a suspect. Each generator takes an integer share
+# of the arrival rate (shares sum exactly to the total) and runs the same
+# ramp; the per-generator summaries are simply added up.
 name: Load test (scratch only)
 
 # Two triggers for the same job:
@@ -25,7 +31,7 @@ on:
         description: "Publish token of the Load Test Verto"
         required: true
       arrivals_per_s:
-        description: "Peak respondent arrivals per second (event 83, proof 125)"
+        description: "Peak respondent arrivals per second, all generators together (event 83, proof 125)"
         required: false
         default: "10"
       ramp_s:
@@ -44,18 +50,34 @@ on:
         description: "1 adds the retry-echo brownout scenario"
         required: false
         default: "0"
+      generators:
+        description: "How many runners share the arrival rate (1–8)"
+        required: false
+        default: "1"
 
 permissions:
   contents: read
 
 jobs:
-  k6:
+  # Resolves the parameters once (from RUN on push, from the inputs on
+  # dispatch) and sizes the generator matrix from them.
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    outputs:
+      base_url:       ${{ steps.p.outputs.base_url }}
+      token:          ${{ steps.p.outputs.token }}
+      arrivals_per_s: ${{ steps.p.outputs.arrivals_per_s }}
+      ramp_s:         ${{ steps.p.outputs.ramp_s }}
+      hold_s:         ${{ steps.p.outputs.hold_s }}
+      dwell_scale:    ${{ steps.p.outputs.dwell_scale }}
+      brownout:       ${{ steps.p.outputs.brownout }}
+      generators:     ${{ steps.p.outputs.generators }}
+      matrix:         ${{ steps.p.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Resolve parameters
+        id: p
         env:
           IN_BASE_URL: ${{ inputs.base_url }}
           IN_TOKEN: ${{ inputs.token }}
@@ -64,20 +86,67 @@ jobs:
           IN_HOLD: ${{ inputs.hold_s }}
           IN_DWELL: ${{ inputs.dwell_scale }}
           IN_BROWNOUT: ${{ inputs.brownout }}
+          IN_GENERATORS: ${{ inputs.generators }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "push" ]; then
-            grep -E '^[A-Z_]+=' test/load/RUN >> "$GITHUB_ENV"
+            # Only bare KEY=VALUE lines are taken from RUN; comments and
+            # anything else are ignored.
+            grep -E '^[A-Z_]+=[^ ;&|$`]*$' test/load/RUN > params.env
+            set -a; . ./params.env; set +a
           else
-            {
-              echo "BASE_URL=$IN_BASE_URL"
-              echo "TOKEN=$IN_TOKEN"
-              echo "ARRIVALS_PER_S=$IN_ARRIVALS"
-              echo "RAMP_S=$IN_RAMP"
-              echo "HOLD_S=$IN_HOLD"
-              echo "DWELL_SCALE=$IN_DWELL"
-              echo "BROWNOUT=$IN_BROWNOUT"
-            } >> "$GITHUB_ENV"
+            BASE_URL="$IN_BASE_URL"; TOKEN="$IN_TOKEN"; ARRIVALS_PER_S="$IN_ARRIVALS"
+            RAMP_S="$IN_RAMP"; HOLD_S="$IN_HOLD"; DWELL_SCALE="$IN_DWELL"
+            BROWNOUT="$IN_BROWNOUT"; GENERATORS="$IN_GENERATORS"
           fi
+          GENERATORS="${GENERATORS:-1}"
+          case "$BASE_URL" in
+            *playverto.com*|*survey-poc.onrender.com*)
+              echo "::error::base_url looks like production. Refusing." && exit 1 ;;
+          esac
+          case "$GENERATORS" in [1-8]) ;; *) echo "::error::GENERATORS must be 1–8, got '$GENERATORS'" && exit 1 ;; esac
+          case "$ARRIVALS_PER_S" in ''|*[!0-9]*) echo "::error::ARRIVALS_PER_S must be a whole number, got '$ARRIVALS_PER_S'" && exit 1 ;; esac
+          {
+            echo "base_url=$BASE_URL"
+            echo "token=$TOKEN"
+            echo "arrivals_per_s=$ARRIVALS_PER_S"
+            echo "ramp_s=$RAMP_S"
+            echo "hold_s=$HOLD_S"
+            echo "dwell_scale=$DWELL_SCALE"
+            echo "brownout=$BROWNOUT"
+            echo "generators=$GENERATORS"
+            echo "matrix=[$(seq -s, 1 "$GENERATORS")]"
+          } >> "$GITHUB_OUTPUT"
+          echo "$ARRIVALS_PER_S arrivals/s over $GENERATORS generator(s) against $BASE_URL (ramp ${RAMP_S}s, hold ${HOLD_S}s, dwell ${DWELL_SCALE})"
+
+  k6:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        generator: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    env:
+      BASE_URL: ${{ needs.plan.outputs.base_url }}
+      TOKEN: ${{ needs.plan.outputs.token }}
+      RAMP_S: ${{ needs.plan.outputs.ramp_s }}
+      HOLD_S: ${{ needs.plan.outputs.hold_s }}
+      DWELL_SCALE: ${{ needs.plan.outputs.dwell_scale }}
+      BROWNOUT: ${{ needs.plan.outputs.brownout }}
+      TOTAL_ARRIVALS_PER_S: ${{ needs.plan.outputs.arrivals_per_s }}
+      GENERATORS: ${{ needs.plan.outputs.generators }}
+      GENERATOR: ${{ matrix.generator }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Integer shares that sum exactly to the total: the first
+      # (total mod N) generators take one extra arrival/s.
+      - name: This generator's share of the arrival rate
+        run: |
+          share=$(( TOTAL_ARRIVALS_PER_S / GENERATORS ))
+          if [ "$GENERATOR" -le $(( TOTAL_ARRIVALS_PER_S % GENERATORS )) ]; then share=$(( share + 1 )); fi
+          echo "ARRIVALS_PER_S=$share" >> "$GITHUB_ENV"
+          echo "generator $GENERATOR of $GENERATORS: $share of $TOTAL_ARRIVALS_PER_S arrivals/s"
 
       - name: Refuse production hostnames
         run: |
@@ -92,9 +161,12 @@ jobs:
           tar -xzf k6.tgz --strip-components=1
           ./k6 version
 
+      # --summary-mode=full prints every metric, including the request
+      # phases (blocked / connecting / waiting / receiving) that tell a
+      # server-side queue from a generator that has run out of steam.
       - name: Run k6
         run: |
-          ./k6 run --summary-export=k6-summary.json \
+          ./k6 run --summary-export=k6-summary.json --summary-mode=full \
             --summary-trend-stats "avg,min,med,p(90),p(95),p(99),max" \
             test/load/journey.js 2>&1 | tee k6-output.txt
           exit "${PIPESTATUS[0]}"
@@ -103,7 +175,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: k6-results-${{ github.run_id }}
+          name: k6-results-${{ github.run_id }}-g${{ matrix.generator }}
           path: |
             k6-summary.json
             k6-output.txt

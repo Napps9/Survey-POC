@@ -72,9 +72,19 @@ runner or k6 distributed mode) so connection-concurrency effects are real.
 runner: Actions tab → "Load test (scratch only)" → Run workflow, or dispatch
 it via the API. Inputs mirror the env knobs above; the guard step refuses
 production-looking hostnames before k6 even starts. The full text output and
-`k6-summary.json` are uploaded as a run artifact. A standard runner handles
-the compressed-dwell profiles (~1,200 concurrent VUs at 83/s); the
-`DWELL_SCALE=1` rehearsal still needs a bigger machine.
+`k6-summary.json` are uploaded as a run artifact (one per generator).
+
+`GENERATORS=N` (dispatch input `generators`, 1–8) splits the arrival rate
+across N runners — integer shares that sum to the total, all running the same
+ramp — because one standard runner is a single source IP with two shared
+vCPUs, and runs 12 and 13 met the same ~160–180 req/s ceiling against two
+very different web boxes. Keep each generator at or below ~20 arrivals/s
+(the rate one runner has proven clean): 40/s → 2, 83/s → 4–5, 125/s → 7.
+Add the per-generator `http_reqs` and `iterations` for the run's totals. The
+summary is printed in full, so each generator also shows where its time
+went: a queue that is `http_req_waiting` is the server's, one that is
+`http_req_blocked` is the runner's own. The `DWELL_SCALE=1` rehearsal still
+needs bigger machines than the standard runner.
 
 ## What to record per run
 
