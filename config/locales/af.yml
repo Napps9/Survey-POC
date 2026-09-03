@@ -207,6 +207,8 @@ af:
     repeat_new_password: "Herhaal nuwe wagwoord"
     set_submit: "Stoor nuwe wagwoord"
   results:
+    share_paused_by_admin: "Deur 'n admin onderbreek — die skakel werk weer sodra hulle dit hervat."
+    share_not_enabled: "Nog nie gedeel nie — 'n admin van jou rekening kan resultate-deling aanskakel."
     title: "Resultate"
     editor: "← Redigeerder"
     ask_verto: "Vra Verto"
@@ -660,6 +662,7 @@ af:
     switch_workspace: "Wissel werkruimte"
     role_admin: "Admin"
     role_member: "Lid"
+    role_viewer: "Kyker"
     members: "Lede"
     sign_out: "Meld af"
   partnerships:
@@ -1316,6 +1319,7 @@ af:
     empty_cta: "Skep jou eerste Verto →"
     empty_title_managed: "Nog geen Vertos nie"
     empty_body_managed: "Jou Playverto-span publiseer Vertos hier. Hulle sal verskyn sodra die eerste een gereed is."
+    empty_body_viewer: "Jou span se Vertos sal hier verskyn sodra die eerste een geskep is — gereed vir jou om te deel en die resultate te sien."
     section_live: "Regstreeks"
     section_drafts: "Konsepte"
     section_archived: "Geargiveer"
@@ -1687,6 +1691,7 @@ af:
       no_organisation: "Geen organisasie gevind nie."
       not_authorised: "Nie gemagtig nie."
       verto_creation_disabled: "Jou rekening skep nie Vertos nie — jou Playverto-span skep dit vir jou."
+      viewer_read_only: "Kykers kan Vertos deel en hul resultate sien, maar kan dit nie skep of wysig nie."
     partnership_common_question_sets:
       creator_only: "Slegs die vennootgroep se skepper kan dit doen."
       partnership_not_found: "Vennootgroep nie gevind nie."

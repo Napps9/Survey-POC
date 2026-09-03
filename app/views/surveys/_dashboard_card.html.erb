@@ -202,7 +202,11 @@
         already means the /play link being handed to the OS share sheet. %>
     <%# dash-card-actions is a phone hook only (M-STUDIO block): on ≤767px it
         raises these rows' links/buttons to 44px touch targets. No desktop CSS. %>
-    <% if published && current_membership&.admin? %>
+    <%# Every role gets the Share button: the panel behind it is read-only for
+        anyone who isn't an admin (SurveyLinksController#show), and handing
+        the link on is the one thing every seat — a viewer above all — is
+        here to do. %>
+    <% if published %>
       <div class="dash-card-actions" style="padding:10px 16px 0;">
         <button type="button"
                 data-action="click->share-modal#open"
@@ -213,16 +217,24 @@
       </div>
     <% end %>
 
+    <%# Edit and Publish are the editing doors, so a viewer isn't shown them
+        (SurveysController refuses both on the same can_edit_vertos? answer).
+        Results is for everyone. The row is skipped entirely when a viewer
+        would have nothing in it — a plain draft — rather than drawn empty. %>
+    <% has_results = published || (unpublished && has_responses) %>
+    <% if can_edit_vertos? || has_results %>
     <div class="dash-card-actions" style="display:flex;align-items:center;gap:8px;padding:10px 16px 0;">
-      <%= link_to t("dashboard_card.edit"), survey_path(survey),
-            style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",
-            onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
-            onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
+      <% if can_edit_vertos? %>
+        <%= link_to t("dashboard_card.edit"), survey_path(survey),
+              style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",
+              onmouseover: "this.style.color='white';this.style.background='rgba(255,255,255,0.1)'",
+              onmouseout:  "this.style.color='rgba(255,255,255,0.75)';this.style.background='rgba(255,255,255,0.05)'" %>
+      <% end %>
 
       <%# A closed Verto keeps its results, so it offers Results rather than
           Publish — re-publishing lives in the editor's Status panel, behind a
           confirm that explains the link comes back. %>
-      <% if published || (unpublished && has_responses) %>
+      <% if has_results %>
         <%= link_to t("dashboard_card.results"), survey_results_path(survey),
               style: "flex:1;text-align:center;padding:9px 12px;border-radius:10px;background:rgba(255,30,111,0.14);border:1px solid rgba(255,30,111,0.32);color:#FF1E6F;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);text-decoration:none;transition:all 0.15s;white-space:nowrap;",
               onmouseover: "this.style.background='rgba(255,30,111,0.22)'",
@@ -236,6 +248,7 @@
               onmouseout:  "this.style.background='rgba(1,234,203,0.14)'" %>
       <% end %>
     </div>
+    <% end %>
 
     <div class="dash-card-actions" style="padding:8px 16px 12px;">
       <%= link_to "▶ #{t("dashboard_card.preview")}", preview_survey_path(survey),

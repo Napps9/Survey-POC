@@ -18,6 +18,18 @@ class ResultsReportStreamsController < ApplicationController
   def show
     survey = Current.organisation.surveys.find(params[:survey_id])
 
+    # A viewer sees results, and a report that doesn't exist yet is a result
+    # nobody has seen — so their first Generate goes through. The explicit
+    # Regenerate on one that already exists is a different act: a deliberate
+    # rewrite under a brief of their own, discarding the stored text (a
+    # colleague's hand edits included), which is editing. Only that click is
+    # refused: the cache's own refresh when responses change is the same for
+    # every role and stays as it is. Answered in the plain-text language this
+    # endpoint speaks, before the stream opens.
+    if params[:regenerate].present? && !can_edit_vertos? && survey.results_report.present?
+      return render plain: t("flash.organisation_scope.viewer_read_only"), status: :forbidden
+    end
+
     response.headers["Content-Type"]      = "text/plain; charset=utf-8"
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["Cache-Control"]     = "no-cache"

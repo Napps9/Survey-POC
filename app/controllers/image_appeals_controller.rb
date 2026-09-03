@@ -5,6 +5,10 @@
 # staff to look. Deciding it is ImageReviewsController's job, behind the
 # staff routing constraint.
 class ImageAppealsController < ApplicationController
+  # Both halves belong to the editor's media picker, which a viewer never
+  # opens: an appeal is filed against an upload they can't make, for a strip
+  # they can't see.
+  gate_verto_editing only: %i[ index create ]
   before_action :set_survey
 
   # No AI call here (ImageModerator already ran, client-side, before this),

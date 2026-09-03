@@ -7,9 +7,17 @@
 #
 # Share links exist to hand different audiences different terms (see SurveyLink),
 # which is an account-level decision about who sees whose answers — hence
-# admin-only, the same bar as partner shares and Ask Verto opt-in.
+# every mutation here is admin-only, the same bar as partner shares and Ask
+# Verto opt-in.
+#
+# The panel itself (#show) is open to every role. Handing the link on is the
+# one thing every seat in an account is for — it is the whole job of a viewer
+# — and the panel is where the link, the QR and the share sheet live. A
+# non-admin gets it read-only: the view draws the addresses and the copy
+# buttons and none of the forms, on the same admin? answer that refuses the
+# forms' endpoints here.
 class SurveyLinksController < ApplicationController
-  before_action :require_admin!
+  before_action :require_admin!, except: [ :show ]
   before_action :set_survey
 
   FRAME_ID = "share-modal".freeze

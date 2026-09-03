@@ -61,7 +61,8 @@
           </a>
         <% end %>
 
-        <a href="<%= new_common_question_set_path %>"
+        <%# Starting a set is creating; a viewer's tile opens the list instead. %>
+        <a href="<%= can_edit_vertos? ? new_common_question_set_path : common_question_sets_path %>"
            class="command-palette-tile"
            style="--tile-accent:#615BF5;"
            data-command-palette-target="item"
@@ -141,7 +142,9 @@
             Recent Vertos
           </div>
           <% recent_surveys.each do |s| %>
-            <a href="<%= survey_path(s) %>"
+            <%# A viewer has no editor to jump to; their door into a Verto is
+                its results. %>
+            <a href="<%= can_edit_vertos? ? survey_path(s) : survey_results_path(s) %>"
                class="command-palette-item"
                data-command-palette-target="item"
                data-search-text="<%= [s.title, s.theme, s.audience_age].compact.join(' ').downcase %>">

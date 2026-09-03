@@ -215,6 +215,8 @@ xh:
     repeat_new_password: "Phinda iphasiwedi entsha"
     set_submit: "Gcina iphasiwedi entsha"
   results:
+    share_paused_by_admin: "Imiswe okwethutyana ngumlawuli — ikhonkco liya kusebenza kwakhona xa eliqhubeka."
+    share_not_enabled: "Ayikabelwana ngayo okwangoku — umlawuli we-akhawunti yakho angavula ukwabelana ngeziphumo."
     title: "Iziphumo"
     editor: "← Umhleli"
     ask_verto: "Ask Verto"
@@ -675,6 +677,7 @@ xh:
     switch_workspace: "Tshintsha indawo yokusebenza"
     role_admin: "Umlawuli"
     role_member: "Ilungu"
+    role_viewer: "Umboneli"
     members: "Amalungu"
     sign_out: "Phuma"
   partnerships:
@@ -1331,6 +1334,7 @@ xh:
     empty_cta: "Yenza iVerto yakho yokuqala →"
     empty_title_managed: "Akukho ii-Vertos okwangoku"
     empty_body_managed: "Iqela lakho lasePlayverto lipapasha ii-Vertos apha. Ziya kubonakala nje ukuba eyokuqala ilungile."
+    empty_body_viewer: "Ii-Vertos zeqela lakho ziya kuvela apha nje ukuba eyokuqala yenziwe — zilungele ukuba wabelane ngazo kwaye ubone iziphumo."
     section_live: "Iyasebenza"
     section_drafts: "Uyilo"
     section_archived: "Igciniwe"
@@ -1721,6 +1725,7 @@ xh:
       no_organisation: "Akukho mbutho ufunyenweyo."
       not_authorised: "Akuvunyelwanga."
       verto_creation_disabled: "I-akhawunti yakho ayenzi ii-Vertos — iqela lakho lasePlayverto lizenzela wena."
+      viewer_read_only: "Ababoneli banokwabelana ngee-Vertos kwaye babone iziphumo zazo, kodwa abanakuzenza okanye bazihlele."
     partnership_common_question_sets:
       creator_only: "Ngumdali weqela lamaqabane kuphela onokwenza oko."
       partnership_not_found: "Iqela lamaqabane alifunyanwanga."

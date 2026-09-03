@@ -33,7 +33,9 @@
             </p>
           </div>
 
-          <% if @kept_sets.any? %>
+          <%# Starting a set is creating, which a viewer doesn't do — the same
+              rule hides every other Create-a-set door on this page. %>
+          <% if @kept_sets.any? && can_edit_vertos? %>
             <%= link_to new_common_question_set_path,
                   style: "flex-shrink:0;display:inline-flex;align-items:center;gap:8px;background:#615BF5;border:none;border-radius:100px;padding:12px 22px;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-md);letter-spacing:0.04em;white-space:nowrap;box-shadow:0 8px 24px rgba(97,91,245,0.28);text-decoration:none;" do %>
               <span style="font-size:18px;line-height:1;">+</span> <%= t("common_questions.create_new", default: "Create a set") %>
@@ -78,8 +80,10 @@
               <%= t("common_questions.empty_body", default: "A Common Questions set is a small battery you can attach to many Vertos. Answers from every attached Verto roll up into one cross-cutting view.") %>
             </div>
           </div>
-          <%= link_to t("common_questions.empty_cta", default: "Start a set"), new_common_question_set_path,
-                style: "padding:12px 26px;border-radius:100px;background:#615BF5;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
+          <% if can_edit_vertos? %>
+            <%= link_to t("common_questions.empty_cta", default: "Start a set"), new_common_question_set_path,
+                  style: "padding:12px 26px;border-radius:100px;background:#615BF5;color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;" %>
+          <% end %>
         </div>
 
       <% else %>
@@ -120,10 +124,12 @@
               <% end %>
 
               <%# Create-a-set tile %>
-              <%= link_to new_common_question_set_path,
-                    style: "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px dashed rgba(97,91,245,0.32);color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;min-height:140px;" do %>
-                <span style="font-size:24px;line-height:1;color:#615BF5;">+</span>
-                <%= t("common_questions.create_new", default: "Create a set") %>
+              <% if can_edit_vertos? %>
+                <%= link_to new_common_question_set_path,
+                      style: "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;border-radius:14px;background:rgba(255,255,255,0.02);border:1px dashed rgba(97,91,245,0.32);color:rgba(255,255,255,0.65);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);text-decoration:none;min-height:140px;" do %>
+                  <span style="font-size:24px;line-height:1;color:#615BF5;">+</span>
+                  <%= t("common_questions.create_new", default: "Create a set") %>
+                <% end %>
               <% end %>
             </div>
           </div>

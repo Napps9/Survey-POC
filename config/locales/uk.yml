@@ -206,6 +206,8 @@ uk:
     repeat_new_password: Повторіть новий пароль
     set_submit: Зберегти новий пароль
   results:
+    share_paused_by_admin: "Призупинено адміністратором — посилання знову запрацює, щойно він його відновить."
+    share_not_enabled: "Ще не опубліковано — адміністратор вашого облікового запису може ввімкнути доступ до результатів."
     title: Результати
     editor: "← Редактор"
     ask_verto: Запитати Verto
@@ -659,6 +661,7 @@ uk:
     switch_workspace: "Змінити робочий простір"
     role_admin: "Адміністратор"
     role_member: "Учасник"
+    role_viewer: "Спостерігач"
     members: Учасники
     sign_out: Вийти
   partnerships:
@@ -1311,6 +1314,7 @@ uk:
     empty_cta: Створити перший Verto →
     empty_title_managed: "Поки що немає жодного Verto"
     empty_body_managed: "Команда Playverto публікує Vertos тут. Вони з'являться, щойно буде готовий перший."
+    empty_body_viewer: "Vertos вашої команди з'являться тут, щойно буде створено перший — їх можна буде поширити й переглянути результати."
     section_live: Активні
     section_drafts: Чернетки
     section_archived: Архів
@@ -1688,6 +1692,7 @@ uk:
       no_organisation: "Організацію не знайдено."
       not_authorised: "Немає доступу."
       verto_creation_disabled: "Ваш обліковий запис не створює Vertos — їх створює для вас команда Playverto."
+      viewer_read_only: "Спостерігачі можуть ділитися Vertos і бачити їхні результати, але не можуть їх створювати чи редагувати."
     partnership_common_question_sets:
       creator_only: "Це може зробити лише творець партнерства."
       partnership_not_found: "Партнерство не знайдено."

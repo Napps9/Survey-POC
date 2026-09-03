@@ -7,6 +7,12 @@ class CommonQuestionSetsController < ApplicationController
   throttle_ai to: 20, within: 1.hour, name: "ai-question-set", respond: :html, only: %i[ generate ]
   cap_ai_spend respond: :html, only: %i[ generate ]
 
+  # Common Questions are content the same way a Verto's cards are: a viewer
+  # can look at every set and its results, and can't start, change or remove
+  # one. The list and detail pages hide the forms on the same answer.
+  gate_verto_editing only: %i[ new create generate update destroy
+                               add_question update_question destroy_question ]
+
   before_action :set_set, only: [ :show, :update, :destroy, :results, :add_question, :update_question, :destroy_question ]
 
   def index

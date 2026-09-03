@@ -206,6 +206,8 @@ pt:
     repeat_new_password: Repetir nova palavra-passe
     set_submit: Guardar nova palavra-passe
   results:
+    share_paused_by_admin: "Em pausa por um administrador — a ligação volta a funcionar assim que a retomar."
+    share_not_enabled: "Ainda não partilhado — um administrador da sua conta pode ativar a partilha de resultados."
     title: Resultados
     editor: "← Editor"
     ask_verto: Perguntar ao Verto
@@ -659,6 +661,7 @@ pt:
     switch_workspace: "Mudar de espaço de trabalho"
     role_admin: "Administrador"
     role_member: "Membro"
+    role_viewer: "Leitor"
     members: Membros
     sign_out: Terminar sessão
   partnerships:
@@ -1309,6 +1312,7 @@ pt:
     empty_cta: Criar o seu primeiro Verto →
     empty_title_managed: "Ainda não há Vertos"
     empty_body_managed: "A sua equipa Playverto publica os Vertos aqui. Aparecerão assim que o primeiro estiver pronto."
+    empty_body_viewer: "Os Vertos da sua equipa aparecerão aqui assim que o primeiro for criado — prontos para partilhar e ver os resultados."
     section_live: Ao vivo
     section_drafts: Rascunhos
     section_archived: Arquivados
@@ -1722,6 +1726,7 @@ pt:
       no_organisation: "Nenhuma organização encontrada."
       not_authorised: "Não autorizado."
       verto_creation_disabled: "A sua conta não cria Vertos — a sua equipa Playverto cria-os por si."
+      viewer_read_only: "Os leitores podem partilhar Vertos e ver os seus resultados, mas não podem criá-los nem editá-los."
     sessions:
       rate_limited: "Tente novamente mais tarde."
       invalid_credentials: "Experimente outro endereço de e-mail ou outra palavra-passe."

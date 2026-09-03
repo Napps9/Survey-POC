@@ -216,6 +216,8 @@ en:
     repeat_new_password: "Repeat new password"
     set_submit: "Save new password"
   results:
+    share_paused_by_admin: "Paused by an admin — the link works again once they resume it."
+    share_not_enabled: "Not shared yet — an admin of your account can turn on results sharing."
     title: "Results"
     editor: "← Editor"
     ask_verto: "Ask Verto"
@@ -675,6 +677,7 @@ en:
     switch_workspace: "Switch workspace"
     role_admin: "Admin"
     role_member: "Member"
+    role_viewer: "Viewer"
     members: "Members"
     sign_out: "Sign out"
   partnerships:
@@ -1333,6 +1336,7 @@ en:
     empty_cta: "Create your first Verto →"
     empty_title_managed: "No Vertos yet"
     empty_body_managed: "Your Playverto team publishes Vertos here. They'll appear as soon as the first one is ready."
+    empty_body_viewer: "Your team's Vertos will appear here as soon as the first one is created — ready for you to share and see the results."
     section_live: "Live"
     section_drafts: "Drafts"
     section_archived: "Archived"
@@ -1723,6 +1727,7 @@ en:
       no_organisation: "No organisation found."
       not_authorised: "Not authorised."
       verto_creation_disabled: "Your account doesn't create Vertos — your Playverto team creates them for you."
+      viewer_read_only: "Viewers can share Vertos and see their results, but can't create or edit them."
     partnership_common_question_sets:
       creator_only: "Only the partnership creator can do that."
       partnership_not_found: "Partnership not found."

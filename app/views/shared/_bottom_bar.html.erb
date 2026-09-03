@@ -45,7 +45,11 @@
           <div class="bottom-bar-workspace-popover" data-command-palette-target="workspacePopover" hidden>
             <div class="bottom-bar-user-popover-section"><%= t("nav.workspaces") %></div>
             <% workspaces.each do |w| %>
-              <% role_label = workspace_roles[w.id] == "admin" ? t("nav.role_admin") : t("nav.role_member") %>
+              <% role_label = case workspace_roles[w.id]
+                              when "admin"  then t("nav.role_admin")
+                              when "viewer" then t("nav.role_viewer")
+                              else               t("nav.role_member")
+                              end %>
               <% if w.id == org.id %>
                 <div class="bottom-bar-workspace-item" data-current="true">
                   <%= render "shared/workspace_avatar", organisation: w %>

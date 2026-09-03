@@ -3,12 +3,16 @@ module OrganisationScope
 
   included do
     before_action :set_current_organisation
-    helper_method :current_organisation, :current_membership, :can_create_vertos?
+    helper_method :current_organisation, :current_membership, :can_create_vertos?, :can_edit_vertos?
 
     # Records which actions the creation gate covers, so a test can assert no
     # creation endpoint slipped past it. Same idiom (and same reason) as
     # ThrottlesAiSpend's ai_throttled_actions.
     class_attribute :verto_creation_actions, default: [], instance_writer: false
+    # The same register for the editing gate: every action that changes a
+    # Verto — its deck, its settings, whether it is live — is listed here, so
+    # the coverage test can hold every SurveysController action to account.
+    class_attribute :verto_editing_actions, default: [], instance_writer: false
   end
 
   class_methods do
@@ -18,6 +22,15 @@ module OrganisationScope
       actions = Array(only).map(&:to_sym)
       self.verto_creation_actions = (verto_creation_actions + actions).uniq
       before_action :require_verto_creation!, only: actions
+    end
+
+    # Same shape for editing. A viewer is refused at the door of every one of
+    # these; member and admin pass. Creation implies editing, so an action
+    # registered with gate_verto_creation needs no second registration here.
+    def gate_verto_editing(only:)
+      actions = Array(only).map(&:to_sym)
+      self.verto_editing_actions = (verto_editing_actions + actions).uniq
+      before_action :require_verto_editing!, only: actions
     end
   end
 
@@ -32,14 +45,23 @@ module OrganisationScope
     end
     Current.organisation = membership.organisation
     session[:current_organisation_id] = Current.organisation.id
+    # The membership just resolved IS the current membership; the role checks
+    # below and the views' predicates ask for it several times per request,
+    # so hand it over rather than looking it up again each time.
+    @current_membership = membership
   end
 
   def current_organisation
     Current.organisation
   end
 
+  # Memoised per request: the role predicates (admin?, can_edit_vertos?,
+  # can_create_vertos?) and every view that hides an affordance on them each
+  # ask, and the answer can't change within one request.
   def current_membership
-    Current.user.memberships.find_by(organisation: Current.organisation)
+    return @current_membership if defined?(@current_membership)
+
+    @current_membership = Current.user&.memberships&.find_by(organisation: Current.organisation)
   end
 
   # Whether a Verto can be created in the account currently being acted in.
@@ -49,13 +71,31 @@ module OrganisationScope
   # client cannot create, but the Playverto person building their Verto is
   # inside the same account and must be able to.
   #
+  # Neither way is open to a viewer: their role says they share and read, and
+  # creating is the one thing more than editing. Checked first, so a viewer
+  # who happens to be Playverto staff is still a viewer here.
+  #
   # Also the view predicate: every Create affordance is hidden on the same
   # answer that refuses the request, so a restricted user never meets a button
   # that bounces them.
   def can_create_vertos?
     return false unless Current.organisation
+    return false unless can_edit_vertos?
 
     Current.organisation.verto_creation_enabled? || PlayvertoStaff.member?(Current.user)
+  end
+
+  # Whether the actor may change a Verto in the account currently being acted
+  # in — open the editor, save the deck, publish, change settings. Every role
+  # but viewer can. Unlike can_create_vertos? this is purely a property of the
+  # ROLE: a managed account's members still edit the Vertos built for them.
+  #
+  # The view predicate for Edit, Publish and every other affordance that leads
+  # into the editor, so a viewer never meets a button that bounces them.
+  def can_edit_vertos?
+    return false unless Current.organisation
+
+    current_membership&.can_edit_vertos? || false
   end
 
   # Deliberately enforced HERE, at the controller boundary, and not as a
@@ -64,10 +104,22 @@ module OrganisationScope
   # Vertos FOR an account, restricted or not, and a model-level rule would
   # break them. Every user-reachable door is gated below; the job is only ever
   # enqueued from one of them.
+  #
+  # A viewer is refused with the viewer message, not the managed-account one:
+  # "your Playverto team creates them for you" would be a lie to someone whose
+  # own colleagues create them in the next seat.
   def require_verto_creation!
     return if can_create_vertos?
 
-    deny_verto_creation
+    can_edit_vertos? ? deny_verto_creation : deny_verto_editing
+  end
+
+  # The editing gate. Refuses a viewer at every action that changes a Verto;
+  # member and admin pass straight through.
+  def require_verto_editing!
+    return if can_edit_vertos?
+
+    deny_verto_editing
   end
 
   # A redirect answers an HTML request fine, but a fetch() asking for JSON gets
@@ -92,6 +144,17 @@ module OrganisationScope
              status: :forbidden
     else
       redirect_to root_path, alert: t("flash.organisation_scope.verto_creation_disabled")
+    end
+  end
+
+  # And again for the editing gate: the editor's autosave, card endpoints and
+  # pollers are all fetch() calls that need a 403 they can read.
+  def deny_verto_editing
+    if request.format.json?
+      render json: { ok: false, error: t("flash.organisation_scope.viewer_read_only") },
+             status: :forbidden
+    else
+      redirect_to root_path, alert: t("flash.organisation_scope.viewer_read_only")
     end
   end
 end

@@ -206,6 +206,8 @@ ko:
     repeat_new_password: 새 비밀번호 재입력
     set_submit: 새 비밀번호 저장
   results:
+    share_paused_by_admin: "관리자가 일시 중지했습니다. 다시 시작하면 링크가 다시 작동합니다."
+    share_not_enabled: "아직 공유되지 않았습니다. 계정 관리자가 결과 공유를 켤 수 있습니다."
     title: 결과
     editor: "← 편집기"
     ask_verto: Verto에게 묻기
@@ -659,6 +661,7 @@ ko:
     switch_workspace: "워크스페이스 전환"
     role_admin: "관리자"
     role_member: "멤버"
+    role_viewer: "뷰어"
     members: 멤버
     sign_out: 로그아웃
   partnerships:
@@ -1309,6 +1312,7 @@ ko:
     empty_cta: 첫 Verto 만들기 →
     empty_title_managed: "아직 Verto가 없습니다"
     empty_body_managed: "Playverto 팀이 여기에 Verto를 게시합니다. 첫 번째가 준비되면 표시됩니다."
+    empty_body_viewer: "팀의 Verto는 첫 번째가 만들어지는 대로 여기에 표시됩니다. 공유하고 결과를 볼 수 있습니다."
     section_live: 라이브
     section_drafts: 초안
     section_archived: 보관됨
@@ -1680,6 +1684,7 @@ ko:
       no_organisation: "조직을 찾을 수 없습니다."
       not_authorised: "권한이 없습니다."
       verto_creation_disabled: "이 계정은 Verto를 만들지 않습니다. Playverto 팀이 대신 만들어 드립니다."
+      viewer_read_only: "뷰어는 Verto를 공유하고 결과를 볼 수 있지만, 만들거나 편집할 수는 없습니다."
     partnership_common_question_sets:
       creator_only: "파트너십을 만든 사람만 할 수 있습니다."
       partnership_not_found: "파트너십을 찾을 수 없습니다."

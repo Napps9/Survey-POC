@@ -214,6 +214,8 @@ zu:
     repeat_new_password: "Phinda iphasiwedi entsha"
     set_submit: "Londoloza iphasiwedi entsha"
   results:
+    share_paused_by_admin: "Imiswe okwesikhashana ngumphathi — isixhumanisi sizosebenza futhi lapho esiqhubeka."
+    share_not_enabled: "Akukabelwana ngakho okwamanje — umphathi we-akhawunti yakho angavula ukwabelana ngemiphumela."
     title: "Imiphumela"
     editor: "← Umhleli"
     ask_verto: "Buza i-Verto"
@@ -673,6 +675,7 @@ zu:
     switch_workspace: "Shintsha isikhala somsebenzi"
     role_admin: "Umphathi"
     role_member: "Ilungu"
+    role_viewer: "Umbukeli"
     members: "Amalungu"
     sign_out: "Phuma"
   partnerships:
@@ -1329,6 +1332,7 @@ zu:
     empty_cta: "Dala i-Verto yakho yokuqala →"
     empty_title_managed: "Azikho ama-Verto okwamanje"
     empty_body_managed: "Ithimba lakho lasePlayverto lishicilela ama-Verto lapha. Azovela ngokushesha nje uma elokuqala selilungile."
+    empty_body_viewer: "Ama-Verto ethimba lakho azovela lapha nje uma elokuqala selidaliwe — asekulungele ukuthi wabelane ngawo futhi ubone imiphumela."
     section_live: "Isesikhundleni"
     section_drafts: "Izinhlaka"
     section_archived: "Okulondoloziwe"
@@ -1717,6 +1721,7 @@ zu:
       no_organisation: "Ayikho inhlangano etholakele."
       not_authorised: "Awugunyaziwe."
       verto_creation_disabled: "I-akhawunti yakho ayidali ama-Verto — ithimba lakho lasePlayverto liwadalela wena."
+      viewer_read_only: "Ababukeli bangabelana ngama-Verto futhi babone imiphumela yawo, kodwa abakwazi ukuwadala noma ukuwahlela."
     partnership_common_question_sets:
       creator_only: "Umdali weqembu lozakwethu kuphela ongakwenza lokho."
       partnership_not_found: "Iqembu lozakwethu alitholakalanga."

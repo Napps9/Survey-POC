@@ -206,6 +206,8 @@ pl:
     repeat_new_password: Powtórz nowe hasło
     set_submit: Zapisz nowe hasło
   results:
+    share_paused_by_admin: "Wstrzymane przez administratora — link znów zadziała, gdy je wznowi."
+    share_not_enabled: "Jeszcze nieudostępnione — administrator Twojego konta może włączyć udostępnianie wyników."
     title: Wyniki
     editor: "← Edytor"
     ask_verto: Zapytaj Verto
@@ -659,6 +661,7 @@ pl:
     switch_workspace: "Zmień przestrzeń roboczą"
     role_admin: "Administrator"
     role_member: "Członek"
+    role_viewer: "Przeglądający"
     members: Członkowie
     sign_out: Wyloguj się
   partnerships:
@@ -1311,6 +1314,7 @@ pl:
     empty_cta: Utwórz swoje pierwsze Verto →
     empty_title_managed: "Nie ma jeszcze żadnych Vertos"
     empty_body_managed: "Zespół Playverto publikuje tutaj Vertos. Pojawią się, gdy tylko pierwszy będzie gotowy."
+    empty_body_viewer: "Vertos Twojego zespołu pojawią się tutaj, gdy tylko powstanie pierwszy — gotowe do udostępnienia i sprawdzenia wyników."
     section_live: Na żywo
     section_drafts: Wersje robocze
     section_archived: Zarchiwizowane
@@ -1688,6 +1692,7 @@ pl:
       no_organisation: "Nie znaleziono organizacji."
       not_authorised: "Brak uprawnień."
       verto_creation_disabled: "Twoje konto nie tworzy Vertos — tworzy je dla Ciebie zespół Playverto."
+      viewer_read_only: "Przeglądający mogą udostępniać Vertos i widzieć ich wyniki, ale nie mogą ich tworzyć ani edytować."
     partnership_common_question_sets:
       creator_only: "Może to zrobić tylko twórca partnerstwa."
       partnership_not_found: "Nie znaleziono partnerstwa."

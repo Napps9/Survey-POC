@@ -206,6 +206,8 @@ ru:
     repeat_new_password: Повторите новый пароль
     set_submit: Сохранить новый пароль
   results:
+    share_paused_by_admin: "Приостановлено администратором — ссылка снова заработает, когда он её возобновит."
+    share_not_enabled: "Пока не опубликовано — администратор вашего аккаунта может включить доступ к результатам."
     title: Результаты
     editor: "← Редактор"
     ask_verto: Спросить Verto
@@ -659,6 +661,7 @@ ru:
     switch_workspace: "Сменить рабочее пространство"
     role_admin: "Администратор"
     role_member: "Участник"
+    role_viewer: "Наблюдатель"
     members: Участники
     sign_out: Выйти
   partnerships:
@@ -1311,6 +1314,7 @@ ru:
     empty_cta: Создать первый Verto →
     empty_title_managed: "Пока нет ни одного Verto"
     empty_body_managed: "Команда Playverto публикует Vertos здесь. Они появятся, как только будет готов первый."
+    empty_body_viewer: "Vertos вашей команды появятся здесь, как только будет создан первый — их можно будет отправить другим и посмотреть результаты."
     section_live: Активные
     section_drafts: Черновики
     section_archived: Архив
@@ -1687,6 +1691,7 @@ ru:
       no_organisation: "Организация не найдена."
       not_authorised: "Нет доступа."
       verto_creation_disabled: "Ваш аккаунт не создаёт Vertos — их создаёт для вас команда Playverto."
+      viewer_read_only: "Наблюдатели могут делиться Vertos и видеть их результаты, но не могут их создавать или редактировать."
     partnership_common_question_sets:
       creator_only: "Это может сделать только создатель партнёрства."
       partnership_not_found: "Партнёрство не найдено."

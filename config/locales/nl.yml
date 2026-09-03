@@ -206,6 +206,8 @@ nl:
     repeat_new_password: Herhaal nieuw wachtwoord
     set_submit: Nieuw wachtwoord opslaan
   results:
+    share_paused_by_admin: "Gepauzeerd door een beheerder — de link werkt weer zodra die wordt hervat."
+    share_not_enabled: "Nog niet gedeeld — een beheerder van je account kan het delen van resultaten inschakelen."
     title: Resultaten
     editor: "← Editor"
     ask_verto: Vraag het Verto
@@ -659,6 +661,7 @@ nl:
     switch_workspace: "Werkruimte wisselen"
     role_admin: "Beheerder"
     role_member: "Lid"
+    role_viewer: "Kijker"
     members: Leden
     sign_out: Uitloggen
   partnerships:
@@ -1309,6 +1312,7 @@ nl:
     empty_cta: Maak je eerste Verto →
     empty_title_managed: "Nog geen Vertos"
     empty_body_managed: "Je Playverto-team publiceert hier Vertos. Ze verschijnen zodra de eerste klaar is."
+    empty_body_viewer: "De Vertos van je team verschijnen hier zodra de eerste is gemaakt — klaar om te delen en de resultaten te bekijken."
     section_live: Live
     section_drafts: Concepten
     section_archived: Gearchiveerd
@@ -1722,6 +1726,7 @@ nl:
       no_organisation: "Geen organisatie gevonden."
       not_authorised: "Niet gemachtigd."
       verto_creation_disabled: "Je account maakt geen Vertos — je Playverto-team maakt ze voor je."
+      viewer_read_only: "Kijkers kunnen Vertos delen en hun resultaten bekijken, maar kunnen ze niet maken of bewerken."
     sessions:
       rate_limited: "Probeer het later opnieuw."
       invalid_credentials: "Probeer een ander e-mailadres of wachtwoord."

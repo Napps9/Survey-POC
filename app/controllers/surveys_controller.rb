@@ -123,6 +123,22 @@ class SurveysController < ApplicationController
 
   def settings_locked_message = t("flash.surveys.settings_locked")
 
+  # A viewer (Membership#viewer?) shares Vertos and reads their results, and
+  # nothing else: every action that changes a Verto — its deck, its settings,
+  # its languages, whether it is live or in Test Mode — is refused at the door.
+  # The editor itself (#show) is in the list, because everything it does lands
+  # on one of the endpoints after it. Creation is gated separately above
+  # (creation implies editing, so those need no second entry), and the
+  # destructive set is admin-only below. What is left — index, preview, qr,
+  # results, results_compare — is exactly what a viewer is for. The coverage
+  # test in viewer_role_test.rb holds every action to one of these lists.
+  gate_verto_editing only: %i[ show update publish unpublish enable_test_link disable_test_link
+                               convert_to_test_mode update_settings update_languages
+                               update_audience_country card_image card_lottie moderate_image
+                               pexels_search shuffle_assets setup_status generate_card
+                               generate_flow restore_card optimise_card render_card
+                               add_demographic_card ]
+
   before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy, :contacts ]
   before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr, :contacts ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]

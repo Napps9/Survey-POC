@@ -206,6 +206,8 @@ sw:
     repeat_new_password: Rudia nenosiri jipya
     set_submit: Hifadhi nenosiri jipya
   results:
+    share_paused_by_admin: "Imesitishwa na msimamizi — kiungo kitafanya kazi tena mara tu atakapokiendeleza."
+    share_not_enabled: "Bado haijashirikiwa — msimamizi wa akaunti yako anaweza kuwasha kushiriki matokeo."
     title: Matokeo
     editor: "← Mhariri"
     ask_verto: Muulize Verto
@@ -659,6 +661,7 @@ sw:
     switch_workspace: "Badilisha nafasi ya kazi"
     role_admin: "Msimamizi"
     role_member: "Mwanachama"
+    role_viewer: "Mtazamaji"
     members: Wanachama
     sign_out: Toka
   partnerships:
@@ -1309,6 +1312,7 @@ sw:
     empty_cta: Unda Verto yako ya kwanza →
     empty_title_managed: "Bado hakuna Verto"
     empty_body_managed: "Timu yako ya Playverto huchapisha Vertos hapa. Zitaonekana mara tu ya kwanza itakapokuwa tayari."
+    empty_body_viewer: "Vertos za timu yako zitaonekana hapa mara tu ya kwanza itakapotengenezwa — tayari kwa wewe kushiriki na kuona matokeo."
     section_live: Hai
     section_drafts: Rasimu
     section_archived: Yaliyohifadhiwa
@@ -1682,6 +1686,7 @@ sw:
       no_organisation: "Hakuna shirika lililopatikana."
       not_authorised: "Huna ruhusa."
       verto_creation_disabled: "Akaunti yako haitengenezi Vertos — timu yako ya Playverto huzitengeneza kwa niaba yako."
+      viewer_read_only: "Watazamaji wanaweza kushiriki Vertos na kuona matokeo yake, lakini hawawezi kuzitengeneza wala kuzihariri."
     partnership_common_question_sets:
       creator_only: "Ni mwanzilishi wa ushirikiano pekee anayeweza kufanya hilo."
       partnership_not_found: "Ushirikiano haukupatikana."

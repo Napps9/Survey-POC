@@ -25,7 +25,10 @@
       <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;"><%= t("results.title") %></span>
       <span style="color:rgba(255,255,255,0.15);">·</span>
       <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.35);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;"><%= @survey.theme %></span>
-      <%= link_to t("results.editor"), survey_path(@survey),
+      <%# A viewer has no editor to go back to, so their way out is the
+          dashboard they came from. %>
+      <%= link_to (can_edit_vertos? ? t("results.editor") : t("nav.my_vertos")),
+            (can_edit_vertos? ? survey_path(@survey) : root_path),
             style: "flex-shrink:0;font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);text-decoration:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all 0.15s;",
             onmouseover: "this.style.color='white';this.style.borderColor='rgba(255,255,255,0.3)'",
             onmouseout:  "this.style.color='rgba(255,255,255,0.4)';this.style.borderColor='rgba(255,255,255,0.1)'" %>
@@ -256,26 +259,36 @@
                             style: "flex:1;text-align:center;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.78);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);border:1px solid rgba(255,255,255,0.2);cursor:pointer;text-decoration:none;" %>
                     </div>
 
-                    <% if @survey.results_share_active? %>
-                      <%= button_to "Pause", results_share_survey_path(@survey), method: :patch, params: { active: "0" },
-                            form: { style: "margin:8px 0 0;" },
+                    <%# Minting, pausing and revoking the link are admin calls
+                        (ResultsSharesController), so only an admin is shown
+                        the buttons — everyone else gets the address to pass
+                        on, which is the part sharing actually needs. %>
+                    <% if current_membership&.admin? %>
+                      <% if @survey.results_share_active? %>
+                        <%= button_to "Pause", results_share_survey_path(@survey), method: :patch, params: { active: "0" },
+                              form: { style: "margin:8px 0 0;" },
+                              style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,255,255,0.12);cursor:pointer;" %>
+                      <% else %>
+                        <div style="margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(255,204,0,0.1);color:#FFCC00;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);">Paused — the link keeps working once resumed.</div>
+                        <%= button_to "Resume", results_share_survey_path(@survey), method: :patch, params: { active: "1" },
+                              form: { style: "margin:8px 0 0;" },
+                              style: "width:100%;padding:8px;border-radius:10px;background:rgba(1,234,203,0.15);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(1,234,203,0.3);cursor:pointer;" %>
+                      <% end %>
+                      <%= button_to "Reset link", results_share_survey_path(@survey), method: :post, params: { reset: "1" },
+                            form: { style: "margin:6px 0 0;", data: { turbo_confirm: "Reset the link? The old one stops working immediately." } },
                             style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,255,255,0.12);cursor:pointer;" %>
-                    <% else %>
-                      <div style="margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(255,204,0,0.1);color:#FFCC00;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);">Paused — the link keeps working once resumed.</div>
-                      <%= button_to "Resume", results_share_survey_path(@survey), method: :patch, params: { active: "1" },
-                            form: { style: "margin:8px 0 0;" },
-                            style: "width:100%;padding:8px;border-radius:10px;background:rgba(1,234,203,0.15);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(1,234,203,0.3);cursor:pointer;" %>
+                      <%= button_to "Turn off sharing", results_share_survey_path(@survey), method: :delete,
+                            form: { style: "margin:6px 0 0;", data: { turbo_confirm: "Turn off results sharing? The link stops working immediately." } },
+                            style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,110,110,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,110,110,0.2);cursor:pointer;" %>
+                    <% elsif !@survey.results_share_active? %>
+                      <div style="margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(255,204,0,0.1);color:#FFCC00;font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);"><%= t("results.share_paused_by_admin") %></div>
                     <% end %>
-                    <%= button_to "Reset link", results_share_survey_path(@survey), method: :post, params: { reset: "1" },
-                          form: { style: "margin:6px 0 0;", data: { turbo_confirm: "Reset the link? The old one stops working immediately." } },
-                          style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.55);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,255,255,0.12);cursor:pointer;" %>
-                    <%= button_to "Turn off sharing", results_share_survey_path(@survey), method: :delete,
-                          form: { style: "margin:6px 0 0;", data: { turbo_confirm: "Turn off results sharing? The link stops working immediately." } },
-                          style: "width:100%;padding:8px;border-radius:10px;background:transparent;color:rgba(255,110,110,0.75);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);border:1px solid rgba(255,110,110,0.2);cursor:pointer;" %>
-                  <% else %>
+                  <% elsif current_membership&.admin? %>
                     <%= button_to "Enable results sharing", results_share_survey_path(@survey), method: :post,
                           form: { style: "margin:0;" },
                           style: "width:100%;padding:10px;border-radius:12px;background:#01EACB;color:#1C2034;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);border:none;cursor:pointer;font-weight:600;" %>
+                  <% else %>
+                    <div style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.45);font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);"><%= t("results.share_not_enabled") %></div>
                   <% end %>
                 </div>
               </details>
@@ -388,9 +401,20 @@
                         <button type="button" class="report-foot-btn" data-action="click->report-export#saveDrive" data-report-export-target="driveBtn">Save to Google Drive</button>
                         <span class="report-foot-status" data-report-export-target="driveStatus"></span>
                       <% end %>
-                      <button type="button" class="report-foot-btn hidden" data-action="click->report-export#edit" data-report-export-target="editBtn">✎ Edit</button>
-                      <button type="button" class="report-foot-btn hidden" data-action="click->report-export#save" data-report-export-target="saveBtn">✓ Save changes</button>
-                      <button type="button" class="report-foot-btn hidden" data-action="click->report-export#regenerate" data-report-export-target="regenBtn">↻ Regenerate</button>
+                      <%# Hand-editing the report is editing (ResultsReportsController#update
+                          refuses a viewer), so a viewer isn't shown the way in. The
+                          Stimulus controller treats both targets as optional. %>
+                      <% if can_edit_vertos? %>
+                        <button type="button" class="report-foot-btn hidden" data-action="click->report-export#edit" data-report-export-target="editBtn">✎ Edit</button>
+                        <button type="button" class="report-foot-btn hidden" data-action="click->report-export#save" data-report-export-target="saveBtn">✓ Save changes</button>
+                      <% end %>
+                      <%# An explicit Regenerate rewrites the stored report under a new
+                          brief, hand edits and all (ResultsReportStreamsController
+                          refuses a viewer's once one exists); the first Generate still
+                          comes from the brief above. %>
+                      <% if can_edit_vertos? %>
+                        <button type="button" class="report-foot-btn hidden" data-action="click->report-export#regenerate" data-report-export-target="regenBtn">↻ Regenerate</button>
+                      <% end %>
                       <button type="button" class="report-foot-btn report-foot-close" data-action="click->report-export#close" style="margin-left:auto;">Close</button>
                     </div>
                   </div>

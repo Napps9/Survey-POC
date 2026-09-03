@@ -216,6 +216,8 @@ st:
     repeat_new_password: "Pheta phasewete e ntjha"
     set_submit: "Boloka phasewete e ntjha"
   results:
+    share_paused_by_admin: "E emisitswe ke motsamaisi — sehokelo se tla sebetsa hape hang ha a se tsosolosa."
+    share_not_enabled: "Ha e so arolelanwe — motsamaisi wa akhaonto ya hao a ka bulela ho arolelana diphetho."
     title: "Diphetho"
     editor: "← Mohlophisi"
     ask_verto: "Botsa Verto"
@@ -675,6 +677,7 @@ st:
     switch_workspace: "Fetola sebaka sa mosebetsi"
     role_admin: "Molaodi"
     role_member: "Setho"
+    role_viewer: "Mosheba"
     members: "Ditho"
     sign_out: "Tswa"
   partnerships:
@@ -1331,6 +1334,7 @@ st:
     empty_cta: "Theha Verto ya hao ya pele →"
     empty_title_managed: "Ha ho diVerto ho fihlela jwale"
     empty_body_managed: "Sehlopha sa hao sa Playverto se phatlalatsa diVerto mona. Di tla hlaha hang ha ya pele e loketse."
+    empty_body_viewer: "DiVerto tsa sehlopha sa hao di tla hlaha mona hang ha ya pele e thehilwe — di loketse hore o di arolelane le ho bona diphetho."
     section_live: "E A Phela"
     section_drafts: "Meralo"
     section_archived: "Tse Bolokilweng"
@@ -1719,6 +1723,7 @@ st:
       no_organisation: "Ha ho mokgatlo o fumanweng."
       not_authorised: "Ha o na tumello."
       verto_creation_disabled: "Akhaonto ya hao ha e thehe diVerto — sehlopha sa hao sa Playverto se di u thehela."
+      viewer_read_only: "Basheba ba ka arolelana diVerto le ho bona diphetho tsa tsona, empa ba ke ke ba di theha kapa ba di fetola."
     partnership_common_question_sets:
       creator_only: "Ke motheha wa selekane feela ya ka etsang seo."
       partnership_not_found: "Selekane ha se a fumanwa."

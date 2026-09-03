@@ -208,6 +208,8 @@ sn:
     repeat_new_password: "Dzokorora Pasiwedhi Itsva"
     set_submit: "Chengetedza Pasiwedhi Itsva"
   results:
+    share_paused_by_admin: "Yakamiswa nemutungamiri — chinongedzo chichashanda zvakare kana vachitangazve."
+    share_not_enabled: "Haisati yagoverwa — mutungamiri weakaunti yako anogona kubatidza kugoverwa kwemhinduro."
     title: "Mhedzisiro"
     editor: "← Chigadziriso"
     ask_verto: "Ask Verto"
@@ -663,6 +665,7 @@ sn:
     switch_workspace: "Chinja nzvimbo yebasa"
     role_admin: "Mutungamiriri"
     role_member: "Nhengo"
+    role_viewer: "Muoni"
     members: "Nhengo"
     sign_out: "Buda"
   partnerships:
@@ -1319,6 +1322,7 @@ sn:
     empty_cta: "Gadzira Verto Yako Yekutanga →"
     empty_title_managed: "Hapana Vertos Parizvino"
     empty_body_managed: "Boka rako rePlayverto rinobudisa Vertos pano. Dzichaonekwa kana yekutanga yagadzirira."
+    empty_body_viewer: "Vertos dzeboka rako dzichaonekwa pano kana yekutanga yagadzirwa — dzakagadzirira kuti ugovere uye uone mhinduro."
     section_live: "Pachena"
     section_drafts: "Madhirafiti"
     section_archived: "Zvakachengetwa"
@@ -1692,6 +1696,7 @@ sn:
       no_organisation: "Hapana sangano rakawanikwa."
       not_authorised: "Hauna mvumo."
       verto_creation_disabled: "Akaunti yako haigadziri Vertos — boka rako rePlayverto rinozvigadzirira iwe."
+      viewer_read_only: "Vaoni vanogona kugovera Vertos uye kuona mhinduro dzadzo, asi havagoni kudzigadzira kana kudzichinja."
     partnership_common_question_sets:
       creator_only: "Mugadziri weushirikiano chete ndiye anogona kuita izvozvo."
       partnership_not_found: "Ushirikiano hahuna kuwanikwa."

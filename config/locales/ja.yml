@@ -206,6 +206,8 @@ ja:
     repeat_new_password: 新しいパスワードを再入力
     set_submit: 新しいパスワードを保存
   results:
+    share_paused_by_admin: "管理者によって一時停止中です。再開されるとリンクは再び有効になります。"
+    share_not_enabled: "まだ共有されていません。アカウントの管理者が結果の共有を有効にできます。"
     title: 結果
     editor: "← エディター"
     ask_verto: Vertoに聞く
@@ -659,6 +661,7 @@ ja:
     switch_workspace: "ワークスペースを切り替える"
     role_admin: "管理者"
     role_member: "メンバー"
+    role_viewer: "閲覧者"
     members: メンバー
     sign_out: ログアウト
   partnerships:
@@ -1309,6 +1312,7 @@ ja:
     empty_cta: 最初のVertoを作成 →
     empty_title_managed: "まだ Verto がありません"
     empty_body_managed: "Playverto チームがここに Verto を公開します。最初の 1 つが完成すると表示されます。"
+    empty_body_viewer: "チームの Verto は、最初の 1 つが作成されるとここに表示されます。共有したり結果を見たりできます。"
     section_live: ライブ
     section_drafts: 下書き
     section_archived: アーカイブ済み
@@ -1680,6 +1684,7 @@ ja:
       no_organisation: "組織が見つかりません。"
       not_authorised: "権限がありません。"
       verto_creation_disabled: "このアカウントでは Verto を作成できません。Playverto チームが代わりに作成します。"
+      viewer_read_only: "閲覧者は Verto を共有して結果を見ることはできますが、作成や編集はできません。"
     partnership_common_question_sets:
       creator_only: "この操作はパートナーシップの作成者のみが行えます。"
       partnership_not_found: "パートナーシップが見つかりません。"

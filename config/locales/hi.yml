@@ -206,6 +206,8 @@ hi:
     repeat_new_password: नया पासवर्ड दोहराएं
     set_submit: नया पासवर्ड सहेजें
   results:
+    share_paused_by_admin: "एक एडमिन ने रोक दिया है — जब वे इसे फिर से शुरू करेंगे तो लिंक फिर काम करेगा।"
+    share_not_enabled: "अभी साझा नहीं किया गया — आपके खाते का कोई एडमिन परिणाम साझा करना चालू कर सकता है।"
     title: परिणाम
     editor: "← संपादक"
     ask_verto: Verto से पूछें
@@ -659,6 +661,7 @@ hi:
     switch_workspace: "कार्यक्षेत्र बदलें"
     role_admin: "व्यवस्थापक"
     role_member: "सदस्य"
+    role_viewer: "दर्शक"
     members: सदस्य
     sign_out: साइन आउट
   partnerships:
@@ -1309,6 +1312,7 @@ hi:
     empty_cta: अपना पहला Verto बनाएं →
     empty_title_managed: "अभी तक कोई Verto नहीं"
     empty_body_managed: "आपकी Playverto टीम यहाँ Vertos प्रकाशित करती है। पहला तैयार होते ही वे दिखाई देंगे।"
+    empty_body_viewer: "आपकी टीम के Vertos पहला बनते ही यहाँ दिखाई देंगे — साझा करने और परिणाम देखने के लिए तैयार।"
     section_live: लाइव
     section_drafts: ड्राफ़्ट
     section_archived: संग्रहीत
@@ -1682,6 +1686,7 @@ hi:
       no_organisation: "कोई संगठन नहीं मिला।"
       not_authorised: "अधिकृत नहीं।"
       verto_creation_disabled: "आपका खाता Vertos नहीं बनाता — आपकी Playverto टीम उन्हें आपके लिए बनाती है।"
+      viewer_read_only: "दर्शक Vertos साझा कर सकते हैं और उनके परिणाम देख सकते हैं, लेकिन उन्हें बना या संपादित नहीं कर सकते।"
     partnership_common_question_sets:
       creator_only: "यह केवल साझेदारी बनाने वाला ही कर सकता है।"
       partnership_not_found: "साझेदारी नहीं मिली।"

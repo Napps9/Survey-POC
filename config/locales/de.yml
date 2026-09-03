@@ -206,6 +206,8 @@ de:
     repeat_new_password: Neues Passwort wiederholen
     set_submit: Neues Passwort speichern
   results:
+    share_paused_by_admin: "Von einem Admin pausiert — der Link funktioniert wieder, sobald er fortgesetzt wird."
+    share_not_enabled: "Noch nicht geteilt — ein Admin deines Kontos kann das Teilen der Ergebnisse einschalten."
     title: Ergebnisse
     editor: "← Editor"
     ask_verto: Verto fragen
@@ -659,6 +661,7 @@ de:
     switch_workspace: "Arbeitsbereich wechseln"
     role_admin: "Admin"
     role_member: "Mitglied"
+    role_viewer: "Betrachter"
     members: Mitglieder
     sign_out: Abmelden
   partnerships:
@@ -1309,6 +1312,7 @@ de:
     empty_cta: Erstelle dein erstes Verto →
     empty_title_managed: "Noch keine Vertos"
     empty_body_managed: "Dein Playverto-Team veröffentlicht hier Vertos. Sie erscheinen, sobald das erste fertig ist."
+    empty_body_viewer: "Die Vertos deines Teams erscheinen hier, sobald das erste erstellt ist — bereit zum Teilen und zum Ansehen der Ergebnisse."
     section_live: Live
     section_drafts: Entwürfe
     section_archived: Archiviert
@@ -1722,6 +1726,7 @@ de:
       no_organisation: "Keine Organisation gefunden."
       not_authorised: "Nicht berechtigt."
       verto_creation_disabled: "Dein Konto erstellt keine Vertos — dein Playverto-Team erstellt sie für dich."
+      viewer_read_only: "Betrachter können Vertos teilen und ihre Ergebnisse sehen, aber keine erstellen oder bearbeiten."
     sessions:
       rate_limited: "Bitte versuche es später erneut."
       invalid_credentials: "Versuche es mit einer anderen E-Mail-Adresse oder einem anderen Passwort."

@@ -206,6 +206,8 @@ tr:
     repeat_new_password: Yeni şifreyi tekrar girin
     set_submit: Yeni şifreyi kaydet
   results:
+    share_paused_by_admin: "Bir yönetici tarafından duraklatıldı — yönetici sürdürdüğünde bağlantı yeniden çalışır."
+    share_not_enabled: "Henüz paylaşılmadı — hesabınızın bir yöneticisi sonuç paylaşımını açabilir."
     title: Sonuçlar
     editor: "← Editör"
     ask_verto: Verto'ya sor
@@ -659,6 +661,7 @@ tr:
     switch_workspace: "Çalışma alanını değiştir"
     role_admin: "Yönetici"
     role_member: "Üye"
+    role_viewer: "Görüntüleyici"
     members: Üyeler
     sign_out: Çıkış yap
   partnerships:
@@ -1309,6 +1312,7 @@ tr:
     empty_cta: İlk Verto'nuzu oluşturun →
     empty_title_managed: "Henüz Verto yok"
     empty_body_managed: "Playverto ekibiniz Vertos'ları burada yayımlar. İlki hazır olur olmaz görünecekler."
+    empty_body_viewer: "Ekibinizin Verto'ları ilki oluşturulur oluşturulmaz burada görünecek — paylaşmanız ve sonuçları görmeniz için hazır."
     section_live: Canlı
     section_drafts: Taslaklar
     section_archived: Arşivlenenler
@@ -1682,6 +1686,7 @@ tr:
       no_organisation: "Kuruluş bulunamadı."
       not_authorised: "Yetkiniz yok."
       verto_creation_disabled: "Hesabınız Verto oluşturmaz — Playverto ekibiniz sizin için oluşturur."
+      viewer_read_only: "Görüntüleyiciler Verto'ları paylaşabilir ve sonuçlarını görebilir, ancak oluşturamaz veya düzenleyemez."
     partnership_common_question_sets:
       creator_only: "Bunu yalnızca ortaklığı oluşturan kişi yapabilir."
       partnership_not_found: "Ortaklık bulunamadı."

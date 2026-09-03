@@ -206,6 +206,8 @@ he:
     repeat_new_password: חזור על הסיסמה החדשה
     set_submit: שמור סיסמה חדשה
   results:
+    share_paused_by_admin: "הושהה על ידי מנהל — הקישור יפעל שוב ברגע שהוא יחדש אותו."
+    share_not_enabled: "עדיין לא משותף — מנהל בחשבון שלך יכול להפעיל שיתוף תוצאות."
     title: תוצאות
     editor: "← עורך"
     ask_verto: שאל את Verto
@@ -659,6 +661,7 @@ he:
     switch_workspace: "החלפת מרחב עבודה"
     role_admin: "מנהל"
     role_member: "חבר"
+    role_viewer: "צופה"
     members: חברים
     sign_out: התנתק
   partnerships:
@@ -1309,6 +1312,7 @@ he:
     empty_cta: צור את ה-Verto הראשון שלך →
     empty_title_managed: "אין עדיין Vertos"
     empty_body_managed: "צוות Playverto מפרסם כאן Vertos. הם יופיעו ברגע שהראשון יהיה מוכן."
+    empty_body_viewer: "ה-Vertos של הצוות שלך יופיעו כאן ברגע שהראשון ייווצר — מוכנים לשיתוף ולצפייה בתוצאות."
     section_live: פעיל
     section_drafts: טיוטות
     section_archived: ארכיון
@@ -1685,6 +1689,7 @@ he:
       no_organisation: "לא נמצא ארגון."
       not_authorised: "אין הרשאה."
       verto_creation_disabled: "החשבון שלך אינו יוצר Vertos — צוות Playverto יוצר אותם עבורך."
+      viewer_read_only: "צופים יכולים לשתף Vertos ולראות את התוצאות שלהם, אך לא ליצור או לערוך אותם."
     partnership_common_question_sets:
       creator_only: "רק יוצר השותפות יכול לעשות זאת."
       partnership_not_found: "השותפות לא נמצאה."

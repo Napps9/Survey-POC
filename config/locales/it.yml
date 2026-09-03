@@ -206,6 +206,8 @@ it:
     repeat_new_password: Ripeti nuova password
     set_submit: Salva nuova password
   results:
+    share_paused_by_admin: "In pausa per scelta di un amministratore: il link tornerà a funzionare quando lo riattiverà."
+    share_not_enabled: "Non ancora condiviso: un amministratore del tuo account può attivare la condivisione dei risultati."
     title: Risultati
     editor: "← Editor"
     ask_verto: Chiedi a Verto
@@ -659,6 +661,7 @@ it:
     switch_workspace: "Cambia spazio di lavoro"
     role_admin: "Amministratore"
     role_member: "Membro"
+    role_viewer: "Lettore"
     members: Membri
     sign_out: Esci
   partnerships:
@@ -1309,6 +1312,7 @@ it:
     empty_cta: Crea il tuo primo Verto →
     empty_title_managed: "Nessun Verto per ora"
     empty_body_managed: "Il tuo team Playverto pubblica qui i Vertos. Appariranno non appena il primo sarà pronto."
+    empty_body_viewer: "I Vertos del tuo team appariranno qui non appena verrà creato il primo: pronti da condividere e per vederne i risultati."
     section_live: Live
     section_drafts: Bozze
     section_archived: Archiviati
@@ -1722,6 +1726,7 @@ it:
       no_organisation: "Nessuna organizzazione trovata."
       not_authorised: "Non autorizzato."
       verto_creation_disabled: "Il tuo account non crea Vertos: il tuo team Playverto li crea per te."
+      viewer_read_only: "I lettori possono condividere i Vertos e vederne i risultati, ma non possono crearli né modificarli."
     sessions:
       rate_limited: "Riprova più tardi."
       invalid_credentials: "Prova con un altro indirizzo email o un'altra password."

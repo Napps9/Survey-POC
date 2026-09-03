@@ -288,7 +288,10 @@ namespace :verto do
     survey = org.surveys.kept.find_by(slug: importer.verto_slug) || org.surveys.kept.order(:id).first
     abort "No Verto found in '#{importer.org_slug}'." unless survey
 
-    admin = org.memberships.order(:id).first&.user
+    # The admin the importer minted, by preference — never a viewer, who can't
+    # offer a Verto to Ask Verto from the app and shouldn't be recorded as the
+    # one who did here either.
+    admin = (org.memberships.admin.order(:id).first || org.memberships.editing.order(:id).first)&.user
     abort "No member of '#{importer.org_slug}' to record as the creator." unless admin
 
     result = CorpusEnrolment.new(survey, user: admin, reviewer: admin.email_address).call

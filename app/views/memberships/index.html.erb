@@ -174,7 +174,14 @@
               <div style="font-family:'Alata',sans-serif;font-size: var(--text-lg);color:#F7F7F7;"><%= membership.user.name.presence || "—" %></div>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:rgba(255,255,255,0.4);"><%= membership.user.email_address %></div>
             </div>
-            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:<%= membership.admin? ? 'rgba(1,234,203,0.15)' : 'rgba(255,255,255,0.06)' %>;color:<%= membership.admin? ? '#01EACB' : 'rgba(255,255,255,0.4)' %>;">
+            <%# Admin in the brand teal, member neutral, viewer a step quieter
+                still — the badge reads as the ladder the invite form lists. %>
+            <% badge_bg, badge_fg =
+                 if membership.admin?  then [ "rgba(1,234,203,0.15)", "#01EACB" ]
+                 elsif membership.viewer? then [ "rgba(255,255,255,0.04)", "rgba(255,255,255,0.3)" ]
+                 else                       [ "rgba(255,255,255,0.06)", "rgba(255,255,255,0.4)" ]
+                 end %>
+            <span style="font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:<%= badge_bg %>;color:<%= badge_fg %>;">
               <%= membership.role %>
             </span>
             <% if membership.user != Current.user %>

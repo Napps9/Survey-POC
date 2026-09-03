@@ -206,6 +206,8 @@ ar:
     repeat_new_password: أعد إدخال كلمة المرور الجديدة
     set_submit: حفظ كلمة المرور الجديدة
   results:
+    share_paused_by_admin: "أوقفه مسؤول مؤقتًا — سيعمل الرابط مجددًا عندما يستأنفه."
+    share_not_enabled: "لم تتم المشاركة بعد — يمكن لمسؤول في حسابك تفعيل مشاركة النتائج."
     title: النتائج
     editor: "← المحرر"
     ask_verto: اسأل Verto
@@ -659,6 +661,7 @@ ar:
     switch_workspace: "تبديل مساحة العمل"
     role_admin: "مسؤول"
     role_member: "عضو"
+    role_viewer: "مشاهد"
     members: الأعضاء
     sign_out: تسجيل الخروج
   partnerships:
@@ -1309,6 +1312,7 @@ ar:
     empty_cta: أنشئ أول فيرتو لك ←
     empty_title_managed: "لا توجد Vertos بعد"
     empty_body_managed: "ينشر فريق Playverto الـ Vertos هنا. ستظهر بمجرد أن يصبح أولها جاهزًا."
+    empty_body_viewer: "ستظهر Vertos فريقك هنا بمجرد إنشاء أولها — جاهزة لتشاركها وتطّلع على نتائجها."
     section_live: مباشر
     section_drafts: مسودات
     section_archived: المؤرشفة
@@ -1689,6 +1693,7 @@ ar:
       no_organisation: "لم يتم العثور على أي مؤسسة."
       not_authorised: "غير مصرَّح به."
       verto_creation_disabled: "حسابك لا ينشئ Vertos — فريق Playverto ينشئها نيابةً عنك."
+      viewer_read_only: "يمكن للمشاهدين مشاركة Vertos والاطلاع على نتائجها، لكن لا يمكنهم إنشاؤها أو تعديلها."
     partnership_common_question_sets:
       creator_only: "منشئ الشراكة وحده من يمكنه فعل ذلك."
       partnership_not_found: "الشراكة غير موجودة."

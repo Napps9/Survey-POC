@@ -7,6 +7,11 @@
 class FlowGenerationsController < ApplicationController
   include RendersCardHtml
 
+  # The generation this polls can only have been started from the editor
+  # (SurveysController#generate_flow, itself behind the same gate), so the
+  # poll is refused on the same answer — as JSON, which is how it's asked.
+  gate_verto_editing only: %i[ show ]
+
   # GET /flow_generations/:id
   def show
     generation = find_generation

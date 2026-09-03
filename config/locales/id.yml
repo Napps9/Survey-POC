@@ -206,6 +206,8 @@ id:
     repeat_new_password: Ulangi kata sandi baru
     set_submit: Simpan kata sandi baru
   results:
+    share_paused_by_admin: "Dijeda oleh admin — tautan akan berfungsi lagi begitu mereka melanjutkannya."
+    share_not_enabled: "Belum dibagikan — admin akun Anda dapat mengaktifkan berbagi hasil."
     title: Hasil
     editor: "← Editor"
     ask_verto: Tanya Verto
@@ -659,6 +661,7 @@ id:
     switch_workspace: "Ganti ruang kerja"
     role_admin: "Admin"
     role_member: "Anggota"
+    role_viewer: "Pelihat"
     members: Anggota
     sign_out: Keluar
   partnerships:
@@ -1309,6 +1312,7 @@ id:
     empty_cta: Buat Verto pertama Anda →
     empty_title_managed: "Belum ada Verto"
     empty_body_managed: "Tim Playverto Anda menerbitkan Vertos di sini. Semuanya akan muncul begitu yang pertama siap."
+    empty_body_viewer: "Vertos tim Anda akan muncul di sini begitu yang pertama dibuat — siap untuk Anda bagikan dan lihat hasilnya."
     section_live: Live
     section_drafts: Draf
     section_archived: Diarsipkan
@@ -1681,6 +1685,7 @@ id:
       no_organisation: "Tidak ada organisasi yang ditemukan."
       not_authorised: "Tidak diizinkan."
       verto_creation_disabled: "Akun Anda tidak membuat Vertos — tim Playverto Anda yang membuatnya untuk Anda."
+      viewer_read_only: "Pelihat dapat membagikan Vertos dan melihat hasilnya, tetapi tidak dapat membuat atau mengeditnya."
     partnership_common_question_sets:
       creator_only: "Hanya pembuat kemitraan yang dapat melakukan itu."
       partnership_not_found: "Kemitraan tidak ditemukan."
