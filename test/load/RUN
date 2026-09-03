@@ -1,14 +1,17 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 14: same 40/s as run 13 on the same 2c-4g box, but split over 2
-# generators (20/s each — the rate one runner ran clean in run 11).
-# Discriminates a server-side ceiling (identical saturation) from a
-# generator/path ceiling (clean).
+# Run 15: path-only probe — /up (pool checkout + one trivial DB round-trip;
+# no cache, rate limit or app work) at 400 req/s from 2 generators (200 each)
+# through the same Cloudflare→Render→Puma path. Clean far above 185 req/s ⇒
+# the journeys' ceiling is in the DB/Key Value/app work; queueing at ~185 ⇒
+# the path itself.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
-ARRIVALS_PER_S=40
-RAMP_S=60
-HOLD_S=240
+SCRIPT=test/load/ping.js
+PING_PATH=/up
+ARRIVALS_PER_S=400
+RAMP_S=30
+HOLD_S=90
 DWELL_SCALE=0.05
 BROWNOUT=0
 GENERATORS=2
