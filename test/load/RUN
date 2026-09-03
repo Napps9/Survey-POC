@@ -1,14 +1,16 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 15: path-only probe — /up (pool checkout + one trivial DB round-trip;
-# no cache, rate limit or app work) at 400 req/s from 2 generators (200 each)
-# through the same Cloudflare→Render→Puma path. Clean far above 185 req/s ⇒
-# the journeys' ceiling is in the DB/Key Value/app work; queueing at ~185 ⇒
-# the path itself.
+# Run 16: second probe — the per-Verto manifest (PlayerController#manifest:
+# the full Rails/PlayerController stack + ONE survey read, JSON render; no
+# writes, no rate limit, no Key Value) at 400 req/s from 2 generators. Run 15
+# cleared the path with /up; this clears (or indicts) the Ruby request stack
+# and a plain indexed read. If clean, the ~185 req/s wall belongs to the
+# write endpoints, the rate-limit counters on Key Value, or the leaderboard's
+# board-wide counts.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/ping.js
-PING_PATH=/up
+PING_PATH=/play/5rJks8kFiOaNOWeTmzkcinYf/manifest
 ARRIVALS_PER_S=400
 RAMP_S=30
 HOLD_S=90
