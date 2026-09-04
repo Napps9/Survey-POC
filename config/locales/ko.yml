@@ -212,6 +212,11 @@ ko:
     editor: "← 편집기"
     ask_verto: Verto에게 묻기
     analysing: 응답 분석 중…
+    view_all_answers: "모든 답변 보기 (%{count})"
+    freeform_eyebrow: "자유 서술 답변"
+    freeform_search_placeholder: "답변 검색…"
+    freeform_copy: "모두 복사"
+    freeform_load_more: "더 불러오기"
   shared_results:
     title: 결과
     read_only_badge: 읽기 전용
@@ -639,6 +644,13 @@ ko:
       compare_card_n: "카드 %{n}"
       compare_freeform_count_one: "자유 서술형 답변 %{n}개"
       compare_freeform_count_other: "자유 서술형 답변 %{n}개"
+      freeform_showing: "%{total}개 중 %{shown}개 표시"
+      freeform_matched: "“%{q}”와 일치: %{total}개 중 %{matched}개"
+      freeform_none: "일치하는 답변이 없습니다."
+      freeform_loading: "답변을 불러오는 중…"
+      freeform_error: "답변을 불러오지 못했습니다. 다시 시도해 주세요."
+      freeform_copied: "복사했습니다!"
+      freeform_copy_failed: "복사하지 못했습니다. 선택 후 복사하세요"
       compare_summarize_btn: "✦ AI로 요약"
       compare_summarizing: "요약하는 중…"
       compare_summarize_error: "지금은 요약할 수 없습니다."

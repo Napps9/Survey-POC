@@ -212,6 +212,11 @@ vi:
     editor: "← Trình chỉnh sửa"
     ask_verto: Hỏi Verto
     analysing: Đang phân tích phản hồi…
+    view_all_answers: "Xem tất cả câu trả lời (%{count})"
+    freeform_eyebrow: "Câu trả lời tự do"
+    freeform_search_placeholder: "Tìm trong câu trả lời…"
+    freeform_copy: "Sao chép tất cả"
+    freeform_load_more: "Tải thêm"
   shared_results:
     title: Kết quả
     read_only_badge: Chỉ xem
@@ -639,6 +644,13 @@ vi:
       compare_card_n: 'Thẻ %{n}'
       compare_freeform_count_one: '%{n} câu trả lời dạng văn bản tự do'
       compare_freeform_count_other: '%{n} câu trả lời dạng văn bản tự do'
+      freeform_showing: "Đang hiển thị %{shown} trên %{total}"
+      freeform_matched: "%{matched} trên %{total} khớp với “%{q}”"
+      freeform_none: "Không có câu trả lời nào khớp."
+      freeform_loading: "Đang tải câu trả lời…"
+      freeform_error: "Không tải được câu trả lời — vui lòng thử lại."
+      freeform_copied: "Đã sao chép!"
+      freeform_copy_failed: "Sao chép thất bại — hãy chọn rồi sao chép"
       compare_summarize_btn: '✦ Tóm tắt bằng AI'
       compare_summarizing: 'Đang tóm tắt…'
       compare_summarize_error: 'Hiện không thể tóm tắt.'

@@ -212,6 +212,11 @@ uk:
     editor: "← Редактор"
     ask_verto: Запитати Verto
     analysing: Аналіз відповідей…
+    view_all_answers: "Показати всі відповіді (%{count})"
+    freeform_eyebrow: "Відповіді у вільній формі"
+    freeform_search_placeholder: "Пошук у відповідях…"
+    freeform_copy: "Скопіювати все"
+    freeform_load_more: "Завантажити ще"
   shared_results:
     title: Результати
     read_only_badge: Лише перегляд
@@ -639,6 +644,13 @@ uk:
       compare_card_n: 'Картка %{n}'
       compare_freeform_count_one: '%{n} текстова відповідь'
       compare_freeform_count_other: '%{n} текстових відповідей'
+      freeform_showing: "Показано %{shown} із %{total}"
+      freeform_matched: "%{matched} із %{total} відповідають «%{q}»"
+      freeform_none: "Збігів немає."
+      freeform_loading: "Завантаження відповідей…"
+      freeform_error: "Не вдалося завантажити відповіді — спробуйте ще раз."
+      freeform_copied: "Скопійовано!"
+      freeform_copy_failed: "Не вдалося скопіювати — виділіть і скопіюйте"
       compare_summarize_btn: '✦ Узагальнити за допомогою ШІ'
       compare_summarizing: 'Узагальнюємо…'
       compare_summarize_error: 'Зараз не вдалося узагальнити.'

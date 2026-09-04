@@ -212,6 +212,11 @@ es:
     editor: "← Editor"
     ask_verto: Preguntarle a Verto
     analysing: Analizando respuestas…
+    view_all_answers: "Ver todas las respuestas (%{count})"
+    freeform_eyebrow: "Respuestas de texto libre"
+    freeform_search_placeholder: "Buscar respuestas…"
+    freeform_copy: "Copiar todo"
+    freeform_load_more: "Cargar más"
   shared_results:
     title: Resultados
     read_only_badge: Solo lectura
@@ -639,6 +644,13 @@ es:
       compare_card_n: 'Tarjeta %{n}'
       compare_freeform_count_one: '%{n} respuesta de texto libre'
       compare_freeform_count_other: '%{n} respuestas de texto libre'
+      freeform_showing: "Mostrando %{shown} de %{total}"
+      freeform_matched: "%{matched} de %{total} coinciden con «%{q}»"
+      freeform_none: "Ninguna respuesta coincide."
+      freeform_loading: "Cargando respuestas…"
+      freeform_error: "No se pudieron cargar las respuestas: inténtalo de nuevo."
+      freeform_copied: "¡Copiado!"
+      freeform_copy_failed: "No se pudo copiar: selecciona y copia"
       compare_summarize_btn: '✦ Resumir con IA'
       compare_summarizing: 'Resumiendo…'
       compare_summarize_error: 'No se pudo resumir en este momento.'

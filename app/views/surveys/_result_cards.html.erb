@@ -9,7 +9,13 @@
       shared     — when true, redacts open_ended texts, "other" free text and
                    contact_form's lead table to count-only lines. Defaults to
                    false so the owner's own results.html.erb, which renders
-                   this unconditionally, doesn't have to pass it. %>
+                   this unconditionally, doesn't have to pass it.
+      answers    — { survey:, segment:, range: } for the "View all answers"
+                   button on freeform cards (SurveyTextAnswersController),
+                   carrying the segment and date range the page aggregated
+                   under so the panel shows the same answers the card counted.
+                   Omitted (the shared page, or any renderer without a page
+                   filter to follow), no button is drawn. %>
 <%
   left_bg_for = {
     "welcome_card"     => "linear-gradient(150deg,#0d3d22 0%,#051408 100%)",
@@ -23,7 +29,8 @@
     "rating"           => "linear-gradient(150deg,#3d2a00 0%,#1a1000 100%)",
     "open_ended"       => "linear-gradient(150deg,#3d0020 0%,#1a0010 100%)",
   }
-  shared = local_assigns.fetch(:shared, false)
+  shared  = local_assigns.fetch(:shared, false)
+  answers = local_assigns[:answers]
 %>
 <% aggregated.each_with_index do |result, idx| %>
   <% type      = result[:type]
@@ -149,16 +156,29 @@
               <%= t("shared_results.hidden_answers", count: result[:texts].size) %>
             </div>
           <% else %>
-            <div style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;">
-              <% result[:texts].first(20).each do |text| %>
-                <div style="padding:7px 11px;border-radius:7px;background:rgba(0,0,0,0.03);border-left:2px solid rgba(1,234,203,0.25);font-family:'ABeeZee',sans-serif;font-size: var(--text-base);color:#111;line-height:1.5;">
-                  <%= text.truncate(200) %>
-                </div>
-              <% end %>
-              <% if result[:texts].size > 20 %>
-                <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-xs);color:rgba(0,0,0,0.3);padding:3px 11px;">+ <%= result[:texts].size - 20 %> more</div>
+            <%# A preview of the latest few — the last ten the aggregator
+                walked, which is arrival order for a Verto answered live —
+                clamped by CSS rather than cut at a character count, and a
+                door to the rest: the panel behind "View all answers"
+                (freeform_answers_controller + SurveyTextAnswersController)
+                pages through every answer in full, newest first, within the
+                segment and date range this page is showing, and searches
+                them. Before it, the card stopped at twenty truncated answers
+                and a "+ N more" that led nowhere. %>
+            <% preview = result[:texts].last(10).reverse %>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <% preview.each do |text| %>
+                <div class="freeform-preview-item"><div class="freeform-preview-item__text"><%= text %></div></div>
               <% end %>
             </div>
+            <% if result[:texts].any? && answers && card_data["demographic"].blank? %>
+              <button type="button" class="freeform-view-all"
+                      data-action="click->freeform-answers#open"
+                      data-freeform-answers-url-param="<%= survey_results_answers_path(answers[:survey], card_index: idx, segment: answers[:segment], range: answers[:range]) %>"
+                      data-freeform-answers-question-param="<%= card_data["text"] %>">
+                <%= t("results.view_all_answers", count: result[:texts].size) %> →
+              </button>
+            <% end %>
           <% end %>
 
         <% elsif type == "contact_form" %>

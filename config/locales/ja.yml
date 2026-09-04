@@ -212,6 +212,11 @@ ja:
     editor: "← エディター"
     ask_verto: Vertoに聞く
     analysing: 回答を分析中…
+    view_all_answers: "すべての回答を見る（%{count}）"
+    freeform_eyebrow: "自由記述の回答"
+    freeform_search_placeholder: "回答を検索…"
+    freeform_copy: "すべてコピー"
+    freeform_load_more: "さらに読み込む"
   shared_results:
     title: 結果
     read_only_badge: 読み取り専用
@@ -639,6 +644,13 @@ ja:
       compare_card_n: "カード%{n}"
       compare_freeform_count_one: "自由記述の回答 %{n}件"
       compare_freeform_count_other: "自由記述の回答 %{n}件"
+      freeform_showing: "%{total} 件中 %{shown} 件を表示"
+      freeform_matched: "「%{q}」に一致：%{total} 件中 %{matched} 件"
+      freeform_none: "一致する回答はありません。"
+      freeform_loading: "回答を読み込んでいます…"
+      freeform_error: "回答を読み込めませんでした。もう一度お試しください。"
+      freeform_copied: "コピーしました"
+      freeform_copy_failed: "コピーできませんでした。選択してコピーしてください"
       compare_summarize_btn: "✦ AIで要約"
       compare_summarizing: "要約しています…"
       compare_summarize_error: "現在要約できませんでした。"

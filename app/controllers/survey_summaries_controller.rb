@@ -61,7 +61,9 @@ class SurveySummariesController < ApplicationController
     survey = Current.organisation.surveys.find(params[:id])
     cards  = Array(survey.cards)
     idx    = params[:card_index].to_i
-    card   = cards[idx]
+    # Never a card from the end of the deck: a negative index would pass the
+    # type check below and then aggregate against a key no response has.
+    card   = idx.negative? ? nil : cards[idx]
 
     response.headers["Content-Type"]      = "text/plain; charset=utf-8"
     response.headers["X-Accel-Buffering"] = "no"

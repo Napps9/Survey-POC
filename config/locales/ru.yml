@@ -212,6 +212,11 @@ ru:
     editor: "← Редактор"
     ask_verto: Спросить Verto
     analysing: Анализ ответов…
+    view_all_answers: "Показать все ответы (%{count})"
+    freeform_eyebrow: "Ответы в свободной форме"
+    freeform_search_placeholder: "Поиск по ответам…"
+    freeform_copy: "Скопировать всё"
+    freeform_load_more: "Загрузить ещё"
   shared_results:
     title: Результаты
     read_only_badge: Только для чтения
@@ -639,6 +644,13 @@ ru:
       compare_card_n: 'Карточка %{n}'
       compare_freeform_count_one: '%{n} текстовый ответ'
       compare_freeform_count_other: '%{n} текстовых ответов'
+      freeform_showing: "Показано %{shown} из %{total}"
+      freeform_matched: "%{matched} из %{total} соответствуют «%{q}»"
+      freeform_none: "Совпадений нет."
+      freeform_loading: "Загрузка ответов…"
+      freeform_error: "Не удалось загрузить ответы — попробуйте ещё раз."
+      freeform_copied: "Скопировано!"
+      freeform_copy_failed: "Не удалось скопировать — выделите и скопируйте"
       compare_summarize_btn: '✦ Обобщить с помощью ИИ'
       compare_summarizing: 'Обобщаем…'
       compare_summarize_error: 'Сейчас не удалось обобщить.'

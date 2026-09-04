@@ -212,6 +212,11 @@ hi:
     editor: "← संपादक"
     ask_verto: Verto से पूछें
     analysing: उत्तरों का विश्लेषण किया जा रहा है…
+    view_all_answers: "सभी उत्तर देखें (%{count})"
+    freeform_eyebrow: "मुक्त-पाठ उत्तर"
+    freeform_search_placeholder: "उत्तर खोजें…"
+    freeform_copy: "सभी कॉपी करें"
+    freeform_load_more: "और लोड करें"
   shared_results:
     title: परिणाम
     read_only_badge: केवल पढ़ने के लिए
@@ -639,6 +644,13 @@ hi:
       compare_card_n: 'कार्ड %{n}'
       compare_freeform_count_one: '%{n} मुक्त-पाठ उत्तर'
       compare_freeform_count_other: '%{n} मुक्त-पाठ उत्तर'
+      freeform_showing: "%{total} में से %{shown} दिखाए जा रहे हैं"
+      freeform_matched: "%{total} में से %{matched} “%{q}” से मेल खाते हैं"
+      freeform_none: "कोई उत्तर मेल नहीं खाता।"
+      freeform_loading: "उत्तर लोड हो रहे हैं…"
+      freeform_error: "उत्तर लोड नहीं हो सके — कृपया फिर से प्रयास करें।"
+      freeform_copied: "कॉपी हो गया!"
+      freeform_copy_failed: "कॉपी नहीं हो सका — चुनें और कॉपी करें"
       compare_summarize_btn: '✦ AI से सारांशित करें'
       compare_summarizing: 'सारांशित किया जा रहा है…'
       compare_summarize_error: 'अभी सारांशित नहीं किया जा सका.'

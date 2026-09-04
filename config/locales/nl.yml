@@ -212,6 +212,11 @@ nl:
     editor: "← Editor"
     ask_verto: Vraag het Verto
     analysing: Antwoorden analyseren…
+    view_all_answers: "Alle antwoorden bekijken (%{count})"
+    freeform_eyebrow: "Vrije-tekstantwoorden"
+    freeform_search_placeholder: "Antwoorden doorzoeken…"
+    freeform_copy: "Alles kopiëren"
+    freeform_load_more: "Meer laden"
   shared_results:
     title: Resultaten
     read_only_badge: Alleen-lezen
@@ -639,6 +644,13 @@ nl:
       compare_card_n: 'Kaart %{n}'
       compare_freeform_count_one: '%{n} vrije-tekstantwoord'
       compare_freeform_count_other: '%{n} vrije-tekstantwoorden'
+      freeform_showing: "%{shown} van %{total} weergegeven"
+      freeform_matched: "%{matched} van %{total} komen overeen met “%{q}”"
+      freeform_none: "Geen antwoorden komen overeen."
+      freeform_loading: "Antwoorden laden…"
+      freeform_error: "De antwoorden konden niet worden geladen — probeer het opnieuw."
+      freeform_copied: "Gekopieerd!"
+      freeform_copy_failed: "Kopiëren mislukt — selecteer en kopieer"
       compare_summarize_btn: '✦ Samenvatten met AI'
       compare_summarizing: 'Wordt samengevat…'
       compare_summarize_error: 'Kon nu niet worden samengevat.'

@@ -212,6 +212,11 @@ it:
     editor: "← Editor"
     ask_verto: Chiedi a Verto
     analysing: Analisi delle risposte…
+    view_all_answers: "Vedi tutte le risposte (%{count})"
+    freeform_eyebrow: "Risposte a testo libero"
+    freeform_search_placeholder: "Cerca tra le risposte…"
+    freeform_copy: "Copia tutto"
+    freeform_load_more: "Carica altre"
   shared_results:
     title: Risultati
     read_only_badge: Sola lettura
@@ -639,6 +644,13 @@ it:
       compare_card_n: 'Scheda %{n}'
       compare_freeform_count_one: '%{n} risposta a testo libero'
       compare_freeform_count_other: '%{n} risposte a testo libero'
+      freeform_showing: "%{shown} di %{total} mostrate"
+      freeform_matched: "%{matched} di %{total} corrispondono a “%{q}”"
+      freeform_none: "Nessuna risposta corrisponde."
+      freeform_loading: "Caricamento delle risposte…"
+      freeform_error: "Impossibile caricare le risposte: riprova."
+      freeform_copied: "Copiato!"
+      freeform_copy_failed: "Copia non riuscita: seleziona e copia"
       compare_summarize_btn: '✦ Riassumi con l''IA'
       compare_summarizing: 'Riassumendo…'
       compare_summarize_error: 'Impossibile riassumere in questo momento.'

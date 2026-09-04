@@ -212,6 +212,11 @@ de:
     editor: "← Editor"
     ask_verto: Verto fragen
     analysing: Antworten werden analysiert…
+    view_all_answers: "Alle Antworten ansehen (%{count})"
+    freeform_eyebrow: "Freitext-Antworten"
+    freeform_search_placeholder: "Antworten durchsuchen…"
+    freeform_copy: "Alle kopieren"
+    freeform_load_more: "Mehr laden"
   shared_results:
     title: Ergebnisse
     read_only_badge: Schreibgeschützt
@@ -639,6 +644,13 @@ de:
       compare_card_n: 'Karte %{n}'
       compare_freeform_count_one: '%{n} Freitextantwort'
       compare_freeform_count_other: '%{n} Freitextantworten'
+      freeform_showing: "%{shown} von %{total} angezeigt"
+      freeform_matched: "%{matched} von %{total} passen zu „%{q}“"
+      freeform_none: "Keine passenden Antworten."
+      freeform_loading: "Antworten werden geladen…"
+      freeform_error: "Die Antworten konnten nicht geladen werden — bitte versuch es noch einmal."
+      freeform_copied: "Kopiert!"
+      freeform_copy_failed: "Kopieren fehlgeschlagen — markieren und kopieren"
       compare_summarize_btn: '✦ Mit KI zusammenfassen'
       compare_summarizing: 'Wird zusammengefasst…'
       compare_summarize_error: 'Konnte gerade nicht zusammengefasst werden.'

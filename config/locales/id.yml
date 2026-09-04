@@ -212,6 +212,11 @@ id:
     editor: "← Editor"
     ask_verto: Tanya Verto
     analysing: Menganalisis tanggapan…
+    view_all_answers: "Lihat semua jawaban (%{count})"
+    freeform_eyebrow: "Jawaban teks bebas"
+    freeform_search_placeholder: "Cari jawaban…"
+    freeform_copy: "Salin semua"
+    freeform_load_more: "Muat lebih banyak"
   shared_results:
     title: Hasil
     read_only_badge: Hanya baca
@@ -639,6 +644,13 @@ id:
       compare_card_n: 'Kartu %{n}'
       compare_freeform_count_one: '%{n} jawaban teks bebas'
       compare_freeform_count_other: '%{n} jawaban teks bebas'
+      freeform_showing: "Menampilkan %{shown} dari %{total}"
+      freeform_matched: "%{matched} dari %{total} cocok dengan “%{q}”"
+      freeform_none: "Tidak ada jawaban yang cocok."
+      freeform_loading: "Memuat jawaban…"
+      freeform_error: "Jawaban tidak dapat dimuat — silakan coba lagi."
+      freeform_copied: "Tersalin!"
+      freeform_copy_failed: "Gagal menyalin — pilih lalu salin"
       compare_summarize_btn: '✦ Ringkas dengan AI'
       compare_summarizing: 'Meringkas…'
       compare_summarize_error: 'Tidak dapat meringkas saat ini.'

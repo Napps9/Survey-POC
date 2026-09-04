@@ -188,6 +188,9 @@ Rails.application.routes.draw do
   get  "surveys/:id/setup_status",    to: "surveys#setup_status",  as: :setup_status_survey
   get  "surveys/:id/results/summary", to: "survey_summaries#show",  as: :survey_results_summary
   get  "surveys/:id/results/summarize_texts", to: "survey_summaries#texts", as: :survey_results_summarize_texts
+  # Every answer to one freeform question, paged and searchable — the results
+  # page's "View all answers" panel (SurveyTextAnswersController).
+  get  "surveys/:id/results/answers",  to: "survey_text_answers#index",  as: :survey_results_answers
   post "surveys/:survey_id/chat",     to: "survey_chats#create",    as: :survey_chat
   # The creator's Ask Verto opt-in. Its own route rather than a settings field:
   # offering another organisation's researchers access to what your respondents

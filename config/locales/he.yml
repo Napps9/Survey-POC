@@ -212,6 +212,11 @@ he:
     editor: "← עורך"
     ask_verto: שאל את Verto
     analysing: מנתח תגובות…
+    view_all_answers: "הצג את כל התשובות (%{count})"
+    freeform_eyebrow: "תשובות בטקסט חופשי"
+    freeform_search_placeholder: "חיפוש בתשובות…"
+    freeform_copy: "העתק הכול"
+    freeform_load_more: "טען עוד"
   shared_results:
     title: תוצאות
     read_only_badge: לקריאה בלבד
@@ -639,6 +644,13 @@ he:
       compare_card_n: 'כרטיס %{n}'
       compare_freeform_count_one: '%{n} תשובת טקסט חופשי'
       compare_freeform_count_other: '%{n} תשובות טקסט חופשי'
+      freeform_showing: "מוצגות %{shown} מתוך %{total}"
+      freeform_matched: "%{matched} מתוך %{total} תואמות ל־“%{q}”"
+      freeform_none: "אין תשובות תואמות."
+      freeform_loading: "טוען תשובות…"
+      freeform_error: "לא ניתן לטעון את התשובות — נסו שוב."
+      freeform_copied: "הועתק!"
+      freeform_copy_failed: "ההעתקה נכשלה — סמנו והעתיקו"
       compare_summarize_btn: '✦ סכם באמצעות AI'
       compare_summarizing: 'מסכם…'
       compare_summarize_error: 'לא ניתן לסכם כרגע.'

@@ -212,6 +212,11 @@ sw:
     editor: "← Mhariri"
     ask_verto: Muulize Verto
     analysing: Inachambua majibu…
+    view_all_answers: "Ona majibu yote (%{count})"
+    freeform_eyebrow: "Majibu ya maandishi huru"
+    freeform_search_placeholder: "Tafuta majibu…"
+    freeform_copy: "Nakili yote"
+    freeform_load_more: "Pakia zaidi"
   shared_results:
     title: Matokeo
     read_only_badge: Kusoma tu
@@ -639,6 +644,13 @@ sw:
       compare_card_n: 'Kadi %{n}'
       compare_freeform_count_one: 'Jibu %{n} la maandishi huru'
       compare_freeform_count_other: 'Majibu %{n} ya maandishi huru'
+      freeform_showing: "Yanaonyeshwa %{shown} kati ya %{total}"
+      freeform_matched: "%{matched} kati ya %{total} yanalingana na “%{q}”"
+      freeform_none: "Hakuna jibu linalolingana."
+      freeform_loading: "Inapakia majibu…"
+      freeform_error: "Imeshindwa kupakia majibu — tafadhali jaribu tena."
+      freeform_copied: "Imenakiliwa!"
+      freeform_copy_failed: "Kunakili kumeshindikana — chagua kisha unakili"
       compare_summarize_btn: '✦ Fupisha kwa AI'
       compare_summarizing: 'Inafupisha…'
       compare_summarize_error: 'Imeshindwa kufupisha kwa sasa.'

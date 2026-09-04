@@ -42,16 +42,19 @@ module AggregatesSurveyResults
     cards.map.with_index { |card, idx| finalize_card(card, types[idx], states[idx], total) }
   end
 
-  # Yield each response's answers Hash. For relations, load only id+answers in
-  # batches so the whole set is never resident at once; for arrays (in-memory
-  # Response objects), iterate directly.
+  # Yield each response's answers Hash (and, second, when it arrived). For
+  # relations, load only id+answers+created_at in batches so the whole set is
+  # never resident at once; for arrays (in-memory Response objects), iterate
+  # directly. The tallies above ignore the second argument; the freeform
+  # answers panel (SurveyTextAnswersController) sorts by it, and walks rows
+  # through here so it accepts exactly the answers the tallies counted.
   def each_response(responses)
     if responses.respond_to?(:find_each)
-      responses.reorder(nil).select(:id, :answers).find_each(batch_size: 500) do |r|
-        yield(r.answers || {})
+      responses.reorder(nil).select(:id, :answers, :created_at).find_each(batch_size: 500) do |r|
+        yield(r.answers || {}, r.created_at)
       end
     else
-      responses.each { |r| yield(r.answers || {}) }
+      responses.each { |r| yield(r.answers || {}, r.created_at) }
     end
   end
 

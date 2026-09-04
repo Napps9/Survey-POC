@@ -212,6 +212,11 @@ pl:
     editor: "← Edytor"
     ask_verto: Zapytaj Verto
     analysing: Analizowanie odpowiedzi…
+    view_all_answers: "Zobacz wszystkie odpowiedzi (%{count})"
+    freeform_eyebrow: "Odpowiedzi otwarte"
+    freeform_search_placeholder: "Szukaj w odpowiedziach…"
+    freeform_copy: "Kopiuj wszystko"
+    freeform_load_more: "Wczytaj więcej"
   shared_results:
     title: Wyniki
     read_only_badge: Tylko do odczytu
@@ -639,6 +644,13 @@ pl:
       compare_card_n: 'Karta %{n}'
       compare_freeform_count_one: '%{n} odpowiedź tekstowa'
       compare_freeform_count_other: '%{n} odpowiedzi tekstowych'
+      freeform_showing: "Wyświetlono %{shown} z %{total}"
+      freeform_matched: "%{matched} z %{total} pasuje do „%{q}”"
+      freeform_none: "Żadna odpowiedź nie pasuje."
+      freeform_loading: "Wczytywanie odpowiedzi…"
+      freeform_error: "Nie udało się wczytać odpowiedzi — spróbuj ponownie."
+      freeform_copied: "Skopiowano!"
+      freeform_copy_failed: "Kopiowanie nie powiodło się — zaznacz i skopiuj"
       compare_summarize_btn: '✦ Podsumuj z AI'
       compare_summarizing: 'Podsumowywanie…'
       compare_summarize_error: 'Nie udało się teraz podsumować.'

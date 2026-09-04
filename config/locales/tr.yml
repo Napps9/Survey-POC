@@ -212,6 +212,11 @@ tr:
     editor: "← Editör"
     ask_verto: Verto'ya sor
     analysing: Yanıtlar analiz ediliyor…
+    view_all_answers: "Tüm yanıtları gör (%{count})"
+    freeform_eyebrow: "Serbest metin yanıtları"
+    freeform_search_placeholder: "Yanıtlarda ara…"
+    freeform_copy: "Tümünü kopyala"
+    freeform_load_more: "Daha fazla yükle"
   shared_results:
     title: Sonuçlar
     read_only_badge: Salt okunur
@@ -639,6 +644,13 @@ tr:
       compare_card_n: 'Kart %{n}'
       compare_freeform_count_one: '%{n} serbest metin yanıtı'
       compare_freeform_count_other: '%{n} serbest metin yanıtı'
+      freeform_showing: "%{total} yanıttan %{shown} tanesi gösteriliyor"
+      freeform_matched: "%{total} yanıttan %{matched} tanesi “%{q}” ile eşleşiyor"
+      freeform_none: "Eşleşen yanıt yok."
+      freeform_loading: "Yanıtlar yükleniyor…"
+      freeform_error: "Yanıtlar yüklenemedi — lütfen tekrar deneyin."
+      freeform_copied: "Kopyalandı!"
+      freeform_copy_failed: "Kopyalanamadı — seçip kopyalayın"
       compare_summarize_btn: '✦ Yapay zekâ ile özetle'
       compare_summarizing: 'Özetleniyor…'
       compare_summarize_error: 'Şu anda özetlenemedi.'

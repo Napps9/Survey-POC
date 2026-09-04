@@ -212,6 +212,11 @@ ar:
     editor: "← المحرر"
     ask_verto: اسأل Verto
     analysing: جارٍ تحليل الإجابات…
+    view_all_answers: "عرض كل الإجابات (%{count})"
+    freeform_eyebrow: "إجابات النص الحر"
+    freeform_search_placeholder: "ابحث في الإجابات…"
+    freeform_copy: "نسخ الكل"
+    freeform_load_more: "تحميل المزيد"
   shared_results:
     title: النتائج
     read_only_badge: للقراءة فقط
@@ -639,6 +644,13 @@ ar:
       compare_card_n: 'البطاقة %{n}'
       compare_freeform_count_one: '%{n} إجابة نصية حرة'
       compare_freeform_count_other: '%{n} إجابات نصية حرة'
+      freeform_showing: "عرض %{shown} من %{total}"
+      freeform_matched: "%{matched} من %{total} تطابق “%{q}”"
+      freeform_none: "لا توجد إجابات مطابقة."
+      freeform_loading: "جارٍ تحميل الإجابات…"
+      freeform_error: "تعذّر تحميل الإجابات — يرجى المحاولة مرة أخرى."
+      freeform_copied: "تم النسخ!"
+      freeform_copy_failed: "فشل النسخ — حدد النص وانسخه"
       compare_summarize_btn: '✦ تلخيص باستخدام الذكاء الاصطناعي'
       compare_summarizing: 'جارٍ التلخيص…'
       compare_summarize_error: 'تعذّر التلخيص الآن.'

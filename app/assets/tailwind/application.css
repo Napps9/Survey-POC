@@ -12537,3 +12537,91 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .m-studio .add-animation-fab,
   .m-studio .split-left-design-prompt { min-height: 40px; }
 }
+
+/* ── Freeform answers ─────────────────────────────────────────────────────────
+   The result card's preview of a freeform question's newest answers, and the
+   "View all answers" panel behind it (freeform_answers_controller). The
+   preview is clamped by lines rather than characters, so a long answer reads
+   as a paragraph that trails off, not a sentence cut mid-word; the panel is
+   the dark surface the share and report modals use, over the dark page. */
+.freeform-preview-item {
+  padding: 7px 11px; border-radius: 7px; background: rgba(0,0,0,0.03);
+  border-left: 2px solid rgba(1,234,203,0.25);
+}
+/* The clamp sits on an unpadded inner block: a clamped box clips at its
+   padding edge, so clamping the padded wrapper would leave a sliver of the
+   fourth line showing in the bottom padding. */
+.freeform-preview-item__text {
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-base); color: #111; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.freeform-view-all {
+  align-self: flex-start; margin-top: 2px; padding: 7px 14px; border-radius: 100px;
+  background: rgba(1,234,203,0.12); border: 1px solid rgba(1,234,203,0.35); color: #0a8f7c;
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-sm); cursor: pointer; transition: background 0.15s;
+}
+.freeform-view-all:hover { background: rgba(1,234,203,0.22); }
+
+.app-modal__panel.freeform-modal {
+  max-width: 760px; background: #1C2034; border: 1px solid rgba(255,255,255,0.1);
+  display: flex; flex-direction: column; overflow: hidden; max-height: calc(100vh - 64px);
+}
+.freeform-modal__head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+  padding: 20px 22px 14px; border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.freeform-modal__eyebrow {
+  font-family: "Alata", sans-serif; font-size: var(--text-2xs); letter-spacing: 0.16em;
+  text-transform: uppercase; font-weight: 700; color: #01EACB; margin-bottom: 4px;
+}
+.freeform-modal__question {
+  font-family: "Alata", sans-serif; font-size: var(--text-xl); color: #fff; line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.freeform-modal__close {
+  flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 18px;
+  color: rgba(255,255,255,0.4); line-height: 1; padding: 2px;
+}
+.freeform-modal__close:hover { color: #fff; }
+.freeform-modal__tools {
+  display: flex; gap: 10px; align-items: center; padding: 12px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.freeform-modal__search {
+  flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px;
+  background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.12); color: #fff;
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-base); outline: none;
+}
+.freeform-modal__search:focus { border-color: rgba(1,234,203,0.5); }
+.freeform-modal__copy {
+  flex-shrink: 0; padding: 8px 14px; border-radius: 100px; background: transparent;
+  border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.7);
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-sm); cursor: pointer; white-space: nowrap;
+}
+.freeform-modal__copy:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+.freeform-modal__body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 22px 20px; }
+.freeform-modal__list { display: flex; flex-direction: column; gap: 8px; }
+.freeform-item {
+  padding: 11px 14px; border-radius: 12px; background: rgba(255,255,255,0.05);
+  border-left: 2px solid rgba(1,234,203,0.35);
+}
+.freeform-item__text {
+  font-family: "ABeeZee", sans-serif; font-size: var(--text-md); color: rgba(255,255,255,0.88);
+  line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.freeform-item__when {
+  display: block; margin-top: 6px; font-family: "ABeeZee", sans-serif; font-size: var(--text-xs);
+  color: rgba(255,255,255,0.3);
+}
+.freeform-modal__status {
+  margin-top: 12px; font-family: "ABeeZee", sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.45); text-align: center;
+}
+.freeform-modal__status:empty { display: none; }
+.freeform-modal__more {
+  display: block; width: 100%; margin-top: 10px; padding: 10px 14px; border-radius: 10px;
+  background: rgba(1,234,203,0.1); border: 1px solid rgba(1,234,203,0.3); color: #01EACB;
+  font-family: "Alata", sans-serif; font-size: var(--text-sm); letter-spacing: 0.04em; cursor: pointer;
+}
+.freeform-modal__more:hover { background: rgba(1,234,203,0.18); }
