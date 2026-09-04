@@ -70,20 +70,38 @@ class FreeformAnswersModalTest < ApplicationSystemTestCase
     assert_selector "[data-freeform-answers-target='modal'].hidden", visible: :all, wait: 5
   end
 
+  # Enter after typing, rather than waiting out the 300ms debounce: on a
+  # loaded CI runner the timer has lagged past the assertion's wait, leaving
+  # the unfiltered list in place. Enter runs the same search at once.
   test "searching asks the server across every answer" do
+    open_panel
+
+    search = find("[data-freeform-answers-target='search']")
+    search.set("Answer 12")
+    search.send_keys(:enter)
+    within("[data-freeform-answers-target='modal']") do
+      # "Answer 12" and "Answer 120".."Answer 129" — eleven, some of them
+      # beyond the first page the panel had loaded.
+      assert_text "11 of 130 match", wait: 15
+      assert_selector ".freeform-item", count: 11, wait: 15
+      assert_no_button "Load more", wait: 2
+    end
+
+    search.set("nothing here")
+    search.send_keys(:enter)
+    within("[data-freeform-answers-target='modal']") do
+      assert_text "No answers match.", wait: 15
+      assert_selector ".freeform-item", count: 0
+    end
+  end
+
+  test "the search box also searches when the typing pauses" do
     open_panel
 
     find("[data-freeform-answers-target='search']").set("Answer 12")
     within("[data-freeform-answers-target='modal']") do
-      # "Answer 12" and "Answer 120".."Answer 129" — eleven, some of them
-      # beyond the first page the panel had loaded.
-      assert_selector ".freeform-item", count: 11, wait: 10
-      assert_text "11 of 130 match"
-      assert_no_button "Load more", wait: 2
-
-      find("[data-freeform-answers-target='search']").set("nothing here")
-      assert_text "No answers match.", wait: 10
-      assert_selector ".freeform-item", count: 0
+      assert_text "11 of 130 match", wait: 15
+      assert_selector ".freeform-item", count: 11, wait: 15
     end
   end
 end

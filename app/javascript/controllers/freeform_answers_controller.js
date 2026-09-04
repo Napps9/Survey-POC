@@ -58,15 +58,26 @@ export default class extends Controller {
   // Debounced: the server is asked once the typing pauses, not per keystroke.
   search() {
     clearTimeout(this._debounce)
-    this._debounce = setTimeout(() => {
-      if (!this._isOpen()) return
-      const q = this.searchTarget.value.trim()
-      if (q === this.query) return
-      this.query = q
-      this._answers = []
-      this.listTarget.innerHTML = ""
-      this._load(1)
-    }, 300)
+    this._debounce = setTimeout(() => this._applySearch(), 300)
+  }
+
+  // Enter searches at once, without waiting out the pause — the reflex of
+  // anyone who has used a search box. Also what makes the search testable
+  // on a slow headless browser, where a timer can lag well past its delay.
+  searchNow(event) {
+    event.preventDefault()
+    clearTimeout(this._debounce)
+    this._applySearch()
+  }
+
+  _applySearch() {
+    if (!this._isOpen()) return
+    const q = this.searchTarget.value.trim()
+    if (q === this.query) return
+    this.query = q
+    this._answers = []
+    this.listTarget.innerHTML = ""
+    this._load(1)
   }
 
   loadMore() {

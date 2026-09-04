@@ -32,7 +32,7 @@
         <input type="search" class="freeform-modal__search"
                placeholder="<%= t("results.freeform_search_placeholder") %>"
                data-freeform-answers-target="search"
-               data-action="input->freeform-answers#search" />
+               data-action="input->freeform-answers#search keydown.enter->freeform-answers#searchNow" />
         <button type="button" class="freeform-modal__copy" data-freeform-answers-target="copy"
                 data-copy-label="<%= t("results.freeform_copy") %>"
                 data-action="click->freeform-answers#copy"><%= t("results.freeform_copy") %></button>
