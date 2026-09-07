@@ -1,17 +1,16 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 18: CORRECTED config. Scratch web 8c-16g now in Puma CLUSTER mode —
-# WEB_CONCURRENCY=8, RAILS_MAX_THREADS=5 (8 processes across the 8 cores; Solid
-# Queue runs once in the master, not per worker). Page cache + Key Value live.
-# Same 40/s over 2 generators as run 17 (which was crippled by WEB_CONCURRENCY=1
-# = one core) — this is the apples-to-apples proof the multi-worker config fixes
-# it, before escalating to 80 and 125.
+# Run 19: escalation. Scratch web 8c-16g cluster (WEB_CONCURRENCY=8,
+# RAILS_MAX_THREADS=5), page cache + Key Value. Run 18 was clean at 40/s
+# (p95 304ms, journeys at think-time, ~234 req/s combined). Now 80/s over 4
+# generators (20/s each) — the whole event rate on ONE box — before the 125/s
+# proof.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
-ARRIVALS_PER_S=40
+ARRIVALS_PER_S=80
 RAMP_S=60
 HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
-GENERATORS=2
+GENERATORS=4
