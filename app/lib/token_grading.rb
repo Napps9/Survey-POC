@@ -29,6 +29,9 @@ module TokenGrading
   CHOICE_MANY  = %w[select_many select_many_grid].freeze
   CHOICE       = (CHOICE_ONE + CHOICE_MANY).freeze
   FLAT         = %w[range nps rating open_ended prioritise].freeze
+  # Stands in for a held free-text value in totals — see there. Non-blank so
+  # flat_earned treats the card as answered; never matched against an option.
+  HELD_STAND_IN = "[held]".freeze
   # Was a hand-copied list; now the canonical one, so a new non-answer card type
   # can't be added in one place and forgotten here.
   NON_QUESTION = CardTypes::NON_QUESTION_TYPES
@@ -88,7 +91,12 @@ module TokenGrading
     base = Array(token_type_ids).index_with { 0 }
     Array(cards).each_with_index do |card, idx|
       next unless awarding?(card)
-      value = answers[idx.to_s]&.dig("value")
+      entry = answers[idx.to_s]
+      value = entry&.dig("value")
+      # A free-text answer the moderator is holding has no value in the
+      # answer yet, but it was given, and a flat award is earned by answering:
+      # the respondent keeps the points whether or not the text is shown.
+      value = HELD_STAND_IN if value.nil? && entry.is_a?(Hash) && entry.dig("held", "value")
       earned(card, value).each { |k, v| base[k] = base[k] + v.to_i if base.key?(k) }
     end
     base

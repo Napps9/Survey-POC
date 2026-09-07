@@ -2,6 +2,10 @@ class Organisation < ApplicationRecord
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
   has_many :surveys, dependent: :destroy
+  # Scoped to the account as well as the Verto so a review queue can be built
+  # per organisation without joining through surveys. The surveys' cascade
+  # (above, so first) already removes every row; this is the belt to that brace.
+  has_many :held_texts, dependent: :delete_all
   has_many :verto_builds, dependent: :destroy
   has_many :invites, dependent: :destroy
 

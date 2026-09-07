@@ -198,6 +198,11 @@ class ResultsExport
 
     value = answer["value"]
     other = answer["other"].presence
+    # Free text the moderator is holding or has removed: the cell says so,
+    # rather than reading as an unanswered question — see Moderation::Hold.
+    held = answer["held"].is_a?(Hash) ? answer["held"] : {}
+    value = held_placeholder(held["value"]) if value.nil? && held["value"]
+    other = held_placeholder(held["other"]) if other.nil? && held["other"]
 
     text =
       case card["type"].to_s
@@ -225,6 +230,13 @@ class ResultsExport
 
     return text unless other
     text.present? ? "#{text}; Other: #{other}" : "Other: #{other}"
+  end
+
+  HELD_PLACEHOLDER    = "[awaiting moderation]".freeze
+  REMOVED_PLACEHOLDER = "[removed by moderation]".freeze
+
+  def held_placeholder(marker)
+    marker == "removed" ? REMOVED_PLACEHOLDER : HELD_PLACEHOLDER
   end
 
   # A range answer's stored value is the zero-based step index; show its label.

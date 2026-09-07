@@ -36,6 +36,14 @@ module AggregatesSurveyResults
         end
         other = a["other"]
         st[:other_texts] << other if other.respond_to?(:presence) && other.presence
+        # Free text the moderator is holding (or removed): answered, so it
+        # counts toward the card's total exactly as the text would have, but
+        # there is nothing to list — see Moderation::Hold for the marker.
+        held = a["held"]
+        if held.is_a?(Hash)
+          st[:held_values] += 1 if held["value"]
+          st[:held_others] += 1 if held["other"]
+        end
       end
     end
 
@@ -66,7 +74,8 @@ module AggregatesSurveyResults
     # sum_count is the number of answers actually banked into sum — the same as
     # value_count except when a wrong-shaped answer is skipped (scalar_answer?),
     # so a rating average never divides by an answer it didn't add.
-    st = { value_count: 0, other_texts: [], counts: Hash.new(0), texts: [], sum: 0.0, sum_count: 0 }
+    st = { value_count: 0, other_texts: [], counts: Hash.new(0), texts: [], sum: 0.0, sum_count: 0,
+           held_values: 0, held_others: 0 }
     st[:response_keys] = TapScales.keys_for(card) if type == "tap_card"
     st
   end
@@ -129,8 +138,12 @@ module AggregatesSurveyResults
   end
 
   def finalize_card(card, type, st, total_responses)
-    other_count = st[:other_texts].size
-    base = { type:, card:, other_texts: st[:other_texts] }
+    # A held "Other" write-in still chose Other, so it is in the Other bar and
+    # the total; a held open_ended value is in that card's total. `held` says
+    # how many of a card's answers are not being shown, for the results page.
+    other_count = st[:other_texts].size + st[:held_others]
+    held        = st[:held_values] + st[:held_others]
+    base = { type:, card:, other_texts: st[:other_texts], held: }
 
     case type
     when "multiple_choice", "yes_no", "select_one_grid", "select_many", "select_many_grid", "scenario"
@@ -149,7 +162,7 @@ module AggregatesSurveyResults
       avg = st[:sum_count].positive? ? (st[:sum] / st[:sum_count]).round(1) : 0.0
       base.merge(total: st[:value_count] + other_count, counts: st[:counts], avg:)
     when "open_ended"
-      base.merge(total: st[:value_count] + other_count, texts: st[:texts])
+      base.merge(total: st[:value_count] + st[:held_values] + other_count, texts: st[:texts])
     when "contact_form"
       base.merge(total: st[:value_count], entries: st[:texts])
     else

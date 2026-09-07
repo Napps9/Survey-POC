@@ -40,6 +40,14 @@ production:
     class: Comms::SweepJob
     schedule: every 5 minutes
 
+  # The same safety net for free-text moderation: a screen lost to a restart
+  # leaves a respondent's answer held with nothing coming for it. The sweep
+  # re-enqueues stale pending texts, releases stale claims, and blanks removed
+  # texts past their retention. All idempotent.
+  moderation_sweep:
+    class: SweepHeldTextsJob
+    schedule: every 10 minutes
+
   # Books automation runs for newly-eligible subjects. Safe to re-run any
   # number of times: the runs ledger's UNIQUE idempotency key absorbs every
   # duplicate booking attempt.

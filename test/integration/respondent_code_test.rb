@@ -86,11 +86,17 @@ class RespondentCodeTest < ActionDispatch::IntegrationTest
   # filter_parameters into regexps, so checking for the symbol proves nothing.
   test "the code is filtered from logs" do
     filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-    masked = filter.filter("respondent_code" => "sam14", "answers" => { "0" => "Yes" })
+    masked = filter.filter("respondent_code" => "sam14", "answers" => { "0" => "Yes" }, "locale" => "en")
 
     assert_not_equal "sam14", masked["respondent_code"],
                      "the logs must not hold the one plaintext copy the database refuses to keep"
-    assert_equal({ "0" => "Yes" }, masked["answers"], "and ordinary answers are still logged")
+    # Answers used to be logged in full. Since free-text moderation holds a
+    # typed answer out of the database until it is screened, a verbatim copy
+    # in the request log would defeat the hold — so `answers` is filtered too
+    # (config/initializers/filter_parameter_logging.rb). Ordinary parameters
+    # still log.
+    assert_equal "[FILTERED]", masked["answers"]
+    assert_equal "en", masked["locale"]
   end
 
   # ── Linking across waves ──────────────────────────────────────────────────

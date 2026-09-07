@@ -45,6 +45,39 @@ respondent-data export and deletion paths (`/respondent-data`) like the rest of
 the response, and go when the response or the Verto does. Retiring the card
 stopped the collection; it did not delete what was already collected.
 
+### Free text is held until it is moderated
+
+A typed answer — an `open_ended` value, or an "Other" write-in on any card —
+is the one place a respondent can put anything at all into the platform. It no
+longer lands in `answers` directly (`app/lib/moderation.rb`):
+
+1. **Scrub.** Email addresses, phone numbers, URLs and social handles are
+   replaced with `[removed]` before the text is stored anywhere. This is
+   deterministic and has no off switch.
+2. **Hold.** What is left is moved out of `answers` into a `held_texts` row
+   (`HeldText`, text encrypted at rest with Active Record encryption), and a
+   marker — `"held" => { "value" => true }` — is left in its place. The
+   response still counts as answered; results totals include it; the results
+   page, exports, Ask Verto and the AI report have no text to show because
+   there is none in the row.
+3. **Screen.** A background job asks Claude to classify each held text.
+   Confidently clean text is released back into the answer; confidently
+   identifying, abusive or spam text is removed (a `removed` marker stays in
+   the answer); anything uncertain, anything a Verto in `review_all` mode
+   holds, and anything that reads as a safeguarding disclosure waits for a
+   person. Every failure — the screen off, the daily cap spent, the API
+   erroring — leaves the text held, never shown.
+
+Held texts follow the response: they are deleted with it, with the Verto, with
+the organisation, and by the consent-decline purge. The subject access export
+includes them (`held_answers`, with each text's status) because a held copy is
+still the respondent's data. A **removed** text is kept, readable to staff
+only, for `Moderation::REMOVED_RETENTION` (7 days) so a question about the
+decision can be answered, and is then blanked by `SweepHeldTextsJob`; the row
+remains as the record that a removal happened. A text the respondent replaced
+before it was decided (`superseded`) is blanked on the same schedule.
+Safeguarding texts are never auto-purged: a person reads them.
+
 The `respondent_code_digest` is a one-way HMAC keyed per Verto
 (`Survey#respondent_code_key`), so a code is comparable **within** one Verto and
 nowhere else, and the plaintext is never stored, logged or returned.
@@ -103,7 +136,8 @@ Admins get **Results → Download CSV → One respondent's data…**
 - finds a respondent's rows by session token or by respondent code;
 - exports **everything** held about them as JSON (Article 15 / 20) — including
   the demographics, consent record, derived region, device, timings and scoring
-  that the ordinary results export leaves out;
+  that the ordinary results export leaves out, and any free text still held
+  or removed by moderation (`held_answers`);
 - erases those rows permanently (Article 17).
 
 Erasure is a hard delete, not an anonymisation pass. A stripped-but-present row

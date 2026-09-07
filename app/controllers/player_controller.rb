@@ -261,7 +261,7 @@ class PlayerController < ApplicationController
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
     apply_token_totals(resp)
-    resp.save!
+    save_with_hold!(resp)
     render json: { ok: true, session_token: token }
   rescue JSON::ParserError
     render json: { ok: false, error: "Malformed request body." }, status: :bad_request
@@ -299,7 +299,7 @@ class PlayerController < ApplicationController
     resp.completed_at ||= Time.current
     apply_quiz_score(resp)
     apply_token_totals(resp)
-    resp.save!
+    save_with_hold!(resp)
     # Best-effort: have the finisher's anonymous name minted before the thank-you
     # screen fetches the board. A naming hiccup must never fail the write that
     # just stored the answers — #leaderboard's backfill names anyone missed.
@@ -471,7 +471,7 @@ class PlayerController < ApplicationController
     mark_started_unless_completed(resp)
     apply_quiz_score(resp)
     apply_token_totals(resp)
-    resp.save!
+    save_with_hold!(resp)
 
     base = { ok: true, session_token: token, score: resp.score, max: resp.quiz_max }
     base[:token_totals] = resp.token_totals if @survey.tokenisation_enabled?
@@ -1020,6 +1020,23 @@ class PlayerController < ApplicationController
     resp.persisted? && resp.answers.is_a?(Hash) ? resp.answers : {}
   end
 
+  # The one save for anything that writes answers. Moderation::Hold scrubs the
+  # free text and lifts what is left into HeldText rows, leaving markers in
+  # the answer — see app/lib/moderation.rb. One transaction for the save and
+  # the rows: a committed marker without its row would lose the respondent's
+  # text, so if the rows can't be written neither is the response, the action
+  # 500s, and the service worker retries the whole write.
+  #
+  # Runs last, after every sync/score/total has read the merged answers, and
+  # after ai_normalize_open_ended_answer! has had the (scrubbed) text to grade.
+  def save_with_hold!(resp)
+    held = Moderation::Hold.extract!(resp, @survey, scrub_hits: @scrub_hits || {})
+    Response.transaction do
+      resp.save!
+      Moderation::Hold.persist!(resp, held)
+    end
+  end
+
   # Anti-cheat for quizzes and tokenised Vertos: a graded or token-awarding
   # card that already holds a committed answer is locked — its stored value
   # always wins over anything in the new payload, so a respondent can't go
@@ -1037,6 +1054,16 @@ class PlayerController < ApplicationController
     incoming = @survey.clamp_free_text(incoming.is_a?(Hash) ? incoming : {})
     incoming = @survey.clamp_selection_count(incoming)
     incoming = @survey.drop_retired_answers(incoming)
+    # A moderation marker is something the server writes (save_with_hold!),
+    # never something the player may send: a planted one would count as an
+    # answer with no text behind it.
+    incoming = Moderation::Hold.strip_markers(incoming)
+    # Contact details come out here, before anything reads the answer — the
+    # hold would scrub them anyway, but #grade sends a free-text quiz answer
+    # to Claude for near-miss grading first, and an email address in it has
+    # no business in that prompt either. The hits ride to save_with_hold! so
+    # the held row still records what was removed.
+    incoming, @scrub_hits = Moderation::Scrub.answers(@survey.cards, incoming)
     return incoming unless @survey.quiz? || @survey.tokenisation_enabled? || @survey.no_going_back?
     stored = stored.is_a?(Hash) ? stored : {}
     merged = incoming.dup

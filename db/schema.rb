@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_03_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_07_100100) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -422,6 +422,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_090000) do
     t.index ["organisation_id", "name"], name: "index_funders_on_organisation_id_and_name", unique: true
     t.index ["organisation_id"], name: "index_funders_on_organisation_id"
     t.check_constraint "status IN ('active', 'revoked')", name: "chk_funders_status"
+  end
+
+  create_table "held_texts", force: :cascade do |t|
+    t.boolean "auto", default: false, null: false
+    t.integer "card_index", null: false
+    t.string "category"
+    t.float "certainty"
+    t.datetime "created_at", null: false
+    t.datetime "decided_at"
+    t.string "decided_by_email"
+    t.text "decision_note"
+    t.string "last_screen_error"
+    t.integer "organisation_id", null: false
+    t.datetime "purge_after"
+    t.string "question"
+    t.integer "response_id", null: false
+    t.integer "screen_attempts", default: 0, null: false
+    t.datetime "screened_at"
+    t.json "scrub_hits", default: {}, null: false
+    t.string "slot", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "survey_id", null: false
+    t.text "text"
+    t.string "text_digest", null: false
+    t.datetime "updated_at", null: false
+    t.text "verdict_note"
+    t.index ["organisation_id", "status"], name: "index_held_texts_on_organisation_id_and_status"
+    t.index ["organisation_id"], name: "index_held_texts_on_organisation_id"
+    t.index ["response_id", "card_index", "slot", "text_digest"], name: "index_held_texts_on_response_slot_digest", unique: true
+    t.index ["response_id"], name: "index_held_texts_on_response_id"
+    t.index ["status", "updated_at"], name: "index_held_texts_on_status_and_updated_at"
+    t.index ["survey_id", "status"], name: "index_held_texts_on_survey_id_and_status"
+    t.index ["survey_id", "text_digest"], name: "index_held_texts_on_survey_id_and_text_digest"
+    t.index ["survey_id"], name: "index_held_texts_on_survey_id"
+    t.check_constraint "slot IN ('value', 'other')", name: "chk_held_texts_slot"
+    t.check_constraint "status IN ('pending', 'screening', 'review', 'released', 'removed', 'safeguarding', 'superseded')", name: "chk_held_texts_status"
   end
 
   create_table "identities", force: :cascade do |t|
@@ -898,6 +934,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_090000) do
     t.string "leaderboard_retake_policy", default: "accumulate", null: false
     t.json "locales"
     t.boolean "logic", default: false, null: false
+    t.string "moderation_mode", default: "assisted", null: false
     t.boolean "no_going_back", default: false, null: false
     t.boolean "no_retests", default: false, null: false
     t.integer "organisation_id", null: false
@@ -944,6 +981,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_090000) do
     t.index ["slug"], name: "index_surveys_on_slug", unique: true
     t.index ["test_token"], name: "index_surveys_on_test_token", unique: true
     t.check_constraint "leaderboard_retake_policy IN ('accumulate', 'no_redo', 'restart')", name: "chk_surveys_leaderboard_retake_policy"
+    t.check_constraint "moderation_mode IN ('assisted', 'review_all')", name: "chk_surveys_moderation_mode"
   end
 
   create_table "translation_cache", force: :cascade do |t|
@@ -1011,6 +1049,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_090000) do
   add_foreign_key "funder_memberships", "funders"
   add_foreign_key "funder_memberships", "organisations"
   add_foreign_key "funders", "organisations"
+  add_foreign_key "held_texts", "organisations"
+  add_foreign_key "held_texts", "responses"
+  add_foreign_key "held_texts", "surveys"
   add_foreign_key "identities", "users"
   add_foreign_key "image_review_requests", "organisations"
   add_foreign_key "image_review_requests", "surveys"

@@ -102,8 +102,22 @@ class RespondentDataExport
       }.compact,
       "respondent_code" => respondent_code_note(response),
       "scoring"        => scoring(response),
-      "answers"        => answers(response)
+      "answers"        => answers(response),
+      "held_answers"   => held_answers(response).presence
     }.compact
+  end
+
+  # Free text of theirs that moderation is holding, or has removed: it is
+  # still their personal data while the platform holds a copy, so a subject
+  # access export includes it, with where it stands. Rows whose text has been
+  # blanked by the sweep are omitted — there is nothing left to give.
+  def held_answers(response)
+    response.held_texts.where.not(text: nil).order(:id).map do |held|
+      { "question" => held.question,
+        "text"     => held.text,
+        "status"   => held.status,
+        "held_at"  => held.created_at.utc.iso8601 }.compact
+    end
   end
 
   def respondent_code_note(response)

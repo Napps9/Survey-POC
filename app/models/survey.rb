@@ -14,6 +14,10 @@ class Survey < ApplicationRecord
   # Appeals filed against this Verto's rejected uploads — see
   # ImageReviewRequest and ImageAppealsController.
   has_many :image_review_requests, dependent: :destroy
+  # Free-text answers held for moderation — see HeldText. delete_all: the
+  # responses (declared above, so destroyed first) already take theirs with
+  # them; this catches nothing in practice and costs one DELETE.
+  has_many :held_texts, dependent: :delete_all
   has_many :flow_generations, dependent: :destroy
   # Builds outlive the Verto they produced — they're the account's generation
   # log, deleted with the organisation, not the survey. Nullify rather than
@@ -2371,6 +2375,10 @@ class Survey < ApplicationRecord
   # in the model — a bad value should surface as a validation error, not a raw
   # database exception.
   validates :leaderboard_retake_policy, inclusion: { in: LEADERBOARD_RETAKE_POLICIES }
+
+  # How this Verto's held free text is decided (Moderation::MODES). A DB CHECK
+  # backs it, like every other closed set on this table.
+  validates :moderation_mode, inclusion: { in: Moderation::MODES }
 
   # What the board RANKS BY: "all" — one total across every token type, the
   # original board — or one of this Verto's token type ids, when the types are

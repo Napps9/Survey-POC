@@ -28,22 +28,29 @@ module QuoteRedactor
   # Order matters. Emails go before handles (an address contains an @) and before
   # digit runs (an address can contain digits); URLs go before both so a query
   # string isn't half-eaten first.
-  PATTERNS = [
+  #
+  # Named so a second caller can pick a subset: Moderation::Scrub runs the
+  # contact-detail shapes (everything but :digits) over every free-text answer
+  # as it is written, where a bare number is as likely a year or a score as an
+  # ID and would be a false positive on the respondent's own answer.
+  NAMED = {
     # URLs, with or without a scheme.
-    %r{\bhttps?://\S+}i,
-    /\bwww\.[a-z0-9-]+(?:\.[a-z]{2,})+\S*/i,
+    url:    %r{\bhttps?://\S+}i,
+    www:    /\bwww\.[a-z0-9-]+(?:\.[a-z]{2,})+\S*/i,
     # Email addresses.
-    /\b[\w.+-]+@[\w-]+(?:\.[\w-]+)+\b/,
+    email:  /\b[\w.+-]+@[\w-]+(?:\.[\w-]+)+\b/,
     # Social handles.
-    /(?<![\w])@[a-z0-9._]{2,}/i,
+    handle: /(?<![\w])@[a-z0-9._]{2,}/i,
     # Phone numbers: an optional +, then 7+ digits allowing spaces, dots, dashes
     # and bracketed area codes. Deliberately greedy — a false positive costs a
     # redaction, a false negative costs a phone number.
-    /\+?\d[\d\s().-]{6,}\d/,
+    phone:  /\+?\d[\d\s().-]{6,}\d/,
     # Any bare run of 5+ digits. Catches ID numbers, postcodes with digits,
     # student numbers, RUTs — the identifiers a phone-number pattern misses.
-    /\b\d{5,}\b/
-  ].freeze
+    digits: /\b\d{5,}\b/
+  }.freeze
+
+  PATTERNS = NAMED.values.freeze
 
   # The result of redacting one answer.
   #

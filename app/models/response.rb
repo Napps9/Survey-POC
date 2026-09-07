@@ -5,6 +5,9 @@ class Response < ApplicationRecord
   # everyone on the Verto's own /play link has none, and so does every response
   # collected before send links existed.
   belongs_to :survey_link, optional: true
+  # Free-text answers lifted out of `answers` until moderation passes them —
+  # see HeldText and Moderation. Gone with the response, in one DELETE.
+  has_many :held_texts, dependent: :delete_all
   validates :session_token, presence: true, uniqueness: true
 
   # The only two states a response is ever in: "started" once it has an answer,
@@ -77,10 +80,21 @@ class Response < ApplicationRecord
   def self.answered_entry?(entry)
     return false unless entry.is_a?(Hash)
     return true if entry["other"].to_s.strip != ""
+    # A free-text answer the moderator is holding (or has removed) was GIVEN —
+    # the respondent typed it and the row exists; only its text is elsewhere.
+    # Counting it keeps responder counts, the quiz/token locks and the results
+    # totals identical whether or not the text has been passed yet. See
+    # Moderation::Hold for the marker's shape.
+    return true if held_entry?(entry)
 
     v = entry["value"]
     return v.any? if v.is_a?(Array) || v.is_a?(Hash)
     !(v.nil? || (v.is_a?(String) && v.strip.empty?))
+  end
+
+  # Does this answer carry a moderation marker for either slot?
+  def self.held_entry?(entry)
+    entry.is_a?(Hash) && entry["held"].is_a?(Hash) && entry["held"].values.any?
   end
 
   # Declining consent is not just a timestamp — it means "do not collect my
@@ -102,6 +116,9 @@ class Response < ApplicationRecord
   # takes the row out of every responder-scoped view.
   def purge_for_declined_consent!
     self.answers = {}
+    # The held copies of their free text are their data too, and the only
+    # place it still exists once `answers` is cleared.
+    held_texts.delete_all if persisted?
     # status is deliberately left alone: STATUSES is a closed set with a DB
     # CHECK constraint behind it, and a declined respondent is by definition
     # mid-deck, so the row is "started" and already excluded from every

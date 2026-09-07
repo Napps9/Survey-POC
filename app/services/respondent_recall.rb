@@ -94,6 +94,10 @@ class RespondentRecall
   def agreed_answer(rows, key)
     given = rows.filter_map { |answers| answers.is_a?(Hash) ? answers[key] : nil }
                 .select { |entry| Response.answered_entry?(entry) }
+                # An answer whose text is held for moderation has nothing to
+                # recall — pre-filling the marker would hand the player an
+                # empty answer to send back as their own.
+                .reject { |entry| Response.held_entry?(entry) }
     return nil if given.empty?
     return nil unless given.uniq.size == 1
 

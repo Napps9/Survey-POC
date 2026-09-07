@@ -9,5 +9,12 @@ Rails.application.config.filter_parameters += [
   # Survey#respondent_code_digest), so it must not survive in a log either —
   # otherwise the logs would hold the one copy of the plaintext the database
   # deliberately doesn't.
-  :respondent_code
+  :respondent_code,
+  # A respondent's answers and contact-form fields. PlayerController reads the
+  # JSON body itself, but Rails also parses an application/json body into
+  # params for the request log line — so every free-text answer, every "Other"
+  # write-in and every contact field used to be printed, verbatim, into the
+  # request log on each /progress and /submit. The moderator holds free text
+  # out of the database until it is screened; a log copy would undo that.
+  :answers, :contact
 ]

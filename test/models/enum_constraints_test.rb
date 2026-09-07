@@ -95,12 +95,13 @@ class EnumConstraintsTest < ActiveSupport::TestCase
   test "every constrained column is covered by a model enum or validation" do
     # The database and the model must not drift: a value allowed by one and not
     # the other is a bug in whichever direction it goes.
-    {
-      Funder => :status, FunderMembership => :status, Invite => :kind,
-      Membership => :role, Partnership => :status, PartnershipMembership => :status,
-      FlowGeneration => :status, ReportRender => :status, VertoBuild => :status,
-      Response => :status, Survey => :leaderboard_retake_policy
-    }.each do |model, column|
+    [
+      [ Funder, :status ], [ FunderMembership, :status ], [ Invite, :kind ],
+      [ Membership, :role ], [ Partnership, :status ], [ PartnershipMembership, :status ],
+      [ FlowGeneration, :status ], [ ReportRender, :status ], [ VertoBuild, :status ],
+      [ Response, :status ], [ Survey, :leaderboard_retake_policy ], [ Survey, :moderation_mode ],
+      [ HeldText, :status ], [ HeldText, :slot ]
+    ].each do |model, column|
       declared = model.respond_to?(:defined_enums) && model.defined_enums.key?(column.to_s)
       validated = model.validators_on(column).any? { |v| v.is_a?(ActiveModel::Validations::InclusionValidator) }
       assert declared || validated,

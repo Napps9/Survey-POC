@@ -7,14 +7,19 @@ control. Everything else in this document is context or recovery.**
 
 ## What is encrypted
 
-Two columns, both on `users`:
+Three columns:
 
-- `google_refresh_token`
-- `google_access_token`
+- `users.google_refresh_token`
+- `users.google_access_token`
+- `held_texts.text`
 
-They grant write access to a user's Google Drive and Sheets, which is why they
-are encrypted at rest. Nothing else in the database uses Active Record
-encryption — checked with `grep -rn "^\s*encrypts " app/models/`.
+The two Google tokens grant write access to a user's Google Drive and Sheets,
+which is why they are encrypted at rest. `held_texts.text` is a respondent's
+free-text answer while moderation holds it (see `docs/DATA_RETENTION.md`,
+"Free text is held until it is moderated") — the one place unscreened
+respondent prose sits in the database, so it is encrypted for the same reason
+the hold exists. Nothing else uses Active Record encryption — checked with
+`grep -rn "^\s*encrypts " app/models/`.
 
 ## Why this is on the readiness plan
 
@@ -123,5 +128,8 @@ Building it there raises `Missing Active Record encryption credential` at boot.
    ```
 
    Every affected user then reconnects Google from the dashboard, which is the
-   normal flow. No survey data, response, or account is affected — the blast
-   radius really is these two columns.
+   normal flow. No survey data, response, or account is affected beyond the
+   third column: any free text still **held** for moderation at that moment
+   becomes unreadable, so it can never be released — those answers stay held
+   (they still count as answered) and staff can only remove them. Text already
+   released is in `answers` in plaintext and is unaffected.

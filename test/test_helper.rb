@@ -2,8 +2,24 @@ ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
 
+# Free-text moderation holds every typed answer out of `responses.answers`
+# until it is screened (app/lib/moderation.rb). Hundreds of older tests post a
+# free-text answer and assert the text they read back, so the hold is OFF for
+# the suite by default; the moderation tests switch it on for themselves (see
+# ModerationTestHelper). The scrub still runs — it has no switch.
+Moderation.hold_enabled = false
+
 class ActiveSupport::TestCase
   parallelize(workers: 1)
+
+  # Run the block with the moderation hold on, as it is in production.
+  def with_moderation_hold
+    previous = Moderation.hold_enabled
+    Moderation.hold_enabled = true
+    yield
+  ensure
+    Moderation.hold_enabled = previous
+  end
 
   # Verto creation and the other AI paths enqueue jobs rather than running
   # inline (P0-3). The suite uses the :test adapter, so a test that cares about
