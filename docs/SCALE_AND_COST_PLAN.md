@@ -79,7 +79,7 @@ If the deck later gains graded quiz cards, requests triple
 Deliberately deferred until the load test says they matter: caching the
 token→survey resolution and the parsed deck (both are indexed/sub-ms today).
 
-### 2b. Load-test log (scratch env, 2026-09-01 → 03)
+### 2b. Load-test log (scratch env, 2026-09-01 → 07)
 
 Setup: scratch web service `vertonow.onrender.com` (hand-made, builds this
 branch, single instance, `WEB_CONCURRENCY` unset) + scratch Basic-256mb
@@ -107,6 +107,9 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 14 | 40 (2 generators × 20) | **Identical**: 1 failed of 65,653, median 4.83 s, p95 7.4 s; combined **187 req/s** (26.7 journeys/s), 2,019 iterations dropped; `http_req_waiting` is 99.8% of every request, `http_req_blocked` median 291 ns | The runner is exonerated: two runners at 20/s each — the rate one ran clean in run 11 — queue exactly as one runner at 40/s did, and all the time is spent waiting for the server's first byte, none of it getting a connection. So the ~185 req/s ceiling is on the far side of the runner and does not move with the web box (three shapes, ±15%): the Cloudflare→Render path, the 4c-16g database, the free Key Value, or something the app serialises on. Next: `test/load/ping.js`, a path-only probe of `/up` (no database, cache or rate-limit work) at 400 req/s — same runners, same path — to split the path from the app's work. |
 | 15 | **path probe**: `/up` at 400 req/s (2 generators × 200) | **Clean**: 43,998 requests, 0 failed, no dropped iterations; medians **183 ms / 106 ms** (the two runners sit in different regions — those are their network floors), p95 208 / 123 ms, max 744 ms; ~340 req/s averaged over ramp+hold, 400 req/s held | The path is innocent: Cloudflare → Render proxy → Puma → a pool checkout and one trivial database round-trip carries 400 req/s on the same 20-slot box with nothing queueing. So the ~185 req/s wall is in what the journeys do that `/up` does not: the heavier database work (response writes across 14 indexes, the leaderboard's two counts over the 50k board — measured locally at ~13 ms of DB CPU per board read), the Key Value round-trips (`rate_limit` on every request), or Ruby CPU in the app. Render's own graphs for 08:14–08:20 UTC (web CPU, database CPU, Key Value) split those three; the next probe splits the Key Value from the database. |
 | 16 | **stack probe**: `/play/:token/manifest` at 400 req/s (2 × 200) | **Queued**: combined **310 req/s** served, medians 3.1–3.3 s, p95 6.7 s, 0 failed, all `http_req_waiting`; both runners hit their 1,000-VU cap | The manifest is PlayerController's full stack — ApplicationController filters, the survey load, a 300-byte JSON render — with no writes, no rate-limit counter, no Key Value and no board. It walls at 310 req/s where the bare `ActionController::Base` health check ran 400 clean. So the ceiling is Ruby CPU per request in the app's own request stack, and the journeys (page render, response upserts, board counts) simply cost more of it per request: 20 slots ÷ 310 req/s = 65 ms per request in the box, ≈ 6.5 ms of CPU each across 2 vCPUs; the journeys work out at ≈ 11 ms. Web-CPU graph for 08:44–08:47 UTC confirms it if it sits at the 2-CPU line. What does NOT fit a pure-CPU story is run 12: the 1-vCPU box did 160 req/s of journeys, 85% of what 2 vCPUs did — either Standard instances burst above their 1 CPU, or 4 workers × 5 threads waste a good part of the second core (GVL, context switching, 4× GC). Either way the Pro box bought +17% for 3.4× the price. |
+| 17 | 40 (2 gen × 20) | **Crippled** — combined ~88 req/s, median 15 s, p95 20 s, journeys 1m37s, 0 failed | With the **page cache live**, scratch web resized to **8c-16g** but run with `WEB_CONCURRENCY=1` × `RAILS_MAX_THREADS=24` — one Puma process. MRI's GVL pins one process to ~one core, so 7 of 8 cores sat idle and 24 threads fought over one. A test-config error, not the app: single-process is the wrong shape for a multi-core box. |
+| 18 | 40 (2 gen × 20) | **Clean, big headroom** — combined ~234 req/s, median 144 ms, p95 304 ms (show 347, submit 230, progress 223, lb 239), journeys at pure think-time 11.9 s, 0 failed | Same 8c-16g box in **cluster mode: `WEB_CONCURRENCY=8` × `RAILS_MAX_THREADS=5`**, page cache + Key Value. The fix for run 17. Deploy log confirms **Solid Queue starts once in the Puma master (PID 1), not per worker** — so a multi-worker box does not spin up N duplicate queues/schedulers. |
+| 19 | 80 (4 gen × 20) | **Saturated** — combined ~388 req/s served, median 3.8 s, p95 7.2 s, journeys ~36 s, **0 failed** (queues, never errors), some dropped iterations | The whole event rate on ONE 8c-16g box. Clean at 40/s, underwater at 80/s → this box tops out **~50–55 arrivals/s**; the 83/s event needs more than one of it. **Open question:** is the 80/s wall the **web box** or the **database**? No connection errors (so not pool exhaustion). Nick's Render CPU graphs for 17:53–17:58 UTC decide: DB pinned → bigger DB + one web box likely carries it (no R2); web pinned → a 12-core box or two boxes (two reopens the Active Storage → R2 disk-unpin). |
 
 **Measured capacity (2026-09-03):** the ceiling is **Ruby CPU per request
 on the web instance**, not the database, the cache, the proxy path or the
@@ -250,11 +253,39 @@ over 6–7 generators) against the event-day fleet.
   synchronised 90% restarts are a capacity dip at peak.
 - Do not bump `CACHE_VERSION` during the window (it reloads every idle
   in-flight respondent).
-- Degrade switches, in order: disable the live broadcast; `AI_GRADE_SLOTS=0`
-  (already honoured); leaderboard is precomputed so it stays on.
+- Degrade switches, in order: **disable the live results broadcast**;
+  `AI_GRADE_SLOTS=0` (already honoured, and a plain Verto never hits the AI
+  path anyway); leaderboard is precomputed so it stays on.
+  - The broadcast switch now has code (`Response.results_broadcast_disabled?`):
+    set `DISABLE_RESULTS_BROADCAST=1` before the window for a boot-time default,
+    **or flip it live with no deploy/restart** from a Rails console —
+    `Rails.cache.write("degrade:results-broadcast", true)` (and `.delete` to
+    restore). Only the creator's live tally is shed; respondents and the
+    leaderboard are untouched.
+- **Pre-warm before doors open** (avoids a cold-render stampede on the first
+  arrivals): `bin/rails load_test:prewarm TOKEN=<publish-token>` — fetches the
+  play page once (populating the `player-page` cache entry) and the leaderboard
+  once (crossing the bootstrap threshold so the board is built), against the
+  event Verto's real link. Run it from a Render Shell a few minutes before.
 - Decide location search in advance: paid LocationIQ (`GEOCODE_MAX_RPS` up)
   or drop the card — at 2 req/s app-wide it silently returns nothing at 50k.
-- Afterwards: scale back down (2 × Standard web, baseline Postgres tier).
+- Set `PLAYER_RATE_LIMIT_SCALE` for the window (the per-IP caps ×N; restore
+  after). Sized to expected respondents-behind-one-NAT — generous is safe over
+  10 minutes, since a plain event has no per-IP abuse concern. No Cloudflare
+  for v1, so `remote_ip` is the respondent's real IP (mostly distinct mobile
+  IPs); if Cloudflare is ever added, trusted-proxy handling is a prerequisite
+  or every respondent shares an edge IP and mass-429s.
+- **Job queue posture:** a single big web box needs no worker service — Solid
+  Queue runs once in its Puma master. Only a **multi-instance fleet** needs the
+  dedicated `vertonow-worker` (render.yaml, inert until synced): create it, set
+  `RUN_SOLID_QUEUE_IN_PUMA=0` on the web service (so the web tier stops running
+  the queue/scheduler and the DB pool drops its +12), and confirm the worker
+  drains before the window.
+- Afterwards: **`VACUUM ANALYZE responses`** (50k inserts + per-response updates
+  across 14 indexes in 10 minutes leaves the planner's stats stale and the table
+  bloated — the leaderboard counts read better once it's re-analysed), then
+  scale the web box and Postgres back down to the steady-state tiers and restore
+  `MEMORY_WATCHDOG_RESTART_PERCENT` and `PLAYER_RATE_LIMIT_SCALE`.
 
 ## 5. Cost (dashboard-confirmed prices, 2026-09-01)
 

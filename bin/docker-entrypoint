@@ -22,7 +22,11 @@ fi
 # Note: db:seed is intentionally NOT run on boot — it matches the previous
 # native-runtime start command (db:prepare only). Seeds are create-only/
 # idempotent; run `rails db:seed` manually for the initial setup.
-if [ -n "${DATABASE_URL}" ]; then
+# The dedicated Solid Queue worker service runs this SAME image, so it would
+# otherwise also run db:prepare on boot and race the web container's migrations.
+# Set SKIP_DB_PREPARE=1 on the worker: migrations stay owned by the web service
+# (its preDeployCommand plus this line), and the worker just boots and consumes.
+if [ -n "${DATABASE_URL}" ] && [ -z "${SKIP_DB_PREPARE}" ]; then
   bundle exec rails db:prepare
 fi
 

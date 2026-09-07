@@ -50,7 +50,20 @@ plugin :tmp_restart
 #
 # Off by default outside production so `bin/rails server` in development
 # doesn't quietly start a worker; set SOLID_QUEUE_IN_PUMA=1 to opt in locally.
-if !ENV["SOLID_QUEUE_IN_PUMA"].to_s.empty? || ENV["RAILS_ENV"] == "production"
+# Whether THIS process runs Solid Queue in-Puma. The default preserves the
+# historical behaviour (on in production, or when SOLID_QUEUE_IN_PUMA is set
+# anywhere). To scale the web tier out — a big multi-worker box, or more than one
+# instance — hand the queue to a dedicated Render worker service and set
+# RUN_SOLID_QUEUE_IN_PUMA=0 on the WEB service; the worker leaves it unset (so it
+# runs the queue). config/database.yml drops the Solid Queue pool headroom in
+# lockstep with this flag.
+run_solid_queue_in_puma =
+  if ENV.key?("RUN_SOLID_QUEUE_IN_PUMA")
+    ENV["RUN_SOLID_QUEUE_IN_PUMA"] == "1"
+  else
+    !ENV["SOLID_QUEUE_IN_PUMA"].to_s.empty? || ENV["RAILS_ENV"] == "production"
+  end
+if run_solid_queue_in_puma
   plugin :solid_queue
   solid_queue_mode :async
 end

@@ -118,6 +118,12 @@ services:
       # region is chosen there, not here). Blank = errors only reach the logs.
       - key: SENTRY_DSN
         sync: false
+      # Rails.cache + rate-limit counters move onto Render Key Value (Valkey)
+      # when this is set (config/environments/production.rb). Dashboard-managed
+      # (sync: false) — declared here so a blueprint sync never prunes the value,
+      # and so the dedicated worker below can pull the SAME store via fromService.
+      - key: REDIS_URL
+        sync: false
       # How long any single Claude call may hold a request thread, and how many
       # times it retries, before failing fast. Bounds thread occupancy so a slow
       # Anthropic API can't tie up every Puma thread and 502 the whole app.
@@ -201,6 +207,153 @@ services:
         fromDatabase:
           name: survey-poc-db
           property: connectionString
+
+  # Dedicated Solid Queue worker. ONLY needed for the scale-OUT posture — a web
+  # tier that has handed off the queue by setting RUN_SOLID_QUEUE_IN_PUMA=0 on the
+  # web service (so no Puma worker also runs the queue + scheduler, which would
+  # double-fire config/recurring.yml tasks). A single-box deployment does NOT need
+  # this at all: Solid Queue runs exactly once, in the Puma master. This whole
+  # block is inert until a blueprint sync deliberately creates the service.
+  #
+  # Secrets ride `fromService` so they MATCH the web service byte-for-byte — the
+  # ACTIVE_RECORD_ENCRYPTION_* keys and SECRET_KEY_BASE especially, or the worker
+  # mints fresh ones and can't decrypt stored Google tokens / verify sessions.
+  #
+  # LIMITATION: this worker has NO Active Storage disk, so the three storage-
+  # writing jobs (RenderReportPdfJob, RenderInfographicJob, BuildVertoJob) would
+  # write to its ephemeral filesystem, unreachable by the web service. That is
+  # acceptable only for a burst window that generates no reports; the real fix is
+  # Active Storage -> R2 (object storage shared across services), docs scale plan §3.
+  - type: worker
+    name: vertonow-worker
+    runtime: docker
+    region: frankfurt
+    branch: Main
+    autoDeployTrigger: off
+    # Skips db:prepare (SKIP_DB_PREPARE below) then execs this: the Solid Queue
+    # supervisor (dispatcher + worker + scheduler), same as bin/jobs locally.
+    dockerCommand: bin/jobs
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RACK_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: "1"
+      # Migrations belong to the web service (its preDeploy + entrypoint); the
+      # worker must not race them. See bin/docker-entrypoint.
+      - key: SKIP_DB_PREPARE
+        value: "1"
+      # This service RUNS the queue, so it leaves RUN_SOLID_QUEUE_IN_PUMA unset and
+      # keeps the DB pool's Solid Queue headroom (config/database.yml). Its threads
+      # are queue worker threads (config/queue.yml), not web request threads.
+      - key: RAILS_MAX_THREADS
+        value: "5"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: survey-poc-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: REDIS_URL
+      - key: SECRET_KEY_BASE
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: SECRET_KEY_BASE
+      - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+      - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+      - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+      # Jobs call Claude (BuildVerto, GenerateFlow, TranslateLocales, corpus
+      # refresh, newsletter). Same key + tuning as the web service.
+      - key: ANTHROPIC_API_KEY
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: ANTHROPIC_API_KEY
+      - key: ANTHROPIC_TIMEOUT_SECONDS
+        value: "120"
+      - key: ANTHROPIC_MAX_RETRIES
+        value: "1"
+      - key: AI_DAILY_GENERATION_CAP
+        value: "300"
+      # Comms jobs send mail; mailers need SMTP + host/from. Pulled from the web
+      # service so the two stay identical.
+      - key: APP_HOST
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: APP_HOST
+      - key: APP_PROTOCOL
+        value: https
+      - key: MAIL_FROM
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: MAIL_FROM
+      - key: MAIL_REPLY_TO
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: MAIL_REPLY_TO
+      - key: SMTP_ADDRESS
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: SMTP_ADDRESS
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: SMTP_USERNAME
+      - key: SMTP_PASSWORD
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: SMTP_PASSWORD
+      - key: SMTP_AUTHENTICATION
+        value: plain
+      - key: SMTP_STARTTLS
+        value: "true"
+      - key: SMTP_TLS
+        value: "false"
+      # Sheets/Drive export jobs.
+      - key: GOOGLE_CLIENT_ID
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: GOOGLE_CLIENT_ID
+      - key: GOOGLE_CLIENT_SECRET
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: GOOGLE_CLIENT_SECRET
+      - key: SENTRY_DSN
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: SENTRY_DSN
+      # Same memory posture as the web container.
+      - key: MALLOC_ARENA_MAX
+        value: "2"
+      - key: RUBY_GC_HEAP_GROWTH_FACTOR
+        value: "1.1"
 
 databases:
   - name: survey-poc-db
