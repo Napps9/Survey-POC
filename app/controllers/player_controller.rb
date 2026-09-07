@@ -201,7 +201,12 @@ class PlayerController < ApplicationController
     # token/vanity slug all resolved through load_survey_and_share already),
     # so the manifest's start_url is the exact link this respondent is on.
     @pwa_manifest_url = play_manifest_path(params[:token])
-    render_with_chrome_language
+    # The player HTML is the same bytes for every respondent on this link +
+    # resolved locale (a JS shell that fetches all respondent data from the JSON
+    # endpoints), and rendering its ~150 KB is the single most expensive request
+    # in a burst — ~45% of a journey's CPU. Serve it from cache. See
+    # cached_play_page for the key and the freshness/stampede discipline.
+    render html: cached_play_page.html_safe
   end
 
   # GET /play/:token/manifest — a per-Verto install manifest, so "Add to Home
@@ -1139,6 +1144,44 @@ class PlayerController < ApplicationController
     Rails.cache.fetch([ "player-agg", kind, @survey.id, @survey.updated_at.to_f ],
                       expires_in: PLAYER_AGGREGATE_TTL,
                       race_condition_ttl: 30.seconds, &block)
+  end
+
+  # How long a rendered player page stays cached. Long, because the key already
+  # carries every input that changes the bytes (deck version, wave, link
+  # settings, locale) so an edit busts it immediately — the TTL is only a
+  # backstop for the rare change that doesn't bump one of those. race_condition_ttl
+  # serves the just-expired copy while ONE caller re-renders, so an expiry can't
+  # stampede; a genuinely cold key (first play, or right after a deploy flushes
+  # the store) is not covered, which is why an event pre-warms this before doors.
+  PLAYER_PAGE_TTL = 1.hour
+
+  # The rendered #show HTML, cached as shared bytes per link + deck version +
+  # resolved locale. Safe to share: the page boots player_controller.js and
+  # fetches all respondent-specific data from the JSON endpoints, so nothing
+  # per-respondent is rendered into it; the one per-session byte (csrf_meta_tags)
+  # is never verified because every player write endpoint uses null_session.
+  def cached_play_page
+    Rails.cache.fetch(play_page_cache_key, expires_in: PLAYER_PAGE_TTL,
+                      race_condition_ttl: 30.seconds) do
+      if @survey.chrome_follows_verto_language?
+        I18n.with_locale(@display_locale) { render_to_string(:show, layout: "fullscreen") }
+      else
+        render_to_string(:show, layout: "fullscreen")
+      end
+    end
+  end
+
+  # Everything that changes the rendered bytes. The token (not the survey id) is
+  # the identity: publish token, share token, vanity slug and named-link slug
+  # each embed themselves in every data-*-url the shell reads. current_wave and a
+  # named link's settings can alter the page without bumping survey.updated_at,
+  # so both ride the key; Current.locale only matters when the chrome does NOT
+  # follow the Verto's language (otherwise @display_locale already captures it).
+  def play_page_cache_key
+    [ "player-page", params[:token], @survey.updated_at.to_f, @display_locale,
+      @survey.current_wave&.position,
+      (@survey.chrome_follows_verto_language? ? nil : Current.locale),
+      @survey_link&.updated_at&.to_f ]
   end
 
   def aggregate_rows(responses)

@@ -59,6 +59,17 @@ class ResultsLiveTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the degrade switch sheds the live tally but not the leaderboard refresh" do
+    resp = @survey.responses.create!(session_token: SecureRandom.uuid, status: "started", answers: {})
+
+    ENV["DISABLE_RESULTS_BROADCAST"] = "1"
+    assert_no_broadcasts_on_results do
+      resp.update!(answers: { "0" => { "value" => "Yes" } })
+    end
+  ensure
+    ENV.delete("DISABLE_RESULTS_BROADCAST")
+  end
+
   test "a response broadcasts when it completes" do
     resp = answered_response(status: "started")
 

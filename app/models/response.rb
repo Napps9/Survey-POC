@@ -134,6 +134,19 @@ class Response < ApplicationRecord
     self.answered = content_answered?
   end
 
+  # Whether the live results tally is currently shed. DISABLE_RESULTS_BROADCAST=1
+  # sets the boot default (turn it off from the start of a window); the cache
+  # flag "degrade:results-broadcast" flips it live from a console with no deploy
+  # or restart. Fails open (keep broadcasting) if the cache read errors, so a
+  # cache blip never silences the tally on an ordinary day.
+  def self.results_broadcast_disabled?
+    return true if ENV["DISABLE_RESULTS_BROADCAST"] == "1"
+
+    Rails.cache.read("degrade:results-broadcast") ? true : false
+  rescue StandardError
+    false
+  end
+
   def broadcast_results_activity
     return unless saved_change_to_answered? || saved_change_to_status?
     # Broadcast when a response BECOMES answered, and also when it STOPS being
@@ -142,6 +155,13 @@ class Response < ApplicationRecord
     # that must go DOWN. The old `return unless answered?` suppressed exactly
     # that broadcast. Still silent for an empty session that never answered.
     return unless answered? || saved_change_to_answered?
+
+    # Event degrade switch. The creator's live tally is a nicety and the first
+    # thing to shed under a burst; the leaderboard refresh below is NOT gated
+    # because it is respondent-facing. Checked at runtime so it can be flipped
+    # from a Rails console mid-event, without a deploy or a restart (the runbook's
+    # "disable the live broadcast" step) — env sets the boot default.
+    return if self.class.results_broadcast_disabled?
 
     # Off the request thread and coalesced: the broadcast used to run its two
     # COUNTs, a partial render and a cable INSERT inline here, twice per
