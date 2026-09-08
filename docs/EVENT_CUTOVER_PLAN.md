@@ -5,6 +5,24 @@ carry the event: 50,000 respondents arriving in ~10 minutes (~83 arrivals/s) on
 one plain Verto with the token leaderboard, fully branded (organisation logo +
 card images), EU/UK residency.
 
+## Status — steps 1, 2, 3 and 5 are done
+
+Brought forward to the evening of 2026-09-08 at the owner's call ("can I get
+tomorrow's plan done tonight?"). Storage was the long pole and the only part
+with real surprise risk, and a quiet site is the right time to redeploy for it.
+
+| Step | State |
+|---|---|
+| 1. Rebase and verify | **Done** — five gates green (3,064 unit / 440 system, 0 F/E) |
+| 2. Merge to Main | **Done** — `23ba9a2 → 0c73f43`, fast-forward, 22 commits |
+| 3. Object storage, phases 0–2 | **Done** — 271 blobs on R2, 0 failed, app writing to `bucket` |
+| 4. Pre-scale to 12c-24g | **Wednesday** — four dashboard fields, deliberately not run early |
+| 5. Verify production | **Done** — CSP, presigned fetch, play page, fresh upload |
+| 6. Go/no-go | Wednesday, after step 4 |
+
+Step 4 was held back on purpose: it is two minutes of dashboard work, it
+restarts the box, and starting the 12c-24g meter a day early buys nothing.
+
 ## The decision, and what it rests on
 
 **One 12c-24g web instance, with Active Storage on the R2 bucket.** Owner's
@@ -42,9 +60,12 @@ deliberately deferred until after the event.
 - **A second instance.** Proven by run 27 and available as a one-click option
   after phase 3, but not needed.
 
-## Before anything else: the branch is behind Main
+## Before anything else: the branch is behind Main (done)
 
-`origin/Main` has moved (moderation / held-text, rich text, save-warning work
+Resolved on 2026-09-08: rebased with zero conflicts, full suite green, merged.
+Kept because the rule it states outlives this cutover.
+
+`origin/Main` had moved (moderation / held-text, rich text, save-warning work
 from other sessions — ~2,700 lines this branch does not have). The scale branch
 must be rebased onto it before merging, and per the standing rule the **full
 system suite runs after the rebase**, not just the unit suite. Budget for it:
@@ -55,7 +76,7 @@ system suite runs after the rebase**, not just the unit suite. Budget for it:
 Times are indicative; the ordering is what matters. Nothing here touches
 production until step 3, and each step states its own rollback.
 
-### 1. Rebase and verify (me) — ~45 min
+### 1. Rebase and verify (me) — ~45 min · **DONE 2026-09-08**
 
 ```
 git fetch origin Main
@@ -71,7 +92,7 @@ bin/importmap audit
 All five green or the merge does not happen. **Rollback:** nothing has left the
 branch.
 
-### 2. Merge to Main and let it deploy (me) — ~20 min
+### 2. Merge to Main and let it deploy (me) — ~20 min · **DONE 2026-09-08**
 
 Push to `Main`; CI's four checks gate Render's deploy hook. Then `bin/trello_log`
 the shipped work.
@@ -82,7 +103,7 @@ disk; `PlayerAssetUrls` returns same-origin paths; the process-local page cache
 is the only live change and is transparent. **Rollback:** revert the merge, or
 roll back the Render deploy.
 
-### 3. Object storage, phases 0–2 (you + me) — ~40 min
+### 3. Object storage, phases 0–2 (you + me) — ~40 min · **DONE 2026-09-08**
 
 Exactly the sequence rehearsed on scratch today, which came back 5/5 on the
 smoke test. Full detail in `docs/OBJECT_STORAGE_CUTOVER.md`.
@@ -95,7 +116,8 @@ smoke test. Full detail in `docs/OBJECT_STORAGE_CUTOVER.md`.
   flips each as it lands; the site serves throughout. *Rollback: nothing has
   moved for the app yet.*
 - **Phase 2 (you + me):** set `ACTIVE_STORAGE_SERVICE=bucket`, redeploy, then
-  sweep (`migrate` again), `verify` → `verify OK`, and the five-point smoke.
+  sweep (`migrate` again), check that no *readable* blob is left on `local`
+  (not `verify OK` — see §6 and the storage runbook), and the five-point smoke.
   *Rollback: unset the var, redeploy, `object_storage:rollback` — a pure
   metadata flip, because nothing was deleted from the disk.*
 
@@ -115,7 +137,7 @@ smoke test. Full detail in `docs/OBJECT_STORAGE_CUTOVER.md`.
 
 *Rollback: every one of these is a dashboard field.*
 
-### 5. Verify production (me) — ~15 min
+### 5. Verify production (me) — ~15 min · **DONE 2026-09-08**
 
 - `/up` 200; `/up/storage` (reports "mounted" for any non-local service).
 - The CSP header carries the bucket host in `img-src` **and** `connect-src`.
@@ -126,11 +148,27 @@ smoke test. Full detail in `docs/OBJECT_STORAGE_CUTOVER.md`.
 - One full manual play of a real Verto: consent → progress → submit →
   leaderboard.
 
+Results, 2026-09-08: CSP carried the bucket in `img-src`, `media-src` and
+`connect-src`; a presigned fetch returned 200 with
+`public, max-age=31536000, immutable`; a play page with uploaded card art
+emitted 9 presigned URLs and no `/rails/…` paths; a fresh logo upload landed on
+`bucket` and rendered. Note the trap: a Verto whose art came from Pexels shows
+neither, because those URLs are external and pass straight through — pick a
+Verto with *uploaded* art or the check proves nothing.
+
 ### 6. Go/no-go
 
-**Go** requires all of: the five gates green in step 1; `verify OK` and the
-smoke passing in step 3; the box on 12c-24g with `WEB_CONCURRENCY=12`; and step
-5 clean. Any failure stops the cutover — production is left on whatever the
+**Go** requires all of: the five gates green in step 1; step 3's migration
+clean and its smoke passing; the box on 12c-24g with `WEB_CONCURRENCY=12`; and
+step 5 clean.
+
+This originally said "`verify OK`", which production cannot print and never
+will: `object_storage:verify` returns OK only when *zero* blobs remain on
+`local`, and 291 of production's 562 lost their bytes on 2026-08-19, long
+before any of this. They are left on `local` by design. The real condition —
+**no blob left on `local` that is still readable**, plus a full bucket sample —
+was met: `still readable: 0`, `50/50 present`. See
+`docs/OBJECT_STORAGE_CUTOVER.md` for the check and the full record. Any failure stops the cutover — production is left on whatever the
 last good state was, which at every stage above is a working site.
 
 ## Event day

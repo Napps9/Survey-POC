@@ -98,13 +98,36 @@ URLs).
    Redeploy.
 2. Shell: `bin/rails object_storage:migrate` — sweeps anything uploaded to the
    disk between phase 1 and the redeploy — then
-   `bin/rails object_storage:verify` → must print `verify OK`, and
-   `object_storage:status` → "app writes new uploads to: bucket", nothing on
-   `local`.
+   `bin/rails object_storage:verify`, and `object_storage:status` → "app writes
+   new uploads to: bucket".
+
+   **`verify OK` is only reachable on a store with no pre-existing damage.**
+   It returns OK when *zero* blobs are left on `local`, but a blob whose bytes
+   were already gone is deliberately left there (it 404s either way), so on a
+   store that has lost files `verify` reports the count and returns false
+   forever. That is not a failed migration. The real pass condition is **no
+   blob left on `local` that is still readable**, which is what the migration
+   could have moved and didn't:
+
+   ```
+   bin/rails runner 'local = ActiveStorage::Blob.services.fetch(:local); \
+     bucket = ActiveStorage::Blob.services.fetch(:bucket); \
+     left = ActiveStorage::Blob.where(service_name: "local").to_a; \
+     unmigrated = left.count { |b| local.exist?(b.key) }; \
+     sample = ActiveStorage::Blob.where(service_name: "bucket").order(Arel.sql("RANDOM()")).limit(50).to_a; \
+     present = sample.count { |b| bucket.exist?(b.key) }; \
+     puts "left on local: #{left.size} (still readable = NOT migrated: #{unmigrated}); bucket sample: #{present}/#{sample.size}"'
+   ```
+
+   Pass is `still readable: 0` and a full sample.
 3. Smoke, in this order:
    - a play page: logo renders (proxy route, 200);
-   - a card image URL from that page's HTML: `curl -sI <url>` → **302** to the
-     bucket host, and following it → 200 with `Cache-Control: public, max-age=31536000`;
+   - a card image URL from that page's HTML: it is a presigned
+     `…r2.cloudflarestorage.com/…X-Amz-Signature=…` URL, and fetching it → 200
+     with `Cache-Control: public, max-age=31536000, immutable`. Pick a Verto
+     whose card art was **uploaded**: art chosen from Pexels stays an
+     `images.pexels.com` URL and is passed straight through, so such a page
+     shows neither a bucket URL nor a `/rails/…` path and proves nothing;
    - the CSP header contains the bucket host in `img-src` **and** `connect-src`;
    - upload a fresh logo/card image in the editor → it appears, and
      `object_storage:status` shows the new blob on `bucket`.
@@ -165,3 +188,34 @@ HTML is an `https://…r2.cloudflarestorage.com/…X-Amz-Signature=…` URL (not
 - k6 follows the 302, so `endpoint:image` timings in `journey.js` include the
   bucket fetch. Seed scratch with `IMAGES=N` so the proof run loads real
   attachments — every run before 22 measured a text-only deck.
+
+## Production record — 2026-09-08
+
+Phases 0–2 ran on production the evening before the event cutover; phase 3 is
+deliberately not done (see above). What the run found, kept here because the
+numbers are the argument for the corrected gate:
+
+- **562 blobs, of which 291 had no bytes on the disk.** Not caused by the
+  migration and not fixed by it: everything created up to `id 304 @ 2026-08-19
+  08:23 UTC` was gone, everything from `id 305 @ 2026-08-19 11:36 UTC` intact.
+  That is the morning the persistent disk was attached — before it, `storage/`
+  lived in the container and was wiped on every deploy. Those 291 are 404s
+  today and stay 404s; they are org logos and card art from before that date
+  and the only repair is re-uploading the originals.
+- **271 copied, 0 failed**, then `still readable: 0` and a 50/50 bucket sample.
+- Presigned fetch: 200, `public, max-age=31536000, immutable`.
+- CSP carried the bucket host in `img-src`, `media-src` and `connect-src`, both
+  path-style and virtual-hosted.
+- A play page with uploaded card art emitted 9 presigned URLs and no
+  `/rails/active_storage/…` paths; a fresh editor upload landed on `bucket`.
+
+Two practical notes for the next store:
+
+- `curl` from a machine outside the network may not reach the app at all; every
+  check above runs from the service's own Shell against `http://localhost:10000`
+  with `-H "Host: <domain>" -H "X-Forwarded-Proto: https"`, which satisfies
+  host authorisation and `force_ssl`.
+- Do the credential pre-flight *before* phase 1 — one `upload`/`download`/
+  `delete` round trip through `ActiveStorage::Blob.services.fetch(:bucket)`.
+  It proves key, secret, endpoint, jurisdiction and token scope in one shot,
+  at the one moment when nothing depends on the answer.
