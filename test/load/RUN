@@ -1,26 +1,26 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 26: THE RE-BASELINE. Branded deck, 80/s over 4 generators, two 12c-24g
-# boxes — the run-24 shape — but the FIRST run against a Key Value store that
-# is not saturated. Runs 19-24 all ran against the free tier (0.05 CPU, 25 MB,
-# 50 connections), which Render's graphs show pinned at 100% CPU throughout,
-# peaking near 40 of its 50 connections. Rails.cache fails OPEN, so that was
-# silent: the page cache missed, every request re-rendered, and rate_limit
-# paid up to its 0.5s read timeout per call. Both instances are now 1 GB /
-# 1,000 connections with Persistence Mode OFF (Journal + Snapshot was
-# fsyncing every counter write to disk).
+# Run 27: THE 1.5x PROOF — 125 arrivals/s over 7 generators, branded deck, two
+# 12c-24g boxes, bucket-backed assets, healthy Key Value. The event is ~83/s;
+# this is the go/no-go gate.
 #
-# So every previous measurement of the web tier was taken through a degraded
-# cache and is suspect — including "one 12-core box tops out around 2s".
-# Expect: journey medians well under 1s and the thresholds to pass. If they
-# do, go to the 125/s proof. If the journey endpoints are STILL ~2s with a
-# healthy store, the wall is the database and nothing else is left.
+# Run 26 settled the long-running mystery: at 80/s the same fleet came back
+# completely clean — ~935 req/s, median 161 ms, p95 286 ms, 0 failed, ZERO
+# dropped iterations, journeys at pure think-time (13.1 s), every threshold
+# green. The only change from run 24 (2.1 s medians, thresholds failing) was
+# a Key Value store that is not saturated. So the wall through runs 19-24 was
+# the free-tier cache all along, and every web-tier measurement taken through
+# it understated the app.
+#
+# Gate: 0 x 5xx, submit p95 < 1 s, image p95 < 1.5 s, flat leaderboard
+# latency, ~0 dropped iterations, no health flaps. A latency-only failure with
+# 0 errors sizes a third instance; errors are a stop.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
-ARRIVALS_PER_S=80
+ARRIVALS_PER_S=125
 RAMP_S=60
 HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
-GENERATORS=4
+GENERATORS=7
