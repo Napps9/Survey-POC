@@ -1,13 +1,18 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 21: more cores. IDENTICAL load to runs 19/20 (80/s, 4 generators, ramp
-# 60 / hold 240 / dwell 0.05). The web box is resized 8c-16g -> 12c-24g and
-# WEB_CONCURRENCY 8 -> 12 (one Puma worker per core), page cache + Key Value,
-# bigger DB from run 20, same commit 7452994. Runs 19 & 20 both saturated at
-# 80/s (~355-388 req/s, ~5s median) on 8 cores regardless of DB size -> the
-# wall was CPU. 8->12 cores is 1.5x. If run 21 comes back clean, cores were the
-# lever and we go to the 125/s proof. If still saturated, one box tops out
-# below the event rate -> two boxes + R2.
+# Run 22: the branded two-box fleet. IDENTICAL load params to runs 19–21
+# (80/s, 4 generators, ramp 60 / hold 240 / dwell 0.05), with three changes:
+#   1. TWO 12c-24g instances (manual scaling, autoscaling off) behind Render's
+#      load balancer, WEB_CONCURRENCY=12 each, Solid Queue in both masters.
+#   2. Active Storage on the R2 bucket (EU jurisdiction) — phases 0–2 of
+#      docs/OBJECT_STORAGE_CUTOVER.md rehearsed and smoke-tested on scratch.
+#   3. journey.js now loads every attachment the play page references — the
+#      logo (proxy route) and six ~60 KB card images (redirect → presigned
+#      R2), seeded with IMAGES=6 IMAGE_KB=60 — tagged endpoint:image. Runs
+#      1–21 measured a text-only deck; this is the first honest branded run.
+# Run 21 (one 12c box, text-only): ~446 req/s, 1.9 s median, 3.7 s p95, 0
+# failed. Expect sub-second journey medians, image p95 < 1.5 s, 0 failed, 0
+# dropped. If clean → the 125/s proof (GENERATORS=7) on this fleet.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
