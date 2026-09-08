@@ -96,6 +96,34 @@ module NpsHelper
   # (never an arbitrary sport animation on an unrelated Verto).
   RANGE_THEME_FALLBACK = (RANGE_THEME_GROUPS["General"] || RANGE_THEMES).freeze
 
+  # Animation sets that are variants of one another: the same subject drawn
+  # twice — a colour version, a loading version, a second sheet of the same
+  # faces. Distinct slugs are not enough to make them distinct CONTENT, and a
+  # respondent scrolling past `speech_bubbles` and then `speech_bubbles_colour`
+  # has seen the same animation twice whatever the deck's data says. So
+  # auto-population spends one member of a family before it comes back for a
+  # second (see AssetPopulator#pick_range_theme). The picker still offers every
+  # slug — this only orders what an automatic pick reaches for first. A slug not
+  # named here is its own family.
+  RANGE_THEME_FAMILIES = {
+    "emoji_a"               => "emoji",
+    "emoji_b"               => "emoji",
+    "speech_bubbles"        => "speech_bubbles",
+    "speech_bubbles_colour" => "speech_bubbles",
+    "lightbulb"             => "lightbulb",
+    "lightbulb_loading"     => "lightbulb",
+    "heart"                 => "heart",
+    "loading_hearts"        => "heart"
+    # `football` and `football_goal` are deliberately NOT a family: a player and
+    # a goal are two different animations that happen to share a sport, and
+    # pairing them would push a sport Verto off its own theme to avoid a repeat
+    # that isn't one. A family is a redraw, not a subject.
+  }.freeze
+
+  def self.range_theme_family(slug)
+    RANGE_THEME_FAMILIES[slug.to_s] || slug.to_s
+  end
+
   # Range-animation slugs suited to a Verto whose theme is `theme` (a string or
   # a list of words), best-matching first. Matches the theme's OWN words against
   # RANGE_THEME_KEYWORDS — deliberately NOT the image matcher's cluster expansion

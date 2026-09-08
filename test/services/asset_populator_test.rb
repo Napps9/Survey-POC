@@ -814,8 +814,59 @@ class AssetPopulatorTest < ActiveSupport::TestCase
                  pop.send(:card_query, s.cards[0])
     assert_equal [ pop.send(:background_query) ], pop.send(:background_queries),
       "with nothing to drop there is only one query, so only one API call"
-    assert_equal [ pop.send(:card_query, s.cards[0]) ],
+    # The card's own query leads and the theme relaxes it — no direction-led
+    # rung, which is what "as if the feature isn't there" means. The relaxation
+    # rung costs nothing unless it is needed; the test below is what holds that.
+    assert_equal [ pop.send(:card_query, s.cards[0]), pop.send(:theme_base_query) ],
                  pop.send(:card_queries, s.cards[0], pop.send(:card_query, s.cards[0]))
+  end
+
+  test "a card that finds its picture first time still costs one API call" do
+    # Every card carries a relaxation rung and a second page below its own
+    # query now. They are walked lazily, so a run that finds what it needs on
+    # the first rung must never pay for them — this is what keeps the rate
+    # limit where it was.
+    cards = (1..3).map { |i| { "type" => "multiple_choice", "text" => "Peak #{i}?", "options" => %w[a b] } }
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: cards)
+    photos = (1..12).map { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") }
+
+    queries = []
+    fake = Object.new
+    fake.define_singleton_method(:search) { |**kw| queries << [ kw[:query], kw[:page] || 1 ]; photos }
+    fake.define_singleton_method(:search_videos) { |**_kw| [] }
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake) { AssetPopulator.new(s).populate! }
+    end
+
+    assert_equal 3, s.reload.cards.count { |c| c["image"].present? }
+    assert_empty queries.select { |_q, page| page > 1 }, "page 2 is only for a pool that ran out"
+    assert_equal queries.uniq, queries, "each distinct query-page is asked for once and memoised"
+    assert_operator queries.size, :<=, 2,
+      "one backdrop query and one card query for the whole deck: #{queries.inspect}"
+  end
+
+  test "a deck that outgrows a page asks for the next one before repeating" do
+    # Eight cards sharing one query against a five-photo page. Pexels was only
+    # ever asked for page 1, so the ninth photograph did not exist as far as the
+    # populator was concerned and cards started showing each other's.
+    cards = (1..8).map { |i| { "type" => "multiple_choice", "text" => "Peak #{i}?", "options" => %w[a b] } }
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: cards)
+    pages = {
+      1 => (1..5).map  { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") },
+      2 => (6..15).map { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") }
+    }
+
+    fake = Object.new
+    fake.define_singleton_method(:search) { |**kw| pages[kw[:page] || 1] || [] }
+    fake.define_singleton_method(:search_videos) { |**_kw| [] }
+    stub_method(PexelsClient, :configured?, true) do
+      stub_method(PexelsClient, :new, fake) { AssetPopulator.new(s).populate! }
+    end
+
+    imgs = s.reload.cards.map { |c| c["image"] }.compact
+    assert_equal 8, imgs.size
+    assert_equal imgs.size, imgs.uniq.size, "a second page is a better answer than a second copy"
+    assert imgs.any? { |u| u[%r{/photos/(\d+)/}, 1].to_i > 5 }, "page 2 was actually reached"
   end
 
   test "a negated clause is vetoed, never searched for" do
@@ -1168,5 +1219,204 @@ class AssetPopulatorTest < ActiveSupport::TestCase
                "the allowance exists because the creator STATED the topic — a phrase we " \
                "derived from a title is not a statement, and letting a derivation flip a " \
                "safety switch would be a regression"
+  end
+
+  # ── One piece of content, one place ───────────────────────────────────────
+  # Reported as "multiple pieces of content are being used when a verto is
+  # generated" — a generated deck showing the same photograph on three cards
+  # and the same animation on three sliders. Each source used to repeat as soon
+  # as its OWN pool ran dry, while the other sources sat unasked, so "we ran
+  # out" and "we didn't look" were indistinguishable from the outside. Every
+  # test below is the same rule from a different angle: spend everything before
+  # repeating anything.
+
+  test "a deck longer than one pool takes from the next pool rather than repeating" do
+    # Eight select cards against a five-asset themed left-panel pool. Cards
+    # six to eight used to be handed a second copy of a left-panel photo with
+    # the eight-asset select-art pool untouched next to them.
+    cards = (1..8).map { |i| { "type" => "multiple_choice", "text" => "Q#{i}", "options" => %w[a b] } }
+    s = make_survey(theme: "Sport", audience_age: "18-24", cards: cards)
+
+    AssetPopulator.new(s).populate!
+
+    imgs = s.reload.cards.map { |c| c["image"] }.compact
+    assert_equal 8, imgs.size, "every card should still be illustrated"
+    assert_equal imgs.size, imgs.uniq.size, "a picture is spent once: #{imgs.map { |u| u[/[^\/]+\z/] }.inspect}"
+  end
+
+  test "two cards never share a Pexels photograph" do
+    cards = (1..6).map { |i| { "type" => "multiple_choice", "text" => "Peak #{i}?", "options" => %w[a b] } }
+    s = make_survey(theme: "Mountains", audience_age: "18-24", cards: cards)
+    photos = (1..12).map { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") }
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    imgs = s.reload.cards.map { |c| c["image"] }.compact
+    assert_equal 6, imgs.size
+    assert_equal imgs.size, imgs.uniq.size, "each card gets its own photograph"
+  end
+
+  test "a card would rather take curated art than a second copy of a photograph" do
+    # One relevant photo, four cards. The first card takes it; the rest must
+    # reach the curated library instead of being handed the same photo again.
+    cards = (1..4).map { |i| { "type" => "multiple_choice", "text" => "Favourite team #{i}?", "options" => %w[a b] } }
+    s = make_survey(theme: "Football fans", audience_age: "18-24", cards: cards)
+
+    with_pexels([ pexels_photo(1, "A football team celebrating a goal on the pitch") ]) do
+      AssetPopulator.new(s).populate!
+    end
+
+    imgs = s.reload.cards.map { |c| c["image"] }.compact
+    assert_equal 4, imgs.size
+    assert_equal imgs.size, imgs.uniq.size, "no card repeats another's picture: #{imgs.inspect}"
+    assert_equal 1, imgs.count { |u| u.include?("images.pexels.com") },
+      "the one relevant photo is spent once, not four times"
+    assert_equal 3, imgs.count { |u| u.include?("verto-library/") },
+      "the other three come from the curated library"
+  end
+
+  test "a card panel is not the backdrop the respondent is already looking at" do
+    cards = (1..3).map { |i| { "type" => "multiple_choice", "text" => "Peak #{i}?", "options" => %w[a b] } }
+    s = make_survey(theme: "Mountains", audience_age: "18-24", cards: cards)
+    photos = (1..8).map { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") }
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    backdrop = s.background_image[%r{/photos/(\d+)/}, 1]
+    assert backdrop.present?, "the backdrop should be a Pexels photo here"
+    s.cards.each_with_index do |c, i|
+      refute_equal backdrop, c["image"].to_s[%r{/photos/(\d+)/}, 1],
+        "card #{i} is showing the same photograph as the backdrop behind it"
+    end
+  end
+
+  test "the backdrop is only demoted, never made unavailable" do
+    # The one photo that clears relevance IS the backdrop's. Preferring not to
+    # reuse it must not cost the card its picture — a soft avoid, not a ban.
+    s = make_survey(theme: "Mountains", audience_age: "all",
+                    cards: [ { "type" => "multiple_choice", "text" => "Which peak?", "options" => %w[a b] } ])
+
+    with_pexels([ pexels_photo(1, "Snowy mountain peak and alpine landscape") ]) do
+      AssetPopulator.new(s).populate!
+    end
+
+    assert_includes s.reload.cards[0]["image"].to_s, "/photos/1/",
+      "with nothing else on offer the card takes the backdrop's photo rather than going blank"
+  end
+
+  test "every statement on a tap_card gets its own picture, Pexels topped up from the library" do
+    # Five statements, three relevant photos. The Pexels picks used to be
+    # cycled to length — the first two statements' pictures shown twice — with
+    # the eleven-asset curated pool sitting unasked.
+    s = make_survey(theme: "Mountains", audience_age: "all",
+                    cards: [ { "type" => "tap_card", "text" => "Which mountain peak is best?",
+                               "options" => %w[a b c d e] } ])
+    photos = (1..3).map { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") }
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    imgs = Array(s.reload.cards[0]["option_images"])
+    assert_equal 5, imgs.size, "the renderer pairs pictures to statements positionally"
+    assert_equal imgs.size, imgs.uniq.size, "no statement repeats its neighbour's picture"
+    assert imgs.count { |u| u.include?("verto-library/swipe-cards/") } >= 2,
+      "the shortfall is topped up from the curated pool: #{imgs.inspect}"
+  end
+
+  test "a statement picture and a card panel are not the same photograph" do
+    s = make_survey(theme: "Mountains", audience_age: "all", cards: [
+      { "type" => "multiple_choice", "text" => "Which peak?", "options" => %w[a b] },
+      { "type" => "tap_card", "text" => "Which mountain peak is best?", "options" => %w[a b] }
+    ])
+    photos = (1..6).map { |i| pexels_photo(i, "Snowy mountain peak and alpine landscape #{i}") }
+
+    with_pexels(photos) { AssetPopulator.new(s).populate! }
+
+    s.reload
+    panel = s.cards[0]["image"].to_s[%r{/photos/(\d+)/}, 1]
+    ids   = Array(s.cards[1]["option_images"]).map { |u| u[%r{/photos/(\d+)/}, 1] }.compact
+    assert panel.present?
+    refute_includes ids, panel,
+      "the same photograph was cropped for a panel and for a statement — one picture, two slots"
+  end
+
+  test "every range card plays a different animation" do
+    # "Climate action" matches four animations; a five-slider deck has to reach
+    # past them. An independent draw per card used to give this deck two.
+    cards = (1..5).map { { "type" => "range", "text" => "How worried are you?", "options" => %w[a b c] } }
+    s = make_survey(theme: "Climate action", audience_age: "all", cards: cards)
+
+    AssetPopulator.new(s).populate!
+
+    themes = s.reload.cards.map { |c| c["range_theme"] }
+    assert_equal themes.size, themes.uniq.size, "one animation, one slider: #{themes.inspect}"
+    on_theme = NpsHelper.range_themes_for("Climate action")
+    assert_equal on_theme.to_set, themes.first(on_theme.size).to_set,
+      "the on-theme animations are spent BEFORE the deck reaches past them"
+    (themes - on_theme).each do |t|
+      assert_includes NpsHelper::RANGE_THEME_FALLBACK, t,
+        "past the theme, the next animation is a neutral one — never an off-theme subject"
+    end
+  end
+
+  test "a redraw of an animation already playing is not a different animation" do
+    # speech_bubbles and speech_bubbles_colour are one drawing in two colourways:
+    # distinct slugs, but to a respondent scrolling past, the same animation
+    # twice. A neutral animation nobody has seen is the better answer.
+    cards = (1..4).map { { "type" => "range", "text" => "How was it?", "options" => %w[a b c] } }
+    s = make_survey(theme: "Customer feedback", audience_age: "all", cards: cards)
+
+    AssetPopulator.new(s).populate!
+
+    themes   = s.reload.cards.map { |c| c["range_theme"] }
+    families = themes.map { |t| NpsHelper.range_theme_family(t) }
+    assert_equal themes.size, themes.uniq.size
+    assert_equal families.size, families.uniq.size,
+      "two animations from the same family are playing: #{themes.inspect}"
+  end
+
+  test "a veto still holds once the on-theme animations run out" do
+    cards = (1..12).map { { "type" => "range", "text" => "How was the match?", "options" => %w[a b c] } }
+    s = make_survey(theme: "Football fans", audience_age: "all", cards: cards)
+
+    AssetPopulator.new(s, seed: "anim", direction: "no football").populate!
+
+    themes = s.reload.cards.map { |c| c["range_theme"] }
+    assert_equal themes.size, themes.uniq.size, "twelve sliders, twelve animations"
+    assert_empty themes & %w[football football_goal],
+      "reaching further for variety must not reach past the veto"
+    themes.each { |t| assert_includes NpsHelper::RANGE_THEMES, t }
+  end
+
+  test "a fill-only top-up does not hand a card what the deck is already showing" do
+    # The import path: the creator already has imagery on some cards and this
+    # run fills the rest. What they have is content the Verto is showing.
+    # Three of the four animations this theme matches are already playing, so
+    # the fourth card has exactly one on-theme animation left to it — and a run
+    # that read the deck as empty would have all four to choose from and a
+    # three-in-four chance of duplicating one.
+    kept  = pexels_photo(1, "A recycling bin and climate action 1")
+    cards = [
+      { "type" => "multiple_choice", "text" => "Q1", "options" => %w[a b],
+        "image" => PexelsClient.url_for(kept, :card) },
+      { "type" => "multiple_choice", "text" => "Q2", "options" => %w[a b] },
+      { "type" => "range", "text" => "Q3", "options" => %w[a b c], "range_theme" => "recycling" },
+      { "type" => "range", "text" => "Q4", "options" => %w[a b c], "range_theme" => "sun" },
+      { "type" => "range", "text" => "Q5", "options" => %w[a b c], "range_theme" => "flowers" },
+      { "type" => "range", "text" => "Q6", "options" => %w[a b c] }
+    ]
+    s = make_survey(theme: "Climate action", audience_age: "all", cards: cards)
+
+    with_pexels([ kept ]) { AssetPopulator.new(s, fill_only: true).populate! }
+
+    s.reload
+    assert_equal PexelsClient.url_for(kept, :card), s.cards[0]["image"],
+      "fill-only leaves what the creator already had"
+    refute_equal s.cards[0]["image"], s.cards[1]["image"],
+      "and does not hand the next card a second crop of the same photograph"
+    themes = s.cards.filter_map { |c| c["range_theme"] }
+    assert_equal %w[recycling sun flowers], themes.first(3), "the creator's animations are kept"
+    assert_equal themes.size, themes.uniq.size,
+      "an animation already playing is one this run must not pick again: #{themes.inspect}"
   end
 end

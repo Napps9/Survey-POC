@@ -109,6 +109,38 @@ class GenerateFlowTest < ActionDispatch::IntegrationTest
     assert_match cids[0], body["cards"][0]["html"], "the rendered wrap carries the stamped cid"
   end
 
+  test "a flow's sliders each arrive with their own animation" do
+    # A range card with no `range_theme` doesn't render animation-less, it
+    # renders the DEFAULT animation — so a flow of sliders used to arrive
+    # playing the same basketball on every one of them, whatever the flow was
+    # about and whatever the deck was already playing.
+    @survey.update!(theme: "Recycling and climate action",
+                    cards: @survey.cards + [ { "type" => "range", "cid" => "c_old", "text" => "How much?",
+                                               "options" => %w[a b c], "range_theme" => "recycling" } ])
+    result = { "name" => "Habits", "cards" => (1..3).map { |i|
+      { "type" => "range", "text" => "How often #{i}?", "options" => %w[Never Sometimes Always] }
+    } }
+
+    body = with_generator(->(**) { result }) { generate_flow!(prompt: "recycling habits") }
+
+    themes = body["cards"].map { |c| c["card"]["range_theme"] }
+    assert_equal 3, themes.compact.size, "every slider gets an animation of its own"
+    assert_equal themes.size, themes.uniq.size, "and not the same one three times: #{themes.inspect}"
+    refute_includes themes, "recycling", "nor the one the deck is already playing"
+    themes.each { |t| assert_includes NpsHelper::RANGE_THEMES, t }
+    assert_match themes[0], body["cards"][0]["html"],
+      "the rendered wrap carries it, so the client's save keeps it"
+  end
+
+  test "a flow's other card types are left exactly as generated" do
+    result = { "name" => "UK", "cards" => [ { "type" => "yes_no", "text" => "Fair?", "options" => %w[Yes No] } ] }
+    body = with_generator(->(**) { result }) { generate_flow!(prompt: "UK stuff") }
+
+    card = body["cards"][0]["card"]
+    assert_nil card["range_theme"], "only range cards take an animation"
+    assert_nil card["image"], "a generated flow still arrives without imagery"
+  end
+
   test "the generated deck is not saved onto the survey" do
     result = { "name" => "UK", "cards" => [ { "type" => "yes_no", "text" => "Fair?", "options" => %w[Yes No] } ] }
     with_generator(->(**) { result }) { generate_flow!(prompt: "UK stuff") }

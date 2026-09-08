@@ -440,8 +440,21 @@ class AssetPopulator
 
   # Shared by both writes above: everything except the save.
   def compute!
-    used       = Set.new   # left_panel + select_art + range_art picks
-    swipe_used = Set.new   # swipe_cards picks across the whole survey
+    # ONE ledger of what this Verto is already showing, spanning every slot:
+    # the backdrop, the left panels and the tap_card statement pictures. It
+    # used to be two sets (panels here, statement pictures there) keyed on the
+    # URL of the crop asked for — which is why one photograph could turn up as
+    # the backdrop, as a card panel and as a statement picture all at once and
+    # still look, to the code, like three different pictures. Pexels serves the
+    # same photograph at whatever size the slot wants, so the ledger keys on
+    # the photograph (see content_key), not on the URL of one crop of it.
+    used        = Set.new
+    used_themes = Set.new  # range cards' reaction animations
+    # A fill-only run tops up a deck that already has imagery on it. What is
+    # already there is content this Verto is showing, so it goes in the ledger
+    # too — otherwise the top-up's idea of "unused" is everything, and it
+    # cheerfully hands a card a second copy of the picture two cards up.
+    seed_used_from_existing(used, used_themes) if @fill_only
 
     @survey.background_image = safe_pick { pick_background_path }
 
@@ -461,18 +474,24 @@ class AssetPopulator
         if (picked = pick_card_image_path(card, idx, used, prefer_video: prefer_video))
           apply_card_media(new_card, picked)
           media_idx += 1
+        else
+          # Nothing was picked, so the card KEEPS the media it arrived with —
+          # a fill-only skip, a creator's own animation, a pick that found
+          # nothing. Whatever it keeps is a picture this Verto is showing, so
+          # it belongs in the ledger even though this run didn't choose it.
+          ledger_existing_media(new_card, used)
         end
         # The other two per-card assets, under the same fill-only rule as the
         # left panel: a creator who picked statement images or an animation
         # theme in the seconds after an import keeps them.
         if card["type"].to_s == "tap_card" && !(@fill_only && Array(card["option_images"]).any?(&:present?))
-          new_card["option_images"] = pick_tap_card_option_images(card, idx, swipe_used)
+          new_card["option_images"] = pick_tap_card_option_images(card, idx, used)
           # Fresh statement pictures, so the per-statement repositions chosen
           # for the old ones go with them — same reasoning as apply_card_media.
           new_card.delete("option_focals")
         end
         if card["type"].to_s == "range" && !(@fill_only && card["range_theme"].present?)
-          new_card["range_theme"] = pick_range_theme(idx)
+          new_card["range_theme"] = pick_range_theme(idx, used_themes)
         end
       rescue => e
         ErrorReporting.report("AssetPopulator", e, card_index: idx, card_type: card["type"])
@@ -481,6 +500,33 @@ class AssetPopulator
     end
 
     @survey.cards = cards
+  end
+
+  # Reaction animations for a LOOSE array of cards — a generated flow's, before
+  # the client splices them into the deck (see GenerateFlowJob). Returns the
+  # cards; the survey is read for its theme and its animations, never written.
+  #
+  # Without this a flow's range cards arrive carrying no `range_theme` at all,
+  # and NpsHelper#range_theme_slug then renders the SAME default animation on
+  # every one of them — a basketball on each slider of a flow about recycling,
+  # ignoring both the deck's animations and each other's. "No pick" is blank for
+  # a photo but not for an animation: a range card always plays something, so a
+  # missing pick is not an absent animation, it is the same one over and over.
+  #
+  # Imagery is deliberately NOT touched here. A generated flow has never carried
+  # any, and adding some would be a new behaviour rather than a repeat removed.
+  def animate_cards!(cards)
+    used_themes = Set.new
+    Array(@survey.cards).each do |card|
+      used_themes << card["range_theme"] if card.is_a?(Hash) && card["range_theme"].present?
+    end
+
+    Array(cards).each_with_index.map do |card, idx|
+      next card unless card.is_a?(Hash)
+      next card unless card["type"].to_s == "range" && card["range_theme"].blank?
+
+      card.merge("range_theme" => pick_range_theme("flow-#{idx}", used_themes))
+    end
   end
 
   # Run a pick that may reach Pexels; on any error log and return nil so the
@@ -530,6 +576,69 @@ class AssetPopulator
   end
 
   private
+
+  # ── The content ledger ────────────────────────────────────────────────────
+  # What a piece of content IS, independent of the crop a slot asks for.
+  #
+  # Pexels builds every URL from one photograph's `original`, so the backdrop
+  # (1920×1080), a left panel (720×1280) and a statement picture (800×800) of
+  # the SAME photograph are three different strings. Keyed on the string, the
+  # de-dup could not see that they were one picture, and a Verto could open
+  # with its backdrop repeated on card three. The id is the photograph; the
+  # URL is only one way of asking for it.
+  #
+  # Curated assets are keyed on their asset path — they live in per-slot
+  # directories, so a path already identifies the file uniquely.
+  def content_key(photo)
+    id = photo["id"].presence
+    return "pexels-photo-#{id}" if id
+    # No id is not a shape Pexels returns, but a nil in the ledger would make
+    # every other keyless candidate look already-used, so there is always a key.
+    PexelsClient.url_for(photo, :card).presence || photo["url"].to_s
+  end
+
+  def video_content_key(video)
+    id = video["id"].presence
+    return "pexels-video-#{id}" if id
+    PexelsClient.video_file_url(video).presence || video["url"].to_s
+  end
+
+  # The ledger key for media already sitting on a card, which we have as a URL
+  # rather than as the API hash it came from. A Pexels URL carries the id in
+  # its path, so the same photograph is recognised however it was cropped;
+  # anything else (a curated asset path, an uploaded blob) is its own key.
+  PEXELS_PHOTO_ID = %r{images\.pexels\.com/photos/(\d+)/}
+  PEXELS_VIDEO_ID = %r{videos\.pexels\.com/video-files/(\d+)/}
+
+  def content_key_for_url(url)
+    v = url.to_s
+    return "pexels-photo-#{Regexp.last_match(1)}" if v.match(PEXELS_PHOTO_ID)
+    return "pexels-video-#{Regexp.last_match(1)}" if v.match(PEXELS_VIDEO_ID)
+    v.presence
+  end
+
+  # Everything a fill-only run is KEEPING, entered into the ledger before it
+  # picks anything, so a top-up doesn't duplicate what is already on the deck.
+  def seed_used_from_existing(used, used_themes)
+    # The backdrop it is keeping is a soft avoid here for the same reason a
+    # freshly picked one is (see backdrop_last).
+    @backdrop_key ||= content_key_for_url(@survey.background_image) if @survey.background_image.present?
+    Array(@survey.cards).each do |card|
+      next unless card.is_a?(Hash)
+      ledger_existing_media(card, used)
+      used_themes << card["range_theme"] if card["range_theme"].present?
+    end
+  end
+
+  # Enter whatever media a card is already carrying into the ledger.
+  def ledger_existing_media(card, used)
+    return unless card.is_a?(Hash)
+    ([ card["image"], card["video"] ] + Array(card["option_images"])).each do |u|
+      next if u.blank?
+      key = content_key_for_url(u)
+      used << key if key
+    end
+  end
 
   def pick_background_path
     # Pexels primary: a themed landscape backdrop. Falls back to the curated
@@ -593,35 +702,48 @@ class AssetPopulator
     # FinishVertoSetupJob's "only fills in cards that have no image yet" untrue.
     return nil if @fill_only && Survey.card_has_media?(card)
 
-    if PexelsClient.configured?
-      if prefer_video && (vid = pexels_card_video(card, idx, used))
-        return vid
+    # Two passes down the same ladder — Pexels, then Tier 1, then Tier 2.
+    #
+    # The first pass will only spend content this Verto is not already showing.
+    # The second is reached only when the first found nothing anywhere, and
+    # there a repeat is allowed, because a repeated picture still beats a blank
+    # panel.
+    #
+    # It used to be one pass, with each source repeating as soon as its OWN
+    # pool ran dry: an eight-card deck put the same left-panel photograph on
+    # cards six, seven and eight while the untouched select-art pool sat next
+    # to it. Exhausting every source before repeating ANY of them is the whole
+    # difference between "we ran out" and "we didn't look".
+    [ false, true ].each do |allow_repeat|
+      if PexelsClient.configured?
+        if prefer_video && (vid = pexels_card_video(card, idx, used, allow_repeat: allow_repeat))
+          return vid
+        end
+        if (photo = pexels_card_photo(card, idx, used, allow_repeat: allow_repeat))
+          used << content_key(photo)
+          return {
+            "image"            => PexelsClient.url_for(photo, :card),
+            "image_credit"     => photo["photographer"].to_s.strip.presence,
+            "image_credit_url" => photo["photographer_url"].to_s.strip.presence
+          }
+        end
       end
-      if (photo = pexels_card_photo(card, idx, used))
-        url = PexelsClient.url_for(photo, :card)
-        used << url
-        return {
-          "image"            => url,
-          "image_credit"     => photo["photographer"].to_s.strip.presence,
-          "image_credit_url" => photo["photographer_url"].to_s.strip.presence
-        }
+
+      if (path = tier1_themed_path(card, idx, used, type, allow_repeat: allow_repeat))
+        used << path
+        return { "image" => path }
       end
-    end
 
-    if (path = tier1_themed_path(card, idx, used, type))
-      used << path
-      return { "image" => path }
-    end
-
-    if (path = tier2_type_art_path(card, idx, used, type))
-      used << path
-      return { "image" => path }
+      if (path = tier2_type_art_path(card, idx, used, type, allow_repeat: allow_repeat))
+        used << path
+        return { "image" => path }
+      end
     end
 
     nil
   end
 
-  def tier1_themed_path(card, idx, used, type)
+  def tier1_themed_path(card, idx, used, type, allow_repeat: true)
     query = survey_query_tags.merge(keywords: card_keywords(card))
 
     # Require BOTH a card-type fit AND a thematic connection (theme keyword
@@ -636,10 +758,12 @@ class AssetPopulator
     end
     return nil if type_matching.empty?
 
-    # Prefer unused assets but allow repeats once the type-matching pool
-    # is exhausted — better to repeat a themed image than leave it blank.
+    # Unused assets only on the first pass. A repeat is still better than a
+    # blank panel, but it is the LAST answer, not the second one: the caller
+    # comes back with allow_repeat once Tier 2 and Pexels have been asked too.
     unused = type_matching.reject { |a| used.include?(asset_url(LEFT_PANEL_DIR, a["file"])) }
-    pool   = unused.presence || type_matching
+    pool   = unused.presence || (allow_repeat ? type_matching : nil)
+    return nil if pool.nil?
 
     scored = pool.map { |a| [ score(a, query), a ] }
                  .select { |s, _| s >= TIER1_MIN_SCORE }
@@ -651,7 +775,7 @@ class AssetPopulator
     asset_url(LEFT_PANEL_DIR, chosen["file"])
   end
 
-  def tier2_type_art_path(_card, idx, used, type)
+  def tier2_type_art_path(_card, idx, used, type, allow_repeat: true)
     bucket, dir =
       if SELECT_TYPES.include?(type)
         [ self.class.manifest["select_art"], SELECT_ART_DIR ]
@@ -667,41 +791,53 @@ class AssetPopulator
     return nil if pool.empty?
 
     available = pool.reject { |a| used.include?(asset_url(dir, a["file"])) }
-    available = pool if available.empty?  # pool exhausted — repeats OK
+    # Pool exhausted. Repeats only on the caller's second pass, once Pexels and
+    # Tier 1 have been asked for something this deck isn't already showing.
+    if available.empty?
+      return nil unless allow_repeat
+      available = pool
+    end
 
     chosen = available[rand_for("t2-#{idx}").rand(available.size)]
     asset_url(dir, chosen["file"])
   end
 
-  # Picks one image per option for a tap_card, drawn from manifest.swipe_cards.
-  # Prefers assets not yet used elsewhere in the survey; no repeats within a
-  # single card. Pool of 11 vs typical 5-8 statements means repeats rarely
-  # bite, but we degrade gracefully if a survey has many tap_cards.
-  def pick_tap_card_option_images(card, card_idx, swipe_used)
+  # One picture per statement on a tap_card. Every statement gets a picture of
+  # its own: Pexels first, topped up from the curated swipe-cards/ pool, and
+  # only once BOTH are dry does a statement repeat one of its neighbours'.
+  #
+  # It used to be either/or — Pexels' picks if there were any, the curated pool
+  # otherwise — and whichever source it landed on was cycled to length when it
+  # was shorter than the statement list. A five-statement card with three
+  # relevant photos therefore showed the first two twice, with a whole curated
+  # pool of eleven sitting unasked next to it.
+  def pick_tap_card_option_images(card, card_idx, used)
     options = Array(card["options"])
     return [] if options.empty?
 
-    # Pexels primary: one themed landscape per statement. Falls back to the
-    # curated swipe-cards/ pool when Pexels is unconfigured or returns nothing.
-    if (urls = pexels_swipe_urls(card, card_idx, options.size, swipe_used))
-      return urls
-    end
+    picks  = pexels_swipe_urls(card, card_idx, options.size, used)
+    picks += curated_swipe_urls(card_idx, options.size - picks.size, used) if picks.size < options.size
+    return [] if picks.empty?
+
+    # Both sources dry with statements still unpictured. The renderer pairs the
+    # arrays positionally, so a short array would leave statements blank in the
+    # middle of a card that is otherwise illustrated: cycle what we have.
+    picks *= ((options.size.to_f / picks.size).ceil) if picks.size < options.size
+    picks.first(options.size)
+  end
+
+  # Up to `want` curated statement pictures the Verto isn't already showing,
+  # newest-unused first. Returns fewer (or none) when the pool is spent.
+  def curated_swipe_urls(card_idx, want, used)
+    return [] if want <= 0
 
     pool = allowed_assets(Array(self.class.manifest["swipe_cards"]))
     return [] if pool.empty?
 
-    rng = rand_for("tap-#{card_idx}")
-
-    unused, used_elsewhere = pool.partition do |a|
-      !swipe_used.include?(asset_url(SWIPE_CARDS_DIR, a["file"]))
-    end
-    ordered = unused.shuffle(random: rng) + used_elsewhere.shuffle(random: rng)
-    # Pool smaller than options? cycle until we have enough.
-    ordered *= ((options.size.to_f / ordered.size).ceil) if ordered.size < options.size
-
-    picks = ordered.first(options.size)
-    urls  = picks.map { |a| asset_url(SWIPE_CARDS_DIR, a["file"]) }
-    urls.each { |u| swipe_used << u }
+    rng   = rand_for("tap-#{card_idx}")
+    fresh = pool.reject { |a| used.include?(asset_url(SWIPE_CARDS_DIR, a["file"])) }
+    urls  = fresh.shuffle(random: rng).first(want).map { |a| asset_url(SWIPE_CARDS_DIR, a["file"]) }
+    urls.each { |u| used << u }
     urls
   end
 
@@ -712,7 +848,16 @@ class AssetPopulator
   # the same seed is stable and Shuffle's new seed re-rolls it, exactly like
   # every image pick. Overwrites any prior pick as Shuffle does for imagery; the
   # creator can still re-choose from the card's Animation picker afterwards.
-  def pick_range_theme(idx)
+  #
+  # Each range card gets a DIFFERENT animation, in the same "spend everything
+  # before repeating anything" order the pictures use: the on-theme pool first,
+  # then the neutral General group, and only when both are spent does a second
+  # slider replay one. This mattered more than it looks: the on-theme pool is
+  # often tiny (four animations for "Climate action", three for "Customer
+  # feedback"), and an independent draw per card meant a five-slider Verto
+  # typically played only two or three distinct animations — the same character
+  # reacting on card after card.
+  def pick_range_theme(idx, used_themes)
     # Match on the Verto theme's OWN words — NOT self.class.theme_keywords, whose
     # image-library cluster expansion over-bridges (food → lifestyle → "game")
     # and would land a sport animation on a food Verto. NpsHelper owns the
@@ -723,9 +868,40 @@ class AssetPopulator
     # steered toward "recycling" should react with recycling. Vetoed animations
     # are dropped unless that would empty the pool — a range card always needs
     # SOME animation to play.
-    pool = NpsHelper.range_themes_for([ @survey.theme, direction_words.join(" ") ])
-    pool = allowed_range_themes(pool)
-    pool[rand_for("range-theme-#{idx}").rand(pool.size)]
+    themed = allowed_range_themes(NpsHelper.range_themes_for([ @survey.theme, direction_words.join(" ") ]))
+    # The neutral group is where an on-theme pool that has run dry goes next —
+    # never the full list. Reaching into that is what would put a football on a
+    # food Verto, which is the one thing this pick has always refused to do.
+    neutral = NpsHelper::RANGE_THEME_FALLBACK.reject { |slug| range_theme_vetoed?(slug) }
+
+    # Something genuinely different first, from the theme and then from the
+    # neutral group; only once nothing different is left anywhere does a variant
+    # of an animation already playing become the answer, and only after THAT a
+    # second copy of one. A neutral animation nobody has seen beats the colour
+    # twin of the one two cards up, even though the twin is the more on-theme of
+    # the two — because to a respondent scrolling past, the twin is not a second
+    # animation at all.
+    pool   = unplayed(themed,  used_themes, families: true)
+    pool   = unplayed(neutral, used_themes, families: true) if pool.empty?
+    pool   = unplayed(themed,  used_themes)                 if pool.empty?
+    pool   = unplayed(neutral, used_themes)                 if pool.empty?
+    pool   = themed                                         if pool.empty?
+
+    chosen = pool[rand_for("range-theme-#{idx}").rand(pool.size)]
+    used_themes << chosen
+    chosen
+  end
+
+  # The animations in `pool` this Verto is not already playing. With
+  # `families:`, also none that merely RESTATES one it is playing — a second
+  # sheet of the same emoji, the colour twin of the same speech bubbles (see
+  # NpsHelper::RANGE_THEME_FAMILIES).
+  def unplayed(pool, used_themes, families: false)
+    fresh = pool.reject { |slug| used_themes.include?(slug) }
+    return fresh unless families && fresh.any?
+
+    played = used_themes.map { |slug| NpsHelper.range_theme_family(slug) }.to_set
+    fresh.reject { |slug| played.include?(NpsHelper.range_theme_family(slug)) }
   end
 
   # The vetoed animations removed. When the veto empties the on-theme pool —
@@ -754,13 +930,15 @@ class AssetPopulator
   # (or [] for swipe) so the curated fallback runs when Pexels is unconfigured
   # or a query comes back empty.
 
-  # Memoised per (query, orientation): at most one API call per distinct query
-  # for the whole populate! run.
-  def pexels_photos(query, context)
+  # Memoised per (query, orientation, page): at most one API call per distinct
+  # query-page for the whole populate! run. Page 2 is only ever asked for when a
+  # caller has spent everything page 1 held (see relevant_rungs), so an ordinary
+  # run costs exactly what it always did.
+  def pexels_photos(query, context, page: 1)
     return [] unless PexelsClient.configured?
     orientation = PexelsClient::ORIENTATION_FOR[context]
-    @pexels_cache[[ query, orientation ]] ||= begin
-      results = PexelsClient.new.search(query: query, orientation: orientation, per_page: 30)
+    @pexels_cache[[ query, orientation, page ]] ||= begin
+      results = PexelsClient.new.search(query: query, orientation: orientation, per_page: 30, page: page)
       fetched = results.size
       # 1. PG / age-appropriate for this Verto.
       results = results.select { |p| ContentSafety.safe?(p["alt"], safety_age_buckets) }
@@ -770,7 +948,7 @@ class AssetPopulator
       neutral = results.size
       # 3. Not something the direction prompt vetoed.
       results = results.select { |p| direction_allows?(p["alt"]) }
-      Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} -> " \
+      Rails.logger.info("[AssetPopulator] pexels #{context} q=#{query.inspect} p#{page} -> " \
                         "#{fetched} fetched / #{safe} safe / #{neutral} neutral / " \
                         "#{results.size} allowed")
       results
@@ -788,35 +966,62 @@ class AssetPopulator
     end
     return nil if photos.blank?
     chosen = direction_first(photos, rand_for("bg")) { |p| p["alt"] }.first
+    # Remembered as a SOFT avoid rather than spent from the ledger — see
+    # backdrop_last. A card panel showing the very photograph behind it is the
+    # most visible repeat there is, but the backdrop must not be able to cost a
+    # card its picture: it is demoted behind every equal candidate, not removed.
+    @backdrop_key = content_key(chosen)
     PexelsClient.url_for(chosen, :background)
   end
 
   # The chosen Pexels photo for one card's left panel (so the caller can read
   # both its crop URL and photographer credit). Seeded order keeps same-seed
-  # runs identical; the shared `used` set stops two cards landing on the same
-  # photo (mirrors the curated de-dup).
-  def pexels_card_photo(card, idx, used)
-    query  = card_query(card)
-    photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :card) }) { |p| p["alt"] }
-    return nil if photos.empty?
-    ordered = direction_first(photos, rand_for("px-#{idx}")) { |p| p["alt"] }
-    ordered.find { |p| !used.include?(PexelsClient.url_for(p, :card)) } || ordered.first
+  # runs identical; the shared `used` ledger stops two cards landing on the same
+  # photograph (mirrors the curated de-dup).
+  #
+  # Walks the WHOLE query ladder for a photograph the Verto isn't already
+  # showing, rather than stopping at the first rung that returned anything: a
+  # rung whose every result is already on another card has found nothing for
+  # THIS card, and the looser rung below it is a better answer than a repeat.
+  # nil when no rung holds anything new; the caller then tries the curated
+  # tiers, and only comes back with allow_repeat once those are spent too.
+  def pexels_card_photo(card, idx, used, allow_repeat: false)
+    query    = card_query(card)
+    fallback = nil
+    relevant_rungs(card, query, ->(q, page) { pexels_photos(q, :card, page: page) }, ->(p) { p["alt"] }).each do |photos|
+      ordered   = direction_first(photos, rand_for("px-#{idx}")) { |p| p["alt"] }
+      fallback ||= ordered.first
+      if (fresh = ordered.find { |p| !used.include?(content_key(p)) })
+        return fresh
+      end
+    end
+    allow_repeat ? fallback : nil
   end
 
   # A portrait video for one card's left panel, returned as a media hash. Picks
   # a small streamable mp4 + its poster, and the videographer credit. nil when
-  # no usable video is found (caller falls back to a photo).
-  def pexels_card_video(card, idx, used)
-    query  = card_query(card)
-    videos = relevant_with_subject_retry(card, query, ->(q) { pexels_videos(q) }) { |v| v["url"] }
-    return nil if videos.empty?
+  # no usable video is found (caller falls back to a photo). Walks the ladder
+  # for an unused video, exactly as the photo pick does.
+  def pexels_card_video(card, idx, used, allow_repeat: false)
+    query    = card_query(card)
+    fallback = nil
+    chosen   = nil
+    relevant_rungs(card, query, ->(q, page) { pexels_videos(q, page: page) }, ->(v) { v["url"] }).each do |videos|
+      ordered   = direction_first(videos, rand_for("pxv-#{idx}")) { |v| v["url"] }
+      playable  = ordered.select { |v| PexelsClient.video_file_url(v).present? }
+      fallback ||= playable.first
+      if (fresh = playable.find { |v| !used.include?(video_content_key(v)) })
+        chosen = fresh
+        break
+      end
+    end
+    chosen ||= (allow_repeat ? fallback : nil)
+    return nil if chosen.nil?
 
-    ordered = direction_first(videos, rand_for("pxv-#{idx}")) { |v| v["url"] }
-    chosen  = ordered.find { |v| (u = PexelsClient.video_file_url(v)) && !used.include?(u) }
-    url     = chosen && PexelsClient.video_file_url(chosen)
-    return nil unless url
+    url = PexelsClient.video_file_url(chosen)
+    return nil if url.blank?
 
-    used << url
+    used << video_content_key(chosen)
     credit = PexelsClient.video_credit(chosen)
     {
       "video"            => url,
@@ -826,40 +1031,47 @@ class AssetPopulator
     }
   end
 
-  # Memoised portrait video search (one API call per distinct query per run).
-  def pexels_videos(query)
+  # Memoised portrait video search (one API call per distinct query-page per
+  # run). A video page is 15, half a photo page, so the ceiling bit sooner here.
+  def pexels_videos(query, page: 1)
     return [] unless PexelsClient.configured?
-    @pexels_video_cache[query] ||= begin
-      results = PexelsClient.new.search_videos(query: query, orientation: "portrait", per_page: 15)
+    @pexels_video_cache[[ query, page ]] ||= begin
+      results = PexelsClient.new.search_videos(query: query, orientation: "portrait", per_page: 15, page: page)
       # Videos carry no alt text; the page-URL slug is the best signal we have.
       results = results.select { |v| ContentSafety.safe?(v["url"], safety_age_buckets) }
       results = results.select { |v| charged_theme? || ContentSafety.neutral?(v["url"]) }
       results = results.select { |v| direction_allows?(v["url"]) }
-      Rails.logger.info("[AssetPopulator] pexels video q=#{query.inspect} -> #{results.size} result(s)")
+      Rails.logger.info("[AssetPopulator] pexels video q=#{query.inspect} p#{page} -> #{results.size} result(s)")
       results
     end
   end
 
-  # One landscape per tap_card statement, unique within the card and preferring
-  # photos not used by another tap_card. Returns nil to trigger the fallback.
-  def pexels_swipe_urls(card, card_idx, count, swipe_used)
-    return nil unless PexelsClient.configured?
-    query  = card_query(card)
-    photos = relevant_with_subject_retry(card, query, ->(q) { pexels_photos(q, :swipe) }) { |p| p["alt"] }
-    # Direction preference is applied to the PHOTOS, before they become URLs —
-    # the alt text is the only evidence of what a picture shows, and it doesn't
-    # survive the mapping. The unused-first rule then re-partitions without
-    # re-shuffling, so both orderings hold.
-    photos = direction_first(photos, rand_for("pxtap-#{card_idx}")) { |p| p["alt"] }
-    urls   = photos.map { |p| PexelsClient.url_for(p, :swipe) }.compact.uniq
-    return nil if urls.empty?
+  # Up to `count` landscapes for a tap_card's statements — every one a
+  # photograph the Verto isn't already showing anywhere else, and never the
+  # same photograph twice within the card. Returns fewer than asked (or none)
+  # rather than padding with repeats: the caller tops the shortfall up from the
+  # curated pool, which is content this deck hasn't spent either.
+  def pexels_swipe_urls(card, card_idx, count, used)
+    return [] unless PexelsClient.configured?
 
-    fresh, used_elsewhere = urls.partition { |u| !swipe_used.include?(u) }
-    ordered = fresh + used_elsewhere
-    ordered *= ((count.to_f / ordered.size).ceil) if ordered.size < count
+    picks = []
+    query = card_query(card)
+    relevant_rungs(card, query, ->(q, page) { pexels_photos(q, :swipe, page: page) }, ->(p) { p["alt"] }).each do |photos|
+      # Direction preference is applied to the PHOTOS, before they become URLs —
+      # the alt text is the only evidence of what a picture shows, and it doesn't
+      # survive the mapping.
+      direction_first(photos, rand_for("pxtap-#{card_idx}")) { |p| p["alt"] }.each do |photo|
+        key = content_key(photo)
+        next if used.include?(key)
+        url = PexelsClient.url_for(photo, :swipe)
+        next if url.blank?
 
-    picks = ordered.first(count)
-    picks.each { |u| swipe_used << u }
+        used << key
+        picks << url
+        break if picks.size >= count
+      end
+      break if picks.size >= count
+    end
     picks
   end
 
@@ -1028,7 +1240,7 @@ class AssetPopulator
   end
 
   # The query stripped back to just the theme base, no card refinement at all
-  # — used by relevant_with_subject_retry below when a subject-refined query
+  # — used by relevant_rungs below when a subject-refined query
   # comes back with nothing Pexels-relevant. A subject can legitimately be
   # more specific than what this theme+audience's Pexels library covers
   # ("vintage bicycle" vs. plain "commute"), and a theme-anchored photo still
@@ -1038,18 +1250,41 @@ class AssetPopulator
     ContentSafety.scrub_query(raw, safety_age_buckets).presence || "abstract"
   end
 
-  # Runs `fetch` (->(query) { API results }) over progressively looser queries
-  # and returns the first relevance-filtered set that isn't empty; [] when none
-  # of them find anything and the caller falls through to the curated library.
-  # See card_queries for the ladder — with neither a direction nor an
-  # AI-extracted subject it is a single query and one call, exactly as before.
-  def relevant_with_subject_retry(card, query, fetch, &text_for)
-    items = []
-    card_queries(card, query).each do |q|
-      items = relevant(fetch.call(q), card_relevance_words(card), query_theme_words(q), &text_for)
-      break if items.any?
+  # Runs `fetch` (->(query, page) { API results }) over progressively looser
+  # queries and yields each rung's relevance-filtered results, skipping the
+  # rungs that find nothing. See card_queries for the ladder.
+  #
+  # LAZY, and that is the point: a caller satisfied by the first rung (the
+  # common case) never sends the looser queries, so the ladder still costs one
+  # API call per card. A caller that finds the first rung already spent by
+  # another card pays for the next rung only then — the API call it takes to
+  # find a photograph this Verto isn't showing yet.
+  #
+  # Every rung is walked at page 1 before any is walked at page 2, because a
+  # different query is a better source of variety than more of the same one.
+  # Paging at all matters because a page is not the supply: Pexels was only ever
+  # asked for the first 30 results per query, the relevance floor routinely cut
+  # that to a handful, and a deck whose cards share a query then had a handful
+  # of photographs to divide between all of them — which is how "we ran out"
+  # became a Verto showing one picture three times.
+  #
+  # `text_for` is a lambda rather than a block because the caller's own block is
+  # the loop body.
+  MAX_PEXELS_PAGES = 2
+
+  def relevant_rungs(card, query, fetch, text_for)
+    queries = card_queries(card, query)
+    base    = theme_base_query
+    ladder  = (1..MAX_PEXELS_PAGES).flat_map { |page| queries.map { |q| [ q, page ] } }
+
+    ladder.lazy.filter_map do |q, page|
+      # The theme-base rung deliberately drops the card's subject, so judging
+      # its results against the card's own words measures them on something the
+      # query never asked for — the CARD floor (4) applied to a theme search,
+      # which rejected the very photographs this rung exists to find.
+      words = (q == base ? [] : card_relevance_words(card))
+      relevant(fetch.call(q, page), words, query_theme_words(q), &text_for).presence
     end
-    items
   end
 
   # The queries to try for one card, most direction-led first:
@@ -1061,23 +1296,29 @@ class AssetPopulator
   #   2. the same without the direction. A preference is the first thing to
   #      give up: it is how the creator wants the subject shown, not what the
   #      card is about.
-  #   3. the bare theme base, when an AI-extracted subject narrowed the query.
-  #      A subject can legitimately be more specific than what this theme's
-  #      Pexels library covers ("vintage bicycle" vs. plain "commute"), and a
-  #      theme-anchored photo still beats none.
+  #   3. the bare theme base. A card's own subject can be more specific than
+  #      what this theme's Pexels library covers ("vintage bicycle" vs. plain
+  #      "commute"), and a theme-anchored photo still beats none.
+  #
+  #      This rung used to be offered only to cards an AI subject had narrowed,
+  #      which withheld it from exactly the cards most likely to need it: with
+  #      no subject stamped, the query is built from the keyword heuristic and
+  #      can run to a dozen words, which Pexels narrows on hard. Those cards had
+  #      no relaxation rung at all — one query, and a blank panel if it missed.
   #
   # Rung 0 leading is the whole point and also its own risk, so the rungs below
   # it stay exactly as they were: a direction that finds nothing still falls
   # through to the card's own search rather than leaving the panel blank.
   #
   # De-duped, so a step that would re-send an identical query is skipped rather
-  # than spending a second API call to re-filter the same results.
+  # than spending a second API call to re-filter the same results. And LAZY at
+  # the point of use (see relevant_rungs) — a rung nobody needs is never sent.
   def card_queries(card, query)
     ladder = []
     ladder << direction_led_query if direction_affinity.any?
     ladder << query
     ladder << card_query(card, directed: false) if direction_terms.any?
-    ladder << theme_base_query                  if card["subject"].to_s.strip.present?
+    ladder << theme_base_query
     ladder.uniq
   end
 
@@ -1256,9 +1497,28 @@ class AssetPopulator
   # and the next got the rugby match. With no direction — or nothing in the
   # pool that matches one — it is exactly the shuffle it replaces.
   def direction_first(items, rng, &text_for)
-    return items.shuffle(random: rng) if direction_affinity.empty?
-    preferred, rest = items.partition { |it| direction_preferred?(text_for.call(it)) }
-    preferred.shuffle(random: rng) + rest.shuffle(random: rng)
+    groups =
+      if direction_affinity.empty?
+        [ items ]
+      else
+        items.partition { |it| direction_preferred?(text_for.call(it)) }
+      end
+    groups.flat_map { |group| backdrop_last(group.shuffle(random: rng)) }
+  end
+
+  # The backdrop's own photograph sorts to the back of whatever group it lands
+  # in. A card panel showing the picture the respondent already has behind them
+  # is the most visible repeat in a Verto, so any other candidate of equal
+  # standing is the better answer — but it stays ELIGIBLE. Demoting it costs
+  # nothing; removing it could cost a card its picture, or (when a direction is
+  # running) cost it the direction, which is why it is a preference and not a
+  # ledger entry.
+  def backdrop_last(items)
+    return items if @backdrop_key.nil?
+    other, backdrop = items.partition do |it|
+      !(it.is_a?(Hash) && it["src"].present? && content_key(it) == @backdrop_key)
+    end
+    other + backdrop
   end
 
   def direction_moods

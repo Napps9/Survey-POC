@@ -45,6 +45,11 @@ class GenerateFlowJob < ApplicationJob
     # One translation pass for the whole flow, not one per card — the difference
     # between 5 Claude calls and 30 on a five-language Verto.
     cards = VertoGeneration.translate_cards!(cards, survey)
+    # Give the flow's sliders their reaction animations. A range card with no
+    # `range_theme` doesn't render without one, it renders the DEFAULT one — so
+    # every slider a flow adds used to play the same basketball, whatever the
+    # flow was about and whatever the rest of the deck was already playing.
+    cards = VertoGeneration.animate_cards!(cards, survey)
 
     generation.succeed!(cards: cards, flow_name: result["name"])
   end

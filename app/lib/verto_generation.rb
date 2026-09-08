@@ -98,6 +98,18 @@ module VertoGeneration
     ErrorReporting.report("AssetPopulator", e)
   end
 
+  # Reaction animations for a LOOSE array of cards — a generated flow's, before
+  # the client splices them in. See AssetPopulator#animate_cards! for why a
+  # range card with no animation is not an unillustrated card but a repeated
+  # one. Best-effort like every other pass here: cards back unchanged on any
+  # failure, because a flow that generated is worth more than its animations.
+  def animate_cards!(cards, survey)
+    AssetPopulator.new(survey).animate_cards!(cards)
+  rescue => e
+    ErrorReporting.report("AssetPopulator flow", e)
+    cards
+  end
+
   # Names each question card's photographable subject (card["subject"]) BEFORE
   # populate! runs, so AssetPopulator#card_query can read it on this very
   # first pass — see CardSubjectExtractor for what it does and why a failure
