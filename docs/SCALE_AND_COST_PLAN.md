@@ -117,6 +117,8 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 24 | 80 (4 gen × 20) — **branded, both fixes** | **Images solved; journey unchanged** — image med **265 ms**, p95 **336 ms** (its threshold PASSES); show 2.07 s / 4.67 s, progress 2.16 / 4.77, submit 2.22 / 4.89, leaderboard 1.89 / 4.49; **0.00% failed** (0 of 79,391), ~274 dropped/gen | Run 22 repeated with presigned bucket URLs (c7f7047) and the process-local page cache (4d79fb0). The presign change is an unqualified success: card images and the logo left Rails entirely and now come from R2 at a quarter-second. **Beware the headline** — the overall median reads 298 ms, but that is a MIX ARTIFACT: seven fast R2 fetches per journey now outnumber the Rails requests and drag the median down. The Rails endpoints did not move, and the local page cache changed nothing measurable. |
 | 25 | **path probe**: `/up` at 900 req/s (5 gen × 180) | **Clean** — 49,499 requests per generator, **~800 req/s** combined, median **180 ms**, p90 193 ms, p95 **200 ms**, p99 249 ms, max 729 ms, **0 failed**, 0 dropped; all thresholds green | The path is exonerated a second time, at double run 15's rate: Render proxy → Puma → a pool checkout and one trivial query carries ~800 req/s on this fleet with nothing queueing, and 180 ms is the runners' own network floor (183 ms in run 15). So the ~440 req/s the journeys wall at is **not** the path, the load balancer, routing or Puma capacity — it is in the journey's own work. NOTE this does **not** by itself prove both instances take traffic: one 12c box carries 60 Puma slots against run 15's 20, so it might clear 800 req/s alone. What it does settle is where the wall is not. |
 | 26 | 80 (4 gen × 20) — **branded, healthy Key Value** | **CLEAN — every threshold green.** ~935 req/s combined; median **161 ms**, p90 219 ms, p95 **286 ms**, p99 339 ms; **0 failed** (0 of 79,786); checks **100.00%** (74,087/74,087); **ZERO dropped iterations**; journeys at **pure think-time, 13.06 s**; VUs peaked at 400 of 800 | The answer to runs 19–24. Identical load, identical two 12c-24g boxes, identical code to run 24 — which failed four thresholds at 2.1 s medians. **The only variable was a Key Value store that is not saturated** (free 0.05 CPU → 1 GB / 1,000 connections, Persistence Mode Off). Rails.cache fails OPEN, so the free tier's 100%-pinned CPU was invisible in the app: the page cache missed, every request re-rendered, and `rate_limit` paid up to its 0.5 s read timeout — on every request, on every box. **Consequence: every web-tier measurement in runs 19–24 was taken through a crippled cache and understates the app.** In particular "one 12c box tops out ~2 s at the event rate, so the event needs two boxes" is unproven — a single box should be re-measured before the fleet size is fixed. The presigned-asset work (run 24) still stands on its own: it removed 60% of requests from Rails. |
+| 27 | **125 (7 gen × 18) — THE 1.5× PROOF**, two boxes | **PASSED — all thresholds green.** ~1,470 req/s; median **165 ms**, p90 283 ms, p95 **311 ms**, p99 573 ms; **1 5xx in 71,806** (0.0014%, one image fetch); **zero dropped**; journeys at pure think-time **13.29 s**; VUs 360 of 800 | The acceptance gate, at 1.5× the event's 83/s, branded deck, bucket assets. The striking result is not the pass but the **flatness**: 80/s → 125/s moved the median 161 → 165 ms and p95 286 → 311 ms. A system near its limit degrades sharply; this one absorbed +56% traffic for 4 ms. Two boxes are nowhere near their ceiling — we did not find it. |
+| 28 | **83 (4 gen × 21) — the EVENT RATE, ONE box** | **PASSED — all thresholds green.** ~980 req/s; median **214 ms**, p90 280 ms, p95 **402 ms**, p99 493 ms; **0 failed out of 83,776**; **zero dropped**; journeys at pure think-time **13.92 s**; VUs 420 of 800 | **One 12c-24g box carries the whole event**, with no errors at all and no server queueing. This overturns the two-box plan, which rested on run 21 measuring one box at ~2 s medians — through the free-tier Key Value pinned at 100% CPU and failing open, so the page cache missed and every request re-rendered. Same box, same code, honest cache: **2.1 s → 214 ms.** The architecture was never the problem. Consequences: the event needs ONE box (\$450/mo while scaled, not \$900); the **R2 migration and the Solid Queue worker extraction come off the event's critical path** (a single box has no split-brain and runs the queue in its Puma master, as production does today) — both stay worth shipping, but as improvements, not dependencies. Two boxes remain proven by run 27 if margin is wanted. |
 
 **Measured capacity (2026-09-03):** the ceiling is **Ruby CPU per request
 on the web instance**, not the database, the cache, the proxy path or the
@@ -259,6 +261,21 @@ over 6–7 generators) against the event-day fleet.
    latency, bounded brownout echo, no health flaps, no autovacuum cliff.
 
 ## 4. Event day
+
+**Proven configuration (2026-09-08, runs 26–28).** Both of these are measured,
+not projected, against the branded deck (organisation logo + six card images)
+with assets on the bucket and a healthy Key Value store:
+
+| Configuration | Proven at | Result |
+|---|---|---|
+| **1 × 12c-24g** (WEB_CONCURRENCY=12 × 5 threads) | **83/s — the event rate** | 214 ms median, 402 ms p95, **0 errors in 83,776**, journeys at think-time |
+| 2 × 12c-24g | **125/s — 1.5× the event** | 165 ms median, 311 ms p95, 1 5xx in 71,806, journeys at think-time |
+
+Either carries the event; one box is the cheaper choice and two is headroom.
+**Both depend on a Key Value store that is not saturated** — that is the single
+most important lesson of the day and is why the tier is a prerequisite below,
+not a tuning detail. Pre-scale whichever is chosen hours ahead; never rely on
+autoscaling, which reacts after a ten-minute burst is over.
 
 - **Key Value (Valkey) — size and configure it BEFORE the web tier.** It sits
   on the hot path of every request (`rate_limit` counters; the aggregate cache)
