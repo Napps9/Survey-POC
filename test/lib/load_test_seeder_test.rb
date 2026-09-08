@@ -116,4 +116,22 @@ test "without IMAGES nothing is attached" do
   assert_equal 0, result[:survey].card_images.count
   refute result[:survey].organisation.logo.attached?
 end
+test "refuses a database that holds an organisation which is not a seed artifact" do
+  Organisation.create!(name: "Real Client", slug: "real-client-#{SecureRandom.hex(3)}")
+
+  err = with_seed_flag("1") { assert_raises(RuntimeError) { LoadTestSeeder.run!(responses: 1, io: StringIO.new) } }
+
+  assert_match(/refuses: this database already holds 1 organisation/, err.message)
+  assert_nil Organisation.find_by(slug: LoadTestSeeder::ORG_SLUG), "nothing is seeded on refusal"
+end
+
+test "tolerates the organisations db/seeds.rb provisions on every deploy" do
+  # A fresh scratch database the moment db:prepare has run its seeds.
+  Organisation.find_or_create_by!(slug: AlpbachAccountProvisioner::ORG_SLUG) { |o| o.name = "Alpbach" }
+  Organisation.find_or_create_by!(slug: "playverto") { |o| o.name = "Playverto" }
+
+  result = with_seed_flag("1") { LoadTestSeeder.run!(responses: 1, io: StringIO.new) }
+
+  assert_equal 1, result[:inserted]
+end
 end

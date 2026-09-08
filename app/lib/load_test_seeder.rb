@@ -49,9 +49,13 @@ class LoadTestSeeder
   # Organisations our own seeders create. db/seeds.rb runs on every deploy
   # (the entrypoint's db:prepare), so a freshly-provisioned scratch database
   # already holds the "playverto" org before this seeder ever runs; the
-  # DemoSeeder slugs are equally ours. These are recognisable seed artifacts,
-  # not evidence of real accounts — anything OUTSIDE this list is.
-  SEEDED_SLUGS = [ "playverto", DemoSeeder::ORG_SLUG, DemoSeeder::PARTNER_SLUG ].freeze
+  # DemoSeeder slugs are equally ours, and so is the Alpbach partner account
+  # db/seeds.rb provisions on every deploy (AlpbachAccountProvisioner,
+  # create-only — it tripped this check on scratch on 2026-09-08). These are
+  # recognisable seed artifacts, not evidence of real accounts — anything
+  # OUTSIDE this list is.
+  SEEDED_SLUGS = [ "playverto", DemoSeeder::ORG_SLUG, DemoSeeder::PARTNER_SLUG,
+                   AlpbachAccountProvisioner::ORG_SLUG ].freeze
 
   # The smallest thing that is a valid PNG — 8-bit RGB, one IDAT, no
   # interlace — filled with seeded pseudo-random pixels so the file is about
