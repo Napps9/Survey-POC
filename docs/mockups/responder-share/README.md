@@ -56,8 +56,8 @@ from `file://` and from any host. It follows the build-stamp convention of the
 one-pagers in `public/`:
 
 ```html
-<!-- responder-share mockups · build 2026-09-08-a · … -->
-<html lang="en" data-build="2026-09-08-a">
+<!-- responder-share mockups · build 2026-09-08-b · … -->
+<html lang="en" data-build="2026-09-08-b">
 ```
 
 Bump that stamp when you change the file, and check it in view-source to be sure

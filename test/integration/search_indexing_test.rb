@@ -27,10 +27,25 @@ class SearchIndexingTest < ActionDispatch::IntegrationTest
   test "robots.txt disallows every capability path" do
     body = ROBOTS.read
     assert_match(/^User-agent: \*/, body)
-    %w[/play/ /invites/ /funder_invites/ /blazer].each do |path|
+    %w[/test/ /invites/ /funder_invites/ /blazer].each do |path|
       assert_match(/^Disallow: #{Regexp.escape(path)}\s*$/, body,
                    "robots.txt should disallow #{path}")
     end
+  end
+
+  # /play/ is the deliberate exception, and it is asserted rather than merely
+  # absent from the list above so that re-adding the line fails a test instead
+  # of quietly breaking link previews. Facebook/Messenger, X, LinkedIn and Slack
+  # read robots.txt before fetching a URL to unfurl it, so a Disallow here turns
+  # every shared Verto into a bare link on those platforms — and a crawler that
+  # may not fetch the page never receives the X-Robots-Tag below either, which
+  # is the header actually doing the de-indexing.
+  test "robots.txt does not disallow /play/, so shared links can unfurl" do
+    body = ROBOTS.read
+    refute_match(/^Disallow: \/play\/?\s*$/, body,
+                 "/play/ must stay crawlable: blocking the fetch blocks the link " \
+                 "previews the player's og: tags exist to produce, and stops the " \
+                 "noindex header from ever being read")
   end
 
   test "robots.txt is served" do
@@ -39,7 +54,7 @@ class SearchIndexingTest < ActionDispatch::IntegrationTest
     # but if that ever changes this catches it.
     get "/robots.txt"
     assert_response :success
-    assert_match(/Disallow: \/play\//, response.body)
+    assert_match(/Disallow: \/invites\//, response.body)
   end
 
   # The half that binds. robots.txt is advisory and only reaches a crawler that
