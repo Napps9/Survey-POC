@@ -22,7 +22,10 @@
   # (data-card-index below), so the deck is paired with its own positions and
   # iterated as pairs rather than re-enumerated. Dropping a card and letting
   # the rest slide up by one would re-point every answer after it.
-  cards   = Array(@survey.cards).each_with_index.reject { |c, _| CardTypes.retired?(c["type"]) }
+  # Card imagery drawn straight from the bucket when uploads live there
+  # (PlayerAssetUrls): map BEFORE each_with_index so the indexes — the answer
+  # keys — are untouched.
+  cards   = Array(@survey.cards).map { |c| PlayerAssetUrls.direct_card(c) }.each_with_index.reject { |c, _| CardTypes.retired?(c["type"]) }
   total_q = cards.count { |c, _| CardTypes.question?(c["type"]) }
   prev_q  = 0
 
@@ -189,7 +192,7 @@
       masthead rather than our wordmark in their slot, and the wrapper is
       skipped along with it because its own 18px of padding would otherwise
       hold an empty band open above the deck. %>
-  <% if (masthead = brand_logo_tag(@survey.organisation, style: "height:36px;width:auto;max-width:50%;")) %>
+  <% if (masthead = brand_logo_tag(@survey.organisation, style: "height:36px;width:auto;max-width:50%;", direct: true)) %>
     <div class="player-brand-header"><%= masthead %></div>
   <% end %>
 
@@ -374,7 +377,7 @@
             wordmark further down is the attribution and is unaffected. %>
         <%= brand_logo_tag @survey.organisation,
               style: "height:44px;width:auto;max-width:60%;margin:0 auto 18px;",
-              class: "player-thankyou-logo" %>
+              class: "player-thankyou-logo", direct: true %>
 
         <div class="preview-thankyou-title" data-player-target="thankyouTitle"><%= @survey.thankyou_title_text %></div>
         <div class="preview-thankyou-sub" data-player-target="thankyouSub">

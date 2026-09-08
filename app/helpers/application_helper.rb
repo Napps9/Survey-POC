@@ -561,12 +561,16 @@ module ApplicationHelper
   # rendering nothing is deliberate — an account with one logo keeps behaving
   # exactly as it did, and a missing alternate is a worse-looking logo rather
   # than no logo at all.
-  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil, on: :dark)
+  # `direct: true` (the public player only) draws the logo from the bucket's own
+  # presigned URL once uploads live there — see PlayerAssetUrls — instead of
+  # streaming it through Rails for every respondent. Same-origin proxy otherwise.
+  def brand_logo_tag(organisation, style: "height:22px;width:auto;flex-shrink:0;", alt: nil, class: nil, on: :dark, direct: false)
     css_class = binding.local_variable_get(:class)
     logo = brand_logo_for(organisation, on)
     if logo
+      proxy = rails_storage_proxy_path(logo, only_path: true)
       image_tag(
-        rails_storage_proxy_path(logo, only_path: true),
+        direct ? PlayerAssetUrls.attachment_url(logo, proxy_path: proxy) : proxy,
         style: "#{style};object-fit:contain;",
         alt:   alt || "#{organisation.name} logo",
         class: css_class,

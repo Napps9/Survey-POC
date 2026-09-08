@@ -133,17 +133,26 @@ function answers(i) {
 }
 
 const IMAGES_MAX = Number(__ENV.IMAGES_MAX || 40);
+// Same-origin Active Storage paths — the redirect/proxy routes through Rails …
 const IMAGE_PATH = /\/rails\/active_storage\/[^"'\s<>&\\]+/g;
+// … and the presigned bucket URLs the player bakes into the page once uploads
+// live in object storage (PlayerAssetUrls). A browser fetches those straight
+// from the bucket, so they never touch Rails — but every respondent still
+// downloads them, so the journey does too.
+const IMAGE_URL = /https?:\/\/[^"'\s<>\\]+X-Amz-Signature=[0-9a-fA-F]+/g;
 
-// Every distinct Active Storage path the play page references — the logo
-// (proxy route) and each card's image (redirect route), which the page embeds
-// as same-origin paths inside data attributes (so a JSON-escaped "\/" is
-// unescaped first). Capped, deduplicated, in page order.
-function imagePaths(html) {
+// Every distinct attachment URL the play page references — the logo and each
+// card's image — as absolute URLs, capped. The page embeds them inside data
+// attributes and inline styles, so the HTML- and JSON-escaped forms (&amp;
+// &quot; & \/) are unescaped first.
+function imageUrls(html) {
+  const src = String(html || "")
+    .replace(/\\u0026/g, "&").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/\\\//g, "/");
   const seen = new Set();
-  const src = String(html || "").replace(/\\\//g, "/");
   let m;
-  while (seen.size < IMAGES_MAX && (m = IMAGE_PATH.exec(src)) !== null) seen.add(m[0]);
+  while (seen.size < IMAGES_MAX && (m = IMAGE_URL.exec(src)) !== null) seen.add(m[0]);
+  IMAGE_URL.lastIndex = 0;
+  while (seen.size < IMAGES_MAX && (m = IMAGE_PATH.exec(src)) !== null) seen.add(`${BASE}${m[0]}`);
   IMAGE_PATH.lastIndex = 0;
   return [...seen];
 }
@@ -170,12 +179,13 @@ export function journey() {
   // Card art + logo — every attachment the page references, the way a real
   // browser loads them all on first view. Each is a request the journey-only
   // runs (1–21) never counted. On the bucket a card image is a 302 to a
-  // presigned URL (the bytes never touch Puma; k6 follows the redirect and the
-  // timing includes the bucket) and the logo is proxied through Rails. Bodies
+  // presigned URL (k6 follows the redirect and the timing includes the bucket)
+  // or, once the player bakes presigned URLs into the page, a direct bucket
+  // fetch that never touches Rails at all. Bodies
   // are discarded — the server's cost is what is being measured.
   if (!SKIP.has("images")) {
-    for (const path of imagePaths(page.body)) {
-      const img = note(http.get(`${BASE}${path}`, { ...anyType, responseType: "none", tags: { endpoint: "image" } }), "image");
+    for (const url of imageUrls(page.body)) {
+      const img = note(http.get(url, { ...anyType, responseType: "none", tags: { endpoint: "image" } }), "image");
       check(img, { "image 200": (r) => r.status === 200 });
       imagesFetched.add(1);
     }

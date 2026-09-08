@@ -1,4 +1,8 @@
 class PlayerController < ApplicationController
+  # ActiveStorage::Current.url_options for PlayerAssetUrls: a blob's own URL on
+  # the Disk service (dev/test, or a fallback) is built from the request's host.
+  include ActiveStorage::SetCurrent
+
   include AggregatesSurveyResults
   layout "fullscreen"
   skip_before_action :require_authentication
