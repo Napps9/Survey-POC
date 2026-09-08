@@ -1,13 +1,13 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 20: the DB-vs-web discriminator. IDENTICAL load to run 19 (80/s, 4
-# generators, ramp 60 / hold 240 / dwell 0.05) with the ONE variable changed:
-# the scratch Postgres was resized up one tier (4c-16g -> 8c-32g) while the
-# web box is held at 8c-16g cluster (WEB_CONCURRENCY=8, RAILS_MAX_THREADS=5),
-# page cache + Key Value, same commit 7452994. Run 19 saturated at 80/s
-# (~388 req/s, 3.8s median, 0 errors). If run 20 comes back clean, the DB was
-# the wall -> Branch A (one box + bigger DB) and on to the 125/s proof. If it
-# still saturates, the wall is the web box -> Branch B (bigger single box).
+# Run 21: more cores. IDENTICAL load to runs 19/20 (80/s, 4 generators, ramp
+# 60 / hold 240 / dwell 0.05). The web box is resized 8c-16g -> 12c-24g and
+# WEB_CONCURRENCY 8 -> 12 (one Puma worker per core), page cache + Key Value,
+# bigger DB from run 20, same commit 7452994. Runs 19 & 20 both saturated at
+# 80/s (~355-388 req/s, ~5s median) on 8 cores regardless of DB size -> the
+# wall was CPU. 8->12 cores is 1.5x. If run 21 comes back clean, cores were the
+# lever and we go to the 125/s proof. If still saturated, one box tops out
+# below the event rate -> two boxes + R2.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
