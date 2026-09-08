@@ -1,18 +1,16 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 22: the branded two-box fleet. IDENTICAL load params to runs 19–21
-# (80/s, 4 generators, ramp 60 / hold 240 / dwell 0.05), with three changes:
-#   1. TWO 12c-24g instances (manual scaling, autoscaling off) behind Render's
-#      load balancer, WEB_CONCURRENCY=12 each, Solid Queue in both masters.
-#   2. Active Storage on the R2 bucket (EU jurisdiction) — phases 0–2 of
-#      docs/OBJECT_STORAGE_CUTOVER.md rehearsed and smoke-tested on scratch.
-#   3. journey.js now loads every attachment the play page references — the
-#      logo (proxy route) and six ~60 KB card images (redirect → presigned
-#      R2), seeded with IMAGES=6 IMAGE_KB=60 — tagged endpoint:image. Runs
-#      1–21 measured a text-only deck; this is the first honest branded run.
-# Run 21 (one 12c box, text-only): ~446 req/s, 1.9 s median, 3.7 s p95, 0
-# failed. Expect sub-second journey medians, image p95 < 1.5 s, 0 failed, 0
-# dropped. If clean → the 125/s proof (GENERATORS=7) on this fleet.
+# Run 23: run 22 with SKIP=images — same two-box bucket-backed fleet, same
+# 80/s, but the journey no longer loads the logo + 6 card images. Run 22
+# (branded) served ~1,120 req/s with the images flawless (141k loads, 100%
+# 200, med 251 ms) but the journey endpoints no better than one box (submit
+# med 2.7 s, p95 5.3 s; p99 29 s). Either the second instance was not yet in
+# rotation (fired ~2 min after the scale-up) or the wall has moved to a
+# shared tier — the database, or the ~670 Rails 302s/s the images cost.
+# This run isolates the image cost and previews the fix (presigned bucket
+# URLs baked into the cached play page, zero Rails requests per image).
+# Clean here → images were the cost → ship the presign change and re-run
+# branded. Still slow → shared wall (database) → look there.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
@@ -22,3 +20,4 @@ HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
 GENERATORS=4
+SKIP=images
