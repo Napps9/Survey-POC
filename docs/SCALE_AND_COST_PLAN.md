@@ -172,10 +172,19 @@ over 6–7 generators) against the event-day fleet.
   `REDIS_URL` is set, and `rate_limit` counters follow it (they resolve
   their store from `cache_store`). Solid Cable and
   Solid Queue stay on Postgres. Needs: a Key Value instance in Frankfurt
-  (free 25 MB is ample for counters + the small aggregate cache) and
-  `REDIS_URL` on the web service — scratch first, production after the
+  and `REDIS_URL` on the web service — scratch first, production after the
   scratch rerun shows the DB CPU dropping off the graph. Counters reset to
   zero at the flip; do it on a quiet day.
+  **CORRECTION (2026-09-08): the free tier is NOT ample under burst.** It is
+  0.05 CPU / 25 MB / 50 connections, and Render's graphs show it **pinned at
+  100% CPU through every load run** while peaking at ~40 of its 50
+  connections. `Rails.cache` fails OPEN, so a saturated store is silent: the
+  page cache misses, every request re-renders, and `rate_limit` pays up to
+  its 0.5 s read timeout per call. Runs 19–24 were all measured against a
+  store in that state, which is why adding a second web box changed nothing.
+  Both instances moved to **1 GB / 1,000 connections ($32/mo)** on
+  2026-09-08. Sizing rule: the cache store is on the hot path of EVERY
+  request, so it is sized before the web tier, not after.
 
 1. **Done 2026-09-01**: the four `generateValue` secrets (`SECRET_KEY_BASE`
    + the three `ACTIVE_RECORD_ENCRYPTION_*` values) are backed up outside
@@ -247,6 +256,21 @@ over 6–7 generators) against the event-day fleet.
    latency, bounded brownout echo, no health flaps, no autovacuum cliff.
 
 ## 4. Event day
+
+- **Key Value (Valkey) — size and configure it BEFORE the web tier.** It sits
+  on the hot path of every request (`rate_limit` counters; the aggregate cache)
+  and it fails OPEN, so when it saturates nothing errors — the whole app just
+  gets slow, and more web boxes make it worse rather than better. Two settings,
+  both learned the hard way on 2026-09-08:
+  - **Tier**: `vertonow-infra` is on **1 GB / 1,000 connections ($32/mo)**. The
+    connection budget is the number that constrains the fleet: the Redis cache
+    store opens a pool of **5 per process**, so a fleet of N 12-worker instances
+    holds up to `60 × N` connections (2 boxes ≈ 125, 4 boxes ≈ 245 — which is
+    why the old 250-connection tier capped the fleet at three).
+  - **Persistence Mode: Off.** Everything in there is disposable (counters,
+    cached aggregates). `Journal + Snapshot` — the paid-tier default, and what a
+    tier change resets it to — fsyncs every write, putting a disk round-trip on
+    each `rate_limit` INCR. Re-check this after ANY plan change.
 
 - **Database storage: DONE 2026-09-01 — raised 1 GB → 10 GB** (was 67% full).
   Two Render rules to plan around: storage changes are limited to **once per
