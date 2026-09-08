@@ -1,8 +1,12 @@
 namespace :load_test do
   desc "Seed the load-test Verto + N responses (LOAD_TEST_SEED=1 RESPONSES=50000). " \
+       "IMAGES=N (IMAGE_KB=40) also attaches a logo + N card images — the full-branding " \
+       "shape, so journey.js exercises the attachment loads. " \
        "Additive-only; for throwaway load-test databases — see test/load/README.md."
   task seed: :environment do
-    LoadTestSeeder.run!(responses: Integer(ENV.fetch("RESPONSES", "50000")))
+    LoadTestSeeder.run!(responses: Integer(ENV.fetch("RESPONSES", "50000")),
+                        images:    Integer(ENV.fetch("IMAGES", "0")),
+                        image_kb:  Integer(ENV.fetch("IMAGE_KB", "40")))
   end
 
   desc "Pre-warm an event Verto before doors open (TOKEN=<publish token>). " \

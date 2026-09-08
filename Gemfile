@@ -85,6 +85,15 @@ gem "rqrcode", "~> 3.0"
 gem "image_processing", "~> 1.2"
 gem "ruby-vips", require: false
 
+# Active Storage → an S3-compatible object store (Cloudflare R2, EU jurisdiction,
+# or S3 eu-central-1) so uploads are shared by every web instance AND the
+# worker — the "disk unpin" that lets the web tier run more than one box. The
+# `bucket` service in config/storage.yml is env-driven and inert until
+# STORAGE_BUCKET is set; Active Storage requires this gem itself the first time
+# that service is instantiated, so `require: false` keeps boot unchanged.
+# Cutover runbook: docs/OBJECT_STORAGE_CUTOVER.md.
+gem "aws-sdk-s3", require: false
+
 # AI results report → PDF download + Google Doc
 gem "kramdown"               # Markdown → HTML for the report body
 gem "wicked_pdf"             # HTML → PDF for the downloadable report

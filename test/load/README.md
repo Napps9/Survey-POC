@@ -95,10 +95,22 @@ accept queue); if it runs clean far above, the ceiling is in what the
 journeys touch (database, Key Value, the app).
 
 `SKIP=leaderboard` (dispatch input `skip`; also `manifest`, `service_worker`,
-comma-separated) drops optional steps from the journey, so the same arrival
-rate can be re-run without the board read to see how much of a ceiling the
-board's two counts over a big snapshot account for. The writes are never
-skippable.
+`images`, comma-separated) drops optional steps from the journey, so the same
+arrival rate can be re-run without the board read to see how much of a
+ceiling the board's two counts over a big snapshot account for. The writes
+are never skippable.
+
+**Attachments.** Every run up to 21 measured a text-only Verto: the journey
+never loaded the card images or the logo a real browser fetches on first
+view. Since run 22 it does — it pulls every `/rails/active_storage/…` path out
+of the play page (`IMAGES_MAX`, default 40, caps it) and reports them as
+`endpoint:image` (p95 threshold 1.5 s) plus an `images_fetched` counter, which
+reads **zero** against a deck with no imagery. So seed the branded shape first:
+`LOAD_TEST_SEED=1 RESPONSES=0 IMAGES=6 IMAGE_KB=60 bin/rails load_test:seed`
+attaches an organisation logo and a ~60 KB card image to each of the first six
+cards (idempotent — the first N cards carry an image, re-running adds nothing).
+On the bucket a card image is a 302 to a presigned URL, so the image timing
+includes the bucket round-trip; the server's share is the redirect.
 
 ## What to record per run
 

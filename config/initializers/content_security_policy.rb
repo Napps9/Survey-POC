@@ -11,8 +11,19 @@
 #
 # Path to a stronger policy: refactor inline on*= handlers to Stimulus/CSS, then
 # switch script_src to :self + a nonce (config.content_security_policy_nonce_*).
+# The Active Storage bucket, once configured (STORAGE_BUCKET set — see
+# config/storage.yml). Redirect-mode blob URLs (rails_blob_path: every card
+# image) answer with a 302 to a presigned URL on the bucket's host, and the
+# browser checks img-src / connect-src against that redirect TARGET as well
+# as the original request, so the bucket's origin has to be allowed wherever
+# an attachment may load. Empty on local disk. lib/ + an explicit require,
+# because reloadable app/ constants can't be referenced at boot.
+require Rails.root.join("lib/object_storage_origins")
+
 Rails.application.configure do
   config.content_security_policy do |policy|
+    bucket_origins = ObjectStorageOrigins.allowed
+
     policy.default_src      :self
     policy.base_uri         :self
     policy.object_src       :none
@@ -51,12 +62,12 @@ Rails.application.configure do
     # MAX_EDGE-capped re-encode the comment two blocks up says this exists to
     # produce. That fallback exists for genuinely exotic formats a canvas
     # can't decode, not as the path every ordinary JPEG/PNG silently took.
-    policy.img_src    :self, :data, :blob, "https://images.pexels.com", "https://*.clarity.ms"
+    policy.img_src    :self, :data, :blob, "https://images.pexels.com", "https://*.clarity.ms", *bucket_origins
 
     # Pexels stock videos stream from the Pexels video CDN (autoplaying card
     # art). Without this the browser blocks the <video>, like img_src did for
     # photos. If clips ever come from another host, add it here.
-    policy.media_src  :self, "https://videos.pexels.com"
+    policy.media_src  :self, "https://videos.pexels.com", *bucket_origins
 
     # XHR/fetch: same-origin app endpoints, Clarity's upload endpoints, and the
     # Pexels CDNs.
@@ -70,7 +81,7 @@ Rails.application.configure do
     # showing through where the photo should be. img_src alone only covers the
     # <img>/CSS load the worker had already intercepted.
     policy.connect_src :self, "https://*.clarity.ms", "https://c.bing.com",
-                       "https://images.pexels.com", "https://videos.pexels.com"
+                       "https://images.pexels.com", "https://videos.pexels.com", *bucket_origins
 
     policy.worker_src   :self
     policy.manifest_src :self

@@ -36,8 +36,12 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for Apache
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Where uploads live. :local is the Render persistent disk (one instance only —
+  # a disk pins the service to a single box). ACTIVE_STORAGE_SERVICE=bucket flips
+  # the app to the shared S3-compatible store in config/storage.yml, which is
+  # what lets the web tier scale out. The flip is the LAST step of the cutover,
+  # after the blobs have been copied: docs/OBJECT_STORAGE_CUTOVER.md.
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").to_sym
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil

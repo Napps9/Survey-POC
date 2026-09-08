@@ -6,6 +6,43 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# S3-compatible object store shared by every web instance and the worker — the
+# production service once ACTIVE_STORAGE_SERVICE=bucket is set (see
+# config/environments/production.rb and docs/OBJECT_STORAGE_CUTOVER.md).
+# Env-driven so the same entry serves Cloudflare R2 (STORAGE_ENDPOINT set,
+# region "auto", path-style addressing) and AWS S3 (no endpoint, a real region).
+# Everything after `bucket:` is passed straight to Aws::S3::Resource:
+#   * request_checksum_calculation / response_checksum_validation: newer
+#     aws-sdk-s3 sends a CRC32 checksum on every PUT by default and R2 rejects
+#     it — "when_required" restores the MD5-only behaviour both stores accept.
+#   * upload.cache_control: blob keys are content-addressed and never reused,
+#     so a browser may cache the bytes for a year. Redirect-mode blob URLs
+#     (rails_blob_path — the card images) 302 to a presigned URL that carries
+#     this header, which is what keeps 50k respondents from re-downloading
+#     card art on every screen.
+# Parsed at every boot but only INSTANTIATED when referenced, so it is harmless
+# while STORAGE_BUCKET is blank.
+bucket:
+  service: S3
+  access_key_id: <%= ENV["STORAGE_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["STORAGE_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("STORAGE_REGION", "auto") %>
+  bucket: <%= ENV["STORAGE_BUCKET"] %>
+<% if ENV["STORAGE_ENDPOINT"].present? %>
+  endpoint: <%= ENV["STORAGE_ENDPOINT"] %>
+  force_path_style: true
+<% end %>
+  request_checksum_calculation: when_required
+  response_checksum_validation: when_required
+  upload:
+    cache_control: "public, max-age=31536000, immutable"
+
+# A second Disk service for the test suite, so ObjectStorage::Migrator can be
+# exercised Disk→Disk (copy, flip, roll back) with no bucket and no network.
+test_bucket:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage_bucket") %>
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

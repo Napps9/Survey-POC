@@ -83,4 +83,37 @@ class LoadTestSeederTest < ActiveSupport::TestCase
     result = with_seed_flag("1") { LoadTestSeeder.run!(responses: 2, io: StringIO.new) }
     assert_equal 2, result[:inserted]
   end
+test "IMAGES attaches a logo and a redirect-mode card image per card, idempotently" do
+  result = with_seed_flag("1") { LoadTestSeeder.run!(responses: 2, batch_size: 2, images: 3, image_kb: 2, io: StringIO.new) }
+  survey = result[:survey].reload
+
+  assert_equal 3, result[:images]
+  assert survey.organisation.logo.attached?
+  assert_equal 3, survey.card_images.count
+  imaged = survey.cards.select { |c| c["image"].present? }
+  assert_equal 3, imaged.size
+  # Exactly the path shape an editor upload leaves on a card, which is what
+  # sanitize_image_url keeps and what journey.js's extractor looks for.
+  imaged.each { |c| assert_match Survey::ACTIVE_STORAGE_IMAGE_URL, c["image"] }
+  imaged.each { |c| assert_includes c["image"], "/rails/active_storage/blobs/redirect/" }
+
+  blobs = survey.card_images.blobs.to_a
+  assert_equal 3, blobs.map(&:checksum).uniq.size, "each card gets its own bytes"
+  blobs.each do |blob|
+    assert_equal "image/png", blob.content_type
+    assert blob.byte_size.between?(1_500, 4_000), "~2 KB asked for, got #{blob.byte_size}"
+    assert blob.download.start_with?("\x89PNG".b)
+  end
+
+  again = with_seed_flag("1") { LoadTestSeeder.run!(responses: 1, batch_size: 1, images: 3, image_kb: 2, io: StringIO.new) }
+  assert_equal 0, again[:images]
+  assert_equal 3, survey.reload.card_images.count
+end
+
+test "without IMAGES nothing is attached" do
+  result = with_seed_flag("1") { LoadTestSeeder.run!(responses: 1, io: StringIO.new) }
+  assert_equal 0, result[:images]
+  assert_equal 0, result[:survey].card_images.count
+  refute result[:survey].organisation.logo.attached?
+end
 end

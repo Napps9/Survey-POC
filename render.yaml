@@ -47,6 +47,11 @@ services:
     # service to a single instance and swaps zero-downtime deploys for a brief
     # stop/start (fine here — already WEB_CONCURRENCY=1 on starter). The disk is
     # NOT available during build/pre-deploy, only at runtime (entrypoint on).
+    # POST-CUTOVER: this block is the LAST thing to go (docs/OBJECT_STORAGE_CUTOVER.md,
+    # phase 3) — removing the disk is what un-pins the service from one
+    # instance, and it destroys the disk's contents. Never remove it before
+    # `bin/rails object_storage:verify` passes on production with the app
+    # already running on the bucket.
     disk:
       name: storage
       mountPath: /rails/storage
@@ -117,6 +122,26 @@ services:
       # docs/DEPLOYMENT_RUNBOOK.md for the one-time Sentry org setup (EU data
       # region is chosen there, not here). Blank = errors only reach the logs.
       - key: SENTRY_DSN
+        sync: false
+      # Active Storage on a shared S3-compatible bucket (Cloudflare R2, EU
+      # jurisdiction) instead of the per-instance disk above — the change that
+      # lets this service run more than one instance and lets the worker reach
+      # attachments. All blank = local disk, exactly as before. The five
+      # STORAGE_* vars CONFIGURE the bucket (so `bin/rails object_storage:migrate`
+      # can copy into it while uploads still go to the disk);
+      # ACTIVE_STORAGE_SERVICE=bucket is the separate cutover SWITCH, set last.
+      # Staged runbook with rollback at each step: docs/OBJECT_STORAGE_CUTOVER.md.
+      - key: ACTIVE_STORAGE_SERVICE
+        sync: false
+      - key: STORAGE_BUCKET
+        sync: false
+      - key: STORAGE_ENDPOINT
+        sync: false
+      - key: STORAGE_REGION
+        sync: false
+      - key: STORAGE_ACCESS_KEY_ID
+        sync: false
+      - key: STORAGE_SECRET_ACCESS_KEY
         sync: false
       # Rails.cache + rate-limit counters move onto Render Key Value (Valkey)
       # when this is set (config/environments/production.rb). Dashboard-managed
@@ -219,11 +244,13 @@ services:
   # ACTIVE_RECORD_ENCRYPTION_* keys and SECRET_KEY_BASE especially, or the worker
   # mints fresh ones and can't decrypt stored Google tokens / verify sessions.
   #
-  # LIMITATION: this worker has NO Active Storage disk, so the three storage-
-  # writing jobs (RenderReportPdfJob, RenderInfographicJob, BuildVertoJob) would
-  # write to its ephemeral filesystem, unreachable by the web service. That is
-  # acceptable only for a burst window that generates no reports; the real fix is
-  # Active Storage -> R2 (object storage shared across services), docs scale plan §3.
+  # This worker has NO Active Storage disk. While the app is on the local disk
+  # (ACTIVE_STORAGE_SERVICE unset) the three storage-writing jobs
+  # (RenderReportPdfJob, RenderInfographicJob, BuildVertoJob) would write to its
+  # ephemeral filesystem, unreachable by the web service — acceptable only for a
+  # burst window that generates no reports. Once the app is on the bucket
+  # (ACTIVE_STORAGE_SERVICE=bucket, docs/OBJECT_STORAGE_CUTOVER.md) the worker
+  # reads and writes the same store as the web service and the limitation is gone.
   - type: worker
     name: vertonow-worker
     runtime: docker
@@ -349,6 +376,38 @@ services:
           type: web
           name: survey-poc
           envVarKey: SENTRY_DSN
+      # Object storage — identical to the web service, so the worker reads AND
+      # writes the same bucket the moment ACTIVE_STORAGE_SERVICE flips there.
+      - key: ACTIVE_STORAGE_SERVICE
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: ACTIVE_STORAGE_SERVICE
+      - key: STORAGE_BUCKET
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: STORAGE_BUCKET
+      - key: STORAGE_ENDPOINT
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: STORAGE_ENDPOINT
+      - key: STORAGE_REGION
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: STORAGE_REGION
+      - key: STORAGE_ACCESS_KEY_ID
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: STORAGE_ACCESS_KEY_ID
+      - key: STORAGE_SECRET_ACCESS_KEY
+        fromService:
+          type: web
+          name: survey-poc
+          envVarKey: STORAGE_SECRET_ACCESS_KEY
       # Same memory posture as the web container.
       - key: MALLOC_ARENA_MAX
         value: "2"

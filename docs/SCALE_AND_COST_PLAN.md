@@ -110,6 +110,8 @@ surfaces as **Cloudflare 502s**, not app errors.
 | 17 | 40 (2 gen × 20) | **Crippled** — combined ~88 req/s, median 15 s, p95 20 s, journeys 1m37s, 0 failed | With the **page cache live**, scratch web resized to **8c-16g** but run with `WEB_CONCURRENCY=1` × `RAILS_MAX_THREADS=24` — one Puma process. MRI's GVL pins one process to ~one core, so 7 of 8 cores sat idle and 24 threads fought over one. A test-config error, not the app: single-process is the wrong shape for a multi-core box. |
 | 18 | 40 (2 gen × 20) | **Clean, big headroom** — combined ~234 req/s, median 144 ms, p95 304 ms (show 347, submit 230, progress 223, lb 239), journeys at pure think-time 11.9 s, 0 failed | Same 8c-16g box in **cluster mode: `WEB_CONCURRENCY=8` × `RAILS_MAX_THREADS=5`**, page cache + Key Value. The fix for run 17. Deploy log confirms **Solid Queue starts once in the Puma master (PID 1), not per worker** — so a multi-worker box does not spin up N duplicate queues/schedulers. |
 | 19 | 80 (4 gen × 20) | **Saturated** — combined ~388 req/s served, median 3.8 s, p95 7.2 s, journeys ~36 s, **0 failed** (queues, never errors), some dropped iterations | The whole event rate on ONE 8c-16g box. Clean at 40/s, underwater at 80/s → this box tops out **~50–55 arrivals/s**; the 83/s event needs more than one of it. **Open question:** is the 80/s wall the **web box** or the **database**? No connection errors (so not pool exhaustion). Nick's Render CPU graphs for 17:53–17:58 UTC decide: DB pinned → bigger DB + one web box likely carries it (no R2); web pinned → a 12-core box or two boxes (two reopens the Active Storage → R2 disk-unpin). |
+| 20 | 80 (4 gen × 20) — **DB-vs-web discriminator** | **Saturated, unchanged** — combined ~355 req/s, median 5.1 s, p95 9.0 s, submit p95 9.4 s, 0 failed, ~4,800 dropped iterations | Identical load to run 19 with ONE variable moved: scratch Postgres resized 4c-16g → 8c-32g, web held at 8c-16g. A bigger database did not lift the ceiling (if anything a shade worse — cold cache after the tier restart), so the database is not the wall. **The web box is.** |
+| 21 | 80 (4 gen × 20) — **more cores** | **Better, still over the SLO** — combined ~446 req/s, median 1.9 s, p95 3.7 s, submit p95 4.0 s, **0 failed**, ~900 dropped iterations | Web resized 8c-16g → **12c-24g**, `WEB_CONCURRENCY=12` (one worker per core). +50% cores bought +26% throughput and halved latency: cores ARE the lever, and the latency is uniform across show/progress/submit/leaderboard — a Puma queue backing up, not one slow endpoint. 12 CPU is Render's largest single instance, so **one box tops out here**: it serves the 83/s event with zero errors at ~2 s page loads, not sub-second, with no margin. Sub-second needs a second box → the disk unpin (Active Storage → bucket), now built: `docs/OBJECT_STORAGE_CUTOVER.md`. **Caveat for every row above:** `journey.js` never fetched card images, so all of these measured a text-only Verto; the event Verto is fully branded (logo + card images), and runs from 22 include those loads (`IMAGES=` seeder knob, `endpoint:image` in the summary). |
 
 **Measured capacity (2026-09-03):** the ceiling is **Ruby CPU per request
 on the web instance**, not the database, the cache, the proxy path or the
@@ -201,10 +203,18 @@ over 6–7 generators) against the event-day fleet.
    CPU per request, page render first. The scratch environment (web
    `vertonow.onrender.com`, its Postgres and Key Value) is still up for the
    page-cache re-measure and the proof run; scale it down between sessions.
-3. **Active Storage → Cloudflare R2** (EU jurisdiction;
-   `request_checksum_calculation: "when_required"` — R2 rejects CRC32),
-   migrate blobs **and their `service_name`**, then remove the disk from
-   `render.yaml`. This is what unpins the service from one instance.
+3. **Active Storage → object storage (Cloudflare R2, EU jurisdiction)** —
+   **built on this branch (2026-09-08)**: env-driven `bucket` service
+   (`config/storage.yml`, `request_checksum_calculation: when_required` — R2
+   rejects CRC32), the `ACTIVE_STORAGE_SERVICE=bucket` switch,
+   `ObjectStorage::Migrator` + `bin/rails object_storage:{status,migrate,verify,rollback}`
+   (copy → flip `service_name`; rollback is a pure flip because nothing is
+   deleted from the disk), and the bucket's origin added to the CSP at boot
+   (card images are redirect-mode URLs, so the browser checks the presigned
+   target). Staged runbook with rollback at each phase:
+   `docs/OBJECT_STORAGE_CUTOVER.md`. Removing the disk from `render.yaml` is
+   the LAST step — it is what unpins the service from one instance, and it is
+   irreversible.
 4. **Cloudflare CDN** — prerequisites, not tuning: **trusted proxies /
    `CF-Connecting-IP` before orange-clouding** (every `rate_limit` keys on
    `remote_ip`; 50k respondents via a few dozen edge IPs mass-429s the event

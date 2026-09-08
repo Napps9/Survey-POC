@@ -15,6 +15,9 @@
 //   BROWNOUT=1      adds a scenario replaying submits in quick triples, the
 //                   shape the service worker's drain queue produces after a
 //                   5xx brownout. Watch that the echo stays bounded.
+//   SKIP=images     drops the card-image + logo fetches (see the journey);
+//                   IMAGES_MAX caps how many of the page's Active Storage
+//                   images one journey loads (default 40 — a big branded deck).
 //
 // The answers below match LoadTestSeeder::CARDS by index — change one file,
 // change the other.
@@ -34,14 +37,14 @@ const ARRIVALS = Number(__ENV.ARRIVALS_PER_S || 10);
 const RAMP_S = Number(__ENV.RAMP_S || 60);
 const HOLD_S = Number(__ENV.HOLD_S || 300);
 const DWELL = Number(__ENV.DWELL_SCALE || 0.05);
-// SKIP=leaderboard,manifest,service_worker drops optional steps from the
+// SKIP=leaderboard,manifest,service_worker,images drops optional steps from the
 // journey so a ceiling can be attributed: the same arrival rate with the
 // board read removed tells whether the board's two counts over a big
 // snapshot are what the database is spending itself on. The writes
 // (consent, progress, submit) are never skippable — they ARE the journey.
 const SKIP = new Set(String(__ENV.SKIP || "").split(",").map((s) => s.trim()).filter(Boolean));
 for (const step of SKIP) {
-  if (![ "leaderboard", "manifest", "service_worker" ].includes(step)) throw new Error(`SKIP: unknown step '${step}'`);
+  if (![ "leaderboard", "manifest", "service_worker", "images" ].includes(step)) throw new Error(`SKIP: unknown step '${step}'`);
 }
 
 const play = `${BASE}/play/${TOKEN}`;
@@ -56,6 +59,9 @@ const status403 = new Counter("status_403");
 const status4xx = new Counter("status_4xx_other");
 const status5xx = new Counter("status_5xx");
 const statusNet = new Counter("status_network_error");
+// How many attachments the journeys actually loaded — zero against a deck with
+// no imagery, so a "branded" run can be told from a text-only one after the fact.
+const imagesFetched = new Counter("images_fetched");
 
 function note(res, endpoint) {
   if (res.status >= 200 && res.status < 400) status2xx.add(1);
@@ -106,6 +112,7 @@ export const options = {
     "http_req_duration{endpoint:progress}": ["p(95)<1000"],
     "http_req_duration{endpoint:submit}": ["p(95)<1000"],
     "http_req_duration{endpoint:leaderboard}": ["p(95)<1000"],
+    "http_req_duration{endpoint:image}": ["p(95)<1500"],
   },
 };
 
@@ -123,6 +130,22 @@ function answers(i) {
     "4": { type: "open_ended", value: `k6 answer ${i % 17}` },
     "5": { type: "rating", value: 1 + ((i + 2) % 5) },
   };
+}
+
+const IMAGES_MAX = Number(__ENV.IMAGES_MAX || 40);
+const IMAGE_PATH = /\/rails\/active_storage\/[^"'\s<>&\\]+/g;
+
+// Every distinct Active Storage path the play page references — the logo
+// (proxy route) and each card's image (redirect route), which the page embeds
+// as same-origin paths inside data attributes (so a JSON-escaped "\/" is
+// unescaped first). Capped, deduplicated, in page order.
+function imagePaths(html) {
+  const seen = new Set();
+  const src = String(html || "").replace(/\\\//g, "/");
+  let m;
+  while (seen.size < IMAGES_MAX && (m = IMAGE_PATH.exec(src)) !== null) seen.add(m[0]);
+  IMAGE_PATH.lastIndex = 0;
+  return [...seen];
 }
 
 function payload(session, ans, playerKey) {
@@ -144,6 +167,19 @@ export function journey() {
   const anyType = { headers: { Accept: "*/*" } };
   if (!SKIP.has("manifest")) note(http.get(`${play}/manifest`, { ...anyType, tags: { endpoint: "manifest" } }), "manifest");
   if (!SKIP.has("service_worker")) note(http.get(`${BASE}/service-worker`, { ...anyType, tags: { endpoint: "service_worker" } }), "service_worker");
+  // Card art + logo — every attachment the page references, the way a real
+  // browser loads them all on first view. Each is a request the journey-only
+  // runs (1–21) never counted. On the bucket a card image is a 302 to a
+  // presigned URL (the bytes never touch Puma; k6 follows the redirect and the
+  // timing includes the bucket) and the logo is proxied through Rails. Bodies
+  // are discarded — the server's cost is what is being measured.
+  if (!SKIP.has("images")) {
+    for (const path of imagePaths(page.body)) {
+      const img = note(http.get(`${BASE}${path}`, { ...anyType, responseType: "none", tags: { endpoint: "image" } }), "image");
+      check(img, { "image 200": (r) => r.status === 200 });
+      imagesFetched.add(1);
+    }
+  }
   sleep(60 * DWELL);
 
   // 2. Consent.

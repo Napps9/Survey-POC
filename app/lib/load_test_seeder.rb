@@ -1,3 +1,5 @@
+require "zlib"
+
 # Seeds a scratch database for the k6 load-test harness (test/load/).
 #
 # Two jobs, both additive-only:
@@ -51,8 +53,36 @@ class LoadTestSeeder
   # not evidence of real accounts — anything OUTSIDE this list is.
   SEEDED_SLUGS = [ "playverto", DemoSeeder::ORG_SLUG, DemoSeeder::PARTNER_SLUG ].freeze
 
+  # The smallest thing that is a valid PNG — 8-bit RGB, one IDAT, no
+  # interlace — filled with seeded pseudo-random pixels so the file is about
+  # the size asked for (noise doesn't deflate) and stable across re-runs.
+  module Png
+    SIGNATURE = "\x89PNG\r\n\x1A\n".b
+    WIDTH     = 128
+
+    module_function
+
+    def noise(seed:, kb:)
+      height = [ (kb * 1024.0 / (WIDTH * 3)).ceil, 1 ].max
+      rng    = Random.new(seed)
+      rows   = Array.new(height) { "\x00".b + rng.bytes(WIDTH * 3) } # filter byte 0 + RGB row
+      encode(WIDTH, height, rows.join)
+    end
+
+    def encode(width, height, raw)
+      ihdr = [ width, height, 8, 2, 0, 0, 0 ].pack("NNCCCCC") # depth 8, colour type 2 (RGB)
+      SIGNATURE + chunk("IHDR", ihdr) + chunk("IDAT", Zlib::Deflate.deflate(raw)) + chunk("IEND", "".b)
+    end
+
+    def chunk(type, data)
+      body = type.b + data.b
+      [ data.bytesize ].pack("N") + body + [ Zlib.crc32(body) ].pack("N")
+    end
+    private_class_method :encode, :chunk
+  end
+
   class << self
-    def run!(responses:, batch_size: 1_000, io: $stdout)
+    def run!(responses:, batch_size: 1_000, io: $stdout, images: 0, image_kb: 40)
       unless ENV["LOAD_TEST_SEED"] == "1"
         raise "LoadTestSeeder refuses to run without LOAD_TEST_SEED=1 — it is " \
               "for throwaway load-test databases only (see test/load/README.md)."
@@ -73,12 +103,15 @@ class LoadTestSeeder
       end
 
       survey   = find_or_create_survey!
+      attached = images.positive? ? attach_brand_assets!(survey, images: images, image_kb: image_kb) : 0
       inserted = insert_responses!(survey, count: responses, batch_size: batch_size, io: io)
 
       io.puts "Verto:       #{survey.title} (id #{survey.id})"
       io.puts "Play path:   /play/#{survey.publish_token}"
       io.puts "Responses:   +#{inserted} this run, #{survey.responses.count} total"
-      { survey: survey, inserted: inserted }
+      io.puts "Images:      +#{attached} card image(s) this run, #{survey.card_images.count} total; " \
+              "logo #{survey.organisation.logo.attached? ? 'attached' : 'none'}"
+      { survey: survey, inserted: inserted, images: attached }
     end
 
     def find_or_create_survey!
@@ -92,6 +125,44 @@ class LoadTestSeeder
         tokenisation_enabled: true, leaderboard_enabled: true,
         publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current
       )
+    end
+
+    # The full-branding shape the event Verto has (IMAGES=N on the seed task):
+    # an organisation logo — the play page draws it through the PROXY route —
+    # and a card image on each of the first N cards, stored on the card as a
+    # REDIRECT-route Active Storage path exactly as the editor stores an upload
+    # (Survey::ACTIVE_STORAGE_IMAGE_URL is what sanitize_image_url lets
+    # through). Runs 1–21 measured a text-only deck; these are the requests a
+    # real browser adds on top. Each image is deterministic noise of about
+    # `image_kb` KB — incompressible, so the bytes on the wire are realistic,
+    # and unique per card, so nothing dedupes. Idempotent: the target state is
+    # "the first N cards carry an image", so an attached logo and cards that
+    # already have one are left alone and a re-run attaches nothing. Returns the
+    # number of card images attached this run.
+    def attach_brand_assets!(survey, images:, image_kb:)
+      org = survey.organisation
+      unless org.logo.attached?
+        org.logo.attach(io: StringIO.new(Png.noise(seed: 0, kb: [ image_kb, 8 ].min)),
+                        filename: "load-test-logo.png", content_type: "image/png")
+      end
+
+      cards    = survey.cards.map(&:dup)
+      attached = 0
+      cards.each_with_index do |card, index|
+        break if index >= images         # target state: the FIRST N cards carry an image...
+        next if card["image"].present? # ...so a re-run attaches nothing
+
+        blob = ActiveStorage::Blob.create_and_upload!(
+          io:           StringIO.new(Png.noise(seed: index + 1, kb: image_kb)),
+          filename:     "load-test-card-#{index}.png",
+          content_type: "image/png"
+        )
+        survey.card_images.attach(blob)
+        card["image"] = Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
+        attached += 1
+      end
+      survey.update!(cards: cards) if attached.positive?
+      attached
     end
 
     def insert_responses!(survey, count:, batch_size: 1_000, io: $stdout)
