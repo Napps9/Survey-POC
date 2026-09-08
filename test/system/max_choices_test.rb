@@ -67,12 +67,12 @@ class MaxChoicesSystemTest < ApplicationSystemTestCase
     # Inert, and saying so. The dimming is the visible half; aria-disabled is
     # the half a screen reader gets, and neither is any use without the other.
     assert_equal "true", item("Cycling")[:"aria-disabled"]
-    assert_in_delta 0.4, opacity_of("Cycling"), 0.01,
+    assert_in_delta 0.4, settled_opacity_of("Cycling", 0.4), 0.01,
                     "the compiled stylesheet has to carry the [data-at-cap] rule — " \
                     "run bin/rails tailwindcss:build if this is the only failure"
     assert_nil item("Trains")[:"aria-disabled"], "a pick you have made is never disabled — " \
                                                  "unticking it is the way back under the cap"
-    assert_in_delta 1.0, opacity_of("Trains"), 0.01
+    assert_in_delta 1.0, settled_opacity_of("Trains", 1.0), 0.01
 
     # Giving one up frees the slot, which is what makes the cap navigable.
     pick("Trains")
@@ -165,6 +165,29 @@ class MaxChoicesSystemTest < ApplicationSystemTestCase
 
   def opacity_of(label)
     computed(label, "opacity").to_f
+  end
+
+  # The painted opacity once it has stopped moving.
+  #
+  # The dimming rule FADES — `[data-at-cap="true"] … { opacity: 0.4; transition:
+  # opacity 0.15s }` — so a single read taken the instant the cap engages can
+  # catch the fade in flight rather than at rest. CI read 0.418 on its way from
+  # 1.0 down to 0.4 and failed: the right rule, applied, sampled at the wrong
+  # moment. (0.418 is itself the proof the rule was there — a missing rule reads
+  # a flat 1.0.) `pointer-events` above needs no such wait; it is not
+  # transitioned and flips in the same frame as the attribute.
+  #
+  # Hands back the LAST value read whether or not it arrived, so a stylesheet
+  # that genuinely lacks the rule still fails the assertion below — with the
+  # number actually found, and the message about rebuilding it intact.
+  def settled_opacity_of(label, expected)
+    deadline = Time.current + 5
+    value    = opacity_of(label)
+    while (value - expected).abs > 0.01 && Time.current < deadline
+      sleep 0.05
+      value = opacity_of(label)
+    end
+    value
   end
 
   def computed(label, property)
