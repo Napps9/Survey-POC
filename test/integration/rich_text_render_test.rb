@@ -16,7 +16,14 @@ class RichTextRenderTest < ActionDispatch::IntegrationTest
                  "text_html" => %(<span class="font-anton">Big</span> question),
                  "options" => [ "Bold pick", "Plain" ],
                  "options_html" => [ "<b>Bold pick</b>", nil ],
-                 "i18n" => { "fr" => { "text" => "Grande question" } } } ]
+                 "i18n" => { "fr" => { "text" => "Grande question" } } },
+               # The scenario's answer page is the multiple_choice list reused —
+               # its rows must carry the same rich-text layer, or a font set on
+               # one renders plain after reload and is dropped on the next save.
+               { "type" => "scenario", "cid" => "sc", "text" => "A fork in the road",
+                 "pages" => [ { "id" => "p1", "text" => "Once upon a time." } ],
+                 "options" => [ "Go left", "Go right" ],
+                 "options_html" => [ "<b>Go left</b>", nil ] } ]
     )
     @survey.update!(publish_token: SecureRandom.hex(8))
   end
@@ -27,6 +34,7 @@ class RichTextRenderTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".q-title span.font-anton", text: "Big"
     assert_select ".pick-text b", text: "Bold pick"
+    assert_select ".book-page.is-answer .pick-text b", text: "Go left"
   end
 
   test "a translated view renders plain — a translation never wears primary markup" do
@@ -45,6 +53,10 @@ class RichTextRenderTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".q-title[data-rich-text] span.font-anton", { minimum: 1 }
+    # The option rows are regions too — this is what lets a creator put a font
+    # on one option. The toolbar only ever appears inside [data-rich-text].
+    assert_select ".pick-text[data-rich-text] b", text: "Bold pick"
+    assert_select ".book-page.is-answer .pick-text[data-rich-text] b", text: "Go left"
     assert_select ".rich-text-toolbar", 1
   end
 
@@ -57,13 +69,19 @@ class RichTextRenderTest < ActionDispatch::IntegrationTest
                                "text" => "Big question",
                                "text_html" => %(<span class="font-spectral">Big question</span>),
                                "options" => [ "Bold pick" ],
-                               "options_html" => [ %(<b onclick="x()">Bold pick</b>) ] } ] }.to_json,
+                               "options_html" => [ %(<b onclick="x()">Bold pick</b>) ] },
+                             { "type" => "scenario", "cid" => "sc", "text" => "A fork in the road",
+                               "pages" => [ { "id" => "p1", "text" => "Once upon a time." } ],
+                               "options" => [ "Go left", "Go right" ],
+                               "options_html" => [ %(<span class="font-poppins">Go left</span>), nil ] } ] }.to_json,
           headers: { "CONTENT_TYPE" => "application/json" }
 
     assert_response :success
     card = @survey.reload.cards.first
     assert_equal %(<span class="font-spectral">Big question</span>), card["text_html"]
     assert_equal "<b>Bold pick</b>", card["options_html"][0], "the handler must be stripped"
+    assert_equal %(<span class="font-poppins">Go left</span>), @survey.cards.second["options_html"][0],
+                 "a font on a scenario answer must survive the save like any other option's"
   end
 
   test "the CSV export stays plain" do

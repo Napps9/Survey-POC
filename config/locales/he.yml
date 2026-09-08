@@ -434,6 +434,10 @@ he:
       saved: נשמר %{time}
       save_failed: 'השמירה נכשלה: %{msg}'
       save_warning: 'נשמר, אך תמונה אחת לא נשמרה — יש לבדוק ולהעלות אותה שוב.'
+      save_warning_media: "נשמר, אך סרטון או אנימציה לא נשמרו — יש לבדוק ולהחיל מחדש."
+      save_warning_duplicate: "נשמר — כרטיס כפול הוסר (ל-Verto יש רק אחד מסוג זה)."
+      save_warning_retired: "נשמר — כרטיס מסוג שהוצא משימוש הוסר."
+      save_warning_consent_moved: "נשמר — שער ההסכמה הועבר לפני השאלה הראשונה שלך."
       card_n: כרטיס %{n} · %{type}
       choose_format: בחר פורמט תשובה למטה.
       type_updated: סוג התשובה עודכן ל-%{type}

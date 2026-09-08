@@ -434,6 +434,10 @@ nl:
       saved: Opgeslagen %{time}
       save_failed: 'Opslaan mislukt: %{msg}'
       save_warning: 'Opgeslagen, maar een afbeelding is niet bewaard — controleer en upload deze opnieuw.'
+      save_warning_media: "Opgeslagen, maar een video of animatie is niet bewaard — controleer en pas deze opnieuw toe."
+      save_warning_duplicate: "Opgeslagen — een dubbele kaart is verwijderd (een Verto heeft er maar één van dat type)."
+      save_warning_retired: "Opgeslagen — een kaart van een uitgefaseerd type is verwijderd."
+      save_warning_consent_moved: "Opgeslagen — de toestemmingspoort is vóór je eerste vraag geplaatst."
       card_n: Kaart %{n} · %{type}
       choose_format: Kies hieronder een antwoordformaat.
       type_updated: Antwoordtype bijgewerkt naar %{type}

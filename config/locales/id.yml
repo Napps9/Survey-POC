@@ -434,6 +434,10 @@ id:
       saved: Tersimpan %{time}
       save_failed: 'Gagal menyimpan: %{msg}'
       save_warning: 'Disimpan, tetapi satu gambar tidak tersimpan — periksa dan unggah ulang.'
+      save_warning_media: "Disimpan, tetapi satu video atau animasi tidak tersimpan — periksa dan terapkan ulang."
+      save_warning_duplicate: "Disimpan — satu kartu duplikat dihapus (sebuah Verto hanya memiliki satu kartu jenis itu)."
+      save_warning_retired: "Disimpan — satu kartu dari jenis yang sudah tidak digunakan dihapus."
+      save_warning_consent_moved: "Disimpan — gerbang persetujuan dipindahkan ke sebelum pertanyaan pertama Anda."
       card_n: Kartu %{n} · %{type}
       choose_format: Pilih format jawaban di bawah ini.
       type_updated: Tipe jawaban diperbarui menjadi %{type}

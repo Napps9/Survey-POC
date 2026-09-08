@@ -413,4 +413,89 @@ class JsConstantParityTest < ActiveSupport::TestCase
                  "Use isPaged() from lib/paged_types so a new paged type is picked up — " \
                  "this is what let a consent gate lose its pages on every save."
   end
+
+  # ── Rich-text markers ─────────────────────────────────────────────────────
+  # The floating font/bold toolbar shows itself only inside an element carrying
+  # `data-rich-text` (rich_text_controller.js#_region). The server partial marks
+  # its option rows; the client templates that build the SAME rows — "＋ Add
+  # option", and every row of a card whose answer type was picked in-session —
+  # did not, so an Image List built in the editor could not be given a font
+  # until the next full reload, while the Image Grid beside it (never rebuilt
+  # client-side) could. Marker parity, per row shape, on both sides.
+  def template_body(source, name)
+    body = source[/export function #{Regexp.escape(name)}\(.*?\n\}/m]
+    assert body, "lib/choice_templates.js no longer defines #{name}"
+    body
+  end
+
+  RICH_LABEL = /contenteditable="true"[^>]*\bdata-rich-text\b/
+
+  test "client-built editable labels are rich-text regions exactly where their server twins are" do
+    source  = js("lib/choice_templates.js")
+    partial = File.read(Rails.root.join("app/views/shared/_card_component.html.erb"))
+
+    %w[choiceListItemHtml prioritiseItemHtml choiceGridItemHtml].each do |name|
+      assert_match RICH_LABEL, template_body(source, name),
+                   "#{name} builds an editable label with no data-rich-text: a row added or " \
+                   "rebuilt in this session shows no formatting toolbar until the page is reloaded"
+    end
+    refute_match RICH_LABEL, template_body(source, "yesNoItemHtml"),
+                 "yes_no labels are the translated canonical Yes/No — the server row has no " \
+                 "data-rich-text, and the client row must match it"
+
+    # The server side of the same contract: list, prioritise, grid and the
+    # scenario answer page all mark their label; the yes_no row does not.
+    marked = partial.scan(/(?:pick-text choice-list-label|choice-label)" <%= ce_attr %> <%= "data-rich-text"\.html_safe if editable %>/)
+    assert_operator marked.size, :>=, 4,
+                    "expected the list, prioritise, grid and scenario-answer rows of " \
+                    "_card_component.html.erb to carry data-rich-text; found #{marked.size}"
+    yes_no_row = partial.lines.find { |l| l.include?('t("card.#{canon_label.downcase}"') }
+    assert yes_no_row, "the yes_no row's markup moved — update this test's anchor"
+    refute_includes yes_no_row, "data-rich-text"
+
+    # Scenario page text: the type panel's rebuild and "＋ Add page" both build
+    # the .book-page-text the server marks (and renders through rich_page_text).
+    page_text = /book-page-text" contenteditable="true"[^>]*\bdata-rich-text\b/
+    scenario  = js("controllers/type_panel_controller.js")[/^  scenario: \(opts, ctx = \{\}\) => \{.*?^  \},/m]
+    assert scenario, "type_panel_controller.js no longer has a scenario: builder"
+    assert_match page_text, scenario, "a scenario rebuilt by the type panel has unformattable pages"
+    assert_match page_text, js("controllers/scenario_controller.js"), "a page added with ＋ Add page is unformattable"
+  end
+
+  # ── Save warnings ─────────────────────────────────────────────────────────
+  # Every silent repair the server makes on save is reported through one
+  # `warnings` array of codes, and the editor used to answer all of them with
+  # "an image didn't stick". The table in survey_editor_controller.js is what
+  # turns a code into a sentence; a code the server can emit that the table
+  # doesn't know falls back to the image wording — exactly the lie this pins
+  # against.
+  test "every save-warning code the server can emit has a message in the editor" do
+    server = %w[app/models/survey.rb app/controllers/surveys_controller.rb].flat_map do |path|
+      File.read(Rails.root.join(path)).scan(/warnings << "([a-z_]+)"/).flatten
+    end.uniq.sort
+    assert_operator server.size, :>=, 8, "expected to find the server's warning codes; got #{server.inspect}"
+
+    source = js("controllers/survey_editor_controller.js")
+    table  = source[/const SAVE_WARNING_KEYS = \{(.*?)\n\}/m, 1]
+    assert table, "survey_editor_controller.js no longer defines SAVE_WARNING_KEYS"
+    entries = table.scan(/(\w+):\s*"([^"]+)"/)
+
+    assert_empty server - entries.map(&:first),
+                 "server warning codes with no editor message — each would be reported as " \
+                 "\"an image didn't stick\""
+    entries.map(&:last).uniq.each do |key|
+      assert I18n.exists?("js.#{key}", :en), "SAVE_WARNING_KEYS points at js.#{key}, which en.yml does not define"
+    end
+    refute_match(/flash\(t\("editor\.save_warning"\)/, source,
+                 "_doSave must route through _saveWarningMessage, not the fixed image sentence")
+  end
+
+  # The picker refuses an upload it could not store once its inline fallback is
+  # over the sanitiser's cap — the two sizes must agree, or the refusal is
+  # either needless or too late (the creator gets "an image didn't stick").
+  test "the media picker's inline cap matches Survey::MAX_BACKGROUND_DATA_URL_BYTES" do
+    cap = js("controllers/media_picker_controller.js")[/static INLINE_DATA_URL_CAP\s*=\s*(\d+)/, 1]
+    assert cap, "media_picker_controller.js no longer defines a numeric INLINE_DATA_URL_CAP"
+    assert_equal Survey::MAX_BACKGROUND_DATA_URL_BYTES, cap.to_i
+  end
 end

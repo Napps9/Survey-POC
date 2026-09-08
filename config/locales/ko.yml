@@ -434,6 +434,10 @@ ko:
       saved: "%{time}에 저장됨"
       save_failed: '저장 실패: %{msg}'
       save_warning: '저장되었지만 이미지가 저장되지 않았습니다 — 확인 후 다시 업로드해 주세요.'
+      save_warning_media: "저장되었지만 동영상 또는 애니메이션이 저장되지 않았습니다 — 확인 후 다시 적용해 주세요."
+      save_warning_duplicate: "저장됨 — 중복된 카드가 제거되었습니다 (Verto에는 해당 유형의 카드가 하나만 있습니다)."
+      save_warning_retired: "저장됨 — 사용 중단된 유형의 카드가 제거되었습니다."
+      save_warning_consent_moved: "저장됨 — 동의 게이트가 첫 번째 질문 앞으로 이동되었습니다."
       card_n: 카드 %{n} · %{type}
       choose_format: 아래에서 답변 형식을 선택하세요.
       type_updated: 답변 유형이 %{type}(으)로 업데이트되었습니다

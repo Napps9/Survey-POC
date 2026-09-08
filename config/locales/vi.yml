@@ -434,6 +434,10 @@ vi:
       saved: Đã lưu %{time}
       save_failed: 'Lưu thất bại: %{msg}'
       save_warning: 'Đã lưu, nhưng một hình ảnh chưa được lưu — vui lòng kiểm tra và tải lên lại.'
+      save_warning_media: "Đã lưu, nhưng một video hoặc hình động chưa được lưu — vui lòng kiểm tra và áp dụng lại."
+      save_warning_duplicate: "Đã lưu — một thẻ trùng lặp đã bị xóa (mỗi Verto chỉ có một thẻ loại đó)."
+      save_warning_retired: "Đã lưu — một thẻ thuộc loại đã ngừng sử dụng đã bị xóa."
+      save_warning_consent_moved: "Đã lưu — cổng đồng ý đã được chuyển lên trước câu hỏi đầu tiên của bạn."
       card_n: Thẻ %{n} · %{type}
       choose_format: Chọn định dạng câu trả lời bên dưới.
       type_updated: Đã cập nhật loại câu trả lời thành %{type}

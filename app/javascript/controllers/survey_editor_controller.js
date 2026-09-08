@@ -42,6 +42,29 @@ const OPTION_LABEL_SELECTORS = {
   scenario: ".pick-text"
 }
 
+// What the save response's `warnings` codes mean to a creator. The server
+// (Survey.sanitize_cards_images! and SurveysController#update — grep
+// `warnings << "`) reports every silent repair through this one array, and
+// the editor used to answer all of them with "an image didn't stick": a deck
+// holding a second welcome card, a retired card type or a consent gate after
+// its first question was told to re-upload an image that was perfectly fine,
+// on every autosave, forever. JsConstantParityTest pins this table to the
+// server's codes, so a new code can't fall back to the image wording unseen;
+// a genuinely unknown code still does, deliberately — a raw dotted key is
+// worse than a slightly wrong sentence.
+const SAVE_WARNING_KEYS = {
+  image: "editor.save_warning",
+  option_images: "editor.save_warning",
+  background_image: "editor.save_warning",
+  video: "editor.save_warning_media",
+  lottie: "editor.save_warning_media",
+  duplicate_welcome: "editor.save_warning_duplicate",
+  duplicate_respondent_code: "editor.save_warning_duplicate",
+  duplicate_points_intro: "editor.save_warning_duplicate",
+  retired_card: "editor.save_warning_retired",
+  consent_gate_moved: "editor.save_warning_consent_moved"
+}
+
 // Token-award rows are keyed by canonical option label, so the types whose
 // labels are edited live in the card need their rows rebuilt as options change
 // (see syncTokenRowsFor) — yes_no's canonicals are fixed, the flat-award types
@@ -3101,17 +3124,29 @@ export default class extends Controller {
       // pagehide/visibilitychange safety net — skips when _dirty is false, so
       // closing the tab inside that window silently dropped them.
       if (gen === this._editGen) this._dirty = false
-      // The save itself succeeded, but the server may have silently dropped an
-      // oversized/invalid image (sanitize_cards_images! nils it out rather than
-      // erroring) — tell the editor instead of just showing "Saved".
+      // The save itself succeeded, but the server may have silently repaired
+      // the deck — dropped an oversized/invalid image, removed a duplicate
+      // welcome card, moved the consent gate (sanitize_cards_images! fixes
+      // rather than erroring) — so say WHICH, instead of just "Saved".
       if (Array.isArray(json.warnings) && json.warnings.length) {
-        this.flash(t("editor.save_warning"), "text-hot-pink")
+        this.flash(this._saveWarningMessage(json.warnings), "text-hot-pink")
       } else {
         this.flash(t("editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
       }
     } catch (err) {
       this.flash(t("editor.save_failed", { msg: err.message }), "text-hot-pink")
     }
+  }
+
+  // The sentence for a save response's `warnings` — the FIRST code the table
+  // knows (the server lists a card's media codes before the deck-level
+  // structural passes, so a dropped image outranks a moved gate), one sentence
+  // only because the status pill is a single nowrap line. Membership in
+  // SAVE_WARNING_KEYS decides the fallback, not a t() miss: t() returns the
+  // raw dotted key for an unknown one.
+  _saveWarningMessage(codes) {
+    const code = codes.find((c) => SAVE_WARNING_KEYS[c])
+    return t(SAVE_WARNING_KEYS[code] || "editor.save_warning")
   }
 
   // Plural, like undoBtnTargets: the mobile studio hides the float bar this

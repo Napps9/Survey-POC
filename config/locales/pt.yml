@@ -434,6 +434,10 @@ pt:
       saved: Guardado %{time}
       save_failed: 'Falha ao guardar: %{msg}'
       save_warning: 'Guardado, mas uma imagem não foi guardada — verifique e carregue-a novamente.'
+      save_warning_media: "Guardado, mas um vídeo ou uma animação não foi guardado — verifique e volte a aplicar."
+      save_warning_duplicate: "Guardado — um cartão duplicado foi removido (um Verto só tem um desse tipo)."
+      save_warning_retired: "Guardado — um cartão de um tipo descontinuado foi removido."
+      save_warning_consent_moved: "Guardado — o portão de consentimento foi movido para antes da sua primeira pergunta."
       card_n: Cartão %{n} · %{type}
       choose_format: Escolha um formato de resposta abaixo.
       type_updated: Tipo de resposta atualizado para %{type}

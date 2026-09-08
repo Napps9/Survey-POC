@@ -434,6 +434,10 @@ ja:
       saved: "%{time}に保存済み"
       save_failed: '保存失敗: %{msg}'
       save_warning: '保存しましたが、画像が保存されませんでした。確認して再アップロードしてください。'
+      save_warning_media: "保存しましたが、動画またはアニメーションが保存されませんでした。確認して再適用してください。"
+      save_warning_duplicate: "保存しました。重複したカードを削除しました（Vertoにはその種類のカードは1枚のみです）。"
+      save_warning_retired: "保存しました。廃止された種類のカードを削除しました。"
+      save_warning_consent_moved: "保存しました。同意ゲートを最初の質問の前に移動しました。"
       card_n: カード %{n} · %{type}
       choose_format: 以下から回答形式を選択してください。
       type_updated: 回答タイプが %{type} に更新されました

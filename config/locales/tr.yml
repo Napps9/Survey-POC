@@ -434,6 +434,10 @@ tr:
       saved: "%{time} kaydedildi"
       save_failed: 'Kaydetme başarısız: %{msg}'
       save_warning: 'Kaydedildi, ancak bir görsel kaydedilmedi — lütfen kontrol edip yeniden yükleyin.'
+      save_warning_media: "Kaydedildi, ancak bir video veya animasyon kaydedilmedi — lütfen kontrol edip yeniden uygulayın."
+      save_warning_duplicate: "Kaydedildi — yinelenen bir kart kaldırıldı (bir Verto'da o türden yalnızca bir kart bulunur)."
+      save_warning_retired: "Kaydedildi — kullanımdan kaldırılmış türde bir kart kaldırıldı."
+      save_warning_consent_moved: "Kaydedildi — onay kapısı ilk sorunuzun önüne taşındı."
       card_n: Kart %{n} · %{type}
       choose_format: Aşağıdan bir yanıt formatı seçin.
       type_updated: Yanıt türü %{type} olarak güncellendi

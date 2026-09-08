@@ -434,6 +434,10 @@ it:
       saved: Salvato %{time}
       save_failed: 'Salvataggio non riuscito: %{msg}'
       save_warning: 'Salvato, ma un''immagine non è stata salvata — controllala e ricaricala.'
+      save_warning_media: "Salvato, ma un video o un'animazione non è stato salvato — controlla e riapplicalo."
+      save_warning_duplicate: "Salvato — una scheda duplicata è stata rimossa (un Verto ne ha solo una di quel tipo)."
+      save_warning_retired: "Salvato — una scheda di un tipo ritirato è stata rimossa."
+      save_warning_consent_moved: "Salvato — il gate del consenso è stato spostato prima della tua prima domanda."
       card_n: Carta %{n} · %{type}
       choose_format: Scegli un formato di risposta qui sotto.
       type_updated: Tipo di risposta aggiornato a %{type}

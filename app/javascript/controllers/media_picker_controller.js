@@ -40,6 +40,15 @@ export default class extends Controller {
   // server's own Survey::CARD_IMAGE_MAX_BYTES so nothing the client accepts
   // can still be rejected once it reaches CardImageStore.decode.
   static GIF_BYTE_CAP    = 3 * 1024 * 1024
+  // The most inline base64 a card may KEEP — Survey::MAX_BACKGROUND_DATA_URL_BYTES,
+  // measured on the data-URL string (JsConstantParityTest pins the two). It
+  // only matters when _persistUpload has failed and the picture is about to be
+  // carried inline: a raw GIF or an undecodable file near GIF_BYTE_CAP is
+  // ~4 MB of base64, the sanitiser drops anything over this, and the creator
+  // was left with "Saved, but an image didn't stick" on every autosave, with
+  // re-uploading reproducing it exactly. Better to refuse at the upload pane,
+  // where the message can say what to do.
+  static INLINE_DATA_URL_CAP = 3000000
 
   // Fixed [width, height] output ratio per slot, matching PexelsClient::CROP_FOR
   // — a Pexels pick already arrives pre-cropped to these dimensions server-side,
@@ -1538,6 +1547,14 @@ export default class extends Controller {
       // Store the bytes once and carry a short path on the card instead of the
       // base64. Inline data-URLs were the memory driver behind the 502s.
       this._pendingUrl = await this._persistUpload(this._pendingUrl)
+      // Still a data URL means storage failed and the picture is about to ride
+      // inline. Small ones may (the server still accepts them); one over the
+      // sanitiser's cap would be applied here, then silently nil'd on the very
+      // next autosave — so stop now, with a reason, instead of a warning later.
+      if (this._pendingUrl.startsWith("data:") && this._pendingUrl.length > this.constructor.INLINE_DATA_URL_CAP) {
+        this._showUploadError("We couldn't store that image — please try again, or use a smaller file (under about 2 MB).")
+        return
+      }
     }
 
     if (this._mode === "background") {

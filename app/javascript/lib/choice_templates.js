@@ -11,6 +11,16 @@
 // arrive as the optional `style` argument and are carried as data-option-*
 // attributes; explicit icons are injected asynchronously by
 // lib/option_icons.js#injectIcons after insertion.
+//
+// The label carries `data-rich-text` wherever its server twin does. That
+// attribute is the ONLY thing the floating font/bold toolbar looks for
+// (rich_text_controller.js#_region), so a row built here without it — every
+// "＋ Add option" row, and every row of a card whose answer type was picked in
+// this session — could not be given a font until the next full reload, while
+// the server-rendered rows beside it could ("On Image List you can't change
+// the font of the list"). yes_no is the deliberate exception: its server row
+// has no marker either, because its labels are the translated canonical
+// Yes/No rather than a creator's words.
 import { t } from "lib/i18n"
 import { tileStyle } from "lib/option_styles"
 
@@ -49,7 +59,7 @@ export function choiceListItemHtml(label, i, mode, style = null) {
         <li class="choice-list-item pick-item" data-picker-target="item"
             data-action="click->picker#pick" data-selected="false"${styleAttrs(style)}>
           <div class="choice-list-tile choice-bg-${(i % 6) + 1}" style="${esc(tileStyle(style))}">${tileInner(style)}</div>
-          <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
+          <span class="pick-text choice-list-label" contenteditable="true" data-rich-text>${esc(label)}</span>
           <span class="choice-list-tick ${tick}">✓</span>
           ${styleBtnHtml()}
           <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
@@ -63,7 +73,7 @@ export function prioritiseItemHtml(label, i, style = null) {
         <li class="choice-list-item pick-item prioritise-item" data-prioritise-target="item"
             data-action="pointerdown->prioritise#start"${styleAttrs(style)}>
           <div class="choice-list-tile choice-bg-${(i % 6) + 1}" style="${esc(tileStyle(style))}"><span class="prioritise-rank" data-prioritise-target="rank">${i + 1}</span>${tileInner(style)}</div>
-          <span class="pick-text choice-list-label" contenteditable="true">${esc(label)}</span>
+          <span class="pick-text choice-list-label" contenteditable="true" data-rich-text>${esc(label)}</span>
           <span class="prioritise-grip" aria-hidden="true">⋮⋮</span>
           ${styleBtnHtml()}
           <button type="button" class="pick-item-delete" data-action="click->card-editor#deleteOption" title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
@@ -80,12 +90,14 @@ export function choiceGridItemHtml(label, i, style = null) {
             <div class="choice-tick">✓</div>
             ${styleBtnHtml(" option-style-btn-grid")}
           </div>
-          <div class="choice-label" contenteditable="true">${esc(label)}</div>
+          <div class="choice-label" contenteditable="true" data-rich-text>${esc(label)}</div>
         </li>`
 }
 
 // A yes/no row: fixed pair, fixed tile colours (1 = green, 4 = red), no
-// delete button — the pair is not user-extensible. `canonical` must be the
+// delete button — the pair is not user-extensible. No `data-rich-text` on the
+// label, matching the server row: the words are the translated canonical
+// Yes/No, not a creator's text to format. `canonical` must be the
 // stable "Yes"/"No" key whatever the display label says: the serializer
 // reads data-canonical for yes_no quiz answers, and grading is keyed on it.
 // `quiz` mirrors the server's mark-correct button so a client-rebuilt card

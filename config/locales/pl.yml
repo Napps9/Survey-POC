@@ -434,6 +434,10 @@ pl:
       saved: Zapisano %{time}
       save_failed: 'Zapis nie powiódł się: %{msg}'
       save_warning: 'Zapisano, ale jeden obraz się nie zapisał — sprawdź i prześlij go ponownie.'
+      save_warning_media: "Zapisano, ale film lub animacja się nie zapisały — sprawdź i zastosuj ponownie."
+      save_warning_duplicate: "Zapisano — usunięto zduplikowaną kartę (Verto ma tylko jedną kartę tego typu)."
+      save_warning_retired: "Zapisano — usunięto kartę wycofanego typu."
+      save_warning_consent_moved: "Zapisano — bramka zgody została przeniesiona przed Twoje pierwsze pytanie."
       card_n: Karta %{n} · %{type}
       choose_format: Wybierz format odpowiedzi poniżej.
       type_updated: Typ odpowiedzi zmieniono na %{type}

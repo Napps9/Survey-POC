@@ -277,7 +277,7 @@ const COMPONENTS = {
       <div class="book-page" data-scenario-target="page" data-page-id="${esc(p.id || "")}">
         <div class="book-page-scroll">
           <div class="book-page-kicker" data-scenario-target="kicker">${esc(t("editor.scenario.page_of", { n: i + 1, total: pages.length }))}</div>
-          <div class="book-page-text" contenteditable="true" data-scenario-target="pageText"
+          <div class="book-page-text" contenteditable="true" data-rich-text data-scenario-target="pageText"
                data-placeholder="${esc(t("editor.scenario.page_placeholder"))}">${esc(p.text || "")}</div>
         </div>
         <div class="book-page-corner">${i + 1}</div>

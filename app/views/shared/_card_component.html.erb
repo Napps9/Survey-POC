@@ -553,7 +553,7 @@
                       data-selected="false"
                       <%= pick_a11y.call(false) %>>
                     <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
-                    <span class="pick-text choice-list-label" <%= ce_attr %>><%= opt %></span>
+                    <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
                     <%= token_badge.call(canon[i]) %>
                     <span class="choice-list-tick pick-dot">✓</span>
                     <% if quiz_mode %>

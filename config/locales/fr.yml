@@ -434,6 +434,10 @@ fr:
       saved: Enregistré %{time}
       save_failed: 'Échec de l''enregistrement : %{msg}'
       save_warning: 'Enregistré, mais une image n''a pas été conservée — vérifiez-la et réimportez-la.'
+      save_warning_media: "Enregistré, mais une vidéo ou une animation n'a pas été conservée — vérifiez-la et réappliquez-la."
+      save_warning_duplicate: "Enregistré — une carte en double a été supprimée (un Verto n'en a qu'une de ce type)."
+      save_warning_retired: "Enregistré — une carte d'un type retiré a été supprimée."
+      save_warning_consent_moved: "Enregistré — la porte de consentement a été déplacée avant votre première question."
       card_n: Carte %{n} · %{type}
       choose_format: Choisissez un format de réponse ci-dessous.
       type_updated: 'Type de réponse mis à jour : %{type}'

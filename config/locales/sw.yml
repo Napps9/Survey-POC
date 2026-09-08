@@ -434,6 +434,10 @@ sw:
       saved: Imehifadhiwa %{time}
       save_failed: 'Kuhifadhi kumeshindikana: %{msg}'
       save_warning: 'Imehifadhiwa, lakini picha moja haikuhifadhiwa — tafadhali angalia na upakie tena.'
+      save_warning_media: "Imehifadhiwa, lakini video au uhuishaji haukuhifadhiwa — tafadhali angalia na uutumie tena."
+      save_warning_duplicate: "Imehifadhiwa — kadi iliyorudiwa imeondolewa (Verto ina kadi moja tu ya aina hiyo)."
+      save_warning_retired: "Imehifadhiwa — kadi ya aina iliyoondolewa imeondolewa."
+      save_warning_consent_moved: "Imehifadhiwa — lango la idhini limehamishwa kabla ya swali lako la kwanza."
       card_n: Kadi %{n} · %{type}
       choose_format: Chagua muundo wa jibu hapa chini.
       type_updated: Aina ya jibu imebadilishwa kuwa %{type}

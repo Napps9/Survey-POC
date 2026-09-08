@@ -115,7 +115,7 @@ export default class extends Controller {
     el.innerHTML = `
       <div class="book-page-scroll">
         <div class="book-page-kicker" data-scenario-target="kicker"></div>
-        <div class="book-page-text" contenteditable="true" data-scenario-target="pageText"
+        <div class="book-page-text" contenteditable="true" data-rich-text data-scenario-target="pageText"
              data-placeholder="${this._esc(t("editor.scenario.page_placeholder"))}">${this._esc(text)}</div>
       </div>
       <div class="book-page-corner"></div>
