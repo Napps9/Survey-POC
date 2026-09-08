@@ -27,9 +27,11 @@ Frankfurt), alongside the Frankfurt web service and database.
 | Service worker | — | No change and no `CACHE_VERSION` bump: its same-origin Active Storage handler returns whatever the fetch returns; a redirected image arrives opaque, renders, and simply isn't offline-cached. |
 | `render.yaml` | web + worker | The six vars declared (`sync: false` on web, `fromService` on the worker). The `disk:` block is deliberately still there — see phase 3. |
 
-URLs never change: cards store `/rails/active_storage/blobs/redirect/…` paths
-and the play page uses `/rails/active_storage/blobs/proxy/…` for the logo; both
-resolve per blob to whichever service holds it. No content is rewritten.
+Stored URLs never change: cards keep `/rails/active_storage/blobs/redirect/…`
+paths and the dashboard draws the logo through `/rails/active_storage/blobs/proxy/…`;
+both resolve per blob to whichever service holds it. No stored content is
+rewritten. The public player alone swaps them for presigned bucket URLs at
+render time — see "Player assets and the page cache" below.
 
 ## Env vars
 
@@ -130,6 +132,29 @@ Only after phase 2 has been live and verified.
      now run exactly once, in the worker — never in N web instances);
    - web instances → 2 (or whatever the proof run calls for), same compute plan.
 3. Re-run the branded proof against the fleet (`IMAGES=` seeded Verto).
+
+## Player assets and the page cache (post-cutover behaviour)
+
+Once `ACTIVE_STORAGE_SERVICE=bucket`, the public player changes two things, both
+measured necessary by runs 22–23 (`docs/SCALE_AND_COST_PLAN.md` §2b):
+
+- **Card images and the logo are presigned bucket URLs in the page**
+  (`app/lib/player_asset_urls.rb`): a respondent's browser fetches them from the
+  bucket directly and Rails never sees an image request — on the disk each was
+  a 302 or a proxied stream, 60% of all web requests on a six-image deck. URL
+  TTL 2 h ≥ 2 × the page-cache TTL, pinned by a test; anything unresolvable
+  passes through as the old same-origin path, so a broken presign degrades
+  rather than fails. Editor, preview and dashboard are unchanged. This is why
+  the bucket origin is in the CSP (phase 0), not only for the 302s.
+- **The play page has a process-local front cache**
+  (`PlayerController.player_page_local_cache`) in front of `Rails.cache`: one
+  render per Puma worker per hour per key, and a Key Value blip no longer means
+  every request re-renders. Keys are unchanged and expiry-only, so republish
+  busting works exactly as before.
+
+The phase-2 smoke therefore also checks that a card image URL in the play page
+HTML is an `https://…r2.cloudflarestorage.com/…X-Amz-Signature=…` URL (not a
+`/rails/active_storage/…` path) and that the logo `<img src>` is likewise.
 
 ## Costs and notes
 

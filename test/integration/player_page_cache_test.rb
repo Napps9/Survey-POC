@@ -67,4 +67,37 @@ class PlayerPageCacheTest < ActionDispatch::IntegrationTest
       assert_includes @response.body, link.slug
     end
   end
+def with_local_page_cache
+  old = PlayerController.player_page_local_cache
+  PlayerController.player_page_local_cache = ActiveSupport::Cache::MemoryStore.new
+  yield
+ensure
+  PlayerController.player_page_local_cache = old
+end
+
+test "each process keeps its own copy, so the shared store is off the page's hot path" do
+  survey = published_survey(theme: "Sports")
+
+  with_memory_cache do
+    with_local_page_cache do
+      get play_survey_path(survey.publish_token)
+      assert_response :success
+      assert_includes @response.body, "Sports"
+
+      # The shared store loses everything (a Key Value blip, a flush) and the
+      # row changes without bumping updated_at: the page is still served, from
+      # the process-local copy, with no re-render.
+      Rails.cache.clear
+      survey.update_columns(theme: "Cricket")
+      get play_survey_path(survey.publish_token)
+      assert_includes @response.body, "Sports"
+      refute_includes @response.body, "Cricket"
+
+      # A republish changes the key; the local copy is bypassed like any other.
+      survey.touch
+      get play_survey_path(survey.publish_token)
+      assert_includes @response.body, "Cricket"
+    end
+  end
+end
 end

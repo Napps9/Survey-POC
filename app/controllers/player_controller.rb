@@ -1191,14 +1191,42 @@ class PlayerController < ApplicationController
   # fetches all respondent-specific data from the JSON endpoints, so nothing
   # per-respondent is rendered into it; the one per-session byte (csrf_meta_tags)
   # is never verified because every player write endpoint uses null_session.
+  #
+  # Two tiers. A process-local MemoryStore sits in front of Rails.cache: each
+  # Puma worker keeps the pages it has served for the same TTL, so a burst costs
+  # one render per worker per key instead of a ~150 KB round-trip to the shared
+  # store on every request — and the page no longer depends on that store being
+  # healthy. Rails.cache fails OPEN (config/environments/production.rb), which
+  # under load turns a struggling Key Value instance into a full re-render of
+  # every page and hands the web tier its biggest cost straight back (runs 22–23,
+  # docs/SCALE_AND_COST_PLAN.md §2b). Correctness is unchanged: the key already
+  # carries every input that changes the bytes and nothing deletes these keys
+  # (expiry only), so a local copy can never outlive a republish. Sized for a
+  # handful of live links × locales; MemoryStore evicts least-recently-used past
+  # the cap. The test environment defaults it to a null store, as Rails.cache
+  # already is there, so a test sees every render unless it opts in
+  # (test/integration/player_page_cache_test.rb).
+  def self.default_player_page_local_cache
+    return ActiveSupport::Cache::NullStore.new if Rails.env.test?
+
+    ActiveSupport::Cache::MemoryStore.new(size: 32.megabytes)
+  end
+  class_attribute :player_page_local_cache, instance_accessor: false, default: default_player_page_local_cache
+
   def cached_play_page
-    Rails.cache.fetch(play_page_cache_key, expires_in: PLAYER_PAGE_TTL,
-                      race_condition_ttl: 30.seconds) do
-      if @survey.chrome_follows_verto_language?
-        I18n.with_locale(@display_locale) { render_to_string(:show, layout: "fullscreen") }
-      else
-        render_to_string(:show, layout: "fullscreen")
+    key = play_page_cache_key
+    self.class.player_page_local_cache.fetch(key, expires_in: PLAYER_PAGE_TTL) do
+      Rails.cache.fetch(key, expires_in: PLAYER_PAGE_TTL, race_condition_ttl: 30.seconds) do
+        render_play_page
       end
+    end
+  end
+
+  def render_play_page
+    if @survey.chrome_follows_verto_language?
+      I18n.with_locale(@display_locale) { render_to_string(:show, layout: "fullscreen") }
+    else
+      render_to_string(:show, layout: "fullscreen")
     end
   end
 
