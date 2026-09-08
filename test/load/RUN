@@ -1,10 +1,13 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 19: escalation. Scratch web 8c-16g cluster (WEB_CONCURRENCY=8,
-# RAILS_MAX_THREADS=5), page cache + Key Value. Run 18 was clean at 40/s
-# (p95 304ms, journeys at think-time, ~234 req/s combined). Now 80/s over 4
-# generators (20/s each) — the whole event rate on ONE box — before the 125/s
-# proof.
+# Run 20: the DB-vs-web discriminator. IDENTICAL load to run 19 (80/s, 4
+# generators, ramp 60 / hold 240 / dwell 0.05) with the ONE variable changed:
+# the scratch Postgres was resized up one tier (4c-16g -> 8c-32g) while the
+# web box is held at 8c-16g cluster (WEB_CONCURRENCY=8, RAILS_MAX_THREADS=5),
+# page cache + Key Value, same commit 7452994. Run 19 saturated at 80/s
+# (~388 req/s, 3.8s median, 0 errors). If run 20 comes back clean, the DB was
+# the wall -> Branch A (one box + bigger DB) and on to the 125/s proof. If it
+# still saturates, the wall is the web box -> Branch B (bigger single box).
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
