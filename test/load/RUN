@@ -1,16 +1,17 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 23: run 22 with SKIP=images — same two-box bucket-backed fleet, same
-# 80/s, but the journey no longer loads the logo + 6 card images. Run 22
-# (branded) served ~1,120 req/s with the images flawless (141k loads, 100%
-# 200, med 251 ms) but the journey endpoints no better than one box (submit
-# med 2.7 s, p95 5.3 s; p99 29 s). Either the second instance was not yet in
-# rotation (fired ~2 min after the scale-up) or the wall has moved to a
-# shared tier — the database, or the ~670 Rails 302s/s the images cost.
-# This run isolates the image cost and previews the fix (presigned bucket
-# URLs baked into the cached play page, zero Rails requests per image).
-# Clean here → images were the cost → ship the presign change and re-run
-# branded. Still slow → shared wall (database) → look there.
+# Run 24: run 22 again (branded deck, two 12c-24g boxes on the bucket, 80/s)
+# with the two fixes runs 22–23 called for:
+#   * card images + logo are presigned bucket URLs baked into the cached page
+#     (PlayerAssetUrls, c7f7047) — the browser fetches them from R2 and Rails
+#     never sees an image request (they were 60% of all requests in run 22);
+#   * a process-local front cache for the play page (4d79fb0) — one render per
+#     Puma worker per hour, the Key Value store off the page's hot path.
+# Runs 22 (branded) and 23 (SKIP=images) both served what ONE box served, so
+# the wall is a shared tier; the local page cache removes the most likely one
+# (a struggling Key Value store failing open → every request re-renders).
+# Clean here → the fleet works → 125/s proof next. Still ~2 s medians → the
+# database (Render graphs for this window decide).
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
@@ -20,4 +21,3 @@ HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
 GENERATORS=4
-SKIP=images
