@@ -1,23 +1,28 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 24: run 22 again (branded deck, two 12c-24g boxes on the bucket, 80/s)
-# with the two fixes runs 22–23 called for:
-#   * card images + logo are presigned bucket URLs baked into the cached page
-#     (PlayerAssetUrls, c7f7047) — the browser fetches them from R2 and Rails
-#     never sees an image request (they were 60% of all requests in run 22);
-#   * a process-local front cache for the play page (4d79fb0) — one render per
-#     Puma worker per hour, the Key Value store off the page's hot path.
-# Runs 22 (branded) and 23 (SKIP=images) both served what ONE box served, so
-# the wall is a shared tier; the local page cache removes the most likely one
-# (a struggling Key Value store failing open → every request re-renders).
-# Clean here → the fleet works → 125/s proof next. Still ~2 s medians → the
-# database (Render graphs for this window decide).
+# Run 25: ARE BOTH INSTANCES SERVING? A path-only probe of /up at 900 req/s
+# over 5 generators against the two-box fleet. /up is a bare
+# ActionController::Base health check: no rate limit, no cache, no Key Value,
+# one trivial database round-trip — so it measures the ROUTE and the fleet,
+# not the journey's work.
+#
+# Run 15 measured ONE box at 400 req/s clean on this exact path. Runs 21, 23
+# and 24 each served ~440 req/s of Rails work whether the fleet was one box or
+# two, with or without the images, with or without the page cache — which is
+# either a shared-tier wall or a second instance that never took traffic.
+#   * clears ~800 req/s clean  -> both instances serve; the wall is in the
+#     journey's own work (database, or the Key Value rate limiter).
+#   * walls at ~400 req/s      -> only one instance is in rotation and every
+#     run since 22 has measured a single box.
+# Scratch Key Value is pinned at 100% of 0.05 CPU during load; /up does not
+# touch it, so this probe is valid even while that is being upgraded.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
-SCRIPT=test/load/journey.js
-ARRIVALS_PER_S=80
+SCRIPT=test/load/ping.js
+ARRIVALS_PER_S=900
 RAMP_S=60
 HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
-GENERATORS=4
+GENERATORS=5
+PING_PATH=/up
