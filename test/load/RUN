@@ -1,26 +1,28 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 27: THE 1.5x PROOF — 125 arrivals/s over 7 generators, branded deck, two
-# 12c-24g boxes, bucket-backed assets, healthy Key Value. The event is ~83/s;
-# this is the go/no-go gate.
+# Run 28: CAN ONE BOX CARRY THE EVENT? 83 arrivals/s — the real event rate,
+# 50,000 respondents in ~10 minutes — over 4 generators against a SINGLE
+# 12c-24g box (scratch web scaled to 1 instance, manual scaling), branded
+# deck, bucket assets, healthy Key Value.
 #
-# Run 26 settled the long-running mystery: at 80/s the same fleet came back
-# completely clean — ~935 req/s, median 161 ms, p95 286 ms, 0 failed, ZERO
-# dropped iterations, journeys at pure think-time (13.1 s), every threshold
-# green. The only change from run 24 (2.1 s medians, thresholds failing) was
-# a Key Value store that is not saturated. So the wall through runs 19-24 was
-# the free-tier cache all along, and every web-tier measurement taken through
-# it understated the app.
+# Why this is worth a run: the case for two boxes rests on run 21, which
+# measured one box at ~2 s medians at 80/s. Run 26 then showed that every
+# measurement in that range was taken through a free-tier Key Value pinned at
+# 100% CPU — with the cache failing OPEN, so the page cache missed and every
+# request re-rendered. The same fleet on a healthy store ran 80/s at a 161 ms
+# median with journeys at pure think-time and zero dropped iterations. So one
+# box has never been measured under fair conditions.
 #
-# Gate: 0 x 5xx, submit p95 < 1 s, image p95 < 1.5 s, flat leaderboard
-# latency, ~0 dropped iterations, no health flaps. A latency-only failure with
-# 0 errors sizes a third instance; errors are a stop.
+# Clean here => the event needs ONE box, which halves the compute bill and
+# removes the second instance (and its R2 dependency) from the critical path
+# for Thursday. Two boxes then become headroom, not a requirement.
+# Saturated => two boxes are genuinely needed and run 27 already proved them.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
 SCRIPT=test/load/journey.js
-ARRIVALS_PER_S=125
+ARRIVALS_PER_S=83
 RAMP_S=60
 HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
-GENERATORS=7
+GENERATORS=4
