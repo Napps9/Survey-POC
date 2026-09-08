@@ -1,28 +1,26 @@
 # Parameters for the next Actions-driven load-test run (see load_test.yml).
 # Pushing a change to this file fires the workflow from this branch.
-# Run 25: ARE BOTH INSTANCES SERVING? A path-only probe of /up at 900 req/s
-# over 5 generators against the two-box fleet. /up is a bare
-# ActionController::Base health check: no rate limit, no cache, no Key Value,
-# one trivial database round-trip — so it measures the ROUTE and the fleet,
-# not the journey's work.
+# Run 26: THE RE-BASELINE. Branded deck, 80/s over 4 generators, two 12c-24g
+# boxes — the run-24 shape — but the FIRST run against a Key Value store that
+# is not saturated. Runs 19-24 all ran against the free tier (0.05 CPU, 25 MB,
+# 50 connections), which Render's graphs show pinned at 100% CPU throughout,
+# peaking near 40 of its 50 connections. Rails.cache fails OPEN, so that was
+# silent: the page cache missed, every request re-rendered, and rate_limit
+# paid up to its 0.5s read timeout per call. Both instances are now 1 GB /
+# 1,000 connections with Persistence Mode OFF (Journal + Snapshot was
+# fsyncing every counter write to disk).
 #
-# Run 15 measured ONE box at 400 req/s clean on this exact path. Runs 21, 23
-# and 24 each served ~440 req/s of Rails work whether the fleet was one box or
-# two, with or without the images, with or without the page cache — which is
-# either a shared-tier wall or a second instance that never took traffic.
-#   * clears ~800 req/s clean  -> both instances serve; the wall is in the
-#     journey's own work (database, or the Key Value rate limiter).
-#   * walls at ~400 req/s      -> only one instance is in rotation and every
-#     run since 22 has measured a single box.
-# Scratch Key Value is pinned at 100% of 0.05 CPU during load; /up does not
-# touch it, so this probe is valid even while that is being upgraded.
+# So every previous measurement of the web tier was taken through a degraded
+# cache and is suspect — including "one 12-core box tops out around 2s".
+# Expect: journey medians well under 1s and the thresholds to pass. If they
+# do, go to the 125/s proof. If the journey endpoints are STILL ~2s with a
+# healthy store, the wall is the database and nothing else is left.
 BASE_URL=https://vertonow.onrender.com
 TOKEN=5rJks8kFiOaNOWeTmzkcinYf
-SCRIPT=test/load/ping.js
-ARRIVALS_PER_S=900
+SCRIPT=test/load/journey.js
+ARRIVALS_PER_S=80
 RAMP_S=60
 HOLD_S=240
 DWELL_SCALE=0.05
 BROWNOUT=0
-GENERATORS=5
-PING_PATH=/up
+GENERATORS=4
