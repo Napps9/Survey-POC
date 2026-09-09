@@ -16,12 +16,14 @@ with real surprise risk, and a quiet site is the right time to redeploy for it.
 | 1. Rebase and verify | **Done** — five gates green (3,064 unit / 440 system, 0 F/E) |
 | 2. Merge to Main | **Done** — `23ba9a2 → 0c73f43`, fast-forward, 22 commits |
 | 3. Object storage, phases 0–2 | **Done** — 271 blobs on R2, 0 failed, app writing to `bucket` |
-| 4. Pre-scale to 12c-24g | **Wednesday** — four dashboard fields, deliberately not run early |
+| 4. Pre-scale and configure | **Done** — 12c-24g web, and the database resized 256 MB → 16 GB |
 | 5. Verify production | **Done** — CSP, presigned fetch, play page, fresh upload |
-| 6. Go/no-go | Wednesday, after step 4 |
+| 6. Go/no-go | Wednesday — the only thing left |
 
-Step 4 was held back on purpose: it is two minutes of dashboard work, it
-restarts the box, and starting the 12c-24g meter a day early buys nothing.
+Step 4 was meant to wait for Wednesday (two minutes of dashboard work, and the
+12c-24g meter buys nothing early), but checking its prerequisites surfaced the
+database, so it was done the same evening. Cost of holding both tiers up from
+Tuesday evening to the event: about $22/day.
 
 ## The decision, and what it rests on
 
@@ -123,12 +125,29 @@ smoke test. Full detail in `docs/OBJECT_STORAGE_CUTOVER.md`.
 
 **Leave the disk attached.** It is the rollback.
 
-### 4. Pre-scale and configure production (you) — ~10 min
+### 4. Pre-scale and configure production (you) — ~10 min · **DONE 2026-09-08**
 
+- **Resize Postgres to 4c-16g FIRST.** This was missing from the list and is
+  the single most important line in it: production was still `Basic-256mb`
+  (0.1 CPU, 256 MB, `shared_buffers` 64 MB, `max_connections` 103) — the tier
+  that OOM-crashed at *2* arrivals/s. Run 28 was measured against a 4c-16g
+  scratch database, so without this the proof does not describe production, and
+  a 12-core web box in front of it only delivers the write burst to the
+  bottleneck faster. Resizing restarts the database (a few minutes of hard
+  downtime), which is why it goes first and on a quiet evening. After:
+  `shared_buffers` 4 GB, `max_connections` 403. $200/mo + $3 storage.
 - Web service → Compute → **12 CPU / 24 GB**, Manual Scaling **1**, autoscaling
-  **off**. (~$450/mo while scaled; scale back after.)
+  **off**. (~$450/mo while scaled; scale back after.) A service with a disk
+  attached cannot scale past one instance at all — Render says so on the
+  Compute page — so there is no autoscaler to fight and no risk of a second
+  instance appearing mid-event.
 - Environment: `WEB_CONCURRENCY=12` (one worker per core — this is what run 28
-  measured), `RAILS_MAX_THREADS=5`.
+  measured), `RAILS_MAX_THREADS=5`. **Set these only once the box is actually
+  12-core**: 12 Puma workers want 4–5 GB, so saving them against the old
+  instance is an OOM, not a warm-up. Connection budget: production keeps Solid
+  Queue in Puma, so each pool is `RAILS_MAX_THREADS + 12` = 17, i.e. 204 of
+  capacity and ~72 in real use — fine against 403, would have been marginal
+  against 103.
 - Confirm `REDIS_URL` points at `vertonow-infra`, now 1 GB / 1,000 connections
   with **Persistence Mode Off**.
 - Set `SENTRY_DSN` if it is still unset, and `PLAYER_RATE_LIMIT_SCALE`
