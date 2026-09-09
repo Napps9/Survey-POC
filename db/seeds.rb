@@ -59,6 +59,13 @@ end
 # path runs first, the other is a no-op.
 AlpbachAccountProvisioner.new.call
 
+# The Unleash Football client account, and Jamie's and Nick's access to it.
+# Same two-path split, and the same create-only provisioner, as the Alpbach
+# account above: this line covers a FRESH database,
+# db/migrate/20260909090000_provision_unleash_football_account.rb covers an
+# existing one.
+UnleashFootballAccountProvisioner.new.call
+
 # The showcase Verto in the Playverto org itself — one deck that plays every
 # answer type, with imagery, branching and points on. Same split as the Alpbach
 # account above, for the same reason: this line covers a FRESH database,
