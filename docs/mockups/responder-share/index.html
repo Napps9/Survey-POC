@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- responder-share mockups · build 2026-09-09-a · view-source and check this line to confirm
+<!-- responder-share mockups · build 2026-09-09-b · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible).
      Fictional example throughout: "Haverley Town Council" does not exist. -->
 <html lang="en" data-build="2026-09-08-a">
@@ -414,11 +414,26 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
   .board-head { break-after: avoid; border-bottom: 1px solid var(--line); }
 
   /* An auto-scrolling stage becomes a guillotine on paper. */
-  .stage { overflow: visible !important; background: #fff; padding: 22px 0 8px; }
+  .stage { overflow: visible !important; background: #fff; padding: 22px 26px 10px; }
   .stage-row { width: auto; }
   .board-body { border: 0; }
-  .notes { border-left: 1px solid var(--line); }
-  .notes.below { border-left: 0; border-top: 1px solid var(--line); }
+
+  /* On screen the stage stretches and the notes sit in a fixed 300px rail —
+     which reads fine while scrolling but strands a 390px phone in the middle of
+     a 1150px column once the page stops moving. On paper the stage hugs its
+     artwork instead and the notes take everything left over, flowing into as
+     many ~260px columns as that width allows (one beside two phones, three
+     beside a small tile). Wide boards keep their notes underneath. */
+  .board-body:not(.wide) { grid-template-columns: max-content minmax(0, 1fr); }
+  .notes { border-left: 1px solid var(--line); columns: 258px; column-gap: 26px; }
+  .notes.below { border-left: 0; border-top: 1px solid var(--line); columns: 300px; }
+  .notes h3, .notes .cut { column-span: all; }
+  .notes ol { display: block; }
+  .notes li { margin-bottom: 11px; }
+
+  /* The cover's measure is set for reading on screen; on the page it just
+     leaves a wide right margin. */
+  .intro { max-width: none; }
 
   /* Nothing that reads as one object may straddle a page. */
   .frame, .phone, .desk-frame, .utile, .dtile, .editor-col, .og-half,
@@ -559,7 +574,7 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
 
 <header class="hero">
   <div class="wrap">
-    <div class="eyebrow">Mockups · respondent share · build 2026-09-09-a</div>
+    <div class="eyebrow">Mockups · respondent share · build 2026-09-09-b</div>
     <h1>Pass it on: letting a respondent send the Verto to friends and family</h1>
     <p>What the end of a Verto offers, what the friend receives in WhatsApp, Messages and the feeds, the social image behind the link, and where the creator writes the narrative headline. A change.org-style share: a headline that tells the story, a picture, and a message in the respondent's own voice.</p>
     <div class="meta"><span>Fictional example: Haverley Town Council</span><span>Player at 390×844 and 1280×800</span><span>Share image at 1200×630</span><span>Spec for the implementer at the foot</span></div>
