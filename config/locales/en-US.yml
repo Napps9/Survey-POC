@@ -1408,8 +1408,8 @@ en-US:
   you:
     eyebrow: "Your Vertos"
     kept:
-      one: "1 kept"
-      other: "%{count} kept"
+      one: "1 Verto kept"
+      other: "%{count} Vertos kept"
     empty: "Nothing here yet. Finish a Verto and ask for a link, and it'll be waiting."
     played_on: "Played %{date}"
     signed_out_title: "Your Vertos live here"

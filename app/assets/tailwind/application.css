@@ -12789,10 +12789,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .you-mark-sm { opacity: .9; }
 
 .you-bar { display: flex; align-items: center; gap: 10px; padding: 4px 0 14px; }
-.you-avatar {
-  margin-left: auto; width: 30px; height: 30px; border-radius: 50%;
-  background: #615BF5; color: #fff; font-family: "Alata", sans-serif; font-size: 14px;
-  display: flex; align-items: center; justify-content: center;
+/* Which account this is. An address is one unbroken token, so it wraps by
+   character rather than pushing the shell wider on a narrow phone. */
+.you-whoami {
+  font-size: 13px; color: rgba(255,255,255,.5); margin-top: 6px; overflow-wrap: anywhere;
 }
 
 .you-head { padding: 2px 0 14px; }

@@ -5,11 +5,13 @@
   <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
   <div class="you-shell">
 
+    <%# Nothing on the RIGHT of this bar: the fullscreen layout parks its
+        language switcher there, and an avatar chip landed underneath it. The
+        account is named under the heading instead, which says more than an
+        initial did anyway — on a shared device, WHICH account you are in is
+        the thing worth knowing. %>
     <div class="you-bar">
       <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
-      <% if player_signed_in? %>
-        <span class="you-avatar" title="<%= current_player.email_address %>"><%= current_player.email_address.first.upcase %></span>
-      <% end %>
     </div>
 
     <% if !player_signed_in? %>
@@ -22,6 +24,7 @@
       <div class="you-head">
         <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.eyebrow") %></div>
         <h1 class="you-h1"><%= t("you.kept", count: @claims.size) %></h1>
+        <div class="you-whoami"><%= current_player.email_address %></div>
       </div>
 
       <% if @claims.empty? %>
