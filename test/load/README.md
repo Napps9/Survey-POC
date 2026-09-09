@@ -39,6 +39,43 @@ deleted afterwards.
 3. Install k6 (https://k6.io) on the machine driving the test — ideally not
    the machine serving it.
 
+### Rebuilding scratch after a teardown (2026-09-09)
+
+The scratch environment is deleted between campaigns, so this is the recipe
+rather than a description of something that exists. **Render does not support
+downgrading Key Value or Postgres instances** — the smaller rows are greyed
+out with "we don't support downgrading" — so a scratch store cannot be parked
+cheaply between runs. Create, use, delete. As of the 2026-09-09 teardown the
+web service survives **suspended** (Settings → Suspend keeps its config, env
+vars and URL at zero cost); the Key Value and the database were deleted.
+
+To bring it back:
+
+1. **Resume the web service** (Settings → Resume) and set its Compute to the
+   tier under test.
+2. **Create a Postgres** at the tier you intend to prove — the whole point is
+   that scratch mirrors production, and run 28's numbers are only comparable
+   because both were `4c-16g`. Point `DATABASE_URL` at it.
+3. **Create a Key Value, PAID, ≥1 GB.** Not the free tier. This is the single
+   most expensive mistake available here: the free 25 MB store (0.05 CPU, 50
+   connections) sat pinned at 100% CPU through runs 19–24 and, because
+   `Rails.cache` fails open, nothing in the app said so — the page cache
+   simply missed, every request re-rendered, and five runs' worth of
+   conclusions were wrong. Run 26 re-ran the identical fleet against a healthy
+   1 GB store: 2.1 s → 161 ms. Point `REDIS_URL` at it.
+4. `PLAYER_RATE_LIMIT_SCALE=1000`, plus `WEB_CONCURRENCY` / `RAILS_MAX_THREADS`
+   matching the shape under test.
+5. Seed (step 2 above), branded if the run needs images.
+
+Costs at the tiers this campaign used, so the bill is a decision rather than a
+surprise: web `12c-24g` $450/mo, Postgres `4c-16g` $200/mo, Key Value 1 GB
+$32/mo. All bill per second, so a day of testing is a few dollars — but they
+keep billing until deleted, which is what the teardown is for.
+
+**While scratch is down, do not touch `test/load/RUN`.** Any push to Main
+touching that file fires the workflow, which will run against a suspended or
+non-existent service and fail in a way that looks like a real regression.
+
 ## Running
 
 Smoke (default: 10 arrivals/s, compressed dwell):
