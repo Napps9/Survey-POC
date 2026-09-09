@@ -1103,6 +1103,12 @@ ru:
     ty_forward_url_label: 'Кнопка со ссылкой (необязательно)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Текст кнопки (напр. Перейти на сайт)'
+    share_card: 'Карточка для отправки'
+    share_card_hint: 'Что увидят друзья, когда участник перешлёт это Verto — в WhatsApp, Сообщениях, Facebook, X, LinkedIn и Slack.'
+    share_title_label: 'Заголовок для отправки'
+    share_description_label: 'Описание для отправки'
+    share_message_label: 'Сообщение, которое отправляют участники'
+    share_message_hint: 'Написано от лица участника. Ссылка добавляется автоматически.'
     tab_quiz: 'Режим викторины'
     tab_tokens: 'Токенизация'
     note_limit_split_hint: "После %{n} символов текст становится тесным на вводной карточке — вынесите подробности на отдельную карточку."
@@ -1132,6 +1138,7 @@ ru:
     drag_to_reorder: 'Перетащите, чтобы изменить порядок'
     remove_consent_gate: 'Убрать экран согласия'
     remove_thankyou_screen: 'Убрать экран благодарности'
+    remove_share_card: 'Удалить карточку для отправки'
     remove: 'Убрать'
     animation_theme: "Анимация"
     live_locked_bar: "Этот Verto опубликован — вопросы заблокированы для защиты качества данных."

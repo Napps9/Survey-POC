@@ -1101,6 +1101,12 @@ he:
     ty_forward_url_label: 'כפתור קישור (אופציונלי)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'תווית הכפתור (למשל בקרו באתר שלנו)'
+    share_card: 'כרטיס שיתוף'
+    share_card_hint: 'מה שחברים רואים כשמשיב מעביר את ה-Verto הזה — בוואטסאפ, הודעות, פייסבוק, X, לינקדאין וסלאק.'
+    share_title_label: 'כותרת השיתוף'
+    share_description_label: 'סיפור השיתוף'
+    share_message_label: 'ההודעה שהמשיבים שולחים'
+    share_message_hint: 'כתובה בקולו של המשיב. הקישור נוסף אוטומטית.'
     tab_quiz: 'מצב חידון'
     tab_tokens: 'טוקניזציה'
     note_limit_split_hint: "מעל %{n} תווים זה נדחס בכרטיס הפתיחה — עדיף לשים את הפירוט בכרטיס נפרד."
@@ -1130,6 +1136,7 @@ he:
     drag_to_reorder: 'גרור כדי לסדר מחדש'
     remove_consent_gate: 'הסרת מסך ההסכמה'
     remove_thankyou_screen: 'הסרת מסך התודה'
+    remove_share_card: 'הסרת כרטיס השיתוף'
     remove: 'הסרה'
     animation_theme: "אנימציה"
     live_locked_bar: "הוורטו פעיל — השאלות נעולות כדי להגן על איכות הנתונים."

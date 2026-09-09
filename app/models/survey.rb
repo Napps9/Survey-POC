@@ -1987,6 +1987,9 @@ class Survey < ApplicationRecord
       thankyou_body:           thankyou_body,
       forward_url:             forward_url,
       forward_label:           forward_label,
+      share_title:             share_title,
+      share_description:       share_description,
+      share_message:           share_message,
       consent_text:            consent_text,
       consent_image:           consent_image,
       consent_image_credit:    consent_image_credit,
@@ -2114,6 +2117,48 @@ class Survey < ApplicationRecord
 
   def forward_url?
     forward_url.present?
+  end
+
+  # ── Share copy (what a passed-on /play link says about itself) ─────────────
+  # Same contract as the thank-you readers above: the column is what the creator
+  # wrote, the reader is what the product says. Blank falls back to the tags the
+  # player has always emitted, so a Verto nobody has written share copy for
+  # unfurls exactly as it did before these columns existed.
+  #
+  # The caps are the tightest each field meets in the wild, and they are enforced
+  # in SurveysController#update_settings alongside every other creator-written
+  # column — LinkedIn truncates a title past 70; og:description is cut around
+  # 200 everywhere; a respondent's message rides in an SMS body, so 160.
+  MAX_SHARE_TITLE       = 70
+  MAX_SHARE_DESCRIPTION = 200
+  MAX_SHARE_MESSAGE     = 160
+
+  # The internal theme with the product name after it — what og:title has always
+  # been. A creator who writes a headline is replacing exactly this.
+  def share_title_text
+    share_title.presence || "#{theme} · Playverto"
+  end
+
+  # description is the creator's editing brief and was never written for a
+  # stranger, but it has been public in og:description all along; it stays the
+  # fallback so nothing regresses.
+  def share_description_text
+    share_description.presence || description.presence || theme
+  end
+
+  # No fallback on purpose. The other two always have something to say because
+  # the tags must be filled; a message written in the respondent's voice is
+  # either the creator's or absent, and inventing one would put words in a
+  # respondent's mouth.
+  def share_message_text
+    share_message.presence
+  end
+
+  # Whether the creator has written any share copy — drives the editor's
+  # CTA-versus-card state, the same way forward_url? and the thankyou_* columns
+  # decide whether the thank-you slot is open.
+  def share_copy?
+    share_title.present? || share_description.present? || share_message.present?
   end
 
   # ── End screens (answer-branching) ─────────────────────────────────────────

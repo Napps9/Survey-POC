@@ -1101,6 +1101,12 @@ ar:
     ty_forward_url_label: 'زر الرابط (اختياري)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'نص الزر (مثال: زيارة موقعنا)'
+    share_card: 'بطاقة المشاركة'
+    share_card_hint: 'ما يراه الأصدقاء عندما يمرّر أحد المشاركين هذا الـ Verto — في واتساب والرسائل وفيسبوك وX ولينكدإن وسلاك.'
+    share_title_label: 'عنوان المشاركة'
+    share_description_label: 'قصة المشاركة'
+    share_message_label: 'الرسالة التي يرسلها المشاركون'
+    share_message_hint: 'مكتوبة بصوت المشارك نفسه. يُضاف الرابط تلقائيًا.'
     tab_quiz: 'وضع الاختبار'
     tab_tokens: 'الترميز'
     note_limit_split_hint: "بعد %{n} حرفًا يصبح النص مزدحمًا على بطاقة المقدمة — ضع التفاصيل في بطاقة خاصة بها بدلاً من ذلك."
@@ -1130,6 +1136,7 @@ ar:
     drag_to_reorder: 'اسحب لإعادة الترتيب'
     remove_consent_gate: 'إزالة بوابة الموافقة'
     remove_thankyou_screen: 'إزالة شاشة الشكر'
+    remove_share_card: 'إزالة بطاقة المشاركة'
     remove: 'إزالة'
     animation_theme: "الرسوم المتحركة"
     live_locked_bar: "هذه الـVerto نشطة — الأسئلة مقفلة لحماية جودة البيانات."

@@ -1111,6 +1111,12 @@ sn:
     ty_forward_url_label: 'Bhatani reRinki (hazvina kumanikidzwa)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Zita reBhatani (semuenzaniso, Shanyira Webhusaiti Yedu)'
+    share_card: 'Kadhi rekugovera'
+    share_card_hint: 'Zvinoonekwa neshamwari kana mupinduri achitumira Verto iyi — muWhatsApp, Messages, Facebook, X, LinkedIn neSlack.'
+    share_title_label: 'Musoro wekugovera'
+    share_description_label: 'Nyaya yekugovera'
+    share_message_label: 'Meseji inotumirwa nevapinduri'
+    share_message_hint: 'Yakanyorwa sezwi remupinduri pachake. Rinki inowedzerwa yoga.'
     tab_quiz: 'Muitiro weKwizi'
     tab_tokens: 'Kuisa Mapoinzi'
     note_limit_split_hint: "Kupfuura mavara %{n} zvinotanga kumanikana pakadhi rekutanga — isai ruzivo rwakadzama pakadhi rakazvimirira."
@@ -1140,6 +1146,7 @@ sn:
     drag_to_reorder: 'Zvuzvurudza Kuti Urongedze'
     remove_consent_gate: 'Bvisa Gedhi reMvumo'
     remove_thankyou_screen: 'Bvisa Sikirini reKutenda'
+    remove_share_card: 'Bvisa kadhi rekugovera'
     remove: 'Bvisa'
     animation_theme: "Animeshoni"
     live_locked_bar: "Verto iyi iri pachena — mibvunzo yakakiiwa kudzivirira hunhu hwedhata."

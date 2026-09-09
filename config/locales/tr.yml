@@ -1101,6 +1101,12 @@ tr:
     ty_forward_url_label: 'Bağlantı düğmesi (isteğe bağlı)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Düğme etiketi (örn. Sitemizi ziyaret edin)'
+    share_card: 'Paylaşım kartı'
+    share_card_hint: 'Bir katılımcı bu Verto''yu paylaştığında arkadaşlarının gördüğü şey — WhatsApp, Mesajlar, Facebook, X, LinkedIn ve Slack''te.'
+    share_title_label: 'Paylaşım başlığı'
+    share_description_label: 'Paylaşım metni'
+    share_message_label: 'Katılımcıların gönderdiği mesaj'
+    share_message_hint: 'Katılımcının kendi ağzından yazılır. Bağlantı otomatik olarak eklenir.'
     tab_quiz: 'Sınav modu'
     tab_tokens: 'Jetonlaştırma'
     note_limit_split_hint: "%{n} karakteri geçince tanıtım kartında sıkışık görünür — ayrıntıyı kendi kartına koyun."
@@ -1130,6 +1136,7 @@ tr:
     drag_to_reorder: 'Yeniden sıralamak için sürükleyin'
     remove_consent_gate: 'Onay ekranını kaldır'
     remove_thankyou_screen: 'Teşekkür ekranını kaldır'
+    remove_share_card: 'Paylaşım kartını kaldır'
     remove: 'Kaldır'
     animation_theme: "Animasyon"
     live_locked_bar: "Bu Verto yayında — veri kalitesini korumak için sorular kilitli."

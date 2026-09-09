@@ -1101,6 +1101,12 @@ hi:
     ty_forward_url_label: 'लिंक बटन (वैकल्पिक)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'बटन लेबल (उदा. हमारी साइट देखें)'
+    share_card: 'शेयर कार्ड'
+    share_card_hint: 'जब कोई उत्तरदाता यह Verto आगे भेजता है तो दोस्तों को क्या दिखता है — WhatsApp, Messages, Facebook, X, LinkedIn और Slack में।'
+    share_title_label: 'शेयर शीर्षक'
+    share_description_label: 'शेयर कहानी'
+    share_message_label: 'उत्तरदाता जो संदेश भेजते हैं'
+    share_message_hint: 'उत्तरदाता की आवाज़ में लिखा गया। लिंक अपने आप जुड़ जाता है।'
     tab_quiz: 'क्विज़ मोड'
     tab_tokens: 'टोकन प्रणाली'
     note_limit_split_hint: "%{n} अक्षरों से आगे यह इंट्रो कार्ड पर भर जाता है — बेहतर है कि विवरण को अलग कार्ड पर रखें।"
@@ -1130,6 +1136,7 @@ hi:
     drag_to_reorder: 'क्रम बदलने के लिए खींचें'
     remove_consent_gate: 'सहमति स्क्रीन हटाएँ'
     remove_thankyou_screen: 'धन्यवाद स्क्रीन हटाएँ'
+    remove_share_card: 'शेयर कार्ड हटाएँ'
     remove: 'हटाएं'
     animation_theme: "एनिमेशन"
     live_locked_bar: "यह वर्टो लाइव है — डेटा गुणवत्ता की रक्षा के लिए सवाल लॉक हैं।"

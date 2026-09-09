@@ -1123,6 +1123,12 @@ xh:
     ty_forward_url_label: 'Iqhosha lekhonkco (olungayomfuneko)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Ileyibhile yeqhosha (umz. Tyelela iwebhusayithi yethu)'
+    share_card: 'Ikhadi lokwabelana'
+    share_card_hint: 'Oko kubonwa ngabahlobo xa umphenduli edlulisela le Verto — kuWhatsApp, Messages, Facebook, X, LinkedIn neSlack.'
+    share_title_label: 'Umxholo wokwabelana'
+    share_description_label: 'Ibali lokwabelana'
+    share_message_label: 'Umyalezo othunyelwa ngabaphenduli'
+    share_message_hint: 'Ubhalwe ngelizwi lomphenduli ngokwakhe. Ikhonkco longezwa ngokuzenzekelayo.'
     tab_quiz: 'Inkqubo yovavanyo'
     tab_tokens: 'Ukunikwa kweetoken'
     note_limit_split_hint: "Ngaphaya kweempawu ezingu-%{n} kuya kucinana kwikhadi lentshayelelo — beka iinkcukacha kwikhadi lazo."
@@ -1152,6 +1158,7 @@ xh:
     drag_to_reorder: 'Tsala ukulungelelanisa kwakhona'
     remove_consent_gate: 'Susa isango lemvume'
     remove_thankyou_screen: 'Susa isikrini sombulelo'
+    remove_share_card: 'Susa ikhadi lokwabelana'
     remove: 'Susa'
     animation_theme: "Ushukumo"
     live_locked_bar: "Le Verto iyasebenza — imibuzo icinyiwe ukukhusela umgangatho wedatha."

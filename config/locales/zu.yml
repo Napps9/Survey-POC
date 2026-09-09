@@ -1121,6 +1121,12 @@ zu:
     ty_forward_url_label: 'Inkinobho yesixhumanisi (akudingekile)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Igama lenkinobho (isb. Vakashela isayithi yethu)'
+    share_card: 'Ikhadi lokwabelana'
+    share_card_hint: 'Lokho okubonwa abangane lapho umphenduli edlulisela le Verto — ku-WhatsApp, Messages, Facebook, X, LinkedIn ne-Slack.'
+    share_title_label: 'Isihloko sokwabelana'
+    share_description_label: 'Indaba yokwabelana'
+    share_message_label: 'Umlayezo othunyelwa abaphenduli'
+    share_message_hint: 'Ubhalwe ngezwi lomphenduli uqobo. Isixhumanisi sengezwa ngokuzenzakalelayo.'
     tab_quiz: 'Imodi yesivivinyo'
     tab_tokens: 'Ukuthokheniza'
     note_limit_split_hint: "Ngaphezu kwezinhlamvu ezingu-%{n} kuyaminyana ekhadini lesingeniso — beka imininingwane ekhadini layo."
@@ -1150,6 +1156,7 @@ zu:
     drag_to_reorder: 'Hudula ukuze uhlele kabusha'
     remove_consent_gate: 'Susa isango lemvume'
     remove_thankyou_screen: 'Susa isikrini sokubonga'
+    remove_share_card: 'Susa ikhadi lokwabelana'
     remove: 'Susa'
     animation_theme: "Isixhihixhihi"
     live_locked_bar: "Le-Verto isesikhundleni — imibuzo ivaliwe ukuvikela izinga lekhwalithi yedatha."

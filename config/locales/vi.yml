@@ -1101,6 +1101,12 @@ vi:
     ty_forward_url_label: 'Nút liên kết (tùy chọn)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Nhãn nút (vd. Ghé thăm trang của chúng tôi)'
+    share_card: 'Thẻ chia sẻ'
+    share_card_hint: 'Những gì bạn bè nhìn thấy khi người trả lời chuyển tiếp Verto này — trên WhatsApp, Tin nhắn, Facebook, X, LinkedIn và Slack.'
+    share_title_label: 'Tiêu đề chia sẻ'
+    share_description_label: 'Nội dung chia sẻ'
+    share_message_label: 'Tin nhắn người trả lời gửi đi'
+    share_message_hint: 'Viết theo lời của chính người trả lời. Liên kết được thêm tự động.'
     tab_quiz: 'Chế độ đố vui'
     tab_tokens: 'Mã hóa token'
     note_limit_split_hint: "Quá %{n} ký tự sẽ bị chật trên thẻ giới thiệu — hãy đưa phần chi tiết sang một thẻ riêng."
@@ -1130,6 +1136,7 @@ vi:
     drag_to_reorder: 'Kéo để sắp xếp lại'
     remove_consent_gate: 'Xoá màn hình đồng ý'
     remove_thankyou_screen: 'Xoá màn hình cảm ơn'
+    remove_share_card: 'Xóa thẻ chia sẻ'
     remove: 'Gỡ bỏ'
     animation_theme: "Hoạt ảnh"
     live_locked_bar: "Verto này đang hoạt động — câu hỏi bị khóa để bảo vệ chất lượng dữ liệu."

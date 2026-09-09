@@ -1101,6 +1101,12 @@ nl:
     ty_forward_url_label: 'Linkknop (optioneel)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Knoptekst (bijv. Bezoek onze site)'
+    share_card: 'Deelkaart'
+    share_card_hint: 'Wat vrienden zien wanneer een respondent deze Verto doorstuurt — in WhatsApp, Berichten, Facebook, X, LinkedIn en Slack.'
+    share_title_label: 'Deelkop'
+    share_description_label: 'Deelverhaal'
+    share_message_label: 'Bericht dat respondenten sturen'
+    share_message_hint: 'Geschreven vanuit de respondent zelf. De link wordt automatisch toegevoegd.'
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisatie'
     note_limit_split_hint: "Boven %{n} tekens wordt het krap op de introkaart — zet de details liever op een eigen kaart."
@@ -1130,6 +1136,7 @@ nl:
     drag_to_reorder: 'Sleep om opnieuw te ordenen'
     remove_consent_gate: 'Toestemmingsscherm verwijderen'
     remove_thankyou_screen: 'Bedankscherm verwijderen'
+    remove_share_card: 'Deelkaart verwijderen'
     remove: 'Verwijderen'
     animation_theme: "Animatie"
     live_locked_bar: "Deze Verto is live — vragen zijn vergrendeld om de datakwaliteit te beschermen."

@@ -1133,6 +1133,12 @@ en-US:
     ty_forward_url_label: 'Link button (optional)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Button label (e.g. Visit our site)'
+    share_card: 'Share card'
+    share_card_hint: 'What friends see when a respondent passes this Verto on — in WhatsApp, Messages, Facebook, X, LinkedIn and Slack.'
+    share_title_label: 'Share headline'
+    share_description_label: 'Share story'
+    share_message_label: 'Message respondents send'
+    share_message_hint: 'Written as the respondent, in their voice. The link is added automatically.'
     tab_quiz: 'Quiz mode'
     tab_tokens: 'Tokenization'
     note_limit_split_hint: "Past %{n} characters this gets cramped on the intro card — put the detail on its own card instead."
@@ -1162,6 +1168,7 @@ en-US:
     drag_to_reorder: 'Drag to reorder'
     remove_consent_gate: 'Remove consent gate'
     remove_thankyou_screen: 'Remove thank-you screen'
+    remove_share_card: 'Remove share card'
     remove: 'Remove'
     animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."

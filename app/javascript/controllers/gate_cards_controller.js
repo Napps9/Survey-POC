@@ -11,9 +11,17 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "consentCta", "consentCard", "consentBody", "consentLeft",
-    "tyCta", "tyCard", "tyTitle", "tyBody", "tyForwardUrl", "tyForwardLabel"
+    "tyCta", "tyCard", "tyTitle", "tyBody", "tyForwardUrl", "tyForwardLabel",
+    "shareCta", "shareCard", "shareTitle", "shareStory", "shareMessage",
+    "shareTitleCount", "shareStoryCount", "shareMessageCount"
   ]
   static values = { url: String }
+
+  // A Verto that already has share copy renders its card open, so the counters
+  // have to be right before anyone types.
+  connect() {
+    if (this.hasShareTitleTarget) this._paintShareCounts()
+  }
 
   addConsent() {
     clearTimeout(this._consentTimer)
@@ -126,6 +134,65 @@ export default class extends Controller {
 
   blockEnter(event) {
     event.preventDefault()
+  }
+
+  // ── Share card ────────────────────────────────────────────────────────────
+  // Three columns describing what a passed-on /play link says about itself.
+  // Unlike the thank-you card these start EMPTY rather than prefilled with the
+  // fallback: the placeholder shows what the link says today, and typing over
+  // a prefilled default is how a creator ends up "customising" copy they never
+  // meant to touch.
+  addShare() {
+    clearTimeout(this._shareTimer)
+    this.shareCtaTarget.hidden = true
+    this.shareCardTarget.hidden = false
+    this._paintShareCounts()
+    this._focusEnd(this.shareTitleTarget)
+  }
+
+  removeShare() {
+    clearTimeout(this._shareTimer)
+    this.shareCardTarget.hidden = true
+    this.shareCtaTarget.hidden = false
+    this.shareTitleTarget.textContent = ""
+    this.shareStoryTarget.textContent = ""
+    this.shareMessageTarget.textContent = ""
+    this._paintShareCounts()
+    // Clearing all three puts the link back on the fallback tags, which is what
+    // removing the card means. Nothing is lost that the creator can still see.
+    this._save({ share_title: "", share_description: "", share_message: "" })
+  }
+
+  // Text captured at queue time, not read from the DOM when the timer fires —
+  // the same rule as queueConsentSave above, and for the same reason: removeShare
+  // blanks these elements, so a pending timer that re-read them could post
+  // whatever the reset left behind a moment after the card was removed.
+  queueShareSave() {
+    clearTimeout(this._shareTimer)
+    this._paintShareCounts()
+    const fields = {
+      share_title: this.shareTitleTarget.textContent.trim(),
+      share_description: this.shareStoryTarget.textContent.trim(),
+      share_message: this.shareMessageTarget.textContent.trim()
+    }
+    this._shareTimer = setTimeout(() => this._save(fields), 900)
+  }
+
+  // Counters are advisory: the cap is applied server-side in update_settings, so
+  // this only has to tell the creator before the truncation does.
+  _paintShareCounts() {
+    const pairs = [
+      [ this.shareTitleTarget, this.shareTitleCountTarget ],
+      [ this.shareStoryTarget, this.shareStoryCountTarget ],
+      [ this.shareMessageTarget, this.shareMessageCountTarget ]
+    ]
+    pairs.forEach(([ field, count ]) => {
+      if (!field || !count) return
+      const max = parseInt(field.dataset.max, 10)
+      const used = field.textContent.trim().length
+      count.textContent = `${used} / ${max}`
+      count.classList.toggle("is-over", Number.isFinite(max) && used > max)
+    })
   }
 
   _saveThankyou() {

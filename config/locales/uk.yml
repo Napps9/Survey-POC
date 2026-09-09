@@ -1103,6 +1103,12 @@ uk:
     ty_forward_url_label: 'Кнопка з посиланням (необов’язково)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Напис на кнопці (напр. Відвідати сайт)'
+    share_card: 'Картка поширення'
+    share_card_hint: 'Що бачать друзі, коли учасник пересилає це Verto — у WhatsApp, Повідомленнях, Facebook, X, LinkedIn і Slack.'
+    share_title_label: 'Заголовок поширення'
+    share_description_label: 'Опис поширення'
+    share_message_label: 'Повідомлення, яке надсилають учасники'
+    share_message_hint: 'Написано від імені учасника. Посилання додається автоматично.'
     tab_quiz: 'Режим вікторини'
     tab_tokens: 'Токенізація'
     note_limit_split_hint: "Після %{n} символів текст стає тісним на вступній картці — винесіть подробиці на окрему картку."
@@ -1132,6 +1138,7 @@ uk:
     drag_to_reorder: 'Перетягніть, щоб змінити порядок'
     remove_consent_gate: 'Прибрати екран згоди'
     remove_thankyou_screen: 'Прибрати екран подяки'
+    remove_share_card: 'Видалити картку поширення'
     remove: 'Прибрати'
     animation_theme: "Анімація"
     live_locked_bar: "Цей Verto опубліковано — питання заблоковано для захисту якості даних."

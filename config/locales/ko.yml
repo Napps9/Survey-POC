@@ -1101,6 +1101,12 @@ ko:
     ty_forward_url_label: '링크 버튼 (선택)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: '버튼 라벨 (예: 사이트 방문)'
+    share_card: '공유 카드'
+    share_card_hint: '응답자가 이 Verto를 전달할 때 친구에게 보이는 내용입니다 — WhatsApp, 메시지, Facebook, X, LinkedIn, Slack에서.'
+    share_title_label: '공유 제목'
+    share_description_label: '공유 설명'
+    share_message_label: '응답자가 보내는 메시지'
+    share_message_hint: '응답자의 목소리로 작성합니다. 링크는 자동으로 추가됩니다.'
     tab_quiz: '퀴즈 모드'
     tab_tokens: '토큰화'
     note_limit_split_hint: "%{n}자를 넘으면 인트로 카드에서 빽빽해집니다 — 자세한 내용은 별도의 카드에 담으세요."
@@ -1130,6 +1136,7 @@ ko:
     drag_to_reorder: '드래그해서 순서 변경'
     remove_consent_gate: '동의 화면 삭제'
     remove_thankyou_screen: '감사 화면 삭제'
+    remove_share_card: '공유 카드 삭제'
     remove: '제거'
     animation_theme: "애니메이션"
     live_locked_bar: "이 Verto는 라이브 중 — 데이터 품질 보호를 위해 질문이 잠겨 있어요."

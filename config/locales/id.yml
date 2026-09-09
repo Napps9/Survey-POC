@@ -1101,6 +1101,12 @@ id:
     ty_forward_url_label: 'Tombol tautan (opsional)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Label tombol (mis. Kunjungi situs kami)'
+    share_card: 'Kartu berbagi'
+    share_card_hint: 'Yang dilihat teman ketika responden meneruskan Verto ini — di WhatsApp, Pesan, Facebook, X, LinkedIn, dan Slack.'
+    share_title_label: 'Judul berbagi'
+    share_description_label: 'Cerita berbagi'
+    share_message_label: 'Pesan yang dikirim responden'
+    share_message_hint: 'Ditulis sebagai responden, dengan suara mereka. Tautan ditambahkan otomatis.'
     tab_quiz: 'Mode kuis'
     tab_tokens: 'Tokenisasi'
     note_limit_split_hint: "Lebih dari %{n} karakter akan terlihat sesak di kartu intro — taruh detailnya di kartu tersendiri."
@@ -1130,6 +1136,7 @@ id:
     drag_to_reorder: 'Seret untuk mengatur ulang urutan'
     remove_consent_gate: 'Hapus gerbang persetujuan'
     remove_thankyou_screen: 'Hapus layar terima kasih'
+    remove_share_card: 'Hapus kartu berbagi'
     remove: 'Hapus'
     animation_theme: "Animasi"
     live_locked_bar: "Verto ini live — pertanyaan terkunci untuk menjaga kualitas data."

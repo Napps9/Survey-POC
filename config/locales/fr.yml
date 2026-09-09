@@ -1101,6 +1101,12 @@ fr:
     ty_forward_url_label: 'Bouton de lien (facultatif)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Libellé du bouton (ex. Visitez notre site)'
+    share_card: 'Carte de partage'
+    share_card_hint: 'Ce que voient les amis lorsque quelqu''un transmet ce Verto — dans WhatsApp, Messages, Facebook, X, LinkedIn et Slack.'
+    share_title_label: 'Titre de partage'
+    share_description_label: 'Récit de partage'
+    share_message_label: 'Message envoyé par les répondants'
+    share_message_hint: 'Rédigé à la voix du répondant. Le lien est ajouté automatiquement.'
     tab_quiz: 'Mode quiz'
     tab_tokens: 'Tokenisation'
     note_limit_split_hint: "Au-delà de %{n} caractères, c'est à l'étroit sur la carte d'introduction — mettez plutôt le détail sur sa propre carte."
@@ -1130,6 +1136,7 @@ fr:
     drag_to_reorder: 'Faites glisser pour réorganiser'
     remove_consent_gate: 'Supprimer l’écran de consentement'
     remove_thankyou_screen: 'Supprimer l’écran de remerciement'
+    remove_share_card: 'Supprimer la carte de partage'
     remove: 'Retirer'
     animation_theme: "Animation"
     live_locked_bar: "Ce Verto est en ligne — les questions sont verrouillées pour protéger la qualité des données."

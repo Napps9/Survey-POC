@@ -1123,6 +1123,12 @@ tn:
     ty_forward_url_label: 'Konopo ya kgokaganyo (ga se tlhokego)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Leina la konopo (sk. Etela webosaete ya rona)'
+    share_card: 'Karata ya go abelana'
+    share_card_hint: 'Se ditsala di se bonang fa moarabi a fetisetsa Verto eno — mo WhatsApp, Messages, Facebook, X, LinkedIn le Slack.'
+    share_title_label: 'Setlhogo sa go abelana'
+    share_description_label: 'Kgang ya go abelana'
+    share_message_label: 'Molaetsa o baarabi ba o romelang'
+    share_message_hint: 'E kwadilwe ka lentswe la moarabi. Kgolagano e tsenngwa ka boyona.'
     tab_quiz: 'Mokgwa wa tlhatlhobo'
     tab_tokens: 'Tokeni'
     note_limit_split_hint: "Morago ga ditlhaka tse %{n} go a patana mo karateng ya matseno — baya dintlha mo karateng ya tsona."
@@ -1152,6 +1158,7 @@ tn:
     drag_to_reorder: 'Goga go rulaganya gape'
     remove_consent_gate: 'Tlosa kgoro ya tumelano'
     remove_thankyou_screen: 'Tlosa tsebe ya tebogo'
+    remove_share_card: 'Tlosa karata ya go abelana'
     remove: 'Tlosa'
     animation_theme: "Tshakgamiso"
     live_locked_bar: "Verto e e teng mo tirisong — dipotso di tswaletswe go sireletsa boleng jwa data."

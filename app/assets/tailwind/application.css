@@ -2055,6 +2055,10 @@
 .gate-cta-row { display: flex; justify-content: center; }
 .s-badge.gate-badge-consent { background: #FFC24B; color: #4A3200; }
 .s-badge.gate-badge-ty { background: #DB0E58; }
+/* Purple rather than the thank-you pink: the share card sits directly under it
+   in the feed and the two are different jobs — one is what the respondent
+   reads, the other is what their friends see. */
+.s-badge.gate-badge-share { background: #615BF5; }
 .gate-ty-card { margin-inline: auto; }
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
@@ -2202,6 +2206,55 @@
 }
 .gate-ty-forward-input::placeholder { color: rgba(255,255,255,0.35); }
 .gate-ty-forward-input:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); border-color: transparent; }
+
+/* ── Share card ────────────────────────────────────────────────────────────
+   Three labelled contenteditable fields rather than the thank-you card's
+   centred replica: this card is not a preview of anything the respondent sees,
+   it is copy aimed at whoever receives the link, so it reads as a form. Reuses
+   .gate-ty-forward-label for the labels — the same labelled-field stack. */
+.preview-thankyou-card.gate-share-card {
+  margin-inline: auto;
+  align-items: stretch;
+  text-align: start;
+  gap: 0;
+}
+.gate-share-hint {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.6); line-height: 1.45; margin-bottom: 4px;
+}
+.gate-share-field {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 14px; padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  width: 100%;
+}
+.gate-share-field .gate-ty-forward-label {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+}
+/* Advisory only — update_settings applies the real cap. Tabular figures so the
+   number doesn't jitter the label as it counts. */
+.gate-share-count {
+  font-size: var(--text-xs); color: rgba(255,255,255,0.35);
+  font-variant-numeric: tabular-nums;
+}
+.gate-share-count.is-over { color: #FF5C93; }
+.gate-share-input {
+  width: 100%; box-sizing: border-box;
+  padding: 8px 10px; border-radius: 8px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  line-height: 1.5; min-height: 38px;
+}
+/* contenteditable has no placeholder, so the fallback the link uses today is
+   shown in its place — greyed, and gone the moment anything is typed. */
+.gate-share-input:empty::before {
+  content: attr(data-default-text);
+  color: rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+.gate-share-note {
+  font-size: var(--text-xs); color: rgba(255,255,255,0.45); line-height: 1.45;
+}
 /* Structural edits are locked to the primary language, and the device frames
    preview only the question cards — hide the gate chrome in both, matching
    the add-question rows. */

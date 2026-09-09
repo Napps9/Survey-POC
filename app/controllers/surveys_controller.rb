@@ -912,6 +912,20 @@ class SurveysController < ApplicationController
     if params.key?(:forward_label)
       attrs[:forward_label] = params[:forward_label].to_s.strip.first(Survey::MAX_END_LABEL).presence
     end
+    # Share copy — what a passed-on /play link says about itself. Deliberately
+    # NOT in SETTINGS_LOCKED_IN_USE: this is distribution, like the thank-you
+    # copy and the custom slug above it, and a creator rewrites how their Verto
+    # is described for its whole life. Blank clears back to the fallback rather
+    # than storing "", which is what .presence is doing on each of these.
+    if params.key?(:share_title)
+      attrs[:share_title] = params[:share_title].to_s.strip.first(Survey::MAX_SHARE_TITLE).presence
+    end
+    if params.key?(:share_description)
+      attrs[:share_description] = params[:share_description].to_s.strip.first(Survey::MAX_SHARE_DESCRIPTION).presence
+    end
+    if params.key?(:share_message)
+      attrs[:share_message] = params[:share_message].to_s.strip.first(Survey::MAX_SHARE_MESSAGE).presence
+    end
     if params.key?(:consent_text)
       attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
     end

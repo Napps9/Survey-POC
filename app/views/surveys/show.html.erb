@@ -478,6 +478,83 @@
           </div>
         </div>
 
+        <%# ── Share card — what a passed-on /play link says about itself. A CTA
+            below the thank-you slot until the creator writes any of it, then an
+            editable card. Backed by the share_* columns, NOT by a card in the
+            deck: a deck card's index is the positional key every answer is
+            stored under, and this is metadata about the link, not a question
+            anyone answers. Same shape as the thank-you slot above for exactly
+            that reason — both are columns wearing a card. ── %>
+        <% has_share = @survey.share_copy? %>
+        <div class="gate-cta-row" data-gate-cards-target="shareCta" <%= "hidden" if has_share %>>
+          <button type="button" class="aq-trigger-btn aq-insert-btn"
+                  data-action="click->gate-cards#addShare">
+            ＋ <%= t("editor.share_card", default: "Share card") %>
+          </button>
+        </div>
+        <div class="gate-card-wrap" data-gate-cards-target="shareCard" <%= "hidden" unless has_share %>>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
+            <span class="s-badge gate-badge-share"><%= t("editor.share_card", default: "Share card") %></span>
+            <button type="button" class="card-delete-btn" style="margin-left:auto;"
+                    title="<%= t("editor.remove_share_card", default: "Remove share card") %>"
+                    aria-label="<%= t("editor.remove_share_card", default: "Remove share card") %>"
+                    data-action="click->gate-cards#removeShare">
+              ✕ <span><%= t("editor.remove", default: "Remove") %></span>
+            </button>
+          </div>
+          <div class="preview-thankyou-card gate-share-card">
+            <div class="gate-share-hint">
+              <%= t("editor.share_card_hint",
+                    default: "What friends see when a respondent passes this Verto on — in WhatsApp, Messages, Facebook, X, LinkedIn and Slack.") %>
+            </div>
+
+            <div class="gate-share-field">
+              <label class="gate-ty-forward-label" for="share-title">
+                <%= t("editor.share_title_label", default: "Share headline") %>
+                <span class="gate-share-count" data-gate-cards-target="shareTitleCount"></span>
+              </label>
+              <div id="share-title" class="gate-share-input gate-editable" contenteditable="true"
+                   role="textbox"
+                   aria-label="<%= t("editor.share_title_label", default: "Share headline") %>"
+                   data-gate-cards-target="shareTitle"
+                   data-max="<%= Survey::MAX_SHARE_TITLE %>"
+                   data-default-text="<%= @survey.share_title_text %>"
+                   data-action="input->gate-cards#queueShareSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.share_title %></div>
+            </div>
+
+            <div class="gate-share-field">
+              <label class="gate-ty-forward-label" for="share-description">
+                <%= t("editor.share_description_label", default: "Share story") %>
+                <span class="gate-share-count" data-gate-cards-target="shareStoryCount"></span>
+              </label>
+              <div id="share-description" class="gate-share-input gate-editable" contenteditable="true"
+                   role="textbox" aria-multiline="true"
+                   aria-label="<%= t("editor.share_description_label", default: "Share story") %>"
+                   data-gate-cards-target="shareStory"
+                   data-max="<%= Survey::MAX_SHARE_DESCRIPTION %>"
+                   data-default-text="<%= @survey.share_description_text %>"
+                   data-action="input->gate-cards#queueShareSave:stop"><%= @survey.share_description %></div>
+            </div>
+
+            <div class="gate-share-field">
+              <label class="gate-ty-forward-label" for="share-message">
+                <%= t("editor.share_message_label", default: "Message respondents send") %>
+                <span class="gate-share-count" data-gate-cards-target="shareMessageCount"></span>
+              </label>
+              <div id="share-message" class="gate-share-input gate-editable" contenteditable="true"
+                   role="textbox" aria-multiline="true"
+                   aria-label="<%= t("editor.share_message_label", default: "Message respondents send") %>"
+                   data-gate-cards-target="shareMessage"
+                   data-max="<%= Survey::MAX_SHARE_MESSAGE %>"
+                   data-action="input->gate-cards#queueShareSave:stop"><%= @survey.share_message %></div>
+              <div class="gate-share-note">
+                <%= t("editor.share_message_hint",
+                      default: "Written as the respondent, in their voice. The link is added automatically.") %>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div><%# /cards feed %>
 
       <%# Floating bottom CTAs — the finalize bar (and its card-count /

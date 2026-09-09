@@ -1101,6 +1101,12 @@ sw:
     ty_forward_url_label: 'Kitufe cha kiungo (hiari)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Lebo ya kitufe (k.m. Tembelea tovuti yetu)'
+    share_card: 'Kadi ya kushiriki'
+    share_card_hint: 'Kile marafiki wanachokiona mjibu anaposambaza Verto hii — katika WhatsApp, Messages, Facebook, X, LinkedIn na Slack.'
+    share_title_label: 'Kichwa cha kushiriki'
+    share_description_label: 'Hadithi ya kushiriki'
+    share_message_label: 'Ujumbe wanaotuma wajibu'
+    share_message_hint: 'Umeandikwa kwa sauti ya mjibu mwenyewe. Kiungo huongezwa kiotomatiki.'
     tab_quiz: 'Hali ya maswali'
     tab_tokens: 'Utoaji wa tokeni'
     note_limit_split_hint: "Zaidi ya herufi %{n} inakuwa finyu kwenye kadi ya utangulizi — weka maelezo kwenye kadi yake mwenyewe."
@@ -1130,6 +1136,7 @@ sw:
     drag_to_reorder: 'Buruta ili kupanga upya'
     remove_consent_gate: 'Ondoa skrini ya idhini'
     remove_thankyou_screen: 'Ondoa skrini ya shukrani'
+    remove_share_card: 'Ondoa kadi ya kushiriki'
     remove: 'Ondoa'
     animation_theme: "Animation"
     live_locked_bar: "Verto hii iko hewani — maswali yamefungwa kulinda ubora wa data."

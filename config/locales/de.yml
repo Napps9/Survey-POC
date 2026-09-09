@@ -1101,6 +1101,12 @@ de:
     ty_forward_url_label: 'Link-Button (optional)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Button-Text (z. B. Website besuchen)'
+    share_card: 'Teilen-Karte'
+    share_card_hint: 'Was Freunde sehen, wenn Teilnehmende dieses Verto weitergeben — in WhatsApp, Nachrichten, Facebook, X, LinkedIn und Slack.'
+    share_title_label: 'Überschrift zum Teilen'
+    share_description_label: 'Text zum Teilen'
+    share_message_label: 'Nachricht der Teilnehmenden'
+    share_message_hint: 'Aus Sicht der Teilnehmenden geschrieben. Der Link wird automatisch angehängt.'
     tab_quiz: 'Quizmodus'
     tab_tokens: 'Tokenisierung'
     note_limit_split_hint: "Ab %{n} Zeichen wird es auf der Intro-Karte eng — bringen Sie die Details lieber auf einer eigenen Karte unter."
@@ -1130,6 +1136,7 @@ de:
     drag_to_reorder: 'Zum Neuanordnen ziehen'
     remove_consent_gate: 'Einwilligungs-Gate entfernen'
     remove_thankyou_screen: 'Dankeschön-Seite entfernen'
+    remove_share_card: 'Teilen-Karte entfernen'
     remove: 'Entfernen'
     animation_theme: "Animation"
     live_locked_bar: "Dieses Verto ist live — die Fragen sind gesperrt, um die Datenqualität zu schützen."

@@ -1103,6 +1103,12 @@ pl:
     ty_forward_url_label: 'Przycisk linku (opcjonalnie)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Etykieta przycisku (np. Odwiedź naszą stronę)'
+    share_card: 'Karta udostępniania'
+    share_card_hint: 'Co widzą znajomi, gdy uczestnik przekazuje to Verto dalej — w WhatsApp, Wiadomościach, Facebooku, X, LinkedIn i Slacku.'
+    share_title_label: 'Nagłówek udostępniania'
+    share_description_label: 'Opis udostępniania'
+    share_message_label: 'Wiadomość wysyłana przez uczestników'
+    share_message_hint: 'Napisana głosem uczestnika. Link dodaje się automatycznie.'
     tab_quiz: 'Tryb quizu'
     tab_tokens: 'Tokenizacja'
     note_limit_split_hint: "Powyżej %{n} znaków robi się ciasno na karcie wprowadzającej — szczegóły lepiej umieścić na osobnej karcie."
@@ -1132,6 +1138,7 @@ pl:
     drag_to_reorder: 'Przeciągnij, aby zmienić kolejność'
     remove_consent_gate: 'Usuń ekran zgody'
     remove_thankyou_screen: 'Usuń ekran podziękowania'
+    remove_share_card: 'Usuń kartę udostępniania'
     remove: 'Usuń'
     animation_theme: "Animacja"
     live_locked_bar: "To Verto jest na żywo — pytania są zablokowane, by chronić jakość danych."

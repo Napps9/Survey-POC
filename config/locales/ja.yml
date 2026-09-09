@@ -1101,6 +1101,12 @@ ja:
     ty_forward_url_label: 'リンクボタン（任意）'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'ボタンのラベル（例：サイトを見る）'
+    share_card: '共有カード'
+    share_card_hint: '回答者がこの Verto を共有したときに友人に表示される内容です — WhatsApp、メッセージ、Facebook、X、LinkedIn、Slack で。'
+    share_title_label: '共有の見出し'
+    share_description_label: '共有の説明'
+    share_message_label: '回答者が送るメッセージ'
+    share_message_hint: '回答者自身の言葉として書きます。リンクは自動的に追加されます。'
     tab_quiz: 'クイズモード'
     tab_tokens: 'トークン化'
     note_limit_split_hint: "%{n}文字を超えるとイントロカードで窮屈になります — 詳細は専用のカードに置いてください。"
@@ -1130,6 +1136,7 @@ ja:
     drag_to_reorder: 'ドラッグして並べ替え'
     remove_consent_gate: '同意画面を削除'
     remove_thankyou_screen: 'サンクス画面を削除'
+    remove_share_card: '共有カードを削除'
     remove: '削除'
     animation_theme: "アニメーション"
     live_locked_bar: "このVertoは公開中 — データ品質を守るため質問はロックされています。"

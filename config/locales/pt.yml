@@ -1101,6 +1101,12 @@ pt:
     ty_forward_url_label: 'Botão de link (opcional)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Texto do botão (ex. Visite o nosso site)'
+    share_card: 'Cartão de partilha'
+    share_card_hint: 'O que os amigos veem quando alguém partilha este Verto — no WhatsApp, Mensagens, Facebook, X, LinkedIn e Slack.'
+    share_title_label: 'Título de partilha'
+    share_description_label: 'História de partilha'
+    share_message_label: 'Mensagem que os participantes enviam'
+    share_message_hint: 'Escrita na voz de quem responde. O link é adicionado automaticamente.'
     tab_quiz: 'Modo de quiz'
     tab_tokens: 'Tokenização'
     note_limit_split_hint: "Acima de %{n} caracteres fica apertado no cartão de introdução — coloque o detalhe num cartão próprio."
@@ -1130,6 +1136,7 @@ pt:
     drag_to_reorder: 'Arraste para reordenar'
     remove_consent_gate: 'Remover o ecrã de consentimento'
     remove_thankyou_screen: 'Remover o ecrã de agradecimento'
+    remove_share_card: 'Remover cartão de partilha'
     remove: 'Remover'
     animation_theme: "Animação"
     live_locked_bar: "Este Verto está no ar — as perguntas estão bloqueadas para proteger a qualidade dos dados."

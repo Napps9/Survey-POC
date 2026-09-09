@@ -1108,6 +1108,12 @@ af:
     ty_forward_url_label: "Skakelknoppie (opsioneel)"
     ty_forward_url_placeholder: "https://example.org"
     ty_forward_label_placeholder: "Knopetiket (bv. Besoek ons webwerf)"
+    share_card: 'Deelkaart'
+    share_card_hint: 'Wat vriende sien wanneer ’n respondent hierdie Verto aanstuur — in WhatsApp, Boodskappe, Facebook, X, LinkedIn en Slack.'
+    share_title_label: 'Deel-opskrif'
+    share_description_label: 'Deelverhaal'
+    share_message_label: 'Boodskap wat respondente stuur'
+    share_message_hint: 'Geskryf as die respondent, in hul eie stem. Die skakel word outomaties bygevoeg.'
     tab_quiz: "Kwismodus"
     tab_tokens: "Tokenisering"
     note_limit_split_hint: "Verby %{n} karakters raak dit benoud op die inleidingskaart — sit die besonderhede eerder op hul eie kaart."
@@ -1137,6 +1143,7 @@ af:
     drag_to_reorder: "Sleep om te herrangskik"
     remove_consent_gate: "Verwyder toestemmingshek"
     remove_thankyou_screen: "Verwyder dankie-skerm"
+    remove_share_card: 'Verwyder deelkaart'
     remove: "Verwyder"
     animation_theme: "Animasie"
     live_locked_bar: "Hierdie Verto is regstreeks — vrae is gesluit om datagehalte te beskerm."

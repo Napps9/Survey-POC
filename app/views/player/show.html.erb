@@ -7,9 +7,13 @@
     @test_mode) — that's an authed iframe, never a shared URL. %>
 <% unless @preview && !@test_mode %>
   <% content_for :head do %>
-    <%= tag.meta property: "og:title", content: "#{@survey.theme} · Playverto" %>
-    <%# The creator's editing brief — becomes public the moment a link is shared. %>
-    <%= tag.meta property: "og:description", content: (@survey.description.presence || @survey.theme).to_s.truncate(200) %>
+    <%# The creator's own share copy where they have written it, and exactly what
+        these tags said before it existed where they haven't — Survey#share_title_text
+        falls back to "theme · Playverto", share_description_text to the editing
+        brief and then the theme. A Verto nobody has written share copy for
+        unfurls as it always did. %>
+    <%= tag.meta property: "og:title", content: @survey.share_title_text %>
+    <%= tag.meta property: "og:description", content: @survey.share_description_text.to_s.truncate(200) %>
     <%= tag.meta property: "og:type", content: "website" %>
     <%= tag.meta property: "og:site_name", content: "Playverto" %>
     <%= tag.meta property: "og:url", content: request.base_url + request.path %>

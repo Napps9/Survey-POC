@@ -1123,6 +1123,12 @@ st:
     ty_forward_url_label: 'Konopo ya kgokahano (boikgethelo)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Lebo la konopo (mohlala, Etela webosaete ya rona)'
+    share_card: 'Karete ya ho arolelana'
+    share_card_hint: 'Seo metsoalle e se bonang ha ea arabang a fetisetsa Verto ena — ho WhatsApp, Messages, Facebook, X, LinkedIn le Slack.'
+    share_title_label: 'Sehlooho sa ho arolelana'
+    share_description_label: 'Pale ya ho arolelana'
+    share_message_label: 'Molaetsa oo ba arabang ba o romelang'
+    share_message_hint: 'E ngotsoe ka lentsoe la ea arabang. Sehokelo se kenyelletsoa ka boiketsiso.'
     tab_quiz: 'Mokgwa wa Teko'
     tab_tokens: "Ts'ebediso ya Ditokene"
     note_limit_split_hint: "Ka mora ditlhaku tse %{n} ho ba hlophehileng karengoaneng ya selelekela — beha dintlha karengoaneng ya tsona."
@@ -1152,6 +1158,7 @@ st:
     drag_to_reorder: 'Hula ho hlophisa hape'
     remove_consent_gate: 'Tlosa monyako wa tumello'
     remove_thankyou_screen: 'Tlosa skrini ya kea leboha'
+    remove_share_card: 'Tlosa karete ya ho arolelana'
     remove: 'Tlosa'
     animation_theme: "Motsamao"
     live_locked_bar: "Verto ena e a phela — dipotso di notlelehile ho sireletsa boleng ba datha."
