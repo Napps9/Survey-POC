@@ -35,6 +35,20 @@ Open `index.html` in a browser, or read `shots/*.png`.
 Haverley Town Council is fictional, and the photograph in the share image is a
 hand-drawn SVG stand-in for a Verto's real `background_image`.
 
+## The PDF
+
+`responder-share-mockups.pdf` is the shareable version — 12 pages, one per board,
+each page sized to its own board so nothing is orphaned or padded. Rebuild it
+after editing `index.html`:
+
+```
+node make_pdf.mjs      # per-board parts into .pdf-parts/ (gitignored)
+python3 merge_pdf.py   # stitches and numbers them
+```
+
+It prints the page rather than stitching `shots/*.png`, so every word in it stays
+real vector text — searchable, selectable, and sharp at any zoom.
+
 ## Re-shooting
 
 ```
@@ -56,8 +70,8 @@ from `file://` and from any host. It follows the build-stamp convention of the
 one-pagers in `public/`:
 
 ```html
-<!-- responder-share mockups · build 2026-09-08-b · … -->
-<html lang="en" data-build="2026-09-08-b">
+<!-- responder-share mockups · build 2026-09-09-a · … -->
+<html lang="en" data-build="2026-09-09-a">
 ```
 
 Bump that stamp when you change the file, and check it in view-source to be sure

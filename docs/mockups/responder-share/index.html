@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- responder-share mockups · build 2026-09-08-b · view-source and check this line to confirm
+<!-- responder-share mockups · build 2026-09-09-a · view-source and check this line to confirm
      which copy your browser is showing (a stale cache is otherwise invisible).
      Fictional example throughout: "Haverley Town Council" does not exist. -->
 <html lang="en" data-build="2026-09-08-a">
@@ -395,6 +395,39 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
 .spec .cuts li{margin-bottom:4px}
 .foot{padding:0 0 60px;font-size:12px;color:var(--ink3)}
 
+/* ── print / PDF ──────────────────────────────────────────────────────────
+   The whole page is HTML, CSS and inline SVG — no raster images anywhere — so
+   printing it through Chromium gives a PDF whose every word is real, selectable,
+   searchable text that stays sharp at any zoom. That is the point of this block:
+   it exists so the deliverable can be a readable document, not a folder of PNGs.
+   Boards keep their on-screen layout (notes beside a phone, notes below a wide
+   frame); all this does is give each one its own page and stop the stage from
+   clipping, since `overflow-x: auto` prints as a hard crop. */
+@media print {
+  @page { margin: 0; }
+  html, body { background: #fff; }
+  .wrap { max-width: none; padding: 0 30px; }
+
+  /* Cover: hero + contents + the worked example, then a page per board. */
+  .intro { break-after: page; }
+  .board, .spec { break-before: page; margin: 0 0 6px; border: 0; border-radius: 0; box-shadow: none; }
+  .board-head { break-after: avoid; border-bottom: 1px solid var(--line); }
+
+  /* An auto-scrolling stage becomes a guillotine on paper. */
+  .stage { overflow: visible !important; background: #fff; padding: 22px 0 8px; }
+  .stage-row { width: auto; }
+  .board-body { border: 0; }
+  .notes { border-left: 1px solid var(--line); }
+  .notes.below { border-left: 0; border-top: 1px solid var(--line); }
+
+  /* Nothing that reads as one object may straddle a page. */
+  .frame, .phone, .desk-frame, .utile, .dtile, .editor-col, .og-half,
+  .notes li, .spec ol.items li, .spec tr, .example { break-inside: avoid; }
+
+  .toc { border: 0; }
+  .toc ol { gap: 4px 12px; }
+  .foot { break-inside: avoid; }
+}
 @media (max-width:1100px){.board-body{grid-template-columns:1fr}.notes{border-left:0;border-top:1px solid var(--line)}}
 </style>
 </head>
@@ -526,7 +559,7 @@ code{font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;backgrou
 
 <header class="hero">
   <div class="wrap">
-    <div class="eyebrow">Mockups · respondent share · build 2026-09-08-b</div>
+    <div class="eyebrow">Mockups · respondent share · build 2026-09-09-a</div>
     <h1>Pass it on: letting a respondent send the Verto to friends and family</h1>
     <p>What the end of a Verto offers, what the friend receives in WhatsApp, Messages and the feeds, the social image behind the link, and where the creator writes the narrative headline. A change.org-style share: a headline that tells the story, a picture, and a message in the respondent's own voice.</p>
     <div class="meta"><span>Fictional example: Haverley Town Council</span><span>Player at 390×844 and 1280×800</span><span>Share image at 1200×630</span><span>Spec for the implementer at the foot</span></div>
