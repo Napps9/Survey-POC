@@ -362,6 +362,13 @@ tr:
       region_empty: "Henüz bölgesel yanıt yok — ilki sizinki olabilir!"
       progress: "%{total} karttan %{n}. kart"
       queued: Kaydedildi — çevrimiçi olduğunuzda eşitlenecek
+      join_sent_title: "Gelen kutunu kontrol et"
+      join_sent_body: "%{email} adresine bir bağlantı gönderdik. Seni oturum açtırır ve bu Verto'yu saklar — parola gerekmez."
+      join_sent_again: "Tekrar gönder"
+      join_also_one: "Bu cihazın hatırladığı diğer Verto'yu da ekle"
+      join_also_other: "Bu cihazın hatırladığı diğer %{count} Verto'yu da ekle"
+      join_invalid: "Bu bir e-posta adresine benzemiyor."
+      join_failed: "Şu anda gönderemedik. Birazdan tekrar dene."
       submit_rejected: "Bu Verto kapandı, bu yüzden yanıtlarınız kaydedilmedi."
       compare_cta: Sonuçlarınızı diğerleriyle karşılaştırın →
       compare_loading: Yükleniyor…
@@ -1607,9 +1614,10 @@ tr:
     menu_link: "Tek bir katılımcının verisi…"
     back_to_results: "Sonuçlara dön"
     intro: "Bir veri erişim veya silme talebini yanıtlamak için \"%{verto}\" içinde bir katılımcının kaydını bulun."
-    identifier_note: "Bir katılımcı, cihazındaki oturum belirteciyle ya da bu Verto kod istiyorsa seçtiği kodla bulunabilir. Oturum belirteci tarayıcı sekmesi kapandıktan sonra saklanmaz; ikisine de sahip olmayan bir katılımcı tanımlanamaz."
+    identifier_note: "Bir katılımcı cihazındaki oturum belirteciyle, bu Verto soruyorsa seçtiği kodla ya da sonunda bu Verto'yu bir hesaba kaydettiyse verdiği e-posta adresiyle bulunabilir. Oturum belirteci tarayıcı sekmesi kapandıktan sonra saklanmaz; bu üçünden hiçbiri olmayan bir katılımcı tanımlanamaz."
     session_token_label: "Oturum belirteci"
     respondent_code_label: "Katılımcı kodu"
+    email_address_label: "E-posta adresi (bu Verto'yu kaydettiyse)"
     find: "Bul"
     not_found: "Bu tanımlayıcıyla eşleşen yanıt yok."
     found: "%{count} eşleşen yanıt"

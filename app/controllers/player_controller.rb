@@ -7,7 +7,7 @@ class PlayerController < ApplicationController
   layout "fullscreen"
   skip_before_action :require_authentication
   skip_before_action :set_current_organisation
-  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall, :eligibility ]
+  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall, :eligibility, :leaderboard, :join ]
 
   # Public, unauthenticated write endpoints — cap per-IP request rate so one
   # source can't flood responses (results poisoning / storage abuse). Limits are
@@ -62,6 +62,22 @@ class PlayerController < ApplicationController
   # generous per-minute cap here only guards against a runaway client/bot.
   rate_limit to: 30, within: 1.minute, only: :location_search, name: "location_search",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
+  # Join is the only endpoint here that SENDS MAIL to an address a stranger
+  # typed, so it is capped twice and in the SessionsController shape: the
+  # per-IP limit stops one machine walking a list, and the per-address limit
+  # stops a rotating pool of addresses-per-IP hammering ONE inbox, which the
+  # per-IP limit alone never sees. Deliberately NOT scaled by
+  # PLAYER_RATE_LIMIT_SCALE — a bigger crowd behind one NAT address is a
+  # reason to let more submits through, never more mail. #join_budget_ok? adds
+  # the two hourly budgets a per-minute cap cannot express.
+  #
+  # Refusal is `ok: true`, the same body a success returns: a 429 here would
+  # tell a caller which addresses they had already spent (see #join).
+  rate_limit to: 10, within: 5.minutes, only: :join, name: "join_ip",
+             with: -> { render json: { ok: true } }
+  rate_limit to: 5, within: 20.minutes, only: :join, name: "join_email",
+             by:   -> { "join_email:#{params[:email].to_s.strip.downcase}" },
+             with: -> { render json: { ok: true } }
 
   # How many respondent-facing Claude calls may be in flight in this process.
   # Rate limiting above bounds requests per IP; this bounds concurrency, which
@@ -620,9 +636,14 @@ class PlayerController < ApplicationController
     # Resolve "you": the saved row's digest once this session has written, else
     # the raw key the client sent — a recognised returner opening a fresh
     # session (No retests' straight-to-board landing) has a key but no row yet.
-    token = params[:session_token].to_s
+    # POST now, GET while the deprecated route lives (see config/routes.rb).
+    # Rails populates params from a JSON body anyway, so reading params covers
+    # both — but read the body explicitly first so the intent survives the
+    # day the GET goes and nobody has to work out where these came from.
+    asked = leaderboard_request_params
+    token = asked[:session_token].to_s
     resp  = token.present? ? @survey.responses.find_by(session_token: token) : nil
-    you_digest = resp&.player_key_digest.presence || @survey.player_key_digest(params[:player_key])
+    you_digest = resp&.player_key_digest.presence || @survey.player_key_digest(asked[:player_key])
     you_row    = you_digest ? @survey.leaderboard_standings.find_by(key_digest: you_digest) : nil
     own        = you_digest ? TokenLeaderboard.entry_for_digest(@survey, you_digest) : nil
 
@@ -673,6 +694,55 @@ class PlayerController < ApplicationController
     render json: { ok: true, policy: @survey.leaderboard_retake_policy,
                    rank_by: @survey.leaderboard_rank_by,
                    total_players:, entries:, you: }
+  end
+
+  # POST /play/:token/join
+  #
+  # The respondent asks for an account at the end of a Verto. Nothing is
+  # recorded against the address here beyond a pending link: this action
+  # resolves what the person is entitled to claim, parks that on a
+  # PlayerSignInLink, and mails the link. The claims themselves are written by
+  # PlayerSignInsController#create — only once someone has proved they can read
+  # the inbox.
+  #
+  # It is cookie-free by construction and has to stay that way. `:join` is in
+  # the null_session list above (player_controller.js sends no CSRF token on
+  # any fetch, so without it every join is a 422), which means Rails swaps in a
+  # NullCookieJar whose `write` is a no-op and whose read set is empty. There
+  # is no configuration in which this action can set or read
+  # player_session_id — which is fine, because the link is what starts the
+  # session. The embed case says the same thing independently: a Verto is
+  # routinely framed by a third party (see allow_embedding), where a
+  # SameSite=Lax cookie is never sent on a subresource POST anyway.
+  #
+  # And no digest is ever written here. ResultsExport#alias_names mints a
+  # PlayerAlias for every non-nil player_key_digest with no feature gate, so a
+  # digest written only for joiners would label opt-in status in the creator's
+  # CSV; LeaderboardStanding.completed_identities would then build a board out
+  # of joiners alone. The run just finished is claimed by session_token, which
+  # every response already has.
+  #
+  # Every refusal returns the SAME body a success does: unknown address, blank
+  # address, join switched off, budget spent, or an exception. An endpoint that
+  # answers differently for an address it has seen before is an endpoint that
+  # confirms addresses — RespondentRecall's doctrine, applied to email.
+  def join
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+
+    email = params[:email].to_s.strip.downcase.first(Player::MAX_EMAIL)
+
+    if @survey.join_prompt? && join_budget_ok?(email) && (player = Player.for_email(email))
+      remember_play_locale(player)
+      send_sign_in_link(player, join_claim_payload)
+    end
+
+    render json: { ok: true }
+  rescue => e
+    # Deliberately generic, and deliberately ok: an error shape is itself an
+    # oracle signal, so there isn't one.
+    ErrorReporting.report("PlayerController#join", e)
+    render json: { ok: true }
   end
 
   def results
@@ -964,6 +1034,137 @@ class PlayerController < ApplicationController
     true
   end
 
+  # How many DISTINCT addresses one IP may ask for a link for in an hour, and
+  # how often one address may be asked for from anywhere. The same two budgets
+  # recall and No retests spend, and here for a third reason: an uncapped
+  # unauthenticated endpoint that sends mail is a mail-bomb aimed at whoever's
+  # address is typed into it, and a fast route onto every ESP's suppression
+  # list. Generous enough that a venue full of respondents behind one NAT
+  # address each join once; nowhere near enough to grind a list.
+  MAX_JOIN_ADDRESSES_PER_IP = 30
+  MAX_JOIN_PER_ADDRESS      = 5
+
+  # A blank or malformed address spends nothing and sends nothing — and reads
+  # from outside as a success, like every other refusal here.
+  def join_budget_ok?(email)
+    return false unless email.match?(URI::MailTo::EMAIL_REGEXP)
+
+    code_budget_ok?("join", join_budget_digest(email),
+                    per_ip: MAX_JOIN_ADDRESSES_PER_IP, per_code: MAX_JOIN_PER_ADDRESS)
+  end
+
+  # The budget counters are keyed on this, and cache keys are readable wherever
+  # the cache is — so the address goes in as a keyed digest rather than as
+  # itself. Not Survey#respondent_code_digest: that one truncates to
+  # MAX_RESPONDENT_CODE, which would collapse long addresses sharing a prefix
+  # into one budget.
+  def join_budget_digest(email)
+    OpenSSL::HMAC.hexdigest("SHA256", self.class.join_budget_key, email)
+  end
+
+  def self.join_budget_key
+    @join_budget_key ||= Rails.application.key_generator.generate_key("player_join_budget", 32)
+  end
+
+  # How much of a client-sent payload this will resolve. Both bounds exist to
+  # keep one request's database work fixed: a browser holds keys for the
+  # handful of Vertos it has played, not for hundreds.
+  MAX_JOIN_DEVICE_KEYS       = 20
+  MAX_JOIN_CLAIMS_PER_SURVEY = 10
+
+  # What this person may claim, resolved here rather than trusted from the
+  # client. Two sources, neither a bare assertion:
+  #
+  #   session_token — the run just finished. The column is uniquely indexed and
+  #                   scoped to this Verto, so holding the token IS the proof.
+  #   device_keys   — Vertos played earlier on this browser. A key is only ever
+  #                   matched against the digest of the survey it belongs to
+  #                   (per-survey HMAC — see Survey#player_key_digest), so a key
+  #                   lifted from one Verto resolves to nothing on another.
+  #
+  # Stored on the link, not applied. Anything unresolvable is skipped: a paused
+  # SurveyLink, a freed vanity slug or an erased response is an ordinary state,
+  # and one dead entry must not cost the person the rest of their payload.
+  def join_claim_payload
+    claims = []
+
+    token = params[:session_token].to_s
+    if token.present? && (resp = @survey.responses.find_by(session_token: token))
+      claims << { "response_id" => resp.id, "source" => "signup" }
+    end
+
+    Array(params[:device_keys]).first(MAX_JOIN_DEVICE_KEYS).each do |entry|
+      entry = entry.to_unsafe_h if entry.respond_to?(:to_unsafe_h)
+      next unless entry.is_a?(Hash)
+
+      other = survey_for_play_token(entry["token"])
+      next if other.nil?
+
+      digest = other.player_key_digest(entry["player_key"])
+      next if digest.nil?
+
+      other.responses.where(status: "completed", player_key_digest: digest)
+           .order(id: :desc).limit(MAX_JOIN_CLAIMS_PER_SURVEY).pluck(:id).each do |id|
+        claims << { "response_id" => id, "source" => "device_key" }
+      end
+    end
+
+    claims.uniq { |c| c["response_id"] }
+  end
+
+  # load_survey_and_share's four-way resolution without the instance variables:
+  # #join resolves OTHER Vertos' tokens and must not overwrite the one being
+  # played. nil for anything that doesn't resolve.
+  def survey_for_play_token(token)
+    token = token.to_s
+    return nil if token.blank?
+
+    if (share = SurveyShare.find_by(share_token: token))
+      Survey.without_report_text.find_by(id: share.survey_id)
+    elsif (link = SurveyLink.active.find_by(slug: token))
+      Survey.without_report_text.find_by(id: link.survey_id)
+    else
+      Survey.without_report_text.find_by(publish_token: token) ||
+        Survey.without_report_text.where.not(publish_token: nil).find_by(slug: token)
+    end
+  end
+
+  # The locale the mail should arrive in. Set once, from the Verto they were
+  # playing when they joined — never overwritten, because after that the
+  # account holds a preference of its own and this request has no business
+  # moving it.
+  def remember_play_locale(player)
+    return if player.preferred_locale.present?
+
+    player.update_column(:preferred_locale,
+                         SupportedLocales.coerce(params[:lang].presence || I18n.locale))
+  end
+
+  # Mint and mail, in that order, with the mail failure contained. Solid Queue
+  # being unavailable must not lose the link silently OR 500 the join: the row
+  # is already written, so the person can ask again and get a second one.
+  def send_sign_in_link(player, claims)
+    _link, raw = PlayerSignInLink.mint!(player: player, claim_payload: claims)
+    PlayerSignInMailer.sign_in(player, raw, @survey).deliver_later
+  rescue => e
+    ErrorReporting.report("PlayerController#send_sign_in_link", e, survey_id: @survey&.id)
+  end
+
+  # The board's two inputs, from a JSON body on the POST and from the query
+  # string on the deprecated GET. A malformed body is not an error here: the
+  # board is a read, and "no identity" degrades to the anonymous board rather
+  # than to a 400.
+  def leaderboard_request_params
+    if request.post? && request.content_type.to_s.include?("json")
+      body = request.body.read
+      parsed = body.present? ? JSON.parse(body) : {}
+      return { session_token: parsed["session_token"], player_key: parsed["player_key"] }
+    end
+    { session_token: params[:session_token], player_key: params[:player_key] }
+  rescue JSON::ParserError
+    { session_token: nil, player_key: nil }
+  end
+
   # The leaderboard identity, same discipline as the respondent code above:
   # recorded only while the feature is on, only as a digest, and set once per
   # response — a reload keeps the identity it started with.
@@ -982,6 +1183,13 @@ class PlayerController < ApplicationController
   # digest that assigns the leaderboard alias, which is the whole separation
   # the feature promises. Idempotent, so the payload can carry them on every
   # save until the client stops sending.
+  #
+  # The end-of-Verto account ask (#join) collects an address too, and keeps the
+  # separation the same way from the other side: it writes nothing onto the
+  # response and nothing keyed by any digest — the address lives on `players`,
+  # and `player_claims` names the response by id. Survey#join_prompt_enabled?
+  # is inside the neurodiversity wall with contact_form_enabled? for exactly
+  # this reason.
   def apply_contact(data)
     return unless @survey.contact_form_enabled?
     fields = data["contact"]

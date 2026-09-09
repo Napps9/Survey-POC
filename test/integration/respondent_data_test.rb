@@ -229,6 +229,98 @@ class RespondentDataTest < ActionDispatch::IntegrationTest
     assert_not RespondentAlias.exists?(survey_id: @survey.id, code_digest: digest)
   end
 
+  # ── The respondent account ────────────────────────────────────────────────
+  #
+  # A Player is the first durable respondent handle this app has ever had, so
+  # it is the first identifier a data-subject request can plausibly arrive
+  # holding — and the first one whose erasure has a boundary, because an
+  # account spans Vertos belonging to different creators.
+
+  def player_keeping(response, email: "rd-p-#{SecureRandom.hex(3)}@test.com")
+    Player.for_email(email).tap { |pl| PlayerClaim.claim!(player: pl, response: response, source: "signup") }
+  end
+
+  test "an admin finds a respondent by the address they kept this Verto with" do
+    pl = player_keeping(@resp)
+    login(@admin)
+
+    get survey_respondent_data_path(@survey, email_address: pl.email_address.upcase)
+
+    assert_response :success
+    assert_match "1 matching", response.body
+  end
+
+  test "an address that kept another Verto finds nothing here" do
+    other = @org.surveys.create!(title: "T2", theme: "Th", audience_age: "adults", key_insight: "k",
+                                 default_locale: "en", locales: [ "en" ],
+                                 cards: [ { "type" => "yes_no", "text" => "Q", "options" => %w[Yes No] } ])
+    theirs = other.responses.create!(session_token: SecureRandom.uuid, status: "completed", answered: true)
+    pl = player_keeping(theirs)
+    login(@admin)
+
+    get survey_respondent_data_path(@survey, email_address: pl.email_address)
+
+    assert_response :success
+    assert_match I18n.t("respondent_data.not_found"), response.body
+  end
+
+  test "the export carries the account, because Article 15 asks for everything" do
+    pl = player_keeping(@resp)
+    login(@admin)
+
+    get survey_respondent_data_export_path(@survey, session_token: @token)
+
+    data = JSON.parse(response.body)
+    assert_equal pl.email_address, data.dig("account", "email_address")
+    assert_equal 1, data.dig("account", "vertos_in_account")
+  end
+
+  test "an export with no account has no account section at all" do
+    login(@admin)
+    get survey_respondent_data_export_path(@survey, session_token: @token)
+    refute JSON.parse(response.body).key?("account")
+  end
+
+  test "erasure reaches the claim, and does not raise on the way" do
+    # The FK from player_claims to responses is RESTRICT, like every other
+    # responses FK here. Without `dependent: :delete_all` on Response this
+    # raises ActiveRecord::InvalidForeignKey and erasure fails outright — the
+    # regression this pins.
+    pl = player_keeping(@resp)
+    login(@admin)
+
+    delete survey_respondent_data_path(@survey, session_token: @token)
+
+    assert_redirected_to survey_respondent_data_path(@survey)
+    assert_equal 0, PlayerClaim.where(player_id: pl.id).count
+    assert_equal 0, Response.where(id: @resp.id).count
+  end
+
+  test "an account left holding nothing goes with the last Verto in it" do
+    pl = player_keeping(@resp)
+    login(@admin)
+
+    delete survey_respondent_data_path(@survey, session_token: @token)
+
+    refute Player.exists?(pl.id), "keeping a bare address after an erasure request is the half-measure this refuses"
+  end
+
+  test "an account still holding another creator's Verto survives the erasure" do
+    other = @org.surveys.create!(title: "T2", theme: "Th", audience_age: "adults", key_insight: "k",
+                                 default_locale: "en", locales: [ "en" ],
+                                 cards: [ { "type" => "yes_no", "text" => "Q", "options" => %w[Yes No] } ])
+    elsewhere = other.responses.create!(session_token: SecureRandom.uuid, status: "completed", answered: true)
+    pl = player_keeping(@resp)
+    PlayerClaim.claim!(player: pl, response: elsewhere, source: "device_key")
+    login(@admin)
+
+    delete survey_respondent_data_path(@survey, session_token: @token)
+
+    assert Player.exists?(pl.id),
+           "this creator is the data controller for their Verto, not for the rest of the account"
+    assert_equal [ elsewhere.id ], pl.player_claims.pluck(:response_id)
+  end
+
   test "erasing nothing does not claim to have erased something" do
     login(@admin)
     assert_no_difference -> { @survey.responses.count } do

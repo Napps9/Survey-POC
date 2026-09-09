@@ -8,6 +8,12 @@ class Response < ApplicationRecord
   # Free-text answers lifted out of `answers` until moderation passes them —
   # see HeldText and Moderation. Gone with the response, in one DELETE.
   has_many :held_texts, dependent: :delete_all
+  # Respondent accounts that have claimed this response. delete_all rather than
+  # nothing: the foreign key is RESTRICT (this repo has six ON DELETE CASCADEs
+  # in total and none on a responses FK), so without this the GDPR erasure in
+  # RespondentDataController#destroy raises InvalidForeignKey instead of
+  # erasing. The claim goes; the account does not.
+  has_many :player_claims, dependent: :delete_all
   validates :session_token, presence: true, uniqueness: true
 
   # The only two states a response is ever in: "started" once it has an answer,

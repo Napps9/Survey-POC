@@ -362,6 +362,13 @@ it:
       region_empty: "Ancora nessuna risposta regionale — la tua potrebbe essere la prima!"
       progress: Carta %{n} di %{total}
       queued: Salvato — verrà sincronizzato quando sarai di nuovo online
+      join_sent_title: "Controlla la tua casella di posta"
+      join_sent_body: "Abbiamo inviato un link a %{email}. Ti fa accedere e conserva questo Verto — senza password."
+      join_sent_again: "Invialo di nuovo"
+      join_also_one: "Aggiungi anche l'altro Verto che questo dispositivo ricorda"
+      join_also_other: "Aggiungi anche gli altri %{count} Verto che questo dispositivo ricorda"
+      join_invalid: "Questo non sembra un indirizzo email."
+      join_failed: "Non siamo riusciti a inviarlo ora. Riprova tra un momento."
       submit_rejected: "Questo Verto è chiuso, quindi le tue risposte non sono state salvate."
       compare_cta: Confronta i tuoi risultati con gli altri →
       compare_loading: Caricamento…
@@ -1607,9 +1614,10 @@ it:
     menu_link: "Dati di un rispondente…"
     back_to_results: "Torna ai risultati"
     intro: "Trova il record di un rispondente in «%{verto}» per rispondere a una richiesta di accesso o cancellazione."
-    identifier_note: "Un rispondente si può trovare tramite il token di sessione del suo dispositivo o tramite il codice che ha scelto, se questo Verto lo richiede. Il token di sessione non viene conservato dopo la chiusura della scheda: chi non ha né l'uno né l'altro non è identificabile."
+    identifier_note: "Chi ha risposto può essere trovato tramite il token di sessione del suo dispositivo, tramite il codice che ha scelto se questo Verto lo richiede, o tramite l'indirizzo e-mail che ha fornito se al termine ha conservato questo Verto in un account. Il token di sessione non viene mantenuto dopo la chiusura della scheda del browser, quindi chi non ha nessuno dei tre non può essere identificato."
     session_token_label: "Token di sessione"
     respondent_code_label: "Codice rispondente"
+    email_address_label: "Indirizzo e-mail (se ha conservato questo Verto)"
     find: "Cerca"
     not_found: "Nessuna risposta corrisponde a questo identificativo."
     found: "%{count} risposta/e corrispondente/i"

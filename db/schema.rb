@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_09_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_090400) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -602,6 +602,54 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_120000) do
     t.index ["survey_id"], name: "index_player_aliases_on_survey_id"
   end
 
+  create_table "player_claims", force: :cascade do |t|
+    t.datetime "claimed_at", null: false
+    t.datetime "created_at", null: false
+    t.integer "player_id", null: false
+    t.integer "response_id", null: false
+    t.string "source", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["player_id", "response_id"], name: "index_player_claims_on_player_id_and_response_id", unique: true
+    t.index ["player_id"], name: "index_player_claims_on_player_id"
+    t.index ["response_id"], name: "index_player_claims_on_response_id"
+    t.index ["survey_id", "claimed_at"], name: "index_player_claims_on_survey_id_and_claimed_at"
+    t.index ["survey_id"], name: "index_player_claims_on_survey_id"
+    t.check_constraint "source IN ('signup', 'signed_in_play', 'device_key')", name: "chk_player_claims_source"
+  end
+
+  create_table "player_sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.integer "player_id", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.index ["player_id"], name: "index_player_sessions_on_player_id"
+  end
+
+  create_table "player_sign_in_links", force: :cascade do |t|
+    t.json "claim_payload", default: [], null: false
+    t.datetime "consumed_at"
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.integer "player_id", null: false
+    t.string "token_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_player_sign_in_links_on_expires_at"
+    t.index ["player_id"], name: "index_player_sign_in_links_on_player_id"
+    t.index ["token_digest"], name: "index_player_sign_in_links_on_token_digest", unique: true
+  end
+
+  create_table "players", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.datetime "email_verified_at"
+    t.string "name"
+    t.string "preferred_locale"
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_players_on_email_address", unique: true
+  end
+
   create_table "portfolio_common_question_sets", force: :cascade do |t|
     t.integer "common_question_set_id", null: false
     t.datetime "created_at", null: false
@@ -926,6 +974,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_120000) do
     t.json "flows", default: [], null: false
     t.string "forward_label"
     t.string "forward_url"
+    t.string "join_body"
+    t.string "join_cta"
+    t.boolean "join_prompt_enabled", default: false, null: false
+    t.string "join_title"
     t.text "key_insight"
     t.boolean "leaderboard_enabled", default: false, null: false
     t.string "leaderboard_note"
@@ -1074,6 +1126,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_09_120000) do
   add_foreign_key "partnership_vertos", "surveys"
   add_foreign_key "partnerships", "organisations"
   add_foreign_key "player_aliases", "surveys"
+  add_foreign_key "player_claims", "players"
+  add_foreign_key "player_claims", "responses"
+  add_foreign_key "player_claims", "surveys"
+  add_foreign_key "player_sessions", "players"
+  add_foreign_key "player_sign_in_links", "players"
   add_foreign_key "portfolio_common_question_sets", "common_question_sets"
   add_foreign_key "portfolio_common_question_sets", "portfolios"
   add_foreign_key "portfolio_memberships", "funder_memberships"

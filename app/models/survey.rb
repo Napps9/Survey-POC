@@ -18,6 +18,11 @@ class Survey < ApplicationRecord
   # responses (declared above, so destroyed first) already take theirs with
   # them; this catches nothing in practice and costs one DELETE.
   has_many :held_texts, dependent: :delete_all
+  # Accounts that kept this Verto. delete_all for the same reason as
+  # held_texts: the responses declared above take theirs first, and this
+  # catches whatever a direct survey destroy would otherwise leave behind a
+  # RESTRICT foreign key.
+  has_many :player_claims, dependent: :delete_all
   has_many :flow_generations, dependent: :destroy
   # Builds outlive the Verto they produced — they're the account's generation
   # log, deleted with the organisation, not the survey. Nullify rather than
@@ -1669,7 +1674,14 @@ class Survey < ApplicationRecord
   # The leaderboard identity digest — respondent_code_digest's sibling, same
   # posture: the raw browser-minted key is never stored, and the per-survey
   # key means a digest is comparable only within this Verto, so identities
-  # can't be joined across surveys. nil for blank input ("no identity"), and
+  # can't be joined across surveys.
+  #
+  # Still true of DIGESTS, and only of digests. Since respondent accounts
+  # (PlayerClaim) there IS one cross-Verto join in the app — but it is opt-in,
+  # made by the respondent from their own inbox, and it materialises
+  # response_id rather than re-deriving anything from these keys. Nothing here
+  # feeds it: see PlayerController#join for why the account writes no digests
+  # at all. nil for blank input ("no identity"), and
   # the length bound keeps an abusive payload from becoming HMAC fodder — a
   # legitimate key is a 36-char UUID.
   def player_key_digest(key)
@@ -1983,6 +1995,17 @@ class Survey < ApplicationRecord
       # re-deriving would spend a Claude call to compute the same answer.
       sdgs:                    read_attribute(:sdgs),
       compare_note:            compare_note,
+      # tokens_note and leaderboard_note were missing here until the join
+      # prompt was added and the gap became obvious: a duplicated Verto
+      # silently dropped both back to the locale default. A follow-up Verto is
+      # usually made by duplicating the first, which is exactly when losing a
+      # creator's own copy shows.
+      tokens_note:             tokens_note,
+      leaderboard_note:        leaderboard_note,
+      join_prompt_enabled:     join_prompt_enabled,
+      join_title:              join_title,
+      join_body:               join_body,
+      join_cta:                join_cta,
       thankyou_title:          thankyou_title,
       thankyou_body:           thankyou_body,
       forward_url:             forward_url,
@@ -2104,6 +2127,27 @@ class Survey < ApplicationRecord
   def compare_results? = show_results_comparison?
   def share_button?    = share_enabled?
   def regions_map?     = regions_enabled?
+
+  # The end-of-Verto ask (join_prompt_enabled). Two limits apiece, same
+  # reasoning as MAX_NOTE above: the storage cap is the less useful number,
+  # because the block is a card on a phone and the copy stops FITTING well
+  # before it stops saving. The shipped defaults are 40 and 118 characters, so
+  # those are the widths the design actually holds.
+  MAX_JOIN_TITLE         = 60
+  RECOMMENDED_JOIN_TITLE = 40
+  MAX_JOIN_BODY          = 200
+  RECOMMENDED_JOIN_BODY  = 120
+
+  def join_title_text = join_title.presence || I18n.t("player.join_title")
+  def join_body_text  = join_body.presence  || I18n.t("player.join_body")
+  def join_cta_text   = join_cta.presence   || I18n.t("player.join_cta")
+
+  # Reads as a question at the call sites that ask whether to render the block
+  # (player/show, the partial, the URL local), matching leaderboard_active? and
+  # respondent_code_active? beside it. Nothing else gates it: a draft or an
+  # unpublished Verto still renders the markup, and the blank joinUrl value is
+  # what keeps it inert there.
+  def join_prompt? = join_prompt_enabled?
 
   # Thank-you screen copy shown after Finish. Both fall back to the default
   # localized copy when the creator hasn't set their own.
@@ -2460,13 +2504,19 @@ class Survey < ApplicationRecord
   # card autosave, the add-question modal's Demographics tiles, an import —
   # hits the same wall, whichever side moved second. The message is
   # creator-facing: surveys#update relays RecordInvalid text.
-  validate :contact_form_excludes_neurodiversity, if: :contact_form_enabled?
+  # The join prompt collects an email at the end of the Verto, which is a
+  # contact form by any reading — so it sits behind the same wall. Without
+  # this, the block would have been a second door into exactly the pairing
+  # this validation exists to refuse: a name and an email beside a
+  # health-adjacent special-category answer.
+  validate :contact_form_excludes_neurodiversity, if: -> { contact_form_enabled? || join_prompt_enabled? }
 
   def contact_form_excludes_neurodiversity
     return unless neurodiversity_cards?
 
-    errors.add(:base, "A Verto can collect contact details or ask the neurodiversity question, never both — " \
-                      "remove the neurodiversity question to keep the contact form, or turn the contact form off.")
+    collector = contact_form_enabled? ? "collect contact details" : "ask respondents to create an account"
+    errors.add(:base, "A Verto can #{collector} or ask the neurodiversity question, never both — " \
+                      "remove the neurodiversity question, or turn that off.")
   end
 
   def neurodiversity_cards?

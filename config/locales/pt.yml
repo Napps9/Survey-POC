@@ -362,6 +362,13 @@ pt:
       region_empty: "Ainda não há respostas regionais — a sua pode ser a primeira!"
       progress: Cartão %{n} de %{total}
       queued: Guardado — será sincronizado quando voltar a estar online
+      join_sent_title: "Verifique a sua caixa de entrada"
+      join_sent_body: "Enviámos um link para %{email}. Ele autentica-o e guarda este Verto — sem palavra-passe."
+      join_sent_again: "Enviar novamente"
+      join_also_one: "Adicionar também o outro Verto que este dispositivo guarda"
+      join_also_other: "Adicionar também os %{count} outros Vertos que este dispositivo guarda"
+      join_invalid: "Isso não parece um endereço de e-mail."
+      join_failed: "Não conseguimos enviar agora. Tente daqui a pouco."
       submit_rejected: "Este Verto foi encerrado, por isso as suas respostas não foram guardadas."
       compare_cta: Veja os seus resultados comparados com os outros →
       compare_loading: A carregar…
@@ -1607,9 +1614,10 @@ pt:
     menu_link: "Dados de um participante…"
     back_to_results: "Voltar aos resultados"
     intro: "Encontre o registo de um participante em \"%{verto}\" para responder a um pedido de acesso ou de apagamento."
-    identifier_note: "Um participante pode ser encontrado pelo token de sessão do seu dispositivo ou pelo código que escolheu, se este Verto o pedir. O token de sessão não é guardado depois de fechar o separador, por isso quem não tiver nenhum dos dois não pode ser identificado."
+    identifier_note: "Uma pessoa participante pode ser encontrada pelo token de sessão do seu dispositivo, pelo código que escolheu se este Verto o pedir, ou pelo e-mail que deu se guardou este Verto numa conta no final. O token de sessão não é mantido depois de o separador do navegador fechar, por isso quem não tiver nenhum dos três não pode ser identificado."
     session_token_label: "Token de sessão"
     respondent_code_label: "Código do participante"
+    email_address_label: "E-mail (se guardou este Verto)"
     find: "Procurar"
     not_found: "Nenhuma resposta corresponde a esse identificador."
     found: "%{count} resposta(s) correspondente(s)"

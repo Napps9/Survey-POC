@@ -1,0 +1,60 @@
+<%# The ask at the end of a Verto: keep this one, by giving an address.
+    Rendered only when the creator turned the block on (Survey#join_prompt?),
+    and inert in owner preview and Test Mode like every other live endpoint —
+    the controller's joinUrl value is blank there, and _renderJoinState never
+    reveals the card.
+
+    No locals, reading @survey and t("player.join_*") — the player-partial
+    convention. The heading, body and button are the CREATOR'S sentences;
+    Survey#join_title_text and friends fall back to the house copy when the
+    field is blank, so this template never has to know which it got.
+
+    Four states, all in this one card: ask (below), sent, and two failures.
+    Only the ask is server-rendered — the rest are written by
+    player_controller#_renderJoinState, because they carry the address the
+    person typed and that never goes near the page cache. %>
+<div class="join-card hidden" data-player-target="joinBlock">
+  <div class="join-eyebrow"><%= t("player.join_eyebrow") %></div>
+  <%# A div, not a heading: the player renders no h1/h2 anywhere (the thank-you
+      title itself is .preview-thankyou-title on a div), so an <h3> here would
+      be the page's only heading and would announce as a skipped level. %>
+  <div class="join-title"><%= @survey.join_title_text %></div>
+  <p class="join-body"><%= @survey.join_body_text %></p>
+
+  <div class="join-ask" data-player-target="joinAsk">
+    <%# Other Vertos this browser still holds a durable key for. Hidden until
+        the controller finds any, and checked by default: the person is being
+        offered their own history, not opted into someone else's. %>
+    <label class="join-also hidden" data-player-target="joinAlso">
+      <input type="checkbox" checked data-player-target="joinAlsoBox">
+      <span data-player-target="joinAlsoLabel"></span>
+    </label>
+
+    <%# Embedded in a third-party page, localStorage is partitioned or blocked
+        outright, so this browser can see nothing it played elsewhere. Said
+        plainly rather than silently offering less. %>
+    <p class="join-note hidden" data-player-target="joinEmbedded"><%= t("player.join_embedded") %></p>
+
+    <div class="join-row">
+      <input type="email" class="join-input"
+             inputmode="email" autocomplete="email" enterkeyhint="send"
+             spellcheck="false" autocapitalize="off"
+             placeholder="<%= t("player.join_email_placeholder") %>"
+             aria-label="<%= t("player.join_email_placeholder") %>"
+             data-player-target="joinEmail"
+             data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
+      <button type="button" class="join-btn" data-player-target="joinBtn"
+              data-action="click->player#joinSubmit">
+        <%= @survey.join_cta_text %>
+      </button>
+    </div>
+
+    <p class="join-error hidden" role="alert" data-player-target="joinError"></p>
+    <p class="join-fine"><%= t("player.join_fine") %></p>
+  </div>
+
+  <%# Sent / failed. aria-live so the change is announced: the button that was
+      just pressed disappears, and without this a screen reader is told
+      nothing at all. %>
+  <div class="join-done hidden" aria-live="polite" data-player-target="joinDone"></div>
+</div>

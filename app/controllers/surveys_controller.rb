@@ -864,6 +864,7 @@ class SurveysController < ApplicationController
     %i[token_reveal_enabled token_back_nav_enabled token_hud_enabled token_amounts_shown share_enabled
        regions_enabled respondent_code_enabled leaderboard_enabled
        chrome_follows_verto_language auto_detect_language contact_form_enabled
+       join_prompt_enabled
        no_going_back no_retests].each do |flag|
       next unless params.key?(flag)
       attrs[flag] = ActiveModel::Type::Boolean.new.cast(params[flag])
@@ -897,6 +898,17 @@ class SurveysController < ApplicationController
     end
     if params.key?(:leaderboard_note)
       attrs[:leaderboard_note] = params[:leaderboard_note].to_s.strip.first(Survey::MAX_NOTE).presence
+    end
+    # The end-of-Verto ask. Presentation copy, same trust level as
+    # tokens_note; blank restores the locale default.
+    if params.key?(:join_title)
+      attrs[:join_title] = params[:join_title].to_s.strip.first(Survey::MAX_JOIN_TITLE).presence
+    end
+    if params.key?(:join_body)
+      attrs[:join_body] = params[:join_body].to_s.strip.first(Survey::MAX_JOIN_BODY).presence
+    end
+    if params.key?(:join_cta)
+      attrs[:join_cta] = params[:join_cta].to_s.strip.first(Survey::MAX_END_LABEL).presence
     end
     if params.key?(:thankyou_title)
       attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence
@@ -986,7 +998,7 @@ class SurveysController < ApplicationController
         # The one validation a settings form can trip is the contact-form /
         # neurodiversity wall; surface it the way the panel's other refusals
         # surface (slug_error / language_error), not as a 500.
-        raise unless attrs.key?(:contact_form_enabled)
+        raise unless attrs.key?(:contact_form_enabled) || attrs.key?(:join_prompt_enabled)
         return redirect_to survey_path(@survey, panel: "publish", contact_error: "neurodiversity")
       end
     end

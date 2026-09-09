@@ -107,6 +107,13 @@
   leaderboard_mode = token_mode && @survey.leaderboard_enabled?
   leaderboard_url  = leaderboard_mode && !preview_mode && play_token.present? ? player_leaderboard_url(play_token) : ""
 
+  # Respondent accounts: the end-screen ask. Blank in owner preview and Test
+  # Mode like every other live endpoint — a creator checking their own Verto
+  # must not be able to mail themselves a sign-in link from it, and Test Mode's
+  # "no live endpoint may reach this page" test asserts every *-url-value is
+  # empty there.
+  join_url = @survey.join_prompt? && !preview_mode && play_token.present? ? join_survey_url(play_token) : ""
+
   # Answer-branching: a card's routing config is public (like token config), so
   # the player follows the graph entirely client-side from the same cards JSON.
   logic_mode = @survey.logic?
@@ -148,6 +155,7 @@
      data-player-token-back-nav-value="<%= @survey.token_back_nav_enabled? %>"
      data-player-leaderboard-value="<%= leaderboard_mode %>"
      data-player-leaderboard-url-value="<%= leaderboard_url %>"
+     data-player-join-url-value="<%= join_url %>"
      data-player-contact-value="<%= @survey.contact_form_enabled? %>"
      data-player-no-going-back-value="<%= @survey.no_going_back? %>"
      data-player-no-retests-value="<%= @survey.retest_basis %>"
@@ -423,6 +431,14 @@
                     class="play-end-btn play-end-btn-primary">
               <%= show_comparison ? t("player.compare_cta") : t("player.quiz_compare_cta") %>
             </button>
+          <% end %>
+
+          <%# Respondent accounts: the ask goes SECOND, under the compare CTA —
+              the comparison is what they came for, the account is what they
+              might want afterwards. A full-width card rather than a pill,
+              like the token result and the leaderboard above it. %>
+          <% if @survey.join_prompt? %>
+            <%= render "player/join_block" %>
           <% end %>
 
           <%# Forward-to-website CTA. Always rendered (hidden until it has a URL)

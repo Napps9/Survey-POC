@@ -7,7 +7,10 @@ Rails.application.routes.draw do
   post "play/:token/consent", to: "player#consent", as: :consent_survey
   # Ask-once recall. POST, not GET, and that is not a REST quibble: the
   # respondent's code travels in the body, and a code in a URL lands in server
-  # logs, in Referer headers and in the service worker's page cache.
+  # logs, in Referer headers and in the service worker's page cache. The same
+  # rule now covers three more respondent identifiers — the leaderboard's
+  # device key, and the address and device keys the account ask sends
+  # (#join) — which is why every one of them is a POST.
   post "play/:token/recall", to: "player#recall", as: :recall_survey
   # No retests: may this code still take the current wave? POST for the same
   # reason as recall — the code travels in the body.
@@ -16,8 +19,26 @@ Rails.application.routes.draw do
   get  "play/:token/scores", to: "player#scores", as: :player_scores
   get  "play/:token/results", to: "player#results", as: :player_results
   get  "play/:token/regions", to: "player#regions", as: :player_regions
-  get  "play/:token/leaderboard", to: "player#leaderboard", as: :player_leaderboard
+  # POST, for the same reason recall and eligibility are: the board is asked
+  # for by the respondent's durable device key, and a key in a URL lands in
+  # server logs, in Referer headers and in the service worker's page cache
+  # (the catch-all networkFirst at service-worker.js writes any OK GET to
+  # PAGE_CACHE, query string and all).
+  #
+  # The GET stays routed on purpose, and is the one respondent-facing route
+  # here that is deprecated rather than current. sw_register.js deliberately
+  # skips its reload while someone is mid-Verto (playvertoEngaged), so a
+  # respondent who was answering across a deploy keeps running the old JS and
+  # would get a 404 at the moment they finish. Remove it once no cached player
+  # bundle still issues it — a deploy cycle or two.
+  post "play/:token/leaderboard", to: "player#leaderboard", as: :player_leaderboard
+  get  "play/:token/leaderboard", to: "player#leaderboard"
   get  "play/:token/location_search", to: "player#location_search", as: :player_location_search
+  # Respondent accounts: ask for a sign-in link at the end of a Verto. POST for
+  # the same reason recall and eligibility are — the address travels in the
+  # body, never in a URL a log, a Referer header or the service worker's page
+  # cache could keep. See PlayerController#join for why it is cookie-free.
+  post "play/:token/join", to: "player#join", as: :join_survey
   # Per-Verto PWA install manifest — see PlayerController#manifest.
   get  "play/:token/manifest", to: "player#manifest", as: :play_manifest
 
@@ -55,6 +76,20 @@ Rails.application.routes.draw do
   # people open these on a device that isn't signed in); #create is the resend.
   get  "email-confirmations/:token", to: "email_confirmations#show",   as: :email_confirmation
   post "email-confirmations",        to: "email_confirmations#create", as: :email_confirmations
+
+  # Respondent accounts. Outside /play/ on purpose: that path is the service
+  # worker's whole scope and its HTML is cached offline, and a page listing
+  # what one person answered has no business in a shared device's cache.
+  #
+  # The sign-in link splits GET from POST for the reason the unsubscribe pair
+  # below does: corporate link scanners and inbox prefetchers follow GETs, and
+  # a single-use link a scanner can spend is one its recipient never gets to
+  # use. GET confirms; POST signs in.
+  get    "you",                to: "you#show",              as: :you
+  post   "you/sign-out",       to: "you#sign_out",          as: :you_sign_out
+  delete "you",                to: "you#destroy"
+  get    "you/sign-in/:token", to: "player_sign_ins#show",   as: :player_sign_in
+  post   "you/sign-in/:token", to: "player_sign_ins#create"
 
   # Social sign-in (OmniAuth). /auth/:provider itself is middleware.
   get "auth/:provider/callback", to: "oauth_sessions#create", as: :oauth_callback

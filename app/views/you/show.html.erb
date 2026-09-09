@@ -1,0 +1,75 @@
+<%# A respondent's own Vertos. Signed out is a first-class state: there is no
+    sign-in form anywhere in this app, so the page explains where a link comes
+    from rather than sending anyone to a screen they cannot use. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell">
+
+    <div class="you-bar">
+      <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
+      <% if player_signed_in? %>
+        <span class="you-avatar" title="<%= current_player.email_address %>"><%= current_player.email_address.first.upcase %></span>
+      <% end %>
+    </div>
+
+    <% if !player_signed_in? %>
+      <div class="you-card">
+        <h1 class="you-h1"><%= t("you.signed_out_title") %></h1>
+        <p class="you-sub"><%= t("you.signed_out_body") %></p>
+      </div>
+
+    <% else %>
+      <div class="you-head">
+        <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.eyebrow") %></div>
+        <h1 class="you-h1"><%= t("you.kept", count: @claims.size) %></h1>
+      </div>
+
+      <% if @claims.empty? %>
+        <div class="you-card">
+          <p class="you-sub"><%= t("you.empty") %></p>
+        </div>
+      <% else %>
+        <div class="you-list">
+          <% @claims.each do |claim| %>
+            <% survey = claim.survey %>
+            <article class="you-verto">
+              <span class="you-verto-rule" aria-hidden="true"></span>
+              <div class="you-verto-body">
+                <div class="you-verto-org"><%= survey.organisation.name %></div>
+                <h2 class="you-verto-title"><%= survey.theme.presence || survey.title %></h2>
+                <%# When they PLAYED it, not when they claimed it — a device key
+                    can claim a Verto months after the run, and the date that
+                    means anything to them is the day they answered. %>
+                <div class="you-verto-when">
+                  <%= t("you.played_on",
+                        date: l((claim.response.completed_at || claim.claimed_at).to_date, format: :long)) %>
+                </div>
+                <% piles = Array(survey.token_types).filter_map do |tt|
+                     n = claim.response.token_totals.to_h[tt["id"]].to_i
+                     next if n.zero?
+                     [ tt["icon"], n, tt["name"] ]
+                   end %>
+                <% if piles.any? %>
+                  <div class="you-piles">
+                    <% piles.each do |icon, n, name| %>
+                      <span class="you-pile"><%= icon %> <b><%= number_with_delimiter(n) %></b> <%= name %></span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="you-foot">
+        <%= button_to t("you.sign_out"), you_sign_out_path, method: :post,
+              class: "you-link", form: { style: "display:inline;margin:0;" } %>
+        <%= button_to t("you.delete"), you_path, method: :delete,
+              class: "you-link you-link-quiet",
+              form: { style: "display:inline;margin:0;",
+                      data: { turbo_confirm: t("you.delete_confirm") } } %>
+      </div>
+    <% end %>
+  </div>
+</div>

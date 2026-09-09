@@ -1546,6 +1546,87 @@
           <% end %>
         </details>
 
+        <%# The end-of-Verto ask: an account, so the creator can tell this
+            respondent what came of it. OFF by default, unlike its neighbours
+            above — those were hardcoded on before this panel existed, so
+            defaulting them off would have withdrawn a live feature. This one
+            asks a respondent for an email address, which is a thing a creator
+            should turn on deliberately rather than discover they shipped.
+
+            The three copy fields carry BOTH of their limits (note-limit), for
+            the reason the points notes do: the block is a card on a phone and
+            the copy stops fitting long before it stops saving. Blank restores
+            the locale default, so a creator who never opens this still gets a
+            sentence that reads properly. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">Ask them to join <span class="pub-chev">⌄</span></summary>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="join_prompt_enabled" value="0" />
+            <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size: var(--text-base);color:rgba(255,255,255,0.78);line-height:1.4;">
+              <input type="checkbox" name="join_prompt_enabled" value="1"
+                     <%= "checked" if @survey.join_prompt_enabled? %>
+                     onchange="this.form.requestSubmit()"
+                     style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;margin-top:1px;flex-shrink:0;" />
+              <span>Offer respondents an account at the end, so you can tell them what happened.</span>
+            </label>
+          <% end %>
+          <div class="card-flag-note" style="margin-left:24px;">
+            They give an email and get a link — no password. Nothing is stored against
+            an address until someone follows the link from their own inbox.
+          </div>
+
+          <% if params[:contact_error] == "neurodiversity" %>
+            <div style="margin-top:10px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;line-height:1.45;">
+              This Verto asks the neurodiversity question, so it can't also collect an
+              email — those answers must never sit beside a name and an address.
+            </div>
+          <% end %>
+
+          <% if @survey.join_prompt_enabled? %>
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Heading:</div>
+              <div data-controller="note-limit"
+                   data-note-limit-recommended-value="<%= Survey::RECOMMENDED_JOIN_TITLE %>"
+                   data-note-limit-max-value="<%= Survey::MAX_JOIN_TITLE %>">
+                <input type="text" name="join_title" maxlength="<%= Survey::MAX_JOIN_TITLE %>"
+                       value="<%= @survey.join_title_text %>"
+                       data-note-limit-target="input"
+                       data-action="input->note-limit#update"
+                       onchange="this.form.requestSubmit()"
+                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                <div class="note-limit-count" data-note-limit-target="count"></div>
+                <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_JOIN_TITLE) %></div>
+              </div>
+            <% end %>
+
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">What they get:</div>
+              <div data-controller="note-limit"
+                   data-note-limit-recommended-value="<%= Survey::RECOMMENDED_JOIN_BODY %>"
+                   data-note-limit-max-value="<%= Survey::MAX_JOIN_BODY %>">
+                <textarea name="join_body" maxlength="<%= Survey::MAX_JOIN_BODY %>" rows="3"
+                          data-note-limit-target="input"
+                          data-action="input->note-limit#update"
+                          onchange="this.form.requestSubmit()"
+                          style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none; resize:vertical;"><%= @survey.join_body_text %></textarea>
+                <div class="note-limit-count" data-note-limit-target="count"></div>
+                <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_JOIN_BODY) %></div>
+              </div>
+            <% end %>
+
+            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Button:</div>
+              <input type="text" name="join_cta" maxlength="<%= Survey::MAX_END_LABEL %>"
+                     value="<%= @survey.join_cta_text %>"
+                     onchange="this.form.requestSubmit()"
+                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+            <% end %>
+            <div class="card-flag-note" style="margin-left:0;margin-top:8px;">
+              Clear any of the three to go back to the default wording.
+            </div>
+          <% end %>
+        </details>
+
         <%# Everything language: which languages this Verto exists in and which
             is primary (surveys#update_languages), whether the player opens in
             the respondent's own language automatically, and whether the

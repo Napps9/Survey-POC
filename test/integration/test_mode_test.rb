@@ -13,9 +13,12 @@ class TestModeTest < ActionDispatch::IntegrationTest
     @survey = @org.surveys.create!(
       title: "S", theme: "Sports", audience_age: "all", key_insight: "x",
       default_locale: "en", locales: [ "en" ],
-      # No retests with codes wires one more -url-value (eligibility); the
-      # sweeps below must prove it blank here like every other endpoint.
-      no_retests: true, respondent_code_enabled: true,
+      # No retests with codes wires one more -url-value (eligibility), and the
+      # end-of-Verto account ask wires another (join); the sweeps below must
+      # prove both blank here like every other endpoint. The join one matters
+      # most of the three — a live URL there would let anyone holding a test
+      # link mail themselves a sign-in link off a Verto that records nothing.
+      no_retests: true, respondent_code_enabled: true, join_prompt_enabled: true,
       cards: [ { "type" => "welcome_card", "title" => "hi" },
                { "type" => "multiple_choice", "text" => "Pick", "options" => %w[a b] } ]
     )

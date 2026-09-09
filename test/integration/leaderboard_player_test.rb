@@ -33,6 +33,14 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     JSON.parse(response.body)
   end
 
+  # The board is a POST now — the durable device key is what it is asked by,
+  # and a key in a URL lands in logs, Referers and the service worker's page
+  # cache. The deprecated GET is exercised once, at the foot of this file.
+  def board(survey, **payload)
+    post player_leaderboard_path(survey.publish_token),
+         params: payload.to_json, headers: { "Content-Type" => "application/json" }
+  end
+
   # One full play: a fresh session submitting `answer` under `player_key`.
   def play!(survey, player_key:, answer: "Pizza", session: SecureRandom.uuid)
     json_post submit_survey_path(survey.publish_token),
@@ -43,20 +51,21 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
 
   test "the endpoint is refused unless the leaderboard is actually active" do
     off  = board_survey(leaderboard_enabled: false)
-    get player_leaderboard_path(off.publish_token)
+    board(off)
     assert_response :forbidden, "hiding the CTA isn't enough — the data must be refused too"
 
     # leaderboard_enabled without tokenisation is inert: nothing to rank.
     inert = board_survey(tokenisation_enabled: false)
-    get player_leaderboard_path(inert.publish_token)
+    board(inert)
     assert_response :forbidden
 
-    get player_leaderboard_path("no-such-token")
+    post player_leaderboard_path("no-such-token"),
+         params: {}.to_json, headers: { "Content-Type" => "application/json" }
     assert_response :not_found
 
     live = board_survey
     live.update!(unpublished_at: Time.current)
-    get player_leaderboard_path(live.publish_token)
+    board(live)
     assert_response :gone
   end
 
@@ -86,7 +95,7 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     play! s, player_key: "alpha", answer: "Pizza" # 5 gold
     play! s, player_key: "beta",  answer: "Salad" # 2 gold + 1 coal = 3
 
-    get player_leaderboard_path(s.publish_token)
+    board(s)
     body = JSON.parse(response.body)
 
     assert body["ok"]
@@ -107,7 +116,7 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     play! s, player_key: "alpha", answer: "Pizza" # 5 gold
     play! s, player_key: "beta",  answer: "Salad" # 2 gold + 1 coal
 
-    get player_leaderboard_path(s.publish_token), params: { player_key: "beta" }
+    board(s, player_key: "beta")
     body = JSON.parse(response.body)
     assert_equal "all", body["rank_by"]
     assert_equal({ "gold" => 5, "coal" => 0 }, body["entries"].first["totals"], "zero for a type never earned")
@@ -119,7 +128,7 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     play! s, player_key: "alpha", answer: "Pizza" # 5 gold, 0 coal
     play! s, player_key: "beta",  answer: "Salad" # 2 gold, 1 coal
 
-    get player_leaderboard_path(s.publish_token), params: { player_key: "beta" }
+    board(s, player_key: "beta")
     body = JSON.parse(response.body)
     assert_equal "coal", body["rank_by"]
     assert_equal [ 1, 0 ], body["entries"].map { |e| e["total"] }, "coal decides the order; gold is ignored"
@@ -131,11 +140,11 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
   test "retakes accumulate under the default policy, and the name never changes" do
     s = board_survey
     play! s, player_key: "gamer", answer: "Salad" # 3
-    get player_leaderboard_path(s.publish_token), params: { player_key: "gamer" }
+    board(s, player_key: "gamer")
     first_name = JSON.parse(response.body)["you"]["name"]
 
     play! s, player_key: "gamer", answer: "Pizza" # +5
-    get player_leaderboard_path(s.publish_token), params: { player_key: "gamer" }
+    board(s, player_key: "gamer")
     body = JSON.parse(response.body)
 
     assert_equal 8, body["you"]["total"], "two runs, one identity, summed"
@@ -147,7 +156,7 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     s = board_survey
     session = play!(s, player_key: "me", answer: "Pizza")
 
-    get player_leaderboard_path(s.publish_token), params: { session_token: session }
+    board(s, session_token: session)
     you = JSON.parse(response.body)["you"]
     assert_equal 1, you["rank"]
     assert_equal 5, you["total"]
@@ -155,10 +164,10 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
 
     # no_redo's straight-to-board path: a fresh session that never wrote a row
     # still finds itself by its durable key.
-    get player_leaderboard_path(s.publish_token), params: { player_key: "me" }
+    board(s, player_key: "me")
     assert_equal 1, JSON.parse(response.body)["you"]["rank"]
 
-    get player_leaderboard_path(s.publish_token)
+    board(s)
     assert_nil JSON.parse(response.body)["you"]
   end
 
@@ -166,7 +175,7 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     s = board_survey
     12.times { |i| play! s, player_key: "p#{i}", answer: (i < 11 ? "Pizza" : "Salad") }
 
-    get player_leaderboard_path(s.publish_token), params: { player_key: "p11" }
+    board(s, player_key: "p11")
     body = JSON.parse(response.body)
 
     assert_equal 10, body["entries"].size
@@ -182,7 +191,7 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
     # read-time backfill alone can name a bare identified row.
     s.player_aliases.delete_all
 
-    get player_leaderboard_path(s.publish_token)
+    board(s)
     body = JSON.parse(response.body)
 
     assert_equal 1, body["entries"].size
@@ -245,5 +254,37 @@ class LeaderboardPlayerTest < ActionDispatch::IntegrationTest
 
     assert_nil s.responses.find_by(session_token: "sess-q").player_key_digest,
       "no leaderboard, no durable identity — nothing is collected that the feature doesn't need"
+  end
+
+  # ── The device key is not in the URL ───────────────────────────────────────
+  # It used to be: the board was a GET and the key rode the query string, which
+  # the service worker's catch-all networkFirst writes to PAGE_CACHE verbatim.
+  # That is the hazard config/routes.rb names for recall and eligibility, and it
+  # matters more now the same key can attach a Verto to an account.
+
+  test "the board is asked for by POST, with the key in the body" do
+    s = board_survey
+    play! s, player_key: "bodykey", session: "sess-body"
+
+    board(s, player_key: "bodykey")
+
+    assert_response :success
+    assert_not_includes request.fullpath, "bodykey",
+      "the device key must not reach the URL — that is what the POST is for"
+    assert JSON.parse(response.body)["you"], "the key in the body still identifies the player"
+  end
+
+  # Kept routed on purpose: sw_register.js skips its reload while someone is
+  # mid-Verto, so a respondent answering across a deploy keeps running the old
+  # bundle. Removing the route would 404 them at the moment they finish.
+  test "the deprecated GET still answers, so a mid-play respondent is not stranded" do
+    s = board_survey
+    play! s, player_key: "oldjs", session: "sess-old"
+
+    get player_leaderboard_path(s.publish_token), params: { player_key: "oldjs" }
+
+    assert_response :success
+    assert JSON.parse(response.body)["you"],
+      "the old bundle sends a query string; it has to keep working until it is gone"
   end
 end

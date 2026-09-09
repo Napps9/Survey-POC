@@ -362,6 +362,13 @@ pl:
       region_empty: "Nie ma jeszcze odpowiedzi regionalnych — twoja może być pierwsza!"
       progress: Karta %{n} z %{total}
       queued: Zapisano — zsynchronizujemy, gdy wrócisz online
+      join_sent_title: "Sprawdź swoją skrzynkę"
+      join_sent_body: "Wysłaliśmy link na %{email}. Zaloguje Cię i zachowa to Verto — bez hasła."
+      join_sent_again: "Wyślij ponownie"
+      join_also_one: "Dodaj też inne Verto, które pamięta to urządzenie"
+      join_also_other: "Dodaj też %{count} innych Vertos, które pamięta to urządzenie"
+      join_invalid: "To nie wygląda na adres e-mail."
+      join_failed: "Nie udało się teraz wysłać. Spróbuj za chwilę."
       submit_rejected: "To Verto zostało zamknięte, więc Twoje odpowiedzi nie zostały zapisane."
       compare_cta: Zobacz, jak Twoje wyniki wypadają na tle innych →
       compare_loading: Ładowanie…
@@ -1609,9 +1616,10 @@ pl:
     menu_link: "Dane jednego respondenta…"
     back_to_results: "Powrót do wyników"
     intro: "Znajdź rekord jednego respondenta w „%{verto}”, aby odpowiedzieć na wniosek o dostęp do danych lub ich usunięcie."
-    identifier_note: "Respondenta można znaleźć po tokenie sesji z jego urządzenia albo po kodzie, który wybrał, jeśli to Verto o niego prosi. Token sesji nie jest przechowywany po zamknięciu karty przeglądarki, więc osoby bez żadnego z nich nie da się zidentyfikować."
+    identifier_note: "Osobę odpowiadającą można znaleźć po tokenie sesji z jej urządzenia, po kodzie, który wybrała, jeśli to Verto o niego prosi, albo po adresie e-mail, który podała, jeśli na końcu zachowała to Verto na koncie. Token sesji nie jest przechowywany po zamknięciu karty przeglądarki, więc osoby bez żadnego z tych trzech nie da się zidentyfikować."
     session_token_label: "Token sesji"
     respondent_code_label: "Kod respondenta"
+    email_address_label: "Adres e-mail (jeśli zachowano to Verto)"
     find: "Szukaj"
     not_found: "Żadna odpowiedź nie pasuje do tego identyfikatora."
     found: "Pasujące odpowiedzi: %{count}"

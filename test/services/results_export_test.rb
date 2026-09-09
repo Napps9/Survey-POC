@@ -202,6 +202,31 @@ class ResultsExportTest < ActiveSupport::TestCase
     refute_includes flat, "sam14"
   end
 
+  test "joining an account never populates Device group" do
+    # The defect this guards, found in review before the account shipped: a
+    # respondent account that wrote a player_key_digest onto the claimed
+    # response would populate this column for exactly the people who opted in,
+    # and #alias_names has no feature gate to stop it — so the creator's CSV
+    # would report opt-in status under a column about browsers. (The same
+    # digest would let a later leaderboard enable build a board out of joiners
+    # alone, via LeaderboardStanding.completed_identities.)
+    #
+    # PlayerController#join therefore writes no digest at all: the run just
+    # finished is claimed by session_token. This asserts the outcome rather
+    # than the mechanism, so it still holds if the mechanism is rewritten.
+    @survey.update!(join_prompt_enabled: true)
+    joined = coded_response(code: nil, at: 1.day.ago)
+    walked = coded_response(code: nil, at: 2.days.ago)
+    player = Player.for_email("re-#{SecureRandom.hex(3)}@test.com")
+    PlayerClaim.claim!(player: player, response: joined, source: "signup")
+
+    body = fresh_export.response_rows.drop(1)
+    assert_equal "", body.find { |r| r[0] == joined.id }[DEV_COL],
+                 "an account must be invisible in the creator's export"
+    assert_equal "", body.find { |r| r[0] == walked.id }[DEV_COL]
+    assert_nil joined.reload.player_key_digest
+  end
+
   test "Device group wears the leaderboard's exact name, stable across exports" do
     row = coded_response(code: nil, at: 1.day.ago, device: "device-uuid-9")
     board_name = PlayerAlias.ensure_for!(survey: @survey, key_digest: row.player_key_digest).anon_name

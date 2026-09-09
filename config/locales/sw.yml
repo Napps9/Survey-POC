@@ -362,6 +362,13 @@ sw:
       region_empty: "Hakuna majibu ya kanda bado — lako linaweza kuwa la kwanza!"
       progress: Kadi %{n} kati ya %{total}
       queued: Imehifadhiwa — itasawazishwa utakaporejea mtandaoni
+      join_sent_title: "Angalia kikasha chako"
+      join_sent_body: "Tumetuma kiungo kwa %{email}. Kinakuingiza na kuhifadhi Verto hii — bila nenosiri."
+      join_sent_again: "Tuma tena"
+      join_also_one: "Ongeza pia Verto nyingine 1 ambayo kifaa hiki kinakumbuka"
+      join_also_other: "Ongeza pia Vertos nyingine %{count} ambazo kifaa hiki kinakumbuka"
+      join_invalid: "Hiyo haionekani kuwa anwani ya barua pepe."
+      join_failed: "Hatukuweza kutuma sasa hivi. Jaribu tena baada ya muda mfupi."
       submit_rejected: "Verto hii imefungwa, kwa hivyo majibu yako hayakuhifadhiwa."
       compare_cta: Ona matokeo yako yakilinganishwa na wengine →
       compare_loading: Inapakia…
@@ -1607,9 +1614,10 @@ sw:
     menu_link: "Data ya mjibu mmoja…"
     back_to_results: "Rudi kwenye matokeo"
     intro: "Tafuta kumbukumbu ya mjibu mmoja katika \"%{verto}\" ili kujibu ombi la kupata data au kuifuta."
-    identifier_note: "Mjibu anaweza kupatikana kwa tokeni ya kipindi kutoka kifaa chake, au kwa msimbo aliochagua kama Verto hii inauliza. Tokeni ya kipindi haihifadhiwi baada ya kufunga kichupo cha kivinjari, kwa hivyo mjibu asiye na chochote kati ya hivyo hawezi kutambuliwa."
+    identifier_note: "Mjibu anaweza kupatikana kwa tokeni ya kipindi kutoka kifaa chake, kwa msimbo aliochagua ikiwa Verto hii inauliza, au kwa anwani ya barua pepe aliyotoa ikiwa alihifadhi Verto hii kwenye akaunti mwishoni. Tokeni ya kipindi haihifadhiwi baada ya kichupo cha kivinjari kufungwa, hivyo mjibu asiye na hata kimoja kati ya hivyo vitatu hawezi kutambuliwa."
     session_token_label: "Tokeni ya kipindi"
     respondent_code_label: "Msimbo wa mjibu"
+    email_address_label: "Anwani ya barua pepe (kama alihifadhi Verto hii)"
     find: "Tafuta"
     not_found: "Hakuna majibu yanayolingana na kitambulisho hicho."
     found: "Majibu %{count} yanayolingana"

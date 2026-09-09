@@ -29,6 +29,12 @@
       <label style="<%= label %>margin-top:14px;"><%= t("respondent_data.respondent_code_label") %></label>
       <%= f.text_field :respondent_code, value: @respondent_code, style: field, autocomplete: "off" %>
 
+      <%# The third axis: an address, where the respondent kept this Verto to an
+          account at the end of it. Only this Verto's claims are searched — the
+          rest of that person's account belongs to its own creators. %>
+      <label style="<%= label %>margin-top:14px;"><%= t("respondent_data.email_address_label") %></label>
+      <%= f.email_field :email_address, value: @email_address, style: field, autocomplete: "off" %>
+
       <button type="submit" style="margin-top:16px;padding:10px 20px;border-radius:100px;border:none;cursor:pointer;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-sm);">
         <%= t("respondent_data.find") %>
       </button>
@@ -59,12 +65,12 @@
 
           <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
             <%= link_to t("respondent_data.download"),
-                  survey_respondent_data_export_path(@survey, session_token: @session_token, respondent_code: @respondent_code),
+                  survey_respondent_data_export_path(@survey, session_token: @session_token, respondent_code: @respondent_code, email_address: @email_address),
                   data: { turbo: false },
                   style: "padding:10px 20px;border-radius:100px;background:rgba(255,255,255,0.1);color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);text-decoration:none;" %>
 
             <%= button_to t("respondent_data.erase"),
-                  survey_respondent_data_path(@survey, session_token: @session_token, respondent_code: @respondent_code),
+                  survey_respondent_data_path(@survey, session_token: @session_token, respondent_code: @respondent_code, email_address: @email_address),
                   method: :delete,
                   form: { data: { turbo_confirm: t("respondent_data.erase_confirm", count: @responses.size) } },
                   style: "padding:10px 20px;border-radius:100px;border:1px solid rgba(255,90,90,0.5);background:transparent;color:#FF8080;font-family:'Alata',sans-serif;font-size: var(--text-sm);cursor:pointer;" %>

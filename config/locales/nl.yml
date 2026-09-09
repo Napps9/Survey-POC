@@ -362,6 +362,13 @@ nl:
       region_empty: "Nog geen regionale antwoorden — die van jou kan de eerste zijn!"
       progress: Kaart %{n} van %{total}
       queued: Opgeslagen — wordt gesynchroniseerd zodra je weer online bent
+      join_sent_title: "Kijk in je inbox"
+      join_sent_body: "We hebben een link naar %{email} gestuurd. Die logt je in en bewaart deze Verto — zonder wachtwoord."
+      join_sent_again: "Opnieuw versturen"
+      join_also_one: "Voeg ook de andere Verto toe die dit apparaat onthoudt"
+      join_also_other: "Voeg ook de %{count} andere Verto's toe die dit apparaat onthoudt"
+      join_invalid: "Dat lijkt geen e-mailadres."
+      join_failed: "Dat konden we nu niet versturen. Probeer het zo nog eens."
       submit_rejected: "Dit Verto is gesloten, dus je antwoorden zijn niet opgeslagen."
       compare_cta: Bekijk je resultaten ten opzichte van anderen →
       compare_loading: Laden…
@@ -1607,9 +1614,10 @@ nl:
     menu_link: "Gegevens van één respondent…"
     back_to_results: "Terug naar resultaten"
     intro: "Zoek het record van één respondent in \"%{verto}\" om een inzage- of wisverzoek te beantwoorden."
-    identifier_note: "Een respondent is te vinden via het sessietoken van hun apparaat, of via de code die ze kozen als dit Verto daarom vraagt. Een sessietoken wordt niet bewaard nadat het browsertabblad sluit, dus wie geen van beide heeft, is niet te identificeren."
+    identifier_note: "Een respondent is te vinden via het sessietoken van hun apparaat, via de code die ze kozen als dit Verto erom vraagt, of via het e-mailadres dat ze gaven als ze dit Verto aan het eind in een account bewaarden. Een sessietoken wordt niet bewaard nadat het browsertabblad sluit, dus wie geen van de drie heeft, kan niet worden geïdentificeerd."
     session_token_label: "Sessietoken"
     respondent_code_label: "Respondentcode"
+    email_address_label: "E-mailadres (als ze dit Verto bewaarden)"
     find: "Zoeken"
     not_found: "Geen antwoorden komen overeen met die identificatie."
     found: "%{count} overeenkomende reactie(s)"

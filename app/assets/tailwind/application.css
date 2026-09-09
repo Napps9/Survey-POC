@@ -10501,6 +10501,87 @@ body.generating-overlay-active .bottom-bar { display: none; }
    the markup as the stable hook for tests and the contrast audit
    (test/lib/leaderboard_contrast_test.rb). */
 
+/* ── The end-of-Verto account ask ───────────────────────────────────────────
+   A full-width card in .play-end-actions, sitting under the compare CTA and
+   built like .leaderboard-card above it: same width, radius and tinted
+   surface, so the end screen reads as one stack rather than three unrelated
+   panels. Hidden until _renderJoinState reveals it — the whole card is a
+   no-op in preview, in Test Mode, and on a rejected submit.
+
+   Type floor as everywhere else on the player: ≥0.875rem for prose, ≥0.75rem
+   for the eyebrow and the small print, and no text under 0.7 alpha. */
+.join-card {
+  margin: 18px auto 4px; padding: 18px 22px; border-radius: 18px;
+  width: min(100%, 340px);
+  background: var(--brand-primary-soft, rgba(1,234,203,0.12));
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
+  display: flex; flex-direction: column; gap: 10px; text-align: start;
+}
+.join-eyebrow {
+  font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--brand-primary, #01EACB);
+}
+.join-title { font-family: "Alata", sans-serif; font-size: 1.125rem; color: #fff; margin: 0; }
+.join-body {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; line-height: 1.45;
+  color: rgba(255,255,255,0.85); margin: 0;
+}
+.join-ask { display: flex; flex-direction: column; gap: 10px; }
+/* The address and the button share a row on a phone-width card and wrap to
+   two when the button's label is a long one — a creator writes it, so it can
+   be. min-width:0 on the input is what lets it shrink instead of pushing the
+   button off the card. */
+.join-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.join-input {
+  flex: 1 1 11rem; min-width: 0;
+  font-family: "ABeeZee", sans-serif; font-size: 1rem; /* 1rem: anything under
+    16px makes iOS Safari zoom the whole page on focus. */
+  padding: 10px 14px; border-radius: 12px; color: #fff;
+  background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.45);
+}
+.join-input::placeholder { color: rgba(255,255,255,0.6); }
+.join-input:focus-visible {
+  outline: 2px solid var(--brand-primary, #01EACB); outline-offset: 1px;
+  border-color: var(--brand-primary, #01EACB);
+}
+.join-btn {
+  font-family: "Alata", sans-serif; font-size: 0.9375rem;
+  padding: 10px 18px; border-radius: 12px; border: none; cursor: pointer;
+  color: var(--brand-cta-text, #1C2034); background: var(--brand-cta, #01EACB);
+}
+.join-btn:disabled { opacity: 0.6; cursor: default; }
+.join-also {
+  display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: rgba(255,255,255,0.85);
+}
+.join-also input { margin-top: 3px; accent-color: var(--brand-cta, #01EACB); flex: none; }
+.join-note, .join-fine {
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; line-height: 1.45;
+  color: rgba(255,255,255,0.75); margin: 0;
+}
+/* Errors are a warm amber rather than red-on-teal, which measures badly on
+   this surface for most palettes and reads as a system failure besides — a
+   mistyped address is neither. */
+.join-error {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; color: #FCD34D; margin: 0;
+}
+.join-done { display: flex; flex-direction: column; gap: 6px; }
+.join-sent-title {
+  font-family: "Alata", sans-serif; font-size: 1rem; color: var(--brand-primary, #01EACB);
+}
+.join-sent-body {
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem; line-height: 1.45;
+  color: rgba(255,255,255,0.85); margin: 0;
+  /* An address is one unbroken token and a long one will otherwise widen the
+     card past the viewport. */
+  overflow-wrap: anywhere;
+}
+.join-again {
+  align-self: flex-start; background: none; border: none; cursor: pointer; padding: 0;
+  font-family: "ABeeZee", sans-serif; font-size: 0.875rem;
+  color: rgba(255,255,255,0.85); text-decoration: underline;
+}
+
 /* Points Checkpoint card body (player) — populated client-side. */
 .token-checkpoint-body { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .token-checkpoint-row {
@@ -12678,3 +12759,91 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "Alata", sans-serif; font-size: var(--text-sm); letter-spacing: 0.04em; cursor: pointer;
 }
 .freeform-modal__more:hover { background: rgba(1,234,203,0.18); }
+
+/* ── /you — a respondent's own Vertos ──────────────────────────────────────
+   The account is respondent-facing, so it borrows the player's surfaces
+   rather than the studio's: the navy card, the Alata display face, and the
+   dashboard's drifting orbs damped the way the results pages damp them.
+   Inline-free because this is a whole page rather than a panel bolted into
+   surveys/show.html.erb. */
+.you-page {
+  position: relative;
+  min-height: 100dvh;
+  background: #272D4A;
+  color: #F7F7F7;
+  overflow: hidden;
+}
+.you-orbs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.you-orbs i {
+  position: absolute; width: 420px; height: 420px; border-radius: 50%;
+  filter: blur(120px); opacity: .22;
+}
+.you-orbs i.a { background: #01EACB; left: -160px; top: -150px; }
+.you-orbs i.b { background: #FF1E6F; right: -170px; bottom: -60px; }
+.you-orbs i.c { background: #615BF5; left: 32%; top: 38%; }
+.you-orbs i.d { background: #0CA7FF; left: -140px; bottom: -170px; }
+
+.you-shell { position: relative; max-width: 680px; margin: 0 auto; padding: 18px 18px 48px; }
+.you-shell-narrow { max-width: 460px; padding-top: 56px; text-align: center; }
+.you-mark { margin-bottom: 26px; }
+.you-mark-sm { opacity: .9; }
+
+.you-bar { display: flex; align-items: center; gap: 10px; padding: 4px 0 14px; }
+.you-avatar {
+  margin-left: auto; width: 30px; height: 30px; border-radius: 50%;
+  background: #615BF5; color: #fff; font-family: "Alata", sans-serif; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.you-head { padding: 2px 0 14px; }
+.you-eyebrow {
+  display: flex; align-items: center; gap: 7px;
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: .13em;
+  text-transform: uppercase; color: #01EACB;
+}
+.you-dot { width: 6px; height: 6px; border-radius: 50%; background: #01EACB; box-shadow: 0 0 8px #01EACB; }
+.you-h1 { font-family: "Alata", sans-serif; font-size: 27px; line-height: 1.12; letter-spacing: -.3px; margin: 8px 0 0; }
+.you-sub { font-size: 14px; line-height: 1.55; color: rgba(255,255,255,.6); margin: 10px 0 0; }
+.you-fine { font-size: 12px; line-height: 1.5; color: rgba(255,255,255,.38); margin: 14px 0 0; }
+
+.you-card {
+  background: #1C2034; border: 1px solid rgba(255,255,255,.08); border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.35); padding: 28px 24px 26px; margin-top: 8px;
+}
+
+.you-btn {
+  display: inline-block; margin-top: 18px; padding: 12px 24px; border-radius: 100px;
+  font-family: "Alata", sans-serif; font-size: 15px; letter-spacing: .05em;
+  background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.25);
+  text-decoration: none; cursor: pointer;
+}
+.you-btn-primary { background: #01EACB; color: #1C2034; border-color: transparent; }
+
+.you-list { display: flex; flex-direction: column; gap: 12px; }
+.you-verto {
+  position: relative; background: rgba(22,26,44,.93);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 16px; overflow: hidden;
+}
+.you-verto-rule {
+  position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, #FF1E6F, #01EACB);
+}
+.you-verto-body { padding: 14px 15px 15px; }
+.you-verto-org { font-size: 11.5px; color: rgba(255,255,255,.55); }
+.you-verto-title { font-family: "Alata", sans-serif; font-size: 17px; line-height: 1.25; margin: 5px 0 0; font-weight: 400; }
+.you-verto-when { font-size: 11.5px; color: rgba(255,255,255,.4); margin-top: 5px; }
+.you-piles { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.you-pile {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px 4px 8px;
+  border-radius: 100px; background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.09); font-size: 12px; color: rgba(255,255,255,.8);
+}
+.you-pile b { font-family: "Alata", sans-serif; font-weight: 400; color: #01EACB; font-variant-numeric: tabular-nums; }
+
+.you-foot { display: flex; gap: 18px; margin-top: 26px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+.you-link {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,.6);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.you-link-quiet { color: rgba(255,255,255,.38); }

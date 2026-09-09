@@ -311,6 +311,13 @@ en-US:
     quiz_compare_title: "How you compare"
     tokens_welcome_note: "You'll earn points as you answer each question — you can't go back and change an answer to earn more."
     leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
+    join_eyebrow: "Keep this"
+    join_title: "Keep your Vertos"
+    join_body: "Get a link by email — no password. You'll see your answers next to everyone else's, and hear what happens next."
+    join_cta: "Send me a link"
+    join_email_placeholder: "your@email.com"
+    join_fine: "One email to sign in. We never post anything, and you can delete the account in one tap."
+    join_embedded: "This Verto is embedded in another site, so we can't see anything else you've played here. The link will still keep this one."
     play_again: "Play again"
     next_person: "Next person"
     font_size: "Text size"
@@ -386,6 +393,13 @@ en-US:
       region_empty: "No regional answers yet — yours might be the first!"
       progress: "Card %{n} of %{total}"
       queued: "Saved — will sync when you're back online"
+      join_sent_title: "Check your inbox"
+      join_sent_body: "We've sent a link to %{email}. It signs you in and keeps this Verto — no password needed."
+      join_sent_again: "Send it again"
+      join_also_one: "Also add the 1 other Verto this device remembers"
+      join_also_other: "Also add the %{count} other Vertos this device remembers"
+      join_invalid: "That doesn't look like an email address."
+      join_failed: "We couldn't send that just now. Try again in a moment."
       submit_rejected: "This Verto has closed, so your answers weren't saved."
       compare_cta: "See your results compared to others →"
       compare_loading: "Loading…"
@@ -1371,6 +1385,51 @@ en-US:
     section_live: "Live"
     section_drafts: "Drafts"
     section_archived: "Archived"
+  player_sign_in:
+    title: "Sign in to your Vertos"
+    body: "This link was sent to %{email}. Tap below to sign in and keep what you've played."
+    cta: "Sign me in"
+    fine: "Links work once, and expire %{minutes} minutes after they're sent."
+    spent_title: "This link has already been used"
+    spent_body: "Links work once. Finish a Verto and ask for a new one, and it'll be with you in a moment."
+    spent_cta: "Go to your Vertos"
+    welcome: "You're signed in."
+    too_many: "That's a lot of attempts — give it a few minutes."
+  # The respondent account area (/you), the sign-in landing page and the
+  # sign-in email. ENGLISH ONLY for now, deliberately and knowingly: these are
+  # three new namespaces, none of them is parity-guarded
+  # (LocaleStructureParityTest covers js/defaults/card/templates/demographics/
+  # ask/unsubscribe), and config.i18n.fallbacks renders English rather than a
+  # raw key for every other locale. The strings a RESPONDENT sees inside the
+  # player itself — js.player.join_* — are translated in all 26 files, because
+  # those are the ones on the end screen of a Verto they may be taking in their
+  # own language. Translating these three is the next pass, and needs
+  # `bin/rails i18n:translate` with a live key.
+  you:
+    eyebrow: "Your Vertos"
+    kept:
+      one: "1 kept"
+      other: "%{count} kept"
+    empty: "Nothing here yet. Finish a Verto and ask for a link, and it'll be waiting."
+    played_on: "Played %{date}"
+    signed_out_title: "Your Vertos live here"
+    signed_out_body: "There's no password to remember. Finish a Verto, give an email address at the end, and the link we send opens this page."
+    signed_out: "You've been signed out."
+    sign_out: "Sign out"
+    delete: "Delete my account"
+    delete_confirm: "This deletes your account and the list of Vertos you've kept. Your answers stay with the organizations that asked — they were given anonymously and aren't ours to remove. Continue?"
+    deleted: "Your account has been deleted."
+  player_sign_in_mailer:
+    subject: "Your Playverto link"
+    subject_org: "Your link to %{org}'s Verto"
+    heading: "Here's your link"
+    intro: "It signs you in and keeps the Vertos you've played. No password to set."
+    intro_verto: "It signs you in and keeps %{verto} — along with anything else this device remembers. No password to set."
+    cta: "Open my Vertos"
+    fallback: "Button not working? Copy and paste this link:"
+    expiry: "This link works once and expires in %{minutes} minutes."
+    ignore: "If you didn't ask for it, ignore this email — nothing was created."
+    sent_by: "Sent by Playverto on behalf of %{org}."
   welcome_mailer:
     subject: "Welcome to Playverto — let's build your first Verto"
     heading: "You're all set"
@@ -1656,9 +1715,10 @@ en-US:
     menu_link: "One respondent's data…"
     back_to_results: "Back to results"
     intro: "Find one respondent's record in \"%{verto}\" to answer a data access or erasure request."
-    identifier_note: "A respondent can be found by the session token from their device, or by the code they chose if this Verto asks for one. A session token is not kept after the browser tab closes, so a respondent who has neither cannot be identified."
+    identifier_note: "A respondent can be found by the session token from their device, by the code they chose if this Verto asks for one, or by the email address they gave if they kept this Verto to an account at the end of it. A session token is not kept after the browser tab closes, so a respondent with none of the three cannot be identified."
     session_token_label: "Session token"
     respondent_code_label: "Respondent code"
+    email_address_label: "Email address (if they kept this Verto)"
     find: "Find"
     not_found: "No responses match that identifier."
     found: "%{count} matching response(s)"

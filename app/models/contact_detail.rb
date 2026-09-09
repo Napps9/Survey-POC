@@ -6,6 +6,12 @@
 # per-survey on purpose: contacts, like aliases, cannot be joined across
 # Vertos.
 #
+# That remains true of this table and of every digest in the app. The one
+# cross-Verto link that now exists is PlayerClaim — a respondent account, made
+# by the respondent from their own inbox, holding response ids rather than
+# digests. It never reads or writes key_digest, so a contact register still
+# cannot be joined to anything outside its own Verto.
+#
 # Survey#contact_form_excludes_neurodiversity is the other half of the GDPR
 # posture: a Verto may hold this table's rows or ask the neurodiversity
 # question, never both — health-adjacent special-category answers never sit

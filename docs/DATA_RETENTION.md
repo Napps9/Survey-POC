@@ -29,8 +29,18 @@ A `responses` row can hold:
 | `respondent_code_digest` | HMAC of a code the respondent chose, if the creator enabled codes |
 | `player_key_digest` | HMAC of a random key the browser minted for this Verto; recorded only where a feature needs a per-device identity — the leaderboard, the contact gate, ask-once questions, or No retests on a Verto that collects no respondent code |
 
-No email address, name or account is attached to a response. There used to be
-one deliberate, creator-chosen exception — the **contact card**
+No email address, name or account is attached to a response **row**. Since
+respondent accounts shipped there is one link from the outside, and it is
+worth stating precisely because the sentence above used to be unqualified:
+where a creator turns on the end-of-Verto ask (`join_prompt_enabled`, off by
+default) and the respondent gives an address **and then follows the link
+emailed to it**, a `player_claims` row names that response by id and belongs to
+a `players` row that holds the address. The response itself gains no column, no
+digest and no flag — it is unchanged, and nothing in the creator's results or
+export reveals that a claim exists (see "Respondent accounts" below).
+
+There used to be one further deliberate, creator-chosen exception — the
+**contact card**
 (`contact_form`), which stored whatever the respondent typed into its name /
 company / industry / email fields inside `answers`, like any other answer.
 That card type has been **retired**: it can no longer be added to a Verto, the
@@ -157,11 +167,18 @@ browser tab closes. Unless the creator enabled respondent codes — in which cas
 the respondent knows their own code — a person who comes back a week later has
 no handle on their own row, and neither does anyone else.
 
-This is a real gap in honouring Article 17 on request, and it is a deliberate
-consequence of collecting no identifier. Closing it would mean either showing
+This was a real gap in honouring Article 17 on request, and a deliberate
+consequence of collecting no identifier. Closing it meant either showing
 respondents a receipt code at the end of a Verto that they could quote later, or
 storing a durable identifier — which trades a privacy property for a rights one.
-That is a product decision, not a bug fix, and it is not made here.
+That was called a product decision rather than a bug fix, and left unmade.
+
+**It has since been made, in one direction and by the respondent.** See
+"Respondent accounts" below: a respondent may now be offered an account at the
+end of a Verto, and the address is a durable handle on their own rows. It
+closes the gap only for people who chose it, on Vertos whose creator switched
+the ask on — which is the point. Everyone else is exactly as unidentifiable as
+this section describes, and the default is off.
 
 The `respondent_code` card narrows the gap where a creator uses it — a
 respondent who chose a code has a handle on their own rows, and
@@ -174,6 +191,64 @@ Creators also see per-responder groupings — the export's Responder column
 and the results page's Responders card — but only under minted anonymous
 names (`RespondentAlias`, erased with the responses they name): never the
 code, its digest, or anything derived from either.
+
+## Respondent accounts
+
+A creator may switch on an ask at the end of their Verto: *keep this, and hear
+what happens next*. It is **off by default** (`surveys.join_prompt_enabled`),
+the wording is the creator's, and a respondent who ignores it leaves exactly
+the row this document describes everywhere else.
+
+What is stored, and where:
+
+| Table | Holds |
+|---|---|
+| `players` | The address, a name if they give one, their locale, and when the address was verified |
+| `player_sessions` | Signed-in sessions, like `sessions` for creators |
+| `player_sign_in_links` | An outstanding emailed link: its **digest** only, its expiry, and the claims it will make |
+| `player_claims` | `(player_id, survey_id, response_id, claimed_at, source)` — the one cross-Verto join in the app |
+
+Five properties this design is built on, all of them checkable in the code:
+
+1. **Nothing is stored against an address until someone proves they can read
+   it.** `PlayerController#join` mails a link and writes no claim. The claims
+   are made by `PlayerSignInsController#create`, when the link is followed.
+2. **The response is not modified.** No `responses.player_id`, and no digest —
+   `player_claims` materialises `response_id`. A claim is invisible in the
+   creator's results, in the CSV export's "Device group" column, and on the
+   leaderboard.
+3. **Special-category answers and an address never meet.**
+   `Survey#contact_form_excludes_neurodiversity` covers `join_prompt_enabled`
+   exactly as it covers `contact_form_enabled`: a Verto may ask the
+   neurodiversity question or ask for an address, never both.
+4. **There is no password and no sign-in form.** The only way into an account
+   is a single-use link, valid for 20 minutes, stored as a digest. `GET` on the
+   link consumes nothing (inbox scanners follow GETs); the `POST` behind a
+   button does the work.
+5. **`/you` is `no-store` and `noindex`,** and its cookie is separate from the
+   creator's in every respect — different name, different table, different
+   `Current` attribute.
+
+### Rights, and where one creator's authority ends
+
+**Access (Art. 15).** `/respondent-data` accepts an email address as a third
+identifier alongside the session token and the respondent code, and matches
+only claims **on that Verto**. The export gains an `account` section naming
+the address, whether it is verified, and how many Vertos the account holds.
+
+**Erasure (Art. 17).** Erasing a respondent's responses erases their claims on
+that Verto with them. If the account is then holding nothing at all, the
+`players` row goes too — keeping a bare address after an erasure request is
+the half-measure this whole flow refuses. If the account still holds claims on
+**other** Vertos, the row stays: the creator is the data controller for their
+own Verto, not for the rest of that person's account.
+
+**Self-service.** The account holder deletes the whole account from `/you` —
+the player, its sessions, its outstanding links and all of its claims. Never
+the `Response` rows: those are pseudonymous research data belonging to the
+creators who collected them, and are not this person's to delete from here.
+This is the first self-service erasure path in the app, and it exists only
+because a respondent now holds a durable handle at all.
 
 ## Related
 

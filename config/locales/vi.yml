@@ -362,6 +362,13 @@ vi:
       region_empty: "Chưa có câu trả lời theo khu vực — của bạn có thể là đầu tiên!"
       progress: Thẻ %{n} / %{total}
       queued: Đã lưu — sẽ đồng bộ khi bạn trực tuyến trở lại
+      join_sent_title: "Kiểm tra hộp thư của bạn"
+      join_sent_body: "Chúng tôi đã gửi một liên kết tới %{email}. Liên kết đó đăng nhập cho bạn và giữ lại Verto này — không cần mật khẩu."
+      join_sent_again: "Gửi lại"
+      join_also_one: "Thêm cả 1 Verto khác mà thiết bị này còn nhớ"
+      join_also_other: "Thêm cả %{count} Verto khác mà thiết bị này còn nhớ"
+      join_invalid: "Đó có vẻ không phải địa chỉ email."
+      join_failed: "Hiện chưa gửi được. Hãy thử lại sau giây lát."
       submit_rejected: "Verto này đã đóng nên câu trả lời của bạn chưa được lưu."
       compare_cta: Xem kết quả của bạn so với người khác →
       compare_loading: Đang tải…
@@ -1606,9 +1613,10 @@ vi:
     menu_link: "Dữ liệu của một người trả lời…"
     back_to_results: "Quay lại kết quả"
     intro: "Tìm bản ghi của một người trả lời trong \"%{verto}\" để đáp ứng yêu cầu truy cập hoặc xóa dữ liệu."
-    identifier_note: "Có thể tìm người trả lời bằng mã phiên từ thiết bị của họ, hoặc bằng mã họ tự chọn nếu Verto này có hỏi. Mã phiên không được giữ lại sau khi đóng thẻ trình duyệt, nên người không có cả hai thì không thể xác định."
+    identifier_note: "Có thể tìm một người trả lời qua mã phiên từ thiết bị của họ, qua mã họ đã chọn nếu Verto này có hỏi, hoặc qua địa chỉ email họ đã cung cấp nếu cuối buổi họ đã lưu Verto này vào một tài khoản. Mã phiên không được giữ lại sau khi đóng thẻ trình duyệt, nên người không có cả ba thứ đó thì không thể xác định được."
     session_token_label: "Mã phiên"
     respondent_code_label: "Mã người trả lời"
+    email_address_label: "Địa chỉ email (nếu họ đã lưu Verto này)"
     find: "Tìm"
     not_found: "Không có câu trả lời nào khớp với mã đó."
     found: "%{count} câu trả lời khớp"

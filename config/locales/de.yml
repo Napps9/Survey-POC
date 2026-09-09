@@ -362,6 +362,13 @@ de:
       region_empty: "Noch keine regionalen Antworten — deine könnte die erste sein!"
       progress: Karte %{n} von %{total}
       queued: Gespeichert — wird synchronisiert, sobald du wieder online bist
+      join_sent_title: "Sieh in deinem Posteingang nach"
+      join_sent_body: "Wir haben einen Link an %{email} geschickt. Er meldet dich an und behält dieses Verto — ganz ohne Passwort."
+      join_sent_again: "Erneut senden"
+      join_also_one: "Auch das andere Verto hinzufügen, an das sich dieses Gerät erinnert"
+      join_also_other: "Auch die %{count} anderen Vertos hinzufügen, an die sich dieses Gerät erinnert"
+      join_invalid: "Das sieht nicht nach einer E-Mail-Adresse aus."
+      join_failed: "Das konnten wir gerade nicht senden. Versuch es gleich noch einmal."
       submit_rejected: "Dieses Verto ist geschlossen — Ihre Antworten wurden nicht gespeichert."
       compare_cta: Vergleiche deine Ergebnisse mit anderen →
       compare_loading: Wird geladen…
@@ -1607,9 +1614,10 @@ de:
     menu_link: "Daten einer teilnehmenden Person…"
     back_to_results: "Zurück zu den Ergebnissen"
     intro: "Finde den Datensatz einer teilnehmenden Person in „%{verto}“, um eine Auskunfts- oder Löschanfrage zu beantworten."
-    identifier_note: "Eine teilnehmende Person lässt sich über das Sitzungs-Token ihres Geräts finden oder über den selbst gewählten Code, falls dieses Verto danach fragt. Ein Sitzungs-Token wird nach dem Schließen des Browser-Tabs nicht aufbewahrt — wer beides nicht hat, kann nicht identifiziert werden."
+    identifier_note: "Eine befragte Person lässt sich über das Sitzungs-Token ihres Geräts finden, über den von ihr gewählten Code, falls dieses Verto danach fragt, oder über die E-Mail-Adresse, die sie angegeben hat, falls sie dieses Verto am Ende in einem Konto gespeichert hat. Das Sitzungs-Token wird nach dem Schließen des Browser-Tabs nicht aufbewahrt — wer keines der drei hat, kann nicht identifiziert werden."
     session_token_label: "Sitzungs-Token"
     respondent_code_label: "Teilnehmenden-Code"
+    email_address_label: "E-Mail-Adresse (falls dieses Verto gespeichert wurde)"
     find: "Suchen"
     not_found: "Keine Antworten passen zu dieser Kennung."
     found: "%{count} passende Antwort(en)"

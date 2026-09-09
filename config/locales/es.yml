@@ -362,6 +362,13 @@ es:
       region_empty: "Aún no hay respuestas regionales — ¡la tuya podría ser la primera!"
       progress: Tarjeta %{n} de %{total}
       queued: Guardado — se sincronizará cuando vuelvas a estar en línea
+      join_sent_title: "Revisa tu bandeja de entrada"
+      join_sent_body: "Hemos enviado un enlace a %{email}. Te identifica y guarda este Verto: sin contraseña."
+      join_sent_again: "Enviarlo de nuevo"
+      join_also_one: "Añadir también el otro Verto que recuerda este dispositivo"
+      join_also_other: "Añadir también los %{count} Vertos que recuerda este dispositivo"
+      join_invalid: "Eso no parece una dirección de correo."
+      join_failed: "No hemos podido enviarlo ahora. Inténtalo en un momento."
       submit_rejected: "Este Verto se ha cerrado, así que tus respuestas no se guardaron."
       compare_cta: Ve tus resultados comparados con los demás →
       compare_loading: Cargando…
@@ -1607,9 +1614,10 @@ es:
     menu_link: "Datos de una persona participante…"
     back_to_results: "Volver a resultados"
     intro: "Busca el registro de una persona participante en «%{verto}» para responder a una solicitud de acceso o de supresión."
-    identifier_note: "Se puede encontrar a una persona participante mediante el token de sesión de su dispositivo o mediante el código que eligió, si este Verto lo pide. El token de sesión no se conserva al cerrar la pestaña, así que quien no tenga ninguno de los dos no puede ser identificado."
+    identifier_note: "Se puede encontrar a una persona participante mediante el token de sesión de su dispositivo, mediante el código que eligió si este Verto lo pide, o mediante el correo electrónico que dio si guardó este Verto en una cuenta al terminar. El token de sesión no se conserva al cerrar la pestaña, así que quien no tenga ninguno de los tres no puede ser identificado."
     session_token_label: "Token de sesión"
     respondent_code_label: "Código de participante"
+    email_address_label: "Correo electrónico (si guardó este Verto)"
     find: "Buscar"
     not_found: "Ninguna respuesta coincide con ese identificador."
     found: "%{count} respuesta(s) coincidente(s)"

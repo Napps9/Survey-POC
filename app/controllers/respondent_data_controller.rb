@@ -17,7 +17,8 @@ class RespondentDataController < ApplicationController
   def show
     @session_token   = params[:session_token].to_s.strip
     @respondent_code = params[:respondent_code].to_s.strip
-    @searched        = @session_token.present? || @respondent_code.present?
+    @email_address   = params[:email_address].to_s.strip
+    @searched        = @session_token.present? || @respondent_code.present? || @email_address.present?
     @responses       = @searched ? lookup.order(created_at: :asc).to_a : []
   end
 
@@ -69,7 +70,24 @@ class RespondentDataController < ApplicationController
     code_digests = responses.map(&:respondent_code_digest).compact.uniq
     @survey.respondent_aliases.where(code_digest: code_digests).delete_all if code_digests.any?
 
+    # The respondent account, and where this creator's authority over it ends.
+    #
+    # The claims go with the responses — Response has `dependent: :delete_all`
+    # so destroy_all would take them anyway (the FK is RESTRICT, so without it
+    # erasure would raise rather than orphan), but reading the players FIRST is
+    # what makes the next step possible.
+    #
+    # A Player left holding nothing at all is deleted with them: there is
+    # nothing for the row to hold, and keeping a bare address after an erasure
+    # request is the half-measure this whole action refuses. A Player still
+    # holding claims on OTHER Vertos stays — the creator is the data controller
+    # for their own Verto, not for the rest of that person's account, and /you's
+    # own delete is the route to those. docs/DATA_RETENTION.md records this.
+    players = Player.where(id: PlayerClaim.where(response_id: responses.select(:id)).select(:player_id)).to_a
+
     responses.destroy_all
+
+    players.each { |player| player.destroy if player.player_claims.none? }
     redirect_to survey_respondent_data_path(@survey),
                 notice: t("respondent_data.erased", count: count)
   end
@@ -84,7 +102,8 @@ class RespondentDataController < ApplicationController
     RespondentDataExport.lookup(
       survey:          @survey,
       session_token:   params[:session_token],
-      respondent_code: params[:respondent_code]
+      respondent_code: params[:respondent_code],
+      email_address:   params[:email_address]
     )
   end
 end

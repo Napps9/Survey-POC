@@ -65,6 +65,8 @@ export default class extends Controller {
                     "contactName", "contactEmail", "contactCompany", "contactIndustry",
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
+                    "joinBlock", "joinAsk", "joinAlso", "joinAlsoBox", "joinAlsoLabel",
+                    "joinEmbedded", "joinEmail", "joinBtn", "joinError", "joinDone",
                     "testConfirm"]
   static values  = {
     progressUrl: { type: String, default: "" },
@@ -100,6 +102,10 @@ export default class extends Controller {
     // board (and the durable player key) out of those contexts.
     leaderboard: { type: Boolean, default: false },
     leaderboardUrl: { type: String, default: "" },
+    // Respondent accounts: POST here to be mailed a sign-in link. Blank in
+    // owner preview and Test Mode, and blank whenever the creator has the
+    // block switched off — _renderJoinState reveals nothing without it.
+    joinUrl: { type: String, default: "" },
     // No going back: once the respondent moves on from a card its answer is
     // final — Back is hidden, the card is locked, and every advance is saved
     // so the server (locked_merge) holds each answer it pins.
@@ -1798,6 +1804,7 @@ export default class extends Controller {
     if (this.quizValue) this._renderQuizScore()
     if (this.tokenisationValue) this._renderTokenScore()
     if (this.leaderboardValue) this._renderLeaderboard(queued, rejected)
+    this._renderJoinState(rejected)
   }
 
   // Swap the thank-you screen's title / message / forward CTA to the end screen
@@ -3044,10 +3051,18 @@ export default class extends Controller {
       return
     }
     try {
-      const params = new URLSearchParams()
-      if (this._sessionToken) params.set("session_token", this._sessionToken)
-      if (this._playerKey) params.set("player_key", this._playerKey)
-      const res = await fetch(`${this.leaderboardUrlValue}?${params}`)
+      // POST, not GET: the durable device key is the thing being sent, and a
+      // key in a URL is written to the service worker's page cache along with
+      // everything else the catch-all networkFirst handles. Same reasoning as
+      // recall and eligibility — see config/routes.rb.
+      const res = await fetch(this.leaderboardUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_token: this._sessionToken || null,
+          player_key: this._playerKey || null
+        })
+      })
       if (!res.ok) throw new Error(`status ${res.status}`)
       const data = await res.json()
       const entries = data.entries || []
@@ -3121,6 +3136,142 @@ export default class extends Controller {
       this.thankyouMainTarget.appendChild(pill)
     }
     this._renderLeaderboard()
+  }
+
+  // ── The end-screen account ask ────────────────────────────────────────────
+
+  // How many other Vertos this browser's keys will be offered for. A bound,
+  // not a policy: the server caps the payload at the same number, and a
+  // browser holding hundreds of these is a browser something has gone wrong on.
+  static JOIN_MAX_DEVICE_KEYS = 20
+
+  // Reveal the card, and work out what this device can offer alongside the run
+  // just finished. Two states it deliberately does NOT reveal in: no live URL
+  // (preview, Test Mode, or the creator has the block off), and a REJECTED
+  // submit — nothing was stored, so there is nothing to keep and an account
+  // offer would say otherwise.
+  _renderJoinState(rejected = false) {
+    if (!this.hasJoinBlockTarget || !this.joinUrlValue || rejected) return
+    this.joinBlockTarget.classList.remove("hidden")
+
+    const others = this._joinDeviceKeys().filter(d => d.token !== this._playToken())
+    if (this._embedded()) {
+      if (this.hasJoinEmbeddedTarget) this.joinEmbeddedTarget.classList.remove("hidden")
+    } else if (others.length && this.hasJoinAlsoTarget) {
+      this.joinAlsoLabelTarget.textContent =
+        t(others.length === 1 ? "player.join_also_one" : "player.join_also_other", { count: others.length })
+      this.joinAlsoTarget.classList.remove("hidden")
+    }
+  }
+
+  // Clear a stale error the moment they start fixing it — an error that
+  // outlives the thing it described reads as a second failure.
+  joinTyped() {
+    if (this.hasJoinErrorTarget) this.joinErrorTarget.classList.add("hidden")
+  }
+
+  async joinSubmit(event) {
+    event?.preventDefault()
+    if (!this.joinUrlValue || this._joinSending) return
+
+    const email = (this.hasJoinEmailTarget ? this.joinEmailTarget.value : "").trim()
+    // A deliberately loose client-side check: the server is the authority, and
+    // a strict regex here rejects addresses that are perfectly deliverable.
+    // Its only job is to catch the obvious typo before an email goes nowhere.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this._joinError(t("player.join_invalid"))
+      return
+    }
+
+    const wanted = this.hasJoinAlsoBoxTarget && this.joinAlsoBoxTarget.checked
+    this._joinSending = true
+    if (this.hasJoinBtnTarget) this.joinBtnTarget.disabled = true
+
+    try {
+      const res = await fetch(this.joinUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          session_token: this._sessionToken || null,
+          lang: this.localeValue || null,
+          device_keys: wanted ? this._joinDeviceKeys() : []
+        })
+      })
+      if (!res.ok) throw new Error(`status ${res.status}`)
+      await res.json()
+      this._joinSent(email)
+    } catch (_e) {
+      this._joinError(t("player.join_failed"))
+    } finally {
+      this._joinSending = false
+      if (this.hasJoinBtnTarget) this.joinBtnTarget.disabled = false
+    }
+  }
+
+  // The server answers identically whether or not it knows the address, so
+  // this screen says what WE did — a link is on its way — and never anything
+  // about the account behind it.
+  _joinSent(email) {
+    if (!this.hasJoinDoneTarget) return
+    if (this.hasJoinAskTarget) this.joinAskTarget.classList.add("hidden")
+    this.joinDoneTarget.classList.remove("hidden")
+    this.joinDoneTarget.innerHTML = `
+      <div class="join-sent-title">✉ ${this._esc(t("player.join_sent_title"))}</div>
+      <p class="join-sent-body">${this._esc(t("player.join_sent_body", { email }))}</p>
+      <button type="button" class="join-again" data-action="click->player#joinAgain">${this._esc(t("player.join_sent_again"))}</button>`
+  }
+
+  // Back to the ask, with the address still in the field — the usual reason
+  // for pressing this is a typo they have just spotted.
+  joinAgain() {
+    if (this.hasJoinDoneTarget) this.joinDoneTarget.classList.add("hidden")
+    if (this.hasJoinAskTarget) this.joinAskTarget.classList.remove("hidden")
+    if (this.hasJoinEmailTarget) this.joinEmailTarget.focus()
+  }
+
+  _joinError(message) {
+    if (!this.hasJoinErrorTarget) return
+    this.joinErrorTarget.textContent = message
+    this.joinErrorTarget.classList.remove("hidden")
+  }
+
+  // Every Verto this browser still holds a durable leaderboard key for, as
+  // {token, player_key} pairs. The keys are stored per submit URL
+  // (_ensurePlayerKey), so the play token comes back out of the key's own name
+  // — there is no separate index to drift out of step with them.
+  //
+  // Nothing here is trusted by the server: a key only ever resolves against
+  // the HMAC of the survey it belongs to, so a pair that has been tampered
+  // with matches nothing rather than matching someone else.
+  _joinDeviceKeys() {
+    const out = []
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const name = localStorage.key(i)
+        if (!name || !name.startsWith("verto_player_")) continue
+        const token = name.slice("verto_player_".length).match(/\/play\/([^/]+)\/submit\/?$/)?.[1]
+        const key = token && localStorage.getItem(name)
+        if (key) out.push({ token, player_key: key })
+      }
+    } catch (_e) { /* storage blocked — the run just finished is still claimable */ }
+    return out.slice(0, this.constructor.JOIN_MAX_DEVICE_KEYS)
+  }
+
+  // This Verto's play token, read off the submit URL for the same reason.
+  _playToken() {
+    return this.submitUrlValue.match(/\/play\/([^/]+)\/submit\/?$/)?.[1] || ""
+  }
+
+  // Framed by a third party. localStorage is partitioned or refused outright
+  // there, so device keys from other Vertos simply are not visible — the block
+  // says so rather than quietly offering less.
+  _embedded() {
+    try {
+      return window.self !== window.top
+    } catch (_e) {
+      return true
+    }
   }
 
   _esc(s) {

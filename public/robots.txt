@@ -36,3 +36,5 @@ Disallow: /test/
 Disallow: /invites/
 Disallow: /funder_invites/
 Disallow: /blazer
+Disallow: /you/
+Disallow: /you

@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
   # Matched on path rather than controller so the mounted Blazer engine — whose
   # controllers inherit from this class but are not ours to annotate — is
   # covered by the same rule.
-  NOINDEX_PATHS = %r{\A/(play|test|results|invites|funder_invites|blazer|e)(/|\z)}
+  NOINDEX_PATHS = %r{\A/(play|test|results|invites|funder_invites|blazer|e|you)(/|\z)}
 
   # What a respondent is offered once they finish — results comparison, the
   # Share button, the regions map. The named share link they arrived through
@@ -60,6 +60,7 @@ class ApplicationController < ActionController::Base
       params[:locale],
       cookies[:locale],
       Current.user&.preferred_locale,
+      Current.player&.preferred_locale,
       locale_from_header
     ].compact.find { |c| SupportedLocales.supported?(c) }
 

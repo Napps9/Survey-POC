@@ -362,6 +362,13 @@ fr:
       region_empty: "Pas encore de réponses régionales — la vôtre sera peut-être la première !"
       progress: Carte %{n} sur %{total}
       queued: Enregistré — se synchronisera dès votre retour en ligne
+      join_sent_title: "Vérifiez votre boîte de réception"
+      join_sent_body: "Nous avons envoyé un lien à %{email}. Il vous connecte et conserve ce Verto — sans mot de passe."
+      join_sent_again: "Le renvoyer"
+      join_also_one: "Ajouter aussi l'autre Verto dont cet appareil se souvient"
+      join_also_other: "Ajouter aussi les %{count} autres Vertos dont cet appareil se souvient"
+      join_invalid: "Cela ne ressemble pas à une adresse e-mail."
+      join_failed: "Nous n'avons pas pu l'envoyer à l'instant. Réessayez dans un moment."
       submit_rejected: "Ce Verto est clôturé : vos réponses n'ont pas été enregistrées."
       compare_cta: Voyez vos résultats comparés aux autres →
       compare_loading: Chargement…
@@ -1607,9 +1614,10 @@ fr:
     menu_link: "Données d'un répondant…"
     back_to_results: "Retour aux résultats"
     intro: "Trouvez l'enregistrement d'un répondant dans « %{verto} » pour répondre à une demande d'accès ou d'effacement."
-    identifier_note: "Un répondant peut être retrouvé via le jeton de session de son appareil, ou via le code qu'il a choisi si ce Verto en demande un. Le jeton de session n'est pas conservé après la fermeture de l'onglet : une personne qui n'a ni l'un ni l'autre ne peut pas être identifiée."
+    identifier_note: "Un répondant peut être retrouvé via le jeton de session de son appareil, via le code qu'il a choisi si ce Verto en demande un, ou via l'adresse e-mail qu'il a donnée s'il a conservé ce Verto dans un compte à la fin. Le jeton de session n'est pas conservé après la fermeture de l'onglet : une personne qui n'a aucun des trois ne peut pas être identifiée."
     session_token_label: "Jeton de session"
     respondent_code_label: "Code du répondant"
+    email_address_label: "Adresse e-mail (s'il a conservé ce Verto)"
     find: "Rechercher"
     not_found: "Aucune réponse ne correspond à cet identifiant."
     found: "%{count} réponse(s) correspondante(s)"

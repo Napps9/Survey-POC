@@ -362,6 +362,13 @@ id:
       region_empty: "Belum ada jawaban regional — jawabanmu mungkin yang pertama!"
       progress: Kartu %{n} dari %{total}
       queued: Tersimpan — akan disinkronkan saat Anda kembali online
+      join_sent_title: "Periksa kotak masuk Anda"
+      join_sent_body: "Kami telah mengirim tautan ke %{email}. Tautan itu memasukkan Anda dan menyimpan Verto ini — tanpa kata sandi."
+      join_sent_again: "Kirim ulang"
+      join_also_one: "Tambahkan juga 1 Verto lain yang diingat perangkat ini"
+      join_also_other: "Tambahkan juga %{count} Verto lain yang diingat perangkat ini"
+      join_invalid: "Itu sepertinya bukan alamat email."
+      join_failed: "Kami tidak bisa mengirimnya sekarang. Coba lagi sebentar."
       submit_rejected: "Verto ini sudah ditutup, jadi jawaban Anda tidak tersimpan."
       compare_cta: Lihat hasil Anda dibandingkan dengan yang lain →
       compare_loading: Memuat…
@@ -1606,9 +1613,10 @@ id:
     menu_link: "Data satu responden…"
     back_to_results: "Kembali ke hasil"
     intro: "Temukan catatan satu responden di \"%{verto}\" untuk menjawab permintaan akses atau penghapusan data."
-    identifier_note: "Responden dapat ditemukan lewat token sesi dari perangkatnya, atau lewat kode yang mereka pilih jika Verto ini memintanya. Token sesi tidak disimpan setelah tab peramban ditutup, jadi responden yang tidak punya keduanya tidak dapat diidentifikasi."
+    identifier_note: "Seorang responden dapat ditemukan lewat token sesi dari perangkatnya, lewat kode yang ia pilih jika Verto ini memintanya, atau lewat alamat email yang ia berikan jika ia menyimpan Verto ini ke sebuah akun di akhir. Token sesi tidak disimpan setelah tab peramban ditutup, jadi responden yang tidak punya satu pun dari ketiganya tidak dapat diidentifikasi."
     session_token_label: "Token sesi"
     respondent_code_label: "Kode responden"
+    email_address_label: "Alamat email (jika ia menyimpan Verto ini)"
     find: "Cari"
     not_found: "Tidak ada jawaban yang cocok dengan pengenal itu."
     found: "%{count} jawaban yang cocok"

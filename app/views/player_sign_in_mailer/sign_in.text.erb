@@ -1,0 +1,11 @@
+<%= t("player_sign_in_mailer.heading") %>
+
+<%= @survey ? t("player_sign_in_mailer.intro_verto", verto: @survey.theme.presence || @survey.title) : t("player_sign_in_mailer.intro") %>
+
+<%= @url %>
+
+<%= t("player_sign_in_mailer.expiry", minutes: @minutes) %>
+
+<%= t("player_sign_in_mailer.ignore") %>
+
+<%= t("player_sign_in_mailer.sent_by", org: @org_name.presence || "Playverto") %>

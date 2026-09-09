@@ -1,0 +1,27 @@
+<%# The page the emailed link opens. Renders for BOTH states — a live link and
+    a spent or expired one — because "this link has already been used" is the
+    single most likely reason someone lands here and deserves a sentence, not a
+    404. Nothing is consumed by loading this page; the button below is what
+    signs anyone in. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell you-shell-narrow">
+    <div class="you-mark"><%= image_tag "playverto.svg", alt: "Playverto", width: 120 %></div>
+
+    <% if @link %>
+      <div class="you-card">
+        <h1 class="you-h1"><%= t("player_sign_in.title") %></h1>
+        <p class="you-sub"><%= t("player_sign_in.body", email: @link.player.email_address) %></p>
+        <%= button_to t("player_sign_in.cta"), player_sign_in_path(params[:token]),
+              method: :post, class: "you-btn you-btn-primary", form: { style: "margin:0;" } %>
+        <p class="you-fine"><%= t("player_sign_in.fine", minutes: (PlayerSignInLink::LIFETIME / 60).to_i) %></p>
+      </div>
+    <% else %>
+      <div class="you-card">
+        <h1 class="you-h1"><%= t("player_sign_in.spent_title") %></h1>
+        <p class="you-sub"><%= t("player_sign_in.spent_body") %></p>
+        <%= link_to t("player_sign_in.spent_cta"), you_path, class: "you-btn" %>
+      </div>
+    <% end %>
+  </div>
+</div>

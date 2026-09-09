@@ -23,6 +23,17 @@ class AuthThrottlingTest < ActionDispatch::IntegrationTest
     FunderInviteAcceptancesController  => :accept
   }.freeze
 
+  # Endpoints that verify no password but ISSUE a credential — a respondent
+  # sign-in link, and the page that spends one. Same exposure for a different
+  # reason: PlayerController#join sends mail to an address a stranger typed, so
+  # an uncapped one is a mail-bomb and a fast route onto every ESP's
+  # suppression list, and PlayerSignInsController#create spends a bearer token
+  # whose only bound is that it was mailed somewhere.
+  CREDENTIAL_ISSUING_PATHS = {
+    PlayerController      => :join,
+    PlayerSignInsController => :create
+  }.freeze
+
   # Rails hides each rate limit inside an anonymous before_action lambda defined
   # in action_controller/metal/rate_limiting.rb, so counting callbacks whose
   # source_location is that file is the only way to see them.
@@ -44,6 +55,40 @@ class AuthThrottlingTest < ActionDispatch::IntegrationTest
     PASSWORD_PATHS.each do |controller, action|
       assert_operator rate_limit_count(controller), :>=, 1,
                       "#{controller}##{action} verifies a password and must be rate limited"
+    end
+  end
+
+  test "every credential-issuing action is rate limited" do
+    CREDENTIAL_ISSUING_PATHS.each do |controller, action|
+      assert_operator rate_limit_count(controller), :>=, 1,
+                      "#{controller}##{action} issues a credential and must be rate limited"
+    end
+  end
+
+  test "join declares both an IP and an address limit, normalised" do
+    # Two limits for the same reason signing in has two: the IP bound stops one
+    # machine walking a list of addresses, the address bound stops a rotating
+    # pool of IPs mailing ONE inbox over and over.
+    source = File.read(Rails.root.join("app/controllers/player_controller.rb"))
+    assert_match(/name: "join_ip"/, source)
+    assert_match(/name: "join_email"/, source)
+    assert_match(/params\[:email\]\.to_s\.strip\.downcase/, source,
+                 "the join address key must be normalised, or case multiplies the budget")
+  end
+
+  test "join's refusal is the success shape" do
+    # An endpoint that answers 429 tells a caller which addresses it has
+    # already spent — see PlayerController#join. Both limits must render the
+    # ordinary body.
+    lines = File.readlines(Rails.root.join("app/controllers/player_controller.rb"))
+    declarations = lines.each_index.select { |i| lines[i].include?("only: :join,") }
+    assert_equal 2, declarations.size, "join should still declare exactly two limits"
+
+    declarations.each do |i|
+      block = lines[i, 3].join
+      refute_match(/too_many_requests/, block,
+                   "a 429 here would tell a caller which addresses it had already spent")
+      assert_match(/render json: \{ ok: true \}/, block)
     end
   end
 

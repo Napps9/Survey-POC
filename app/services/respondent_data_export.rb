@@ -19,7 +19,7 @@ class RespondentDataExport
     # Responses belonging to one respondent of `survey`. A respondent code can
     # match SEVERAL rows — that's the point of the feature, it links a person
     # across waves — so this always returns a relation.
-    def lookup(survey:, session_token: nil, respondent_code: nil)
+    def lookup(survey:, session_token: nil, respondent_code: nil, email_address: nil)
       if respondent_code.present?
         digest = survey.respondent_code_digest(respondent_code)
         return survey.responses.none if digest.blank?
@@ -27,6 +27,19 @@ class RespondentDataExport
         survey.responses.where(respondent_code_digest: digest)
       elsif session_token.present?
         survey.responses.where(session_token: session_token.to_s.strip)
+      elsif email_address.present?
+        # The third axis, and the only one that starts from a name rather than
+        # from something the respondent has to still be holding: a Player who
+        # kept this Verto at the end of it. Scoped to THIS survey's claims —
+        # the creator is the data controller for their own Verto, not for the
+        # others in that person's account.
+        player = Player.find_by(email_address: email_address.to_s.strip.downcase)
+        return survey.responses.none if player.nil?
+
+        # An id subquery rather than a join, because CI runs this suite on
+        # Postgres too and DISTINCT over rows carrying a json column is a 500
+        # there (see CLAUDE.md).
+        survey.responses.where(id: player.player_claims.where(survey_id: survey.id).select(:response_id))
       else
         survey.responses.none
       end
@@ -49,7 +62,11 @@ class RespondentDataExport
       "notes"      => [
         "This file contains every field stored about this respondent.",
         "Answers are keyed by the question they were given, in the order shown.",
-        "A respondent code is stored only as a one-way hash and cannot be reversed."
+        "A respondent code is stored only as a one-way hash and cannot be reversed.",
+        "An account section appears only where this respondent kept this Verto to a " \
+        "Playverto account. Erasure here removes this Verto from that account; the " \
+        "other Vertos in it belong to their own creators, and the account holder " \
+        "deletes the account itself from /you."
       ],
       "responses"  => @responses.map { |r| response_hash(r) },
       # The contact register entry for the same identity, when the Verto
@@ -58,7 +75,26 @@ class RespondentDataExport
       # stay pseudonymous, but it is still their data and belongs in their
       # export. Reached the same way the leaderboard alias is: through the
       # responses' player_key_digest.
-      "contact_details" => contact_hashes.presence
+      "contact_details" => contact_hashes.presence,
+      # The respondent account that kept this Verto, where there is one. Their
+      # address is data we hold about them and Article 15 asks for everything —
+      # and unlike every other field here it is a name rather than a digest, so
+      # it is also the thing an access request is most likely to be ABOUT.
+      "account" => account_hash
+    }.compact
+  end
+
+  def account_hash
+    claims = PlayerClaim.where(survey_id: @survey.id, response_id: @responses.map(&:id))
+                        .includes(:player)
+    return nil if claims.empty?
+
+    player = claims.first.player
+    {
+      "email_address"    => player&.email_address,
+      "email_verified"   => player&.email_verified?,
+      "kept_this_verto"  => claims.map { |c| c.claimed_at&.utc&.iso8601 }.compact,
+      "vertos_in_account" => player&.player_claims&.count
     }.compact
   end
 

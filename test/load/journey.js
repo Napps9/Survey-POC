@@ -215,8 +215,14 @@ export function journey() {
 
   // 5. The auto-fired leaderboard on the thank-you screen.
   if (!SKIP.has("leaderboard")) {
-    const lb = note(http.get(`${play}/leaderboard?session_token=${session}&player_key=${encodeURIComponent(playerKey)}`,
-      { tags: { endpoint: "leaderboard" } }), "leaderboard");
+    // POST now: the durable device key is what the board is asked by, and a
+    // key in a query string lands in server logs, Referer headers and the
+    // service worker's page cache. The "has entries" check below is what
+    // stops a 404 from passing the duration threshold silently — a fast
+    // error is still fast.
+    const lb = note(http.post(`${play}/leaderboard`,
+      JSON.stringify({ session_token: session, player_key: playerKey }),
+      { headers: JSON_HEADERS, tags: { endpoint: "leaderboard" } }), "leaderboard");
     check(lb, {
       "leaderboard 200": (r) => r.status === 200,
       "leaderboard has entries": (r) => {
