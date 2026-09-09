@@ -37,9 +37,9 @@ hand-drawn SVG stand-in for a Verto's real `background_image`.
 
 ## The PDF
 
-`responder-share-mockups.pdf` is the shareable version — 12 pages, one per board,
-each page sized to its own board so nothing is orphaned or padded. Rebuild it
-after editing `index.html`:
+`responder-share-mockups.pdf` is the shareable version — 13 pages, a page per
+board, each sized to the board it carries so no sheet runs half empty. Rebuild
+it after editing `index.html`:
 
 ```
 node make_pdf.mjs      # per-board parts into .pdf-parts/ (gitignored)
@@ -48,6 +48,15 @@ python3 merge_pdf.py   # stitches and numbers them
 
 It prints the page rather than stitching `shots/*.png`, so every word in it stays
 real vector text — searchable, selectable, and sharp at any zoom.
+
+Two things in the `@media print` block are load-bearing, and both were bugs
+first. The sheet is **1150px wide, not the 1500px the boards use on screen**:
+page width sets how large the type reads, and 13px notes on a 1500px sheet come
+out half again smaller than body text on A4. And the share-image thumbnails are
+drawn as a **raster** below about half size — shrinking the live 1200×630 card
+with CSS `zoom` put its 64px headline under 1pt, which prints as a smear that
+collides with the artwork around it. Every one of those is an `<img>` in the
+real product anyway.
 
 ## Re-shooting
 
@@ -70,8 +79,8 @@ from `file://` and from any host. It follows the build-stamp convention of the
 one-pagers in `public/`:
 
 ```html
-<!-- responder-share mockups · build 2026-09-09-a · … -->
-<html lang="en" data-build="2026-09-09-a">
+<!-- responder-share mockups · build 2026-09-09-c · … -->
+<html lang="en" data-build="2026-09-09-c">
 ```
 
 Bump that stamp when you change the file, and check it in view-source to be sure

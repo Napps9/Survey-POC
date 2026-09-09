@@ -1,20 +1,22 @@
-// Renders index.html to a single shareable PDF — one board per page, each page
-// sized to its own board.
+// Renders index.html to one shareable PDF — a page per board, each sized to
+// the board it carries.
 //
-//   node make_pdf.mjs            # -> responder-share-mockups.pdf
+//   node make_pdf.mjs && python3 merge_pdf.py     # -> responder-share-mockups.pdf
 //
-// Chromium print-to-PDF rather than stitching the PNGs in shots/: the page is
-// HTML, CSS and inline SVG throughout, so every label, note and spec line stays
-// real vector text — sharp at any zoom, selectable and searchable — where an
-// image-per-page PDF would bake it all into pixels.
+// Chromium print-to-PDF rather than stitching shots/*.png: the page is HTML,
+// CSS and inline SVG throughout, so every label, note and spec line stays real
+// vector text — sharp at any zoom, selectable and searchable — where an
+// image-per-page PDF would bake it all into pixels at one fixed resolution.
 //
-// Why a page per board instead of one uniform page size: the boards run from
-// 448px (the dashboard tile) to 2025px (the seven unfurls). One page height tall
-// enough for the tallest leaves most pages two-thirds empty; one short enough to
-// suit the typical board orphans two notes of board C onto a blank page. Sizing
-// each page to its own board costs nothing and keeps every artboard whole.
+// Why a page per board rather than one uniform sheet: the boards run from
+// ~360px (the dashboard tile) to ~1900px (the seven unfurls). Any single height
+// either leaves most sheets two-thirds empty or forces the tall ones to be
+// scaled down or split — and Chromium splits them badly, painting a panel's
+// background past the sheet edge and through the footer. Fitting the sheet to
+// the board costs nothing and means nothing has to be shrunk to survive.
 //
-// Emits per-section PDFs into a temp dir; merge_pdf.py stitches and numbers them.
+// Chromium takes one page size per print call, hence a part per board; the
+// widths all match, so only the heights differ. merge_pdf.py stitches them.
 import { createRequire } from "node:module"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
@@ -28,8 +30,23 @@ const tmp  = process.env.PDF_PARTS_DIR || path.join(here, ".pdf-parts")
 fs.rmSync(tmp, { recursive: true, force: true })
 fs.mkdirSync(tmp, { recursive: true })
 
-const WIDTH = 1500
-const PAD   = 26   // breathing room under the last line of a board
+const WIDTH = 1150   // sets the reading size of the type; see @media print
+// Room under the last line and for the footer, plus a proportional allowance.
+// The notes are a multi-column box and CSS balances columns against the height
+// of the fragmentainer they land in, so a board measured in the DOM grows by a
+// few percent once the sheet is cut to that measurement. page.pdf() fragments
+// against the CSS page box rather than the viewport, so no amount of
+// re-measuring in the page sees it; the slack is what keeps the last line off
+// the edge. Overflow here is not cosmetic — it prints through the footer.
+const PAD   = 30
+const SLACK = 0.07
+// A sheet fitted to its board is right until the board is very tall: the seven
+// unfurls come to ~3000px, and a page nearly three times taller than it is wide
+// is awkward to read and to scroll. Past this the board is split over however
+// many sheets it needs, divided evenly — taking the cap for each would leave
+// the last one two-thirds empty. Splitting is clean because the tiles, notes
+// and table rows all carry break-inside: avoid.
+const CAP   = 2000
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || "/opt/pw-browsers/chromium" })
 const page = await browser.newPage({ viewport: { width: WIDTH, height: 1200 } })
@@ -38,13 +55,10 @@ await page.evaluate(() => document.fonts.ready)
 await page.emulateMedia({ media: "print" })
 await page.waitForTimeout(250)
 
-// Page 1 is the cover (masthead, contents, worked example); then one per board.
 const sections = await page.evaluate(() =>
   ["__cover__", ...[...document.querySelectorAll("section.board, section.spec")].map(el => el.id)]
 )
 
-// Isolating a section means hiding its siblings, and dropping the forced page
-// break that would otherwise open the file on a blank sheet.
 await page.addStyleTag({ content: `
   body.pdf-isolate header.hero, body.pdf-isolate nav.toc,
   body.pdf-isolate main.wrap > *:not(.pdf-show) { display: none !important; }
@@ -69,17 +83,25 @@ for (const [i, id] of sections.entries()) {
     return el.getBoundingClientRect().height
   }, id)
 
+  const target = Math.ceil(height * (1 + SLACK)) + PAD
+  const sheets = Math.max(1, Math.ceil(target / CAP))
+  // Dividing the raw height evenly is not enough once a board actually splits:
+  // tiles and note blocks carry break-inside: avoid, so each sheet wastes
+  // whatever is left below the last whole one, and the remainder spills to an
+  // extra, nearly empty page. The extra headroom absorbs that.
+  const sheet  = sheets === 1 ? target : Math.min(CAP, Math.ceil(target * 1.18 / sheets))
+
   const file = path.join(tmp, `${String(i).padStart(2, "0")}-${id.replace(/\W+/g, "-")}.pdf`)
   await page.pdf({
     path: file,
     width: `${WIDTH}px`,
-    height: `${Math.ceil(height) + PAD}px`,
+    height: `${sheet}px`,
     printBackground: true,
     margin: { top: "0px", bottom: "0px", left: "0px", right: "0px" },
   })
   parts.push(file)
-  console.log(`  ${id} — ${Math.ceil(height)}px`)
+  console.log(`  ${id.padEnd(12)} ${Math.ceil(height)}px -> ${sheets} sheet(s) of ${sheet}px`)
 }
 
 await browser.close()
-console.log(`${parts.length} parts in ${path.relative(here, tmp)}/`)
+console.log(`${parts.length} parts -> run: python3 merge_pdf.py`)
