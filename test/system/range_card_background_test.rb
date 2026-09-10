@@ -1,7 +1,7 @@
 require "application_system_test_case"
 
 # Animation background (2.10-ish: card["media_bg"]) already applied to a
-# range card once _syncAnimationBg ran — _cardAnimates checks
+# range card once _syncAnimationBg ran — _cardTakesBackground checks
 # `card.dataset.cardType === "range"` — but nothing on a range card's panel
 # ever called media-picker#open to get there: the range branch of
 # _split_left.html.erb only rendered the reactive Lottie plus a
@@ -108,7 +108,7 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
   # is a real design decision — and this panel offered no way to make it ("I
   # need the Change Background option here for when we upload transparent
   # lottie files"). Only the ENTRY POINT was missing: media-picker's
-  # _cardAnimates already returns true for any card carrying a lottie, not just
+  # _cardTakesBackground already returns true for any card carrying a lottie, not just
   # for range, so the Animation background section has been in that modal all
   # along with nothing on this panel calling it.
   test "a lottie card offers Background alongside Change media" do
@@ -180,5 +180,96 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
     assert_operator boxes[0]["right"], :<=, boxes[1]["left"] + 1,
                     "the CTAs overlap (#{boxes.inspect}) — one is still absolutely positioned " \
                     "inside the row, so it is painted on top of the other."
+  end
+
+  # ── A card with NO media ──────────────────────────────────────────────────
+  # The third case, and the one that had no control at all. A range or Lottie
+  # card wants a backdrop because its animation is transparent; a bare card IS
+  # its backdrop — the panel is nothing but a colour — and until a creator asked
+  # to be able to design the phone view of an ordinary card, the only way to
+  # change it was the Verto-wide brand panel.
+  def bare_card
+    find(".survey-card-wrap[data-card-cid='bare']")
+  end
+
+  def add_bare_card
+    @survey.update_columns(cards: @survey.cards + [
+      { "type" => "multiple_choice", "cid" => "bare", "text" => "Pick a lane",
+        "options" => %w[Left Right] }
+    ])
+  end
+
+  def open_bare_editor
+    add_bare_card
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    assert_text "Pick a lane"
+  end
+
+  test "a card with no media offers Background alongside Add design" do
+    open_bare_editor
+
+    within(bare_card) do
+      assert_selector ".split-left-design-prompt"
+      assert_selector ".add-bg-fab", text: "Background"
+    end
+  end
+
+  test "the bare card's Background CTA opens the card background settings" do
+    open_bare_editor
+    within(bare_card) { find(".add-bg-fab").click }
+
+    assert_selector ".media-modal-backdrop", visible: true
+    assert_selector "[data-media-picker-target='animBgSection']", visible: true
+  end
+
+  # The point of the control, and the reason it exists: on a phone a media-less
+  # card has no hero strip at all — .split-left is display: contents — so a
+  # backdrop with nothing to paint on would be a control that silently did
+  # nothing on the one screen it was asked for. Setting one has to earn the card
+  # its strip back, in the editor's phone frame as on the phone.
+  test "a background gives a bare card a hero strip in the phone frame" do
+    open_bare_editor
+    find(".device-toggle-btn[data-device='mobile']").click
+    assert_selector ".device-mobile", wait: 5
+
+    before = evaluate_script(<<~JS)
+      getComputedStyle(document.querySelector(".survey-card-wrap[data-card-cid='bare'] .split-left")).display
+    JS
+    assert_equal "contents", before,
+                 "a bare card already has a hero strip in the phone frame — the live player " \
+                 "gives it none, so this preview is wrong before the backdrop is even set"
+
+    within(bare_card) { find(".add-bg-fab").click }
+    evaluate_script(<<~JS)
+      (() => {
+        const el = document.querySelector("[data-media-picker-target='animBgColor']")
+        el.value = "#2255ff"
+        el.dispatchEvent(new Event("input", { bubbles: true }))
+      })()
+    JS
+    find(".media-modal-close").click
+
+    after = evaluate_script(<<~JS)
+      (() => {
+        const wrap = document.querySelector(".survey-card-wrap[data-card-cid='bare']")
+        const left = wrap.querySelector(".split-left")
+        const card = wrap.querySelector(".split-card")
+        return {
+          display: getComputedStyle(left).display,
+          klass:   left.className,
+          share:   left.getBoundingClientRect().height / card.getBoundingClientRect().height
+        }
+      })()
+    JS
+
+    assert_includes after["klass"], "has-media-bg",
+                    "the panel was painted but never marked, so nothing gives it a strip"
+    assert_equal "block", after["display"],
+                 "the backdrop is set and the phone frame still shows no strip to paint it on"
+    assert_in_delta 0.45, after["share"], 0.03,
+                    "the earned strip is #{(after['share'] * 100).round(1)}% of the card rather " \
+                    "than the player's 45%"
   end
 end

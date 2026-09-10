@@ -9,6 +9,7 @@ import { OPTION_STYLE_TYPES } from "lib/option_style_types"
 import { styleFromRow } from "lib/option_styles"
 import { hasFormatting } from "lib/rich_text"
 import { cardEyebrow, MULTI_SELECT_TYPES } from "lib/card_eyebrow"
+import { NPS_VESSELS, npsStageStyle, npsVesselSvg, npsVesselFor } from "lib/nps_vessels"
 
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
@@ -1757,6 +1758,32 @@ export default class extends Controller {
     this.markDirty()
   }
 
+  // NPS-card container silhouette. Same contract as setRangeTheme above —
+  // record it on the wrap for serialize(), then redraw so the creator sees the
+  // vessel they picked without a round-trip. The redraw is the shared
+  // lib/nps_vessels drawing, i.e. the same one the type panel uses and a mirror
+  // of the Ruby that rendered what is on screen now.
+  setNpsShape(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (!card) return
+    const shape = npsVesselFor(event.currentTarget.value)
+    card.dataset.cardNpsShape = shape
+
+    const stage = card.querySelector(".nps-slider-stage")
+    const control = stage?.querySelector(".nps-control")
+    if (stage && control) {
+      const v = NPS_VESSELS[shape]
+      // The stage's custom properties are the vessel's own geometry (where its
+      // liquid sits empty and full, and the digit column's inset off the same
+      // two numbers), so they have to move WITH the silhouette or the labels
+      // stop lining up with the fill.
+      stage.setAttribute("style", npsStageStyle(v))
+      control.className = `nps-control nps-shape-${shape}`
+      control.innerHTML = npsVesselSvg(shape, v)
+    }
+    this.markDirty()
+  }
+
   // { slug: [5 asset URLs] } from the editor's range-theme-picker blob, used to
   // swap the live preview when the theme changes.
   get _rangeThemeUrls() {
@@ -1958,6 +1985,10 @@ export default class extends Controller {
       // Range cards carry the reaction-animation theme picked in the editor.
       // Server-side sanitize drops it if it isn't a known slug on a range card.
       if (type === "range" && card.dataset.cardRangeTheme) out.range_theme = card.dataset.cardRangeTheme
+      // NPS cards carry the container silhouette picked in the editor, same
+      // gate: the server drops it if it isn't a vessel it can draw on an NPS
+      // card, and its absence means "use the Verto-themed default".
+      if (type === "nps" && card.dataset.cardNpsShape) out.nps_shape = card.dataset.cardNpsShape
       // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
       if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
       // Select-many cards may cap how many answers a respondent ticks. Only

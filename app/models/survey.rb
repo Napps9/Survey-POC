@@ -917,11 +917,29 @@ class Survey < ApplicationRecord
           c.delete("range_theme")
         end
       end
-      # Animation backdrop — the colour or image behind a Lottie / range
-      # animation, overriding the Verto-wide --brand-panel for this one card.
-      # Only meaningful where an animation actually fills the panel (a photo or
-      # video covers the panel itself), so it is dropped anywhere else rather
-      # than kept as dead data that would surprise whoever adds media later.
+      # An NPS card's container silhouette — only a vessel we can actually
+      # draw survives, and only on an NPS card, so the helper always resolves
+      # to a real path (NpsHelper::NPS_VESSELS owns the drawing table). Same
+      # allowlist-or-drop shape as range_theme above; dropping it falls back to
+      # the Verto-themed pick rather than to nothing.
+      if c.key?("nps_shape")
+        shape = c["nps_shape"].to_s
+        if c["type"].to_s == "nps" && NpsHelper::NPS_VESSELS.key?(shape)
+          c["nps_shape"] = shape
+        else
+          c.delete("nps_shape")
+        end
+      end
+      # Card backdrop — the colour or image behind whatever the panel holds,
+      # overriding the Verto-wide --brand-panel for this one card. Meaningful
+      # wherever the panel is not already covered edge to edge: behind an
+      # animation, and on a card with NO media, where the backdrop IS the design
+      # (and, on a phone, is the card's whole top half — see .has-media-bg in
+      # the mobile block of application.css). A photo or a video covers the
+      # panel itself, so a backdrop is dropped there rather than kept as dead
+      # data that would surprise whoever removes the picture later.
+      # ApplicationHelper#card_takes_backdrop? states the same rule for
+      # rendering; media_picker#_cardTakesBackground for the editor.
       # Same allowlist-or-drop shape as range_theme above.
       if c.key?("media_bg")
         bg  = c["media_bg"].is_a?(Hash) ? c["media_bg"] : {}
@@ -931,12 +949,15 @@ class Survey < ApplicationRecord
         if (img = sanitize_image_url(bg["image"])).present?
           out["image"] = img
         end
-        # Reads the card's OWN lottie value, which at this point has not been
-        # through sanitize_lottie_url yet — a card carrying an off-allowlist
-        # animation would have its backdrop kept and the animation dropped.
-        # Check the value the way that sanitiser will.
+        # Reads the card's OWN lottie / image / video values, which at this
+        # point have not been through their own sanitisers yet — a card carrying
+        # an off-allowlist animation would otherwise have its backdrop kept and
+        # the animation dropped, and one carrying an off-allowlist photo would
+        # have its backdrop dropped for a picture that is about to go too. Check
+        # each the way that sanitiser will.
         animated = c["type"].to_s == "range" || sanitize_lottie_url(c["lottie"]).present?
-        if animated && out.any?
+        bare     = sanitize_image_url(c["image"]).blank? && sanitize_video_url(c["video"]).blank?
+        if (animated || bare) && out.any?
           c["media_bg"] = out
         else
           c.delete("media_bg")

@@ -269,13 +269,16 @@
         </div>
         <div class="media-lottie-hint"><%= t("editor.focal_note", default: "Only affects the header on phones — the full image is kept, so you can change this any time.") %></div>
       </div>
-      <%# Animation backdrop. Shown only for a card whose panel is actually an
-          animation (a pasted Lottie, or a range card's reaction set) — behind
-          a photo or video there is nothing to see, so the section stays
-          hidden rather than offering a control that does nothing.
-          media-picker toggles it in _syncAnimationBg. %>
+      <%# Card backdrop. Shown wherever the panel is not already covered edge to
+          edge: behind an animation (a pasted Lottie, or a range card's reaction
+          set), and on a card carrying no media at all — where the backdrop IS
+          the design, and on a phone is the card's whole top half. Behind a
+          photo or a video there is nothing to see, so the section stays hidden
+          rather than offering a control that does nothing.
+          media-picker toggles it in _syncAnimationBg, off the same rule
+          ApplicationHelper#card_takes_backdrop? states server-side. %>
       <div class="media-animbg-section" data-media-picker-target="animBgSection" hidden>
-        <div class="media-lottie-label"><%= t("editor.animation_bg", default: "Animation background") %></div>
+        <div class="media-lottie-label"><%= t("editor.card_bg", default: "Card background") %></div>
         <div class="media-animbg-row">
           <input type="color" class="media-animbg-color"
                  data-media-picker-target="animBgColor"
@@ -287,7 +290,7 @@
                   data-media-picker-target="animBgClear"
                   data-action="click->media-picker#clearAnimBg"><%= t("editor.animation_bg_clear", default: "Reset to brand colour") %></button>
         </div>
-        <div class="media-lottie-hint"><%= t("editor.animation_bg_hint", default: "Sits behind the animation on this card only. Without one the card uses your brand's panel colour.") %></div>
+        <div class="media-lottie-hint"><%= t("editor.card_bg_hint", default: "Sits behind this card's panel — an animation, or nothing at all — and on a phone it is the card's whole top half. Without one the card uses your brand's panel colour.") %></div>
       </div>
       <%# Slow push-in/out loop on the card's own photo or Lottie — never
           video (its own motion is enough) or range (already animates via

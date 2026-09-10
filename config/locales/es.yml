@@ -566,6 +566,7 @@ es:
         delete_page: "✕ Eliminar esta página"
         add_page: "＋ Añadir página"
         prev_page: "Página anterior"
+        next_page: "Página siguiente"
       add_question:
         add_to_survey: "Añadir a la encuesta →"
         adding: "Añadiendo…"
@@ -1095,6 +1096,8 @@ es:
     animation_bg_image: "Usar una imagen"
     animation_bg_clear: "Restablecer al color de marca"
     animation_bg_hint: "Se muestra detrás de la animación solo en esta tarjeta. Sin uno, la tarjeta usa el color de panel de tu marca."
+    card_bg: "Fondo de la tarjeta"
+    card_bg_hint: "Se sitúa detrás del panel de esta tarjeta —una animación, o nada— y en el móvil ocupa toda la mitad superior. Sin él, la tarjeta usa el color de panel de tu marca."
     animate_asset: "Animar recurso"
     animate_asset_hint: "Un acercamiento y alejamiento lento y suave en bucle."
     focal_label: "Posición del encabezado móvil"
@@ -1172,6 +1175,7 @@ es:
     slider_axis_vertical: "Cambiar a diseño vertical"
     animation_modal_title: "Elige una animación"
     animation_modal_sub: "Este personaje reacciona a medida que los encuestados arrastran el control deslizante. Se elige para combinar con el tema de tu Verto; cámbialo cuando quieras."
+    nps_animation_modal_sub: "Las personas encuestadas arrastran para llenar este recipiente hasta su respuesta. Se elige para combinar con el tema de tu Verto; cámbialo cuando quieras."
     close: "Cerrar"
     add_design: Agregar diseño
     add_design_title: Agregar una imagen a esta tarjeta

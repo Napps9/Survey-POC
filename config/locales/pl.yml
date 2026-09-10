@@ -566,6 +566,7 @@ pl:
         delete_page: "✕ Usuń tę stronę"
         add_page: "＋ Dodaj stronę"
         prev_page: "Poprzednia strona"
+        next_page: "Następna strona"
       add_question:
         add_to_survey: "Dodaj do ankiety →"
         adding: "Dodawanie…"
@@ -1097,6 +1098,8 @@ pl:
     animation_bg_image: "Użyj obrazu"
     animation_bg_clear: "Przywróć kolor marki"
     animation_bg_hint: "Widoczne za animacją tylko na tej karcie. Bez tego karta używa koloru panelu Twojej marki."
+    card_bg: "Tło karty"
+    card_bg_hint: "Znajduje się za panelem tej karty — animacją albo niczym — a na telefonie stanowi całą górną połowę karty. Bez niego karta używa koloru panelu Twojej marki."
     animate_asset: "Animuj zasób"
     animate_asset_hint: "Powolne, delikatne przybliżanie i oddalanie w pętli."
     focal_label: "Pozycja nagłówka mobilnego"
@@ -1174,6 +1177,7 @@ pl:
     slider_axis_vertical: "Przełącz na układ pionowy"
     animation_modal_title: "Wybierz animację"
     animation_modal_sub: "Ta postać reaguje, gdy respondenci przesuwają suwak. Została dobrana do motywu Twojego Verto — możesz ją zmienić w każdej chwili."
+    nps_animation_modal_sub: "Respondenci przeciągają, aby napełnić to naczynie do wysokości swojej odpowiedzi. Zostało dobrane do motywu Twojego Verto — możesz je zmienić w każdej chwili."
     close: "Zamknij"
     add_design: Dodaj projekt
     add_design_title: Dodaj obraz do tej karty

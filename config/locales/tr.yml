@@ -566,6 +566,7 @@ tr:
         delete_page: "✕ Bu sayfayı sil"
         add_page: "＋ Sayfa ekle"
         prev_page: "Önceki sayfa"
+        next_page: "Sonraki sayfa"
       add_question:
         add_to_survey: "Ankete ekle →"
         adding: "Ekleniyor…"
@@ -1095,6 +1096,8 @@ tr:
     animation_bg_image: "Bir görsel kullan"
     animation_bg_clear: "Marka rengine sıfırla"
     animation_bg_hint: "Yalnızca bu kartta animasyonun arkasında görünür. Ayarlanmazsa kart, markanızın panel rengini kullanır."
+    card_bg: "Kart arka planı"
+    card_bg_hint: "Bu kartın panelinin arkasında durur — bir animasyonun ya da hiçbir şeyin — ve telefonda kartın üst yarısının tamamıdır. Belirlemezseniz kart markanızın panel rengini kullanır."
     animate_asset: "Öğeyi canlandır"
     animate_asset_hint: "Sürekli tekrarlanan, yavaş ve yumuşak bir yakınlaşma-uzaklaşma."
     focal_label: "Mobil başlık konumu"
@@ -1172,6 +1175,7 @@ tr:
     slider_axis_vertical: "Dikey düzene geç"
     animation_modal_title: "Bir animasyon seçin"
     animation_modal_sub: "Bu karakter, katılımcılar kaydırıcıyı sürüklerken tepki verir. Verto'nuzun temasına uyacak şekilde seçildi — istediğiniz zaman değiştirin."
+    nps_animation_modal_sub: "Katılımcılar bu kabı kendi cevaplarına kadar doldurmak için sürükler. Verto'nuzun temasına uyacak şekilde seçildi — istediğiniz zaman değiştirin."
     close: "Kapat"
     add_design: Tasarım ekle
     add_design_title: Bu karta bir resim ekle

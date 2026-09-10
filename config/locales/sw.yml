@@ -566,6 +566,7 @@ sw:
         delete_page: "✕ Futa ukurasa huu"
         add_page: "＋ Ongeza ukurasa"
         prev_page: "Ukurasa uliotangulia"
+        next_page: "Ukurasa unaofuata"
       add_question:
         add_to_survey: "Ongeza kwenye utafiti →"
         adding: "Inaongeza…"
@@ -1095,6 +1096,8 @@ sw:
     animation_bg_image: "Tumia picha"
     animation_bg_clear: "Rudisha rangi ya chapa"
     animation_bg_hint: "Huonekana nyuma ya uhuishaji kwenye kadi hii pekee. Bila hiyo, kadi hutumia rangi ya paneli ya chapa yako."
+    card_bg: "Mandharinyuma ya kadi"
+    card_bg_hint: "Yapo nyuma ya paneli ya kadi hii — uhuishaji, au hakuna kitu — na kwenye simu ndiyo nusu nzima ya juu ya kadi. Bila hiyo, kadi hutumia rangi ya paneli ya chapa yako."
     animate_asset: "Huisha mali"
     animate_asset_hint: "Mwendo wa polepole, laini wa kuingia na kutoka mfululizo."
     focal_label: "Nafasi ya kichwa cha simu"
@@ -1172,6 +1175,7 @@ sw:
     slider_axis_vertical: "Badilisha kuwa mpangilio wima"
     animation_modal_title: "Chagua uhuishaji"
     animation_modal_sub: "Mhusika huyu hujibu washiriki wanaposogeza kitelezi. Umechaguliwa ili kuendana na mandhari ya Verto yako — ubadilishe wakati wowote."
+    nps_animation_modal_sub: "Washiriki husogeza ili kujaza chombo hiki hadi kwenye jibu lao. Kimechaguliwa ili kuendana na mandhari ya Verto yako — ubadilishe wakati wowote."
     close: "Funga"
     add_design: Ongeza muundo
     add_design_title: Ongeza picha kwenye kadi hii

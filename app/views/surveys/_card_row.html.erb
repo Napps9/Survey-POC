@@ -75,6 +75,11 @@
      <% if card['common_question_id'].present? %>data-card-common-question-id="<%= card['common_question_id'] %>"<% end %>
      <% if card['common_question_set_id'].present? %>data-card-common-question-set-id="<%= card['common_question_set_id'] %>"<% end %>
      <% if card['range_theme'].present? %>data-card-range-theme="<%= card['range_theme'] %>"<% end %>
+     <%# The container an NPS card fills. Absent means "whatever the Verto's
+         theme picks" — the same open default range_theme has, so a deck nobody
+         has touched keeps following its theme rather than being frozen to the
+         shape it happened to render once. %>
+     <% if card['nps_shape'].present? %>data-card-nps-shape="<%= card['nps_shape'] %>"<% end %>
      <%# How many answers a respondent may tick on this card. Absent = no limit,
          which is what keeps "as many as there are answers" true when the option
          list grows — see Survey::MULTI_SELECT_TYPES. %>

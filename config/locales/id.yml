@@ -566,6 +566,7 @@ id:
         delete_page: "✕ Hapus halaman ini"
         add_page: "＋ Tambah halaman"
         prev_page: "Halaman sebelumnya"
+        next_page: "Halaman berikutnya"
       add_question:
         add_to_survey: "Tambahkan ke survei →"
         adding: "Menambahkan…"
@@ -1095,6 +1096,8 @@ id:
     animation_bg_image: "Gunakan gambar"
     animation_bg_clear: "Setel ulang ke warna merek"
     animation_bg_hint: "Tampil di belakang animasi hanya pada kartu ini. Tanpa ini, kartu memakai warna panel merek Anda."
+    card_bg: "Latar kartu"
+    card_bg_hint: "Berada di belakang panel kartu ini — sebuah animasi, atau tidak ada apa-apa — dan di ponsel ini adalah seluruh separuh atas kartu. Tanpanya, kartu memakai warna panel merek Anda."
     animate_asset: "Animasikan aset"
     animate_asset_hint: "Gerakan mendekat-menjauh yang lambat dan lembut, berulang."
     focal_label: "Posisi header seluler"
@@ -1172,6 +1175,7 @@ id:
     slider_axis_vertical: "Beralih ke tata letak vertikal"
     animation_modal_title: "Pilih animasi"
     animation_modal_sub: "Karakter ini bereaksi saat responden menyeret slider. Dipilih agar cocok dengan tema Verto Anda — ganti kapan saja."
+    nps_animation_modal_sub: "Responden menyeret untuk mengisi wadah ini sampai ke jawaban mereka. Dipilih agar cocok dengan tema Verto Anda — ganti kapan saja."
     close: "Tutup"
     add_design: Tambah desain
     add_design_title: Tambahkan gambar ke kartu ini

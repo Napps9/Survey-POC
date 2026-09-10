@@ -566,6 +566,7 @@ nl:
         delete_page: "✕ Deze pagina verwijderen"
         add_page: "＋ Pagina toevoegen"
         prev_page: "Vorige pagina"
+        next_page: "Volgende pagina"
       add_question:
         add_to_survey: "Toevoegen aan enquête →"
         adding: "Toevoegen…"
@@ -1095,6 +1096,8 @@ nl:
     animation_bg_image: "Afbeelding gebruiken"
     animation_bg_clear: "Terug naar merkkleur"
     animation_bg_hint: "Staat alleen op deze kaart achter de animatie. Zonder deze instelling gebruikt de kaart de panelkleur van je merk."
+    card_bg: "Kaartachtergrond"
+    card_bg_hint: "Zit achter het paneel van deze kaart — een animatie, of helemaal niets — en op een telefoon is het de hele bovenste helft van de kaart. Zonder gebruikt de kaart de paneelkleur van je merk."
     animate_asset: "Asset animeren"
     animate_asset_hint: "Een langzame, zachte in- en uitzoombeweging in een lus."
     focal_label: "Positie van mobiele koptekst"
@@ -1172,6 +1175,7 @@ nl:
     slider_axis_vertical: "Overschakelen naar verticale lay-out"
     animation_modal_title: "Kies een animatie"
     animation_modal_sub: "Dit personage reageert terwijl respondenten de schuifregelaar verslepen. Het is gekozen om bij het thema van je Verto te passen — je kunt het altijd verwisselen."
+    nps_animation_modal_sub: "Respondenten slepen om deze houder tot hun antwoord te vullen. Hij is gekozen om bij het thema van je Verto te passen — je kunt hem altijd verwisselen."
     close: "Sluiten"
     add_design: Ontwerp toevoegen
     add_design_title: Een afbeelding aan deze kaart toevoegen

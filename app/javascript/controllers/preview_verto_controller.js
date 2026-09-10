@@ -1,5 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 import { tapResetRowHtml } from "lib/tap_response_templates"
+import { t } from "lib/i18n"
+
+// The one place this file builds markup from a translated string. Small enough
+// to state here rather than pull in a helper: an aria-label is the only
+// attribute involved, and a stray quote in a locale would otherwise close it.
+function escapeAttr(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;")
+}
 
 export default class extends Controller {
   static targets = [
@@ -173,7 +181,29 @@ export default class extends Controller {
       ".pick-item-delete, .tap-card-delete, .pick-add-btn, .tap-add-btn, .add-media-fab, " +
       ".split-left-design-prompt, .quiz-correct-block, .token-award-block, " +
       ".book-edit-tools, .logic-branch-block, .mark-correct, .mark-correct-grid, " +
-      ".tap-card-image-btn, .slider-axis-toggle, .add-animation-fab"
+      ".tap-card-image-btn, .slider-axis-toggle, .add-animation-fab, " +
+      // The panel's OTHER creator CTAs. These are not inert decoration: like the
+      // 🎨 below, `media-picker` is bound on the editor root — an ancestor of
+      // this overlay — so a cloned "Background" or "Reposition" opened the
+      // creator's media modal from inside a respondent view, over the top of the
+      // preview they were checking. .add-bg-fab covers .card-bg-fab and
+      // .media-adjust-fab, which both carry it.
+      ".add-bg-fab, .tap-card-adjust-btn, " +
+      // …and the empty rail they sat in. It is absolutely positioned over the
+      // panel, and its own :not(:has(…)) collapse only fires when every child is
+      // hidden rather than gone; removing it outright says what is meant.
+      ".split-left-cta-row, " +
+      // The creator's "Answer length" select under an open-ended card. Worse
+      // than chrome: its <select> carries change->survey-editor#markDirty, so
+      // changing it while "previewing as a respondent" autosaved a new character
+      // limit onto the deck.
+      ".freeform-limit-row, " +
+      // The two hidden apply paths the animation picker drives. They are
+      // `hidden` in the editor and would stay hidden here, but a respondent view
+      // has no business carrying the creator's controls at all — and one of them
+      // shipped without its `hidden` for a while, which is exactly how a hidden
+      // thing becomes a visible one.
+      ".range-theme-picker, .nps-shape-picker"
     ).forEach(el => el.remove())
 
     // 1b. The tap card's statement pager is the one piece of editor chrome that
@@ -194,7 +224,33 @@ export default class extends Controller {
       reset ? row.replaceWith(reset) : row.remove()
     })
 
-    // 1c. The editor's per-answer STYLE and REMOVE controls. `option-style` is
+    // 1c. The scenario/consent book's pager is the SAME shape of problem, and it
+    //     was the one still on the wrong side of it. The editor's nav row
+    //     carries a full-width "Next page ›" button with a separate dot strip
+    //     floating above it; the player's is one capsule — ‹ · · · › — with the
+    //     dots between the two chevrons ("the owner's pick from the three mocked
+    //     treatments"). So a previewed scenario showed a control the player does
+    //     not have, in a layout the player does not use, on the card type whose
+    //     whole point is how it reads.
+    //
+    //     Both halves, in order: drop the editor's stray dot strip (the one
+    //     OUTSIDE the row), then swap the button for the player's dots + right
+    //     chevron. scenario_controller finds both by data-scenario-target, so
+    //     the swapped-in pair is the working pager, not a picture of one.
+    clone.querySelectorAll(".book-dots").forEach((dots) => {
+      if (!dots.closest(".book-nav-row")) dots.remove()
+    })
+    clone.querySelectorAll(".book-nav-row .next-btn").forEach((btn) => {
+      const holder = document.createElement("template")
+      holder.innerHTML = `
+        <div class="book-dots" data-scenario-target="dots"></div>
+        <button type="button" class="book-chevron" data-scenario-target="nextBtn"
+                data-action="click->scenario#next"
+                aria-label="${escapeAttr(t("editor.scenario.next_page"))}">›</button>`
+      btn.replaceWith(...holder.content.children)
+    })
+
+    // 1d. The editor's per-answer STYLE and REMOVE controls. `option-style` is
     //     bound on the editor root (surveys/show), which is an ancestor of this
     //     overlay as well, so a cloned 🎨 is not inert decoration — it opens the
     //     creator's colour/icon popover from inside a respondent view.
@@ -214,6 +270,31 @@ export default class extends Controller {
       kept ? el.setAttribute("data-action", kept) : el.removeAttribute("data-action")
       // The hover ring that advertised the mark as a control goes with it.
       el.classList.remove("rotate-action-btn--editable")
+    })
+
+    // 1e. …and the row itself goes back to being a BUTTON. _tap_responses renders
+    //     a <div> in editor mode and a <button> in player mode, deliberately:
+    //     contenteditable inside a button doesn't reliably take a caret, and the
+    //     creator has to be able to retype the label. The clone inherited the
+    //     div, so a previewed tap answer was a generic element — not focusable,
+    //     no aria-label, unreachable by keyboard on the one card type that is
+    //     nothing but answer buttons. Clicking it worked, which is why this
+    //     survived the earlier passes: the mouse could not tell.
+    //
+    //     Rebuilt rather than patched with role/tabindex: the player's markup is
+    //     a button and the honest way to match it is to be one. Everything else
+    //     — classes, the fan's inline --tap-x/--tap-y, the tap-stack data
+    //     attributes — moves across untouched, and the accessible name comes
+    //     from the label span that is already inside it.
+    clone.querySelectorAll("div.rotate-action[data-tap-response]").forEach((row) => {
+      const btn = document.createElement("button")
+      for (const { name, value } of Array.from(row.attributes)) btn.setAttribute(name, value)
+      // After the copy, not before: a `type` carried over from the div would
+      // otherwise turn this into a submit button inside whatever form it lands in.
+      btn.type = "button"
+      btn.setAttribute("aria-label", row.querySelector(".rotate-action-label")?.textContent?.trim() || "")
+      btn.append(...row.childNodes)
+      row.replaceWith(btn)
     })
 
     // 2. The "+ Other" CTA is disabled in the editor itself (there the

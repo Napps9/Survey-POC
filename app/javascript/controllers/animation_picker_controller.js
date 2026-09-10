@@ -1,15 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 import lottie from "lottie-web"
 
-// Modal that lets an editor swap a Range card's reaction animation — the
-// animation equivalent of the media picker for images. Mirrors media-picker's
-// open/close (the backdrop `hidden` toggle) and applies the pick by driving the
-// card's hidden <select> (survey-editor#setRangeTheme does the live left-panel
-// swap + autosave), so the visual picker and any keyboard/SR use share ONE
-// apply path. The animation URLs come from the #range-theme-picker JSON blob
-// already emitted in the editor head.
+// Modal that lets an editor swap a card's animation — the animation equivalent
+// of the media picker for images. Mirrors media-picker's open/close (the
+// backdrop `hidden` toggle) and applies the pick by driving the card's hidden
+// <select> (survey-editor#setRangeTheme / #setNpsShape does the live swap +
+// autosave), so the visual picker and any keyboard/SR use share ONE apply path.
+//
+// Two panes, because two card types have an animation and they are different
+// things:
+//   open()       Range — the reaction CHARACTER, a Lottie set per theme. URLs
+//                come from the #range-theme-picker JSON blob already emitted in
+//                the editor head, and each tile mounts a small looping preview.
+//   openShapes() NPS — the liquid CONTAINER. Its tiles are server-rendered SVG
+//                (nps_shape_preview), so there is nothing to mount and nothing
+//                to tear down.
 export default class extends Controller {
-  static targets = ["backdrop", "option", "preview"]
+  static targets = ["backdrop", "option", "preview", "lottiePane", "shapePane", "shapeOption"]
 
   connect() {
     this._activeCard = null
@@ -25,17 +32,32 @@ export default class extends Controller {
 
   // Opened by the "Change animation" CTA on a Range card's left panel.
   open(event) {
+    if (!this._activate(event, "lottie")) return
+    this._mountPreviews()
+    this._highlightCurrent()
+    this._instances.forEach(i => i.play())
+  }
+
+  // …and by the same CTA on an NPS card's, where the animation is the vessel.
+  openShapes(event) {
+    if (!this._activate(event, "shape")) return
+    this._highlightCurrentShape()
+  }
+
+  // The half both entry points share: find the card the CTA belongs to, show
+  // the pane that answers for its type, and open.
+  _activate(event, mode) {
     event?.preventDefault()
     const trigger = event?.currentTarget
     const card = trigger?.closest("[data-survey-editor-target='card']")
               || trigger?.closest(".survey-card-wrap")
-    if (!card) return
+    if (!card) return false
     this._activeCard = card
-    this._mountPreviews()
-    this._highlightCurrent()
+    if (this.hasLottiePaneTarget) this.lottiePaneTarget.hidden = mode !== "lottie"
+    if (this.hasShapePaneTarget)  this.shapePaneTarget.hidden  = mode !== "shape"
     this.backdropTarget.hidden = false
-    this._instances.forEach(i => i.play())
     document.addEventListener("keydown", this._escListener)
+    return true
   }
 
   close() {
@@ -54,14 +76,24 @@ export default class extends Controller {
   // <select> so survey-editor#setRangeTheme performs the live swap + autosave —
   // the exact same path the inline picker used, so behaviour can't drift.
   pick(event) {
+    this._apply(event, ".range-theme-select", this.optionTargets)
+  }
+
+  // Same contract for the NPS vessel — a different <select> and a different
+  // survey-editor action behind it, nothing else.
+  pickShape(event) {
+    this._apply(event, ".nps-shape-select", this.shapeOptionTargets)
+  }
+
+  _apply(event, selector, options) {
     const slug = event.currentTarget?.dataset.slug
     if (!slug || !this._activeCard) { this.close(); return }
-    const select = this._activeCard.querySelector(".range-theme-select")
+    const select = this._activeCard.querySelector(selector)
     if (select) {
       select.value = slug
       select.dispatchEvent(new Event("change", { bubbles: true }))
     }
-    this._markSelected(slug)
+    this._mark(options, slug)
     this.close()
   }
 
@@ -94,11 +126,19 @@ export default class extends Controller {
   _highlightCurrent() {
     const cur = this._activeCard?.querySelector(".range-theme-select")?.value
              || this._activeCard?.dataset.cardRangeTheme
-    this._markSelected(cur)
+    this._mark(this.optionTargets, cur)
   }
 
-  _markSelected(slug) {
-    this.optionTargets.forEach(o =>
+  // No dataset fallback here: an NPS card only carries data-card-nps-shape once
+  // the creator has picked one, and before that the <select> is already parked
+  // on the Verto-themed default the server chose (nps_shape_slug) — which is
+  // the shape the card is actually drawing, so it is the one to tick.
+  _highlightCurrentShape() {
+    this._mark(this.shapeOptionTargets, this._activeCard?.querySelector(".nps-shape-select")?.value)
+  }
+
+  _mark(options, slug) {
+    options.forEach(o =>
       o.setAttribute("aria-selected", o.dataset.slug === slug ? "true" : "false")
     )
   }

@@ -566,6 +566,7 @@ ko:
         delete_page: "✕ 이 페이지 삭제"
         add_page: "＋ 페이지 추가"
         prev_page: "이전 페이지"
+        next_page: "다음 페이지"
       add_question:
         add_to_survey: "설문에 추가 →"
         adding: "추가하는 중…"
@@ -1095,6 +1096,8 @@ ko:
     animation_bg_image: "이미지 사용"
     animation_bg_clear: "브랜드 색상으로 되돌리기"
     animation_bg_hint: "이 카드의 애니메이션 뒤에만 표시됩니다. 설정하지 않으면 브랜드의 패널 색상이 사용됩니다."
+    card_bg: "카드 배경"
+    card_bg_hint: "이 카드 패널 뒤에 깔려요 — 애니메이션이 있든 아무것도 없든 — 휴대폰에서는 카드의 위쪽 절반 전체가 돼요. 지정하지 않으면 브랜드의 패널 색을 사용해요."
     animate_asset: "애셋 애니메이션"
     animate_asset_hint: "느리고 부드럽게 확대·축소를 반복합니다."
     focal_label: "모바일 헤더 위치"
@@ -1172,6 +1175,7 @@ ko:
     slider_axis_vertical: "세로 레이아웃으로 전환"
     animation_modal_title: "애니메이션 선택"
     animation_modal_sub: "응답자가 슬라이더를 드래그하면 이 캐릭터가 반응해요. Verto 테마에 맞춰 선택된 캐릭터이며, 언제든지 바꿀 수 있어요."
+    nps_animation_modal_sub: "응답자가 드래그해서 이 용기를 자기 답만큼 채워요. Verto 테마에 맞춰 선택된 용기이며, 언제든지 바꿀 수 있어요."
     close: "닫기"
     add_design: 디자인 추가
     add_design_title: 이 카드에 이미지 추가

@@ -566,6 +566,7 @@ ja:
         delete_page: "✕ このページを削除"
         add_page: "＋ ページを追加"
         prev_page: "前のページ"
+        next_page: "次のページ"
       add_question:
         add_to_survey: "アンケートに追加 →"
         adding: "追加中…"
@@ -1095,6 +1096,8 @@ ja:
     animation_bg_image: "画像を使う"
     animation_bg_clear: "ブランドカラーに戻す"
     animation_bg_hint: "このカードのアニメーションの背面にのみ表示されます。未設定の場合はブランドのパネル色が使われます。"
+    card_bg: "カードの背景"
+    card_bg_hint: "このカードのパネルの後ろ（アニメーション、または何もない場合）に表示され、スマートフォンではカードの上半分すべてになります。設定しない場合はブランドのパネルカラーが使われます。"
     animate_asset: "アセットをアニメーション化"
     animate_asset_hint: "ゆっくりと優しくズームイン・アウトを繰り返します。"
     focal_label: "モバイルヘッダーの位置"
@@ -1172,6 +1175,7 @@ ja:
     slider_axis_vertical: "縦向きレイアウトに切り替え"
     animation_modal_title: "アニメーションを選択"
     animation_modal_sub: "このキャラクターは、回答者がスライダーを動かすと反応します。Vertoのテーマに合わせて選ばれていますが、いつでも変更できます。"
+    nps_animation_modal_sub: "回答者はドラッグして、この容器を自分の答えの高さまで満たします。Vertoのテーマに合わせて選ばれていますが、いつでも変更できます。"
     close: "閉じる"
     add_design: デザインを追加
     add_design_title: このカードに画像を追加

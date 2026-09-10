@@ -566,6 +566,7 @@ it:
         delete_page: "✕ Elimina questa pagina"
         add_page: "＋ Aggiungi pagina"
         prev_page: "Pagina precedente"
+        next_page: "Pagina successiva"
       add_question:
         add_to_survey: "Aggiungi al sondaggio →"
         adding: "Aggiunta in corso…"
@@ -1095,6 +1096,8 @@ it:
     animation_bg_image: "Usa un'immagine"
     animation_bg_clear: "Ripristina il colore del brand"
     animation_bg_hint: "Compare dietro l'animazione solo su questa scheda. Senza, la scheda usa il colore del pannello del tuo brand."
+    card_bg: "Sfondo della scheda"
+    card_bg_hint: "Sta dietro al pannello di questa scheda — un'animazione, o nulla — e su un telefono è tutta la metà superiore della scheda. Senza, la scheda usa il colore del pannello del tuo brand."
     animate_asset: "Anima risorsa"
     animate_asset_hint: "Uno zoom lento e delicato avanti e indietro, in loop."
     focal_label: "Posizione dell'intestazione mobile"
@@ -1172,6 +1175,7 @@ it:
     slider_axis_vertical: "Passa al layout verticale"
     animation_modal_title: "Scegli un'animazione"
     animation_modal_sub: "Questo personaggio reagisce mentre chi risponde trascina il cursore. È scelto per adattarsi al tema del tuo Verto: puoi cambiarlo quando vuoi."
+    nps_animation_modal_sub: "Chi risponde trascina per riempire questo contenitore fino alla propria risposta. È scelto per adattarsi al tema del tuo Verto: puoi cambiarlo quando vuoi."
     close: "Chiudi"
     add_design: Aggiungi design
     add_design_title: Aggiungi un'immagine a questa carta

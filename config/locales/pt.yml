@@ -566,6 +566,7 @@ pt:
         delete_page: "✕ Eliminar esta página"
         add_page: "＋ Adicionar página"
         prev_page: "Página anterior"
+        next_page: "Página seguinte"
       add_question:
         add_to_survey: "Adicionar ao inquérito →"
         adding: "A adicionar…"
@@ -1095,6 +1096,8 @@ pt:
     animation_bg_image: "Usar uma imagem"
     animation_bg_clear: "Repor a cor da marca"
     animation_bg_hint: "Aparece por trás da animação apenas neste cartão. Sem isto, o cartão usa a cor de painel da sua marca."
+    card_bg: "Fundo do cartão"
+    card_bg_hint: "Fica atrás do painel deste cartão — uma animação, ou nada — e no telemóvel é toda a metade superior do cartão. Sem ele, o cartão usa a cor de painel da sua marca."
     animate_asset: "Animar recurso"
     animate_asset_hint: "Um zoom lento e suave para dentro e para fora, em loop."
     focal_label: "Posição do cabeçalho móvel"
@@ -1172,6 +1175,7 @@ pt:
     slider_axis_vertical: "Mudar para esquema vertical"
     animation_modal_title: "Escolher uma animação"
     animation_modal_sub: "Esta personagem reage à medida que os respondentes arrastam o cursor. É escolhida para combinar com o tema do seu Verto — troque-a quando quiser."
+    nps_animation_modal_sub: "Os respondentes arrastam para encher este recipiente até à sua resposta. É escolhido para combinar com o tema do seu Verto — troque-o quando quiser."
     close: "Fechar"
     add_design: Adicionar design
     add_design_title: Adicionar uma imagem a este cartão

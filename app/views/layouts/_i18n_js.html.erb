@@ -24,7 +24,13 @@
         "reposition_chrome_statement", "reposition_chrome_answers",
         "consent_page_placeholder",
         "consent_agreement_kicker", "animation_theme",
-        "slider_axis_auto", "slider_axis_horizontal", "slider_axis_vertical"
+        "slider_axis_auto", "slider_axis_horizontal", "slider_axis_vertical",
+        # The left panel's "Change animation" CTA. type_panel_controller rebuilds
+        # that button when a card is switched TO Range or NPS (the server render
+        # that normally carries it doesn't happen on a type switch), so its two
+        # strings have to reach the browser or the button renders as a raw
+        # dotted key — the one failure this slice exists to prevent.
+        "change_animation", "change_animation_title"
       ),
       "player" => ns.call("player", locale).slice(
         "consent_agree", "consent_decline", "visit_website",

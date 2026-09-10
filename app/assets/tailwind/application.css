@@ -653,8 +653,15 @@
 }
 
 /* Editor-only picker under a Range slider to choose its reaction animation
-   theme. Neutral, colour-inherit styling so it reads on the card's background
-   in either panel. */
+   theme, and its NPS twin for the liquid container. Neutral, colour-inherit
+   styling so it reads on the card's background in either panel.
+
+   Both ship `hidden`: the visual picker (the animation-picker modal) is what a
+   creator uses, and these are only the apply path it drives — one code path for
+   the modal and for any keyboard/SR use. They are still styled because `hidden`
+   is a state, not a deletion, and a picker that ever shows should look like the
+   other one. */
+.nps-shape-picker,
 .range-theme-picker {
   display: flex;
   align-items: center;
@@ -666,6 +673,7 @@
   font-size: 0.8rem;
   opacity: 0.65;
 }
+.nps-shape-select,
 .range-theme-select {
   font-size: 0.8rem;
   padding: 4px 8px;
@@ -675,6 +683,7 @@
   color: inherit;
   cursor: pointer;
 }
+.nps-shape-select option,
 .range-theme-select option { color: #111; }
 
 /* Labels: vertical column, top label = highest value. column-reverse keeps
@@ -1070,6 +1079,16 @@
   overflow: hidden;
 }
 .anim-option-preview svg { width: 100% !important; height: 100% !important; }
+/* NPS vessel tiles. The preview is the REAL vessel (nps_shape_preview), part
+   filled so it reads as something that fills up rather than as a silhouette —
+   which means it arrives carrying .nps-control's card-scale sizing (a 320px
+   stage). Restate the height at tile scale; the aspect-ratio is the shape's own
+   (--nps-aspect, inline per vessel) and stays untouched, so a mug still reads
+   wider than a test tube.
+   The waves and bubbles keep their animations: the modal is `hidden` when it is
+   closed, and display:none suspends them, so ten looping vessels cost nothing
+   until someone is actually choosing one. */
+.anim-option-shape .nps-control { --nps-h: 76px; height: 76px; }
 .anim-option-label {
   font-size: 0.8rem;
   font-family: "Alata", sans-serif;
@@ -3967,26 +3986,43 @@
    card's "Add statement".
 
    min-height 44px is the iOS touch minimum; the old 8px padding on a 13px
-   label came to 33px. */
+   label came to 33px.
+
+   NO PLATE. It used to paint a tinted fill inside a solid ring — a filled pill
+   sitting under the option rows, which on a branded Verto read as one more
+   answer to pick rather than as the way to write your own ("the Other cta
+   should be floating with no solid block behind it"). It floats now: the label
+   IS the control, in the brand colour, over whatever the card is. The 44px box
+   is unchanged — it is a touch target, not a look, and it is still there
+   whether or not anything is painted in it. */
 .other-cta-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   min-height: 44px; padding: 10px 20px; border-radius: 100px;
-  background: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 12%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 45%, transparent);
+  background: transparent;
+  border: 0;
   font-family: "ABeeZee", sans-serif; font-size: 14px; font-weight: 600;
   /* Mixed toward black: the brand primary is a light teal by default and sets
      no readable text colour on a white card on its own. */
   color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 70%, #000);
-  cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+  /* The only mark it carries at rest. A floating text CTA with nothing under it
+     is a word, and a word among answers doesn't read as pressable — so the
+     underline does the work the ring used to, without a block. */
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 45%, transparent);
+  cursor: pointer; transition: color 0.15s, text-decoration-color 0.15s;
 }
 .other-cta-btn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 20%, transparent);
-  border-color: var(--brand-primary, var(--color-green-500));
+  color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 85%, #000);
+  text-decoration-color: currentColor;
 }
+/* Open. The panel below it is the state now — this only has to say which of the
+   two the button is, so it goes to full strength and drops the underline (there
+   is nothing left to invite). Still no plate. */
 .other-cta-btn.is-active {
-  background: var(--brand-primary, var(--color-green-500));
-  border-color: var(--brand-primary, var(--color-green-500));
-  color: #06281F;
+  color: color-mix(in srgb, var(--brand-primary, var(--color-green-500)) 85%, #000);
+  text-decoration-color: transparent;
 }
 /* Disabled ONLY in the editor, where the card is a preview and the box below
    is not a real answer surface (_card_component.html.erb:1128). */
@@ -7725,7 +7761,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.split-left-img)   .split-left,
   .preview-overlay .split-card:has(.split-left-video) .split-left,
   .preview-overlay .split-card:has(.card-lottie)      .split-left,
-  .preview-overlay .split-card:has(.nps-lottie)       .split-left {
+  .preview-overlay .split-card:has(.nps-lottie)       .split-left,
+  /* …and a card whose panel is NOTHING BUT a backdrop the creator chose. Every
+     other entry here is a medium that needs a box to fill; this one is a box
+     with a colour or a picture painted straight onto it (card_media_bg_style,
+     inline). It is on this list because without it the phone was the one place
+     the control did nothing: a media-less card's .split-left is display:
+     contents below, so the backdrop had no strip to paint and the creator's
+     pick vanished on exactly the screen they picked it for.
+     Written as :has(.has-media-bg) — one class inside the :has(), so this rule
+     stays (0,4,0) like the rest of the list and the `display: contents`
+     branches for NPS / tap / prioritise still win on source order. Those three
+     drop the strip because their ANSWER needs the card; a backdrop is not a
+     reason to take that back. */
+  .preview-overlay .split-card:has(.has-media-bg)     .split-left {
     display: block;
     position: relative;
     width: 100%;
@@ -8119,7 +8168,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.split-left-img)   .split-right,
   .preview-overlay .split-card:has(.split-left-video) .split-right,
   .preview-overlay .split-card:has(.card-lottie)      .split-right,
-  .preview-overlay .split-card:has(.nps-lottie)       .split-right {
+  .preview-overlay .split-card:has(.nps-lottie)       .split-right,
+  .preview-overlay .split-card:has(.has-media-bg)     .split-right {
     margin-top: calc(-1 * var(--play-lip));
     border-radius: var(--play-lip) var(--play-lip) 0 0;
     z-index: 1;
@@ -8186,6 +8236,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
      all of them are (0,4,0) against the base rule's (0,3,0), and the
      contents-branches must land last. */
   .preview-overlay .split-card:has(.split-left-img, .split-left-video, .card-lottie) .split-right {
+    padding-top: var(--play-pad-y);
+  }
+  /* A backdrop-only card earns the same reset for the same reason — it has a
+     strip now, so its bar rides that and not this panel. Its own rule rather
+     than a fourth entry in the list above: that selector is indexed by name in
+     player_hero_css_test, which reads the order of these three rules, and a
+     rule renamed under a test that matches on its name is a test that quietly
+     stops looking at anything. Sits between the two so the contents-branches
+     below still land last. */
+  .preview-overlay .split-card:has(.has-media-bg) .split-right {
     padding-top: var(--play-pad-y);
   }
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right {
@@ -9990,33 +10050,281 @@ body.generating-overlay-active .bottom-bar { display: none; }
   border: 8px solid #0e1020; border-radius: 34px;
 }
 
-/* Hero strip: a share of the viewport rather than a pixel band, so it keeps its
-   proportion whichever device is being previewed. */
-.device-tablet .split-left,
-.device-mobile .split-left {
-  width: 100%; flex: 0 0 auto;
-  height: 28%; min-height: 0; max-height: none;
-  border-radius: 0; overflow: hidden; position: relative;
+/* ── The frame runs the PLAYER'S mobile rules ──────────────────────────────
+   This block used to be a second, simpler opinion about what a phone card is:
+   a flat 28% hero on every card, a fixed 24px/22px pad, flex-start centring,
+   and none of the player's per-type structure. So a creator designing in the
+   phone frame was designing against a phone that does not exist — an NPS card
+   showed a hero the live player drops, every card's hero was 28% where the
+   player gives 45%, and the type sizes were the desktop card's. "The editor
+   needs to follow the mobile rules so the editor is the same experience as the
+   live verto in look and feel so editing makes sense to the creator."
+
+   It cannot simply BE those rules: they live inside the player's three-clause
+   phone media query (search "Where the PLAYER stops being a desktop
+   split-card"), and this frame is a 390px box on a desktop-width page — the
+   query is false here and always will be. So the rules are restated, and
+   restated by CONSUMING the same tokens rather than by copying their values:
+   everything below is var(--play-…), and the only thing this block decides for
+   itself is what those tokens resolve to on a frame whose viewport is the
+   bezel rather than the window.
+
+   Which is the one honest difference. The player's tokens are written against
+   the real viewport (5vw, 2.4svh); here the "viewport" is --device-w/--device-h,
+   so each is restated as the same fraction of those. Same clamp bounds, same
+   ratios — device_frame_parity_test holds them to it. */
+.device-tablet .split-card,
+.device-mobile .split-card {
+  /* The card IS the frame: no footer to subtract, unlike the player, where
+     --play-card-h is the overlay less its footer. */
+  --play-card-h:     var(--device-h);
+  --play-hero-h:     clamp(140px, calc(var(--play-card-h) * 0.45), 400px);
+  --play-hero-min:   96px;
+  --play-right-min:  clamp(240px, calc(var(--play-card-h) * 0.55), 500px);
+  --play-pad-x:      clamp(16px, calc(var(--device-w) * 0.05), 26px);
+  --play-pad-y:      clamp(14px, calc(var(--device-h) * 0.024), 22px);
+  --play-gap:        clamp(8px, calc(var(--device-h) * 0.016), 14px);
+  --play-bar-clear:  calc(10px + 6px + 12px);
+  --play-lip:        22px;
+  --play-eyebrow:    0.75rem;
+  --play-title:      1.625rem;
+  --play-subtitle:   0.9375rem;
+  --play-label:      1rem;
 }
+/* The tablet frame gets the tablet-portrait tier's absolutes, the same way the
+   player's own second tier does — same 45/55 of the same card, wider bounds. */
+.device-tablet .split-card {
+  --play-hero-h:     clamp(200px, calc(var(--play-card-h) * 0.45), 560px);
+  --play-right-min:  clamp(360px, calc(var(--play-card-h) * 0.55), 700px);
+  --play-pad-x:      clamp(26px, calc(var(--device-w) * 0.04), 44px);
+  --play-pad-y:      clamp(20px, calc(var(--device-h) * 0.026), 30px);
+  --play-title:      clamp(1.625rem, calc(var(--device-w) * 0.034), 2rem);
+  --play-subtitle:   clamp(0.9375rem, calc(var(--device-w) * 0.02), 1.0625rem);
+}
+
+/* No hero by default, exactly as the player: .split-left is display: contents
+   so .panel-progress still paints (absolutely, against .split-card) without the
+   panel box taking any layout room. `contents`, never `none` — the bar is
+   markup INSIDE the panel being dropped. */
+.device-tablet .split-left,
+.device-mobile .split-left { display: contents; }
+
+/* …and the one thing the player never has to think about. `display: contents`
+   promotes .split-left's children into the CARD's flex layout, and in the
+   editor one of those children is the creator's "Add design" block — a 74%-wide
+   dashed panel, which duly became a flex item and pushed the answer panel 174px
+   down a phone that has no hero at all. Measured, on the NPS card.
+   So it floats: the same treatment .split-left-cta-row already gets, stacked
+   just above it. Editor chrome belongs OVER the card, never in its layout — the
+   whole point of the frame is that what is laid out is what ships. Compact,
+   too: the block form's sub-line is a paragraph of guidance, and this is now a
+   pill, so the pill says the short half. */
+.device-tablet .split-left-design-prompt,
+.device-mobile .split-left-design-prompt {
+  position: absolute;
+  /* Clear of .split-left-cta-row, which sits at bottom:14px and can run to two
+     lines when its labels are long. Stated as the row's own offset plus a
+     two-line button so a retune of one moves the other. */
+  left: 50%; bottom: calc(14px + 48px + 10px);
+  transform: translateX(-50%);
+  z-index: 4;
+  width: auto; max-width: calc(100% - 28px);
+  flex-direction: row;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  border: 1px dashed rgba(255,255,255,0.4);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.device-tablet .split-left-design-prompt-icon,
+.device-mobile .split-left-design-prompt-icon {
+  width: 20px; height: 20px; font-size: 15px; border: 0;
+}
+.device-tablet .split-left-design-prompt-title,
+.device-mobile .split-left-design-prompt-title { font-size: 12px; letter-spacing: 0.04em; }
+.device-tablet .split-left-design-prompt-sub,
+.device-mobile .split-left-design-prompt-sub { display: none; }
+
+/* …and the same five media that DO earn a strip, at the same 45%. Kept as one
+   list with the player's, in the same order, so a medium added there and
+   missed here is a diff you can see. */
+.device-tablet .split-card:has(.split-left-img)   .split-left,
+.device-tablet .split-card:has(.split-left-video) .split-left,
+.device-tablet .split-card:has(.card-lottie)      .split-left,
+.device-tablet .split-card:has(.nps-lottie)       .split-left,
+.device-tablet .split-card:has(.has-media-bg)     .split-left,
+.device-mobile .split-card:has(.split-left-img)   .split-left,
+.device-mobile .split-card:has(.split-left-video) .split-left,
+.device-mobile .split-card:has(.card-lottie)      .split-left,
+.device-mobile .split-card:has(.nps-lottie)       .split-left,
+.device-mobile .split-card:has(.has-media-bg)     .split-left {
+  display: block;
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+  height: var(--play-hero-h);
+  min-height: var(--play-hero-min);
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--brand-panel, #2E3564);
+}
+/* The three types whose ANSWER needs the whole card drop the strip even when
+   they carry a picture — a tap matrix, an NPS container, a prioritise list.
+   Last, on source order, for the reason the player's copy spells out. */
+.device-tablet .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-left,
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-left {
+  display: contents;
+}
+/* A card that HAS a strip keeps the design prompt inside it, as the block it
+   was drawn to be — there is a panel to fill, and filling it is the invitation.
+   Stated as the strip's own list so the two can't disagree, and placed after
+   the float above for the same source-order reason everything else in this
+   block is: they are the same specificity. */
+.device-tablet .split-card:has(.split-left-img, .split-left-video, .card-lottie, .nps-lottie, .has-media-bg) .split-left-design-prompt,
+.device-mobile .split-card:has(.split-left-img, .split-left-video, .card-lottie, .nps-lottie, .has-media-bg) .split-left-design-prompt {
+  position: static;
+  transform: none;
+  width: 74%;
+  flex-direction: column;
+  padding: 26px 24px;
+  border-radius: 18px;
+  background: transparent;
+  border: 1.5px dashed color-mix(in srgb, var(--brand-text, #ffffff) 30%, transparent);
+  color: var(--brand-text, #ffffff);
+  backdrop-filter: none;
+}
+/* …and back to the pill for the three types that drop the strip even when the
+   card carries the markup for one. Last, like every other hero-off rule here. */
+.device-tablet .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-left-design-prompt,
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-left-design-prompt {
+  position: absolute;
+  transform: translateX(-50%);
+  width: auto;
+  flex-direction: row;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.55);
+  border: 1px dashed rgba(255,255,255,0.4);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+
 /* The answer panel takes the rest and SCROLLS — the frame is the viewport now,
    so a long option list behaves the way it will on the phone instead of
    stretching the phone.
 
-   It also rides up over the foot of the hero with a rounded top, which is what
-   covers the two dark wedges the old build left there: the strip had rounded
-   BOTTOM corners sitting directly on the near-black bezel fill, and the white
-   panel started flush below it, so the bezel showed through at both corners —
-   "the white bg should go up further to cover the black corners at the bottom
-   of the mobile header". Same construction the real player uses. */
+   `justify-content: safe center`, not flex-start: this is the player's own
+   centring, and `safe` is what stops an overflow being spent off the TOP of the
+   card, where the question is.
+
+   The lip below is what covers the two dark wedges the old build left at the
+   foot of the hero — the strip had rounded BOTTOM corners sitting on the
+   near-black bezel fill and the panel started flush beneath it. Same
+   construction, same 22px, stated once as --play-lip. */
 .device-tablet .split-right,
 .device-mobile .split-right {
-  width: 100%; flex: 1 1 auto; min-height: 0;
-  justify-content: flex-start; background: #fff;
+  width: 100%; flex: 1 1 auto;
+  min-height: var(--play-right-min);
+  background: #fff;
   overflow-y: auto; overscroll-behavior: contain;
   position: relative; z-index: 1;
-  margin-top: -18px;
-  border-radius: 18px 18px 0 0;
+  padding: var(--play-pad-y) var(--play-pad-x);
+  /* Clear the progress bar. On every card whose .split-left is display:
+     contents the bar rides THIS panel's top edge. Hero cards reset it below. */
+  padding-top: var(--play-bar-clear);
+  justify-content: safe center;
+  gap: var(--play-gap);
+  text-align: center;
+  margin-top: 0;
+  border-radius: 0;
 }
+/* A hero above means the bar is on the picture, so the panel keeps its ordinary
+   pad and rides the strip's bottom edge. */
+.device-tablet .split-card:has(.split-left-img, .split-left-video, .card-lottie, .nps-lottie, .has-media-bg) .split-right,
+.device-mobile .split-card:has(.split-left-img, .split-left-video, .card-lottie, .nps-lottie, .has-media-bg) .split-right {
+  padding-top: var(--play-pad-y);
+  margin-top: calc(-1 * var(--play-lip));
+  border-radius: var(--play-lip) var(--play-lip) 0 0;
+}
+/* …and the three hero-less types take the clearance back, and the lip with it —
+   they drop the strip even when the card carries the markup for one, so there
+   is no edge to ride and nothing to round over. Same specificity as the rule
+   above; source order is the whole mechanism. */
+.device-tablet .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right,
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-right {
+  padding-top: var(--play-bar-clear);
+  margin-top: 0;
+  border-radius: 0;
+}
+
+/* The NPS vessel scales with the phone rather than assuming the smallest one,
+   and the digit column takes the SAME track — the numbers align to the steps by
+   sharing the vessel's height, which is why this is one custom property and not
+   two. Same clamp the player states, with its svh read against the frame.
+   Without it the frame drew the desktop vessel (a flat 320px) inside a phone
+   panel, so a creator judged the one control on the card at a size the phone
+   never uses. */
+.device-tablet .split-card,
+.device-mobile .split-card {
+  --nps-vessel-h: clamp(232px, calc(var(--device-h) * 0.42), 320px);
+  --nps-h: var(--nps-vessel-h);
+}
+.device-tablet .nps-slider, .device-mobile .nps-slider { gap: 8px; }
+.device-tablet .nps-slider-stage, .device-mobile .nps-slider-stage { gap: 12px; }
+
+/* The bar the clearance above is measured against. --play-bar-clear is stated
+   as "the bar's own numbers plus air", so it is only correct while the bar has
+   the phone's numbers — 10px down and 6px tall, not the desktop card's 14/8. */
+.device-tablet .split-card .panel-progress,
+.device-mobile .split-card .panel-progress {
+  top: 10px; left: 14px; right: 14px;
+  height: 6px;
+}
+/* The hero's own edges, matching the player: full bleed, and the scrim deepened
+   into the panel so the photograph resolves into it instead of stopping on a
+   line. Desktop keeps the lighter scrim — there the panel sits BESIDE the
+   image, not under it. */
+.device-tablet .split-card:has(.split-left-img) .split-left-img,
+.device-tablet .split-card:has(.split-left-img) .split-left-overlay,
+.device-mobile .split-card:has(.split-left-img) .split-left-img,
+.device-mobile .split-card:has(.split-left-img) .split-left-overlay {
+  border-radius: 0;
+}
+.device-tablet .split-card:has(.split-left-img) .split-left-overlay,
+.device-mobile .split-card:has(.split-left-img) .split-left-overlay {
+  background: linear-gradient(transparent 42%, rgba(0,0,0,0.34) 88%, rgba(0,0,0,0.5));
+}
+
+/* Type. The player's phone tiers are flat floors rather than fluid — "content
+   and images can be lost before the question and answers change" — so these are
+   the same four tokens read in the same four places. Without them the creator
+   was judging the copy at the desktop card's sizes: a 22px question where the
+   phone draws 26, and a 14px option label where the phone draws 16. */
+.device-tablet .q-eyebrow,  .device-mobile .q-eyebrow  { font-size: var(--play-eyebrow); }
+.device-tablet .q-title,    .device-mobile .q-title    { font-size: var(--play-title); }
+.device-tablet .q-subtitle, .device-mobile .q-subtitle { font-size: var(--play-subtitle); }
+.device-tablet .pick-text,  .device-mobile .pick-text,
+.device-tablet .choice-label, .device-mobile .choice-label,
+.device-tablet .slider-label-text, .device-mobile .slider-label-text { font-size: var(--play-label); }
+
+/* Touch ergonomics. These come from the phone media query too, so at desktop
+   width the frame drew a 33px option row and 36px stars — targets a finger
+   cannot hit, on the view whose entire purpose is showing the creator what a
+   finger will meet. 44px is the iOS minimum and it is a floor, not a look. */
+.device-tablet .pick-item, .device-mobile .pick-item,
+.device-tablet .choice-card, .device-mobile .choice-card,
+.device-tablet .rotate-action-btn, .device-mobile .rotate-action-btn { min-height: 44px; }
+.device-tablet .pick-item, .device-mobile .pick-item { padding: 12px 14px; }
+.device-tablet .rating-wrap, .device-mobile .rating-wrap {
+  --rating-star-size: 56px;
+  --rating-star-gap: 8px;
+}
+.device-tablet .slider-track, .device-mobile .slider-track { width: 100%; height: 44px; }
+.device-tablet .slider-thumb, .device-mobile .slider-thumb { width: 52px; height: 52px; }
+
 /* …and the welcome logo has to come out of the float here for the same reason
    it does on a real phone: the panel is whatever the hero left behind, not a
    680px desktop column, so an absolutely-positioned logo lands ON TOP of the
@@ -10034,8 +10342,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
   position: static;
   flex: 0 0 auto;
 }
-.device-tablet .split-right { padding: 32px 40px; }
-.device-mobile .split-right { padding: 24px 22px; }
 /* Selected: the split-card's 2px transparent border IS the bezel in device
    modes, so the desktop rule's pink border-color would paint the whole
    14px/8px bezel. Keep the bezel dark and ring the frame instead. */

@@ -442,10 +442,24 @@ module ApplicationHelper
     bg.blank? ? "" : bg.to_json
   end
 
+  # Whether a card's panel can show a backdrop at all: anything but an opaque
+  # medium. An animation (a range card's reaction set, a pasted Lottie) has
+  # transparency to see through, and a card with NO media is nothing BUT its
+  # backdrop — which is the case that had no control until a creator asked for
+  # one on the phone view. A photo or a video covers the panel edge to edge, so
+  # a backdrop behind one is a control that does nothing and is not offered.
+  #
+  # The single definition of that rule: Survey.sanitize_cards_images! refuses to
+  # store a backdrop the same way, and media_picker#_cardTakesBackground is its
+  # client-side twin. Change one and change all three.
+  def card_takes_backdrop?(card)
+    return false unless card.is_a?(Hash)
+    return true if card["type"].to_s == "range" || card["lottie"].present?
+    card["image"].blank? && card["video"].blank?
+  end
+
   def card_media_bg(card)
-    return nil unless card.is_a?(Hash)
-    animated = card["type"].to_s == "range" || card["lottie"].present?
-    return nil unless animated
+    return nil unless card_takes_backdrop?(card)
 
     bg = card["media_bg"]
     bg.is_a?(Hash) && bg.slice("color", "image").compact_blank.any? ? bg.slice("color", "image").compact_blank : nil

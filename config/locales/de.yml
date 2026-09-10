@@ -566,6 +566,7 @@ de:
         delete_page: "✕ Diese Seite löschen"
         add_page: "＋ Seite hinzufügen"
         prev_page: "Vorherige Seite"
+        next_page: "Nächste Seite"
       add_question:
         add_to_survey: "Zur Umfrage hinzufügen →"
         adding: "Wird hinzugefügt…"
@@ -1095,6 +1096,8 @@ de:
     animation_bg_image: "Bild verwenden"
     animation_bg_clear: "Auf Markenfarbe zurücksetzen"
     animation_bg_hint: "Liegt nur auf dieser Karte hinter der Animation. Ohne eigene Angabe nutzt die Karte die Panelfarbe deiner Marke."
+    card_bg: "Kartenhintergrund"
+    card_bg_hint: "Liegt hinter dem Panel dieser Karte – hinter einer Animation oder hinter gar nichts – und auf dem Handy ist es die gesamte obere Kartenhälfte. Ohne ihn nutzt die Karte die Panel-Farbe deiner Marke."
     animate_asset: "Element animieren"
     animate_asset_hint: "Ein langsames, sanftes Heran- und Herauszoomen in Dauerschleife."
     focal_label: "Position der mobilen Kopfzeile"
@@ -1172,6 +1175,7 @@ de:
     slider_axis_vertical: "Zu vertikalem Layout wechseln"
     animation_modal_title: "Animation auswählen"
     animation_modal_sub: "Diese Figur reagiert, während Teilnehmende den Schieberegler ziehen. Sie passt zum Design deines Vertos – du kannst sie jederzeit austauschen."
+    nps_animation_modal_sub: "Teilnehmende ziehen, um dieses Gefäß bis zu ihrer Antwort zu füllen. Es passt zum Design deines Vertos – du kannst es jederzeit austauschen."
     close: "Schließen"
     add_design: Design hinzufügen
     add_design_title: Bild zu dieser Karte hinzufügen

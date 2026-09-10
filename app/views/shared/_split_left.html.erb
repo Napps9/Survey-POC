@@ -15,13 +15,30 @@
   has_media  = has_video || has_img
   credit_word = has_video ? "Video by" : "Photo by"
   animate_asset = card["animate_asset"] == true
+  is_range   = card["type"].to_s == "range"
+  # An NPS card's animation is the liquid container on the ANSWER side, not
+  # anything on this panel — but the CTA that changes it belongs here anyway,
+  # with every other "change this card's asset" control, so a creator has one
+  # place to look. Which means it has to survive all four media branches below
+  # rather than living in one of them.
+  is_nps     = card["type"].to_s == "nps"
 %>
 
-<%# The animation backdrop (card["media_bg"]) paints only where an animation
-    fills the panel; a photo or video covers .split-left itself, so there would
-    be nothing to see. Falls through to the Verto-wide --brand-panel when the
-    card hasn't set one. %>
-<div class="split-left<%= " has-asset-breathe" if animate_asset %>" style="<%= card_media_bg_style(card) %>">
+<%# The card backdrop (card["media_bg"]) paints wherever the panel is not
+    already covered by an opaque medium: behind an animation, and — since a
+    creator asked to be able to design the phone view of an ordinary card — on a
+    card carrying no media at all, where the panel IS the design. A photo or a
+    video covers .split-left itself, so there is nothing to see behind one and
+    nothing is offered. Falls through to the Verto-wide --brand-panel when the
+    card hasn't set one.
+
+    The class matters as much as the style: on a phone a card with no media has
+    no hero strip at all (.split-left is display: contents, see the mobile block
+    in application.css), so a backdrop with nothing to paint on would be a
+    control that silently did nothing on the one surface it was asked for.
+    .has-media-bg is what earns that card its strip back. %>
+<% has_media_bg = card_media_bg(card).present? %>
+<div class="split-left<%= " has-asset-breathe" if animate_asset %><%= " has-media-bg" if has_media_bg %>" style="<%= card_media_bg_style(card) %>">
   <% if card["type"].to_s == "range" %>
     <%# Range: the LEFT panel plays a Lottie animation that swaps to match the
         slider position. The lottie-player controller listens for the
@@ -91,27 +108,17 @@
       in the editor (e.g. range → NPS → range) finds it ready to reappear.
       CSS hides it while a Lottie is mounted (.split-left:has(.nps-lottie) …). %>
   <% if editable %>
-    <% if card["type"].to_s == "range" %>
+    <% if is_range %>
       <%# Range cards play a Lottie instead of an image — give the animation its
           own "change" CTA (the animation counterpart of the media picker), on
           the panel like every other asset's. A distinct class so the
           .split-left:has(.nps-lottie) rule that hides the image chrome leaves
           this one visible. A second CTA opens the ordinary media picker for
-          this card's Animation background (media-picker#open already shows
-          that section for a range card — _cardAnimates just checks the card
-          type — the only gap was nothing on this panel ever calling it). %>
+          this card's background (media-picker#open already shows that section
+          for a range card — _cardTakesBackground just checks the card type —
+          the only gap was nothing on this panel ever calling it). %>
       <div class="split-left-cta-row">
-        <button type="button" class="add-animation-fab"
-                data-action="click->animation-picker#open"
-                title="<%= t("editor.change_animation_title", default: "Change this card's animation") %>">
-          <span class="add-animation-fab-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="16" rx="3"></rect>
-              <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
-            </svg>
-          </span>
-          <span><%= t("editor.change_animation", default: "Change animation") %></span>
-        </button>
+        <%= render "shared/change_animation_cta", action: "open" %>
         <button type="button" class="add-bg-fab"
                 data-action="click->media-picker#open"
                 title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
@@ -123,13 +130,15 @@
           behind it is a real design decision rather than nothing — and this
           panel offered no way to make it ("I need the Change Background
           option here for when we upload transparent lottie files"). Only the
-          entry point was missing: media-picker#_cardAnimates already returns
-          true for any card carrying a lottie, not just for range, so the
-          Animation background section has been in that modal all along with
-          nothing on this panel calling it.
-          Scoped to lotties deliberately. A photo or a video is opaque; a
-          background behind one is a control that does nothing. %>
+          entry point was missing: media-picker#_cardTakesBackground already
+          returns true for any card carrying a lottie, not just for range, so
+          the background section has been in that modal all along with nothing
+          on this panel calling it.
+          The one branch that gets no Background CTA is the next one down: a
+          photo or a video is opaque, so a backdrop behind one is a control
+          that does nothing. See ApplicationHelper#card_takes_backdrop?. %>
       <div class="split-left-cta-row">
+        <%= render "shared/change_animation_cta", action: "openShapes" if is_nps %>
         <button type="button" class="add-media-fab"
                 data-action="click->media-picker#open"
                 title="<%= t("editor.change_media_title") %>">
@@ -150,6 +159,7 @@
           photo and on a video; the crop-and-zoom hand-off inside the stage is
           the part that needs a same-origin still. %>
       <div class="split-left-cta-row">
+        <%= render "shared/change_animation_cta", action: "openShapes" if is_nps %>
         <button type="button" class="add-media-fab"
                 data-action="click->media-picker#open"
                 title="<%= t("editor.change_media_title") %>">
@@ -176,10 +186,28 @@
         <span class="split-left-design-prompt-title"><%= t("editor.add_design") %></span>
         <span class="split-left-design-prompt-sub"><%= t("editor.add_design_sub") %></span>
       </button>
-      <%# Hidden until media lands on this card without a server render —
-          media_picker#_syncAdjustFab reveals it, the same stays-in-the-DOM
-          contract as the design prompt above. %>
+      <%# Reposition is hidden until media lands on this card without a server
+          render — media_picker#_syncAdjustFab reveals it, the same
+          stays-in-the-DOM contract as the design prompt above.
+
+          Background is NOT hidden. A card with no media is the one card whose
+          panel is nothing but a colour, and until now it was the one card that
+          could not choose it: the CTA existed only for range and Lottie cards,
+          on the reasoning that a photo or a video is opaque so a backdrop
+          behind one does nothing. True — and it left the case where the
+          backdrop is the whole design with no control at all, which is what
+          "users should be able to add background colours/images to the mobile
+          view" is about. On a phone this panel IS the card's top half
+          (.split-left.has-media-bg, see the mobile block in application.css).
+          media_picker#_syncAdjustFab hides it again if media does arrive, where
+          it would once more be a control that does nothing. %>
       <div class="split-left-cta-row">
+        <%= render "shared/change_animation_cta", action: "openShapes" if is_nps %>
+        <button type="button" class="add-bg-fab card-bg-fab"
+                data-action="click->media-picker#open"
+                title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
+          <span><%= t("editor.change_background", default: "Background") %></span>
+        </button>
         <button type="button" class="add-bg-fab media-adjust-fab"
                 data-action="click->media-picker#openAdjust"
                 title="<%= t("editor.reposition_title", default: "Reframe this card's media — drag to reposition, or crop and zoom a photo") %>"

@@ -2149,9 +2149,18 @@ export default class extends Controller {
   // the "Crop & zoom" button inside it. Kept in sync here so just-applied
   // media gets its fab without waiting for the next server render.
   _syncAdjustFab(card) {
+    const hasMedia = !!(card?.dataset.cardImage || card?.dataset.cardVideo)
     const fab = card?.querySelector(".media-adjust-fab")
-    if (!fab) return
-    fab.hidden = !(card.dataset.cardImage || card.dataset.cardVideo)
+    if (fab) fab.hidden = !hasMedia
+    // …and its opposite number on the no-media panel. "Background" is offered
+    // exactly where it does something (see ApplicationHelper#card_takes_backdrop?
+    // for the one statement of that rule): on a bare card the backdrop IS the
+    // design, and the moment a photo lands it is a control that changes nothing
+    // a respondent will ever see. Only the CTA that ships on the bare panel —
+    // range and Lottie cards have their own, and theirs stays whatever happens
+    // to the card's image, because an animation keeps its transparency.
+    const bg = card?.querySelector(".card-bg-fab")
+    if (bg) bg.hidden = hasMedia
   }
 
   // The same rule for one tap statement's chip: it exists only where there is
@@ -2302,10 +2311,17 @@ export default class extends Controller {
   // overriding the Verto-wide --brand-panel. Stored as card.media_bg and read
   // back off the card row by the editor serialiser.
 
-  get _cardAnimates() {
+  // Client-side twin of ApplicationHelper#card_takes_backdrop? and the
+  // media_bg branch of Survey.sanitize_cards_images!. Anything but an opaque
+  // medium: an animation has transparency to see through, and a card with no
+  // media is nothing BUT its backdrop — which is the case that had no control
+  // at all until a creator asked to design the phone view of an ordinary card.
+  // Behind a photo or a video there is nothing to see, so nothing is offered.
+  get _cardTakesBackground() {
     const card = this._activeCard
     if (!card) return false
-    return card.dataset.cardType === "range" || !!card.dataset.cardLottie
+    if (card.dataset.cardType === "range" || card.dataset.cardLottie) return true
+    return !card.dataset.cardImage && !card.dataset.cardVideo
   }
 
   _readAnimBg() {
@@ -2331,6 +2347,12 @@ export default class extends Controller {
       left.style.backgroundImage = clean.image ? `url('${String(clean.image).replace(/'/g, "\\'")}')` : ""
       left.style.backgroundSize     = clean.image ? "cover" : ""
       left.style.backgroundPosition = clean.image ? "center" : ""
+      // The class, not just the paint. On a phone a media-less card has no hero
+      // strip at all — .split-left is display: contents — and .has-media-bg is
+      // what gives it one, so without this the creator picks a colour, watches
+      // the desktop panel change, and sees nothing at all in the mobile frame
+      // they picked it for. Mirrors _split_left.html.erb.
+      left.classList.toggle("has-media-bg", Object.keys(clean).length > 0)
     }
     // _notifyDirty, not dispatch("changed"): the editor root listens for
     // `input`, and there is no media-picker:changed binding to pick up — a
@@ -2340,7 +2362,7 @@ export default class extends Controller {
   }
 
   _syncAnimationBg() {
-    const show = this._mode === "card" && this._cardAnimates
+    const show = this._mode === "card" && this._cardTakesBackground
     if (this.hasAnimBgSectionTarget) this.animBgSectionTarget.hidden = !show
     if (!show) return
     const bg = this._readAnimBg()

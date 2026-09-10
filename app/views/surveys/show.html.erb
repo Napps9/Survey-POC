@@ -23,6 +23,11 @@
     type-panel (to build the theme picker on a type switch) and survey-editor
     (to swap the live preview when the picker changes). %>
 <script id="range-theme-picker" type="application/json"><%= range_theme_picker_data.to_json.html_safe %></script>
+<%# NPS container silhouettes, grouped — read by type-panel to rebuild the
+    card's hidden shape <select> when a card is switched to NPS. No asset URLs
+    to carry: a vessel is drawn from its own geometry (lib/nps_vessels), not
+    fetched. %>
+<script id="nps-shape-picker" type="application/json"><%= nps_shape_picker_data.to_json.html_safe %></script>
 <%# Full cards incl. per-language i18n — the editor's language tabs swap text
     from here without a server round-trip. %>
 <script id="survey-cards-i18n" type="application/json"><%= editor_cards_i18n(@survey.cards).to_json.html_safe %></script>

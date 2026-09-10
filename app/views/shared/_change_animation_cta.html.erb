@@ -1,0 +1,24 @@
+<%# The "Change animation" CTA on a card's left panel.
+
+    Two card types have an animation to change and they are not the same
+    animation: a Range card's is the reaction CHARACTER on this panel, an NPS
+    card's is the liquid CONTAINER on the answer side. The control is the same
+    control either way — one button, on the panel where every other "change
+    this card's asset" CTA already lives, so a creator learns one place —
+    so it is one partial rather than two near-identical buttons.
+
+    Locals:
+      action — the animation-picker method to open (`open` for a Range card's
+               character sets, `openShapes` for an NPS card's containers)
+%>
+<button type="button" class="add-animation-fab"
+        data-action="click->animation-picker#<%= action %>"
+        title="<%= t("editor.change_animation_title", default: "Change this card's animation") %>">
+  <span class="add-animation-fab-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+      <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"></path>
+    </svg>
+  </span>
+  <span><%= t("editor.change_animation", default: "Change animation") %></span>
+</button>

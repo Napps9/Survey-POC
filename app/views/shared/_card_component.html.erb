@@ -789,12 +789,14 @@
           their number. Defaults to the classic 0–10 (the reactive Lottie now
           lives on Range). Labels are editable and drive the step count, so a
           creator can keep 0–10, use a shorter 4/5-point scale, or swap in an
-          agree/emotion range. The container silhouette is themed per Verto
-          (nps_container_shape). column-reverse stacks index 0 at the bottom,
-          matching the fill rising from the bottom. The stored answer is the
-          0-indexed position. %>
+          agree/emotion range. The container silhouette is the card's own
+          `nps_shape` where the creator picked one and the Verto-themed default
+          otherwise (nps_shape_slug). column-reverse stacks index 0 at the
+          bottom, matching the fill rising from the bottom. The stored answer is
+          the 0-indexed position. %>
       <% labels = Array(display["options"]).presence || nps_default_labels %>
       <% n = [labels.size, 2].max %>
+      <% shape = nps_shape_slug(card, @survey) %>
       <div class="nps-slider"
            data-controller="nps-slider"
            data-nps-slider-steps-value="<%= n %>"
@@ -802,15 +804,36 @@
            data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
            tabindex="0" role="slider"
            aria-valuemin="0" aria-valuemax="<%= n - 1 %>">
-        <div class="nps-slider-stage" style="<%= nps_stage_style(nps_container_shape(@survey)) %>">
+        <div class="nps-slider-stage" style="<%= nps_stage_style(shape) %>">
           <div class="slider-labels nps-slider-labels">
             <% labels.each do |opt| %>
               <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>
             <% end %>
           </div>
-          <%= render_nps_control(shape: nps_container_shape(@survey), steps: n) %>
+          <%= render_nps_control(shape: shape, steps: n) %>
         </div>
       </div>
+      <% if editable %>
+        <%# The container this card fills, driven by the "Change animation" CTA
+            on the left panel — the same arrangement Range uses: a hidden
+            <select> is the one apply path, so the visual picker and any
+            keyboard/SR use go through survey-editor#setNpsShape together and
+            can't drift. Hidden rather than absent because the modal needs
+            something to drive, and _stripEditorChrome has to find something to
+            remove. %>
+        <div class="nps-shape-picker" hidden>
+          <label class="range-theme-label"><%= t("editor.animation_theme", default: "Animation") %></label>
+          <select class="nps-shape-select" data-action="change->survey-editor#setNpsShape">
+            <% nps_shape_groups.each do |category, opts| %>
+              <optgroup label="<%= category %>">
+                <% opts.each do |label, slug| %>
+                  <option value="<%= slug %>" <%= "selected" if slug == shape %>><%= label %></option>
+                <% end %>
+              </optgroup>
+            <% end %>
+          </select>
+        </div>
+      <% end %>
 
     <% when "rating" %>
       <%# Every star carries its own label, and every label is rendered — the two

@@ -1,8 +1,16 @@
-<%# Animation picker modal — opened from the "Change animation" CTA on a Range
-    card's left panel. The animation counterpart of the media picker: a grid of
-    the reaction-animation sets, grouped by category, each a small looping
-    preview. Picking one drives the card's hidden <select> so
-    survey-editor#setRangeTheme does the live swap + autosave. %>
+<%# Animation picker modal — opened from the "Change animation" CTA on a card's
+    left panel. The animation counterpart of the media picker.
+
+    TWO panes, one modal, because two card types have an animation and they are
+    different things: a Range card picks a reaction CHARACTER (a looping Lottie
+    per set), an NPS card picks the liquid CONTAINER it fills. The creator's
+    action is the same in both cases — "change this card's animation" — so
+    splitting it into two modals would be two names for one job. Which pane
+    opens is decided by the CTA (animation-picker#open vs #openShapes).
+
+    Either pick drives the card's own hidden <select>, so survey-editor does the
+    live swap + autosave and the visual picker shares ONE apply path with any
+    keyboard/SR use. %>
 <div class="media-modal-backdrop"
      data-animation-picker-target="backdrop"
      data-action="click->animation-picker#backdropClick"
@@ -17,28 +25,62 @@
     </div>
 
     <div class="media-modal-body">
-      <p class="anim-modal-sub"><%= t("editor.animation_modal_sub", default: "This character reacts as respondents drag the slider. It's picked to match your Verto's theme — swap it any time.") %></p>
 
-      <% range_theme_groups.each do |category, opts| %>
-        <div class="anim-group">
-          <div class="anim-group-label"><%= category %></div>
-          <div class="anim-grid">
-            <% opts.each do |label, slug| %>
-              <button type="button" class="anim-option"
-                      role="option" aria-selected="false"
-                      data-slug="<%= slug %>"
-                      data-animation-picker-target="option"
-                      data-action="click->animation-picker#pick"
-                      title="<%= label %>">
-                <span class="anim-option-preview"
-                      data-animation-picker-target="preview"
-                      data-slug="<%= slug %>"></span>
-                <span class="anim-option-label"><%= label %></span>
-              </button>
-            <% end %>
+      <%# ── Range: the reaction character ── %>
+      <div data-animation-picker-target="lottiePane">
+        <p class="anim-modal-sub"><%= t("editor.animation_modal_sub", default: "This character reacts as respondents drag the slider. It's picked to match your Verto's theme — swap it any time.") %></p>
+
+        <% range_theme_groups.each do |category, opts| %>
+          <div class="anim-group">
+            <div class="anim-group-label"><%= category %></div>
+            <div class="anim-grid">
+              <% opts.each do |label, slug| %>
+                <button type="button" class="anim-option"
+                        role="option" aria-selected="false"
+                        data-slug="<%= slug %>"
+                        data-animation-picker-target="option"
+                        data-action="click->animation-picker#pick"
+                        title="<%= label %>">
+                  <span class="anim-option-preview"
+                        data-animation-picker-target="preview"
+                        data-slug="<%= slug %>"></span>
+                  <span class="anim-option-label"><%= label %></span>
+                </button>
+              <% end %>
+            </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
+
+      <%# ── NPS: the liquid container ──
+          The tiles are the real vessel SVG, part-filled, rather than a picture
+          of one: an NPS container has no still frame to preview the way a
+          Lottie set does, and an empty silhouette doesn't read as something
+          that fills up. Server-rendered because the drawing is already a
+          server-side helper — no second code path, and no Lottie to mount. %>
+      <div data-animation-picker-target="shapePane" hidden>
+        <p class="anim-modal-sub"><%= t("editor.nps_animation_modal_sub", default: "Respondents drag to fill this container to their answer. It's picked to match your Verto's theme — swap it any time.") %></p>
+
+        <% nps_shape_groups.each do |category, opts| %>
+          <div class="anim-group">
+            <div class="anim-group-label"><%= category %></div>
+            <div class="anim-grid">
+              <% opts.each do |label, slug| %>
+                <button type="button" class="anim-option anim-option-shape"
+                        role="option" aria-selected="false"
+                        data-slug="<%= slug %>"
+                        data-animation-picker-target="shapeOption"
+                        data-action="click->animation-picker#pickShape"
+                        title="<%= label %>">
+                  <span class="anim-option-preview"><%= nps_shape_preview(slug) %></span>
+                  <span class="anim-option-label"><%= label %></span>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
     </div>
 
   </div>

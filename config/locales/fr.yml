@@ -566,6 +566,7 @@ fr:
         delete_page: "✕ Supprimer cette page"
         add_page: "＋ Ajouter une page"
         prev_page: "Page précédente"
+        next_page: "Page suivante"
       add_question:
         add_to_survey: "Ajouter au sondage →"
         adding: "Ajout…"
@@ -1095,6 +1096,8 @@ fr:
     animation_bg_image: "Utiliser une image"
     animation_bg_clear: "Rétablir la couleur de marque"
     animation_bg_hint: "S'affiche derrière l'animation sur cette carte uniquement. Sans cela, la carte utilise la couleur de panneau de votre marque."
+    card_bg: "Arrière-plan de la carte"
+    card_bg_hint: "Se place derrière le panneau de cette carte — une animation, ou rien du tout — et sur un téléphone il occupe toute la moitié supérieure. Sans lui, la carte utilise la couleur de panneau de votre marque."
     animate_asset: "Animer l'élément"
     animate_asset_hint: "Un léger zoom avant/arrière lent, en boucle."
     focal_label: "Position de l'en-tête mobile"
@@ -1172,6 +1175,7 @@ fr:
     slider_axis_vertical: "Passer à la disposition verticale"
     animation_modal_title: "Choisir une animation"
     animation_modal_sub: "Ce personnage réagit quand les participants font glisser le curseur. Il est choisi pour correspondre au thème de votre Verto — changez-le quand vous voulez."
+    nps_animation_modal_sub: "Les participants font glisser pour remplir ce récipient jusqu'à leur réponse. Il est choisi pour correspondre au thème de votre Verto — changez-le quand vous voulez."
     close: "Fermer"
     add_design: Ajouter un design
     add_design_title: Ajouter une image à cette carte

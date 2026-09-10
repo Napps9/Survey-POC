@@ -168,6 +168,85 @@ module NpsHelper
     card["type"].to_s == "nps"
   end
 
+  # ── The NPS card's own animation: which vessel it fills ────────────────────
+  # A range card picks a reaction CHARACTER (range_theme, above); an NPS card's
+  # animation IS its liquid container, and until now a creator could not choose
+  # one — the shape was derived from the Verto's theme and that was that
+  # (ApplicationHelper#nps_container_shape). Same shape of control as
+  # range_theme: an editor picker writes a slug onto the card, the card's own
+  # value wins where it is a real vessel, and the themed pick stays the default
+  # so nothing changes for a deck nobody has touched.
+  #
+  # Grouped by what the container IS, which is how a creator looks for one — the
+  # same reasoning as RANGE_THEME_GROUPS. Every NPS_VESSELS key must appear in
+  # exactly one group (nps_shape_test holds that), so a vessel added to the
+  # drawing table can't quietly go missing from the picker.
+  NPS_SHAPE_GROUPS = {
+    "Simple"  => %w[pill],
+    "Drinks"  => %w[glass bottle can mug],
+    "Science" => %w[flask beaker tube],
+    "Food"    => %w[jar popsicle]
+  }.freeze
+
+  # Picker display names where the slug doesn't read right on its own — the
+  # code calls the default a "pill" because that is the silhouette, but a
+  # creator scanning a grid reads "Pill" as medicine.
+  NPS_SHAPE_LABELS = {
+    "pill"     => "Capsule",
+    "tube"     => "Test Tube",
+    "can"      => "Drinks Can",
+    "popsicle" => "Ice Lolly"
+  }.freeze
+
+  def nps_shape_label(shape)
+    NPS_SHAPE_LABELS[shape] || shape.to_s.titleize
+  end
+
+  # [[category, [[label, slug], …]], …] for the shape picker's grouped grid.
+  def nps_shape_groups
+    NPS_SHAPE_GROUPS.map { |cat, shapes| [ cat, shapes.map { |s| [ nps_shape_label(s), s ] } ] }
+  end
+
+  # Editor payload for the shape picker: the same groups, as JSON, so the type
+  # panel can rebuild a card's hidden <select> on a type switch without a
+  # round-trip. Deliberately carries no geometry — lib/nps_vessels is already a
+  # mirror of NPS_VESSELS and sending the paths a second time would make a third
+  # copy to keep in sync.
+  def nps_shape_picker_data
+    {
+      label:  t("editor.animation_theme", default: "Animation"),
+      groups: NPS_SHAPE_GROUPS.map do |cat, shapes|
+        { category: cat, shapes: shapes.map { |s| { slug: s, label: nps_shape_label(s) } } }
+      end
+    }
+  end
+
+  # The container an NPS card actually fills: its own `nps_shape` when that's a
+  # vessel we can draw, otherwise the Verto-themed default. Safe on any card
+  # hash, and on a nil survey (the seeders and the type panel both reach it
+  # before a Verto is saved).
+  def nps_shape_slug(card, survey = nil)
+    slug = card.is_a?(Hash) ? card["nps_shape"].to_s : ""
+    return slug if NPS_VESSELS.key?(slug)
+    nps_container_shape(survey)
+  end
+
+  # One vessel drawn at rest for the picker's grid — the same SVG the card
+  # renders, so the tile is the thing itself rather than a drawing of it. Part
+  # filled, because an empty vessel and a full one look like two different
+  # controls and neither reads as "this fills up".
+  NPS_PREVIEW_FILL = 0.6
+
+  def nps_shape_preview(shape)
+    v = nps_vessel_for(shape)
+    content_tag :span, class: "nps-control nps-shape-#{shape}",
+                style: "#{nps_stage_style(shape)}; --nps-fill: #{NPS_PREVIEW_FILL}" do
+      # concat, matching render_nps_control — content_tag's block runs through
+      # capture, which reads the output buffer before the return value.
+      concat nps_vessel_svg(shape, v)
+    end
+  end
+
   # Default 0–10 labels when a card hasn't set its own.
   def nps_default_labels
     (0..(NPS_STEPS - 1)).map(&:to_s)

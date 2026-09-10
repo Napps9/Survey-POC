@@ -566,6 +566,7 @@ vi:
         delete_page: "✕ Xóa trang này"
         add_page: "＋ Thêm trang"
         prev_page: "Trang trước"
+        next_page: "Trang tiếp theo"
       add_question:
         add_to_survey: "Thêm vào khảo sát →"
         adding: "Đang thêm…"
@@ -1095,6 +1096,8 @@ vi:
     animation_bg_image: "Dùng hình ảnh"
     animation_bg_clear: "Đặt lại về màu thương hiệu"
     animation_bg_hint: "Chỉ hiển thị phía sau ảnh động trên thẻ này. Nếu không đặt, thẻ sẽ dùng màu bảng của thương hiệu bạn."
+    card_bg: "Nền của thẻ"
+    card_bg_hint: "Nằm sau bảng của thẻ này — một hoạt ảnh, hoặc không có gì — và trên điện thoại nó là toàn bộ nửa trên của thẻ. Nếu không đặt, thẻ dùng màu bảng của thương hiệu bạn."
     animate_asset: "Hoạt ảnh tài sản"
     animate_asset_hint: "Chuyển động phóng to thu nhỏ chậm rãi, nhẹ nhàng, lặp lại."
     focal_label: "Vị trí tiêu đề trên di động"
@@ -1172,6 +1175,7 @@ vi:
     slider_axis_vertical: "Chuyển sang bố cục dọc"
     animation_modal_title: "Chọn hoạt ảnh"
     animation_modal_sub: "Nhân vật này phản ứng khi người trả lời kéo thanh trượt. Nhân vật được chọn để hợp với chủ đề Verto của bạn — thay bất cứ lúc nào."
+    nps_animation_modal_sub: "Người trả lời kéo để đổ đầy vật chứa này đến mức câu trả lời của họ. Vật chứa được chọn để hợp với chủ đề Verto của bạn — thay bất cứ lúc nào."
     close: "Đóng"
     add_design: Thêm thiết kế
     add_design_title: Thêm hình ảnh vào thẻ này
