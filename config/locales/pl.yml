@@ -1607,7 +1607,7 @@ pl:
       - text: "Jaka jest Twoja data urodzenia?"
       - text: "Gdzie mieszkasz?"
         description: "Oparte na OpenStreetMap — pomaga zbudować mapę, którą możesz przeglądać po zakończeniu."
-      - text: "Płeć"
+      - text: "Która płeć najlepiej Cię opisuje?"
         options: ["Mężczyzna", "Kobieta", "Osoba niebinarna", "Inna", "Wolę nie mówić"]
     optional:
       heritage:

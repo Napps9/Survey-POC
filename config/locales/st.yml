@@ -1634,7 +1634,7 @@ st:
       - text: "O hlahile neng?"
       - text: "O dula kae?"
         description: "E tsamaiswa ke OpenStreetMap — e thusa ho aha mmapa oo o ka o sekasekang ha o qeta."
-      - text: "Bong"
+      - text: "Ke bong bofe bo o hlalosang ka ho fetisisa?"
         options: ["Monna", "Mosadi", "Ha se monna kapa mosadi", "E nngwe", "Ke kgetha ho se bue"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options

@@ -5,7 +5,7 @@ class CardSubjectExtractorTest < ActiveSupport::TestCase
   CARDS = [
     { "type" => "welcome_card", "text" => "Welcome" },
     { "type" => "open_ended", "text" => "How was the school canteen?" },
-    { "type" => "multiple_choice", "text" => "Gender", "demographic" => true,
+    { "type" => "multiple_choice", "text" => "What gender best describes you?", "demographic" => true,
       "options" => [ "Male", "Female", "Other" ] },
     { "type" => "yes_no", "text" => "Do you feel safe walking home at night?", "options" => %w[Yes No] }
   ].freeze
@@ -78,7 +78,8 @@ class CardSubjectExtractorTest < ActiveSupport::TestCase
     assert_includes sent, "How was the school canteen?"
     assert_includes sent, "Do you feel safe walking home at night?"
     refute_includes sent, "Welcome", "scaffolding cards have no subject of their own — must not be sent"
-    refute_includes sent, "Gender", "the demographic card's own copy must never be sent"
+    refute_includes sent, "What gender best describes you?",
+                    "the demographic card's own copy must never be sent"
   end
 
   test "an empty subject from the model is never stamped" do

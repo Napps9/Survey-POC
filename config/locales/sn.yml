@@ -1615,7 +1615,7 @@ sn:
       - text: "Wakaberekwa Riini?"
       - text: "Unogara Kupi?"
         description: "Inoshandiswa neOpenStreetMap — inobatsira kuvaka mepu yaunogona kuongorora mushure mekupedza."
-      - text: "Vukama"
+      - text: "Ndeipi jenda inokutsanangura zvakanyanya?"
         options: ["Murume", "Mukadzi", "Kwete Chikadzi Kana Chirume", "Zvimwe", "Handidi Kutaura"]
     optional:
       heritage:

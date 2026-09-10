@@ -685,7 +685,7 @@ class AssetPopulatorTest < ActiveSupport::TestCase
   # image search (the "Gender" card pulling identity/edgy stock for an 11-16
   # audience). Like scaffolding, it is theme-only.
   GENDER_CARD = {
-    "type" => "multiple_choice", "text" => "Gender", "demographic" => true,
+    "type" => "multiple_choice", "text" => "What gender best describes you?", "demographic" => true,
     "options" => [ "Male", "Female", "Non-binary", "Other", "Prefer not to say" ]
   }.freeze
 

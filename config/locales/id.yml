@@ -1604,7 +1604,7 @@ id:
       - text: "Kapan Anda lahir?"
       - text: "Di mana Anda tinggal?"
         description: "Didukung oleh OpenStreetMap — membantu membangun peta yang bisa Anda jelajahi setelah selesai."
-      - text: "Jenis kelamin"
+      - text: "Jenis kelamin mana yang paling menggambarkan Anda?"
         options: ["Laki-laki", "Perempuan", "Non-biner", "Lainnya", "Memilih untuk tidak menjawab"]
     optional:
       heritage:

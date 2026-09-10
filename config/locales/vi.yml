@@ -1604,7 +1604,7 @@ vi:
       - text: "Bạn sinh vào ngày nào?"
       - text: "Bạn sống ở đâu?"
         description: "Được hỗ trợ bởi OpenStreetMap — giúp tạo một bản đồ bạn có thể khám phá sau khi hoàn thành."
-      - text: "Giới tính"
+      - text: "Giới tính nào mô tả bạn đúng nhất?"
         options: ["Nam", "Nữ", "Phi nhị giới", "Khác", "Không muốn trả lời"]
     optional:
       heritage:

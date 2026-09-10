@@ -1605,7 +1605,7 @@ tr:
       - text: "Ne zaman doğdunuz?"
       - text: "Nerede yaşıyorsunuz?"
         description: "OpenStreetMap altyapısıyla — bitirdikten sonra keşfedebileceğiniz bir harita oluşturmaya yardımcı olur."
-      - text: "Cinsiyet"
+      - text: "Sizi en iyi tanımlayan cinsiyet hangisi?"
         options: ["Erkek", "Kadın", "Non-binary", "Diğer", "Belirtmek istemiyorum"]
     optional:
       heritage:

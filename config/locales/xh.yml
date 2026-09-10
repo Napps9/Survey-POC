@@ -1635,7 +1635,7 @@ xh:
       - text: "Wazalwa nini?"
       - text: "Uhlala phi?"
         description: "Iqhutywa yiOpenStreetMap — inceda ukwakha imephu onokuyihlola emva kokugqiba."
-      - text: "Isini"
+      - text: "Sesiphi isini esikuchaza kakuhle?"
         options: ["Indoda", "Umfazi", "Akulandeli", "Enye", "Ndikhetha ukungatsho"]
     # Imibuzo yedemografiki ozikhethelayo (DemographicQuestions::OPTIONAL_CARDS)
     # — ifanaselwe ngokwendawo yedemographic_key, AYIKHO ngokwendawo njengamakhadi

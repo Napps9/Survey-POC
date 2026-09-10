@@ -126,7 +126,8 @@ class ContactGateTest < ActionDispatch::IntegrationTest
 
     # The scoped wall lets the ordinary tail through the same door.
     patch survey_path(s),
-          params: { cards: s.cards + [ { "type" => "multiple_choice", "text" => "Gender",
+          params: { cards: s.cards + [ { "type" => "multiple_choice",
+                                         "text" => "What gender best describes you?",
                                          "options" => [ "A", "B" ], "demographic" => true } ] }.to_json,
           headers: { "Content-Type" => "application/json" }
     assert_response :success

@@ -1794,7 +1794,7 @@ en:
       - text: "When were you born?"
       - text: "Where do you live?"
         description: "Powered by OpenStreetMap — helps build a map you can explore after finishing."
-      - text: "Gender"
+      - text: "What gender best describes you?"
         options: ["Male", "Female", "Non-binary", "Other", "Prefer not to say"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options

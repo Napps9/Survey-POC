@@ -1605,7 +1605,7 @@ pt:
       - text: "Quando nasceu?"
       - text: "Onde vive?"
         description: "Com tecnologia OpenStreetMap — ajuda a criar um mapa que pode explorar no final."
-      - text: "Género"
+      - text: "Com que género se identifica melhor?"
         options: ["Masculino", "Feminino", "Não-binário", "Outro", "Prefiro não dizer"]
     optional:
       heritage:

@@ -1605,7 +1605,7 @@ it:
       - text: "Qual è la tua data di nascita?"
       - text: "Dove vivi?"
         description: "Basato su OpenStreetMap — aiuta a costruire una mappa che potrai esplorare alla fine."
-      - text: "Genere"
+      - text: "Quale genere ti descrive meglio?"
         options: ["Uomo", "Donna", "Non binario", "Altro", "Preferisco non rispondere"]
     optional:
       heritage:

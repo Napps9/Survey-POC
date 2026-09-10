@@ -1634,7 +1634,7 @@ tn:
       - text: "O tsholetswe leng?"
       - text: "O nna kae?"
         description: "E thusiwa ke OpenStreetMap — e thusa go aga mmapa o o ka o sekasekang morago ga go fetsa."
-      - text: "Bong"
+      - text: "Ke bong bofe jo bo go tlhalosang sentle thata?"
         options: ["Monna", "Mosadi", "Ga se monna kgotsa mosadi", "E Sele", "Ke rata go se bue"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options

@@ -1605,7 +1605,7 @@ sw:
       - text: "Ulizaliwa lini?"
       - text: "Unaishi wapi?"
         description: "Inaendeshwa na OpenStreetMap — husaidia kujenga ramani unayoweza kuchunguza baada ya kumaliza."
-      - text: "Jinsia"
+      - text: "Ni jinsia gani inayokuelezea vizuri zaidi?"
         options: ["Mwanamume", "Mwanamke", "Si mwanamume wala mwanamke", "Nyingine", "Napendelea kutosema"]
     optional:
       heritage:

@@ -1605,7 +1605,7 @@ fr:
       - text: "Quelle est votre date de naissance ?"
       - text: "Où habitez-vous ?"
         description: "Propulsé par OpenStreetMap — cela aide à construire une carte que vous pourrez explorer à la fin."
-      - text: "Genre"
+      - text: "Quel genre vous décrit le mieux ?"
         options: ["Homme", "Femme", "Non-binaire", "Autre", "Je préfère ne pas répondre"]
     optional:
       heritage:

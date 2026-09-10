@@ -10,7 +10,7 @@ module DemographicQuestions
     { "type" => "open_ended", "input" => "location", "text" => "Where do you live?",
       "description" => "Powered by OpenStreetMap — helps build a map you can explore after finishing.",
       "demographic" => true },
-    { "type" => "multiple_choice", "text" => "Gender",
+    { "type" => "multiple_choice", "text" => "What gender best describes you?",
       "options" => [ "Male", "Female", "Non-binary", "Other", "Prefer not to say" ],
       "demographic" => true }
   ].freeze

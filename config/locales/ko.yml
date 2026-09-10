@@ -1603,7 +1603,7 @@ ko:
       - text: "언제 태어나셨나요?"
       - text: "어디에 살고 계세요?"
         description: "OpenStreetMap 기반입니다 — 참여를 마친 뒤 살펴볼 수 있는 지도를 만드는 데 도움이 됩니다."
-      - text: "성별"
+      - text: "본인을 가장 잘 나타내는 성별은 무엇인가요?"
         options: ["남성", "여성", "논바이너리", "기타", "답하고 싶지 않아요"]
     optional:
       heritage:

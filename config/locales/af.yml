@@ -1610,7 +1610,7 @@ af:
       - text: "Wanneer is jy gebore?"
       - text: "Waar woon jy?"
         description: "Aangedryf deur OpenStreetMap — help bou 'n kaart wat jy kan verken nadat jy klaar is."
-      - text: "Geslag"
+      - text: "Watter geslag beskryf jou die beste?"
         options: ["Manlik", "Vroulik", "Nie-binêr", "Ander", "Verkies om nie te sê nie"]
     optional:
       heritage:

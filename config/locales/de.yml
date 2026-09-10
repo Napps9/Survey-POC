@@ -1605,7 +1605,7 @@ de:
       - text: "Wann bist du geboren?"
       - text: "Wo wohnst du?"
         description: "Powered by OpenStreetMap – hilft, eine Karte zu erstellen, die du nach dem Abschluss erkunden kannst."
-      - text: "Geschlecht"
+      - text: "Welches Geschlecht beschreibt dich am besten?"
         options: ["Männlich", "Weiblich", "Nicht-binär", "Anderes", "Möchte ich nicht angeben"]
     optional:
       heritage:

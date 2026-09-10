@@ -1605,7 +1605,7 @@ nl:
       - text: "Wanneer ben je geboren?"
       - text: "Waar woon je?"
         description: "Mogelijk gemaakt door OpenStreetMap — helpt een kaart te bouwen die je na afloop kunt verkennen."
-      - text: "Gender"
+      - text: "Welk gender beschrijft jou het best?"
         options: ["Man", "Vrouw", "Non-binair", "Anders", "Zeg ik liever niet"]
     optional:
       heritage:

@@ -1632,7 +1632,7 @@ zu:
       - text: "Wazalwa nini?"
       - text: "Uhlala kuphi?"
         description: "Kunikwa amandla yi-OpenStreetMap — kusiza ukwakha ibalazwe ongalicwaninga ngemva kokuqeda."
-      - text: "Ubulili"
+      - text: "Yibuphi ubulili obukuchaza kangcono?"
         options: ["Owesilisa", "Owesifazane", "Ongewesilisa nowesifazane", "Okunye", "Ngithanda ukungasho"]
     # Opt-in demographic questions (DemographicQuestions::OPTIONAL_CARDS) —
     # map-shaped by demographic_key, NOT positional like cards above. Options

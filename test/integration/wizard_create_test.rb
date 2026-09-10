@@ -68,7 +68,8 @@ class WizardCreateTest < ActionDispatch::IntegrationTest
     survey = @org.surveys.order(:id).last
     tail = survey.cards.last(3)
     assert tail.all? { |c| c["demographic"] }, "last three cards must be the demographic tail"
-    assert_equal [ "When were you born?", "Where do you live?", "Gender" ], tail.map { |c| c["text"] }
+    assert_equal [ "When were you born?", "Where do you live?", "What gender best describes you?" ],
+                 tail.map { |c| c["text"] }
     assert_equal [ "Male", "Female", "Non-binary", "Other", "Prefer not to say" ], tail.last["options"]
   end
 
