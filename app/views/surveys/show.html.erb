@@ -1589,7 +1589,7 @@
                    data-note-limit-recommended-value="<%= Survey::RECOMMENDED_JOIN_TITLE %>"
                    data-note-limit-max-value="<%= Survey::MAX_JOIN_TITLE %>">
                 <input type="text" name="join_title" maxlength="<%= Survey::MAX_JOIN_TITLE %>"
-                       value="<%= @survey.join_title_text %>"
+                       value="<%= @survey.join_title_for_editor %>"
                        data-note-limit-target="input"
                        data-action="input->note-limit#update"
                        onchange="this.form.requestSubmit()"
@@ -1608,7 +1608,7 @@
                           data-note-limit-target="input"
                           data-action="input->note-limit#update"
                           onchange="this.form.requestSubmit()"
-                          style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none; resize:vertical;"><%= @survey.join_body_text %></textarea>
+                          style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none; resize:vertical;"><%= @survey.join_body_for_editor %></textarea>
                 <div class="note-limit-count" data-note-limit-target="count"></div>
                 <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_JOIN_BODY) %></div>
               </div>
@@ -1617,7 +1617,7 @@
             <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
               <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Button:</div>
               <input type="text" name="join_cta" maxlength="<%= Survey::MAX_END_LABEL %>"
-                     value="<%= @survey.join_cta_text %>"
+                     value="<%= @survey.join_cta_for_editor %>"
                      onchange="this.form.requestSubmit()"
                      style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
             <% end %>

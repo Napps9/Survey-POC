@@ -135,6 +135,41 @@ class PlayerNotificationsTest < ActionDispatch::IntegrationTest
                  mail["List-Unsubscribe"].to_s
   end
 
+  # A mailer action runs inside a Solid Queue job, which has no request and so
+  # no Current.locale — the reader's language has to be applied explicitly, and
+  # applied to the WHOLE message. The subject used to be rendered at the call
+  # site, outside PlayerNotificationMailer#deliver_as's with_locale block, so a
+  # French respondent would have got an English subject over a French body. It
+  # was invisible until these strings were translated: while they lived in
+  # en.yml alone, both halves came out English and agreed.
+  test "the whole mail is in the reader's language, subject included" do
+    s = with_impact(survey)
+    pl = keeper(s)
+    pl.update!(preferred_locale: "fr")
+    admin_for(s.organisation)
+
+    assert_equal :en, I18n.locale, "the job's ambient locale is the default, not the reader's"
+    perform_enqueued_jobs { post survey_impact_path(s) }
+
+    mail = mails_to(pl).sole
+    assert_equal I18n.t("player_notification_mailer.impact.subject_org",
+                        org: s.organisation.name, locale: :fr),
+                 mail.subject
+    assert_match I18n.t("player_notification_mailer.why", locale: :fr),
+                 (mail.text_part || mail).body.to_s
+  end
+
+  test "a reader with no preferred locale still gets English" do
+    s = with_impact(survey)
+    pl = keeper(s)
+    admin_for(s.organisation)
+    perform_enqueued_jobs { post survey_impact_path(s) }
+
+    assert_equal I18n.t("player_notification_mailer.impact.subject_org",
+                        org: s.organisation.name, locale: :en),
+                 mails_to(pl).sole.subject
+  end
+
   # ── Who is never mailed ───────────────────────────────────────────────────
 
   test "an address nobody proved they own is never mailed" do

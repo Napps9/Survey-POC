@@ -16,12 +16,12 @@ class PlayerNotificationMailer < ApplicationMailer
   before_action :load_notification
 
   def impact
-    deliver_as(t("player_notification_mailer.impact.subject_org", org: @org_name))
+    deliver_as("player_notification_mailer.impact.subject_org")
   end
 
   def follow_up
     @follow_ups = @survey.follow_up_surveys
-    deliver_as(t("player_notification_mailer.follow_up.subject_org", org: @org_name))
+    deliver_as("player_notification_mailer.follow_up.subject_org")
   end
 
   private
@@ -40,7 +40,16 @@ class PlayerNotificationMailer < ApplicationMailer
 
   # One place for everything both messages share, so a second kind cannot
   # accidentally ship without the unsubscribe headers.
-  def deliver_as(subject)
+  #
+  # Takes the subject's KEY, not a rendered string: a mailer action runs in
+  # whatever locale the Solid Queue job happens to have (which is the default,
+  # since a job has no request and no Current.locale), and only the block below
+  # switches to the reader's. Rendering the subject at the call site therefore
+  # put it outside that block — an English subject line over a French body,
+  # invisible while these strings existed in en.yml alone and visible the day
+  # they were translated. PlayerSignInMailer and WelcomeMailer both already
+  # build their subject inside the block; this now matches them.
+  def deliver_as(subject_key)
     I18n.with_locale(SupportedLocales.coerce(@player.preferred_locale)) do
       headers["X-Entity-Ref-ID"] = SecureRandom.uuid
       # RFC 8058. The narrow opt-out is the one a mail client's own
@@ -49,7 +58,7 @@ class PlayerNotificationMailer < ApplicationMailer
       headers["List-Unsubscribe"] = "<#{@stop_org}>"
       headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
       mail(to: @player.email_address,
-           subject: subject,
+           subject: t(subject_key, org: @org_name),
            reply_to: ENV["MAIL_REPLY_TO"].presence)
     end
   end

@@ -11,10 +11,23 @@ require "test_helper"
 # (curated into window.I18N by _i18n_js) — plus `ask`, whose 45 server-rendered
 # strings were complete in every locale file only by discipline until they were
 # guarded here. A hole in any of these is user-visible English in a
-# non-English UI, the exact defect this pass removed. Widening it to every
-# namespace is desirable but needs the backfill done first.
+# non-English UI, the exact defect this pass removed.
+#
+# The five respondent-account namespaces joined the list once their backfill
+# landed (98 keys × 24 locales). They are the same class of defect seen from
+# the other side: everything a respondent reads after finishing a Verto, on a
+# page and in an inbox where nobody on the team is looking. The seven
+# server-rendered `player.join_*` keys are guarded by
+# LocaleRespondentParityTest instead — `player` as a whole is 61 keys, and not
+# all of them are this feature's.
+#
+# Widening this to EVERY namespace is still desirable and still needs the
+# remaining backfill first: `editor.*` carries a handful of keys missing from
+# 18-24 locales, left by other work.
 class LocaleStructureParityTest < ActiveSupport::TestCase
-  NAMESPACES = %w[js defaults card templates demographics ask unsubscribe].freeze
+  NAMESPACES = %w[js defaults card templates demographics ask unsubscribe
+                  you player_sign_in player_sign_in_mailer
+                  player_notification_mailer player_unsubscribe].freeze
 
   def locale_files
     Dir[Rails.root.join("config/locales/*.yml")]

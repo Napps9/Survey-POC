@@ -129,10 +129,28 @@ that: push green.
   variants for the same reason.
   `test/lib/locale_structure_parity_test.rb` enforces this for the
   browser-facing namespaces (`js`, `defaults`, `card`, `templates`,
-  `demographics`, `ask`, `unsubscribe`); JS reads strings via
+  `demographics`, `ask`, `unsubscribe`, plus the five respondent-account ones);
+  JS reads strings via
   `window.I18N`, which carries `js:` plus the curated slice in
   `app/views/layouts/_i18n_js.html.erb` — a JS-facing string anywhere else
   renders as a raw dotted key.
+- `bin/rails i18n:translate` has the same escape hatch as
+  `bin/trello_week_summary`, for a session with no `ANTHROPIC_API_KEY`:
+  `PRINT=path|1` dumps the missing keys as `{locale => {key => english}}` JSON
+  and stops, and `TRANSLATIONS=path` reads that shape back and writes it. A
+  Claude session composes the translations itself in between. Both modes build
+  the API client lazily, so neither trips the eager `ENV.fetch`.
+  Three things the writer will not do, all of them measured rather than
+  assumed: it **appends** rather than re-emitting the file (regenerating
+  `fr.yml` from a Hash rewrites 1,224 of its 1,896 lines and destroys every
+  comment — the files are hand-quoted and Psych emits minimal quoting), it
+  re-parses what it wrote and reverts if any pre-existing leaf moved, and it
+  refuses a locale with no file (`zh` is in `SupportedLocales.codes` but has no
+  `zh.yml`; creating one would enter it into three parity suites and the
+  language switcher). Expect **+N lines, 0 deletions** per file; a deletion
+  means stop. Placeholders are checked against the English source on the way
+  in — `LocaleProperties` holds the scanner so the task and the parity suites
+  check the same thing.
 - Dev/test run SQLite; production runs Postgres, and they disagree on real
   things — `LOWER()` on a `json` column and `DISTINCT` over rows containing
   one both pass SQLite and 500 on Postgres (this took Ask Verto down in prod,

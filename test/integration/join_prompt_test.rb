@@ -65,6 +65,56 @@ class JoinPromptTest < ActionDispatch::IntegrationTest
     assert_equal "Hear what the council decides.", s.reload.join_title_text
   end
 
+  test "the player's fallback follows the respondent's language" do
+    s = survey
+
+    I18n.with_locale(:fr) do
+      assert_equal I18n.t("player.join_title", locale: :fr), s.join_title_text
+      refute_equal I18n.t("player.join_title", locale: :en), s.join_title_text,
+        "player.join_* was translated into 24 locales precisely so a French " \
+        "respondent stops reading English on the end screen"
+    end
+  end
+
+  # The other half of that, and the reason the two readers are separate.
+  #
+  # The editor renders these as the value= of inputs that autosave onchange, so
+  # a French creator being pre-filled with French house copy is one stray
+  # keystroke away from PINNING French onto surveys.join_title — shown then to
+  # every respondent, in every language. The pre-fill is English by design.
+  test "the editor's pre-fill stays English whatever the creator's UI language" do
+    s = survey
+    english = I18n.t("player.join_title", locale: :en)
+
+    %i[fr ar ja].each do |locale|
+      I18n.with_locale(locale) do
+        assert_equal english, s.join_title_for_editor,
+          "a #{locale} creator would otherwise save #{locale} copy onto an English Verto"
+        assert_equal I18n.t("player.join_body", locale: :en), s.join_body_for_editor
+        assert_equal I18n.t("player.join_cta", locale: :en), s.join_cta_for_editor
+      end
+    end
+  end
+
+  test "an en-US creator keeps American spelling in the pre-fill" do
+    s = survey
+
+    I18n.with_locale(:"en-US") do
+      assert_equal I18n.t("player.join_title", locale: :"en-US"), s.join_title_for_editor
+      assert_equal I18n.t("player.join_body", locale: :"en-US"), s.join_body_for_editor
+    end
+  end
+
+  test "a creator's own copy is returned untouched to both the editor and the player" do
+    s = survey
+    s.update!(join_title: "Hear what the council decides.")
+
+    I18n.with_locale(:fr) do
+      assert_equal "Hear what the council decides.", s.reload.join_title_for_editor
+      assert_equal "Hear what the council decides.", s.join_title_text
+    end
+  end
+
   test "update_settings stores the three fields and clears them back to the default" do
     s = survey(join_prompt_enabled: true)
     admin_for(s.organisation)

@@ -32,7 +32,7 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
     "ja" => %w[other], "ko" => %w[other], "vi" => %w[other], "id" => %w[other],
     "zh" => %w[other]
   }.freeze
-  DEFAULT_PLURAL_FORMS = %w[one other].freeze
+  DEFAULT_PLURAL_FORMS = LocaleProperties::DEFAULT_PLURAL_FORMS
 
   def flash_tree(locale)
     I18n.backend.send(:translations)[locale.to_sym]&.dig(:flash) || {}
@@ -43,7 +43,8 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
   def leaves(node, prefix = [], out = {})
     node.each do |key, value|
       path = prefix + [ key.to_s ]
-      if value.is_a?(Hash) && value.keys.map(&:to_s).any? { |k| %w[zero one two few many other].include?(k) }
+      if value.is_a?(Hash) &&
+         value.keys.map(&:to_s).any? { |k| LocaleProperties::CONSULTED_PLURAL_FORMS.include?(k) }
         out[path.join(".")] = value
       elsif value.is_a?(Hash)
         leaves(value, path, out)
@@ -54,8 +55,13 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
     out
   end
 
+  # Shared with lib/tasks/i18n.rake, which rejects a translation whose
+  # placeholders differ from its source. When the task's guard and the suite
+  # that checks its output were two independent regexes, they disagreed: the
+  # task wrote sprintf-style %<name>s through untouched and this test then had
+  # no opinion about it.
   def placeholders(text)
-    text.to_s.scan(/%\{(\w+)\}/).flatten.sort.uniq
+    LocaleProperties.placeholders(text).to_a.sort
   end
 
   setup do
@@ -180,7 +186,7 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
       leaves(flash_tree(locale)).each do |key, value|
         english = @en[key]
         next unless english.is_a?(String) && value.is_a?(String)
-        next if english.length < 25
+        next if english.length < LocaleProperties::VERBATIM_MIN_LENGTH
 
         suspicious << "#{locale}/#{key}" if english == value
       end
@@ -223,11 +229,7 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
   # anything above: the placeholders match, the keys are all present, and the
   # verbatim-English check only fires on an EXACT match. A script assertion is
   # the one cheap test that separates "translated" from "looks translated".
-  SCRIPTS = {
-    "ar" => /\p{Arabic}/, "he" => /\p{Hebrew}/, "hi" => /\p{Devanagari}/,
-    "ja" => /\p{Hiragana}|\p{Katakana}|\p{Han}/, "ko" => /\p{Hangul}/,
-    "ru" => /\p{Cyrillic}/, "uk" => /\p{Cyrillic}/
-  }.freeze
+  SCRIPTS = LocaleProperties::SCRIPTS
 
   test "non-Latin locales are written in their own script" do
     problems = []
@@ -236,10 +238,10 @@ class LocaleFlashParityTest < ActiveSupport::TestCase
 
       leaves(flash_tree(locale)).each do |key, value|
         Array(value.is_a?(Hash) ? value.values : value).each do |text|
-          # Placeholders and the product name are Latin by design, and a string
-          # that is nothing else has no script to be in.
-          bare = text.to_s.gsub(/%\{\w+\}|Playverto|Verto/, "").strip
-          next if bare.length < 10 || text.to_s.match?(script)
+          # Placeholders, the product name and an example email address are
+          # Latin by design, and a string that is nothing else has no script to
+          # be in.
+          next if LocaleProperties.bare_prose(text).length < 10 || text.to_s.match?(script)
 
           problems << "#{locale}/#{key}: no #{locale} script in #{text.to_s.first(60).inspect}"
         end

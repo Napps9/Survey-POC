@@ -1387,16 +1387,35 @@ en:
     spent_cta: "Go to your Vertos"
     welcome: "You're signed in."
     too_many: "That's a lot of attempts — give it a few minutes."
-  # The respondent account area (/you), the sign-in landing page and the
-  # sign-in email. ENGLISH ONLY for now, deliberately and knowingly: these are
-  # three new namespaces, none of them is parity-guarded
-  # (LocaleStructureParityTest covers js/defaults/card/templates/demographics/
-  # ask/unsubscribe), and config.i18n.fallbacks renders English rather than a
-  # raw key for every other locale. The strings a RESPONDENT sees inside the
-  # player itself — js.player.join_* — are translated in all 26 files, because
-  # those are the ones on the end screen of a Verto they may be taking in their
-  # own language. Translating these three is the next pass, and needs
-  # `bin/rails i18n:translate` with a live key.
+  # The respondent account area (/you), the sign-in landing page, the sign-in
+  # and notification emails, and the scoped unsubscribe: 98 keys, translated
+  # into all 24 non-English locales and guarded from here on.
+  # LocaleStructureParityTest covers these namespaces for key parity;
+  # LocaleRespondentParityTest covers what a key-set comparison cannot see —
+  # placeholders, plural shape, script, the product name.
+  #
+  # This shipped English-only across three pushes, and the note that used to
+  # sit here recorded that as deliberate. It also said the strings a RESPONDENT
+  # reads inside the player were translated everywhere. They were not: only the
+  # five CLIENT-rendered js.player.join_* keys were, and the seven
+  # SERVER-rendered player.join_* keys (under `player:`, further down) sat in
+  # this file alone, on the end screen of every join-enabled Verto.
+  # config.i18n.fallbacks renders English rather than a raw dotted key, so
+  # nothing failed and nothing raised for three pushes — the only symptom was a
+  # French respondent reading English.
+  #
+  # Two things to know before adding a key here.
+  #
+  # Plurals are `one` and `other`, mirroring this file, and nothing else.
+  # I18n::Backend::Simple consults `zero` (at count 0 only), `one` and `other`;
+  # `few`/`many`/`two` need I18n::Backend::Pluralization and the rails-i18n
+  # rules, and this app loads neither. See LocaleProperties for the long form.
+  #
+  # `you.wallet_across` interpolates %{organisations} — a British-spelled
+  # variable NAME. It is a keyword argument the view passes, not prose, which
+  # is why EnglishSpellings::PLACEHOLDER exists: respelling it writes an
+  # en-US.yml that raises I18n::MissingInterpolationArgument while `en` stays
+  # green.
   you:
     eyebrow: "Your Vertos"
     kept:

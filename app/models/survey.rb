@@ -2151,9 +2151,42 @@ class Survey < ApplicationRecord
   MAX_JOIN_BODY          = 200
   RECOMMENDED_JOIN_BODY  = 120
 
+  # What the PLAYER renders. The fallback resolves in the respondent's locale,
+  # which is the whole point of translating player.join_* — a French respondent
+  # reads the French house copy.
   def join_title_text = join_title.presence || I18n.t("player.join_title")
   def join_body_text  = join_body.presence  || I18n.t("player.join_body")
   def join_cta_text   = join_cta.presence   || I18n.t("player.join_cta")
+
+  # What the EDITOR pre-fills its three boxes with, and deliberately not the
+  # same thing.
+  #
+  # The boxes render as `value=` on inputs that autosave `onchange`, so
+  # whatever they show is one keystroke away from being SAVED — and a saved
+  # join_title is shown to every respondent regardless of the language they
+  # answer in. While en.yml was the only file carrying player.join_*, every
+  # creator was pre-filled with English and this could not bite. Translating
+  # those seven keys is what created the hazard: a creator with a French UI
+  # would be handed French house copy, and a stray space in the box would pin
+  # French onto an English Verto.
+  #
+  # So the pre-fill stays English — exactly what the box showed before the
+  # backfill. English VARIANTS keep their own spelling (an en-US creator is not
+  # shown British copy); everything else falls back to the source. The three
+  # strings happen to be identical in en and en-US today, so this is a no-op
+  # until one of them grows a spelling EnglishSpellings has an opinion about.
+  #
+  # Rendering these as `placeholder=` instead would sidestep the whole problem,
+  # but it reverses a deliberate earlier choice — the creator edits the real
+  # sentence rather than a ghost of it — so it belongs in its own change.
+  def join_title_for_editor = join_title.presence || house_join_copy("join_title")
+  def join_body_for_editor  = join_body.presence  || house_join_copy("join_body")
+  def join_cta_for_editor   = join_cta.presence   || house_join_copy("join_cta")
+
+  def house_join_copy(field)
+    locale = SupportedLocales.english?(I18n.locale) ? I18n.locale : I18n.default_locale
+    I18n.with_locale(locale) { I18n.t("player.#{field}") }
+  end
 
   # ── What happens next, and what happened ──────────────────────────────────
   #

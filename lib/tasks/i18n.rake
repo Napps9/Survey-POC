@@ -37,8 +37,37 @@ namespace :i18n do
     # path, and being a transform it cannot drift structurally.
     targets = SupportedLocales.codes.reject { |c| SupportedLocales.english?(c) }
     targets &= only if only.any?
+    # A registry code with no file is not a translation target, it is a new
+    # file — and creating one has consequences nobody asked for here. `zh` is
+    # in supported_locales.yml with no config/locales/zh.yml; the moment one
+    # exists it joins the three parity suites that glob the directory and
+    # SupportedLocales.ui_ready starts offering Chinese in the switcher. Adding
+    # it is a decision, not a side effect of running a translation.
+    targets = targets.select { |c| Rails.root.join("config/locales/#{c}.yml").exist? }
 
-    client = Anthropic::Client.new(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
+    # ── Working without a key ────────────────────────────────────────────────
+    #
+    # The same hatch bin/trello_week_summary carries, for the same reason: the
+    # thing on the other side of this API call is Claude, and a Claude session
+    # holding no key can do the work itself. PRINT emits exactly what would be
+    # asked; TRANSLATIONS feeds the answer back through the identical merge and
+    # write path, so the hatch cannot drift from the API path.
+    #
+    # Both are read-with-encoding on purpose: a locale-less container (cron, a
+    # sandbox) has Encoding.default_external == US-ASCII, and JSON.parse raises
+    # Encoding::InvalidByteSequenceError on the first accented byte of a file
+    # that is perfectly good UTF-8. trello_week_summary:102-105 hit this first.
+    print_to = ENV["PRINT"].presence
+    supplied = if ENV["TRANSLATIONS"].present?
+      JSON.parse(File.read(ENV["TRANSLATIONS"], encoding: "UTF-8"))
+    end
+
+    # Built only when a batch is actually about to be sent, so neither hatch
+    # mode trips over a missing key. This used to be an eager ENV.fetch, which
+    # meant no key = KeyError before any work, for every locale, with no
+    # partial output and nothing to show for it.
+    client = nil
+    payload = {}
 
     targets.each do |code|
       out_path      = Rails.root.join("config/locales/#{code}.yml")
@@ -53,16 +82,51 @@ namespace :i18n do
       end
 
       loc = SupportedLocales.find(code)
-      batches = todo.each_slice(BATCH_SIZE).map(&:to_h)
-      puts "translating -> #{code} (#{loc&.english_name}) — #{todo.size} key(s) in #{batches.size} batch(es)"
 
-      translated = {}
-      batches.each_with_index do |batch, i|
-        print "  batch #{i + 1}/#{batches.size} (#{batch.size} keys)… "
-        translated.merge!(translate_batch(client, loc, batch))
-        puts "ok"
-      rescue StandardError => e
-        warn "failed: #{e.class}: #{e.message} — keeping what this locale already has for this batch"
+      if print_to
+        payload[code] = todo
+        puts "#{code}: #{todo.size} key(s)"
+        next
+      end
+
+      translated =
+        if supplied
+          # Only what this locale was actually given. Keys outside `todo` are
+          # dropped rather than written: the point of the hatch is to be the
+          # same operation the API path is, and that one can only ever answer
+          # the question it was asked.
+          (supplied[code] || {}).slice(*todo.keys)
+        else
+          client ||= Anthropic::Client.new(api_key: ENV.fetch("ANTHROPIC_API_KEY"))
+          batches = todo.each_slice(BATCH_SIZE).map(&:to_h)
+          puts "translating -> #{code} (#{loc&.english_name}) — #{todo.size} key(s) in #{batches.size} batch(es)"
+          batches.each_with_index.each_with_object({}) do |(batch, i), acc|
+            print "  batch #{i + 1}/#{batches.size} (#{batch.size} keys)… "
+            acc.merge!(translate_batch(client, loc, batch))
+            puts "ok"
+          rescue StandardError => e
+            warn "failed: #{e.class}: #{e.message} — keeping what this locale already has for this batch"
+          end
+        end
+
+      # Placeholders are keyword arguments, not prose. A value that dropped or
+      # renamed one is not a slightly worse translation, it is
+      # I18n::MissingInterpolationArgument in front of a respondent — and until
+      # now the only thing asking for them to be preserved was one line of
+      # prompt text with nothing checking it. Refusing the value leaves the key
+      # missing, which is the state the next run knows how to fix.
+      #
+      # you.wallet_across is the case that proves it: "Across %{vertos} and
+      # %{organisations}." carries a BRITISH-SPELLED variable name, and a
+      # translator tidying it to %{organizations} breaks that locale alone.
+      translated = translated.reject do |k, v|
+        source = todo[k]
+        next false if source.nil?
+
+        bad = placeholders(source) != placeholders(v)
+        warn "  #{code}: dropped #{k} — placeholders #{placeholders(source).to_a.inspect} " \
+             "became #{placeholders(v).to_a.inspect}" if bad
+        bad
       end
 
       if translated.empty?
@@ -70,16 +134,24 @@ namespace :i18n do
         next
       end
 
-      # Merge: keep existing (unless FORCE), add newly translated. A key with
-      # NEITHER — the model didn't return it and there was no prior
-      # translation — is simply left out of the file, not backfilled with
-      # English (see BATCH_SIZE comment above for why that was the bug).
-      merged = (force ? flat.keys : (existing_flat.keys | translated.keys)).index_with do |k|
-        force ? (translated[k].presence || existing_flat[k].presence) : (existing_flat[k].presence || translated[k].presence)
-      end.compact
+      # Only ever ADD. A key the model didn't return, or one whose placeholders
+      # were refused above, is simply left out — never backfilled with English
+      # (see the BATCH_SIZE comment for why that was the bug) and never
+      # rewritten (see splice_into_locale! for why the old whole-file rewrite
+      # could not be kept).
+      added = splice_into_locale!(out_path, code, translated.reject { |k, _| existing_flat[k].present? })
+      puts "wrote #{out_path.relative_path_from(Rails.root)} " \
+           "(+#{added} line(s), #{translated.size} new, #{todo.size - translated.size} still missing)"
+    end
 
-      File.write(out_path, { code => unflatten(merged) }.to_yaml(line_width: -1))
-      puts "wrote #{out_path.relative_path_from(Rails.root)} (#{existing_flat.size} kept, #{translated.size} new/updated, #{todo.size - translated.size} still missing)"
+    if print_to
+      json = JSON.pretty_generate(payload)
+      if print_to == "1"
+        puts json
+      else
+        File.write(print_to, json, encoding: "UTF-8")
+        puts "wrote #{payload.values.sum(&:size)} key(s) across #{payload.size} locale(s) to #{print_to}"
+      end
     end
   end
 
@@ -255,6 +327,151 @@ def unflatten(flat)
       leaf[keys.last] = value
     end
   end
+end
+
+# The interpolation names a string declares, as a Set so order doesn't matter
+# (a translator is free to move %{name} after %{count}; it is not free to lose
+# one). Both spellings i18n accepts: %{name} and sprintf's %<name>s.
+#
+# The scanner itself lives in app/lib so the parity suites check exactly what
+# this guard checks. A rake file cannot be tested — the same reason
+# EnglishSpellings is a class and not a lambda in here.
+def placeholders(text)
+  LocaleProperties.placeholders(text)
+end
+
+# ── Writing a locale file ───────────────────────────────────────────────────
+#
+# NOT `File.write(path, {code => unflatten(merged)}.to_yaml)`, which is what
+# this task used to do and what every caller expects. Two measured reasons:
+#
+#   * flatten_strings/unflatten is LOSSY. `templates.*.cards` is an array of
+#     Hashes, and flatten_strings does `item.to_s` on array elements — so 34
+#     leaves per locale come back as Ruby inspect strings
+#     (`{"text"=>"Une petite question", …}`), and the six `defaults.*` empty
+#     arrays vanish entirely because each_with_index never runs. 816 corrupted
+#     and 144 deleted leaves across 24 files, caught by
+#     LocaleStructureParityTest only after the damage is on disk.
+#   * Re-emitting from a Hash REFORMATS THE WHOLE FILE. The locale files are
+#     hand-quoted ("Nécessaires"); Psych emits minimal quoting (Nécessaires).
+#     Regenerating fr.yml while changing nothing rewrites 1,224 of its 1,896
+#     lines. ~30,000 lines of churn to add 2,500 real ones is not reviewable,
+#     and a reviewer who cannot read the diff cannot catch a bad translation.
+#
+# So: append-only text splicing. Every key this task writes is one that is
+# ABSENT from the target — that is what `todo` means — so nothing is ever
+# edited in place and a removal in the diff is a bug by definition.
+#
+# Returns the number of lines added.
+def splice_into_locale!(path, code, additions)
+  return 0 if additions.empty?
+
+  original = File.read(path, encoding: "UTF-8")
+  before   = YAML.load_file(path)[code] || {}
+  lines    = original.lines
+
+  # Group by top-level namespace: a namespace the file has never seen is
+  # appended whole, one it already has needs its new leaves placed inside it.
+  additions.group_by { |k, _| k.split(".").first }.each do |ns, pairs|
+    subtree = unflatten(pairs.to_h)[ns]
+    body    = yaml_block(ns => subtree)
+
+    if (range = namespace_line_range(lines, ns))
+      # Existing namespace: splice the new leaves in at its end, keeping the
+      # file's own ordering intact. Only ever flat leaves here — a nested
+      # partial insert would need to find the parent, and nothing this task
+      # writes has ever needed it.
+      inner = body.lines.drop(1) # drop the "ns:" line; keep its children
+      lines.insert(range.end + 1, *inner)
+    else
+      lines << "\n" unless lines.last.to_s.end_with?("\n")
+      lines.concat(body.lines)
+    end
+  end
+
+  File.write(path, lines.join, encoding: "UTF-8")
+
+  # The write-back assertion. Re-parse what actually landed and prove it is
+  # exactly what was there before plus what we meant to add — no pre-existing
+  # leaf changed, none disappeared, nothing was reformatted into a different
+  # type. A rewrite that silently ate `templates.*.cards` would have been
+  # caught here rather than by a parity test three commits later.
+  after = YAML.load_file(path)[code] || {}
+  wanted = deep_merge_flat(before, additions)
+  unless after == wanted
+    File.write(path, original, encoding: "UTF-8")
+    raise "splice into #{File.basename(path)} changed something it should not have — reverted"
+  end
+
+  lines.size - original.lines.size
+end
+
+# `{ns => subtree}` as YAML, indented to sit under the locale root, with the
+# document marker dropped.
+#
+# Every string scalar is forced to DOUBLE-QUOTED, which Psych would not do on
+# its own — it quotes only what it must, so `label: Portefeuille` sits
+# unquoted next to the `label: "Rejouer"` already in the file. Both are valid
+# and equivalent; a hundred new lines in the minority style are not, because a
+# reviewer reading a translation diff should be looking at the words rather
+# than wondering why the punctuation changed. Doing it through the emitter's
+# own node type rather than by wrapping strings in quotes is what keeps the
+# escaping correct for the copy that contains a quote, a colon or a newline.
+#
+# line_width: -1 so a long sentence is never folded across lines — a folded
+# scalar is legal YAML and unreadable in review.
+def yaml_block(hash)
+  visitor = Psych::Visitors::YAMLTree.create
+  visitor << hash
+  quote_mapping_values!(visitor.tree)
+  visitor.tree.yaml(nil, line_width: -1).sub(/\A---\n/, "").gsub(/^(?=.)/, "  ")
+end
+
+# A YAML mapping's children alternate key, value, key, value — so the values
+# are the odd indices, and that is the only reliable way to tell one from the
+# other. (Shape is not: "Portefeuille" is a value that looks exactly like the
+# key "tab_wallet".) Psych reports `quoted: true` even for plain scalars, so
+# the style constant is what to test.
+def quote_mapping_values!(node)
+  if node.is_a?(Psych::Nodes::Mapping)
+    node.children.each_slice(2) do |_key, value|
+      next unless value.is_a?(Psych::Nodes::Scalar)
+      next unless value.style == Psych::Nodes::Scalar::PLAIN ||
+                  value.style == Psych::Nodes::Scalar::ANY
+
+      value.style = Psych::Nodes::Scalar::DOUBLE_QUOTED
+    end
+  end
+  node.children&.each { |child| quote_mapping_values!(child) }
+end
+
+# The line range a top-level namespace occupies, or nil if the file has no
+# such namespace. Indentation is the only structure a text splice can see:
+# the namespace starts at `  ns:` and ends before the next line indented two
+# spaces (its sibling) or less.
+def namespace_line_range(lines, ns)
+  start = lines.index { |l| l.start_with?("  #{ns}:") }
+  return nil unless start
+
+  finish = start
+  lines[(start + 1)..].each_with_index do |line, i|
+    break if line =~ /\A\s*\z/ && lines[start + i + 2].to_s =~ /\A  \S/
+    break if line =~ /\A  \S/
+
+    finish = start + i + 1
+  end
+  start..finish
+end
+
+# `before` deep-merged with the dotted-key additions, for the assertion above.
+def deep_merge_flat(before, additions)
+  wanted = Marshal.load(Marshal.dump(before))
+  additions.each do |dotted, value|
+    keys = dotted.split(".")
+    leaf = keys[0..-2].reduce(wanted) { |h, k| h[k] ||= {} }
+    leaf[keys.last] = value
+  end
+  wanted
 end
 
 # ── US English ──────────────────────────────────────────────────────────────
