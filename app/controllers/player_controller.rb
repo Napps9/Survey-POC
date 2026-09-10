@@ -732,17 +732,26 @@ class PlayerController < ApplicationController
 
     email = params[:email].to_s.strip.downcase.first(Player::MAX_EMAIL)
 
+    # `sent` answers "did OUR mail layer manage to take this on", never "was
+    # this address worth sending to". Every respondent-specific refusal below —
+    # switched off, over budget, unusable address — leaves it true, so the
+    # response stays the single indistinguishable shape that keeps this
+    # endpoint from confirming addresses (see the refusal test in
+    # player_claims_test.rb). Only a deployment-wide failure flips it, and that
+    # is a fact about us that an enumerator can read off any Verto anyway.
+    sent = true
     if @survey.join_prompt? && join_budget_ok?(email) && (player = Player.for_email(email))
       remember_play_locale(player)
-      send_sign_in_link(player, join_claim_payload)
+      sent = send_sign_in_link(player, join_claim_payload)
     end
 
-    render json: { ok: true }
+    render json: { ok: true, sent: sent }
   rescue => e
     # Deliberately generic, and deliberately ok: an error shape is itself an
-    # oracle signal, so there isn't one.
+    # oracle signal, so there isn't one. `sent: false` is safe here for the
+    # same reason it is above — we got far enough to know WE failed.
     ErrorReporting.report("PlayerController#join", e)
-    render json: { ok: true }
+    render json: { ok: true, sent: false }
   end
 
   def results
@@ -1143,11 +1152,22 @@ class PlayerController < ApplicationController
   # Mint and mail, in that order, with the mail failure contained. Solid Queue
   # being unavailable must not lose the link silently OR 500 the join: the row
   # is already written, so the person can ask again and get a second one.
+  #
+  # Returns whether the link is genuinely on its way. Containing the failure is
+  # right; reporting it as a success was not — a deployment with no SMTP_ADDRESS
+  # told every respondent "check your inbox" over mail that never left, and
+  # #deliver_later cannot catch that for us because the SMTP connection is only
+  # attempted later, inside the job, where this rescue can no longer see it.
+  # So the unsendable case is checked BEFORE enqueueing rather than rescued.
   def send_sign_in_link(player, claims)
+    return false unless MailConfigCheck.deliverable?
+
     _link, raw = PlayerSignInLink.mint!(player: player, claim_payload: claims)
     PlayerSignInMailer.sign_in(player, raw, @survey).deliver_later
+    true
   rescue => e
     ErrorReporting.report("PlayerController#send_sign_in_link", e, survey_id: @survey&.id)
+    false
   end
 
   # The board's two inputs, from a JSON body on the POST and from the query

@@ -3199,8 +3199,17 @@ export default class extends Controller {
         })
       })
       if (!res.ok) throw new Error(`status ${res.status}`)
-      await res.json()
-      this._joinSent(email)
+      const data = await res.json()
+      // A 200 means the endpoint heard us, not that a link was sent: it answers
+      // identically for every refusal on purpose. `sent: false` is the one
+      // thing it will admit — our own mail layer could not take the message —
+      // and claiming an inbox over that is how a deployment with no SMTP
+      // configured looked, to every respondent, exactly like a working one.
+      // Strict false, not falsy: only an explicit refusal turns into an error,
+      // so an unexpected or missing field reads as the success it used to and
+      // never invents a failure the server did not report.
+      if (data?.sent === false) this._joinError(t("player.join_failed"))
+      else this._joinSent(email)
     } catch (_e) {
       this._joinError(t("player.join_failed"))
     } finally {

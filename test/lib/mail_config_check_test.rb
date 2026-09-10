@@ -99,6 +99,38 @@ class MailConfigCheckTest < ActiveSupport::TestCase
     refute MailConfigCheck.strict?({})
   end
 
+  # ── Can this deployment actually send right now? ──────────────────────────
+
+  test "a delivery method other than SMTP is always deliverable" do
+    # :test here, :file or a local catcher in development. All of them deliver
+    # as intended and none of them has an SMTP_ADDRESS, so reading the variable
+    # alone would call a working suite broken.
+    assert_equal :test, ActionMailer::Base.delivery_method,
+                 "this test is only meaningful while the suite delivers to :test"
+    assert MailConfigCheck.deliverable?({})
+  end
+
+  test "SMTP with no address behind it is not deliverable" do
+    # Rails' bare default — :smtp at localhost:25 — which is exactly what a
+    # Render deploy runs with when SMTP_ADDRESS was never entered in the
+    # dashboard. Every send fails, and every caller used to report success.
+    with_delivery_method(:smtp) do
+      refute MailConfigCheck.deliverable?({})
+      refute MailConfigCheck.deliverable?("SMTP_ADDRESS" => "   "),
+             "blank counts as unset here for the same reason it does in #problems"
+      assert MailConfigCheck.deliverable?(GOOD)
+    end
+  end
+
+  test "deliverable? is narrower than problems — a missing host does not block the send" do
+    # A missing APP_HOST breaks link building INSIDE the job, where the caller's
+    # own rescue reports it. Treating it as undeliverable here would refuse to
+    # enqueue mail that a RENDER_EXTERNAL_HOSTNAME-only deploy sends perfectly.
+    env = { "SMTP_ADDRESS" => "smtp.example.com" }
+    with_delivery_method(:smtp) { assert MailConfigCheck.deliverable?(env) }
+    assert_equal 1, MailConfigCheck.problems(env).size
+  end
+
   # The reason the call lives in after_initialize rather than the initializer
   # body. Initializers run alphabetically, so `mailer` runs before `sentry` and
   # Sentry.configuration is still nil there — the report would have been
@@ -111,5 +143,15 @@ class MailConfigCheckTest < ActiveSupport::TestCase
                     Dir[Rails.root.join("config/initializers/*.rb")].map { |f| File.basename(f) }.sort
                         .index("sentry.rb"),
                     "if sentry.rb ever sorts before mailer.rb this indirection is no longer needed"
+  end
+
+  private
+
+  def with_delivery_method(method)
+    was = ActionMailer::Base.delivery_method
+    ActionMailer::Base.delivery_method = method
+    yield
+  ensure
+    ActionMailer::Base.delivery_method = was
   end
 end

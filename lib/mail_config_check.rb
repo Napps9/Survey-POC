@@ -51,6 +51,27 @@ module MailConfigCheck
     %w[1 true yes].include?(env["STRICT_MAIL_CONFIG"].to_s.downcase)
   end
 
+  # Whether outbound mail can actually leave this deployment right now.
+  #
+  # A narrower question than #problems, which judges a production deploy's env
+  # vars: a test run delivering to :test, and a dev run pointed at a local
+  # catcher, are both working mail as far as a caller is concerned, and neither
+  # has an SMTP_ADDRESS. The one broken shape is Rails' bare default — :smtp
+  # with nothing configured behind it, which resolves to localhost:25 and fails
+  # on every host that isn't itself a mail server. That is precisely the shape
+  # a Render deploy has when SMTP_ADDRESS was never entered.
+  #
+  # Callers use this to avoid saying "check your inbox" over a send that cannot
+  # happen. It deliberately does NOT consider default_url_options: a missing
+  # host raises inside the mailer job, which the caller's own rescue already
+  # turns into an honest failure, whereas this has to be answerable before the
+  # job is enqueued at all.
+  def deliverable?(env = ENV)
+    return true unless ActionMailer::Base.delivery_method == :smtp
+
+    env["SMTP_ADDRESS"].to_s.strip.present?
+  end
+
   # Called from an after_initialize hook so Sentry (config/initializers/sentry.rb)
   # is already configured — initializers run alphabetically, and `mailer` sorts
   # before `sentry`, so reporting from the initializer body itself would only

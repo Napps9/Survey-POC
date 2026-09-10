@@ -58,7 +58,7 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_equal({ "ok" => true }, JSON.parse(response.body))
+    assert_equal({ "ok" => true, "sent" => true }, JSON.parse(response.body))
     assert_equal [ r.id ], payload_of(email).map { |c| c["response_id"] }
   end
 
@@ -159,7 +159,12 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
     s   = survey
     off = survey(join: false)
     r   = completed(s)
-    ok  = { "ok" => true }
+    # `sent` rides in this shape too, and is true for every refusal below. It
+    # reports whether OUR mail layer took the message, never anything about the
+    # address — a `sent` that went false because a Verto had the ask switched
+    # off, or because an address was over budget, would be the oracle this test
+    # exists to prevent.
+    ok  = { "ok" => true, "sent" => true }
 
     # Joined for real.
     join(s, email: address, session_token: r.session_token)
@@ -171,6 +176,70 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_equal ok, JSON.parse(response.body), "#{email.inspect} on #{verto.id} must read as a success"
     end
+  end
+
+  # ── The screen must not claim an inbox we never wrote to ──────────────────
+  # A deploy with no SMTP_ADDRESS falls back to Rails' :smtp-at-localhost:25
+  # default and delivers nothing, while the player's end card said "We've sent
+  # a link to <address>. Check your inbox." to every respondent. #deliver_later
+  # cannot catch it — the connection is only attempted later, inside the job —
+  # so the endpoint answers with what it knows before enqueueing.
+
+  test "an undeliverable deployment says so instead of claiming a send" do
+    s = survey
+    r = completed(s)
+
+    stub_method(MailConfigCheck, :deliverable?, ->(*) { false }) do
+      assert_no_difference [ -> { PlayerSignInLink.count },
+                             -> { ActionMailer::Base.deliveries.size } ] do
+        join(s, email: address, session_token: r.session_token)
+      end
+    end
+
+    assert_response :success
+    assert_equal({ "ok" => true, "sent" => false }, JSON.parse(response.body),
+                 "the player shows join_failed on sent:false; a bare ok:true reads as an inbox")
+  end
+
+  test "a link is not minted for a send that cannot go out" do
+    # Minting first would spend a link nobody can ever receive, and park this
+    # run's claims on it — the person asks again and the earlier claims are
+    # stranded on a dead row.
+    s = survey
+    email = address
+
+    stub_method(MailConfigCheck, :deliverable?, ->(*) { false }) do
+      join(s, email: email)
+    end
+
+    assert_nil payload_of(email), "no link, so nothing to carry claims"
+  end
+
+  test "a mailer that raises reports a failure rather than a send" do
+    # The rescue is right — a dead queue must not 500 a respondent — but it
+    # used to swallow the outcome as well as the exception.
+    s = survey
+    reported = []
+
+    stub_method(ErrorReporting, :report, ->(tag, *_a, **_k) { reported << tag }) do
+      stub_method(PlayerSignInMailer, :sign_in, ->(*) { raise "queue down" }) do
+        join(s, email: address)
+      end
+    end
+
+    assert_response :success
+    assert_equal false, JSON.parse(response.body)["sent"]
+    assert_includes reported, "PlayerController#send_sign_in_link"
+  end
+
+  test "a working deployment still reports a real send" do
+    s = survey
+
+    assert_difference -> { ActionMailer::Base.deliveries.size }, 1 do
+      perform_enqueued_jobs { join(s, email: address) }
+    end
+
+    assert_equal true, JSON.parse(response.body)["sent"]
   end
 
   test "a Verto with join switched off sends nothing and creates no player" do
