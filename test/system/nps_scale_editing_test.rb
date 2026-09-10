@@ -69,33 +69,46 @@ class NpsScaleEditingTest < ApplicationSystemTestCase
 
   # Remove one stop, named by its label.
   #
-  # Two things have to be got right before the click, and the second one cost a
-  # full-suite run to find:
+  # The chip is addressed by the label it belongs to rather than by whichever is
+  # first in the DOM, so a click that ever does land wrong SAYS SO (see
+  # delete_stop's assertion) instead of quietly removing a neighbour. That
+  # assertion is the only reason the bug below was ever seen rather than shipped.
   #
-  #   - the × chips are dimmed until the scale is hovered, exactly as a pick
-  #     list's are, so the pointer has to be over the card first;
-  #   - .editor-feed is `scroll-snap-type: y mandatory`. Ferrum clicks by
-  #     COORDINATES: it scrolls the chip into view, the mandatory snap then
-  #     re-settles the feed to the nearest card centre, and a click issued
-  #     against the pre-snap position lands on whatever has moved under it.
-  #     Measured: asking for the bottom stop deleted the one two rows up.
-  #     Scrolling the CARD — a snap target, so the snap has nothing to correct
-  #     — and letting it settle is what stops that.
+  # WAIT FOR THE REVEAL. The × chips fade in over 0.15s, exactly as a pick
+  # list's do. Capybara filters `all` by visibility and Cuprite counts opacity: 0
+  # as invisible — so a query issued while they are still fading back a PARTIAL
+  # list, and `[index]` then indexes into a list that is missing its first few
+  # entries. Measured, after this cost a CI run and two theories: focus lands,
+  # `.nps-slider:focus-within` matches, and computed opacity is still exactly
+  # "0" in the same tick; 0.6s later all eleven read "1". The offsets that
+  # produced were 4, 6, 8 and 9 stops out, which is what "partial list" looks
+  # like from the outside.
   #
-  # And it clicks the chip belonging to the label asked for rather than
-  # whichever is first in the DOM, so a click that ever does land wrong says so
-  # instead of quietly removing a neighbour.
+  # Waiting on the COUNT is what fixes it: assert_selector retries until every
+  # chip is visible, so the list `all` returns is the whole column and the index
+  # means what it says. Nothing here needs a sleep and nothing needs the
+  # geometry touched — chips are 17px boxes 24px apart and elementFromPoint
+  # returns the right one at every centre, which was checked before changing
+  # anything.
+  #
+  # Focus rather than hover to do the revealing: a hover is a pointer position
+  # and scrolling moves the page out from under it, where focus survives.
   def press_delete(cid, label)
-    card = "[data-card-cid='#{cid}']"
-    page.execute_script(%(document.querySelector("#{card}").scrollIntoView({ block: "center" })))
-    sleep 0.5
-    find("#{card} .nps-slider").hover
+    card  = "[data-card-cid='#{cid}']"
+    stops = scale(cid)["rows"]
 
     index = evaluate_script(<<~JS)
       Array.from(document.querySelectorAll("#{card} .nps-label-row"))
            .findIndex(r => r.querySelector(".slider-label-text").textContent.trim() === "#{label}")
     JS
     assert_operator index, :>=, 0, "no stop labelled #{label.inspect} on #{cid}"
+
+    page.execute_script(<<~JS)
+      const btn = document.querySelectorAll("#{card} .nps-label-delete")[#{index}]
+      btn.focus()
+      btn.scrollIntoView({ block: "center" })
+    JS
+    assert_selector "#{card} .nps-label-delete", count: stops, wait: 5
 
     all("#{card} .nps-label-delete")[index].click
   end
