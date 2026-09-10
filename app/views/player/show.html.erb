@@ -382,6 +382,16 @@
 
     <div class="preview-thankyou" data-player-target="thankyou">
       <div data-player-target="thankyouMain" class="preview-thankyou-card">
+        <%# Two wrappers, and on a phone they are not layout at all:
+            `.thankyou-col { display: contents }` means the card is the single
+            flex column it has always been, with these divs invisible to it.
+            Only at the desktop breakpoint do they become the two columns of
+            the split the rest of the player already uses — the message on the
+            left, everything the respondent can DO on the right. Wrappers
+            rather than grid-placing the flat list, because half these children
+            are hidden until finish and auto-placement would leave holes where
+            they will be. %>
+        <div class="thankyou-col thankyou-col-message">
         <%# Publishing org's logo, mobile only — desktop already has the
             persistent masthead above the deck (.player-brand-header), and
             showing both would double up on the thank-you screen. Renders
@@ -396,6 +406,9 @@
           <%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %>
         </div>
 
+        </div>
+
+        <div class="thankyou-col thankyou-col-actions">
         <%# Quiz final score — filled in by the player on finish (live: from the
             submit response; preview: from client-side grading). %>
         <% if quiz_mode %>
@@ -498,6 +511,8 @@
         </div>
 
         <%# Small "Powered by Playverto" wordmark at the bottom. %>
+        </div>
+
         <div class="play-powered">
           <span class="play-powered-text"><%= t("player.powered_by") %></span>
           <%= image_tag "playverto.svg", alt: "", class: "play-powered-mark" %>

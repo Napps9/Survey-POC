@@ -6421,6 +6421,54 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 16px;
   color: rgba(255,255,255,0.45); max-width: 380px; line-height: 1.6;
 }
+/* The card is as wide as the deck; its CONTENTS are not, because a 750px line
+   of prose is not readable and a 750px pill is not a button. The card gives
+   the title room to sit on one line and the block below it room to breathe —
+   it does not stretch either to the full width. */
+/* Display type in a column narrower than one line of it, which is the normal
+   case for a creator-written title: balance breaks it evenly rather than
+   leaving one word orphaned on the second line ("Thanks for taking / part!").
+   Ignored where unsupported, which is exactly today's behaviour. */
+.preview-thankyou-title { max-width: 100%; text-wrap: balance; }
+
+/* ── The end screen, on a desktop ──────────────────────────────────────────
+   Every question is answered in an 845px split card — image on one side,
+   question on the other — and the end screen was a 520px centred column, so
+   the last screen was the one screen that disagreed with all the ones before
+   it. It gets the same treatment: the message on the left, everything the
+   respondent can DO on the right.
+
+   980 rather than 845, because this split has no image to give up: the action
+   column stays exactly the 440px the join block, the leaderboard card and the
+   pills were designed at, and the message takes what is left. At 845 the
+   columns would have come out at 358px each and the block would have been
+   NARROWER than it is today, which is the opposite of the point.
+
+   Below the breakpoint nothing here applies and nothing changes: the wrappers
+   are display:contents, so the card is the flex column it has always been. */
+@media (min-width: 768px) {
+  .preview-thankyou-card {
+    max-width: 980px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 440px;
+    column-gap: 40px;
+    align-items: start;
+    text-align: start;
+  }
+  .thankyou-col { display: flex; flex-direction: column; min-width: 0; }
+  .thankyou-col-message { align-items: start; }
+  /* The message column is centred against the actions beside it rather than
+     pinned to the top — two columns of very different heights read as a
+     mistake when the short one starts level with a tall one. */
+  .preview-thankyou-card { align-items: center; }
+  .preview-thankyou-sub { max-width: 100%; }
+  /* Already the flex column of pills it was; it just no longer needs to claim
+     the whole card, and it starts level with the title rather than 22px below
+     the paragraph that is now beside it. */
+  .play-end-actions { margin-top: 0; max-width: 100%; }
+  /* Spans both, under everything, still centred. */
+  .play-powered { grid-column: 1 / -1; justify-self: center; margin-top: 8px; }
+}
 
 /* ── After the last card: end-screen actions and the post-finish panels ────
    These were built as inline `style="…font-size:11px…"` strings, half in
@@ -6491,6 +6539,9 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .play-end-actions {
   display: flex; flex-direction: column; align-items: center;
   gap: 10px; margin-top: 22px; width: 100%;
+  /* Holds the action stack to a readable column, so the join block and the
+     pills stay the size they were designed at however wide the card gets. */
+  max-width: 460px; margin-inline: auto;
 }
 /* Same size as .preview-btn — these are the same kind of control, and the
    thank-you screen is where a respondent decides whether to keep going. */
@@ -10512,7 +10563,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
    for the eyebrow and the small print, and no text under 0.7 alpha. */
 .join-card {
   margin: 18px auto 4px; padding: 18px 22px; border-radius: 18px;
-  width: min(100%, 340px);
+  /* Fills the action column rather than sitting in a 340px phone card inside
+     it. .preview-thankyou-card is 520px with 44px of padding on desktop, so
+     the column is ~432px — pinned at 340px the block was 92px narrower than
+     the buttons above it, and the address and the CTA could not share a row.
+     The cap keeps it honest on a wide embed. */
+  width: 100%; max-width: 440px;
   background: var(--brand-primary-soft, rgba(1,234,203,0.12));
   border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
   display: flex; flex-direction: column; gap: 10px; text-align: start;
