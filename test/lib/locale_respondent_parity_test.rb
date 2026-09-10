@@ -18,7 +18,10 @@ class LocaleRespondentParityTest < ActiveSupport::TestCase
 
   # Whole namespaces, plus the seven join keys, which live inside `player.*`
   # alongside 54 others that are not this feature's.
-  NAMESPACES = %w[you player_sign_in player_sign_in_mailer
+  # player_session is the password form a respondent comes back through. It
+  # joined this list in the same commit that created it, rather than three
+  # pushes later — which is the whole lesson of the note above.
+  NAMESPACES = %w[you player_sign_in player_session player_sign_in_mailer
                   player_notification_mailer player_unsubscribe].freeze
   JOIN_KEYS = %w[join_eyebrow join_title join_body join_cta
                  join_email_placeholder join_fine join_embedded].freeze

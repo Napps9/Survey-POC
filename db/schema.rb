@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_120200) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_145157) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -660,6 +660,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_120200) do
     t.datetime "consumed_at"
     t.datetime "created_at", null: false
     t.datetime "expires_at", null: false
+    t.string "origin", default: "email", null: false
     t.integer "player_id", null: false
     t.string "token_digest", null: false
     t.datetime "updated_at", null: false
@@ -673,6 +674,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_120200) do
     t.string "email_address", null: false
     t.datetime "email_verified_at"
     t.string "name"
+    t.string "password_digest"
     t.string "preferred_locale"
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_players_on_email_address", unique: true

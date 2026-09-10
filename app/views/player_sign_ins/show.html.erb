@@ -9,9 +9,19 @@
     <div class="you-mark"><%= image_tag "playverto.svg", alt: "Playverto", width: 120 %></div>
 
     <% if @link %>
+      <%# Two headings, because this page now serves two arrivals. A link out of
+          an inbox is being confirmed by someone who went and fetched it; a
+          signup link was handed straight back a moment ago on the end screen,
+          and telling that person "this link was sent to you" describes an email
+          that was never sent. %>
       <div class="you-card">
-        <h1 class="you-h1"><%= t("player_sign_in.title") %></h1>
-        <p class="you-sub"><%= t("player_sign_in.body", email: @link.player.email_address) %></p>
+        <h1 class="you-h1">
+          <%= t(@link.proves_address? ? "player_sign_in.title" : "player_sign_in.signup_title") %>
+        </h1>
+        <p class="you-sub">
+          <%= @link.proves_address? ? t("player_sign_in.body", email: @link.player.email_address)
+                                    : t("player_sign_in.signup_body") %>
+        </p>
         <%= button_to t("player_sign_in.cta"), player_sign_in_path(params[:token]),
               method: :post, class: "you-btn you-btn-primary", form: { style: "margin:0;" } %>
         <p class="you-fine"><%= t("player_sign_in.fine", minutes: (PlayerSignInLink::LIFETIME / 60).to_i) %></p>

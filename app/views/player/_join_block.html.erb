@@ -35,19 +35,39 @@
         plainly rather than silently offering less. %>
     <p class="join-note hidden" data-player-target="joinEmbedded"><%= t("player.join_embedded") %></p>
 
+    <%# Two rows now, not one. The address and the password each get their own
+        line: side by side they were two 11rem fields fighting over a 430px
+        column, and the password is the field people mistype. %>
     <div class="join-row">
       <input type="email" class="join-input"
-             inputmode="email" autocomplete="email" enterkeyhint="send"
+             inputmode="email" autocomplete="email" enterkeyhint="next"
              spellcheck="false" autocapitalize="off"
              placeholder="<%= t("player.join_email_placeholder") %>"
              aria-label="<%= t("player.join_email_placeholder") %>"
              data-player-target="joinEmail"
+             data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
+    </div>
+
+    <%# autocomplete="new-password" so a password manager offers to GENERATE
+        one rather than filling whatever it has for this domain — this is a
+        signup, and the same form doubles as a sign-in for a returning
+        address. minlength mirrors Player::MIN_PASSWORD; the server enforces
+        it either way, this is only so the browser says so first. %>
+    <div class="join-row">
+      <input type="password" class="join-input"
+             autocomplete="new-password" enterkeyhint="send"
+             minlength="<%= Player::MIN_PASSWORD %>"
+             placeholder="<%= t("player.join_password_placeholder") %>"
+             aria-label="<%= t("player.join_password_placeholder") %>"
+             data-player-target="joinPassword"
              data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
       <button type="button" class="join-btn" data-player-target="joinBtn"
               data-action="click->player#joinSubmit">
         <%= @survey.join_cta_text %>
       </button>
     </div>
+
+    <p class="join-note"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
 
     <p class="join-error hidden" role="alert" data-player-target="joinError"></p>
     <p class="join-fine"><%= t("player.join_fine") %></p>

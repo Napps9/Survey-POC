@@ -1,6 +1,23 @@
 # A respondent's account. See db/migrate/…_create_players.rb for why this is
 # not the creator `User` and why there is no password column.
 class Player < ApplicationRecord
+  # Mirrors User's own minimum. Named here because the end-card form and its
+  # validation message both have to quote the same number.
+  MIN_PASSWORD = 12
+
+  # `validations: false`, and the explicit rule below instead. The default
+  # macro demands a password on every create, and Player.for_email must go on
+  # making passwordless rows: PlayerSignInLink is still the recovery route for
+  # anyone who signed up before passwords existed, or who has forgotten theirs
+  # (there is no respondent password reset — see PlayerSessionsController).
+  has_secure_password validations: false
+
+  # The same floor as User, deliberately. A shorter rule for respondents would
+  # be a security decision made on conversion grounds, and this is the one
+  # credential standing in front of somebody's answers. allow_nil so the
+  # passwordless rows above stay valid.
+  validates :password, length: { minimum: MIN_PASSWORD }, allow_nil: true
+
   has_many :player_sessions,      dependent: :destroy
   has_many :player_sign_in_links, dependent: :delete_all
   has_many :player_claims,        dependent: :delete_all
@@ -27,6 +44,20 @@ class Player < ApplicationRecord
   # Idempotent: a second sign-in must not move the date.
   def verify_email!
     update_column(:email_verified_at, Time.current) unless email_verified?
+  end
+
+  # Whether a passwordless row may be given a password by whoever is asking.
+  #
+  # True only for a shell nothing has happened to. Player.for_email left one of
+  # these behind on every join attempt for as long as the emailed link was the
+  # only way in — and while the mail was silently failing, that was every
+  # attempt ever made. There is nothing behind such a row to take over.
+  #
+  # A row with claims on it, or one whose address someone has proved by
+  # following a link from their own inbox, is a real account: it keeps its
+  # password, and a signup quoting that address has to know it.
+  def adoptable?
+    password_digest.nil? && !email_verified? && player_claims.empty?
   end
 
   # Find-or-create by address. Deliberately does NOT say which it did: the join

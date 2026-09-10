@@ -309,10 +309,12 @@ en:
     leaderboard_teaser: "Top point collectors make the leaderboard at the end!"
     join_eyebrow: "Keep this"
     join_title: "Keep your Vertos"
-    join_body: "Get a link by email — no password. You'll see your answers next to everyone else's, and hear what happens next."
-    join_cta: "Send me a link"
+    join_body: "Pick a password and you're in. You'll see your answers next to everyone else's, and hear what happens next."
+    join_cta: "Create my account"
     join_email_placeholder: "your@email.com"
-    join_fine: "One email to sign in. We never post anything, and you can delete the account in one tap."
+    join_password_placeholder: "Choose a password"
+    join_password_hint: "At least %{count} characters. You'll use it to sign back in on another device."
+    join_fine: "You're signed in the moment you're done — nothing to wait for in your inbox. We never post anything, and you can delete the account in one tap."
     join_embedded: "This Verto is embedded in another site, so we can't see anything else you've played here. The link will still keep this one."
     play_again: "Play again"
     next_person: "Next person"
@@ -392,6 +394,11 @@ en:
       join_sent_title: "Check your inbox"
       join_sent_body: "We've sent a link to %{email}. It signs you in and keeps this Verto — no password needed."
       join_sent_again: "Send it again"
+      join_password_short: "Use at least %{count} characters."
+      join_credentials: "That address already has an account, and that is not its password."
+      join_too_many: "Too many tries just now. Wait a few minutes and try again."
+      join_unavailable: "This Verto is not taking sign-ups."
+      join_done_title: "Taking you to your account…"
       join_also_one: "Also add the 1 other Verto this device remembers"
       join_also_other: "Also add the %{count} other Vertos this device remembers"
       join_invalid: "That doesn't look like an email address."
@@ -1395,6 +1402,22 @@ en:
     spent_cta: "Go to your Vertos"
     welcome: "You're signed in."
     too_many: "That's a lot of attempts — give it a few minutes."
+    signup_title: "You're all set"
+    signup_body: "Tap below to open your account and keep what you've played."
+  # Signing back in with the password chosen at the end of a Verto.
+  player_session:
+    title: "Sign in to your Vertos"
+    body: "The address and password you chose when you finished a Verto."
+    # Not player.join_password_placeholder — that one says "Choose a password",
+    # which is the signup's sentence and reads as an instruction to invent a new
+    # one on a form that is asking for the existing one.
+    password_placeholder: "Your password"
+    cta: "Sign in"
+    fine: "Signing in on a new device? Use the same address and password."
+    welcome: "You're signed in."
+    failed: "That address and password don't match."
+    too_many: "That's a lot of attempts — give it a few minutes."
+    link_sent: "If that address has an account, a sign-in link is on its way."
   # The respondent account area (/you), the sign-in landing page, the sign-in
   # and notification emails, and the scoped unsubscribe: 98 keys, translated
   # into all 24 non-English locales and guarded from here on.

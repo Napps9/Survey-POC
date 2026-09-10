@@ -25,18 +25,23 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
                         player_key_digest: key ? s.player_key_digest(key) : nil)
   end
 
-  def join(s, **payload)
-    post join_survey_path(s.publish_token), params: payload.to_json,
+  # Long enough for Player::MIN_PASSWORD, and the same one everywhere so a test
+  # that cares about the password says so explicitly.
+  PASSWORD = "correct-horse-battery"
+
+  def join(s, password: PASSWORD, **payload)
+    post join_survey_path(s.publish_token), params: payload.merge(password: password).to_json,
          headers: { "CONTENT_TYPE" => "application/json" }
   end
 
   def address = "pc-#{SecureRandom.hex(4)}@test.com"
 
-  # The raw token out of the email that was actually sent — the only place it
-  # exists, since PlayerSignInLink stores nothing but its digest.
-  def mailed_token
-    mail = ActionMailer::Base.deliveries.last
-    (mail.text_part || mail).body.to_s[%r{/you/sign-in/([\w\-]+)}, 1]
+  # The raw token out of the join RESPONSE. It used to come out of an email;
+  # the endpoint hands it straight back now, because the player page is
+  # cached by the service worker and a session cookie written under
+  # null_session would be silently dropped (see PlayerController#join).
+  def handed_token
+    JSON.parse(response.body)["next"].to_s[%r{/you/sign-in/([\w\-]+)}, 1]
   end
 
   # The link the join just minted, and the claims parked on it.
@@ -58,7 +63,10 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
-    assert_equal({ "ok" => true, "sent" => true }, JSON.parse(response.body))
+    body = JSON.parse(response.body)
+    assert_equal true, body["ok"]
+    assert_match %r{\A/you/sign-in/[\w\-]+\z}, body["next"],
+                 "the link is handed back for the client to follow, not emailed"
     assert_equal [ r.id ], payload_of(email).map { |c| c["response_id"] }
   end
 
@@ -66,9 +74,9 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
     s = survey
     r = completed(s)
     email = address
-    perform_enqueued_jobs { join(s, email: email, session_token: r.session_token) }
+    join(s, email: email, session_token: r.session_token)
 
-    post player_sign_in_path(mailed_token)
+    post player_sign_in_path(handed_token)
 
     claim = Player.find_by(email_address: email).player_claims.sole
     assert_equal r.id, claim.response_id
@@ -153,104 +161,138 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
     assert_equal 1, pl.player_claims.count, "the unique index makes a replay a no-op"
   end
 
-  # ── Every refusal is the success shape ────────────────────────────────────
+  # ── Signing up with a password ────────────────────────────────────────────
+  #
+  # The endpoint used to answer identically for every refusal so that it could
+  # never confirm whether an address was already known. A password cannot work
+  # that way — "we made you an account" and "that is not your password" are
+  # different outcomes and the person has to be told which — so that property
+  # was given up on the owner's instruction (2026-09-10). What follows is the
+  # contract that replaced it. No mail is sent by this endpoint at all now.
 
-  test "refusals are indistinguishable from a success" do
-    s   = survey
-    off = survey(join: false)
-    r   = completed(s)
-    # `sent` rides in this shape too, and is true for every refusal below. It
-    # reports whether OUR mail layer took the message, never anything about the
-    # address — a `sent` that went false because a Verto had the ask switched
-    # off, or because an address was over budget, would be the oracle this test
-    # exists to prevent.
-    ok  = { "ok" => true, "sent" => true }
+  test "a new address gets an account, a password and a link to spend" do
+    s = survey
+    email = address
 
-    # Joined for real.
-    join(s, email: address, session_token: r.session_token)
-    assert_equal ok, JSON.parse(response.body)
-
-    # Switched off, blank, malformed, and an address nobody has ever used.
-    [ [ off, address ], [ s, "" ], [ s, "not-an-address" ], [ s, address ] ].each do |verto, email|
-      join(verto, email: email)
-      assert_response :success
-      assert_equal ok, JSON.parse(response.body), "#{email.inspect} on #{verto.id} must read as a success"
+    assert_difference [ -> { Player.count }, -> { PlayerSignInLink.count } ], 1 do
+      assert_no_difference -> { ActionMailer::Base.deliveries.size } do
+        join(s, email: email)
+      end
     end
+
+    assert_response :success
+    player = Player.find_by(email_address: email)
+    assert player.authenticate(PASSWORD), "the password typed at the end card is the account's"
+    assert_nil player.email_verified_at,
+               "nothing has proved this address — only a link out of an inbox does that"
   end
 
-  # ── The screen must not claim an inbox we never wrote to ──────────────────
-  # A deploy with no SMTP_ADDRESS falls back to Rails' :smtp-at-localhost:25
-  # default and delivers nothing, while the player's end card said "We've sent
-  # a link to <address>. Check your inbox." to every respondent. #deliver_later
-  # cannot catch it — the connection is only attempted later, inside the job —
-  # so the endpoint answers with what it knows before enqueueing.
+  test "the handed-back link signs in without verifying the address" do
+    s = survey
+    email = address
+    join(s, email: email)
 
-  test "an undeliverable deployment says so instead of claiming a send" do
+    post player_sign_in_path(handed_token)
+
+    player = Player.find_by(email_address: email)
+    assert_nil player.reload.email_verified_at,
+               "a signup link proves somebody typed the address, not that they can read it"
+    assert_equal PlayerSignInLink::ORIGIN_SIGNUP, PlayerSignInLink.last.origin
+  end
+
+  test "an emailed link still verifies the address" do
+    # The distinction the origin column exists for: PlayerAudience.for_survey
+    # will not mail an unverified address, so getting this backwards would
+    # either mail people who never proved an address or mail nobody at all.
+    pl = Player.for_email(address)
+    _link, raw = PlayerSignInLink.mint!(player: pl, origin: PlayerSignInLink::ORIGIN_EMAIL)
+
+    post player_sign_in_path(raw)
+
+    assert_not_nil pl.reload.email_verified_at
+  end
+
+  test "a returning address with the right password signs in and claims again" do
+    s = survey
+    email = address
+    join(s, email: email)                      # first visit, account created
+    first = Player.find_by(email_address: email)
+
+    later = completed(s)
+    assert_no_difference -> { Player.count } do
+      join(s, email: email, session_token: later.session_token)
+    end
+
+    assert_response :success
+    assert_equal first.id, Player.find_by(email_address: email).id
+    assert_equal [ later.id ], payload_of(email).map { |c| c["response_id"] }
+  end
+
+  test "a returning address with the wrong password is refused" do
+    s = survey
+    email = address
+    join(s, email: email)
+
+    assert_no_difference -> { PlayerSignInLink.count } do
+      join(s, email: email, password: "not-the-right-one")
+    end
+
+    assert_response :unauthorized
+    assert_equal "credentials", JSON.parse(response.body)["error"]
+  end
+
+  test "a passwordless shell from the emailed-link era may be adopted" do
+    # Player.for_email left one of these behind on every join attempt while the
+    # emailed link was the only way in — and the mail was failing, so that is
+    # every attempt ever made. Nothing is on them, so there is nothing to take.
+    s = survey
+    email = address
+    shell = Player.for_email(email)
+    assert_nil shell.password_digest
+    assert shell.adoptable?
+
+    join(s, email: email)
+
+    assert_response :success
+    assert shell.reload.authenticate(PASSWORD)
+  end
+
+  test "a shell that has claims or a proven address is not adoptable" do
     s = survey
     r = completed(s)
 
-    stub_method(MailConfigCheck, :deliverable?, ->(*) { false }) do
-      assert_no_difference [ -> { PlayerSignInLink.count },
-                             -> { ActionMailer::Base.deliveries.size } ] do
-        join(s, email: address, session_token: r.session_token)
-      end
-    end
+    with_claims = Player.for_email(address)
+    PlayerClaim.claim!(player: with_claims, response: r, source: "signup")
+    assert_not with_claims.reload.adoptable?, "claims on the row make it a real account"
 
-    assert_response :success
-    assert_equal({ "ok" => true, "sent" => false }, JSON.parse(response.body),
-                 "the player shows join_failed on sent:false; a bare ok:true reads as an inbox")
+    verified = Player.for_email(address)
+    verified.verify_email!
+    assert_not verified.reload.adoptable?, "a proven address makes it a real account"
+
+    join(s, email: verified.email_address)
+    assert_response :unauthorized,
+                    "adopting a proven address would be a takeover of it"
   end
 
-  test "a link is not minted for a send that cannot go out" do
-    # Minting first would spend a link nobody can ever receive, and park this
-    # run's claims on it — the person asks again and the earlier claims are
-    # stranded on a dead row.
+  test "a password under the minimum is refused before anything is written" do
     s = survey
     email = address
 
-    stub_method(MailConfigCheck, :deliverable?, ->(*) { false }) do
-      join(s, email: email)
+    assert_no_difference [ -> { Player.count }, -> { PlayerSignInLink.count } ] do
+      join(s, email: email, password: "a" * (Player::MIN_PASSWORD - 1))
     end
 
-    assert_nil payload_of(email), "no link, so nothing to carry claims"
+    assert_equal "password_short", JSON.parse(response.body)["error"]
   end
 
-  test "a mailer that raises reports a failure rather than a send" do
-    # The rescue is right — a dead queue must not 500 a respondent — but it
-    # used to swallow the outcome as well as the exception.
-    s = survey
-    reported = []
-
-    stub_method(ErrorReporting, :report, ->(tag, *_a, **_k) { reported << tag }) do
-      stub_method(PlayerSignInMailer, :sign_in, ->(*) { raise "queue down" }) do
-        join(s, email: address)
-      end
-    end
-
-    assert_response :success
-    assert_equal false, JSON.parse(response.body)["sent"]
-    assert_includes reported, "PlayerController#send_sign_in_link"
-  end
-
-  test "a working deployment still reports a real send" do
-    s = survey
-
-    assert_difference -> { ActionMailer::Base.deliveries.size }, 1 do
-      perform_enqueued_jobs { join(s, email: address) }
-    end
-
-    assert_equal true, JSON.parse(response.body)["sent"]
-  end
-
-  test "a Verto with join switched off sends nothing and creates no player" do
+  test "a Verto with join switched off refuses and creates no player" do
     s = survey(join: false)
     email = address
 
-    assert_no_difference [ -> { Player.count }, -> { PlayerSignInLink.count },
-                           -> { ActionMailer::Base.deliveries.size } ] do
+    assert_no_difference [ -> { Player.count }, -> { PlayerSignInLink.count } ] do
       join(s, email: email)
     end
-    assert_response :success
+    assert_response :forbidden
   end
 
   test "a blank or malformed address creates nothing" do
@@ -270,7 +312,9 @@ class PlayerClaimsTest < ActionDispatch::IntegrationTest
     join(s, email: address)
 
     assert_nil cookies[:player_session_id].presence,
-               "the join endpoint runs under null_session and can never set one"
+               "the join endpoint runs under null_session, where a cookie write is " \
+               "silently dropped on a failed CSRF check — which is exactly why the " \
+               "session is established by spending the handed-back link instead"
   end
 
   test "join writes no player_key_digest onto the finished run" do

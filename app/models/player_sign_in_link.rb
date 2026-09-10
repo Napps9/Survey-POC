@@ -20,13 +20,26 @@ class PlayerSignInLink < ApplicationRecord
 
   scope :live, -> { where(consumed_at: nil).where(arel_table[:expires_at].gt(Time.current)) }
 
+  # Where the link reached the person. Only EMAIL proves they can read the
+  # address; SIGNUP is handed straight back in the join response, so it
+  # establishes a session without ever verifying the address (see the
+  # migration, and PlayerSignInsController#create).
+  ORIGIN_EMAIL  = "email"
+  ORIGIN_SIGNUP = "signup"
+  ORIGINS = [ ORIGIN_EMAIL, ORIGIN_SIGNUP ].freeze
+
+  validates :origin, inclusion: { in: ORIGINS }
+
   # Returns [record, raw_token]. The caller mails the raw token and forgets it.
-  def self.mint!(player:, claim_payload: [])
+  def self.mint!(player:, claim_payload: [], origin: ORIGIN_EMAIL)
     raw = SecureRandom.urlsafe_base64(TOKEN_BYTES)
-    record = create!(player: player, token_digest: digest(raw),
+    record = create!(player: player, token_digest: digest(raw), origin: origin,
                      claim_payload: claim_payload, expires_at: LIFETIME.from_now)
     [ record, raw ]
   end
+
+  # Whether spending this link is proof the address belongs to whoever spent it.
+  def proves_address? = origin == ORIGIN_EMAIL
 
   def self.digest(raw)
     normalised = raw.to_s.strip

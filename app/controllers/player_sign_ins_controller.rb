@@ -40,7 +40,11 @@ class PlayerSignInsController < ApplicationController
     return render :show, status: :unprocessable_entity unless @link.consume!
 
     player = @link.player
-    player.verify_email!
+    # Only a link that travelled through an inbox proves the address belongs to
+    # whoever is spending it. A signup link was handed straight back in the join
+    # response, so it establishes a session and nothing more — the address stays
+    # unproven, and PlayerAudience.for_survey goes on refusing to mail it.
+    player.verify_email! if @link.proves_address?
     apply_claims(player, @link.claim_payload)
     start_player_session_for(player)
 

@@ -99,6 +99,12 @@ Rails.application.routes.draw do
   # creator-facing unsubscribe at /e/u/:token.
   get    "you/stop/:token",    to: "player_unsubscribes#show",   as: :player_unsubscribe
   post   "you/stop/:token",    to: "player_unsubscribes#create"
+  # The password form, for a respondent coming back on another device. Declared
+  # BEFORE the :token routes below: "email" is a legal value for :token, so the
+  # POST would otherwise be swallowed by the link-consuming route.
+  get    "you/sign-in",        to: "player_sessions#new",    as: :new_player_session
+  post   "you/sign-in",        to: "player_sessions#create"
+  post   "you/sign-in/email",  to: "player_sessions#link",   as: :player_session_link
   get    "you/sign-in/:token", to: "player_sign_ins#show",   as: :player_sign_in
   post   "you/sign-in/:token", to: "player_sign_ins#create"
 

@@ -13341,6 +13341,20 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .you-btn-primary { background: #01EACB; color: #1C2034; border-color: transparent; }
 
+/* The respondent sign-in form. Sized like .join-input rather than restyled —
+   it is the same two fields the end card asks for, so 1rem here for the same
+   reason: anything under 16px makes iOS Safari zoom the page on focus. */
+.you-input {
+  display: block; width: 100%; box-sizing: border-box; margin-top: 12px;
+  font-family: "ABeeZee", sans-serif; font-size: 1rem;
+  padding: 11px 14px; border-radius: 12px; color: #fff;
+  background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.28);
+}
+.you-input::placeholder { color: rgba(255,255,255,.5); }
+.you-input:focus-visible {
+  outline: 2px solid #01EACB; outline-offset: 1px; border-color: #01EACB;
+}
+
 .you-list { display: flex; flex-direction: column; gap: 12px; }
 .you-verto {
   position: relative; background: rgba(22,26,44,.93);

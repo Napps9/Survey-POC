@@ -1,0 +1,37 @@
+<%# Signing back in with the password chosen at the end of a Verto. Same shell
+    and same classes as player_sign_ins/show — a respondent who has seen one of
+    these pages should recognise the other.
+
+    No "forgot your password?" link, and that is not an oversight: there is no
+    respondent password reset. PlayerSessionsController#link is the recovery
+    route and it needs working SMTP, so a button offering it today would be the
+    same silent nothing this whole change was made to remove. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell you-shell-narrow">
+    <div class="you-mark"><%= image_tag "playverto.svg", alt: "Playverto", width: 120 %></div>
+
+    <div class="you-card">
+      <h1 class="you-h1"><%= t("player_session.title") %></h1>
+      <p class="you-sub"><%= t("player_session.body") %></p>
+
+      <%# Same path as the GET, different verb — the route has no name of its
+          own, so the form posts back to where it was rendered. %>
+      <%= form_with url: new_player_session_path, method: :post, data: { turbo: false },
+                    html: { style: "margin:0;" } do |f| %>
+        <%= f.email_field :email_address, required: true,
+              autocomplete: "email", inputmode: "email", spellcheck: false,
+              autocapitalize: "off", class: "you-input",
+              placeholder: t("player.join_email_placeholder"),
+              aria: { label: t("player.join_email_placeholder") } %>
+        <%= f.password_field :password, required: true,
+              autocomplete: "current-password", class: "you-input",
+              placeholder: t("player_session.password_placeholder"),
+              aria: { label: t("player_session.password_placeholder") } %>
+        <%= f.submit t("player_session.cta"), class: "you-btn you-btn-primary" %>
+      <% end %>
+
+      <p class="you-fine"><%= t("player_session.fine") %></p>
+    </div>
+  </div>
+</div>

@@ -8,6 +8,23 @@ import { NON_QUESTION_TYPES } from "lib/question_types"
 const MAP_MIN_SCALE = 1
 const MAP_MAX_SCALE = 8
 
+// Mirrors Player::MIN_PASSWORD. Duplicated rather than threaded through as a
+// Stimulus value because the same number appears in the partial's `minlength`
+// and in the hint under the field, and the server enforces it regardless —
+// this only lets the browser say so before the round trip.
+const JOIN_MIN_PASSWORD = 12
+
+// The join endpoint's refusals, mapped to what the person is told. Anything
+// unlisted falls through to join_failed: a new server-side code must not
+// render as a blank error or as a raw key.
+const JOIN_ERRORS = {
+  email:          "player.join_invalid",
+  password_short: "player.join_password_short",
+  credentials:    "player.join_credentials",
+  too_many:       "player.join_too_many",
+  unavailable:    "player.join_unavailable"
+}
+
 // Cards that ask for agreement rather than an answer, and drive their own
 // navigation. "consent_gate" is the multi-page card type a creator can place
 // and reorder like any other. The survey-level gate (from consent_text) is no
@@ -66,7 +83,7 @@ export default class extends Controller {
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "joinBlock", "joinAsk", "joinAlso", "joinAlsoBox", "joinAlsoLabel",
-                    "joinEmbedded", "joinEmail", "joinBtn", "joinError", "joinDone",
+                    "joinEmbedded", "joinEmail", "joinPassword", "joinBtn", "joinError", "joinDone",
                     "testConfirm"]
   static values  = {
     progressUrl: { type: String, default: "" },
@@ -3177,9 +3194,15 @@ export default class extends Controller {
     const email = (this.hasJoinEmailTarget ? this.joinEmailTarget.value : "").trim()
     // A deliberately loose client-side check: the server is the authority, and
     // a strict regex here rejects addresses that are perfectly deliverable.
-    // Its only job is to catch the obvious typo before an email goes nowhere.
+    // Its only job is to catch the obvious typo before the round trip.
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       this._joinError(t("player.join_invalid"))
+      return
+    }
+
+    const password = this.hasJoinPasswordTarget ? this.joinPasswordTarget.value : ""
+    if (password.length < JOIN_MIN_PASSWORD) {
+      this._joinError(t("player.join_password_short", { count: JOIN_MIN_PASSWORD }))
       return
     }
 
@@ -3193,23 +3216,25 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
+          password,
           session_token: this._sessionToken || null,
           lang: this.localeValue || null,
           device_keys: wanted ? this._joinDeviceKeys() : []
         })
       })
-      if (!res.ok) throw new Error(`status ${res.status}`)
-      const data = await res.json()
-      // A 200 means the endpoint heard us, not that a link was sent: it answers
-      // identically for every refusal on purpose. `sent: false` is the one
-      // thing it will admit — our own mail layer could not take the message —
-      // and claiming an inbox over that is how a deployment with no SMTP
-      // configured looked, to every respondent, exactly like a working one.
-      // Strict false, not falsy: only an explicit refusal turns into an error,
-      // so an unexpected or missing field reads as the success it used to and
-      // never invents a failure the server did not report.
-      if (data?.sent === false) this._joinError(t("player.join_failed"))
-      else this._joinSent(email)
+      const data = await res.json().catch(() => null)
+
+      // The endpoint hands back a single-use sign-in link rather than setting a
+      // cookie: this POST runs under null_session (the player page is cached by
+      // the service worker, so its CSRF token can be arbitrarily stale) and a
+      // cookie written under a failed check is silently dropped. Following the
+      // link finishes the sign-in on a page that is not cached.
+      if (res.ok && data?.ok && data?.next) {
+        this._joinDone(data.next)
+        return
+      }
+      this._joinError(t(JOIN_ERRORS[data?.error] || "player.join_failed",
+                        { count: JOIN_MIN_PASSWORD }))
     } catch (_e) {
       this._joinError(t("player.join_failed"))
     } finally {
@@ -3218,25 +3243,21 @@ export default class extends Controller {
     }
   }
 
-  // The server answers identically whether or not it knows the address, so
-  // this screen says what WE did — a link is on its way — and never anything
-  // about the account behind it.
-  _joinSent(email) {
-    if (!this.hasJoinDoneTarget) return
+  // The account exists and a single-use link to finish signing in is in hand.
+  //
+  // Navigating rather than rendering a "done" card: the link has to be spent on
+  // the sign-in page to establish the session (see joinSubmit), and parking the
+  // respondent on a success message they then have to act on is how you lose
+  // them. The card is still swapped first so a slow navigation does not leave
+  // the form sitting there looking unpressed.
+  _joinDone(next) {
     if (this.hasJoinAskTarget) this.joinAskTarget.classList.add("hidden")
-    this.joinDoneTarget.classList.remove("hidden")
-    this.joinDoneTarget.innerHTML = `
-      <div class="join-sent-title">✉ ${this._esc(t("player.join_sent_title"))}</div>
-      <p class="join-sent-body">${this._esc(t("player.join_sent_body", { email }))}</p>
-      <button type="button" class="join-again" data-action="click->player#joinAgain">${this._esc(t("player.join_sent_again"))}</button>`
-  }
-
-  // Back to the ask, with the address still in the field — the usual reason
-  // for pressing this is a typo they have just spotted.
-  joinAgain() {
-    if (this.hasJoinDoneTarget) this.joinDoneTarget.classList.add("hidden")
-    if (this.hasJoinAskTarget) this.joinAskTarget.classList.remove("hidden")
-    if (this.hasJoinEmailTarget) this.joinEmailTarget.focus()
+    if (this.hasJoinDoneTarget) {
+      this.joinDoneTarget.classList.remove("hidden")
+      this.joinDoneTarget.innerHTML =
+        `<div class="join-sent-title">${this._esc(t("player.join_done_title"))}</div>`
+    }
+    window.location.assign(next)
   }
 
   _joinError(message) {

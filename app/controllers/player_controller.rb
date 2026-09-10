@@ -722,36 +722,63 @@ class PlayerController < ApplicationController
   # of joiners alone. The run just finished is claimed by session_token, which
   # every response already has.
   #
-  # Every refusal returns the SAME body a success does: unknown address, blank
-  # address, join switched off, budget spent, or an exception. An endpoint that
-  # answers differently for an address it has seen before is an endpoint that
-  # confirms addresses — RespondentRecall's doctrine, applied to email.
+  # THE ORACLE PROPERTY IS GONE, deliberately and on the owner's instruction
+  # (2026-09-10). This endpoint used to answer identically for every refusal so
+  # that it could never confirm whether an address was already known. A
+  # password cannot work that way: "we made you an account" and "that is not
+  # your password" are different outcomes and the person has to be told which.
+  # Creator signup has always leaked the same fact, so the app is at least
+  # consistent — but the property was real and this is what replaced it.
+  #
+  # That makes join_budget_ok? load-bearing in a way it was not before: it is
+  # now the brute-force bound on a password field, not just a mail-volume cap.
+  #
+  # No session is started HERE. This action runs under protect_from_forgery
+  # with: :null_session (the player page is cached by the service worker, so
+  # its CSRF token can be arbitrarily stale) and under null_session a failed
+  # check swaps in a cookie jar whose writes are silently dropped — the account
+  # would be created and the session never set, which is precisely the trap
+  # PlayerSignInsController's header describes. So the response hands back a
+  # single-use PlayerSignInLink instead and the client follows it: same row,
+  # same consumption, same claim application as the emailed path, on a page
+  # that is not cached and does carry a live token.
   def join
     return render json: { ok: false }, status: :not_found unless @survey
     return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+    return render json: { ok: false, error: "unavailable" }, status: :forbidden unless @survey.join_prompt?
 
-    email = params[:email].to_s.strip.downcase.first(Player::MAX_EMAIL)
+    email    = params[:email].to_s.strip.downcase.first(Player::MAX_EMAIL)
+    password = params[:password].to_s
 
-    # `sent` answers "did OUR mail layer manage to take this on", never "was
-    # this address worth sending to". Every respondent-specific refusal below —
-    # switched off, over budget, unusable address — leaves it true, so the
-    # response stays the single indistinguishable shape that keeps this
-    # endpoint from confirming addresses (see the refusal test in
-    # player_claims_test.rb). Only a deployment-wide failure flips it, and that
-    # is a fact about us that an enumerator can read off any Verto anyway.
-    sent = true
-    if @survey.join_prompt? && join_budget_ok?(email) && (player = Player.for_email(email))
-      remember_play_locale(player)
-      sent = send_sign_in_link(player, join_claim_payload)
+    return render json: { ok: false, error: "email" } unless email.match?(URI::MailTo::EMAIL_REGEXP)
+    return render json: { ok: false, error: "password_short" } if password.length < Player::MIN_PASSWORD
+    return render json: { ok: false, error: "too_many" }, status: :too_many_requests unless join_budget_ok?(email)
+
+    player = Player.find_by(email_address: email)
+
+    if player.nil?
+      player = Player.create!(email_address: email, password: password)
+    elsif player.adoptable?
+      # A shell left behind by the emailed-link era, with nothing on it. Giving
+      # it the password now is the same act as creating it would have been.
+      player.update!(password: password)
+    elsif !player.authenticate(password)
+      return render json: { ok: false, error: "credentials" }, status: :unauthorized
     end
 
-    render json: { ok: true, sent: sent }
+    remember_play_locale(player)
+    _link, raw = PlayerSignInLink.mint!(player: player, claim_payload: join_claim_payload,
+                                        origin: PlayerSignInLink::ORIGIN_SIGNUP)
+
+    render json: { ok: true, next: player_sign_in_path(raw) }
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => e
+    # A losing create race, or a password the model refused for a reason the
+    # length check above did not catch. Neither is a server fault.
+    ErrorReporting.report("PlayerController#join", e, survey_id: @survey&.id)
+    render json: { ok: false, error: "retry" }, status: :unprocessable_entity
   rescue => e
-    # Deliberately generic, and deliberately ok: an error shape is itself an
-    # oracle signal, so there isn't one. `sent: false` is safe here for the
-    # same reason it is above — we got far enough to know WE failed.
-    ErrorReporting.report("PlayerController#join", e)
-    render json: { ok: true, sent: false }
+    ErrorReporting.report("PlayerController#join", e, survey_id: @survey&.id)
+    render json: { ok: false, error: "retry" }, status: :internal_server_error
   end
 
   def results
@@ -1149,26 +1176,6 @@ class PlayerController < ApplicationController
                          SupportedLocales.coerce(params[:lang].presence || I18n.locale))
   end
 
-  # Mint and mail, in that order, with the mail failure contained. Solid Queue
-  # being unavailable must not lose the link silently OR 500 the join: the row
-  # is already written, so the person can ask again and get a second one.
-  #
-  # Returns whether the link is genuinely on its way. Containing the failure is
-  # right; reporting it as a success was not — a deployment with no SMTP_ADDRESS
-  # told every respondent "check your inbox" over mail that never left, and
-  # #deliver_later cannot catch that for us because the SMTP connection is only
-  # attempted later, inside the job, where this rescue can no longer see it.
-  # So the unsendable case is checked BEFORE enqueueing rather than rescued.
-  def send_sign_in_link(player, claims)
-    return false unless MailConfigCheck.deliverable?
-
-    _link, raw = PlayerSignInLink.mint!(player: player, claim_payload: claims)
-    PlayerSignInMailer.sign_in(player, raw, @survey).deliver_later
-    true
-  rescue => e
-    ErrorReporting.report("PlayerController#send_sign_in_link", e, survey_id: @survey&.id)
-    false
-  end
 
   # The board's two inputs, from a JSON body on the POST and from the query
   # string on the deprecated GET. A malformed body is not an error here: the

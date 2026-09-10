@@ -26,7 +26,7 @@ require "test_helper"
 # 18-24 locales, left by other work.
 class LocaleStructureParityTest < ActiveSupport::TestCase
   NAMESPACES = %w[js defaults card templates demographics ask unsubscribe
-                  you player_sign_in player_sign_in_mailer
+                  you player_sign_in player_session player_sign_in_mailer
                   player_notification_mailer player_unsubscribe].freeze
 
   def locale_files
