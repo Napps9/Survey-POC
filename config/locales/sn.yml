@@ -1240,6 +1240,7 @@ sn:
     why_outcome_label: "Zivo Yauchawana"
     why_condition_label: "Mamiriro Anobvumira"
     why_framework: "Playverto inoverenga Kuita Munyika serongedzero — Kuziva → Chinangwa → Simba. Kuisa mubvunzo wega wega pachinzvimbo chinoita kuti “mukaha wekutanga kuita” uonekwe: kwavanhu vachiziva asi vasingaiti, kana vakagadzirira asi vasingakwanisi."
+    ty_also_sees: "Vachaonawo"
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"

@@ -1230,6 +1230,7 @@ pt:
     why_outcome_label: "The insight you'll get"
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
+    ty_also_sees: "Também verão"
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"

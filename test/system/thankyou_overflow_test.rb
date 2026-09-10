@@ -38,16 +38,9 @@ class ThankyouOverflowTest < ApplicationSystemTestCase
     assert_selector ".preview-thankyou.active", wait: 8
   end
 
-  # A short *window* won't do: Chromium clamps its window to roughly 500px, so
-  # the layout would quietly stay tall enough to hide the bug.
-  def with_viewport(width, height)
-    page.driver.browser.page.command("Emulation.setDeviceMetricsOverride",
-                                     width: width, height: height,
-                                     deviceScaleFactor: 1, mobile: true)
-    yield
-  ensure
-    page.driver.browser.page.command("Emulation.clearDeviceMetricsOverride")
-  end
+  # with_viewport moved to ApplicationSystemTestCase when EndScreenLayoutTest
+  # became the third suite that needs it. Same behaviour: CDP device metrics,
+  # because Chromium clamps a resized window to roughly 500px.
 
   test "a thank-you taller than the viewport starts at the top and scrolls" do
     with_viewport(390, 240) do

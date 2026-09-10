@@ -93,6 +93,8 @@ export default class extends Controller {
     regionsUrl: { type: String, default: "" },
     locale: { type: String, default: "" },
     shareUrl: { type: String, default: "" },
+    shareTitle: { type: String, default: "" },
+    shareText: { type: String, default: "" },
     showComparison: { type: Boolean, default: false },
     quiz: { type: Boolean, default: false },
     gradeUrl: { type: String, default: "" },
@@ -1491,11 +1493,21 @@ export default class extends Controller {
   // Share the public play link so respondents can pass the Verto on. Uses the
   // native share sheet where available (mobile), falling back to copying the
   // link to the clipboard with a brief ✓ on the button (desktop).
+  //
+  // The creator's own share copy is carried through. This used to pass
+  // `document.title` and the URL and nothing else, which meant BOTH the share
+  // headline and the "Message respondents send" field were invisible: the
+  // editor asked for a line "written as the respondent, in their voice" and
+  // promised "the link is added automatically", and the sheet then opened with
+  // neither. share_message has no fallback by design — an empty `text` is
+  // simply omitted rather than inventing words for somebody.
   async share() {
     const url = this.shareUrlValue || window.location.href
     if (navigator.share) {
+      const payload = { title: this.shareTitleValue || document.title, url }
+      if (this.shareTextValue) payload.text = this.shareTextValue
       try {
-        await navigator.share({ title: document.title, url })
+        await navigator.share(payload)
       } catch (_) {
         // Sheet dismissed or failed — nothing more to do.
       }

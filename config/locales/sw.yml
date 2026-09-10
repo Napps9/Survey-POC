@@ -1230,6 +1230,7 @@ sw:
     why_outcome_label: "The insight you'll get"
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
+    ty_also_sees: "Pia wataona"
   dashboard_card:
     publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"

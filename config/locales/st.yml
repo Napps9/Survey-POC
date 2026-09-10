@@ -1252,6 +1252,7 @@ st:
     why_outcome_label: "Tsebo eo o tla e fumana"
     why_condition_label: "Boemo bo dumellang"
     why_framework: "Playverto e bala Ho Nka Bohato Lefatsheng jwalo ka tatelano — Tlhokomelo → Maikemisetso → Matla. Ho tshwaya potso ka nngwe ho etsa hore “lekgalo la ho nka bohato” le bonahale — moo batho ba tlhokomelang empa ba sa nke bohato, kapa ba itokiseditse empa ba sa kgone."
+    ty_also_sees: "Ba tla bona hape"
   dashboard_card:
     publish_warning: "Phatlalatsa “%{title}”? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     preview: "Pontsho"

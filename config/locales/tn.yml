@@ -1252,6 +1252,7 @@ tn:
     why_outcome_label: "Kitso e o tla e bonang"
     why_condition_label: "Seemo se se dumelelang"
     why_framework: "Playverto e bala Go dira mo lefatsheng jaaka tatelano — Kelotlhoko → Boikaelelo → Bokgoni. Go tshwaya potso nngwe le nngwe go dira gore “lekgalo la tiragatso” le bonale — kwa batho ba lemogang mme ba sa dire, kgotsa ba iketleeditse mme ba sa kgone."
+    ty_also_sees: "Ba tla bona gape"
   dashboard_card:
     publish_warning: "Phasaladitsa “%{title}”? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     preview: "Leba"

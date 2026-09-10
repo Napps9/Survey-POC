@@ -12,12 +12,14 @@ function escapeAttr(s) {
 export default class extends Controller {
   static targets = [
     "overlay", "card", "backBtn", "nextBtn",
-    "finishBtn", "thankyou", "returnBtn", "editBtn", "progress"
+    "finishBtn", "thankyou", "returnBtn", "editBtn", "progress",
+    "thankyouTitle", "thankyouBody", "thankyouForward"
   ]
   static values = { current: { type: Number, default: 0 } }
 
   open() {
     this._syncPreviewCards()
+    this._syncThankyou()
     this.overlayTarget.classList.remove("hidden")
     this.overlayTarget.classList.add("flex")
     this.currentValue = 0
@@ -133,6 +135,45 @@ export default class extends Controller {
   // statement pager, the card-editor controller binding), and drop it into the matching
   // `.preview-card` wrapper. Stimulus's MutationObserver rebinds the
   // picker / tap-stack / slider / rating controllers automatically.
+  // The thank-you screen is server-rendered once, at page load, and the feed's
+  // gate card is edited live — so opening Preview after typing a new title used
+  // to show the OLD one, next to cards that were perfectly up to date. Same
+  // rule as the cards above: the editor's markup is the source of truth, so
+  // read it rather than the value the page happened to boot with.
+  //
+  // Reads the CARD, not the save: gate-cards debounces its POST by 900ms, so
+  // waiting for persistence would mean previewing stale copy for a second
+  // after every keystroke.
+  _syncThankyou() {
+    const feed = (sel) => document.querySelector(sel)
+    const copy = (target, source, fallbackAttr = "defaultText") => {
+      if (!target || !source) return
+      const written = source.textContent.trim()
+      target.textContent = written || source.dataset[fallbackAttr] || ""
+    }
+
+    copy(this.hasThankyouTitleTarget ? this.thankyouTitleTarget : null,
+         feed("[data-gate-cards-target='tyTitle']"))
+    copy(this.hasThankyouBodyTarget ? this.thankyouBodyTarget : null,
+         feed("[data-gate-cards-target='tyBody']"))
+
+    // The forward button is an <input> pair in the editor and a pill here, so
+    // it is rebuilt rather than copied — and hidden when there is no URL,
+    // exactly as the player hides it.
+    if (this.hasThankyouForwardTarget) {
+      const url   = feed("[data-gate-cards-target='tyForwardUrl']")
+      const label = feed("[data-gate-cards-target='tyForwardLabel']")
+      const href  = url ? url.value.trim() : ""
+      this.thankyouForwardTarget.classList.toggle("hidden", href === "")
+      if (href !== "") {
+        const text = label && label.value.trim() !== ""
+          ? label.value.trim()
+          : (label ? label.placeholder : "")
+        if (text) this.thankyouForwardTarget.textContent = `${text} →`
+      }
+    }
+  }
+
   _syncPreviewCards() {
     const editorCards = Array.from(
       document.querySelectorAll('[data-type-panel-target="card"]')

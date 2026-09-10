@@ -1237,6 +1237,7 @@ af:
     why_outcome_label: "Die insig wat jy sal kry"
     why_condition_label: "Bemagtigende voorwaarde"
     why_framework: "Playverto lees Optrede in die wêreld as 'n volgorde — Bewustheid → Voorneme → Vermoë. Deur elke vraag te merk word die “aktiveringsgaping” sigbaar: waar mense bewus is maar nie optree nie, of gereed is maar nie in staat is nie."
+    ty_also_sees: "Hulle sal ook sien"
   dashboard_card:
     publish_warning: "Publiseer “%{title}”? Sodra dit regstreeks is, word sy vrae gesluit en kan nie gewysig word nie — maak seker alles lees presies soos jy dit wil hê."
     preview: "Voorskou"

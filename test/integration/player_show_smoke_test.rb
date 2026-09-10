@@ -29,7 +29,11 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
 
     # The cards feed and the thank-you screen still render.
     assert_select ".preview-card[data-card-type='welcome_card']"
-    assert_select "[data-player-target='thankyou'] .preview-thankyou-card"
+    # Child chain, not a descendant match: the message column is the half that
+    # went missing on the editor's copy of this card, and a descendant selector
+    # would keep passing if the wrappers were dropped and the title reparented.
+    assert_select "[data-player-target='thankyou'] .end-screen-frame > .preview-thankyou-card > " \
+                  ".thankyou-col-message > [data-player-target='thankyouTitle']"
   end
 
   # The one context with no other guard: a respondent's very first sight of a
@@ -77,7 +81,15 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:type'][content='website']"
     assert_select "meta[property='og:site_name'][content='Playverto']"
     assert_select "meta[property='og:url'][content=?]", play_survey_url(survey.publish_token)
-    assert_select "meta[name='twitter:card'][content='summary']"
+    # summary_large_image, not summary: there is now always an og:image worth
+    # the room. Survey#share_image_path falls through the Verto's own imagery to
+    # a theme-matched picture from the committed library, so this is a
+    # guarantee rather than a Verto-by-Verto question — see
+    # survey_share_image_test.rb.
+    assert_select "meta[name='twitter:card'][content='summary_large_image']"
+    assert_select "meta[property='og:image'][content=?]",
+                  URI.join(play_survey_url(survey.publish_token), survey.share_image_path).to_s
+    assert_select "meta[property='og:image:alt'][content=?]", survey.share_image_alt
   end
 
   test "OpenGraph tags fall back to the theme when there is no description" do

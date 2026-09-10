@@ -160,6 +160,89 @@ class ShareCardTest < ActionDispatch::IntegrationTest
     assert_select "div[data-gate-cards-target='shareStory'][data-default-text='The brief.']"
   end
 
+  # The card used to borrow .preview-thankyou-card and read as three identical
+  # labelled fields. Both were wrong: borrowing the player's card class is what
+  # let the end screen's desktop grid pick it up and deal the fields into a 2x2,
+  # and "three fields" hid that two of them are the unfurl a recipient reads
+  # while the third is the line the respondent sends.
+  test "the share card is drawn as the link preview it configures" do
+    org = sign_in_org("unfurl")
+    s   = survey_for(org, share_title: "Written")
+
+    get survey_path(s)
+    assert_response :success
+
+    assert_select ".unfurl-mock", 1
+    assert_select ".unfurl-mock.preview-thankyou-card", 0,
+                  "it must not borrow the player's card class again — that is what scrambled it"
+    assert_select ".gate-share-card", 0
+
+    # The headline and story are edited inside the bubble...
+    assert_select ".unfurl-bubble div[data-gate-cards-target='shareTitle']", 1
+    assert_select ".unfurl-bubble div[data-gate-cards-target='shareStory']", 1
+    assert_select ".unfurl-bubble img.unfurl-thumb", 1
+    # ...and the message the respondent sends is deliberately outside it.
+    assert_select ".unfurl-bubble [data-gate-cards-target='shareMessage']", 0
+    assert_select "div[data-gate-cards-target='shareMessage']", 1
+
+    # The counters moved out of the labels but must still be there to paint.
+    %w[shareTitleCount shareStoryCount shareMessageCount].each do |target|
+      assert_select "[data-gate-cards-target='#{target}']", 1
+    end
+  end
+
+  # The mock draws Survey#share_image_path, which is the same value the meta tag
+  # emits — so the preview cannot drift from what a recipient actually sees.
+  test "the mock's thumbnail is the real og:image" do
+    org = sign_in_org("thumb")
+    s   = survey_for(org, share_title: "Written")
+
+    get survey_path(s)
+    assert_select "img.unfurl-thumb" do |img|
+      assert_equal s.share_image_path, img.first["src"]
+    end
+  end
+
+  # ── The tags ──────────────────────────────────────────────────────────────
+
+  # Social recruitment is a real distribution channel, and a link with no
+  # picture is a line of grey text beside everyone else's cards. So this is a
+  # guarantee rather than a nicety: EVERY Verto unfurls with an image.
+  test "every Verto emits an absolute og:image, imagery or none" do
+    with_imagery = published_survey(background_image: "https://images.pexels.com/photos/1/p.jpg")
+    without      = published_survey
+
+    [ with_imagery, without ].each do |s|
+      get "/play/#{s.publish_token}"
+      assert_response :success
+
+      src = css_select("meta[property='og:image']").first&.[]("content")
+      assert src.present?, "og:image missing for #{s.id} — the fallback exists so this cannot happen"
+      assert_match %r{\Ahttps?://}, src, "og:image must be absolute, got #{src.inspect}"
+      assert_equal src, css_select("meta[name='twitter:image']").first&.[]("content")
+      assert_equal "summary_large_image",
+                   css_select("meta[name='twitter:card']").first&.[]("content")
+    end
+  end
+
+  # The editor promises "written as the respondent, in their voice" and "the
+  # link is added automatically". The share sheet was getting document.title and
+  # the URL and nothing else, so both the headline and this line went nowhere.
+  test "the creator's share copy reaches the share sheet" do
+    s = published_survey(share_title: "A headline", share_message: "Have a go at this")
+
+    get "/play/#{s.publish_token}"
+    assert_select "[data-player-share-title-value='A headline']"
+    assert_select "[data-player-share-text-value='Have a go at this']"
+  end
+
+  test "a Verto with no message sends no text, rather than an invented one" do
+    s = published_survey
+
+    get "/play/#{s.publish_token}"
+    assert_select "[data-player-share-text-value='']"
+  end
+
   test "any one field alone opens the card" do
     org = sign_in_org("anyone")
     %i[share_title share_description share_message].each do |field|

@@ -17,7 +17,19 @@
     <%= tag.meta property: "og:type", content: "website" %>
     <%= tag.meta property: "og:site_name", content: "Playverto" %>
     <%= tag.meta property: "og:url", content: request.base_url + request.path %>
-    <%= tag.meta name: "twitter:card", content: "summary" %>
+    <%# Always present. Survey#share_image_path falls back through the Verto's
+        own imagery to a theme-matched picture from the committed library, so
+        there is no branch here and no Verto that unfurls as a grey nothing.
+        Absolutised against this request, because og:image must be absolute and
+        only the request knows the host — a Pexels URL is already absolute and
+        URI.join leaves it alone. %>
+    <% share_image = URI.join(request.base_url, @survey.share_image_path).to_s %>
+    <%= tag.meta property: "og:image", content: share_image %>
+    <%= tag.meta property: "og:image:alt", content: @survey.share_image_alt %>
+    <%= tag.meta name: "twitter:image", content: share_image %>
+    <%# summary_large_image rather than summary now there is reliably an image
+        worth the room. %>
+    <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
   <% end %>
 <% end %>
 <%
@@ -143,6 +155,13 @@
      data-player-regions-url-value="<%= regions_url %>"
      data-player-locale-value="<%= @display_locale %>"
      data-player-share-url-value="<%= share_url %>"
+     <%# The creator's share copy, carried into the native share sheet. Both
+         were being dropped on the floor: the sheet got document.title and the
+         URL, so the headline and the "message respondents send" line the
+         editor collects went nowhere. Blank when share is off or there is no
+         link to pass on, exactly like share_url itself. %>
+     data-player-share-title-value="<%= share_url.present? ? @survey.share_title_text : "" %>"
+     data-player-share-text-value="<%= share_url.present? ? @survey.share_message_text : "" %>"
      data-player-show-comparison-value="<%= show_comparison %>"
      data-player-quiz-value="<%= quiz_mode %>"
      data-player-grade-url-value="<%= grade_url %>"
@@ -381,17 +400,12 @@
     <% end %>
 
     <div class="preview-thankyou" data-player-target="thankyou">
-      <div data-player-target="thankyouMain" class="preview-thankyou-card">
-        <%# Two wrappers, and on a phone they are not layout at all:
-            `.thankyou-col { display: contents }` means the card is the single
-            flex column it has always been, with these divs invisible to it.
-            Only at the desktop breakpoint do they become the two columns of
-            the split the rest of the player already uses — the message on the
-            left, everything the respondent can DO on the right. Wrappers
-            rather than grid-placing the flat list, because half these children
-            are hidden until finish and auto-placement would leave holes where
-            they will be. %>
-        <div class="thankyou-col thankyou-col-message">
+      <%# Derived here rather than beside its first use, because that use is now
+          inside a capture block and the compare panel further down needs it
+          too — a local first assigned inside a block is invisible outside it. %>
+      <% show_quiz_scores = quiz_mode && scores_url.present? %>
+      <%
+        thankyou_message = capture do %>
         <%# Publishing org's logo, mobile only — desktop already has the
             persistent masthead above the deck (.player-brand-header), and
             showing both would double up on the thank-you screen. Renders
@@ -405,10 +419,10 @@
         <div class="preview-thankyou-sub" data-player-target="thankyouSub">
           <%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %>
         </div>
+      <% end %>
 
-        </div>
-
-        <div class="thankyou-col thankyou-col-actions">
+      <%
+        thankyou_actions = capture do %>
         <%# Quiz final score — filled in by the player on finish (live: from the
             submit response; preview: from client-side grading). %>
         <% if quiz_mode %>
@@ -435,7 +449,6 @@
             turn on either or both), but they used to render as two separate
             CTAs/panels — redundant and confusing when both are on. One button
             now opens one panel with whichever section(s) apply. %>
-        <% show_quiz_scores = quiz_mode && scores_url.present? %>
         <div class="play-end-actions">
           <% if show_quiz_scores || show_comparison %>
             <button type="button"
@@ -509,15 +522,11 @@
             </button>
           <% end %>
         </div>
+      <% end %>
 
-        <%# Small "Powered by Playverto" wordmark at the bottom. %>
-        </div>
-
-        <div class="play-powered">
-          <span class="play-powered-text"><%= t("player.powered_by") %></span>
-          <%= image_tag "playverto.svg", alt: "", class: "play-powered-mark" %>
-        </div>
-      </div>
+      <%= render "shared/end_screen_shell",
+            message: thankyou_message, actions: thankyou_actions,
+            card_attrs: { data: { player_target: "thankyouMain" } } %>
 
       <% if regions_url.present? %>
         <%# Post-finish regions view: a full-screen, pannable/zoomable world map

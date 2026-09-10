@@ -126,4 +126,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def dismiss_cookie_banner
     click_button "Accept all" if has_button?("Accept all", wait: 2)
   end
+
+  # Resizing the WINDOW won't do: Chromium clamps its window to roughly 500px,
+  # so a layout under test would quietly stay tall enough to hide the bug. CDP's
+  # device-metrics override is the only way to get a genuinely short or narrow
+  # viewport.
+  #
+  # `mobile` defaults true because that is what the first caller
+  # (ThankyouOverflowTest) has always passed; measuring a DESKTOP layout wants
+  # mobile: false, or Chromium emulates a touch device at desktop dimensions.
+  def with_viewport(width, height, mobile: true)
+    page.driver.browser.page.command("Emulation.setDeviceMetricsOverride",
+                                     width: width, height: height,
+                                     deviceScaleFactor: 1, mobile: mobile)
+    yield
+  ensure
+    page.driver.browser.page.command("Emulation.clearDeviceMetricsOverride")
+  end
 end

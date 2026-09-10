@@ -439,8 +439,15 @@
               ✕ <span><%= t("editor.remove", default: "Remove") %></span>
             </button>
           </div>
-          <div class="preview-thankyou-card gate-ty-card">
-            <div class="preview-thankyou-emoji">🎉</div>
+          <%# Through the same shell the player uses, so the creator edits the
+              shape a respondent actually meets: the message on the left,
+              everything they can DO on the right. No 🎉 — the player has never
+              had one, and an emoji that appears only in the editor is the
+              clearest way to make a "replica" a lie. (No brand logo either:
+              the player's .player-thankyou-logo is mobile-only, so on a
+              desktop editor it would render nothing at all.) %>
+          <%
+            ty_message = capture do %>
             <div class="preview-thankyou-title gate-editable" contenteditable="true"
                  role="textbox"
                  aria-label="<%= t("editor.ty_title_label", default: "Thank-you title") %>"
@@ -453,34 +460,77 @@
                  data-gate-cards-target="tyBody"
                  data-default-text="<%= t("player.thank_you_from", org: @survey.organisation.name) %>"
                  data-action="input->gate-cards#queueThankyouSave:stop"><%= @survey.thankyou_body_text %></div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.45);padding:0 4px;">
+            <%# Field help for the two boxes above it, so it belongs in their
+                column. Left in English on purpose: every %{name} here would
+                have to be written %%{name} in YAML or Rails raises
+                MissingInterpolationArgument, there is no %%{ anywhere in
+                en.yml today, and this string also exists in
+                _end_screen_row.html.erb and end_screens_controller.js — all
+                three want doing together, not one of them across 26 files. %>
+            <div class="gate-ty-hint">
               Personalise with %{name}, %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{name|there}
             </div>
+          <% end %>
 
-            <%# Off-site link — the "Visit website →" button the respondent sees
-                after finishing. Backed by the survey's own forward_url/label
-                columns (branch end screens carry their own pair in the
-                end_screens JSON). Until now this rendered on the player with no
-                way to set it from the editor at all. %>
-            <div class="gate-ty-forward">
-              <label class="gate-ty-forward-label" for="ty-forward-url">
-                <%= t("editor.ty_forward_url_label", default: "Link button (optional)") %>
-              </label>
-              <input type="url" id="ty-forward-url"
-                     data-gate-cards-target="tyForwardUrl"
-                     data-action="input->gate-cards#queueThankyouSave:stop"
-                     value="<%= @survey.forward_url %>"
-                     placeholder="<%= t("editor.ty_forward_url_placeholder", default: "https://example.org") %>"
-                     class="gate-ty-forward-input" />
-              <input type="text" id="ty-forward-label"
-                     data-gate-cards-target="tyForwardLabel"
-                     data-action="input->gate-cards#queueThankyouSave:stop"
-                     value="<%= @survey.forward_label %>"
-                     maxlength="<%= Survey::MAX_END_LABEL %>"
-                     placeholder="<%= t("editor.ty_forward_label_placeholder", default: "Button label (e.g. Visit our site)") %>"
-                     class="gate-ty-forward-input" />
+          <%
+            ty_actions = capture do %>
+            <div class="play-end-actions">
+              <%# Facsimiles of the pills this Verto will actually show, so the
+                  creator can see what their link button sits among rather than
+                  guessing. Gated on the same settings the player reads, minus
+                  the live-data halves it can't know here (the player also needs
+                  a results_url, which only exists on a real play request).
+                  Inert divs inside aria-hidden — not buttons, so nothing here
+                  is focusable or announced. %>
+              <% ghosts = @survey.compare_results? || @survey.join_prompt? || @survey.share_enabled? %>
+              <% if ghosts %>
+                <div class="gate-ty-ghost-label" aria-hidden="true">
+                  <%= t("editor.ty_also_sees", default: "They'll also see") %>
+                </div>
+              <% end %>
+              <div aria-hidden="true">
+                <% if @survey.compare_results? %>
+                  <div class="play-end-btn play-end-btn-primary gate-ty-ghost"><%= t("player.compare_cta") %></div>
+                <% end %>
+                <% if @survey.join_prompt? %>
+                  <div class="gate-ty-ghost gate-ty-ghost-card"><%= @survey.join_title_text %></div>
+                <% end %>
+              </div>
+
+              <%# Off-site link — the "Visit website →" button the respondent
+                  sees after finishing, in the slot the player puts it in
+                  (after compare and the account ask, before Share). Backed by
+                  the survey's own forward_url/label columns; branch end screens
+                  carry their own pair in the end_screens JSON. %>
+              <div class="gate-ty-forward">
+                <label class="gate-ty-forward-label" for="ty-forward-url">
+                  <%= t("editor.ty_forward_url_label", default: "Link button (optional)") %>
+                </label>
+                <input type="url" id="ty-forward-url"
+                       data-gate-cards-target="tyForwardUrl"
+                       data-action="input->gate-cards#queueThankyouSave:stop"
+                       value="<%= @survey.forward_url %>"
+                       placeholder="<%= t("editor.ty_forward_url_placeholder", default: "https://example.org") %>"
+                       class="gate-ty-forward-input" />
+                <input type="text" id="ty-forward-label"
+                       data-gate-cards-target="tyForwardLabel"
+                       data-action="input->gate-cards#queueThankyouSave:stop"
+                       value="<%= @survey.forward_label %>"
+                       maxlength="<%= Survey::MAX_END_LABEL %>"
+                       placeholder="<%= t("editor.ty_forward_label_placeholder", default: "Button label (e.g. Visit our site)") %>"
+                       class="gate-ty-forward-input" />
+              </div>
+
+              <% if @survey.share_enabled? %>
+                <div aria-hidden="true">
+                  <div class="play-end-btn gate-ty-ghost"><%= t("player.share") %></div>
+                </div>
+              <% end %>
             </div>
-          </div>
+          <% end %>
+
+          <%= render "shared/end_screen_shell",
+                message: ty_message, actions: ty_actions, card_class: "gate-ty-card" %>
         </div>
 
         <%# ── Share card — what a passed-on /play link says about itself. A CTA
@@ -507,46 +557,73 @@
               ✕ <span><%= t("editor.remove", default: "Remove") %></span>
             </button>
           </div>
-          <div class="preview-thankyou-card gate-share-card">
+          <%# Not a .preview-thankyou-card any more. This was dressed as the
+              thank-you card's twin and it is not one — the respondent never
+              sees it, and borrowing the player's card class is how it got
+              dragged into the end screen's desktop grid and dealt into a 2x2.
+              What it actually configures is an UNFURL: the block WhatsApp and
+              Slack draw when somebody pastes the link. So it is drawn as one,
+              in a light bubble rather than the dark card, because the point is
+              that this is somebody else's chat app.
+              The headline and story are edited in place, at unfurl proportions,
+              so what the creator types is laid out the way a recipient will
+              read it. %>
+          <div class="unfurl-mock">
             <div class="gate-share-hint">
               <%= t("editor.share_card_hint",
                     default: "What friends see when a respondent passes this Verto on — in WhatsApp, Messages, Facebook, X, LinkedIn and Slack.") %>
             </div>
 
-            <div class="gate-share-field">
-              <label class="gate-ty-forward-label" for="share-title">
+            <div class="unfurl-bubble">
+              <div class="unfurl-card">
+                <%# The real og:image, not a mock of one — Survey#share_image_path
+                    is exactly what the meta tag emits, so this cannot drift
+                    from what a recipient actually sees. %>
+                <%= image_tag @survey.share_image_path, alt: "", class: "unfurl-thumb", loading: "lazy" %>
+                <div class="unfurl-text">
+                  <div id="share-title" class="unfurl-title gate-placeholder gate-editable" contenteditable="true"
+                       role="textbox"
+                       aria-label="<%= t("editor.share_title_label", default: "Share headline") %>"
+                       data-gate-cards-target="shareTitle"
+                       data-max="<%= Survey::MAX_SHARE_TITLE %>"
+                       data-default-text="<%= @survey.share_title_text %>"
+                       data-action="input->gate-cards#queueShareSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.share_title %></div>
+                  <div id="share-description" class="unfurl-desc gate-placeholder gate-editable" contenteditable="true"
+                       role="textbox" aria-multiline="true"
+                       aria-label="<%= t("editor.share_description_label", default: "Share story") %>"
+                       data-gate-cards-target="shareStory"
+                       data-max="<%= Survey::MAX_SHARE_DESCRIPTION %>"
+                       data-default-text="<%= @survey.share_description_text %>"
+                       data-action="input->gate-cards#queueShareSave:stop"><%= @survey.share_description %></div>
+                  <div class="unfurl-domain"><%= request.host %></div>
+                </div>
+              </div>
+            </div>
+
+            <%# The counters the labels used to carry. Out of the bubble,
+                because a chat app does not draw one and the creator still needs
+                to know when the copy will be cut. %>
+            <div class="unfurl-meta">
+              <span class="unfurl-meta-item">
                 <%= t("editor.share_title_label", default: "Share headline") %>
                 <span class="gate-share-count" data-gate-cards-target="shareTitleCount"></span>
-              </label>
-              <div id="share-title" class="gate-share-input gate-editable" contenteditable="true"
-                   role="textbox"
-                   aria-label="<%= t("editor.share_title_label", default: "Share headline") %>"
-                   data-gate-cards-target="shareTitle"
-                   data-max="<%= Survey::MAX_SHARE_TITLE %>"
-                   data-default-text="<%= @survey.share_title_text %>"
-                   data-action="input->gate-cards#queueShareSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.share_title %></div>
-            </div>
-
-            <div class="gate-share-field">
-              <label class="gate-ty-forward-label" for="share-description">
+              </span>
+              <span class="unfurl-meta-item">
                 <%= t("editor.share_description_label", default: "Share story") %>
                 <span class="gate-share-count" data-gate-cards-target="shareStoryCount"></span>
-              </label>
-              <div id="share-description" class="gate-share-input gate-editable" contenteditable="true"
-                   role="textbox" aria-multiline="true"
-                   aria-label="<%= t("editor.share_description_label", default: "Share story") %>"
-                   data-gate-cards-target="shareStory"
-                   data-max="<%= Survey::MAX_SHARE_DESCRIPTION %>"
-                   data-default-text="<%= @survey.share_description_text %>"
-                   data-action="input->gate-cards#queueShareSave:stop"><%= @survey.share_description %></div>
+              </span>
             </div>
 
+            <%# Outside the bubble on purpose: this is what the RESPONDENT
+                sends, not part of what the recipient sees. Giving all three
+                fields the same treatment is what made the old card read as a
+                form about one thing when it was really about two. %>
             <div class="gate-share-field">
               <label class="gate-ty-forward-label" for="share-message">
                 <%= t("editor.share_message_label", default: "Message respondents send") %>
                 <span class="gate-share-count" data-gate-cards-target="shareMessageCount"></span>
               </label>
-              <div id="share-message" class="gate-share-input gate-editable" contenteditable="true"
+              <div id="share-message" class="gate-share-input gate-placeholder gate-editable" contenteditable="true"
                    role="textbox" aria-multiline="true"
                    aria-label="<%= t("editor.share_message_label", default: "Message respondents send") %>"
                    data-gate-cards-target="shareMessage"
@@ -2407,25 +2484,39 @@
 
       <%# Thank you screen — shown after Finish. "Powered by" is mentioned
           only once here, followed by the Playverto wordmark image. %>
+      <%# The third hand-written copy of the end screen, and the one that had
+          drifted furthest: its own fallbacks (thankyou_title.presence || ...
+          rather than the model's *_text readers, with a hardcoded English
+          "Your responses have been recorded." that no other surface uses, so a
+          French creator previewing their own Verto read English), its own
+          inline-styled copies of .play-end-btn, and the 🎉 the player has never
+          had. Now the shell, the model's readers, and the player's own classes.
+
+          preview_verto#open refreshes the copy from the live feed before the
+          overlay is shown — this markup is the pre-open state, not the truth. %>
       <div class="preview-thankyou" data-preview-verto-target="thankyou">
-        <div class="preview-thankyou-card">
-          <div class="preview-thankyou-emoji">🎉</div>
-          <div class="preview-thankyou-title"><%= @survey.thankyou_title.presence || t("player.thank_you_title") %></div>
-          <div class="preview-thankyou-sub">
-            <%= @survey.thankyou_body.presence || "Your responses have been recorded." %>
-          </div>
-          <%# Non-interactive preview of the respondent's thank-you actions. %>
-          <div style="margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:10px;">
-            <% if @survey.forward_url? %>
-              <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= @survey.forward_label.presence || t("player.visit_website") %></span>
+        <%
+          pv_message = capture do %>
+          <div class="preview-thankyou-title" data-preview-verto-target="thankyouTitle"><%= @survey.thankyou_title_text %></div>
+          <div class="preview-thankyou-sub" data-preview-verto-target="thankyouBody"><%= @survey.thankyou_body_text %></div>
+        <% end %>
+        <%
+          pv_actions = capture do %>
+          <div class="play-end-actions" aria-hidden="true">
+            <% if @survey.compare_results? %>
+              <div class="play-end-btn play-end-btn-primary gate-ty-ghost"><%= t("player.compare_cta") %></div>
             <% end %>
-            <span style="padding:11px 22px;border-radius:100px;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);letter-spacing:0.05em;border:1px solid rgba(255,255,255,0.25);"><%= t("player.share") %></span>
+            <% if @survey.join_prompt? %>
+              <div class="gate-ty-ghost gate-ty-ghost-card"><%= @survey.join_title_text %></div>
+            <% end %>
+            <div class="play-end-btn gate-ty-ghost<%= " hidden" unless @survey.forward_url? %>"
+                 data-preview-verto-target="thankyouForward"><%= @survey.forward_label.presence || t("player.visit_website") %> →</div>
+            <% if @survey.share_enabled? %>
+              <div class="play-end-btn gate-ty-ghost"><%= t("player.share") %></div>
+            <% end %>
           </div>
-          <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.55;">
-            <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);">Powered by</span>
-            <%= image_tag "playverto.svg", alt: "", style: "height:14px;width:auto;" %>
-          </div>
-        </div>
+        <% end %>
+        <%= render "shared/end_screen_shell", message: pv_message, actions: pv_actions %>
       </div>
 
     </div><%# /preview-body %>

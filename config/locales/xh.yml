@@ -1252,6 +1252,7 @@ xh:
     why_outcome_label: "Ingqiqo oya kuyifumana"
     why_condition_label: "Imeko exhasayo"
     why_framework: "IPlayverto ifunda ukwenza ehlabathini njengochungechunge — uKuqonda → iNjongo → aManDla. Ukuphawula umbuzo ngamnye kwenza 'isikhewu sokushukumela' sibonakale — apho abantu beqonda kodwa bengasenzi, okanye belungele kodwa bengenako."
+    ty_also_sees: "Baya kubona kwakhona"
   dashboard_card:
     publish_warning: "Papasha “%{title}”? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     preview: "Jonga kuqala"

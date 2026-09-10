@@ -2344,6 +2344,56 @@ class Survey < ApplicationRecord
     share_title.present? || share_description.present? || share_message.present?
   end
 
+  # The picture a shared /play link unfurls with. NEVER nil: a Verto with no
+  # imagery of its own still gets a theme-matched one from the committed
+  # library, because "sometimes there's a picture" is not something anybody can
+  # rely on when they paste a link into a group chat, and an unfurl with no
+  # image is a grey nothing next to one that has one.
+  #
+  # Relative here; the view absolutises it, because og:image must be an absolute
+  # URL and only a request knows the host.
+  #
+  # A data: background falls THROUGH rather than being used: base64 cannot be an
+  # og:image, and promoting one to a blob is a migration this does not need —
+  # sanitize_background_image confines data: URLs to that one column anyway, so
+  # there is almost always a card image or the library behind it.
+  def share_image_path
+    [ consent_image, background_image, first_card_image ]
+      .find { |candidate| shareable_image?(candidate) } ||
+      AssetPopulator.share_image_url_for(self)
+  end
+
+  # Alt text for it. The theme is what the picture was chosen to illustrate.
+  def share_image_alt
+    "#{theme} · Playverto"
+  end
+
+  # Fetchable by a crawler on the open internet: a Pexels URL is already
+  # absolute and public, and the two same-origin forms become absolute in the
+  # view. A data: URL is none of those things.
+  def shareable_image?(url)
+    return false if url.blank?
+
+    value = url.to_s
+    value.match?(PEXELS_IMAGE_URL) ||
+      value.match?(ACTIVE_STORAGE_IMAGE_URL) ||
+      value.match?(ASSET_IMAGE_URL)
+  end
+
+  # The first picture the deck itself carries, in card order — the Verto's own
+  # imagery beats the library every time.
+  def first_card_image
+    Array(cards).each do |card|
+      next unless card.is_a?(Hash)
+
+      candidate = card["image"].presence ||
+                  (card["media_bg"].is_a?(Hash) ? card["media_bg"]["image"].presence : nil)
+      return candidate if shareable_image?(candidate)
+    end
+    nil
+  end
+  private :shareable_image?, :first_card_image
+
   # ── End screens (answer-branching) ─────────────────────────────────────────
   # A branch can finish on its own thank-you screen (e.g. a per-hub Stripe link)
   # instead of the shared one. The built-in "default" screen stays backed by the

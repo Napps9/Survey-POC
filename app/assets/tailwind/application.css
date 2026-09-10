@@ -2269,13 +2269,51 @@
    browser's url-type validation is worth having. */
 .gate-ty-forward {
   display: flex; flex-direction: column; gap: 6px;
-  margin-top: 16px; padding-top: 14px;
-  border-top: 1px solid rgba(255,255,255,0.12);
   text-align: start;
   /* The thank-you card centres its children, so stretch back to full width —
      otherwise the inputs shrink to their content. */
   align-self: stretch; width: 100%;
 }
+
+/* Field help for the two contenteditables it sits under, in their column. */
+.gate-ty-hint {
+  font-size: var(--text-xs); color: rgba(255,255,255,0.45);
+  line-height: 1.45; margin-top: 4px;
+}
+
+/* ── The pills the creator is not editing ──────────────────────────────────
+   The editor's thank-you card is a replica, and a replica that shows only the
+   one control the creator can type into misrepresents the screen: the link
+   button lands in a column with the compare CTA above it and Share below, and
+   how much room it has depends on what else is turned on. So the rest of the
+   column is drawn too — inert, dimmed, inside aria-hidden. Not buttons: a
+   creator tabbing through the editor should never land on one, and a screen
+   reader should never announce a control that does nothing. */
+.gate-ty-ghost {
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.45;
+}
+.gate-ty-ghost-label {
+  font-family: "Alata", sans-serif; font-size: var(--text-2xs);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  align-self: start; margin-bottom: 2px;
+}
+/* Stands in for the join block — same tinted, full-width shape, one line of
+   the creator's own heading rather than a re-render of _join_block, which
+   carries a dozen live player targets and a submit action. */
+.gate-ty-ghost-card {
+  width: 100%; padding: 14px 18px; border-radius: 18px;
+  background: var(--brand-primary-soft, rgba(1,234,203,0.12));
+  border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
+  font-family: "Alata", sans-serif; font-size: 1rem; color: #fff;
+  text-align: start;
+}
+/* The facsimiles and the real inputs are one stack, so they need the column's
+   gaps rather than the pill row's centring. */
+.gate-ty-card .play-end-actions { gap: 10px; align-items: stretch; }
+.gate-ty-card .play-end-actions > div { display: flex; flex-direction: column; gap: 10px; }
 .gate-ty-forward-label {
   font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
   color: rgba(255,255,255,0.6); letter-spacing: 0.02em;
@@ -2290,16 +2328,74 @@
 .gate-ty-forward-input::placeholder { color: rgba(255,255,255,0.35); }
 .gate-ty-forward-input:focus { box-shadow: 0 0 0 2px rgba(1,234,203,0.55); border-color: transparent; }
 
-/* ── Share card ────────────────────────────────────────────────────────────
-   Three labelled contenteditable fields rather than the thank-you card's
-   centred replica: this card is not a preview of anything the respondent sees,
-   it is copy aimed at whoever receives the link, so it reads as a form. Reuses
-   .gate-ty-forward-label for the labels — the same labelled-field stack. */
-.preview-thankyou-card.gate-share-card {
+/* ── Share card: the link's own preview ────────────────────────────────────
+   This used to borrow .preview-thankyou-card and read as a form of three
+   labelled fields. Both were wrong. It is not a card the respondent ever sees,
+   so wearing the thank-you card's chrome only invited the end screen's desktop
+   grid to pick it up and deal its fields into a 2x2 — which is exactly what
+   happened. And "three fields" hid that two of them are one thing (the unfurl
+   a recipient reads) and the third is another (the line the respondent sends).
+   So: the unfurl is drawn as an unfurl, and the message sits outside it. */
+.unfurl-mock {
+  background: #1C2034;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  padding: 28px 28px 24px;
+  max-width: 560px; width: 100%;
   margin-inline: auto;
-  align-items: stretch;
+  display: flex; flex-direction: column;
   text-align: start;
-  gap: 0;
+}
+/* Light, because the whole point is that this block is rendered by somebody
+   else's chat app and not by us. */
+.unfurl-bubble {
+  margin-top: 14px;
+  background: #E7F3E4;
+  border-radius: 14px;
+  padding: 6px;
+}
+.unfurl-card {
+  display: flex; gap: 10px;
+  background: #fff;
+  border-radius: 10px;
+  border-inline-start: 4px solid var(--brand-primary, #01EACB);
+  padding: 10px 12px;
+  overflow: hidden;
+}
+.unfurl-thumb {
+  width: 76px; height: 76px; flex: 0 0 76px;
+  object-fit: cover; border-radius: 6px;
+  background: rgba(0,0,0,0.06);
+}
+.unfurl-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+/* Dark type on a light bubble — this is the one place in the editor that is
+   not on the dark surface, so the editable rings need to read against white. */
+.unfurl-title {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  font-weight: 600; color: #111827; line-height: 1.3;
+}
+.unfurl-desc {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-xs);
+  color: #4B5563; line-height: 1.4;
+}
+.unfurl-domain {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-2xs);
+  color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.unfurl-mock .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,180,155,0.45); }
+.unfurl-mock .gate-editable:focus { box-shadow: 0 0 0 2px rgba(1,180,155,0.75); }
+/* Counters live out here: a chat app draws no character count, and the creator
+   still needs to know before the truncation tells them. */
+.unfurl-meta {
+  display: flex; flex-wrap: wrap; gap: 4px 18px;
+  margin-top: 10px;
+}
+.unfurl-meta-item {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-xs);
+  color: rgba(255,255,255,0.5);
 }
 .gate-share-hint {
   font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
@@ -2329,12 +2425,19 @@
   line-height: 1.5; min-height: 38px;
 }
 /* contenteditable has no placeholder, so the fallback the link uses today is
-   shown in its place — greyed, and gone the moment anything is typed. */
-.gate-share-input:empty::before {
+   shown in its place — greyed, and gone the moment anything is typed.
+   On its OWN class rather than on .gate-share-input, because the headline and
+   story now live inside the unfurl bubble where they want none of that class's
+   input chrome but all of its placeholder behaviour. Colour is inherited-ish
+   per surface: the rule below is the dark-surface default, and the bubble
+   overrides it. */
+.gate-placeholder:empty::before {
   content: attr(data-default-text);
   color: rgba(255,255,255,0.3);
   pointer-events: none;
 }
+.unfurl-mock .unfurl-title:empty::before,
+.unfurl-mock .unfurl-desc:empty::before { color: rgba(17,24,39,0.35); }
 .gate-share-note {
   font-size: var(--text-xs); color: rgba(255,255,255,0.45); line-height: 1.45;
 }
@@ -6493,6 +6596,14 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .preview-thankyou.active {
   display: flex;
   align-self: stretch;
+  /* align-self stretches the CROSS axis, and .preview-body is a row, so that
+     is the height. The width was shrink-to-fit, driven by the card's own
+     max-content size — which stopped working the moment the card gained an
+     inline-size container: a contained box contributes nothing to its parent's
+     max-content width, so the parent collapsed and took the card with it (the
+     title clipped to two letters). An inline-size container needs a definite
+     width somewhere above it; this is that width. */
+  width: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -6512,12 +6623,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   align-items: center;
   gap: 16px;
   text-align: center;
-  /* Auto margins take the spare room when there is any and collapse to zero
-     when there isn't, so a thank-you that fits stays centred exactly as it was
-     and only a too-tall one starts at the top of its scroll area. */
-  margin-block: auto;
 }
-.preview-thankyou-emoji { font-size: 60px; line-height: 1; }
 .preview-thankyou-title {
   font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif)); font-size: 44px;
   color: #fff; letter-spacing: -0.5px;
@@ -6536,6 +6642,15 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    Ignored where unsupported, which is exactly today's behaviour. */
 .preview-thankyou-title { max-width: 100%; text-wrap: balance; }
 
+/* Below the split, the two column wrappers are not layout at all — the card is
+   the flex column it has always been and these divs are invisible to it.
+   MUST live outside the query: this rule was promised by the comment below and
+   never written, so for one day the wrappers were real boxes shrink-to-fitting
+   inside a centred flex column, and every percentage width inside the card
+   (.play-end-actions, .leaderboard-card, .join-card) resolved against the
+   wrapper instead of the card. A base rule, not tidiness. */
+.thankyou-col { display: contents; }
+
 /* ── The end screen, on a desktop ──────────────────────────────────────────
    Every question is answered in an 845px split card — image on one side,
    question on the other — and the end screen was a 520px centred column, so
@@ -6549,30 +6664,63 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    columns would have come out at 358px each and the block would have been
    NARROWER than it is today, which is the opposite of the point.
 
-   Below the breakpoint nothing here applies and nothing changes: the wrappers
-   are display:contents, so the card is the flex column it has always been. */
-@media (min-width: 768px) {
-  .preview-thankyou-card {
+   A CONTAINER query, not a media query, and the difference is not academic.
+   This card is rendered in three places and only one of them is the width of
+   the window: the editor draws it inside a feed that loses 444px to the right
+   panel (.editor-grid.is-panel-open), so a 1280px window offers the card ~700px
+   and a viewport rule would hand 44px display type a 220px column. Asking "is
+   there room here" instead of "is the window wide" also fixes the portrait
+   iPad and the landscape phone, which the player's own mobile boundary
+   (see the complement pair further down) calls mobile while 768px called them
+   desktop.
+
+   880 = 300 (a floor for the message) + 40 (gap) + 440 (the actions column the
+   join block and pills were drawn at) + 88 (the card's own padding) + slack. */
+.end-screen-frame {
+  container: end-screen / inline-size;
+  /* Inline-size containment needs a definite width — without this the frame
+     computes a zero inline size and takes the card with it. */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /* Auto margins take the spare room when there is any and collapse to zero
+     when there isn't, so a thank-you that fits stays centred exactly as it was
+     and only a too-tall one starts at the top of its scroll area. Lives on the
+     frame now that the frame is what the scroll area contains. */
+  margin-block: auto;
+}
+
+/* Scoped with :has() rather than a modifier class, because the bug this
+   replaces was markup and CSS drifting apart and a modifier class is a THIRD
+   thing to keep in step — it fails the same way, by being added to a card whose
+   wrappers someone forgot. This says what is actually true: the split exists if
+   and only if the columns do, so a fourth copy that forgets them degrades to
+   the correct single-column card instead of scattering its children. */
+@container end-screen (min-width: 880px) {
+  .preview-thankyou-card:has(> .thankyou-col) {
     max-width: 980px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 440px;
     column-gap: 40px;
-    align-items: start;
     text-align: start;
+    /* The message column is centred against the actions beside it rather than
+       pinned to the top — two columns of very different heights read as a
+       mistake when the short one starts level with a tall one. */
+    align-items: center;
   }
-  .thankyou-col { display: flex; flex-direction: column; min-width: 0; }
-  .thankyou-col-message { align-items: start; }
-  /* The message column is centred against the actions beside it rather than
-     pinned to the top — two columns of very different heights read as a
-     mistake when the short one starts level with a tall one. */
-  .preview-thankyou-card { align-items: center; }
-  .preview-thankyou-sub { max-width: 100%; }
+  .preview-thankyou-card:has(> .thankyou-col) > .thankyou-col {
+    display: flex; flex-direction: column; min-width: 0;
+  }
+  .preview-thankyou-card:has(> .thankyou-col) > .thankyou-col-message { align-items: start; }
+  .preview-thankyou-card:has(> .thankyou-col) .preview-thankyou-sub { max-width: 100%; }
   /* Already the flex column of pills it was; it just no longer needs to claim
      the whole card, and it starts level with the title rather than 22px below
      the paragraph that is now beside it. */
-  .play-end-actions { margin-top: 0; max-width: 100%; }
+  .preview-thankyou-card:has(> .thankyou-col) .play-end-actions { margin-top: 0; max-width: 100%; }
   /* Spans both, under everything, still centred. */
-  .play-powered { grid-column: 1 / -1; justify-self: center; margin-top: 8px; }
+  .preview-thankyou-card:has(> .thankyou-col) > .play-powered {
+    grid-column: 1 / -1; justify-self: center; margin-top: 8px;
+  }
 }
 
 /* ── After the last card: end-screen actions and the post-finish panels ────
@@ -9103,7 +9251,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
   .preview-thankyou       { padding: 28px 20px; }
   .preview-thankyou-card  { padding: 32px 22px; }
-  .preview-thankyou-emoji { font-size: 52px; }
   /* The title is display type and keeps its scale — its floor is generous.
      The sub is prose the respondent is meant to read, so it goes back to
      desktop's size rather than being shaved to 14. */

@@ -244,6 +244,38 @@ class AssetPopulator
       ActionController::Base.helpers.asset_path("#{MOBILE_BG_DIR}/#{chosen['file']}")
     end
 
+    # The picture a shared /play link unfurls with, for a Verto that has no
+    # imagery of its own. Same shape as mobile_bg_url_for above and for the
+    # same reasons — theme-only (this runs on a request from a crawler, long
+    # after any shuffle), and seeded by survey id so the link a person shared
+    # yesterday unfurls with the same picture today.
+    #
+    # The reason it exists rather than letting og:image be absent: a link with
+    # no picture is a grey nothing in WhatsApp, and "most Vertos get one" is not
+    # a guarantee anybody can rely on when they paste a link into a group chat.
+    # Falling back to the whole pool when no theme matches is what makes this
+    # total — it cannot return nil, so Survey#share_image_url cannot either.
+    def share_image_url_for(survey)
+      candidates = Array(manifest["backgrounds"])
+      return nil if candidates.empty?
+
+      query  = { themes: theme_keywords(survey.theme) }
+      themed = candidates.select do |a|
+        (Array(a["themes"]).map { |t| t.to_s.downcase } & query[:themes]).any?
+      end
+      pool = themed.presence || candidates
+      # Digest, NOT String#hash: Ruby seeds String#hash per PROCESS, so a
+      # sibling method's "stable per-survey choice" is only stable until the
+      # next deploy. That is survivable for a background nobody bookmarks; it is
+      # not survivable here, where the URL goes into og:image and is cached by
+      # every chat app that has ever unfurled the link. (mobile_bg_url_for above
+      # has the same latent flaw — left alone deliberately, because changing it
+      # would repaint live Vertos for a guarantee nothing currently depends on.)
+      seed   = Digest::SHA256.hexdigest("share-#{survey.id}")[0, 8].to_i(16)
+      chosen = pool[seed % pool.size]
+      ActionController::Base.helpers.asset_path("#{BACKGROUND_DIR}/#{chosen['file']}")
+    end
+
     # Helpers below mirror the instance-level versions so callers outside
     # the populator don't need an instance just to compute these.
     def theme_keywords(theme)
