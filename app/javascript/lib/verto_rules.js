@@ -188,8 +188,16 @@ export function analyzeCard(card) {
   // lists are fixed taxonomies, so the 3–5-options and label-length advice
   // would mark down every deck that adds them for choices the creator didn't
   // make.
+  // An NPS taken off the classic 0-10 is the same shape of exemption, arrived
+  // at from the other direction: the rule below is not a platform taxonomy the
+  // creator can't change, it is a rule they have been given a switch to turn
+  // off. Scoring "not 11 points" against a card whose scale they deliberately
+  // rebuilt is the check telling them their own choice is a mistake, every
+  // time they look at it. The rule still bites on every NPS that has NOT been
+  // unlocked, which is what it is for.
   const countRule = COUNT_RULES[card.type]
-  if (countRule && !card.demographic) checks.push(countCheck(card, countRule))
+  const countExempt = card.demographic || (card.type === "nps" && card.npsCustomScale)
+  if (countRule && !countExempt) checks.push(countCheck(card, countRule))
 
   const optionCheck = card.demographic ? null : optionLengthCheck(card)
   if (optionCheck) checks.push(optionCheck)

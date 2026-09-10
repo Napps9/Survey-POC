@@ -716,9 +716,22 @@
            calc(var(--nps-h, 320px) * var(--nps-bot-f, 0));
   min-width: 48px;
 }
-.nps-slider-labels .slider-label-text {
+/* One stop. The ROW is the flex item — zero-height, so `space-between` places
+   eleven points across the column's padded track rather than eleven boxes —
+   and the label overflows it visibly. This used to be the label span itself;
+   the row went in when the editor's × needed somewhere to live that was NOT
+   inside a contenteditable, and it is rendered on the player too so the two
+   surfaces lay the same scale out the same way. */
+.nps-slider-labels .nps-label-row {
   flex: 0 0 0;
   height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  overflow: visible;
+}
+.nps-slider-labels .slider-label-text {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -726,6 +739,57 @@
   overflow: visible;
   white-space: nowrap;
 }
+/* Remove a stop. Sits to the label's leading side, in the empty column the
+   right-aligned digits leave behind, and only while the card is off the
+   classic 0-10 — on the classic there is nothing to remove. Dimmed until the
+   scale is hovered or focused, the same way .pick-item-delete is, because
+   eleven live × chips beside eleven digits reads as a list of errors.
+
+   Gated on the whole SCALE rather than on the row the way a pick list gates on
+   its item: .nps-label-row is a zero-height box (it marks a point on a track,
+   it is not a row you can be over), so a per-row :hover would almost never
+   fire. */
+.nps-label-delete {
+  flex: 0 0 auto;
+  width: 17px; height: 17px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,30,111,0.4);
+  background: rgba(255,30,111,0.12);
+  color: #FF1E6F;
+  font-family: "Alata", sans-serif; font-size: 12px; line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+}
+.nps-slider.is-custom-scale:hover .nps-label-delete,
+.nps-slider.is-custom-scale:focus-within .nps-label-delete { opacity: 1; }
+.nps-label-delete:hover { background: #FF1E6F; color: #fff; border-color: #FF1E6F; }
+.nps-label-delete:focus-visible { opacity: 1; outline: 2px solid #01EACB; outline-offset: 1px; }
+
+/* Add a stop. Under the stage rather than in the column: the column divides a
+   fixed height between its stops, so a ＋ inside it would be one more stop as
+   far as `space-between` is concerned and would shift every label. Same dashed
+   editor vocabulary as .pick-add-btn — this one never reaches a respondent
+   (preview_verto strips it), so a dashed ring is honest here. */
+.nps-scale-add {
+  align-self: center;
+  margin-top: 10px;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px; padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px dashed rgba(1,234,203,0.5);
+  background: rgba(1,234,203,0.08);
+  color: #0B7A6B;
+  font-family: "ABeeZee", sans-serif; font-size: 12.5px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.nps-scale-add:hover { background: rgba(1,234,203,0.2); border-color: #01EACB; }
+/* The ceiling is the classic itself — eleven stops. card-editor disables the
+   button rather than hiding it, so the reason stays on screen (its title says
+   what the limit is) instead of the control simply vanishing. */
+.nps-scale-add:disabled { opacity: 0.45; cursor: default; }
 .nps-slider-labels .slider-label-text.is-active {
   color: var(--brand-primary, #01EACB);
   font-weight: 700;
@@ -3956,6 +4020,11 @@
    the presets — the strip on the card is where a set is built by hand. */
 .card-flag-scale { display: flex; flex-direction: column; gap: 7px; }
 .card-flag-scale[hidden] { display: none; }
+/* The NPS card's classic-scale switch plus the line explaining what turning it
+   off costs. Its own block rather than a bare .card-flag because the note
+   belongs to this switch and to no other. */
+.card-flag-nps { display: flex; flex-direction: column; gap: 6px; }
+.card-flag-nps[hidden] { display: none; }
 .response-scale-picker { display: flex; gap: 5px; }
 .response-scale-btn {
   flex: 1; padding: 5px 0; border-radius: 9px;

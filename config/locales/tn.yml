@@ -36,6 +36,10 @@ tn:
     remove_response: "Tlosa karabo e"
     remove_option: "Phimola karata"
     response_scale: "Dikarabo ka polelo"
+    nps_classic: "Sekale sa bogologolo sa 0–10"
+    nps_classic_note: "Go se tima go go letla go oketsa, go tlosa le go fetola maina a dintlha tsa sekale se. Go se tshuba go se busetsa go 0–10, se se dirang gore ntlha ya NPS e bapisiwe."
+    add_scale_point: "Oketsa ntlha"
+    nps_scale_max: "NPS e fitlha go dintlha tse %{max}."
     tap_scale:
       "no": "Nnyaa"
       "yes": "Ee"

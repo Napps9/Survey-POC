@@ -33,6 +33,10 @@ sn:
     remove_response: "Bvisa Mhinduro Iyi"
     remove_option: "Bvisa kadhi"
     response_scale: "Mhinduro pachirevo chimwe nechimwe"
+    nps_classic: "Chiyero chekare che0–10"
+    nps_classic_note: "Kudzima kunokutendera kuwedzera, kubvisa nekutumidza zvipimo zvechiyero ichi. Kubatidza kunochidzosera ku0–10, ndizvo zvinoita kuti chibodzwa cheNPS chienzaniswe."
+    add_scale_point: "Wedzera chipimo"
+    nps_scale_max: "NPS inosvika pazvipimo %{max}."
     tap_scale:
       "no": "Kwete"
       "yes": "Hongu"

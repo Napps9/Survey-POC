@@ -34,6 +34,10 @@ nl:
     remove_response: "Dit antwoord verwijderen"
     remove_option: "Kaart verwijderen"
     response_scale: "Antwoorden per stelling"
+    nps_classic: "Klassieke 0–10-schaal"
+    nps_classic_note: "Uit kun je punten op deze schaal toevoegen, verwijderen en hernoemen. Aan zet hem terug op 0–10, en dat maakt een NPS-score vergelijkbaar."
+    add_scale_point: "Punt toevoegen"
+    nps_scale_max: "Een NPS gaat tot %{max} punten."
     tap_scale:
       "no": "Nee"
       "yes": "Ja"

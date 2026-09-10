@@ -34,6 +34,10 @@ zu:
     remove_response: "Susa le mpendulo"
     remove_option: "Susa ikhadi"
     response_scale: "Izimpendulo ngesitatimende ngasinye"
+    nps_classic: "Isilinganiso esijwayelekile sika-0–10"
+    nps_classic_note: "Ukukuvala kukuvumela ukungeza, ukususa nokushintsha amagama amaphuzu kulesi silinganiso. Ukukuvula kusibuyisela ku-0–10, okwenza amaphuzu e-NPS aqhathaniswe."
+    add_scale_point: "Engeza iphuzu"
+    nps_scale_max: "I-NPS ifinyelela kumaphuzu angu-%{max}."
     tap_scale:
       "no": "Cha"
       "yes": "Yebo"

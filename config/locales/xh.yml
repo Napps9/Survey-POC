@@ -34,6 +34,10 @@ xh:
     remove_response: "Susa le mpendulo"
     remove_option: "Cima ikhadi"
     response_scale: "Iimpendulo ngengxelo nganye"
+    nps_classic: "Isikali esiqhelekileyo se-0–10"
+    nps_classic_note: "Ukusicima kukuvumela ukongeza, ukususa nokutshintsha amagama amanqaku ale skali. Ukusivula kusibuyisela ku-0–10, oko kwenza amanqaku e-NPS athelekiswe."
+    add_scale_point: "Yongeza inqaku"
+    nps_scale_max: "I-NPS ifikelela kumanqaku angu-%{max}."
     tap_scale:
       "no": "Hayi"
       "yes": "Ewe"

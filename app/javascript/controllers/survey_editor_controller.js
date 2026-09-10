@@ -9,7 +9,7 @@ import { OPTION_STYLE_TYPES } from "lib/option_style_types"
 import { styleFromRow } from "lib/option_styles"
 import { hasFormatting } from "lib/rich_text"
 import { cardEyebrow, MULTI_SELECT_TYPES } from "lib/card_eyebrow"
-import { NPS_VESSELS, npsStageStyle, npsVesselSvg, npsVesselFor } from "lib/nps_vessels"
+import { NPS_VESSELS, npsStageStyle, npsVesselSvg, npsVesselFor, npsCustomScale } from "lib/nps_vessels"
 
 
 // Choice-shaped types — mirrors TokenGrading::CHOICE (app/lib/token_grading.rb).
@@ -75,7 +75,7 @@ const TOKEN_SYNCED_TYPES = [ "multiple_choice", "select_many", "select_one_grid"
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
     "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale",
-                    "maxChoices", "maxChoicesPicker",
+                    "maxChoices", "maxChoicesPicker", "npsClassic", "panelNpsClassic",
                     "recallToggle", "panelRecall", "vertoTitle", "undoBtn"]
   static values  = {
     url: String, title: String, description: String,
@@ -1221,7 +1221,14 @@ export default class extends Controller {
         : 0,
       // Demographic cards are exempt from the option-shape rules (their
       // option lists are platform-set taxonomies) — see verto_rules.js.
-      demographic: cardEl.dataset.cardDemographic === "true"
+      demographic: cardEl.dataset.cardDemographic === "true",
+      // An NPS scored against "exactly 11" is right until the creator has
+      // deliberately turned the classic 0-10 off — after which the rule is
+      // marking them down for the choice the switch exists to offer. Same
+      // three-state read as everywhere else: the flag when it is there, the
+      // labels when it isn't.
+      npsCustomScale: cardEl.dataset.cardType === "nps" &&
+        npsCustomScale(c.options, cardEl.dataset.cardNpsCustomScale)
     }
   }
 
@@ -1573,6 +1580,49 @@ export default class extends Controller {
     if (this.hasPanelAskOnceTarget)  this.panelAskOnceTarget.checked  = card.dataset.cardAskOnce === "true"
     this._syncResponseScale(card)
     this._syncMaxChoices(card)
+    this._syncNpsClassic(card)
+  }
+
+  // NPS cards only: is this card still on the classic 0-10?
+  //
+  // Read off the CARD rather than off a stored flag alone, for the same reason
+  // NpsHelper#nps_custom_scale? does — the flag is only written when a creator
+  // turns the classic off, so its absence has to be answered by the labels.
+  // Otherwise every deck predating the switch would have opened claiming to be
+  // classic while showing an agree scale.
+  _syncNpsClassic(card) {
+    if (!this.hasNpsClassicTarget) return
+    const isNps = card?.dataset.cardType === "nps"
+    this.npsClassicTarget.hidden = !isNps
+    if (!isNps || !this.hasPanelNpsClassicTarget) return
+    this.panelNpsClassicTarget.checked = !npsCustomScale(this._npsLabels(card), card.dataset.cardNpsCustomScale)
+  }
+
+  _npsLabels(card) {
+    return Array.from(card.querySelectorAll(".nps-slider-labels .slider-label-text"))
+                .map(el => el.textContent.trim())
+  }
+
+  // The switch itself. Turning the classic ON is the destructive direction —
+  // it re-cuts the labels to 0-10 — and that is what it is for: "make this a
+  // real NPS again". Turning it off changes no label, it only unlocks them.
+  //
+  // Delegated to the card's own card-editor for the rebuild, the same split
+  // setResponseScale uses: this panel knows which card is selected, the card's
+  // controller knows how a scale is drawn.
+  togglePanelNpsClassic(event) {
+    const card = this._selectedCard()
+    if (!card) return
+    const classic = event.currentTarget.checked
+
+    if (classic) delete card.dataset.cardNpsCustomScale
+    else card.dataset.cardNpsCustomScale = "true"
+
+    const slider = card.querySelector(".nps-slider")
+    const editor = slider && this.application.getControllerForElementAndIdentifier(slider, "card-editor")
+    if (editor) editor.setNpsClassic(classic)
+
+    this.markDirty()
   }
 
   // The strip's ＋ and × change the same number the picker reports, so the
@@ -1989,6 +2039,10 @@ export default class extends Controller {
       // gate: the server drops it if it isn't a vessel it can draw on an NPS
       // card, and its absence means "use the Verto-themed default".
       if (type === "nps" && card.dataset.cardNpsShape) out.nps_shape = card.dataset.cardNpsShape
+      // …and whether the creator has taken it off the classic 0-10. Emitted
+      // only when true, because absent is not "classic" — it is "nobody has
+      // said", which the labels then answer (NpsHelper#nps_custom_scale?).
+      if (type === "nps" && card.dataset.cardNpsCustomScale === "true") out.nps_custom_scale = true
       // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
       if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
       // Select-many cards may cap how many answers a respondent ticks. Only

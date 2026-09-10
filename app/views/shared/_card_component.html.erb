@@ -795,10 +795,17 @@
           bottom, matching the fill rising from the bottom. The stored answer is
           the 0-indexed position. %>
       <% labels = Array(display["options"]).presence || nps_default_labels %>
-      <% n = [labels.size, 2].max %>
+      <% n = [labels.size, NpsHelper::NPS_MIN_STEPS].max %>
       <% shape = nps_shape_slug(card, @survey) %>
-      <div class="nps-slider"
-           data-controller="nps-slider"
+      <%# Off the classic 0-10? Then the scale is the creator's to build, and
+          each stop gets a × with an ＋ under the column. On the classic the
+          stops are the scale rather than copy, so they are neither removable
+          nor retypable — "an NPS is 0-10" is the type's whole contract, and the
+          switch in the card-settings island is the one place it comes off. %>
+      <% custom_scale = nps_custom_scale?(card) %>
+      <% scale_editable = editable && custom_scale %>
+      <div class="nps-slider<%= " is-custom-scale" if scale_editable %>"
+           data-controller="<%= editable ? 'nps-slider card-editor' : 'nps-slider' %>"
            data-nps-slider-steps-value="<%= n %>"
            data-nps-slider-axis-value="vertical"
            data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
@@ -806,12 +813,39 @@
            aria-valuemin="0" aria-valuemax="<%= n - 1 %>">
         <div class="nps-slider-stage" style="<%= nps_stage_style(shape) %>">
           <div class="slider-labels nps-slider-labels">
+            <%# The ROW is the flex item, in the player as well as the editor.
+                The column lays its stops out with `space-between` over a fixed
+                height and every item zero-height, so whatever carries the ×
+                has to be the thing that gets those properties — and rendering
+                the wrapper only in the editor would mean the two surfaces laid
+                the same scale out differently, which is the exact class of bug
+                the preview audit was about. So the wrapper is always there and
+                only the × comes and goes. %>
             <% labels.each do |opt| %>
-              <span class="slider-label-text" data-nps-slider-target="label" <%= ce_attr %>><%= opt %></span>
+              <span class="nps-label-row">
+                <% if scale_editable %>
+                  <button type="button" class="nps-label-delete"
+                          data-action="click->card-editor#deleteNpsStop"
+                          title="<%= t("card.remove_option", default: "Delete card") %>"
+                          aria-label="<%= t("card.remove_option", default: "Delete card") %>">×</button>
+                <% end %>
+                <span class="slider-label-text" data-nps-slider-target="label"
+                      <%= ce_attr if scale_editable %>><%= opt %></span>
+              </span>
             <% end %>
           </div>
           <%= render_nps_control(shape: shape, steps: n) %>
         </div>
+        <%# Outside .nps-slider-labels deliberately: that column divides a fixed
+            height between its stops, so an ＋ inside it would be one more stop
+            as far as the layout is concerned and would move every label. %>
+        <% if scale_editable %>
+          <button type="button" class="nps-scale-add"
+                  data-action="click->card-editor#addNpsStop"
+                  data-card-editor-nps-add>
+            <span aria-hidden="true">＋</span> <%= t("card.add_scale_point", default: "Add a point") %>
+          </button>
+        <% end %>
       </div>
       <% if editable %>
         <%# The container this card fills, driven by the "Change animation" CTA

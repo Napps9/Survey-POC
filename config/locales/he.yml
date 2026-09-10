@@ -34,6 +34,10 @@ he:
     remove_response: "הסרת תשובה זו"
     remove_option: "מחיקת כרטיס"
     response_scale: "תשובות לכל היגד"
+    nps_classic: "סולם 0–10 קלאסי"
+    nps_classic_note: "כיבוי מאפשר להוסיף, להסיר ולשנות את שמות הנקודות בסולם. הפעלה מחזירה אותו ל-0–10, וזה מה שהופך ציון NPS להשוואתי."
+    add_scale_point: "הוספת נקודה"
+    nps_scale_max: "סולם NPS מגיע עד %{max} נקודות."
     tap_scale:
       "no": "לא"
       "yes": "כן"

@@ -36,6 +36,10 @@ st:
     remove_response: "Tlosa karabo ena"
     remove_option: "Hlakola karete"
     response_scale: "Dikarabo ka polelo"
+    nps_classic: "Sekala sa khale sa 0–10"
+    nps_classic_note: "Ho e tima ho o dumella ho eketsa, ho tlosa le ho reha lentswe la dintlha tsa sekala sena. Ho e bulela ho e busetsa ho 0–10, e leng se etsang hore dintlha tsa NPS di bapiswe."
+    add_scale_point: "Eketsa ntlha"
+    nps_scale_max: "NPS e fihla dinthleng tse %{max}."
     tap_scale:
       "no": "Che"
       "yes": "Ee"

@@ -805,6 +805,24 @@
             <span class="card-flag-label"><%= t("card.ask_once") %></span>
           </label>
 
+          <%# NPS cards only. An NPS is 0-10 — that is the type's whole contract,
+              and the score only means anything against the same eleven-point
+              question everybody else asks — so the scale is locked by default
+              and the card shows no way to change it. Turn this off and each
+              stop grows a × with an ＋ beneath the column.
+              Locking it again re-cuts the labels to 0-10, which is destructive
+              and deliberate: it is the switch that says "make this a real NPS
+              again", and Undo is a keystroke away. %>
+          <div class="card-flag-nps" data-survey-editor-target="npsClassic" hidden>
+            <label class="card-flag">
+              <input type="checkbox" data-survey-editor-target="panelNpsClassic"
+                     data-action="change->survey-editor#togglePanelNpsClassic">
+              <span class="card-flag-track" aria-hidden="true"></span>
+              <span class="card-flag-label"><%= t("card.nps_classic", default: "Classic 0–10 scale") %></span>
+            </label>
+            <div class="card-flag-note"><%= t("card.nps_classic_note", default: "Off lets you add, remove and rename the points on this scale. On puts it back to 0–10, which is what makes an NPS score comparable.") %></div>
+          </div>
+
           <%# Tap cards only: how many answers each swipe statement is judged on.
               A shortcut, not the only way in — the strip itself carries ＋ and ×
               so a creator can build any set between two and six by hand. Picking

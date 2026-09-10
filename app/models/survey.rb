@@ -930,6 +930,21 @@ class Survey < ApplicationRecord
           c.delete("nps_shape")
         end
       end
+      # "This card is off the classic 0-10 scale." Stored only when a creator
+      # turns the classic off, and only as `true` — its absence is not "classic",
+      # it is "nobody has said", and NpsHelper#nps_custom_scale? then reads the
+      # answer off the labels. That is what lets the switch arrive without a
+      # migration: a deck full of 0-10 cards keeps reading as classic and one
+      # already carrying an agree scale keeps every label it has.
+      # Anything falsy is dropped rather than stored, so there is one
+      # representation of "classic" and not two.
+      if c.key?("nps_custom_scale")
+        if c["type"].to_s == "nps" && c["nps_custom_scale"] == true
+          c["nps_custom_scale"] = true
+        else
+          c.delete("nps_custom_scale")
+        end
+      end
       # Card backdrop — the colour or image behind whatever the panel holds,
       # overriding the Verto-wide --brand-panel for this one card. Meaningful
       # wherever the panel is not already covered edge to edge: behind an

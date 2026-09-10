@@ -34,6 +34,10 @@ ja:
     remove_response: "この回答を削除"
     remove_option: "カードを削除"
     response_scale: "1文あたりの回答数"
+    nps_classic: "クラシックな0〜10のスケール"
+    nps_classic_note: "オフにすると、このスケールの目盛りを追加・削除・名前変更できます。オンにすると0〜10に戻り、NPSスコアを比較できる状態になります。"
+    add_scale_point: "目盛りを追加"
+    nps_scale_max: "NPSの目盛りは最大%{max}個です。"
     tap_scale:
       "no": "いいえ"
       "yes": "はい"

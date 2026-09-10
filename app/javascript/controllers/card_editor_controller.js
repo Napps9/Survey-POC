@@ -3,6 +3,7 @@ import { choiceListItemHtml, prioritiseItemHtml, esc } from "lib/choice_template
 import { tapResponseStripHtml } from "lib/tap_response_templates"
 import { resolveResponses, presetFor, MIN_TAP_RESPONSES } from "lib/tap_scales"
 import { optionMediaStyle } from "lib/option_media"
+import { NPS_MIN_STEPS, NPS_MAX_STEPS, NPS_CLASSIC_LABELS } from "lib/nps_vessels"
 import { t } from "lib/i18n"
 
 // The fewest options a card may be cut down to from the editor. One is enough
@@ -104,6 +105,149 @@ export default class extends Controller {
       range.selectNodeContents(editable)
       window.getSelection()?.removeAllRanges()
       window.getSelection()?.addRange(range)
+    }
+  }
+
+  // ── The NPS scale ─────────────────────────────────────────────────────────
+  // Only reachable while the card is off the classic 0-10 (the ＋ and × are not
+  // rendered otherwise, and survey-editor's switch is what puts them there).
+  //
+  // The step count is not stored — it is however many labels the column holds,
+  // read straight back off the DOM by serialize() — so adding and removing a
+  // stop is adding and removing a row. What IS stored on the widget is
+  // `data-nps-slider-steps-value` and `aria-valuemax`, and both have to move
+  // with the row or the slider goes on dividing the vessel into the old number
+  // of steps: drag it and the liquid lands between two labels.
+
+  addNpsStop(event) {
+    event.stopPropagation() // don't also select/apply the type underneath
+    const column = this.element.querySelector(".nps-slider-labels")
+    if (!column) return
+    const rows = Array.from(column.querySelectorAll(".nps-label-row"))
+    if (rows.length >= NPS_MAX_STEPS) return
+
+    const row = document.createElement("span")
+    row.className = "nps-label-row"
+    row.innerHTML = `
+      <button type="button" class="nps-label-delete" data-action="click->card-editor#deleteNpsStop"
+              title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>
+      <span class="slider-label-text" data-nps-slider-target="label" contenteditable="true">${esc(this._nextNpsLabel(rows))}</span>`
+    // Appended, not prepended. The column is `column-reverse`, so DOM order
+    // 0..N draws bottom to top — the end of the list is the TOP of the scale,
+    // which is where a scale grows.
+    column.appendChild(row)
+
+    this._syncNpsSteps()
+    this._markNpsCustom()
+    this.dispatch("changed")
+    const editable = row.querySelector("[contenteditable]")
+    editable?.focus()
+    if (editable) {
+      const range = document.createRange()
+      range.selectNodeContents(editable)
+      window.getSelection()?.removeAllRanges()
+      window.getSelection()?.addRange(range)
+    }
+  }
+
+  deleteNpsStop(event) {
+    event.stopPropagation()
+    const row = event.currentTarget.closest(".nps-label-row")
+    const column = row?.parentElement
+    if (!row || !column) return
+    // Same floor guard as deleteOption's: below two stops there is no scale to
+    // drag, and nps_slider_controller silently clamps to 2 anyway — so a card
+    // cut to one would show one label against a two-step vessel.
+    if (column.querySelectorAll(".nps-label-row").length <= NPS_MIN_STEPS) return
+    row.remove()
+    this._syncNpsSteps()
+    this._markNpsCustom()
+    this.dispatch("changed")
+  }
+
+  // Using ＋ or × IS the creator saying this is their scale, so record it.
+  //
+  // Not housekeeping: without it a card that only DERIVED as custom — the three
+  // options a type switch carried across, say — could be edited back to exactly
+  // 0-10, at which point the derivation flips to "classic" and the panel switch
+  // would come back on while the card still carried its ＋ and ×. The flag ends
+  // the derivation the moment there is a real answer to give.
+  _markNpsCustom() {
+    const cardRow = this.element.closest('[data-survey-editor-target="card"]')
+    if (cardRow) cardRow.dataset.cardNpsCustomScale = "true"
+  }
+
+  // Lock the scale back to 0-10, or unlock it. Called by survey-editor's
+  // "Classic 0–10 scale" switch, which owns the card's dataset; this owns the
+  // markup.
+  //
+  // Locking REPLACES the labels, and says so on the switch. That is the
+  // difference between this and every other control in the panel: the classic
+  // is not a display mode over whatever labels happen to be there, it is the
+  // eleven specific labels that make one NPS score comparable to another.
+  setNpsClassic(classic) {
+    const column = this.element.querySelector(".nps-slider-labels")
+    if (!column) return
+    const slider = this.element.classList.contains("nps-slider")
+      ? this.element : this.element.querySelector(".nps-slider")
+
+    const labels = classic
+      ? NPS_CLASSIC_LABELS.slice()
+      : Array.from(column.querySelectorAll(".slider-label-text")).map(el => el.textContent.trim())
+
+    column.innerHTML = labels.map(label => `
+      <span class="nps-label-row">
+        ${classic ? "" : `<button type="button" class="nps-label-delete" data-action="click->card-editor#deleteNpsStop"
+                title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>`}
+        <span class="slider-label-text" data-nps-slider-target="label"${classic ? "" : ' contenteditable="true"'}>${esc(label)}</span>
+      </span>`).join("")
+
+    slider?.classList.toggle("is-custom-scale", !classic)
+    this._syncNpsAddBtn(slider, classic)
+    this._syncNpsSteps()
+  }
+
+  // The ＋ is rendered by the server only for a card that is already off the
+  // classic, so flipping the switch has to put it there or take it away —
+  // otherwise the control the creator has just enabled is missing until the
+  // next reload, which is the same defect the "Change animation" CTA had.
+  _syncNpsAddBtn(slider, classic) {
+    if (!slider) return
+    const existing = slider.querySelector("[data-card-editor-nps-add]")
+    if (classic) { existing?.remove(); return }
+    if (existing) return
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.className = "nps-scale-add"
+    btn.dataset.action = "click->card-editor#addNpsStop"
+    btn.dataset.cardEditorNpsAdd = ""
+    btn.innerHTML = `<span aria-hidden="true">＋</span> ${esc(t("card.add_scale_point"))}`
+    slider.appendChild(btn)
+  }
+
+  // A numeric scale carries on counting; a worded one gets the same placeholder
+  // every other list uses. Read off the LAST row because that is the top of the
+  // scale (column-reverse, above) and therefore the one a new stop follows.
+  _nextNpsLabel(rows) {
+    const last = rows[rows.length - 1]?.querySelector(".slider-label-text")?.textContent?.trim()
+    if (last != null && /^-?\d+$/.test(last)) return String(Number(last) + 1)
+    return t("card.new_option")
+  }
+
+  // The widget's own idea of how many steps it has. Kept in step here rather
+  // than left to the next server render, because the slider is live: the
+  // creator drags it the moment they have added a stop.
+  _syncNpsSteps() {
+    const slider = this.element.classList.contains("nps-slider")
+      ? this.element : this.element.querySelector(".nps-slider")
+    if (!slider) return
+    const n = Math.max(NPS_MIN_STEPS, slider.querySelectorAll(".nps-label-row").length)
+    slider.dataset.npsSliderStepsValue = String(n)
+    slider.setAttribute("aria-valuemax", String(n - 1))
+    const add = slider.querySelector("[data-card-editor-nps-add]")
+    if (add) {
+      add.disabled = n >= NPS_MAX_STEPS
+      add.title = add.disabled ? t("card.nps_scale_max", { max: NPS_MAX_STEPS }) : ""
     }
   }
 

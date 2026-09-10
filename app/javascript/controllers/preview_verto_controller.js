@@ -203,7 +203,14 @@ export default class extends Controller {
       // has no business carrying the creator's controls at all — and one of them
       // shipped without its `hidden` for a while, which is exactly how a hidden
       // thing becomes a visible one.
-      ".range-theme-picker, .nps-shape-picker"
+      ".range-theme-picker, .nps-shape-picker, " +
+      // The NPS scale's own ＋ and ×. `card-editor` is stripped from the clone
+      // below, so these would be inert — but an inert × beside every number on
+      // a respondent's scale is still a scale that looks like it can be taken
+      // apart. The .nps-label-row wrapper STAYS: it is the flex item the column
+      // lays its stops out with, on the player as much as here, so removing it
+      // would collapse the scale rather than tidy it.
+      ".nps-label-delete, .nps-scale-add"
     ).forEach(el => el.remove())
 
     // 1b. The tap card's statement pager is the one piece of editor chrome that

@@ -34,6 +34,10 @@ sw:
     remove_response: "Ondoa jibu hili"
     remove_option: "Futa kadi"
     response_scale: "Majibu kwa kila kauli"
+    nps_classic: "Kipimo cha kawaida cha 0–10"
+    nps_classic_note: "Ukizima unaweza kuongeza, kuondoa na kubadilisha majina ya alama za kipimo hiki. Ukiwasha kinarudi 0–10, ndicho kinachofanya alama ya NPS ilinganishwe."
+    add_scale_point: "Ongeza alama"
+    nps_scale_max: "NPS hufika alama %{max}."
     tap_scale:
       "no": "Hapana"
       "yes": "Ndiyo"

@@ -44,6 +44,10 @@ en-US:
     remove_response: "Remove this answer"
     remove_option: "Delete card"
     response_scale: "Answers per statement"
+    nps_classic: "Classic 0–10 scale"
+    nps_classic_note: "Off lets you add, remove and rename the points on this scale. On puts it back to 0–10, which is what makes an NPS score comparable."
+    add_scale_point: "Add a point"
+    nps_scale_max: "An NPS goes up to %{max} points."
     tap_scale:
       "no": "No"
       "yes": "Yes"

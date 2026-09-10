@@ -168,6 +168,41 @@ module NpsHelper
     card["type"].to_s == "nps"
   end
 
+  # ── How many stops the scale has ──────────────────────────────────────────
+  # An NPS is 0-10, and that is the whole point of the type: the score only
+  # means anything against the same eleven-point question everybody else asks.
+  # So the count is LOCKED by default and the editor shows no way to change it.
+  #
+  # But the widget has always been able to carry another scale — the labels
+  # drive the step count, and a 4/5-point or agree/emotion range renders
+  # perfectly well — and creators do want one. Hence a switch rather than a
+  # rule: turn the classic off and the card grows ＋ and × on its stops.
+  #
+  # Two floors, and they are different kinds of number. NPS_MIN_STEPS is what
+  # the slider needs to be a slider at all (see nps_slider_controller's
+  # `Math.max(2, …)`), and it is the same 2 the renderer already assumes.
+  # NPS_MAX_STEPS is the classic itself: eleven stops is what the label column
+  # holds legibly at the vessel's height, and a scale that wanted more than the
+  # canonical one has stopped being this card.
+  NPS_MIN_STEPS = 2
+  NPS_MAX_STEPS = NPS_STEPS
+
+  # Whether this card is off the classic scale.
+  #
+  # Three-state on purpose. `nps_custom_scale` is stored ONLY when a creator
+  # deliberately turns the classic off; its ABSENCE means "nobody has said", and
+  # then the labels answer for themselves. That is what lets this ship without a
+  # migration and without touching a single existing deck: a card sitting on
+  # 0-10 (or on no labels at all) reads as classic, and one already carrying an
+  # agree scale reads as custom and keeps every label it has. A stored default
+  # either way would have been wrong for half the decks in the account.
+  def nps_custom_scale?(card)
+    return false unless card.is_a?(Hash)
+    return true if card["nps_custom_scale"] == true
+    labels = Array(card["options"]).map(&:to_s)
+    labels.any? && labels != nps_default_labels
+  end
+
   # ── The NPS card's own animation: which vessel it fills ────────────────────
   # A range card picks a reaction CHARACTER (range_theme, above); an NPS card's
   # animation IS its liquid container, and until now a creator could not choose

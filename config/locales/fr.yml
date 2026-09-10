@@ -34,6 +34,10 @@ fr:
     remove_response: "Supprimer cette réponse"
     remove_option: "Supprimer la carte"
     response_scale: "Réponses par affirmation"
+    nps_classic: "Échelle classique 0–10"
+    nps_classic_note: "Désactivée, vous pouvez ajouter, supprimer et renommer les points de cette échelle. Activée, elle revient à 0–10, ce qui rend un score NPS comparable."
+    add_scale_point: "Ajouter un point"
+    nps_scale_max: "Une échelle NPS va jusqu'à %{max} points."
     tap_scale:
       "no": "Non"
       "yes": "Oui"

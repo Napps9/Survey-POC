@@ -34,6 +34,10 @@ es:
     remove_response: "Eliminar esta respuesta"
     remove_option: "Eliminar tarjeta"
     response_scale: "Respuestas por afirmación"
+    nps_classic: "Escala clásica 0–10"
+    nps_classic_note: "Desactivada te deja añadir, quitar y renombrar los puntos de esta escala. Activada la devuelve a 0–10, que es lo que hace comparable una puntuación NPS."
+    add_scale_point: "Añadir un punto"
+    nps_scale_max: "Una NPS llega hasta %{max} puntos."
     tap_scale:
       "no": "No"
       "yes": "Sí"

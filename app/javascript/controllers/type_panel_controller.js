@@ -10,7 +10,8 @@ import { injectIcons } from "lib/option_icons"
 import { optionMediaStyle } from "lib/option_media"
 import { t } from "lib/i18n"
 import { cardEyebrow, MULTI_SELECT_TYPES } from "lib/card_eyebrow"
-import { NPS_VESSELS, npsStageStyle, npsVesselSvg, npsVesselFor } from "lib/nps_vessels"
+import { NPS_VESSELS, npsStageStyle, npsVesselSvg, npsVesselFor,
+         npsCustomScale, NPS_MIN_STEPS } from "lib/nps_vessels"
 
 
 
@@ -503,8 +504,17 @@ function gridHtml(opts, mode, styles = [], max = 0) {
 // default 0–10. The container silhouette is the card's own pick where it has
 // one, and the Verto-themed default otherwise (ctx.npsShape).
 function npsHtml(opts, ctx = {}) {
-  const labels = opts.length >= 2 ? opts : defaultOptionsFor("nps")
-  const n = Math.max(labels.length, 2)
+  const labels = opts.length >= NPS_MIN_STEPS ? opts : defaultOptionsFor("nps")
+  const n = Math.max(labels.length, NPS_MIN_STEPS)
+  // Off the classic 0-10, the stops are the creator's to build and each one
+  // gets a × with an ＋ beneath the column; on the classic they are the scale
+  // rather than copy, so they are neither removable nor retypable. Same
+  // three-state read as the server's (NpsHelper#nps_custom_scale?) — which
+  // matters most HERE, because a card switched to NPS carries the previous
+  // type's options across: three answers become a three-stop scale, which is
+  // not the classic and so arrives unlocked, ready to be extended or snapped
+  // back to 0-10 with one switch.
+  const custom = npsCustomScale(labels, ctx.npsCustomScale)
   const key = npsVesselFor(ctx.npsShape)
   const v = NPS_VESSELS[key]
   const groups = ctx.npsShapeGroups || []
@@ -520,9 +530,17 @@ function npsHtml(opts, ctx = {}) {
         ${groups.map(g => `<optgroup label="${esc(g.category)}">${g.shapes.map(s => opt(s.label, s.slug)).join("")}</optgroup>`).join("")}
       </select>
     </div>` : ""
+  const del = custom
+    ? `<button type="button" class="nps-label-delete" data-action="click->card-editor#deleteNpsStop"
+               title="${esc(t("card.remove_option"))}" aria-label="${esc(t("card.remove_option"))}">×</button>`
+    : ""
+  const add = custom
+    ? `<button type="button" class="nps-scale-add" data-action="click->card-editor#addNpsStop"
+               data-card-editor-nps-add><span aria-hidden="true">＋</span> ${esc(t("card.add_scale_point"))}</button>`
+    : ""
   return `
-    <div class="nps-slider"
-         data-controller="nps-slider"
+    <div class="nps-slider${custom ? " is-custom-scale" : ""}"
+         data-controller="nps-slider card-editor"
          data-nps-slider-steps-value="${n}"
          data-nps-slider-axis-value="vertical"
          data-action="pointerdown->nps-slider#start keydown->nps-slider#key"
@@ -530,12 +548,13 @@ function npsHtml(opts, ctx = {}) {
          aria-valuemin="0" aria-valuemax="${n - 1}">
       <div class="nps-slider-stage" style="${npsStageStyle(v)}">
         <div class="slider-labels nps-slider-labels">
-          ${labels.map(o => `<span class="slider-label-text" data-nps-slider-target="label" contenteditable="true">${esc(o)}</span>`).join("")}
+          ${labels.map(o => `<span class="nps-label-row">${del}<span class="slider-label-text" data-nps-slider-target="label"${custom ? ' contenteditable="true"' : ""}>${esc(o)}</span></span>`).join("")}
         </div>
         <div class="nps-control nps-shape-${key}" data-axis="vertical">
           ${npsVesselSvg(key, v)}
         </div>
       </div>
+      ${add}
     </div>${picker}`
 }
 
@@ -1263,6 +1282,7 @@ export default class extends Controller {
         npsShape:        this._npsShape(card),
         npsShapeGroups:  this._npsShapePicker.groups,
         npsShapeLabel:   this._npsShapePicker.label,
+        npsCustomScale:  card.dataset.cardNpsCustomScale,
         rangeThemes:     this._rangeThemePicker.themes,
         rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,

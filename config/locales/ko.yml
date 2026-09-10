@@ -34,6 +34,10 @@ ko:
     remove_response: "이 답변 삭제"
     remove_option: "카드 삭제"
     response_scale: "문항당 답변 수"
+    nps_classic: "클래식 0–10 척도"
+    nps_classic_note: "끄면 이 척도의 눈금을 추가·삭제하고 이름을 바꿀 수 있어요. 켜면 0–10으로 되돌아가며, 그래야 NPS 점수를 비교할 수 있어요."
+    add_scale_point: "눈금 추가"
+    nps_scale_max: "NPS는 최대 %{max}개 눈금이에요."
     tap_scale:
       "no": "아니요"
       "yes": "예"

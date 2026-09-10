@@ -34,6 +34,10 @@ ar:
     remove_response: "حذف هذه الإجابة"
     remove_option: "حذف البطاقة"
     response_scale: "عدد الإجابات لكل عبارة"
+    nps_classic: "مقياس 0–10 التقليدي"
+    nps_classic_note: "إيقافه يتيح لك إضافة نقاط هذا المقياس وحذفها وإعادة تسميتها. تشغيله يعيده إلى 0–10، وهو ما يجعل نتيجة NPS قابلة للمقارنة."
+    add_scale_point: "إضافة نقطة"
+    nps_scale_max: "يصل مقياس NPS إلى %{max} نقاط."
     tap_scale:
       "no": "لا"
       "yes": "نعم"

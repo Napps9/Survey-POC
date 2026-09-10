@@ -34,6 +34,10 @@ tr:
     remove_response: "Bu yanıtı kaldır"
     remove_option: "Kartı sil"
     response_scale: "İfade başına yanıt"
+    nps_classic: "Klasik 0–10 ölçeği"
+    nps_classic_note: "Kapalıyken bu ölçeğin noktalarını ekleyebilir, kaldırabilir ve yeniden adlandırabilirsiniz. Açıkken 0–10'a döner; bir NPS puanını karşılaştırılabilir kılan da budur."
+    add_scale_point: "Nokta ekle"
+    nps_scale_max: "Bir NPS en fazla %{max} noktadır."
     tap_scale:
       "no": "Hayır"
       "yes": "Evet"

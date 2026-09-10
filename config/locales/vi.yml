@@ -34,6 +34,10 @@ vi:
     remove_response: "Xóa câu trả lời này"
     remove_option: "Xoá thẻ"
     response_scale: "Số câu trả lời mỗi phát biểu"
+    nps_classic: "Thang 0–10 cổ điển"
+    nps_classic_note: "Tắt để thêm, bớt và đổi tên các mốc trên thang này. Bật sẽ đưa nó về 0–10, điều làm cho điểm NPS có thể so sánh được."
+    add_scale_point: "Thêm một mốc"
+    nps_scale_max: "Thang NPS tối đa %{max} mốc."
     tap_scale:
       "no": "Không"
       "yes": "Có"

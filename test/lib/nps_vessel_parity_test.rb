@@ -135,6 +135,64 @@ class NpsVesselParityTest < ActiveSupport::TestCase
     end
   end
 
+  # ── The scale's own bounds ────────────────────────────────────────────────
+  # Three copies of "how many stops an NPS may have": the Ruby that renders it,
+  # the JS that lets a creator add and remove them, and the Rules of the Game
+  # that score the card. A ceiling that drifts on one side is a ＋ that keeps
+  # offering a twelfth stop the renderer will not lay out, or a rule that marks
+  # a legal scale down.
+  test "the step bounds agree between Ruby, JS and the rules" do
+    js = Rails.root.join("app/javascript/lib/nps_vessels.js").read
+    {
+      "NPS_MIN_STEPS" => NpsHelper::NPS_MIN_STEPS,
+      "NPS_MAX_STEPS" => NpsHelper::NPS_MAX_STEPS
+    }.each do |name, ruby_value|
+      found = js[/^export const #{name}\s*=\s*(\d+)/, 1]
+      assert found, "#{name} is missing from lib/nps_vessels.js"
+      assert_equal ruby_value, found.to_i, "#{name} differs between Ruby and JS"
+    end
+
+    assert_equal NpsHelper::NPS_STEPS, NpsHelper::NPS_MAX_STEPS,
+                 "the ceiling has drifted off the classic scale it is derived from"
+
+    rules = Rails.root.join("app/javascript/lib/verto_rules.js").read
+    exact = rules[/nps:\s*\{\s*exact:\s*(\d+)\s*\}/, 1]
+    assert exact, "COUNT_RULES no longer states an exact count for nps"
+    assert_equal NpsHelper::NPS_STEPS, exact.to_i,
+                 "the Rules of the Game score an NPS against a different number of points " \
+                 "than the classic scale has"
+  end
+
+  # The three states, which is the whole reason this ships without a migration.
+  test "a card is classic until its labels or its creator say otherwise" do
+    refute nps_custom_scale?({ "type" => "nps" }),
+           "a card with no labels at all is the classic scale — it renders as 0-10"
+    refute nps_custom_scale?({ "type" => "nps", "options" => nps_default_labels }),
+           "a card sitting on 0-10 is the classic scale, flag or no flag"
+
+    assert nps_custom_scale?({ "type" => "nps", "options" => %w[Never Sometimes Always] }),
+           "a deck already carrying its own scale must keep reading as custom — otherwise this " \
+           "change locks every one of them and replaces their labels"
+    assert nps_custom_scale?({ "type" => "nps", "options" => nps_default_labels,
+                               "nps_custom_scale" => true }),
+           "the creator's own switch has to outrank the labels, or unlocking a 0-10 card and " \
+           "reloading would lock it straight back"
+  end
+
+  test "the sanitiser stores the unlock only where it means something" do
+    kept = Survey.sanitize_cards_images!([ { "type" => "nps", "nps_custom_scale" => true } ])
+    assert_equal true, kept.first["nps_custom_scale"]
+
+    [ { "type" => "nps", "nps_custom_scale" => false },
+      { "type" => "nps", "nps_custom_scale" => "yes" },
+      { "type" => "multiple_choice", "nps_custom_scale" => true } ].each do |card|
+      out = Survey.sanitize_cards_images!([ card ])
+      refute out.first.key?("nps_custom_scale"),
+             "nps_custom_scale survived on #{card.inspect} — there must be exactly one " \
+             "representation of 'classic', which is the key being absent"
+    end
+  end
+
   private
 
   # nps_stage_style is a view helper; give the test the module's own methods.

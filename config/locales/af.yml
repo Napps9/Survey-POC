@@ -35,6 +35,10 @@ af:
     remove_response: "Verwyder hierdie antwoord"
     remove_option: "Vee kaart uit"
     response_scale: "Antwoorde per stelling"
+    nps_classic: "Klassieke 0–10-skaal"
+    nps_classic_note: "Af laat jou punte op hierdie skaal byvoeg, verwyder en hernoem. Aan stel dit terug na 0–10, wat 'n NPS-telling vergelykbaar maak."
+    add_scale_point: "Voeg 'n punt by"
+    nps_scale_max: "'n NPS gaan tot %{max} punte."
     tap_scale:
       "no": "Nee"
       "yes": "Ja"

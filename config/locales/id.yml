@@ -34,6 +34,10 @@ id:
     remove_response: "Hapus jawaban ini"
     remove_option: "Hapus kartu"
     response_scale: "Jawaban per pernyataan"
+    nps_classic: "Skala klasik 0–10"
+    nps_classic_note: "Nonaktif memungkinkan Anda menambah, menghapus, dan mengganti nama titik pada skala ini. Aktif mengembalikannya ke 0–10, yang membuat skor NPS bisa dibandingkan."
+    add_scale_point: "Tambah titik"
+    nps_scale_max: "Skala NPS maksimal %{max} titik."
     tap_scale:
       "no": "Tidak"
       "yes": "Ya"

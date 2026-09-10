@@ -34,6 +34,10 @@ de:
     remove_response: "Diese Antwort entfernen"
     remove_option: "Karte löschen"
     response_scale: "Antworten pro Aussage"
+    nps_classic: "Klassische 0–10-Skala"
+    nps_classic_note: "Aus kannst du Punkte dieser Skala hinzufügen, entfernen und umbenennen. An setzt sie auf 0–10 zurück – das macht einen NPS-Wert vergleichbar."
+    add_scale_point: "Punkt hinzufügen"
+    nps_scale_max: "Eine NPS-Skala geht bis %{max} Punkte."
     tap_scale:
       "no": "Nein"
       "yes": "Ja"

@@ -34,6 +34,10 @@ pl:
     remove_response: "Usuń tę odpowiedź"
     remove_option: "Usuń kartę"
     response_scale: "Odpowiedzi na stwierdzenie"
+    nps_classic: "Klasyczna skala 0–10"
+    nps_classic_note: "Wyłączone pozwala dodawać, usuwać i zmieniać nazwy punktów tej skali. Włączone przywraca 0–10, dzięki czemu wynik NPS jest porównywalny."
+    add_scale_point: "Dodaj punkt"
+    nps_scale_max: "Skala NPS ma maksymalnie %{max} punktów."
     tap_scale:
       "no": "Nie"
       "yes": "Tak"
