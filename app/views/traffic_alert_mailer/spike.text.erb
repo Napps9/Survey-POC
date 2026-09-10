@@ -1,0 +1,16 @@
+Respondent traffic is up.
+
+<%= @count %> <%= "response".pluralize(@count) %> in the last <%= @window_minutes %> minutes — about <%= @per_minute.round %> a minute.
+<% if @rows.any? %>
+Busiest Vertos in that window:
+<% @rows.each do |row| -%>
+  - <%= row[:name] %><%= " (#{row[:organisation]})" if row[:organisation] %>: <%= row[:responses] %>
+<% end -%>
+<% end -%>
+
+Nothing is wrong. This is a heads-up that something is happening, so there is
+time to scale the web service up by hand if it keeps climbing — the service
+has a persistent disk, so it cannot autoscale.
+
+You will get one of these per <%= @window_minutes %> minutes for as long as the rate stays above
+the threshold (TRAFFIC_ALERT_PER_MINUTE).

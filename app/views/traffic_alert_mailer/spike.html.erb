@@ -1,0 +1,31 @@
+<h2 style="margin:0 0 12px;font-size:18px;">Respondent traffic is up</h2>
+
+<p style="margin:0 0 16px;font-size:15px;">
+  <strong><%= @count %></strong> <%= "response".pluralize(@count) %> in the last
+  <strong><%= @window_minutes %> minutes</strong> — about
+  <strong><%= @per_minute.round %> a minute</strong>.
+</p>
+
+<% if @rows.any? %>
+  <p style="margin:0 0 6px;font-size:13px;color:#666;">Busiest Vertos in that window</p>
+  <table style="border-collapse:collapse;margin:0 0 16px;font-size:14px;">
+    <% @rows.each do |row| %>
+      <tr>
+        <td style="padding:4px 16px 4px 0;"><%= row[:name] %></td>
+        <td style="padding:4px 16px 4px 0;color:#666;"><%= row[:organisation] %></td>
+        <td style="padding:4px 0;text-align:right;"><%= row[:responses] %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<p style="margin:0 0 16px;font-size:14px;">
+  Nothing is wrong. This is a heads-up that something is happening, so there is
+  time to scale the web service up by hand if it keeps climbing — the service
+  has a persistent disk, so it cannot autoscale.
+</p>
+
+<p style="margin:0;font-size:13px;color:#666;">
+  One of these per <%= @window_minutes %> minutes for as long as the rate stays above the
+  threshold (<code>TRAFFIC_ALERT_PER_MINUTE</code>).
+</p>

@@ -55,6 +55,16 @@ production:
     class: Comms::EnqueueAutomationRunsJob
     schedule: every hour at minute 7
 
+  # The only thing that reports traffic CLIMBING rather than something being
+  # broken. Nobody watches a dashboard at 9pm three days after an event, and
+  # the persistent disk pins this service to one instance, so nothing scales
+  # itself in response — a human has to, and first has to know. The window in
+  # TrafficAlertJob::WINDOW is kept equal to this schedule so runs neither
+  # overlap nor leave gaps. Inert until TRAFFIC_ALERT_EMAILS is set.
+  traffic_alert:
+    class: TrafficAlertJob
+    schedule: every 15 minutes
+
   # Thursday's newsletter DRAFT — it never sends, it only writes a draft for
   # the owner to review and book for Monday. Cron rather than English because
   # this is the file's only weekday-specific schedule; 4 is Thursday, in UTC.
