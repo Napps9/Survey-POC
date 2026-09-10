@@ -21,6 +21,8 @@
       </div>
 
     <% else %>
+      <%= render "you/tabs", current: :vertos %>
+
       <div class="you-head">
         <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.eyebrow") %></div>
         <h1 class="you-h1"><%= t("you.kept", count: @claims.size) %></h1>
@@ -35,7 +37,7 @@
         <div class="you-list">
           <% @claims.each do |claim| %>
             <% survey = claim.survey %>
-            <article class="you-verto">
+            <%= link_to you_verto_path(survey), class: "you-verto" do %>
               <span class="you-verto-rule" aria-hidden="true"></span>
               <div class="you-verto-body">
                 <div class="you-verto-org"><%= survey.organisation.name %></div>
@@ -59,8 +61,9 @@
                     <% end %>
                   </div>
                 <% end %>
+                <span class="you-verto-go" aria-hidden="true">→</span>
               </div>
-            </article>
+            <% end %>
           <% end %>
         </div>
       <% end %>

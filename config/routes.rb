@@ -86,6 +86,11 @@ Rails.application.routes.draw do
   # a single-use link a scanner can spend is one its recipient never gets to
   # use. GET confirms; POST signs in.
   get    "you",                to: "you#show",              as: :you
+  get    "you/wallet",         to: "you#wallet",            as: :you_wallet
+  # One Verto in the account. :id is the SURVEY id, and the lookup is scoped to
+  # the signed-in player's own claims — so the id is not a capability, it is
+  # just a name, and someone else's Verto is a 404 whether or not it exists.
+  get    "you/v/:id",          to: "you#verto",             as: :you_verto
   post   "you/sign-out",       to: "you#sign_out",          as: :you_sign_out
   delete "you",                to: "you#destroy"
   get    "you/sign-in/:token", to: "player_sign_ins#show",   as: :player_sign_in

@@ -1411,6 +1411,35 @@ en:
     delete: "Delete my account"
     delete_confirm: "This deletes your account and the list of Vertos you've kept. Your answers stay with the organisations that asked — they were given anonymously and aren't ours to remove. Continue?"
     deleted: "Your account has been deleted."
+    tabs_label: "Your account"
+    tab_vertos: "Vertos"
+    tab_wallet: "Wallet"
+    back: "Your Vertos"
+    not_found: "That Verto isn't in your account."
+    answered_on: "You answered on %{date}"
+    have_answered:
+      one: "1 person has answered"
+      other: "%{count} people have answered"
+    your_answers: "Your answers"
+    your_answer: "Your answer: %{answer}"
+    comparison_title: "Your answers vs everyone"
+    comparison_too_few: "Not enough answers to compare yet — come back when a few more people have taken part."
+    comparison_off: "%{org} hasn't opened the results of this Verto. You'll still hear from them when there's news."
+    comparison_none: "Nothing to chart on this one — the questions you answered don't have set options to compare."
+    standing: "%{name} · %{rank} of %{of}"
+    wallet_eyebrow: "Collected"
+    wallet_title: "Your wallet"
+    wallet_empty: "No points yet. Not every Verto awards them — the ones that do will show up here."
+    # Two counts in one sentence, and i18n pluralises on `count` alone — so the
+    # halves are counted separately and composed here.
+    wallet_across: "Across %{vertos} and %{organisations}."
+    wallet_vertos:
+      one: "1 Verto"
+      other: "%{count} Vertos"
+    wallet_orgs:
+      one: "1 organisation"
+      other: "%{count} organisations"
+    wallet_note: "Each Verto sets its own tokens and its own amounts, so these piles aren't the same thing as each other. There's a total because it's satisfying to have one — there's no league table across Vertos, because it would only measure whose Verto you happened to play."
   player_sign_in_mailer:
     subject: "Your Playverto link"
     subject_org: "Your link to %{org}'s Verto"

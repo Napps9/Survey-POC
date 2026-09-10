@@ -1377,12 +1377,14 @@ class PlayerController < ApplicationController
   # republish never serves the previous deck's aggregates. Access guards stay
   # in the actions, outside the cache — only link-independent payloads live
   # here. (In test the null cache store makes fetch a pass-through.)
-  PLAYER_AGGREGATE_TTL = 10.seconds
+  # Kept as a name and a constant here because both are referred to from all
+  # over this file; the key, the TTL and the stampede guard now live in
+  # AggregatesSurveyResults, so /you reads the same entry rather than
+  # recomputing the same numbers behind its own key.
+  PLAYER_AGGREGATE_TTL = AggregatesSurveyResults::SURVEY_AGGREGATE_TTL
 
   def cached_aggregate(kind, &block)
-    Rails.cache.fetch([ "player-agg", kind, @survey.id, @survey.updated_at.to_f ],
-                      expires_in: PLAYER_AGGREGATE_TTL,
-                      race_condition_ttl: 30.seconds, &block)
+    cached_survey_aggregate(kind, @survey, &block)
   end
 
   # How long a rendered player page stays cached. Long, because the key already

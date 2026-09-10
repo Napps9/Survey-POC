@@ -1,7 +1,28 @@
 module AggregatesSurveyResults
   extend ActiveSupport::Concern
 
+  # How long an aggregate stays cached. Short, because the numbers are meant to
+  # move as people answer — this only collapses a burst into one recompute per
+  # window. Keyed on updated_at so a deck edit or republish never serves the
+  # previous deck's aggregates. race_condition_ttl serves the just-expired
+  # value while ONE caller recomputes, so an expiry can't stampede.
+  #
+  # The key is deliberately shared across every caller: the respondent's
+  # end-of-Verto comparison (PlayerController#results) and the same comparison
+  # read later from their account (YouController#verto) are the same payload
+  # about the same Verto, so the second one to ask should not pay for it again.
+  # Access guards stay in the actions, OUTSIDE this — only link-independent
+  # payloads live here. (In test the null cache store makes fetch a
+  # pass-through.)
+  SURVEY_AGGREGATE_TTL = 10.seconds
+
   private
+
+  def cached_survey_aggregate(kind, survey, &block)
+    Rails.cache.fetch([ "player-agg", kind, survey.id, survey.updated_at.to_f ],
+                      expires_in: SURVEY_AGGREGATE_TTL,
+                      race_condition_ttl: 30.seconds, &block)
+  end
 
   # Builds the per-card results distribution. Iterates the responses ONCE
   # (batched, answers-column only, for AR relations) and accumulates every

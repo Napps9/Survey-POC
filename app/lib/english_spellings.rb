@@ -47,12 +47,33 @@ module EnglishSpellings
   IDENTICAL = %w[
     analysis audience audiences confidence democratise difference differences
     ellis experience experiences neurodivergence otherwise preference
-    preferences promise recalled sequence sequences yours
+    preferences promise recalled sentence sequence sequences yours
   ].freeze
+
+  # An i18n interpolation name is CODE, not prose. `%{organisations}` is a Ruby
+  # symbol the view passes as a keyword argument, so respelling it to
+  # `%{organizations}` writes a file that raises
+  # I18n::MissingInterpolationArgument for every en-US visitor while `en`
+  # stays perfectly green — a 500 that no test in the `en` suite can see, and
+  # that the generator would reintroduce on the next run even after a hand
+  # fix. Found the first time a key needed two counts in one sentence
+  # (you.wallet_across), which is to say: the moment anyone used a British
+  # word as a variable name.
+  #
+  # Both spellings i18n accepts are protected: %{name} and sprintf's
+  # %<name>s. Everything between them is prose and is transformed as before.
+  PLACEHOLDER = /(%\{[^}]*\}|%<[^>]*>[a-zA-Z])/.freeze
+
+  def americanise(text)
+    text.to_s.split(PLACEHOLDER).each_with_index.map do |part, i|
+      # split with one capture group interleaves the captures at odd indices.
+      i.odd? ? part : americanise_prose(part)
+    end.join
+  end
 
   # Case-preserving: shouty labels stay shouty ("PRIORITISE" → "PRIORITIZE"),
   # sentence case stays sentence case.
-  def americanise(text)
+  def americanise_prose(text)
     text.to_s.gsub(PATTERN) do |hit|
       replacement = BRITISH_TO_AMERICAN[hit.downcase]
       if hit == hit.upcase && hit.length > 1

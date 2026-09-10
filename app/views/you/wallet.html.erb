@@ -1,0 +1,66 @@
+<%# The wallet. One number that spans Vertos, and beneath it the piles that
+    make it up — kept apart, because each Verto sets its own tokens and its own
+    amounts and the piles are therefore three different things.
+
+    The sentence at the foot is not a disclaimer, it is the design: anyone
+    reading this will ask why the numbers can't be compared, and answering it
+    here once is cheaper than answering it in support forever. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell">
+
+    <div class="you-bar">
+      <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
+    </div>
+
+    <%= render "you/tabs", current: :wallet %>
+
+    <% if @rows.empty? %>
+      <div class="you-card">
+        <h1 class="you-h1"><%= t("you.wallet_title") %></h1>
+        <p class="you-sub"><%= t("you.wallet_empty") %></p>
+      </div>
+    <% else %>
+      <div class="you-head">
+        <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.wallet_eyebrow") %></div>
+        <div class="you-total"><%= number_with_delimiter(@total) %></div>
+        <div class="you-total-sub">
+          <%= t("you.wallet_across",
+                vertos: t("you.wallet_vertos", count: @rows.size),
+                organisations: t("you.wallet_orgs", count: @organisations)) %>
+        </div>
+      </div>
+
+      <div class="you-list">
+        <% @rows.each do |row| %>
+          <%= link_to you_verto_path(row[:survey]), class: "you-verto" do %>
+            <span class="you-verto-rule" aria-hidden="true"></span>
+            <div class="you-verto-body">
+              <h2 class="you-verto-title"><%= row[:survey].theme.presence || row[:survey].title %></h2>
+              <div class="you-piles">
+                <% row[:piles].each do |pile| %>
+                  <span class="you-pile">
+                    <%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %>
+                  </span>
+                <% end %>
+              </div>
+              <%# The anonymous name is that Verto's own, and differs from one
+                  Verto to the next — the boards were never joined and this
+                  does not join them. %>
+              <% if row[:standing] %>
+                <div class="you-standing">
+                  <%= t("you.standing", name: row[:standing][:name],
+                        rank: number_with_delimiter(row[:standing][:rank]),
+                        of: number_with_delimiter(row[:standing][:of])) %>
+                </div>
+              <% end %>
+              <span class="you-verto-go" aria-hidden="true">→</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <p class="you-foot-note"><%= t("you.wallet_note") %></p>
+    <% end %>
+  </div>
+</div>

@@ -109,7 +109,12 @@ class EnUsLocaleTest < ActiveSupport::TestCase
   end
 
   test "no British spelling survived into en-US's copy" do
+    # "to the reader" is the whole test, so interpolation names are stripped
+    # first: %{organisations} is a keyword argument the view passes, never
+    # anything a reader sees, and respelling it would be the 500 the guard
+    # below exists to prevent.
     values = leaf_values(YAML.load_file(Rails.root.join("config/locales/en-US.yml")).fetch("en-US"))
+                .map { |v| v.gsub(EnglishSpellings::PLACEHOLDER, " ") }
     offenders = EnglishSpellings::BRITISH_TO_AMERICAN.keys.select do |word|
       values.any? { |v| v.match?(/\b#{word}\b/i) }
     end
@@ -148,6 +153,41 @@ class EnUsLocaleTest < ActiveSupport::TestCase
     assert_equal "PRIORITIZE", EnglishSpellings.americanise("PRIORITISE")
     assert_equal "Organization name", EnglishSpellings.americanise("Organisation name")
     assert_equal "color", EnglishSpellings.americanise("colour")
+  end
+
+  test "an interpolation name is never respelled" do
+    # A placeholder is a Ruby keyword argument, not prose. Respelling
+    # %{organisations} to %{organizations} writes a file that raises
+    # I18n::MissingInterpolationArgument for every en-US visitor while `en`
+    # stays green — a 500 the English suite cannot see. Both accepted
+    # spellings are protected, and the prose around them still transforms.
+    assert_equal "Across %{organisations} and %{centres}: prioritize the color",
+                 EnglishSpellings.americanise("Across %{organisations} and %{centres}: prioritise the colour")
+    assert_equal "%<organisation>s recognized it",
+                 EnglishSpellings.americanise("%<organisation>s recognised it")
+  end
+
+  test "no generated interpolation name drifted from the one en.yml declares" do
+    # The guard above proves the transform; this proves the FILE, so a
+    # hand-edit or a future rule that reintroduces the bug is caught even if
+    # it never goes through americanise.
+    en    = YAML.load_file(Rails.root.join("config/locales/en.yml"))["en"]
+    en_us = YAML.load_file(Rails.root.join("config/locales/en-US.yml"))["en-US"]
+
+    names = lambda do |node, path = [], out = {}|
+      case node
+      when Hash  then node.each { |k, v| names.call(v, path + [ k ], out) }
+      when Array then node.each_with_index { |v, i| names.call(v, path + [ i ], out) }
+      when String then out[path.join(".")] = node.scan(/%[{<]([^}>]*)[}>]/).flatten.sort
+      end
+      out
+    end
+
+    a, b = names.call(en), names.call(en_us)
+    drifted = a.select { |key, vars| b.key?(key) && b[key] != vars }
+    assert_empty drifted,
+                 "en-US changed the interpolation names of #{drifted.keys.join(', ')} — " \
+                 "those are keyword arguments the views pass, and renaming one is a 500 in en-US only"
   end
 
   test "the transform leaves alone the words that only look British" do

@@ -12789,6 +12789,82 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .you-mark-sm { opacity: .9; }
 
 .you-bar { display: flex; align-items: center; gap: 10px; padding: 4px 0 14px; }
+/* The account's own nav, and the two pages behind it. Same surfaces and the
+   same type scale as the Vertos list above — this is one area, not three. */
+.you-tabs { display: flex; gap: 6px; padding: 2px 0 16px; }
+.you-tab {
+  font-family: "Alata", sans-serif; font-size: 13px; text-decoration: none;
+  color: rgba(255,255,255,.6); padding: 7px 14px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.12);
+}
+.you-tab.is-on { color: #1C2034; background: #01EACB; border-color: #01EACB; }
+.you-tab:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+
+.you-back {
+  display: inline-block; font-size: 13px; color: rgba(255,255,255,.55);
+  text-decoration: none; padding: 2px 0 12px;
+}
+.you-back:hover { color: rgba(255,255,255,.8); }
+
+/* The one number that spans Vertos. Large because it is the point of the
+   page, and the only figure here that is allowed to be. */
+.you-total {
+  font-family: "Alata", sans-serif; font-size: 46px; line-height: 1.05;
+  letter-spacing: -1px; margin: 6px 0 0;
+}
+.you-total-sub { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 6px; }
+
+/* The whole row is a link now. Keep it looking like the card it was: no
+   underline, inherited colour, and the arrow as the only added affordance. */
+.you-verto { display: block; text-decoration: none; color: inherit; position: relative; }
+.you-verto:focus-visible { outline: 2px solid #01EACB; outline-offset: 3px; border-radius: 18px; }
+.you-verto-go {
+  position: absolute; top: 50%; inset-inline-end: 4px; transform: translateY(-50%);
+  color: rgba(255,255,255,.35); font-size: 18px;
+}
+.you-standing { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 8px; }
+.you-foot-note {
+  font-size: 12px; line-height: 1.6; color: rgba(255,255,255,.45);
+  margin: 18px 2px 0;
+}
+
+.you-card-tight { padding: 18px 20px; }
+.you-h2 { font-family: "Alata", sans-serif; font-size: 17px; margin: 0 0 14px; }
+
+/* One question's bars. Deliberately the same reading as the player's own
+   comparison — the label, the fill, the percentage — so a respondent
+   recognises the screen they saw when they finished. */
+.you-q { padding: 14px 0; border-top: 1px solid rgba(255,255,255,.07); }
+.you-q:first-of-type { border-top: 0; padding-top: 0; }
+.you-q-prompt { font-size: 14px; line-height: 1.45; margin-bottom: 6px; }
+.you-q-mine {
+  display: inline-block; font-size: 12px; color: #01EACB;
+  background: rgba(1,234,203,.12); border: 1px solid rgba(1,234,203,.4);
+  border-radius: 100px; padding: 3px 10px; margin-bottom: 10px;
+  overflow-wrap: anywhere;
+}
+.you-bar-row { display: flex; align-items: center; gap: 10px; padding: 3px 0; font-size: 12px; }
+.you-bar-label {
+  flex: 0 0 38%; color: rgba(255,255,255,.7);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.you-bar-row.is-mine .you-bar-label { color: #fff; }
+.you-bar-track {
+  flex: 1; height: 8px; border-radius: 100px; background: rgba(255,255,255,.09);
+  overflow: hidden;
+}
+.you-bar-fill { display: block; height: 100%; border-radius: 100px; background: rgba(255,255,255,.32); }
+.you-bar-row.is-mine .you-bar-fill { background: #01EACB; }
+.you-bar-pct { flex: 0 0 34px; text-align: end; color: rgba(255,255,255,.6); }
+.you-bar-row.is-mine .you-bar-pct { color: #fff; }
+
+/* Narrow phones: the label column at 38% leaves too little track to read, so
+   the option goes on its own line above the bar. */
+@media (max-width: 380px) {
+  .you-bar-row { flex-wrap: wrap; }
+  .you-bar-label { flex: 0 0 100%; white-space: normal; }
+}
+
 /* Which account this is. An address is one unbroken token, so it wraps by
    character rather than pushing the shell wider on a narrow phone. */
 .you-whoami {

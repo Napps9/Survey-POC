@@ -1,0 +1,84 @@
+<%# One Verto in the account: what they said, next to what everyone said.
+    These are the rows the player already draws at the end of a Verto — the
+    account's contribution is that they survive closing the tab, which until
+    now they did not. Nothing is restyled for this surface on purpose: a
+    respondent should recognise the screen they saw when they finished. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell">
+
+    <%= link_to you_path, class: "you-back" do %>‹ <%= t("you.back") %><% end %>
+
+    <div class="you-head">
+      <div class="you-verto-org"><%= @survey.organisation.name %></div>
+      <h1 class="you-h1"><%= @survey.theme.presence || @survey.title %></h1>
+      <div class="you-verto-when">
+        <%= t("you.answered_on",
+              date: l((@answered.completed_at || @answered.created_at).to_date, format: :long)) %><%
+        if @comparison[:state] != :off && @comparison[:total].to_i.positive? %> ·
+          <%= t("you.have_answered", count: @comparison[:total]) %><% end %>
+      </div>
+    </div>
+
+    <%# Their piles and their standing on this Verto's own board. The amounts
+        are a snapshot of what they collected; the rank is live, because it
+        describes a population that is still answering. %>
+    <% if @piles.any? %>
+      <div class="you-card you-card-tight">
+        <div class="you-piles">
+          <% @piles.each do |pile| %>
+            <span class="you-pile">
+              <%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %>
+            </span>
+          <% end %>
+        </div>
+        <% if @standing %>
+          <div class="you-standing">
+            <%= t("you.standing", name: @standing[:name],
+                  rank: number_with_delimiter(@standing[:rank]),
+                  of: number_with_delimiter(@standing[:of])) %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="you-card">
+      <% case @comparison[:state] %>
+      <% when :off %>
+        <%# show_results_comparison is the creator's switch and it stays theirs.
+            The account keeps the Verto either way; it just has less to show. %>
+        <h2 class="you-h2"><%= t("you.your_answers") %></h2>
+        <p class="you-sub"><%= t("you.comparison_off", org: @survey.organisation.name) %></p>
+
+      <% when :suppressed %>
+        <%# The same rule the player enforces: under MIN_REGION_SAMPLE_SIZE the
+            whole payload is refused, because on a Verto with one or two
+            responders the "comparison" IS the other respondent's answers. An
+            account does not become a way around small-cell suppression. %>
+        <h2 class="you-h2"><%= t("you.comparison_title") %></h2>
+        <p class="you-sub"><%= t("you.comparison_too_few") %></p>
+
+      <% else %>
+        <h2 class="you-h2"><%= t("you.comparison_title") %></h2>
+        <% @comparison[:rows].each do |row| %>
+          <div class="you-q">
+            <div class="you-q-prompt"><%= row[:prompt] %></div>
+            <div class="you-q-mine"><%= t("you.your_answer", answer: row[:mine]) %></div>
+            <% row[:bars].each do |bar| %>
+              <div class="you-bar-row<%= " is-mine" if bar[:mine] %>">
+                <div class="you-bar-label"><%= bar[:label] %></div>
+                <div class="you-bar-track">
+                  <span class="you-bar-fill" style="width:<%= bar[:pct] %>%;"></span>
+                </div>
+                <div class="you-bar-pct"><%= bar[:pct] %>%</div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        <% if @comparison[:rows].empty? %>
+          <p class="you-sub"><%= t("you.comparison_none") %></p>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
