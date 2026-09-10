@@ -1627,6 +1627,160 @@
           <% end %>
         </details>
 
+        <%# What happens next, what happened, and what is next — the three
+            things a respondent left an address to find out.
+
+            One of these controls does NOT autosave, and it is the only one in
+            this panel that doesn't: publishing the impact sends mail to every
+            respondent who asked to hear. A keystroke is not consent to do
+            that, so it is a button. impact_published_at is what makes a second
+            send impossible, which is why editing the words afterwards is free.
+
+            Editor chrome stays hardcoded English, like its neighbours. %>
+        <details class="publish-block">
+          <summary class="publish-block-title">What happens next <span class="pub-chev">⌄</span></summary>
+
+          <% if params[:impact_error].present? %>
+            <div style="margin:8px 0 0;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#F87171;line-height:1.45;">
+              <%= { "incomplete" => "Write a headline and a few sentences before publishing — a headline on its own is a promise, not an outcome.",
+                    "already"    => "This impact has already been published, and everyone who asked has been told. Edits are saved and shown, but nobody is emailed twice.",
+                    "no_follow_up" => "Pick a follow-up Verto first — there's nothing to tell anyone about yet." }[params[:impact_error]] %>
+            </div>
+          <% end %>
+          <% if params[:impact_notice].present? %>
+            <div style="margin:8px 0 0;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#01EACB;line-height:1.45;">
+              <%= { "published" => "Published. Everyone who asked to hear is being emailed now.",
+                    "notified"  => "On its way to everyone who asked to hear from you." }[params[:impact_notice]] %>
+            </div>
+          <% end %>
+
+          <div class="card-flag-note" style="margin-left:0;">
+            The promise below shows on a respondent's account as soon as you write it.
+            What actually happened comes later — and publishing that is what emails them.
+          </div>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">What happens next — headline:</div>
+            <input type="text" name="next_step_headline" maxlength="<%= Survey::MAX_NEXT_STEP_HEADLINE %>"
+                   value="<%= @survey.next_step_headline %>" placeholder="The council decides on 14 October"
+                   onchange="this.form.requestSubmit()"
+                   style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+          <% end %>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">And when:</div>
+            <div data-controller="note-limit"
+                 data-note-limit-recommended-value="<%= Survey::RECOMMENDED_NEXT_STEP_BODY %>"
+                 data-note-limit-max-value="<%= Survey::MAX_NEXT_STEP_BODY %>">
+              <textarea name="next_step_body" maxlength="<%= Survey::MAX_NEXT_STEP_BODY %>" rows="2"
+                        placeholder="We publish the result in November. We'll email you when we do."
+                        data-note-limit-target="input" data-action="input->note-limit#update"
+                        onchange="this.form.requestSubmit()"
+                        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.next_step_body %></textarea>
+              <div class="note-limit-count" data-note-limit-target="count"></div>
+              <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_NEXT_STEP_BODY) %></div>
+            </div>
+          <% end %>
+
+          <div style="height:1px;background:rgba(255,255,255,0.08);margin:20px 0 4px;"></div>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">What your answers did — headline:</div>
+            <input type="text" name="impact_headline" maxlength="<%= Survey::MAX_IMPACT_HEADLINE %>"
+                   value="<%= @survey.impact_headline %>" placeholder="The High Street closes to traffic at weekends from March"
+                   onchange="this.form.requestSubmit()"
+                   style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+          <% end %>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">What happened:</div>
+            <div data-controller="note-limit"
+                 data-note-limit-recommended-value="<%= Survey::RECOMMENDED_IMPACT_BODY %>"
+                 data-note-limit-max-value="<%= Survey::MAX_IMPACT_BODY %>">
+              <textarea name="impact_body" maxlength="<%= Survey::MAX_IMPACT_BODY %>" rows="4"
+                        placeholder="1,284 people answered and 62% wanted a weekend closure. The council voted for a 12-month trial on 14 October."
+                        data-note-limit-target="input" data-action="input->note-limit#update"
+                        onchange="this.form.requestSubmit()"
+                        style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.impact_body %></textarea>
+              <div class="note-limit-count" data-note-limit-target="count"></div>
+              <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_IMPACT_BODY) %></div>
+            </div>
+          <% end %>
+
+          <%# The "what changed" lines. Optional, and the shape must not demand
+              three achievements from a Verto that produced one decision. %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">What changed (optional, one per line):</div>
+            <textarea name="impact_changes_text" rows="3"
+                      placeholder="Deliveries move to a 7–10am window&#10;Two extra disabled bays on Mill Lane"
+                      onchange="this.form.requestSubmit()"
+                      style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;resize:vertical;"><%= @survey.impact_changes_list.join("\n") %></textarea>
+          <% end %>
+
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <input type="url" name="impact_link_url" value="<%= @survey.impact_link_url %>"
+                     placeholder="https://… (optional link)" onchange="this.form.requestSubmit()"
+                     style="flex:2 1 200px;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+              <input type="text" name="impact_link_label" maxlength="<%= Survey::MAX_END_LABEL %>"
+                     value="<%= @survey.impact_link_label %>" placeholder="Link text" onchange="this.form.requestSubmit()"
+                     style="flex:1 1 120px;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+            </div>
+          <% end %>
+
+          <% joined = @survey.player_claims.count %>
+          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <% if @survey.impact_published? %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.55);">
+                Published <%= l(@survey.impact_published_at.to_date, format: :long) %> — <%= joined %> <%= "person".pluralize(joined) %> told.
+              </span>
+            <% else %>
+              <%= button_to "Publish this, and email everyone who asked",
+                    survey_impact_path(@survey), method: :post,
+                    form: { data: { turbo_confirm: "This emails #{joined} #{'person'.pluralize(joined)} who asked to hear what happened. It can only be sent once. Ready?" } },
+                    style: "padding:10px 18px;border-radius:100px;border:none;cursor:pointer;background:#01EACB;color:#1C2034;font-family:'Alata',sans-serif;font-size: var(--text-sm);" %>
+              <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.45);">
+                <%= joined %> <%= "person".pluralize(joined) %> asked to hear.
+              </span>
+            <% end %>
+          </div>
+
+          <div style="height:1px;background:rgba(255,255,255,0.08);margin:20px 0 4px;"></div>
+
+          <%# What's next. The creator picks from their OWN organisation's
+              Vertos — there is no cross-organisation suggestion and no
+              algorithm. Three is a list; more would need ranking. %>
+          <% others = Current.organisation.surveys.kept.where.not(id: @survey.id).order(updated_at: :desc).limit(50) %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
+            <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">
+              What to play next (up to <%= Survey::MAX_FOLLOW_UPS %>, from your own Vertos):
+            </div>
+            <% if others.empty? %>
+              <div class="card-flag-note" style="margin-left:0;">Nothing to point at yet — this is your only Verto.</div>
+            <% else %>
+              <input type="hidden" name="follow_up_survey_ids[]" value="" />
+              <% others.each do |other| %>
+                <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:5px 0;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.78);">
+                  <input type="checkbox" name="follow_up_survey_ids[]" value="<%= other.id %>"
+                         <%= "checked" if Array(@survey.follow_up_survey_ids).map(&:to_i).include?(other.id) %>
+                         onchange="this.form.requestSubmit()"
+                         style="width:14px;height:14px;accent-color:#01EACB;cursor:pointer;flex-shrink:0;" />
+                  <span><%= other.theme.presence || other.title %><%= other.published? ? "" : " · draft" %></span>
+                </label>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <% if @survey.follow_up_surveys.any? %>
+            <div style="margin-top:14px;">
+              <%= button_to "Tell everyone who asked about it",
+                    survey_follow_up_notice_path(@survey), method: :post,
+                    form: { data: { turbo_confirm: "This emails the #{joined} #{'person'.pluralize(joined)} who kept this Verto. Anyone already told about it won't be emailed again. Ready?" } },
+                    style: "padding:10px 18px;border-radius:100px;border:1px solid rgba(255,255,255,0.25);cursor:pointer;background:transparent;color:#fff;font-family:'Alata',sans-serif;font-size: var(--text-sm);" %>
+            </div>
+          <% end %>
+        </details>
+
         <%# Everything language: which languages this Verto exists in and which
             is primary (surveys#update_languages), whether the player opens in
             the respondent's own language automatically, and whether the

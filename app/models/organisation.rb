@@ -6,6 +6,13 @@ class Organisation < ApplicationRecord
   # per organisation without joining through surveys. The surveys' cascade
   # (above, so first) already removes every row; this is the belt to that brace.
   has_many :held_texts, dependent: :delete_all
+  # Respondent-facing mail state. delete_all for the same reason held_texts
+  # above uses it: both foreign keys are RESTRICT, so without these a
+  # destroy raises rather than cascading. The PLAYER is never touched — an
+  # account spans organisations, and this one going away is not a reason to
+  # delete a person's account.
+  has_many :player_email_preferences, dependent: :delete_all
+  has_many :player_notifications, dependent: :delete_all
   has_many :verto_builds, dependent: :destroy
   has_many :invites, dependent: :destroy
 

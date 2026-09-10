@@ -1439,7 +1439,52 @@ en:
     wallet_orgs:
       one: "1 organisation"
       other: "%{count} organisations"
+    tab_next: "Next"
+    impact_link_default: "Read more"
+    next_step_title: "What happens next"
+    impact_title: "What your answers did"
+    impact_none: "%{org} hasn't said what came of this one. If they do, you'll hear."
+    impact_published_on: "Published %{date}"
+    next_title: "What's next"
+    next_because: "Because you played %{verto}"
+    next_meta: "Open now"
+    next_empty: "Nothing new yet. You'll get an email when one of the organisations you've answered publishes something."
     wallet_note: "Each Verto sets its own tokens and its own amounts, so these piles aren't the same thing as each other. There's a total because it's satisfying to have one — there's no league table across Vertos, because it would only measure whose Verto you happened to play."
+  # News about a Verto someone kept. The ORGANISATION is the sender in the
+  # reader's eyes and Playverto is the "via" — that is the relationship the
+  # address was given for, and it is what makes a per-organisation unsubscribe
+  # a legible thing to offer.
+  player_notification_mailer:
+    via: "%{org} · via Playverto"
+    why: "You're getting this because you asked to hear from organisations whose Vertos you've answered."
+    stop_org: "Only stop emails from %{org}"
+    stop_all: "Stop all Playverto emails"
+    open_account: "Open your account"
+    impact:
+      subject_org: "%{org}: here's what your answers did"
+      after: "You answered \"%{verto}\"."
+    follow_up:
+      subject_org: "%{org} has a new one"
+      heading: "%{org} has a new one"
+      because: "You answered \"%{verto}\", and they said they'd come back to you."
+      meta: "Anonymous, and you'll see how everyone answered as soon as enough people have."
+      cta: "Take it"
+  # The two links at the foot of every one of those mails.
+  player_unsubscribe:
+    org_title: "Stop emails from %{org}?"
+    org_body: "You'll still hear from other organisations whose Vertos you've answered, and your account stays exactly as it is."
+    org_cta: "Stop emails from this organisation"
+    all_title: "Stop all Playverto emails?"
+    all_body: "This stops everything Playverto sends to this address — from every organisation, and from Playverto itself. If you only wanted to hear less from one organisation, the link below does that instead."
+    all_cta: "Stop all emails"
+    switch_to_org: "Only stop emails from %{org} instead"
+    switch_to_all: "Or stop all Playverto emails"
+    expired_title: "That link has expired"
+    expired_body: "The Verto it was about has been removed, so there's nothing left to unsubscribe from. You can manage everything from your account."
+    done_title: "Done"
+    done_org: "You won't hear from %{org} again. Other organisations you've answered can still reach you."
+    done_all: "You won't get any more emails from Playverto at this address."
+    done_cta: "Go to your account"
   player_sign_in_mailer:
     subject: "Your Playverto link"
     subject_org: "Your link to %{org}'s Verto"

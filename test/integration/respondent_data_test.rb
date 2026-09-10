@@ -321,6 +321,26 @@ class RespondentDataTest < ActionDispatch::IntegrationTest
     assert_equal [ elsewhere.id ], pl.player_claims.pluck(:response_id)
   end
 
+  test "erasure takes the told-them records but leaves a standing mail choice alone" do
+    other = @org.surveys.create!(title: "T2", theme: "Th", audience_age: "adults", key_insight: "k",
+                                 default_locale: "en", locales: [ "en" ],
+                                 cards: [ { "type" => "yes_no", "text" => "Q", "options" => %w[Yes No] } ])
+    elsewhere = other.responses.create!(session_token: SecureRandom.uuid, status: "completed", answered: true)
+    pl = player_keeping(@resp)
+    PlayerClaim.claim!(player: pl, response: elsewhere, source: "device_key")
+    PlayerNotification.claim(player: pl, survey: @survey, kind: "impact")
+    PlayerEmailPreference.unsubscribe!(player: pl, organisation: @org)
+    login(@admin)
+
+    delete survey_respondent_data_path(@survey, session_token: @token)
+
+    assert_equal 0, PlayerNotification.where(survey_id: @survey.id).count,
+                 "a record of telling them about an erased Verto is not worth keeping"
+    assert PlayerEmailPreference.unsubscribed?(pl.id, @org.id),
+           "their standing choice about this organisation is not data about the erased Verto — " \
+           "silently re-subscribing them would be the worst reading of an erasure request"
+  end
+
   test "erasing nothing does not claim to have erased something" do
     login(@admin)
     assert_no_difference -> { @survey.responses.count } do

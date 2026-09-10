@@ -4,6 +4,8 @@ class Player < ApplicationRecord
   has_many :player_sessions,      dependent: :destroy
   has_many :player_sign_in_links, dependent: :delete_all
   has_many :player_claims,        dependent: :delete_all
+  has_many :player_email_preferences, dependent: :delete_all
+  has_many :player_notifications,     dependent: :delete_all
   has_many :claimed_surveys, -> { distinct }, through: :player_claims, source: :survey
 
   validates :email_address, presence: true, uniqueness: { case_sensitive: false },

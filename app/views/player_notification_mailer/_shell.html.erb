@@ -1,0 +1,47 @@
+<%# Shared chrome for both notification mails. Inline styles + table layout for
+    email-client compatibility, matching welcome_mailer and
+    player_sign_in_mailer. The organisation is named as the sender and
+    Playverto as the "via", which is the relationship the address was given
+    for — see PlayerNotificationMailer. %>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#272D4A;margin:0;padding:0;width:100%;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:520px;background:#1C2034;border-radius:16px;">
+        <tr>
+          <td align="center" style="padding:36px 32px 4px;">
+            <span style="font-family:'Alata','Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;">
+              <span style="color:#F7F7F7;">play</span><span style="color:#FF1E6F;">verto</span>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:10px 32px 0;">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(247,247,247,0.45);margin:0;">
+              <%= t("player_notification_mailer.via", org: org_name) %>
+            </p>
+          </td>
+        </tr>
+
+        <tr><td style="padding:20px 36px 0;"><%= yield %></td></tr>
+
+        <tr>
+          <td align="center" style="padding:26px 36px 34px;">
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.6;color:rgba(247,247,247,0.4);margin:0 0 10px;">
+              <%= t("player_notification_mailer.why") %>
+            </p>
+            <%# The narrow link first, and named. "Stop all" is the honest
+                second option, not the only one. %>
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.8;margin:0;">
+              <a href="<%= stop_org %>" style="color:rgba(247,247,247,0.6);"><%= t("player_notification_mailer.stop_org", org: org_name) %></a>
+              <br>
+              <a href="<%= stop_all %>" style="color:rgba(247,247,247,0.4);"><%= t("player_notification_mailer.stop_all") %></a>
+            </p>
+            <p style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:1.6;color:rgba(247,247,247,0.4);margin:12px 0 0;">
+              <a href="<%= account_url %>" style="color:rgba(247,247,247,0.55);"><%= t("player_notification_mailer.open_account") %></a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>

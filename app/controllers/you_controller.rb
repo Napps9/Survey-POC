@@ -38,6 +38,21 @@ class YouController < ApplicationController
     @piles     = piles_for(@survey, @claims)
     @standing  = standing_for(@survey, @claims)
     @comparison = comparison_for(@survey, @answered)
+    @follow_ups = @survey.follow_up_surveys
+  end
+
+  # What's next: the Vertos the creators of the ones they kept have pointed at.
+  #
+  # There is no feed and no ranking. The only fact this app has about a
+  # respondent is which Verto they played, so that fact IS the reason, and the
+  # reason is on every card — a respondent who cannot see why they are being
+  # shown something has been retargeted rather than helped.
+  def next_up
+    seen = kept_claims.map(&:survey_id).to_set
+    @suggestions = kept_claims.flat_map { |claim|
+      claim.survey.follow_up_surveys.map { |s| { survey: s, because: claim.survey } }
+    }.reject { |row| seen.include?(row[:survey].id) }
+     .uniq { |row| row[:survey].id }
   end
 
   # The wallet: one row per Verto, and one number that spans them.

@@ -139,8 +139,15 @@ class SurveysController < ApplicationController
                                generate_flow restore_card optimise_card render_card
                                add_demographic_card ]
 
-  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy, :contacts ]
-  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr, :contacts ]
+  # Admin-only, in the company of :contacts rather than of :publish — and that
+  # is the deliberate choice, not the lazy one. Both of these SEND MAIL to
+  # every respondent who left an address, which is outward-facing, irreversible
+  # in a way unpublishing is not, and spends the single contact this
+  # organisation gets with each of those people. :contacts is admin-only for
+  # the same reason: it is the other place in this controller where a
+  # respondent stops being an aggregate.
+  before_action :require_admin!,       only: [ :destroy, :destroy_forever, :restore, :bulk_archive, :bulk_destroy, :contacts, :publish_impact, :notify_follow_up ]
+  before_action :set_survey,           only: [ :show, :preview, :publish, :unpublish, :enable_test_link, :disable_test_link, :convert_to_test_mode, :update_settings, :update_languages, :update_audience_country, :qr, :contacts, :publish_impact, :notify_follow_up ]
   before_action :set_survey_including_archived, only: [ :results, :results_compare ]
 
   helper_method :accessible_common_question_sets
@@ -821,6 +828,44 @@ class SurveysController < ApplicationController
     redirect_to survey_path(survey.duplicate!)
   end
 
+  # Publish what this Verto changed, and tell the people who asked to hear.
+  #
+  # A button rather than an autosave, and the only control in that panel that
+  # is. Everything else there follows onchange="this.form.requestSubmit()"; this
+  # one sends mail to real people, and a keystroke is not consent to do that.
+  #
+  # impact_published_at is what makes a second send impossible, so editing the
+  # words afterwards is free — a creator who spots a typo an hour later fixes
+  # it, and nobody is mailed again. (PlayerNotification's unique index is the
+  # belt to this pair of braces: even a replayed job cannot mail one person
+  # twice.)
+  def publish_impact
+    unless @survey.impact_ready?
+      return redirect_to survey_path(@survey, panel: "publish", impact_error: "incomplete")
+    end
+    if @survey.impact_published?
+      return redirect_to survey_path(@survey, panel: "publish", impact_error: "already")
+    end
+
+    @survey.update_columns(impact_published_at: Time.current, updated_at: Time.current)
+    NotifyPlayersJob.perform_later(@survey.id, "impact")
+    redirect_to survey_path(@survey, panel: "publish", impact_notice: "published")
+  end
+
+  # "A new Verto from an organisation you answered." Same deliberateness, and
+  # the same one-send-per-person guarantee, but no *_published_at of its own:
+  # the notification rows ARE the record here, because a creator may add a
+  # second follow-up months later and telling people about that one is a
+  # legitimate second send about a different Verto.
+  def notify_follow_up
+    if @survey.follow_up_surveys.empty?
+      return redirect_to survey_path(@survey, panel: "publish", impact_error: "no_follow_up")
+    end
+
+    NotifyPlayersJob.perform_later(@survey.id, "follow_up")
+    redirect_to survey_path(@survey, panel: "publish", impact_notice: "notified")
+  end
+
   # Settings forms each post the one field they own — only touch what's sent.
   def update_settings
     attrs = {}
@@ -909,6 +954,52 @@ class SurveysController < ApplicationController
     end
     if params.key?(:join_cta)
       attrs[:join_cta] = params[:join_cta].to_s.strip.first(Survey::MAX_END_LABEL).presence
+    end
+    # What happens next — the creator's promise, written when they publish and
+    # editable for the life of the Verto. Presentation copy, same trust level
+    # as the notes above.
+    if params.key?(:next_step_headline)
+      attrs[:next_step_headline] = params[:next_step_headline].to_s.strip.first(Survey::MAX_NEXT_STEP_HEADLINE).presence
+    end
+    if params.key?(:next_step_body)
+      attrs[:next_step_body] = params[:next_step_body].to_s.strip.first(Survey::MAX_NEXT_STEP_BODY).presence
+    end
+    # What happened. Editable freely — publishing it is a separate, deliberate
+    # action (#publish_impact) because that is what sends the mail.
+    if params.key?(:impact_headline)
+      attrs[:impact_headline] = params[:impact_headline].to_s.strip.first(Survey::MAX_IMPACT_HEADLINE).presence
+    end
+    if params.key?(:impact_body)
+      attrs[:impact_body] = params[:impact_body].to_s.strip.first(Survey::MAX_IMPACT_BODY).presence
+    end
+    # One per line in the editor, an ordered array in the column. A textarea
+    # rather than N inputs because the count is genuinely variable and a
+    # creator with one line should type one line.
+    if params.key?(:impact_changes_text) || params.key?(:impact_changes)
+      lines = params.key?(:impact_changes_text) ? params[:impact_changes_text].to_s.split(/\r?\n/)
+                                                : Array(params[:impact_changes])
+      attrs[:impact_changes] = lines.map { |line| line.to_s.strip.first(Survey::MAX_IMPACT_CHANGE) }
+                                    .reject(&:blank?).first(Survey::MAX_IMPACT_CHANGES)
+    end
+    if params.key?(:impact_link_url)
+      url = params[:impact_link_url].to_s.strip
+      # Same posture as forward_url: a respondent follows this from their
+      # account, so a javascript: or data: scheme here would be a stored XSS
+      # vector aimed at them rather than at the creator.
+      attrs[:impact_link_url] = url.match?(%r{\Ahttps?://}i) ? url.first(500) : nil
+    end
+    if params.key?(:impact_link_label)
+      attrs[:impact_link_label] = params[:impact_link_label].to_s.strip.first(Survey::MAX_END_LABEL).presence
+    end
+    # The next Verto(s). Scoped to the creator's OWN organisation here rather
+    # than trusted from the form — the ids arrive from a picker, and a picker
+    # is a suggestion, not an authorisation.
+    if params.key?(:follow_up_survey_ids)
+      wanted = Array(params[:follow_up_survey_ids]).filter_map { |v| Integer(v, exception: false) }
+      wanted -= [ @survey.id ]
+      attrs[:follow_up_survey_ids] =
+        @survey.organisation.surveys.kept.where(id: wanted).pluck(:id)
+               .sort_by { |id| wanted.index(id) }.first(Survey::MAX_FOLLOW_UPS)
     end
     if params.key?(:thankyou_title)
       attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence

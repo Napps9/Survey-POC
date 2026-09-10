@@ -87,6 +87,16 @@ class RespondentDataController < ApplicationController
 
     responses.destroy_all
 
+    # A player row takes its notifications and mail preferences with it
+    # (dependent: :delete_all on Player). Where the account SURVIVES, this
+    # Verto's notification rows still go — they name a response that no longer
+    # exists, and "we told them about a Verto that has been erased" is not a
+    # fact worth keeping. The organisation-level mail preference stays: it is
+    # the person's own standing choice about this organisation, not data about
+    # the erased Verto, and silently re-subscribing them would be the worst
+    # possible reading of an erasure request.
+    PlayerNotification.where(survey_id: @survey.id,
+                             player_id: players.map(&:id)).delete_all
     players.each { |player| player.destroy if player.player_claims.none? }
     redirect_to survey_respondent_data_path(@survey),
                 notice: t("respondent_data.erased", count: count)

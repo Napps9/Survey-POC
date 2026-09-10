@@ -207,6 +207,8 @@ What is stored, and where:
 | `player_sessions` | Signed-in sessions, like `sessions` for creators |
 | `player_sign_in_links` | An outstanding emailed link: its **digest** only, its expiry, and the claims it will make |
 | `player_claims` | `(player_id, survey_id, response_id, claimed_at, source)` — the one cross-Verto join in the app |
+| `player_email_preferences` | `(player_id, organisation_id, unsubscribed_at)` — an opt-out from ONE organisation's mail |
+| `player_notifications` | One row per intended send: which Verto, which kind, an unsubscribe token, and whether it went |
 
 Five properties this design is built on, all of them checkable in the code:
 
@@ -237,15 +239,45 @@ only claims **on that Verto**. The export gains an `account` section naming
 the address, whether it is verified, and how many Vertos the account holds.
 
 **Erasure (Art. 17).** Erasing a respondent's responses erases their claims on
-that Verto with them. If the account is then holding nothing at all, the
+that Verto with them, and the records of having told them about it. A standing
+mail preference is deliberately NOT erased where the account survives: it is
+the person's own choice about that organisation rather than data about the
+erased Verto, and silently re-subscribing them would be the worst available
+reading of an erasure request. If the account is then holding nothing at all, the
 `players` row goes too — keeping a bare address after an erasure request is
 the half-measure this whole flow refuses. If the account still holds claims on
 **other** Vertos, the row stays: the creator is the data controller for their
 own Verto, not for the rest of that person's account.
 
+### Mail, and the two ways to stop it
+
+An account is written to only when a creator publishes what their Verto
+changed, or points it at a follow-up — both deliberate actions in the editor,
+never automatic. A send honours, in this order: an unverified address is never
+mailed at all; an opt-out from *that organisation*; and the global
+`EmailSuppression`, which also carries hard bounces and complaints. A
+`player_notifications` row is claimed before each mail on a unique index, so a
+retried job or a double-pressed button cannot mail one person twice.
+
+Every message carries **both** unsubscribe links, narrow one first:
+
+- *Only stop emails from this organisation* — a `player_email_preferences`
+  row. It is also the target of the RFC 8058 one-click header, because "this
+  sender" is what a reader thinks a mail client's unsubscribe button stops.
+- *Stop all Playverto emails* — `EmailSuppression`, which is unique on `email`
+  and subtracted from every send in the product, creator campaigns included.
+
+The narrow one exists because the wide one is shared: without it, a respondent
+who wanted fewer emails from one council would have been silencing the results
+digest of any creator using the same address — and creators play their own
+Vertos, so that is a matter of time rather than a hypothetical. A missing or
+malformed scope resolves to the narrow one, because an unintended narrow
+opt-out is a support ticket and an unintended global one is a person cut off
+from mail they never meant to stop.
+
 **Self-service.** The account holder deletes the whole account from `/you` —
-the player, its sessions, its outstanding links and all of its claims. Never
-the `Response` rows: those are pseudonymous research data belonging to the
+the player, its sessions, its outstanding links, its mail preferences, its
+notification records and all of its claims. Never the `Response` rows: those are pseudonymous research data belonging to the
 creators who collected them, and are not this person's to delete from here.
 This is the first self-service erasure path in the app, and it exists only
 because a respondent now holds a durable handle at all.

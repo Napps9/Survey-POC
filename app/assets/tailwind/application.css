@@ -12829,6 +12829,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 
 .you-card-tight { padding: 18px 20px; }
+.you-head-tight { padding: 18px 0 6px; }
+
+/* What happened. The headline carries the weight, because the whole point of
+   leaving an address was to find out this one sentence. */
+.you-impact-headline {
+  font-family: "Alata", sans-serif; font-size: 17px; line-height: 1.3;
+  margin: 0 0 8px; color: #fff;
+}
+.you-impact-change {
+  font-size: 13px; line-height: 1.55; color: rgba(255,255,255,.75);
+  margin-top: 8px; display: flex; gap: 8px;
+}
+.you-impact-change span { color: #01EACB; flex: none; }
+.you-impact-link { font-size: 13px; margin: 14px 0 0; }
+.you-impact-link a { color: #01EACB; }
 .you-h2 { font-family: "Alata", sans-serif; font-size: 17px; margin: 0 0 14px; }
 
 /* One question's bars. Deliberately the same reading as the player's own

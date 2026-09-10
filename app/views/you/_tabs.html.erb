@@ -1,7 +1,5 @@
-<%# The account's own nav. Two tabs, not the three the design carries: "Next"
-    is follow-ups, which is a later phase — an empty tab is worse than no tab.
-    aria-current rather than a class alone, so the state is announced and not
-    only coloured. %>
+<%# The account's own nav. aria-current rather than a class alone, so the
+    state is announced and not only coloured. %>
 <nav class="you-tabs" aria-label="<%= t("you.tabs_label") %>">
   <%= link_to t("you.tab_vertos"), you_path,
         class: "you-tab#{" is-on" if current == :vertos}",
@@ -9,4 +7,7 @@
   <%= link_to t("you.tab_wallet"), you_wallet_path,
         class: "you-tab#{" is-on" if current == :wallet}",
         "aria-current": (current == :wallet ? "page" : nil) %>
+  <%= link_to t("you.tab_next"), you_next_path,
+        class: "you-tab#{" is-on" if current == :next}",
+        "aria-current": (current == :next ? "page" : nil) %>
 </nav>

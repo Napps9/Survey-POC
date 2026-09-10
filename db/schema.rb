@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_10_090400) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_10_120200) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -618,6 +618,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_090400) do
     t.check_constraint "source IN ('signup', 'signed_in_play', 'device_key')", name: "chk_player_claims_source"
   end
 
+  create_table "player_email_preferences", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "organisation_id", null: false
+    t.integer "player_id", null: false
+    t.datetime "unsubscribed_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organisation_id"], name: "index_player_email_preferences_on_organisation_id"
+    t.index ["player_id", "organisation_id"], name: "index_player_email_prefs_on_player_and_org", unique: true
+    t.index ["player_id"], name: "index_player_email_preferences_on_player_id"
+  end
+
+  create_table "player_notifications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.integer "organisation_id", null: false
+    t.integer "player_id", null: false
+    t.datetime "sent_at"
+    t.integer "survey_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["organisation_id"], name: "index_player_notifications_on_organisation_id"
+    t.index ["player_id", "survey_id", "kind"], name: "index_player_notifications_on_player_survey_kind", unique: true
+    t.index ["player_id"], name: "index_player_notifications_on_player_id"
+    t.index ["survey_id"], name: "index_player_notifications_on_survey_id"
+    t.index ["token"], name: "index_player_notifications_on_token", unique: true
+    t.check_constraint "kind IN ('impact', 'follow_up')", name: "chk_player_notifications_kind"
+  end
+
   create_table "player_sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -972,8 +1000,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_090400) do
     t.text "description"
     t.json "end_screens", default: [], null: false
     t.json "flows", default: [], null: false
+    t.json "follow_up_survey_ids", default: [], null: false
     t.string "forward_label"
     t.string "forward_url"
+    t.text "impact_body"
+    t.json "impact_changes", default: [], null: false
+    t.string "impact_headline"
+    t.string "impact_link_label"
+    t.string "impact_link_url"
+    t.datetime "impact_published_at"
     t.string "join_body"
     t.string "join_cta"
     t.boolean "join_prompt_enabled", default: false, null: false
@@ -987,6 +1022,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_090400) do
     t.json "locales"
     t.boolean "logic", default: false, null: false
     t.string "moderation_mode", default: "assisted", null: false
+    t.text "next_step_body"
+    t.string "next_step_headline"
     t.boolean "no_going_back", default: false, null: false
     t.boolean "no_retests", default: false, null: false
     t.integer "organisation_id", null: false
@@ -1129,6 +1166,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_10_090400) do
   add_foreign_key "player_claims", "players"
   add_foreign_key "player_claims", "responses"
   add_foreign_key "player_claims", "surveys"
+  add_foreign_key "player_email_preferences", "organisations"
+  add_foreign_key "player_email_preferences", "players"
+  add_foreign_key "player_notifications", "organisations"
+  add_foreign_key "player_notifications", "players"
+  add_foreign_key "player_notifications", "surveys"
   add_foreign_key "player_sessions", "players"
   add_foreign_key "player_sign_in_links", "players"
   add_foreign_key "portfolio_common_question_sets", "common_question_sets"

@@ -1,0 +1,18 @@
+<%= t("player_notification_mailer.via", org: @org_name) %>
+
+<%= @survey.impact_headline %>
+<%= t("player_notification_mailer.impact.after", verto: @survey.theme.presence || @survey.title) %>
+
+<%= @survey.impact_body %>
+<% @survey.impact_changes_list.each do |line| %>
+- <%= line %>
+<% end %>
+<% if @survey.impact_link? %>
+<%= @survey.impact_link_text %>: <%= @survey.impact_link_url %>
+<% end %>
+
+<%= t("player_notification_mailer.open_account") %>: <%= @account %>
+
+<%= t("player_notification_mailer.why") %>
+<%= t("player_notification_mailer.stop_org", org: @org_name) %>: <%= @stop_org %>
+<%= t("player_notification_mailer.stop_all") %>: <%= @stop_all %>

@@ -20,28 +20,6 @@
       </div>
     </div>
 
-    <%# Their piles and their standing on this Verto's own board. The amounts
-        are a snapshot of what they collected; the rank is live, because it
-        describes a population that is still answering. %>
-    <% if @piles.any? %>
-      <div class="you-card you-card-tight">
-        <div class="you-piles">
-          <% @piles.each do |pile| %>
-            <span class="you-pile">
-              <%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %>
-            </span>
-          <% end %>
-        </div>
-        <% if @standing %>
-          <div class="you-standing">
-            <%= t("you.standing", name: @standing[:name],
-                  rank: number_with_delimiter(@standing[:rank]),
-                  of: number_with_delimiter(@standing[:of])) %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
-
     <div class="you-card">
       <% case @comparison[:state] %>
       <% when :off %>
@@ -80,5 +58,83 @@
         <% end %>
       <% end %>
     </div>
+
+    <%# Their piles and their standing on this Verto's own board. The amounts
+        are a snapshot of what they collected; the rank is live, because it
+        describes a population that is still answering. %>
+    <% if @piles.any? %>
+      <div class="you-card you-card-tight">
+        <div class="you-piles">
+          <% @piles.each do |pile| %>
+            <span class="you-pile">
+              <%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %>
+            </span>
+          <% end %>
+        </div>
+        <% if @standing %>
+          <div class="you-standing">
+            <%= t("you.standing", name: @standing[:name],
+                  rank: number_with_delimiter(@standing[:rank]),
+                  of: number_with_delimiter(@standing[:of])) %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# What happened. Three states, and the third is the commonest and the one
+        a design like this usually forgets: most Vertos will never get an
+        impact written. It has to read as honest rather than as an error — the
+        copy says the organisation hasn't said, not that nothing happened,
+        because the app does not know which and must not imply the harsher
+        reading of a creator who simply hasn't come back. %>
+    <div class="you-card you-impact">
+      <% if @survey.impact_published? %>
+        <h2 class="you-h2"><%= t("you.impact_title") %></h2>
+        <div class="you-impact-headline"><%= @survey.impact_headline %></div>
+        <p class="you-sub"><%= @survey.impact_body %></p>
+        <% @survey.impact_changes_list.each do |line| %>
+          <div class="you-impact-change"><span aria-hidden="true">→</span> <%= line %></div>
+        <% end %>
+        <% if @survey.impact_link? %>
+          <p class="you-impact-link">
+            <%= link_to "#{@survey.impact_link_text} ↗", @survey.impact_link_url,
+                  target: "_blank", rel: "noopener" %>
+          </p>
+        <% end %>
+      <% elsif @survey.next_step? %>
+        <h2 class="you-h2"><%= t("you.next_step_title") %></h2>
+        <% if @survey.next_step_headline.present? %>
+          <div class="you-impact-headline"><%= @survey.next_step_headline %></div>
+        <% end %>
+        <% if @survey.next_step_body.present? %>
+          <p class="you-sub"><%= @survey.next_step_body %></p>
+        <% end %>
+      <% else %>
+        <h2 class="you-h2"><%= t("you.next_step_title") %></h2>
+        <p class="you-sub"><%= t("you.impact_none", org: @survey.organisation.name) %></p>
+      <% end %>
+    </div>
+
+    <%# The next Verto this creator pointed at, with the reason on the card. %>
+    <% if @follow_ups.any? %>
+      <div class="you-head you-head-tight">
+        <h2 class="you-h2"><%= t("you.next_title") %></h2>
+      </div>
+      <div class="you-list">
+        <% @follow_ups.each do |next_verto| %>
+          <%= link_to play_survey_path(next_verto.publish_token), class: "you-verto" do %>
+            <span class="you-verto-rule" aria-hidden="true"></span>
+            <div class="you-verto-body">
+              <div class="you-verto-org">
+                <%= t("you.next_because", verto: @survey.theme.presence || @survey.title) %>
+              </div>
+              <h2 class="you-verto-title"><%= next_verto.theme.presence || next_verto.title %></h2>
+              <div class="you-verto-when"><%= t("you.next_meta") %></div>
+              <span class="you-verto-go" aria-hidden="true">→</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>

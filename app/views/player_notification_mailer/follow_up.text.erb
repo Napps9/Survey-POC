@@ -1,0 +1,15 @@
+<%= t("player_notification_mailer.via", org: @org_name) %>
+
+<%= t("player_notification_mailer.follow_up.heading", org: @org_name) %>
+
+<%= t("player_notification_mailer.follow_up.because", verto: @survey.theme.presence || @survey.title) %>
+<% @follow_ups.each do |next_verto| %>
+* <%= next_verto.theme.presence || next_verto.title %> — <%= t("player_notification_mailer.follow_up.meta") %>
+  <%= play_survey_url(next_verto.publish_token) %>
+<% end %>
+
+<%= t("player_notification_mailer.open_account") %>: <%= @account %>
+
+<%= t("player_notification_mailer.why") %>
+<%= t("player_notification_mailer.stop_org", org: @org_name) %>: <%= @stop_org %>
+<%= t("player_notification_mailer.stop_all") %>: <%= @stop_all %>

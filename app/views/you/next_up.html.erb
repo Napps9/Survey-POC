@@ -1,0 +1,44 @@
+<%# What's next. Three creator-chosen follow-ups is a list; anything longer
+    needs ranking, and ranking needs a model of the respondent this app has
+    deliberately never built. So there is no feed here, and no algorithm — the
+    reason on each card is the only fact the app has. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell">
+
+    <div class="you-bar">
+      <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
+    </div>
+
+    <%= render "you/tabs", current: :next %>
+
+    <div class="you-head">
+      <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.tab_next") %></div>
+      <h1 class="you-h1"><%= t("you.next_title") %></h1>
+    </div>
+
+    <% if @suggestions.empty? %>
+      <%# And it names the CONDITION, so the promise made at sign-up and the
+          promise made here are the same promise. %>
+      <div class="you-card">
+        <p class="you-sub"><%= t("you.next_empty") %></p>
+      </div>
+    <% else %>
+      <div class="you-list">
+        <% @suggestions.each do |row| %>
+          <%= link_to play_survey_path(row[:survey].publish_token), class: "you-verto" do %>
+            <span class="you-verto-rule" aria-hidden="true"></span>
+            <div class="you-verto-body">
+              <div class="you-verto-org">
+                <%= t("you.next_because", verto: row[:because].theme.presence || row[:because].title) %>
+              </div>
+              <h2 class="you-verto-title"><%= row[:survey].theme.presence || row[:survey].title %></h2>
+              <div class="you-verto-when"><%= t("you.next_meta") %></div>
+              <span class="you-verto-go" aria-hidden="true">→</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

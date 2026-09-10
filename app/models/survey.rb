@@ -23,6 +23,8 @@ class Survey < ApplicationRecord
   # catches whatever a direct survey destroy would otherwise leave behind a
   # RESTRICT foreign key.
   has_many :player_claims, dependent: :delete_all
+  # Told-them records, same delete_all reasoning as player_claims above.
+  has_many :player_notifications, dependent: :delete_all
   has_many :flow_generations, dependent: :destroy
   # Builds outlive the Verto they produced — they're the account's generation
   # log, deleted with the organisation, not the survey. Nullify rather than
@@ -2003,6 +2005,17 @@ class Survey < ApplicationRecord
       tokens_note:             tokens_note,
       leaderboard_note:        leaderboard_note,
       join_prompt_enabled:     join_prompt_enabled,
+      # The PROMISE carries: a wave 2 made by duplicating wave 1 is asking the
+      # same people about the same decision, so "the council decides in
+      # October" is still the right sentence to be showing.
+      #
+      # The delivered impact does NOT, and neither does the follow-up list.
+      # An impact belongs to the run that produced it — copying it would have
+      # a brand-new Verto claiming, on day one, to have already changed
+      # something — and a copied follow-up list would point the new Verto at
+      # whatever the old one pointed at, including possibly itself.
+      next_step_headline:      next_step_headline,
+      next_step_body:          next_step_body,
       join_title:              join_title,
       join_body:               join_body,
       join_cta:                join_cta,
@@ -2141,6 +2154,63 @@ class Survey < ApplicationRecord
   def join_title_text = join_title.presence || I18n.t("player.join_title")
   def join_body_text  = join_body.presence  || I18n.t("player.join_body")
   def join_cta_text   = join_cta.presence   || I18n.t("player.join_cta")
+
+  # ── What happens next, and what happened ──────────────────────────────────
+  #
+  # Two halves written months apart (see the migration). The promise is
+  # editable for the life of the Verto; the impact is published once, because
+  # publishing is what sends the mail.
+
+  MAX_NEXT_STEP_HEADLINE = 80
+  RECOMMENDED_NEXT_STEP_HEADLINE = 50
+  MAX_NEXT_STEP_BODY = 300
+  RECOMMENDED_NEXT_STEP_BODY = 160
+
+  MAX_IMPACT_HEADLINE = 80
+  RECOMMENDED_IMPACT_HEADLINE = 50
+  MAX_IMPACT_BODY = 600
+  RECOMMENDED_IMPACT_BODY = 320
+  # Three is a list; more needs ranking, and ranking a respondent's account
+  # needs a model of the respondent this app has deliberately never built.
+  MAX_IMPACT_CHANGES = 5
+  MAX_IMPACT_CHANGE = 140
+  MAX_FOLLOW_UPS = 3
+
+  def impact_published? = impact_published_at.present?
+
+  # Whether there is anything to say about what happens next. A Verto with
+  # neither a promise nor an impact is the ORDINARY case, and the account says
+  # the organisation hasn't said rather than that nothing happened — the app
+  # does not know which, and must not imply the harsher reading of a creator
+  # who simply hasn't come back.
+  def next_step? = next_step_headline.present? || next_step_body.present?
+
+  def impact_changes_list
+    Array(impact_changes).filter_map { |line| line.to_s.strip.presence }
+  end
+
+  def impact_link? = impact_link_url.present?
+
+  def impact_link_text
+    impact_link_label.presence || I18n.t("you.impact_link_default")
+  end
+
+  # Enough written to be worth mailing. A headline alone is a promise, not an
+  # outcome — refusing to publish an empty impact is what stops a misfire from
+  # spending the one send this Verto gets.
+  def impact_ready? = impact_headline.present? && impact_body.present?
+
+  # The Vertos this one points at, in the creator's own order, and only ones
+  # that are still theirs and still playable. Filtered at read time rather than
+  # pruned on write, because a Verto can be unpublished or deleted long after
+  # it was chosen and a respondent must never be sent to a dead link.
+  def follow_up_surveys
+    ids = Array(follow_up_survey_ids).filter_map { |v| Integer(v, exception: false) }
+    return Survey.none if ids.empty?
+
+    found = organisation.surveys.kept.where(id: ids).select(&:playable?).index_by(&:id)
+    ids.filter_map { |id| found[id] }
+  end
 
   # Reads as a question at the call sites that ask whether to render the block
   # (player/show, the partial, the URL local), matching leaderboard_active? and

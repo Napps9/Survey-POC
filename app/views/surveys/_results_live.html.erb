@@ -20,6 +20,18 @@
     <%= completed %> completed
   </span>
 
+  <%# Did anyone join? Only shown once the creator has switched the ask on —
+      on every other Verto it would be a permanent zero that means nothing.
+      A count, deliberately, and never a list: the creator is being told how
+      many people want to hear what happened, not who they are. %>
+  <% if survey.join_prompt? %>
+    <% joined = survey.player_claims.count %>
+    <span title="People who asked to hear what came of this Verto"
+          style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.25);">
+      · <%= joined %> asked to hear
+    </span>
+  <% end %>
+
   <% if live %>
     <%# Reloads just the results frame, so the breakdown rebuilds on demand
         rather than on every incoming answer. %>

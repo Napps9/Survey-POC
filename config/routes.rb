@@ -87,12 +87,18 @@ Rails.application.routes.draw do
   # use. GET confirms; POST signs in.
   get    "you",                to: "you#show",              as: :you
   get    "you/wallet",         to: "you#wallet",            as: :you_wallet
+  get    "you/next",           to: "you#next_up",           as: :you_next
   # One Verto in the account. :id is the SURVEY id, and the lookup is scoped to
   # the signed-in player's own claims — so the id is not a capability, it is
   # just a name, and someone else's Verto is a 404 whether or not it exists.
   get    "you/v/:id",          to: "you#verto",             as: :you_verto
   post   "you/sign-out",       to: "you#sign_out",          as: :you_sign_out
   delete "you",                to: "you#destroy"
+  # The two links at the foot of every mail a respondent gets. GET confirms,
+  # POST acts — same split, same reason, as the sign-in link above and the
+  # creator-facing unsubscribe at /e/u/:token.
+  get    "you/stop/:token",    to: "player_unsubscribes#show",   as: :player_unsubscribe
+  post   "you/stop/:token",    to: "player_unsubscribes#create"
   get    "you/sign-in/:token", to: "player_sign_ins#show",   as: :player_sign_in
   post   "you/sign-in/:token", to: "player_sign_ins#create"
 
@@ -189,6 +195,14 @@ Rails.application.routes.draw do
   post "surveys/:id/card_image",      to: "surveys#card_image", as: :card_image_survey
   post "surveys/:id/card_lottie",     to: "surveys#card_lottie", as: :card_lottie_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
+  # Publishing what a Verto changed. Its own route, and its own button in the
+  # editor, because it is the one control in that panel that cannot follow the
+  # onchange-autosave convention its neighbours use: it SENDS MAIL to every
+  # respondent who asked to hear. See SurveysController#publish_impact.
+  post "surveys/:id/impact",          to: "surveys#publish_impact", as: :survey_impact
+  # Telling the people who played this Verto that a follow-up is out. Same
+  # reasoning, same shape.
+  post "surveys/:id/follow_up_notice", to: "surveys#notify_follow_up", as: :survey_follow_up_notice
   post "surveys/:id/languages",       to: "surveys#update_languages", as: :survey_languages
   get  "surveys/:id/contacts",        to: "surveys#contacts",         as: :survey_contacts
   # Separate from #settings because it can spend at Anthropic (re-tailoring the

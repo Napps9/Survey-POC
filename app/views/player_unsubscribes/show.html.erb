@@ -1,0 +1,49 @@
+<%# GET confirms, it does not act. See PlayerUnsubscribesController. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell you-shell-narrow">
+    <div class="you-mark"><%= image_tag "playverto.svg", alt: "Playverto", width: 120 %></div>
+
+    <% if @notification.nil? %>
+      <div class="you-card">
+        <h1 class="you-h1"><%= t("player_unsubscribe.expired_title") %></h1>
+        <p class="you-sub"><%= t("player_unsubscribe.expired_body") %></p>
+      </div>
+    <% else %>
+      <% org = @notification.organisation.name %>
+      <% all = params[:scope].to_s == "all" %>
+      <div class="you-card">
+        <h1 class="you-h1">
+          <%= all ? t("player_unsubscribe.all_title") : t("player_unsubscribe.org_title", org: org) %>
+        </h1>
+        <p class="you-sub">
+          <%= all ? t("player_unsubscribe.all_body") : t("player_unsubscribe.org_body", org: org) %>
+        </p>
+        <%# turbo: false, like the creator-facing unsubscribe beside it. This
+            action RENDERS its confirmation rather than redirecting — there is
+            no page to redirect to that still knows which of the two things was
+            just done — and Turbo Drive silently discards a 200 HTML response
+            to a form post. The write would land and the person would see
+            nothing change, which on an unsubscribe means they press it again
+            and then complain. %>
+        <%= button_to (all ? t("player_unsubscribe.all_cta") : t("player_unsubscribe.org_cta")),
+              player_unsubscribe_path(@notification.token, scope: (all ? "all" : "organisation")),
+              method: :post, class: "you-btn you-btn-primary",
+              form: { style: "margin:0;", data: { turbo: false } } %>
+
+        <%# The other option, always offered. Someone who arrives on "stop
+            everything" because that was the link their mail client used
+            should be able to choose the narrower thing instead. %>
+        <p class="you-fine">
+          <% if all %>
+            <%= link_to t("player_unsubscribe.switch_to_org", org: org),
+                  player_unsubscribe_path(@notification.token, scope: "organisation") %>
+          <% else %>
+            <%= link_to t("player_unsubscribe.switch_to_all"),
+                  player_unsubscribe_path(@notification.token, scope: "all") %>
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>
