@@ -2463,6 +2463,19 @@
   /* 440 is the width of the player's action column; in the feed the card sits
      alone and can breathe, without becoming a different shape. */
   max-width: 520px;
+  /* .join-card's own background is primary_soft — rgba(primary, 0.12) for every
+     Verto, never a solid. On the end screen that 12% lands on
+     .preview-thankyou-card's opaque #1C2034 and reads as a brand wash on a dark
+     card; in this feed it landed on the Verto's background PHOTO, where 12% of
+     anything composites to nothing and the card was see-through. So put the
+     player's surface back underneath the tint rather than overriding the tint
+     away: background-color is the card the block really sits on, the flat
+     gradient is the block's own tint over it. Identical pixels to a
+     respondent's, and still following the palette — a coral Verto stays coral.
+     Plain #1C2034 would lose that and be the same bug pointing the other way. */
+  background-color: #1C2034;
+  background-image: linear-gradient(var(--brand-primary-soft, rgba(1,234,203,0.12)),
+                                    var(--brand-primary-soft, rgba(1,234,203,0.12)));
 }
 /* The rows a respondent types into. Shown so the shape is honest, greyed and
    inert so they never read as boxes the creator can fill. */
@@ -2478,7 +2491,9 @@
 .gate-join-card .join-btn.gate-editable {
   display: inline-block; cursor: text; min-width: 120px; text-align: center;
 }
-.gate-join-card .join-fine { opacity: 0.6; }
+/* The respondent's side of the card, dimmed so it reads as shape rather than
+   as something the creator is expected to fill in or edit. */
+.gate-join-card .join-fine, .gate-join-card .join-note { opacity: 0.6; }
 
 /* Structural edits are locked to the primary language, and the device frames
    preview only the question cards — hide the gate chrome in both, matching

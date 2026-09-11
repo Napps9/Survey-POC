@@ -235,6 +235,79 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     end
   end
 
+  # Every gate card in the feed is laid over the Verto's BACKGROUND PHOTO, and
+  # not every class it borrows from the player is drawn for that. The account
+  # ask shipped see-through for a day because `.join-card`'s background is
+  # `primary_soft` — rgba(primary, 0.12) for every Verto, a tint that only
+  # becomes a card once it composites onto the opaque #1C2034 it sits on in the
+  # player. On a photo, 12% of anything composites to nothing.
+  #
+  # Written as the general rule rather than about that one card: whatever a gate
+  # wrapper holds, the creator has to be able to read it.
+  test "no gate card in the feed is see-through over the Verto's background" do
+    # With the consent gate on as well, all four wrappers are on the page.
+    @survey.update_columns(consent_text: "Please agree to take part.")
+    sign_in_as @user
+    with_viewport(1440, 950, mobile: false) do
+      visit survey_path(@survey)
+      assert_selector ".gate-join-card", wait: 8
+
+      cards = page.evaluate_script(<<~JS)
+        [...document.querySelectorAll('.gate-card-wrap')]
+          .filter(wrap => !wrap.hidden && wrap.offsetParent !== null)
+          .map(wrap => wrap.lastElementChild)
+          .filter(Boolean)
+          .map(card => {
+            const bg = getComputedStyle(card).backgroundColor
+            const parts = (bg.match(/rgba?\\(([^)]+)\\)/) || [ , '' ])[1].split(',')
+            return { name: card.className, bg: bg,
+                     alpha: parts.length > 3 ? parseFloat(parts[3]) : 1 }
+          })
+      JS
+
+      assert_operator cards.size, :>=, 4,
+                      "only #{cards.size} gate cards on the page — this test proves nothing " \
+                      "unless the feed is actually rendering them"
+      see_through = cards.reject { |c| c["alpha"] == 1.0 }
+      assert_empty see_through,
+                   "a gate card is drawn on a translucent background, so the Verto's photo " \
+                   "shows through it and the creator cannot read their own copy:\n  " +
+                   see_through.map { |c| "#{c['name']} → #{c['bg']}" }.join("\n  ")
+    end
+  end
+
+  # ...and opaque is not enough on its own: the account card must composite to
+  # the SAME colour the respondent sees, which means keeping the brand tint over
+  # #1C2034 rather than being painted a flat dark grey. Both halves, because
+  # dropping the tint to fix the transparency is the same bug pointing the other
+  # way.
+  test "the account-ask card is the same colour as the block it configures" do
+    # The tint the respondent's card is actually painted with, in this Verto's
+    # palette — read off the player's own .join-card rather than hard-coded, so
+    # the check follows a rebrand.
+    player_tint = nil
+    with_viewport(1440, 950, mobile: false) do
+      play_to_the_end
+      player_tint = page.evaluate_script(
+        "getComputedStyle(document.querySelector('.join-card')).backgroundColor"
+      )
+    end
+
+    sign_in_as @user
+    with_viewport(1440, 950, mobile: false) do
+      visit survey_path(@survey)
+      assert_selector ".gate-join-card", wait: 8
+      image = page.evaluate_script(
+        "getComputedStyle(document.querySelector('.gate-join-card')).backgroundImage"
+      )
+      assert_includes image, player_tint,
+                      "the editor's account card is opaque but no longer carries the tint the " \
+                      "player paints the block with (#{player_tint}) — background-image is " \
+                      "#{image.inspect}. Opaque and the WRONG colour is the same bug pointing " \
+                      "the other way: painting over the brand to stop the photo showing through."
+    end
+  end
+
   # ── The account ask, which is edited in the feed rather than a side panel ──
 
   test "the account-ask card appears when the ask is on, and carries the copy" do
@@ -252,6 +325,49 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     # honest without pretending the boxes work. Both of them: the password row
     # arrived with the choose-a-password change.
     assert_selector ".gate-join-card .gate-join-ghost", count: 2
+  end
+
+  # Colour was the loud half of "make it a true preview"; arrangement is the
+  # quiet half. The button used to sit on a row of its own with no length hint
+  # above it, so the creator was writing a button in a place no respondent ever
+  # meets it. Compares the two rather than pinning either, so the replica has to
+  # follow the block when the block changes.
+  test "the account card's rows are arranged the way the player's are" do
+    rows = ->(sel) do
+      page.evaluate_script(<<~JS)
+        (() => {
+          const card = document.querySelector('#{sel}')
+          const top = el => el ? Math.round(el.getBoundingClientRect().top) : null
+          const inputs = [...card.querySelectorAll('.join-input')]
+          const btn = card.querySelector('.join-btn')
+          return { inputs: inputs.length,
+                   sameRowAsPassword: top(inputs[1]) === top(btn),
+                   hint: !!card.querySelector('.join-note') }
+        })()
+      JS
+    end
+
+    player = nil
+    with_viewport(1440, 950, mobile: false) do
+      play_to_the_end
+      page.execute_script("document.querySelector('.join-card').classList.remove('hidden')")
+      player = rows.call(".join-card")
+    end
+
+    sign_in_as @user
+    editor = nil
+    with_viewport(1440, 950, mobile: false) do
+      visit survey_path(@survey)
+      assert_selector ".gate-join-card", wait: 8
+      editor = rows.call(".gate-join-card")
+    end
+
+    assert player["sameRowAsPassword"],
+           "the player is meant to put the button beside the password — if that changed, this " \
+           "test is comparing the editor against the wrong shape"
+    assert_equal player, editor,
+                 "the editor's account card is arranged differently from the block it " \
+                 "configures (player #{player.inspect} vs editor #{editor.inspect})"
   end
 
   test "the account-ask card is absent when the ask is off" do
