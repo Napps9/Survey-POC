@@ -1,0 +1,75 @@
+<%# The languages this Verto speaks, and the way to add more.
+    
+    A rail rather than a row, because it answers a question the creator keeps
+    asking while they work down the board: which language am I behind on? Each
+    entry carries its own translated-so-far count, read off the deck rather
+    than off a translation job — a job that failed or half-finished would
+    otherwise report a language as done that a reviewer is about to find in
+    English. See LanguageCheckLines.coverage.
+
+    Locals: survey, locales, coverage, addable, editable %>
+<aside class="lc-rail" id="language-check-languages">
+  <h2 class="lc-rail-title"><%= t("language_check.rail_title") %></h2>
+
+  <%# Languages added a moment ago by the form below. The job runs in the
+      background, so the honest thing to show is that it has been asked for —
+      not a count of zero that reads as a failure. Comes from the redirect, so
+      it is gone on the next ordinary page view, like the run it describes. %>
+  <% just_added = params[:translating].to_s.split(",") & locales %>
+
+  <ul class="lc-rail-list">
+    <% locales.each do |code| %>
+      <% loc  = SupportedLocales.find(code) %>
+      <% cov  = coverage[code] || { total: 0, translated: 0, primary: false } %>
+      <% done = cov[:total].positive? && cov[:translated] == cov[:total] %>
+      <li class="lc-rail-item<%= ' is-primary' if cov[:primary] %>">
+        <span class="lc-rail-lang">
+          <span aria-hidden="true"><%= loc&.flag %></span>
+          <span class="lc-rail-name"><%= loc&.english_name || code %></span>
+        </span>
+        <% if cov[:primary] %>
+          <span class="lc-chip lc-chip--primary"><%= t("language_check.primary") %></span>
+        <% elsif just_added.include?(code) && cov[:translated].zero? %>
+          <span class="lc-rail-status lc-rail-status--working"><%= t("language_check.rail_translating") %></span>
+        <% elsif done %>
+          <span class="lc-rail-status lc-rail-status--done"><%= t("language_check.rail_translated") %></span>
+        <% else %>
+          <span class="lc-rail-status">
+            <%= t("language_check.rail_progress", done: cov[:translated], total: cov[:total]) %>
+          </span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+
+  <% if editable && addable.any? %>
+    <%# Several at once on purpose. Adding languages is something a creator does
+        in one sitting when a Verto goes to a new market, and one-at-a-time
+        would mean one background translation run per language with a page
+        reload between each. %>
+    <%= form_with url: survey_language_check_languages_path(survey), method: :post,
+                  data: { turbo: false }, class: "lc-rail-add" do %>
+      <%= hidden_field_tag :filter, params[:filter] %>
+      <details class="lc-rail-details">
+        <summary class="lc-rail-add-summary"><%= t("language_check.rail_add") %></summary>
+        <div class="lc-rail-choices">
+          <% addable.each do |loc| %>
+            <label class="lc-checkline">
+              <input type="checkbox" name="locales[]" value="<%= loc.code %>" />
+              <span aria-hidden="true"><%= loc.flag %></span>
+              <span class="lc-rail-choice-name"><%= loc.native_name %>
+                <span class="lc-rail-choice-en">· <%= loc.english_name %></span>
+              </span>
+            </label>
+          <% end %>
+        </div>
+        <button type="submit" class="lc-btn lc-btn--approve lc-rail-go">
+          <%= t("language_check.rail_generate") %>
+        </button>
+        <p class="lc-note-hint"><%= t("language_check.rail_hint") %></p>
+      </details>
+    <% end %>
+  <% elsif editable %>
+    <p class="lc-note-hint"><%= t("language_check.rail_all_added") %></p>
+  <% end %>
+</aside>

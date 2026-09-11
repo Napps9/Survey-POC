@@ -1,112 +1,52 @@
 <% content_for :title, "#{@survey.theme} · #{t("language_check.title")} · Playverto" %>
 
-<div class="lc-page">
-  <div class="lc-wrap">
+<div class="lc-page" data-controller="modal" data-action="keydown.esc@window->modal#closeOnEsc">
+  <div class="lc-wrap lc-wrap--rail">
 
     <div class="lc-top">
       <a class="lc-back" href="<%= survey_path(@survey) %>">← <%= t("language_check.back_to_editor") %></a>
-      <h1 class="lc-title"><%= t("language_check.title") %></h1>
-      <p class="lc-sub"><%= t("language_check.subtitle", title: @survey.theme.presence || @survey.title.to_s) %></p>
+      <div class="lc-top-row">
+        <div>
+          <h1 class="lc-title"><%= t("language_check.title") %></h1>
+          <p class="lc-sub"><%= t("language_check.subtitle", title: @survey.theme.presence || @survey.title.to_s) %></p>
+        </div>
+        <%# Sending the page out is the point of the screen, so the way to do it
+            is at the top where it is found — but it is a once-per-reviewer act
+            next to a board someone works down for twenty minutes, so it lives
+            behind a modal rather than taking permanent space. %>
+        <button type="button" class="lc-btn lc-btn--approve lc-send-btn"
+                data-action="click->modal#open" aria-haspopup="dialog"
+                aria-controls="language-check-share-modal">
+          <%= t("language_check.links_title") %>
+          <% if @links.any? %><span class="lc-send-count"><%= @links.count { |l| l.active? } %></span><% end %>
+        </button>
+      </div>
     </div>
 
-    <% if @locales.size < 2 %>
-      <%# A one-language Verto has nothing to check against. Say so and point at
-          the switch that changes it, rather than drawing an empty board. %>
-      <div class="lc-blank">
-        <p><%= t("language_check.single_language_title") %></p>
-        <p class="lc-blank-sub"><%= t("language_check.single_language_body") %></p>
-        <a class="lc-btn lc-btn--approve" href="<%= survey_path(@survey, panel: "publish") %>">
-          <%= t("language_check.add_languages") %>
-        </a>
-      </div>
-    <% else %>
-      <%= render "language_checks/board",
-                 survey: @survey, cards: @cards, locales: @locales,
-                 checks: @checks, notes: @notes, editable: @editable,
-                 post_url: survey_language_check_lines_path(@survey),
-                 filter: params[:filter].presence || "all" %>
-    <% end %>
+    <div class="lc-layout">
+      <%= render "language_checks/languages_rail",
+                 survey: @survey, locales: @locales, coverage: @coverage,
+                 addable: @addable, editable: @editable %>
 
-    <%# ── Reviewer links ───────────────────────────────────────────────────
-        The half of this screen that does the thing the feature is for:
-        handing the page to somebody who does not have an account. Admin-only
-        to mint, readable by everyone — see LanguageCheckLinksController. %>
-    <section class="lc-links" id="language-check-links">
-      <h2 class="lc-links-title"><%= t("language_check.links_title") %></h2>
-      <p class="lc-links-sub"><%= t("language_check.links_sub") %></p>
-
-      <% if params[:link_error] == "limit" %>
-        <p class="lc-links-error"><%= t("language_check.links_limit", count: LanguageCheckLinksController::MAX_PER_SURVEY) %></p>
-      <% end %>
-
-      <% @links.each do |link| %>
-        <% url = shared_language_check_url(link.token) %>
-        <div class="lc-link<%= ' is-paused' unless link.active? %>">
-          <div class="lc-link-head">
-            <span class="lc-link-name"><%= link.display_name %></span>
-            <span class="lc-link-tags">
-              <% link.visible_locales.each do |code| %>
-                <span class="lc-chip"><%= SupportedLocales.flag(code) %> <%= code.upcase %></span>
-              <% end %>
-              <span class="lc-chip <%= link.can_edit? ? "lc-chip--edit" : "lc-chip--read" %>">
-                <%= link.can_edit? ? t("language_check.link_can_edit") : t("language_check.link_read_only") %>
-              </span>
-              <% unless link.active? %><span class="lc-chip lc-chip--paused"><%= t("language_check.link_paused") %></span><% end %>
-            </span>
+      <div class="lc-main">
+        <% if @locales.size < 2 %>
+          <%# A one-language Verto has nothing to check against. The rail beside
+              this is where the second language is added, so point at it rather
+              than sending the creator back to the editor. %>
+          <div class="lc-blank">
+            <p><%= t("language_check.single_language_title") %></p>
+            <p class="lc-blank-sub"><%= t("language_check.single_language_rail_body") %></p>
           </div>
-
-          <div class="lc-link-url">
-            <input type="text" readonly value="<%= url %>" id="lc-url-<%= link.id %>" class="lc-input" />
-            <button type="button" class="lc-btn lc-btn--ghost"
-                    onclick="(navigator.clipboard?.writeText(document.getElementById('lc-url-<%= link.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("language_check.copied") %>';setTimeout(()=>this.textContent='<%= j t("language_check.copy_link") %>',2000)}).catch(()=>{this.textContent='<%= j t("language_check.copy_failed") %>';setTimeout(()=>this.textContent='<%= j t("language_check.copy_link") %>',2000)})">
-              <%= t("language_check.copy_link") %>
-            </button>
-          </div>
-
-          <% if link.last_seen_at %>
-            <p class="lc-byline"><%= t("language_check.link_last_seen", when: time_ago_in_words(link.last_seen_at)) %></p>
-          <% end %>
-
-          <% if current_membership&.admin? %>
-            <div class="lc-actions">
-              <%= button_to link.active? ? t("language_check.pause_link") : t("language_check.resume_link"),
-                            survey_language_check_link_path(@survey, link), method: :patch,
-                            params: { active: !link.active? }, class: "lc-btn lc-btn--ghost" %>
-              <%= button_to link.can_edit? ? t("language_check.make_read_only") : t("language_check.allow_edits"),
-                            survey_language_check_link_path(@survey, link), method: :patch,
-                            params: { can_edit: !link.can_edit? }, class: "lc-btn lc-btn--ghost" %>
-              <%= button_to t("language_check.revoke_link"),
-                            survey_language_check_link_path(@survey, link), method: :delete,
-                            form: { data: { turbo_confirm: t("language_check.revoke_confirm") } },
-                            class: "lc-btn lc-btn--flag" %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-
-      <% if current_membership&.admin? %>
-        <%= form_with url: survey_language_check_links_path(@survey), method: :post, class: "lc-new-link" do %>
-          <input type="text" name="name" class="lc-input"
-                 maxlength="<%= LanguageCheckLink::MAX_NAME %>"
-                 placeholder="<%= t("language_check.link_name_placeholder") %>" />
-          <div class="lc-link-locales">
-            <span class="lc-field-label"><%= t("language_check.link_locales_label") %></span>
-            <% @locales.each do |code| %>
-              <label class="lc-checkline">
-                <input type="checkbox" name="locales[]" value="<%= code %>" />
-                <span><%= SupportedLocales.flag(code) %> <%= SupportedLocales.english_name(code) || code %></span>
-              </label>
-            <% end %>
-            <p class="lc-note-hint"><%= t("language_check.link_locales_hint") %></p>
-          </div>
-          <label class="lc-checkline">
-            <input type="hidden" name="can_edit" value="0" />
-            <input type="checkbox" name="can_edit" value="1" checked />
-            <span><%= t("language_check.link_can_edit_hint") %></span>
-          </label>
-          <button type="submit" class="lc-btn lc-btn--approve"><%= t("language_check.create_link") %></button>
+        <% else %>
+          <%= render "language_checks/board",
+                     survey: @survey, cards: @cards, locales: @locales,
+                     checks: @checks, notes: @notes, editable: @editable,
+                     post_url: survey_language_check_lines_path(@survey),
+                     filter: params[:filter].presence || "all" %>
         <% end %>
-      <% end %>
-    </section>
+      </div>
+    </div>
   </div>
+
+  <%= render "language_checks/share_modal", survey: @survey, links: @links, locales: @locales %>
 </div>

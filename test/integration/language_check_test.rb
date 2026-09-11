@@ -322,6 +322,80 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
                  LanguageCheckNote.find_by!(survey: @survey, cid: "c_mc", locale: "es").body.length
   end
 
+  # ── Adding languages from the sidebar ──────────────────────────────────────
+
+  test "the sidebar adds several languages at once and sets them translating" do
+    sign_in
+    assert_enqueued_with(job: TranslateLocalesJob) do
+      post survey_language_check_languages_path(@survey), params: { locales: %w[de it] }
+    end
+    assert_response :redirect
+
+    assert_equal %w[en es fr de it], @survey.reload.verto_locales,
+                 "one sitting, one background run — not one page reload per language"
+  end
+
+  test "adding a language the Verto already has costs nothing" do
+    sign_in
+    assert_no_enqueued_jobs(only: TranslateLocalesJob) do
+      post survey_language_check_languages_path(@survey), params: { locales: [ "es" ] }
+    end
+    assert_equal %w[en es fr], @survey.reload.verto_locales,
+                 "re-translating a language already carried would overwrite hand-edited wording"
+  end
+
+  test "the sidebar never drops a language" do
+    sign_in
+    # The form posts only what was ticked. An empty or partial list must not be
+    # read as a deselection — that is the editor's Language settings' job, and a
+    # sidebar that silently removed French from a live Verto would be a very
+    # quiet way to lose a translation.
+    post survey_language_check_languages_path(@survey), params: { locales: [ "de" ] }
+    assert_equal %w[en es fr de], @survey.reload.verto_locales
+  end
+
+  test "an unsupported or junk language code is ignored" do
+    sign_in
+    post survey_language_check_languages_path(@survey), params: { locales: [ "de", "xx", "", "../etc" ] }
+    assert_equal %w[en es fr de], @survey.reload.verto_locales
+  end
+
+  test "a viewer seat cannot add languages" do
+    viewer = User.create!(name: "V", email_address: "v3-#{SecureRandom.hex(3)}@test.com",
+                          password: "verylongpassword")
+    @org.memberships.create!(user: viewer, role: "viewer")
+    sign_in(viewer)
+
+    assert_no_enqueued_jobs(only: TranslateLocalesJob) do
+      post survey_language_check_languages_path(@survey), params: { locales: [ "de" ] }
+    end
+    assert_equal %w[en es fr], @survey.reload.verto_locales,
+                 "adding a language spends AI and changes what respondents are offered"
+  end
+
+  test "the sidebar shows how far each language has actually got" do
+    sign_in
+    get survey_language_check_path(@survey)
+    assert_response :success
+
+    # Spanish is translated on c_mc only; French on neither. Counted off the
+    # deck, so a job that half-finished reads as half-finished.
+    coverage = LanguageCheckLines.coverage(LanguageCheckLines.for(@survey),
+                                            @survey.verto_locales, @survey.default_locale)
+    assert_equal({ total: 2, translated: 2, primary: true }, coverage["en"])
+    assert_equal({ total: 2, translated: 1, primary: false }, coverage["es"])
+    assert_equal({ total: 2, translated: 0, primary: false }, coverage["fr"])
+  end
+
+  test "a one-language Verto still gets the sidebar that fixes it" do
+    @survey.update!(locales: [ "en" ])
+    sign_in
+    get survey_language_check_path(@survey)
+    assert_response :success
+    assert_match "lc-rail", response.body,
+                 "the way out of a one-language Verto is the sidebar, not a trip back to the editor"
+  end
+
   # ── Review links ───────────────────────────────────────────────────────────
 
   test "an admin mints a scoped review link" do
@@ -356,6 +430,8 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
 
     patch survey_language_check_link_path(@survey, link), params: { active: "0" }
     assert_not link.reload.active?
+    assert_match "share=1", response.location,
+                 "every link action happens inside the modal — landing on a closed one hides what just happened"
 
     delete survey_language_check_link_path(@survey, link)
     assert_not LanguageCheckLink.exists?(link.id)

@@ -121,6 +121,96 @@ class LanguageCheckSystemTest < ApplicationSystemTestCase
     assert_selector "#line-c_mc-es .lc-state--stale"
   end
 
+  # ── The languages rail ─────────────────────────────────────────────────────
+
+  test "the rail lists each language with how far it has got" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    within ".lc-rail" do
+      assert_selector ".lc-rail-item", count: 3
+      # The original is labelled as such; the translations carry a count, so a
+      # creator can see at a glance which language they are behind on. Spanish
+      # is translated on one of the two cards here, French on neither.
+      assert_selector ".lc-rail-item.is-primary", text: /English/
+      assert_selector ".lc-rail-item", text: /Spanish/
+      assert_selector ".lc-rail-item", text: %r{French.*0/2}m
+      assert_selector ".lc-rail-status", count: 2
+    end
+  end
+
+  test "a creator adds two languages from the rail in one go" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    find(".lc-rail-add-summary").click
+    check "locales[]", option: "de", allow_label_click: true
+    check "locales[]", option: "it", allow_label_click: true
+    click_button "Generate translations"
+
+    assert_selector ".lc-rail-item", count: 5
+    assert_equal %w[en es fr de it], @survey.reload.verto_locales
+  end
+
+  test "a language just asked for says it is being worked on, not that it is empty" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    find(".lc-rail-add-summary").click
+    check "locales[]", option: "de", allow_label_click: true
+    click_button "Generate translations"
+
+    # The job runs in the background; a bare 0/2 would read as a failure.
+    assert_selector ".lc-rail-status--working"
+  end
+
+  # ── The share modal ────────────────────────────────────────────────────────
+
+  test "the reviewer links open from the top of the screen, not the bottom" do
+    @survey.language_check_links.create!(name: "Marta — Spanish", locales: [ "es" ])
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    assert_no_text "Marta — Spanish", wait: 1
+    click_button "Send this to a reviewer"
+    within "#language-check-share-modal" do
+      assert_text "Marta — Spanish"
+      assert_button "Create review link"
+    end
+  end
+
+  test "escape closes the share modal" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    click_button "Send this to a reviewer"
+    assert_selector "#language-check-share-modal:not(.hidden)"
+    find("body").send_keys(:escape)
+    assert_selector "#language-check-share-modal.hidden", visible: false
+  end
+
+  test "creating a link brings the creator back into the modal with it in hand" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    click_button "Send this to a reviewer"
+    within "#language-check-share-modal" do
+      fill_in "name", with: "Jonas — French"
+      click_button "Create review link"
+    end
+
+    # A closed modal here would hide the URL the creator came for.
+    assert_selector "#language-check-share-modal:not(.hidden)"
+    assert_text "Jonas — French"
+    assert_selector "input[value*='/language-check/']"
+  end
+
   # ── The reviewer's side ────────────────────────────────────────────────────
 
   test "a reviewer with no account opens the link, names themselves and approves" do

@@ -225,6 +225,7 @@ Rails.application.routes.draw do
   # is admin-only (LanguageCheckLinksController).
   get  "surveys/:id/language_check",       to: "language_checks#show",        as: :survey_language_check
   post "surveys/:id/language_check/lines", to: "language_checks#update_line", as: :survey_language_check_lines
+  post "surveys/:id/language_check/languages", to: "language_checks#add_languages", as: :survey_language_check_languages
   post   "surveys/:survey_id/language_check/links",     to: "language_check_links#create",  as: :survey_language_check_links
   patch  "surveys/:survey_id/language_check/links/:id", to: "language_check_links#update",  as: :survey_language_check_link
   delete "surveys/:survey_id/language_check/links/:id", to: "language_check_links#destroy"

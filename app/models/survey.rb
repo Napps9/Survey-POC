@@ -256,6 +256,29 @@ class Survey < ApplicationRecord
     end
   end
 
+  # Add languages to this Verto and say which ones were actually new.
+  #
+  # Two screens offer this — the editor's Language settings and the Language
+  # check screen's own sidebar — and they must mean the same thing, because the
+  # thing they mean is "translate the deck into these": a second implementation
+  # that forgot to enqueue, or enqueued for a language already carried (which
+  # would re-translate over hand-edited wording), is a bug nobody would see
+  # until a reviewer's Spanish quietly reverted. The caller enqueues; this
+  # decides what is new.
+  #
+  # Never removes. Both callers that DESELECT a language go through a full
+  # replacement of `locales` instead, because unticking is a different act with
+  # a different guarantee (the translation stays stored, so re-ticking is
+  # instant) and folding the two together would make one of them lie.
+  def add_locales!(codes)
+    wanted = SupportedLocales.sanitize_list(codes, fallback: [])
+    added  = wanted - verto_locales
+    return [] if added.empty?
+
+    update!(locales: (verto_locales + added).uniq)
+    added
+  end
+
   # ── Language check edits ───────────────────────────────────────────────────
   # Write one line's wording back into the deck, from the Language check screen.
   # This is the "and all edits appear in the Verto itself" half of that feature:

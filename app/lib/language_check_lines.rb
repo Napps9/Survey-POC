@@ -169,4 +169,19 @@ module LanguageCheckLines
   def present_fields(content)
     FIELDS.select { |f| content[f].present? }
   end
+
+  # How far each language has got, for the sidebar: { locale => { total:,
+  # translated: } } over the same rows the board draws.
+  #
+  # Counted from the DECK rather than from a job record, because the deck is
+  # what a reviewer will actually read. A language whose translation job failed,
+  # was discarded, or half-finished shows here as what it is — partly done —
+  # instead of as "translated" on the strength of a job that reported success.
+  def coverage(cards_rows, locales, primary)
+    locales.index_with do |locale|
+      rows = cards_rows.filter_map { |c| c[:lines].find { |l| l[:locale] == locale } }
+      translated = rows.count { |line| line[:primary] || !untranslated?(line[:content]) }
+      { total: rows.size, translated: translated, primary: locale == primary }
+    end
+  end
 end

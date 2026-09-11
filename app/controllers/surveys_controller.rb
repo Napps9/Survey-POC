@@ -818,6 +818,10 @@ class SurveysController < ApplicationController
     end
 
     if params.key?(:locales)
+      # A full replacement, not an add: this form's checkbox list is the whole
+      # set, so an unticked language is a deselection. Survey#add_locales! is
+      # the other half of the pair (the Language check sidebar, which only ever
+      # adds) — see its comment for why the two stayed separate.
       primary = @survey.default_locale
       desired = ([ primary ] + SupportedLocales.sanitize_list(params[:locales], fallback: [])).uniq
       added   = desired - @survey.verto_locales

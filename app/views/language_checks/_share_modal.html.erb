@@ -1,0 +1,104 @@
+<%# The reviewer links, behind a modal opened from the top of the screen.
+    Same content it had as a section at the bottom — minting a link is a
+    once-per-reviewer act, so it is reachable immediately and takes no room
+    while somebody works down the board.
+
+    Admin-only to mint, readable by everyone: see LanguageCheckLinksController.
+    Locals: survey, links, locales %>
+<%# Open on arrival when the creator has just acted inside it (minted a link,
+    paused one, hit the limit) — see LanguageCheckLinksController. %>
+<div class="app-modal app-modal--below-nav<%= " hidden" unless params[:share].present? %>"
+     data-modal-target="modal"
+     id="language-check-share-modal" role="dialog" aria-modal="true"
+     aria-labelledby="lc-share-modal-title">
+  <div class="app-modal__backdrop" data-action="click->modal#close"></div>
+  <div class="app-modal__panel lc-share-modal">
+
+    <div class="lc-share-modal__head">
+      <div>
+        <h2 class="lc-links-title" id="lc-share-modal-title"><%= t("language_check.links_title") %></h2>
+        <p class="lc-links-sub"><%= t("language_check.links_sub") %></p>
+      </div>
+      <button type="button" class="lc-btn lc-btn--ghost lc-share-modal__close"
+              data-action="click->modal#close"
+              aria-label="<%= t("language_check.close") %>">✕</button>
+    </div>
+
+    <div class="lc-share-modal__body">
+      <% if params[:link_error] == "limit" %>
+        <p class="lc-links-error"><%= t("language_check.links_limit", count: LanguageCheckLinksController::MAX_PER_SURVEY) %></p>
+      <% end %>
+
+      <% links.each do |link| %>
+        <% url = shared_language_check_url(link.token) %>
+        <div class="lc-link<%= ' is-paused' unless link.active? %>">
+          <div class="lc-link-head">
+            <span class="lc-link-name"><%= link.display_name %></span>
+            <span class="lc-link-tags">
+              <% link.visible_locales.each do |code| %>
+                <span class="lc-chip"><%= SupportedLocales.flag(code) %> <%= code.upcase %></span>
+              <% end %>
+              <span class="lc-chip <%= link.can_edit? ? "lc-chip--edit" : "lc-chip--read" %>">
+                <%= link.can_edit? ? t("language_check.link_can_edit") : t("language_check.link_read_only") %>
+              </span>
+              <% unless link.active? %><span class="lc-chip lc-chip--paused"><%= t("language_check.link_paused") %></span><% end %>
+            </span>
+          </div>
+
+          <div class="lc-link-url">
+            <input type="text" readonly value="<%= url %>" id="lc-url-<%= link.id %>" class="lc-input" />
+            <button type="button" class="lc-btn lc-btn--ghost"
+                    onclick="(navigator.clipboard?.writeText(document.getElementById('lc-url-<%= link.id %>').value) ?? Promise.reject()).then(()=>{this.textContent='<%= j t("language_check.copied") %>';setTimeout(()=>this.textContent='<%= j t("language_check.copy_link") %>',2000)}).catch(()=>{this.textContent='<%= j t("language_check.copy_failed") %>';setTimeout(()=>this.textContent='<%= j t("language_check.copy_link") %>',2000)})">
+              <%= t("language_check.copy_link") %>
+            </button>
+          </div>
+
+          <% if link.last_seen_at %>
+            <p class="lc-byline"><%= t("language_check.link_last_seen", when: time_ago_in_words(link.last_seen_at)) %></p>
+          <% end %>
+
+          <% if current_membership&.admin? %>
+            <div class="lc-actions">
+              <%= button_to link.active? ? t("language_check.pause_link") : t("language_check.resume_link"),
+                            survey_language_check_link_path(survey, link), method: :patch,
+                            params: { active: !link.active? }, class: "lc-btn lc-btn--ghost" %>
+              <%= button_to link.can_edit? ? t("language_check.make_read_only") : t("language_check.allow_edits"),
+                            survey_language_check_link_path(survey, link), method: :patch,
+                            params: { can_edit: !link.can_edit? }, class: "lc-btn lc-btn--ghost" %>
+              <%= button_to t("language_check.revoke_link"),
+                            survey_language_check_link_path(survey, link), method: :delete,
+                            form: { data: { turbo_confirm: t("language_check.revoke_confirm") } },
+                            class: "lc-btn lc-btn--flag" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if current_membership&.admin? %>
+        <%= form_with url: survey_language_check_links_path(survey), method: :post, class: "lc-new-link" do %>
+          <input type="text" name="name" class="lc-input"
+                 maxlength="<%= LanguageCheckLink::MAX_NAME %>"
+                 placeholder="<%= t("language_check.link_name_placeholder") %>" />
+          <div class="lc-link-locales">
+            <span class="lc-field-label"><%= t("language_check.link_locales_label") %></span>
+            <% locales.each do |code| %>
+              <label class="lc-checkline">
+                <input type="checkbox" name="locales[]" value="<%= code %>" />
+                <span><%= SupportedLocales.flag(code) %> <%= SupportedLocales.english_name(code) || code %></span>
+              </label>
+            <% end %>
+            <p class="lc-note-hint"><%= t("language_check.link_locales_hint") %></p>
+          </div>
+          <label class="lc-checkline">
+            <input type="hidden" name="can_edit" value="0" />
+            <input type="checkbox" name="can_edit" value="1" checked />
+            <span><%= t("language_check.link_can_edit_hint") %></span>
+          </label>
+          <button type="submit" class="lc-btn lc-btn--approve"><%= t("language_check.create_link") %></button>
+        <% end %>
+      <% else %>
+        <p class="lc-note-hint"><%= t("language_check.links_admin_only") %></p>
+      <% end %>
+    </div>
+  </div>
+</div>

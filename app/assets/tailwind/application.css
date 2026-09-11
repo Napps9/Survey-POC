@@ -13719,6 +13719,92 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .lc-blank p { margin: 0 0 8px; }
 .lc-blank .lc-btn { margin-top: 10px; }
 
+/* ── The creator's screen: languages rail beside the board ────────────────
+   The rail answers the question a creator keeps asking while they work down
+   the board — which language am I behind on — so it is sticky beside it on
+   desktop, and stacks above it on a phone where there is no beside. */
+.lc-wrap--rail { max-width: 1120px; }
+.lc-layout { display: grid; grid-template-columns: 244px minmax(0, 1fr); gap: 22px; align-items: start; }
+.lc-main { min-width: 0; }
+.lc-rail {
+  position: sticky; top: 16px;
+  padding: 15px 16px; border-radius: 16px;
+  background: rgba(22,26,44,.93); border: 1px solid rgba(255,255,255,.1);
+}
+.lc-rail-title {
+  font-family: "Alata", sans-serif; font-size: 11px; font-weight: 400;
+  text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.45);
+  margin: 0 0 11px;
+}
+.lc-rail-list { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.lc-rail-item {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 7px 9px; border-radius: 10px;
+}
+.lc-rail-item.is-primary { background: rgba(1,234,203,.06); }
+.lc-rail-lang { display: inline-flex; align-items: center; gap: 7px; min-width: 0; }
+.lc-rail-name {
+  font-size: 13.5px; color: rgba(255,255,255,.85);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.lc-rail-status {
+  margin-left: auto; font-size: 11px; color: rgba(255,255,255,.42);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.lc-rail-status--done { color: #34D399; }
+.lc-rail-status--working { color: #FBBF24; }
+
+.lc-rail-details { border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; }
+.lc-rail-add-summary {
+  cursor: pointer; font-size: 13px; color: #01EACB; list-style: none;
+  padding: 4px 0; user-select: none;
+}
+.lc-rail-add-summary::-webkit-details-marker { display: none; }
+.lc-rail-add-summary::before { content: "+ "; }
+.lc-rail-details[open] .lc-rail-add-summary::before { content: "− "; }
+.lc-rail-choices {
+  max-height: 230px; overflow-y: auto; margin: 9px 0 11px;
+  display: flex; flex-direction: column; gap: 3px;
+  padding-right: 4px;
+}
+.lc-rail-choice-name {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px;
+}
+.lc-rail-choice-en { color: rgba(255,255,255,.4); }
+.lc-rail-go { width: 100%; }
+
+@media (max-width: 860px) {
+  .lc-layout { grid-template-columns: minmax(0, 1fr); }
+  .lc-rail { position: static; margin-bottom: 16px; }
+  .lc-rail-choices { max-height: 260px; }
+}
+
+/* The header row: title on the left, the way to send the page out on the
+   right, where it is found without scrolling past the whole board. */
+.lc-top-row { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.lc-send-btn { margin-left: auto; flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; }
+.lc-send-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 19px; height: 19px; padding: 0 5px; border-radius: 100px;
+  background: rgba(28,32,52,.22); font-size: 11px; font-variant-numeric: tabular-nums;
+}
+
+/* Reviewer links, now inside a modal. The panel does not scroll — the body
+   inside it does — so the heading and the close button stay put however long
+   the link list gets, same reasoning as .share-modal__shell above. */
+.lc-share-modal {
+  max-width: 620px; background: #1C2034; border: 1px solid rgba(255,255,255,.1);
+  color: #F7F7F7; display: flex; flex-direction: column;
+  max-height: calc(100vh - 96px); overflow: hidden;
+}
+.lc-share-modal__head {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 20px 22px 14px; border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.lc-share-modal__head .lc-links-sub { margin-bottom: 0; }
+.lc-share-modal__close { margin-left: auto; flex-shrink: 0; padding: 5px 11px; }
+.lc-share-modal__body { padding: 16px 22px 22px; overflow-y: auto; }
+
 /* Reviewer links — the half of the creator's screen that does the sending. */
 .lc-links { margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.1); }
 .lc-links-title { font-family: "Alata", sans-serif; font-size: 18px; font-weight: 400; margin: 0 0 6px; }

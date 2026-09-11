@@ -61,7 +61,12 @@ class LanguageCheckLinksController < ApplicationController
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:survey_id])
   end
 
+  # Back to the screen with the share modal OPEN. Every action here happens
+  # inside it — minting a link, pausing one, reading the error — and landing
+  # on a closed modal would hide the very thing the creator just did, new URL
+  # included.
   def redirect_back_to_screen(error: nil)
-    redirect_to survey_language_check_path(@survey, link_error: error, anchor: "language-check-links")
+    redirect_to survey_language_check_path(@survey, link_error: error, share: 1,
+                                           anchor: "language-check-share-modal")
   end
 end

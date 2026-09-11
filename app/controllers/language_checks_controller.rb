@@ -25,6 +25,10 @@ class LanguageChecksController < ApplicationController
     @notes  = LanguageCheckNote.index_for(@survey)
     @links  = @survey.language_check_links.order(created_at: :desc)
     @locales = @survey.verto_locales
+    @coverage = LanguageCheckLines.coverage(@cards, @locales, @survey.default_locale)
+    # What the sidebar can still offer. Registry order, so the list reads the
+    # same here as in the editor's Language settings.
+    @addable = SupportedLocales.all.reject { |loc| @locales.include?(loc.code) }
     # Mirrors review_may_edit? below, so the page offers exactly the buttons
     # the endpoint would honour — a viewer seat is shown no Edit control rather
     # than one that bounces.
@@ -51,7 +55,34 @@ class LanguageChecksController < ApplicationController
                 alert: (t("language_check.action_failed") if outcome == :unknown_line)
   end
 
+  # POST /surveys/:id/language_check/languages — add languages from the
+  # sidebar and set them translating.
+  #
+  # Adds only. The editor's Language settings is where a language is DROPPED,
+  # because dropping one is a decision about the Verto rather than about
+  # checking it, and a tick-list that silently deselected on this screen would
+  # let a reviewer's sidebar remove a language from a live Verto. See
+  # Survey#add_locales!.
+  #
+  # Same bar as editing the wording: a viewer seat reads and rules, it does not
+  # change what the Verto IS, and adding a language spends AI and alters what
+  # respondents are offered.
+  def add_languages
+    return redirect_back_to_screen unless can_edit_vertos?
+
+    added = @survey.add_locales!(params[:locales])
+    TranslateLocalesJob.perform_later(@survey.id, added) if added.any?
+    redirect_back_to_screen(added: added)
+  end
+
   private
+
+  def redirect_back_to_screen(added: [])
+    redirect_to survey_language_check_path(@survey,
+                                           filter: params[:filter].presence,
+                                           translating: (added.presence && added.join(",")),
+                                           anchor: "language-check-languages")
+  end
 
   def set_survey
     @survey = Current.organisation.surveys.kept.without_report_text.find(params[:id])
