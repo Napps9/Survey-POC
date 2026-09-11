@@ -1154,6 +1154,11 @@ en:
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Button label (e.g. Visit our site)'
     ty_also_sees: "They'll also see"
+    join_card: 'Ask them to join'
+    remove_join_card: 'Remove the account ask'
+    join_title_label: 'Account ask heading'
+    join_body_label: 'Account ask message'
+    join_cta_label: 'Account ask button'
     share_card: 'Share card'
     share_card_hint: 'What friends see when a respondent passes this Verto on — in WhatsApp, Messages, Facebook, X, LinkedIn and Slack.'
     share_title_label: 'Share headline'

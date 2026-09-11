@@ -481,33 +481,10 @@
           <%
             ty_actions = capture do %>
             <div class="play-end-actions">
-              <%# Facsimiles of the pills this Verto will actually show, so the
-                  creator can see what their link button sits among rather than
-                  guessing. Gated on the same settings the player reads, minus
-                  the live-data halves it can't know here (the player also needs
-                  a results_url, which only exists on a real play request).
-                  Inert divs inside aria-hidden — not buttons, so nothing here
-                  is focusable or announced. %>
-              <% ghosts = @survey.compare_results? || @survey.join_prompt? || @survey.share_enabled? %>
-              <% if ghosts %>
-                <div class="gate-ty-ghost-label" aria-hidden="true">
-                  <%= t("editor.ty_also_sees", default: "They'll also see") %>
-                </div>
-              <% end %>
-              <div aria-hidden="true">
-                <% if @survey.compare_results? %>
-                  <div class="play-end-btn play-end-btn-primary gate-ty-ghost"><%= t("player.compare_cta") %></div>
-                <% end %>
-                <% if @survey.join_prompt? %>
-                  <div class="gate-ty-ghost gate-ty-ghost-card"><%= @survey.join_title_text %></div>
-                <% end %>
-              </div>
-
-              <%# Off-site link — the "Visit website →" button the respondent
-                  sees after finishing, in the slot the player puts it in
-                  (after compare and the account ask, before Share). Backed by
-                  the survey's own forward_url/label columns; branch end screens
-                  carry their own pair in the end_screens JSON. %>
+              <%# What the creator EDITS comes first. The off-site link — the
+                  "Visit website →" button the respondent sees after finishing,
+                  backed by the survey's own forward_url/label columns; branch
+                  end screens carry their own pair in the end_screens JSON. %>
               <div class="gate-ty-forward">
                 <label class="gate-ty-forward-label" for="ty-forward-url">
                   <%= t("editor.ty_forward_url_label", default: "Link button (optional)") %>
@@ -527,9 +504,34 @@
                        class="gate-ty-forward-input" />
               </div>
 
-              <% if @survey.share_enabled? %>
-                <div aria-hidden="true">
-                  <div class="play-end-btn gate-ty-ghost"><%= t("player.share") %></div>
+              <%# Then, beneath it and clearly labelled as such, facsimiles of
+                  the pills this Verto will also show — so the creator sees what
+                  their button sits among rather than guessing. The label used
+                  to sit ABOVE the real inputs, which captioned the one editable
+                  thing in the column as though it were a preview. In one column
+                  the ordering does that work: what you edit is above, what they
+                  also get is below.
+
+                  The account ask is NOT here any more — it has its own editable
+                  card in the feed, directly below this one.
+
+                  Gated on the same settings the player reads, minus the
+                  live-data halves it can't know here (the player also needs a
+                  results_url, which only exists on a real play request). Inert
+                  divs inside aria-hidden — not buttons, so nothing here is
+                  focusable or announced. %>
+              <% ghosts = @survey.compare_results? || @survey.share_enabled? %>
+              <% if ghosts %>
+                <div class="gate-ty-ghosts" aria-hidden="true">
+                  <div class="gate-ty-ghost-label">
+                    <%= t("editor.ty_also_sees", default: "They'll also see") %>
+                  </div>
+                  <% if @survey.compare_results? %>
+                    <div class="play-end-btn play-end-btn-primary gate-ty-ghost"><%= t("player.compare_cta") %></div>
+                  <% end %>
+                  <% if @survey.share_enabled? %>
+                    <div class="play-end-btn gate-ty-ghost"><%= t("player.share") %></div>
+                  <% end %>
                 </div>
               <% end %>
             </div>
@@ -537,6 +539,91 @@
 
           <%= render "shared/end_screen_shell",
                 message: ty_message, actions: ty_actions, card_class: "gate-ty-card" %>
+        </div>
+
+        <%# ── The account ask — the block a respondent meets under the compare
+            CTA at the end, offering to keep what they played. Its copy lived in
+            a collapsed "Ask them to join" disclosure in the publish panel,
+            which is a strange place for the one thing on that block a creator
+            writes: every other end-screen element is edited here, in the feed,
+            in the shape the respondent sees it. So it is a gate card like its
+            neighbours, and the panel keeps only the switch.
+
+            Unlike the other three, this card's presence IS a setting rather
+            than "has the creator written anything" — join_prompt_enabled, which
+            defaults off because it asks a stranger for an email address. ── %>
+        <% join_on = @survey.join_prompt_enabled? %>
+        <div class="gate-cta-row" data-gate-cards-target="joinCta" <%= "hidden" if join_on %>>
+          <%# A real form, NOT the optimistic fetch the other gate CTAs use.
+              Turning this on can be REFUSED: a Verto that asks the
+              neurodiversity question may not also collect an email
+              (Survey#contact_form_excludes_neurodiversity), and the refusal is
+              a redirect carrying contact_error. gate-cards#_save is a fetch
+              that only checks res.ok, and a followed redirect answers 200 — so
+              an optimistic add would show the creator a card the server had
+              just refused to create. Submitting for real reuses the panel's
+              tested refusal path, and the reload is needed to render the card
+              anyway. %>
+          <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
+            <input type="hidden" name="join_prompt_enabled" value="1" />
+            <button type="submit" class="aq-trigger-btn aq-insert-btn">
+              ＋ <%= t("editor.join_card", default: "Ask them to join") %>
+            </button>
+          <% end %>
+        </div>
+        <div class="gate-card-wrap" data-gate-cards-target="joinCard" <%= "hidden" unless join_on %>>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;padding:0 4px;">
+            <span class="s-badge gate-badge-join"><%= t("editor.join_card", default: "Ask them to join") %></span>
+            <button type="button" class="card-delete-btn" style="margin-left:auto;"
+                    title="<%= t("editor.remove_join_card", default: "Remove the account ask") %>"
+                    aria-label="<%= t("editor.remove_join_card", default: "Remove the account ask") %>"
+                    data-action="click->gate-cards#removeJoin">
+              ✕ <span><%= t("editor.remove", default: "Remove") %></span>
+            </button>
+          </div>
+
+          <%# An editable replica of player/_join_block.html.erb, in the same
+              brand-tinted card at the same width. The three fields the creator
+              owns are edited in place; everything else — the eyebrow, the two
+              input rows, the fine print — is the respondent's side of it and is
+              inert, so the shape is honest without pretending the boxes work. %>
+          <div class="join-card gate-join-card">
+            <div class="join-eyebrow"><%= t("player.join_eyebrow") %></div>
+
+            <div class="join-title gate-placeholder gate-editable" contenteditable="true"
+                 role="textbox"
+                 aria-label="<%= t("editor.join_title_label", default: "Account ask heading") %>"
+                 data-gate-cards-target="joinTitle"
+                 data-default-text="<%= @survey.join_title_for_editor %>"
+                 data-action="input->gate-cards#queueJoinSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.join_title %></div>
+
+            <p class="join-body gate-placeholder gate-editable" contenteditable="true"
+               role="textbox" aria-multiline="true"
+               aria-label="<%= t("editor.join_body_label", default: "Account ask message") %>"
+               data-gate-cards-target="joinBody"
+               data-default-text="<%= @survey.join_body_for_editor %>"
+               data-action="input->gate-cards#queueJoinSave:stop"><%= @survey.join_body %></p>
+
+            <div class="join-ask" aria-hidden="true">
+              <div class="join-row">
+                <span class="join-input gate-join-ghost"><%= t("player.join_email_placeholder") %></span>
+              </div>
+              <div class="join-row">
+                <span class="join-input gate-join-ghost"><%= t("player.join_password_placeholder") %></span>
+              </div>
+            </div>
+
+            <div class="join-row">
+              <span class="join-btn gate-placeholder gate-editable" contenteditable="true"
+                    role="textbox"
+                    aria-label="<%= t("editor.join_cta_label", default: "Account ask button") %>"
+                    data-gate-cards-target="joinCtaText"
+                    data-default-text="<%= @survey.join_cta_for_editor %>"
+                    data-action="input->gate-cards#queueJoinSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.join_cta %></span>
+            </div>
+
+            <p class="join-fine" aria-hidden="true"><%= t("player.join_fine") %></p>
+          </div>
         </div>
 
         <%# ── Share card — what a passed-on /play link says about itself. A CTA
@@ -1688,47 +1775,19 @@
             </div>
           <% end %>
 
+          <%# The heading, message and button used to be edited here, in a
+              collapsed disclosure in a side panel — the one part of the
+              account ask a creator actually writes, furthest from where they
+              could see it. They now live on the account-ask card in the feed,
+              beside the thank-you card, in the shape the respondent meets.
+              Deliberately NOT in both places: two surfaces writing the same
+              columns is how the editor and the player drifted apart before.
+              What stays here is the switch, which is a setting and can be
+              refused. %>
           <% if @survey.join_prompt_enabled? %>
-            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
-              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Heading:</div>
-              <div data-controller="note-limit"
-                   data-note-limit-recommended-value="<%= Survey::RECOMMENDED_JOIN_TITLE %>"
-                   data-note-limit-max-value="<%= Survey::MAX_JOIN_TITLE %>">
-                <input type="text" name="join_title" maxlength="<%= Survey::MAX_JOIN_TITLE %>"
-                       value="<%= @survey.join_title_for_editor %>"
-                       data-note-limit-target="input"
-                       data-action="input->note-limit#update"
-                       onchange="this.form.requestSubmit()"
-                       style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-                <div class="note-limit-count" data-note-limit-target="count"></div>
-                <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_JOIN_TITLE) %></div>
-              </div>
-            <% end %>
-
-            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
-              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">What they get:</div>
-              <div data-controller="note-limit"
-                   data-note-limit-recommended-value="<%= Survey::RECOMMENDED_JOIN_BODY %>"
-                   data-note-limit-max-value="<%= Survey::MAX_JOIN_BODY %>">
-                <textarea name="join_body" maxlength="<%= Survey::MAX_JOIN_BODY %>" rows="3"
-                          data-note-limit-target="input"
-                          data-action="input->note-limit#update"
-                          onchange="this.form.requestSubmit()"
-                          style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none; resize:vertical;"><%= @survey.join_body_for_editor %></textarea>
-                <div class="note-limit-count" data-note-limit-target="count"></div>
-                <div class="note-limit-hint" data-note-limit-target="hint" hidden><%= t("editor.note_limit_split_hint", n: Survey::RECOMMENDED_JOIN_BODY) %></div>
-              </div>
-            <% end %>
-
-            <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:10px 0 0;" do %>
-              <div style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.7);margin:12px 0 5px;">Button:</div>
-              <input type="text" name="join_cta" maxlength="<%= Survey::MAX_END_LABEL %>"
-                     value="<%= @survey.join_cta_for_editor %>"
-                     onchange="this.form.requestSubmit()"
-                     style="width:100%;box-sizing:border-box;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
-            <% end %>
-            <div class="card-flag-note" style="margin-left:0;margin-top:8px;">
-              Clear any of the three to go back to the default wording.
+            <div class="card-flag-note" style="margin-left:24px;margin-top:8px;">
+              The wording is on the <strong>Ask them to join</strong> card in the deck,
+              under the thank-you screen.
             </div>
           <% end %>
         </details>

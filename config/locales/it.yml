@@ -1231,6 +1231,11 @@ it:
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
     ty_also_sees: "Vedranno anche"
+    join_card: "Invitali a iscriversi"
+    remove_join_card: "Rimuovi l'invito all'account"
+    join_title_label: "Titolo dell'invito"
+    join_body_label: "Messaggio dell'invito"
+    join_cta_label: "Pulsante dell'invito"
   dashboard_card:
     publish_warning: "Pubblicare “%{title}”? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."
     preview: "Anteprima"

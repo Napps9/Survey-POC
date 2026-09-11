@@ -2142,6 +2142,9 @@
    in the feed and the two are different jobs — one is what the respondent
    reads, the other is what their friends see. */
 .s-badge.gate-badge-share { background: #615BF5; }
+/* Brand teal — the account ask is drawn in the brand-tinted .join-card, so its
+   badge matches the card rather than the pink/purple pair either side. */
+.s-badge.gate-badge-join { background: #0E7C6B; }
 .gate-ty-card { margin-inline: auto; }
 .gate-editable { outline: none; border-radius: 6px; cursor: text; transition: box-shadow 0.15s; }
 .gate-editable:hover { box-shadow: 0 0 0 1px rgba(1,234,203,0.3); }
@@ -2310,10 +2313,17 @@
   font-family: "Alata", sans-serif; font-size: 1rem; color: #fff;
   text-align: start;
 }
-/* The facsimiles and the real inputs are one stack, so they need the column's
+/* The real inputs and the facsimiles are one stack, so they need the column's
    gaps rather than the pill row's centring. */
-.gate-ty-card .play-end-actions { gap: 10px; align-items: stretch; }
-.gate-ty-card .play-end-actions > div { display: flex; flex-direction: column; gap: 10px; }
+.gate-ty-card .play-end-actions { gap: 14px; align-items: stretch; }
+/* The facsimile group, under its own label and separated from the field above
+   it — the divider is what stops "They'll also see" reading as a caption for
+   the Link button. */
+.gate-ty-ghosts {
+  display: flex; flex-direction: column; gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
 .gate-ty-forward-label {
   font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
   color: rgba(255,255,255,0.6); letter-spacing: 0.02em;
@@ -2441,6 +2451,35 @@
 .gate-share-note {
   font-size: var(--text-xs); color: rgba(255,255,255,0.45); line-height: 1.45;
 }
+/* ── The account-ask card, in the feed ─────────────────────────────────────
+   The player's own .join-card, with three of its lines made editable. It keeps
+   that class so it cannot drift from the block it configures — the width, the
+   brand tint and the type are the respondent's, not a second set. Only the
+   editor-side affordances are added here. */
+/* Both classes, because .join-card's own 440px cap is declared later in this
+   file and would otherwise win on source order. */
+.join-card.gate-join-card {
+  margin-inline: auto;
+  /* 440 is the width of the player's action column; in the feed the card sits
+     alone and can breathe, without becoming a different shape. */
+  max-width: 520px;
+}
+/* The rows a respondent types into. Shown so the shape is honest, greyed and
+   inert so they never read as boxes the creator can fill. */
+.join-input.gate-join-ghost {
+  display: block;
+  /* Dim, because these two rows are the RESPONDENT's to fill. At .join-input's
+     own near-white they read as boxes the creator should be typing into. */
+  color: rgba(255,255,255,0.32);
+  pointer-events: none; user-select: none;
+}
+/* The button carries the creator's own label, so it is editable — but it must
+   still look like the pill it becomes. */
+.gate-join-card .join-btn.gate-editable {
+  display: inline-block; cursor: text; min-width: 120px; text-align: center;
+}
+.gate-join-card .join-fine { opacity: 0.6; }
+
 /* Structural edits are locked to the primary language, and the device frames
    preview only the question cards — hide the gate chrome in both, matching
    the add-question rows. */
@@ -6616,13 +6655,19 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   border-radius: 24px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.35);
   padding: 44px 44px 40px;
-  max-width: 520px;
+  /* The deck's own width — .split-card is 850px, so the last screen now agrees
+     with every screen before it. */
+  max-width: 850px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   text-align: center;
+  /* Auto margins take the spare room when there is any and collapse to zero
+     when there isn't, so a thank-you that fits stays centred exactly as it was
+     and only a too-tall one starts at the top of its scroll area. */
+  margin-block: auto;
 }
 .preview-thankyou-title {
   font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif)); font-size: 44px;
@@ -6630,7 +6675,7 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .preview-thankyou-sub {
   font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 16px;
-  color: rgba(255,255,255,0.45); max-width: 380px; line-height: 1.6;
+  color: rgba(255,255,255,0.45); max-width: 560px; line-height: 1.6;
 }
 /* The card is as wide as the deck; its CONTENTS are not, because a 750px line
    of prose is not readable and a 750px pill is not a button. The card gives
@@ -6652,76 +6697,31 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .thankyou-col { display: contents; }
 
 /* ── The end screen, on a desktop ──────────────────────────────────────────
-   Every question is answered in an 845px split card — image on one side,
-   question on the other — and the end screen was a 520px centred column, so
-   the last screen was the one screen that disagreed with all the ones before
-   it. It gets the same treatment: the message on the left, everything the
-   respondent can DO on the right.
+   Every question is answered in an 850px card, and the end screen used to be a
+   520px centred column — the one screen that disagreed with all the ones
+   before it, and on a 1440px desktop a phone-shaped strip.
 
-   980 rather than 845, because this split has no image to give up: the action
-   column stays exactly the 440px the join block, the leaderboard card and the
-   pills were designed at, and the message takes what is left. At 845 the
-   columns would have come out at 358px each and the block would have been
-   NARROWER than it is today, which is the opposite of the point.
+   It gets the deck's width, and that is the whole change: ONE column, wider.
+   There was a two-column split here for a day; it used the width by cutting
+   the content in half, which put a "they'll also see" label over a field the
+   creator edits and made the editor's copy of this card read as two unrelated
+   panels. Width was the ask, not columns.
 
-   A CONTAINER query, not a media query, and the difference is not academic.
-   This card is rendered in three places and only one of them is the width of
-   the window: the editor draws it inside a feed that loses 444px to the right
-   panel (.editor-grid.is-panel-open), so a 1280px window offers the card ~700px
-   and a viewport rule would hand 44px display type a 220px column. Asking "is
-   there room here" instead of "is the window wide" also fixes the portrait
-   iPad and the landscape phone, which the player's own mobile boundary
-   (see the complement pair further down) calls mobile while 768px called them
-   desktop.
+   No query of any kind is needed for it, which is the nice part. `width: 100%`
+   with a `max-width` already does the right thing everywhere the card is
+   drawn: the viewport on a phone, the feed in the editor (which loses 444px to
+   the right panel), 850 on a desktop. The container query, the `:has()`
+   scoping and the inline-size containment that went with the split are all
+   gone — machinery guarding a layout that no longer exists.
 
-   880 = 300 (a floor for the message) + 40 (gap) + 440 (the actions column the
-   join block and pills were drawn at) + 88 (the card's own padding) + slack. */
-.end-screen-frame {
-  container: end-screen / inline-size;
-  /* Inline-size containment needs a definite width — without this the frame
-     computes a zero inline size and takes the card with it. */
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  /* Auto margins take the spare room when there is any and collapse to zero
-     when there isn't, so a thank-you that fits stays centred exactly as it was
-     and only a too-tall one starts at the top of its scroll area. Lives on the
-     frame now that the frame is what the scroll area contains. */
-  margin-block: auto;
-}
+   What stays from that work is `.thankyou-col { display: contents }` above:
+   unconditional now, and the rule whose absence resized the phone player's
+   action column for a day. */
 
-/* Scoped with :has() rather than a modifier class, because the bug this
-   replaces was markup and CSS drifting apart and a modifier class is a THIRD
-   thing to keep in step — it fails the same way, by being added to a card whose
-   wrappers someone forgot. This says what is actually true: the split exists if
-   and only if the columns do, so a fourth copy that forgets them degrades to
-   the correct single-column card instead of scattering its children. */
-@container end-screen (min-width: 880px) {
-  .preview-thankyou-card:has(> .thankyou-col) {
-    max-width: 980px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 440px;
-    column-gap: 40px;
-    text-align: start;
-    /* The message column is centred against the actions beside it rather than
-       pinned to the top — two columns of very different heights read as a
-       mistake when the short one starts level with a tall one. */
-    align-items: center;
-  }
-  .preview-thankyou-card:has(> .thankyou-col) > .thankyou-col {
-    display: flex; flex-direction: column; min-width: 0;
-  }
-  .preview-thankyou-card:has(> .thankyou-col) > .thankyou-col-message { align-items: start; }
-  .preview-thankyou-card:has(> .thankyou-col) .preview-thankyou-sub { max-width: 100%; }
-  /* Already the flex column of pills it was; it just no longer needs to claim
-     the whole card, and it starts level with the title rather than 22px below
-     the paragraph that is now beside it. */
-  .preview-thankyou-card:has(> .thankyou-col) .play-end-actions { margin-top: 0; max-width: 100%; }
-  /* Spans both, under everything, still centred. */
-  .preview-thankyou-card:has(> .thankyou-col) > .play-powered {
-    grid-column: 1 / -1; justify-self: center; margin-top: 8px;
-  }
-}
+/* The contents do NOT take the full 850: a 850px line of prose is not readable
+   and a 850px pill is not a button. Everything in the action stack already
+   caps itself (.play-end-actions 460, .join-card 440, .leaderboard-card 340);
+   only the message needed raising, since 380 was drawn for a 520px card. */
 
 /* ── After the last card: end-screen actions and the post-finish panels ────
    These were built as inline `style="…font-size:11px…"` strings, half in

@@ -1231,6 +1231,11 @@ nl:
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
     ty_also_sees: "Ze zien ook"
+    join_card: "Vraag ze zich aan te melden"
+    remove_join_card: "Accountverzoek verwijderen"
+    join_title_label: "Kop van het verzoek"
+    join_body_label: "Bericht van het verzoek"
+    join_cta_label: "Knop van het verzoek"
   dashboard_card:
     publish_warning: "“%{title}” publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     preview: "Voorbeeld"

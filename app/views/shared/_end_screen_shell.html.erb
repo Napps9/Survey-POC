@@ -1,5 +1,5 @@
-<%# The end screen's SHAPE, in one place — frame, card, the two columns, and
-    the wordmark that spans them.
+<%# The end screen's SHAPE, in one place — the card, its two slots, and the
+    wordmark under them.
 
     Structure only, deliberately: this is NOT the `mode:` partial that
     shared/_card_component is. That pattern works for question cards because
@@ -12,15 +12,16 @@
     switch would be three templates in one file, and would leak dead
     player bindings into an editor that never mounts player_controller.
 
-    What actually broke was the shape: the desktop split went onto the shared
+    What actually broke was the shape: a desktop split went onto the shared
     .preview-thankyou-card class while only the player gained the two
-    .thankyou-col wrappers the grid expects, so the editor's flat children got
-    auto-placed across the columns. That is the invariant worth having exactly
-    one copy of, and it is twelve lines.
+    .thankyou-col wrappers the grid expected, so the editor's flat children got
+    auto-placed across the columns. The split is gone — the card is one wide
+    column now — but the lesson stands: the shape belongs in exactly one place,
+    and it is a dozen lines.
 
     Locals:
-      message:    captured content for the left column (required)
-      actions:    captured content for the right column (required)
+      message:    captured content for the message slot (required)
+      actions:    captured content for the actions slot (required)
       card_class: extra classes on the card, e.g. "gate-ty-card" (optional)
       card_attrs: extra attributes on the card, e.g. data targets (optional)
       powered:    render the "Powered by Playverto" wordmark (default true) %>
@@ -29,28 +30,17 @@
   card_attrs = local_assigns.fetch(:card_attrs, {})
   powered    = local_assigns.fetch(:powered, true)
 %>
-<%# The frame is what the split measures itself against — a container query,
-    not the window, because the editor draws this card in a feed that loses
-    444px to the right panel and a viewport rule would hand 44px display type a
-    220px column. It wraps the CARD only: on the player, .preview-thankyou also
-    holds the fixed .regions-overlay and the compare panel, and inline-size
-    containment on that would trap the full-screen map inside the thank-you. %>
-<div class="end-screen-frame">
-  <%= tag.div class: [ "preview-thankyou-card", card_class.presence ].compact, **card_attrs do %>
-    <%# Below the split these two are display:contents — invisible to layout,
-        so the card is the single flex column it has always been. Wrappers
-        rather than grid-placing the flat list, because half the player's
-        children are hidden until finish and auto-placement would leave holes
-        where they will be. %>
-    <div class="thankyou-col thankyou-col-message"><%= message %></div>
-    <div class="thankyou-col thankyou-col-actions"><%= actions %></div>
-    <% if powered %>
-      <%# A direct child of the card rather than of either column: in the split
-          it spans both and stays centred under them. %>
-      <div class="play-powered">
-        <span class="play-powered-text"><%= t("player.powered_by") %></span>
-        <%= image_tag "playverto.svg", alt: "", class: "play-powered-mark" %>
-      </div>
-    <% end %>
+<%= tag.div class: [ "preview-thankyou-card", card_class.presence ].compact, **card_attrs do %>
+  <%# display:contents — invisible to layout, so the card is one flex column
+      and these are purely this partial's two slots. They stay because the
+      partial's whole job is that the three surfaces agree on the shape, and
+      naming the halves is how a caller gets it right. %>
+  <div class="thankyou-col thankyou-col-message"><%= message %></div>
+  <div class="thankyou-col thankyou-col-actions"><%= actions %></div>
+  <% if powered %>
+    <div class="play-powered">
+      <span class="play-powered-text"><%= t("player.powered_by") %></span>
+      <%= image_tag "playverto.svg", alt: "", class: "play-powered-mark" %>
+    </div>
   <% end %>
-</div>
+<% end %>

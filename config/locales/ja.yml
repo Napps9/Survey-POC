@@ -1231,6 +1231,11 @@ ja:
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
     ty_also_sees: "ほかに表示されるもの"
+    join_card: "アカウント作成を案内"
+    remove_join_card: "アカウントの案内を削除"
+    join_title_label: "案内の見出し"
+    join_body_label: "案内の本文"
+    join_cta_label: "案内のボタン"
   dashboard_card:
     publish_warning: "「%{title}」を公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     preview: "プレビュー"

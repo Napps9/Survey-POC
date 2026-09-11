@@ -13,7 +13,8 @@ export default class extends Controller {
     "consentCta", "consentCard", "consentBody", "consentLeft",
     "tyCta", "tyCard", "tyTitle", "tyBody", "tyForwardUrl", "tyForwardLabel",
     "shareCta", "shareCard", "shareTitle", "shareStory", "shareMessage",
-    "shareTitleCount", "shareStoryCount", "shareMessageCount"
+    "shareTitleCount", "shareStoryCount", "shareMessageCount",
+    "joinCta", "joinCard", "joinTitle", "joinBody", "joinCtaText"
   ]
   static values = { url: String }
 
@@ -193,6 +194,35 @@ export default class extends Controller {
       count.textContent = `${used} / ${max}`
       count.classList.toggle("is-over", Number.isFinite(max) && used > max)
     })
+  }
+
+  // ── The account ask ───────────────────────────────────────────────────────
+  // No addJoin here on purpose. Turning the account ask ON can be REFUSED —
+  // a Verto that asks the neurodiversity question may not also collect an
+  // email — and the refusal comes back as a redirect, which _save's fetch
+  // follows and reads as 200. So the "+ Ask them to join" CTA is a real form
+  // submit in the template, and this controller only handles the off switch
+  // and the copy, neither of which can fail.
+  removeJoin() {
+    clearTimeout(this._joinTimer)
+    this.joinCardTarget.hidden = true
+    this.joinCtaTarget.hidden = false
+    // The copy is deliberately NOT cleared: turning the ask back on should
+    // return the creator's own words, not the house ones. join_prompt_enabled
+    // is what decides whether a respondent ever sees them.
+    this._save({ join_prompt_enabled: "0" })
+  }
+
+  // Captured at queue time rather than read when the timer fires — the same
+  // rule as the other three, and for the same reason.
+  queueJoinSave() {
+    clearTimeout(this._joinTimer)
+    const fields = {
+      join_title: this.joinTitleTarget.textContent.trim(),
+      join_body: this.joinBodyTarget.textContent.trim(),
+      join_cta: this.joinCtaTextTarget.textContent.trim()
+    }
+    this._joinTimer = setTimeout(() => this._save(fields), 900)
   }
 
   _saveThankyou() {

@@ -1231,6 +1231,11 @@ ar:
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
     ty_also_sees: "سيرون أيضًا"
+    join_card: "ادعُهم للانضمام"
+    remove_join_card: "إزالة طلب إنشاء الحساب"
+    join_title_label: "عنوان طلب الحساب"
+    join_body_label: "رسالة طلب الحساب"
+    join_cta_label: "زر طلب الحساب"
   dashboard_card:
     publish_warning: "نشر «%{title}»؟ بعد النشر تُقفل أسئلتها ولا يمكن تعديلها — تأكد أن كل شيء كما تريد تمامًا."
     preview: "معاينة"

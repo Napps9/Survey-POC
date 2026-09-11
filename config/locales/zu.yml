@@ -1251,6 +1251,11 @@ zu:
     why_condition_label: "Isimo esivumelayo"
     why_framework: "I-Playverto ifunda Ukwenza emhlabeni njengokulandelana — Ukwazi → Injongo → Amandla. Ukumaka umbuzo ngamunye kwenza “igebe lokusebenza” libonakale: lapho abantu bekwazi kodwa bengasebenzi, noma belungele kodwa bengakwazi."
     ty_also_sees: "Bazobona futhi"
+    join_card: "Bameme ukuthi bajoyine"
+    remove_join_card: "Susa isicelo se-akhawunti"
+    join_title_label: "Isihloko sesicelo"
+    join_body_label: "Umlayezo wesicelo"
+    join_cta_label: "Inkinobho yesicelo"
   dashboard_card:
     publish_warning: "Shicilela “%{title}”? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     preview: "Buka kuqala"

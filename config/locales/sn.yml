@@ -1241,6 +1241,11 @@ sn:
     why_condition_label: "Mamiriro Anobvumira"
     why_framework: "Playverto inoverenga Kuita Munyika serongedzero — Kuziva → Chinangwa → Simba. Kuisa mubvunzo wega wega pachinzvimbo chinoita kuti “mukaha wekutanga kuita” uonekwe: kwavanhu vachiziva asi vasingaiti, kana vakagadzirira asi vasingakwanisi."
     ty_also_sees: "Vachaonawo"
+    join_card: "Vakumbire kuti vabatane"
+    remove_join_card: "Bvisa chikumbiro cheakaundi"
+    join_title_label: "Musoro wechikumbiro"
+    join_body_label: "Meseji yechikumbiro"
+    join_cta_label: "Bhatani rechikumbiro"
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"

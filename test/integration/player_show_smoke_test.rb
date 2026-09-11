@@ -32,7 +32,7 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
     # Child chain, not a descendant match: the message column is the half that
     # went missing on the editor's copy of this card, and a descendant selector
     # would keep passing if the wrappers were dropped and the title reparented.
-    assert_select "[data-player-target='thankyou'] .end-screen-frame > .preview-thankyou-card > " \
+    assert_select "[data-player-target='thankyou'] > .preview-thankyou-card > " \
                   ".thankyou-col-message > [data-player-target='thankyouTitle']"
   end
 

@@ -166,17 +166,36 @@ class JoinPromptTest < ActionDispatch::IntegrationTest
     get survey_path(s)
     assert_response :success
     assert_match 'name="join_prompt_enabled"', response.body
-    assert_no_match(/name="join_title"/, response.body,
-      "three empty copy fields under an off switch is clutter, not configuration")
+    assert_select "[data-gate-cards-target='joinCard'][hidden]", 1,
+      "an off switch shows no card — the feed offers the CTA instead"
+    assert_select "[data-gate-cards-target='joinCta']:not([hidden])", 1
 
     s.update!(join_prompt_enabled: true)
     get survey_path(s)
 
-    assert_match 'name="join_title"', response.body
-    assert_match 'name="join_body"', response.body
-    assert_match 'name="join_cta"', response.body
-    assert_match "data-note-limit-recommended-value=\"#{Survey::RECOMMENDED_JOIN_TITLE}\"", response.body
-    assert_match "data-note-limit-max-value=\"#{Survey::MAX_JOIN_BODY}\"", response.body
+    assert_select "[data-gate-cards-target='joinCard']:not([hidden])", 1
+    assert_select "[data-gate-cards-target='joinCta'][hidden]", 1
+  end
+
+  # The copy used to be edited in this panel, in a collapsed disclosure — the
+  # one part of the account ask a creator writes, furthest from where they could
+  # see it. It moved to a card in the feed beside the thank-you card. It is NOT
+  # in both places: two surfaces writing the same columns is how the editor and
+  # the player drifted apart before.
+  test "the wording is edited on the card in the feed, not in the panel" do
+    s = survey(join_prompt_enabled: true)
+    admin_for(s.organisation)
+
+    get survey_path(s)
+    assert_response :success
+
+    assert_no_match(/name="join_title"/, response.body)
+    assert_no_match(/name="join_body"/, response.body)
+    assert_no_match(/name="join_cta"/, response.body)
+
+    %w[joinTitle joinBody joinCtaText].each do |target|
+      assert_select "[data-gate-cards-target='#{target}'][contenteditable='true']", 1
+    end
   end
 
   test "the fields are pre-filled with the resolved default, so a creator edits a real sentence" do

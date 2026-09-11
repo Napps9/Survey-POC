@@ -1,22 +1,17 @@
 require "application_system_test_case"
 
 # The end screen is drawn in three places — the player, the editor's in-feed
-# replica, and the Preview overlay — and `.preview-thankyou-card` is shared by
-# all three. When the desktop split was added it put `display: grid` on that
-# shared class and gave only the PLAYER the two `.thankyou-col` wrappers the
-# grid expects. The other two kept flat child lists, so grid auto-placement
-# dealt their children across the columns: the editor's thank-you title jumped
-# into the right-hand column beside the 🎉, and the share card became a 2x2.
+# replica, and the Preview overlay — and they share `.preview-thankyou-card`.
+# For one day there was a two-column desktop split on that shared class, given
+# only to the player, so the other two had their children auto-placed across
+# columns nobody chose. The split is gone; the card is one wide column
+# everywhere.
 #
-# Nothing failed. The whole 440-run system suite stayed green, because every
-# assertion about this card was about the player, and the player was the one
-# copy that had been updated.
-#
-# So the assertion this file exists for is structural rather than pictorial:
-# a card that is a grid must contain ONLY things the grid was designed to
-# place. That is true of all three copies, it is checkable without knowing what
-# any of them should look like, and it fails on the next copy somebody adds
-# without wrappers.
+# What is worth holding now is not "does it use a grid" but the property the
+# split was reaching for and kept breaking: THE EDITOR'S CARD AND THE PLAYER'S
+# ARE THE SAME CARD. If they ever compute a different width at the same
+# viewport, the editor has stopped showing the creator what a respondent will
+# meet — which is the complaint that started all of this.
 class EndScreenLayoutTest < ApplicationSystemTestCase
   CARDS = [
     { "type" => "welcome_card", "title" => "Welcome" },
@@ -81,6 +76,20 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
                  "scattering them across the columns:\n  #{scrambled.join("\n  ")}"
   end
 
+  # gate-cards debounces its POST by 900ms, so a freshly typed value is not on
+  # the row the instant the keystroke lands. Poll rather than sleep a fixed
+  # amount: a fixed sleep is either flaky or slow, and usually both.
+  def eventually(timeout: 6)
+    deadline = Time.now + timeout
+    loop do
+      return true if yield
+      break if Time.now > deadline
+
+      sleep 0.15
+    end
+    false
+  end
+
   def card_metrics
     page.evaluate_script(<<~JS)
       (() => {
@@ -101,20 +110,22 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     JS
   end
 
-  # ── The player ────────────────────────────────────────────────────────────
+  # ── One column, at the deck's width ──────────────────────────────────────
 
-  test "the player's end screen splits on a desktop and stacks on a phone" do
+  test "the player's end screen is one wide column on a desktop" do
     with_viewport(1440, 900, mobile: false) do
       play_to_the_end
-      assert_no_scrambled_cards "player at 1440x900"
-
       m = card_metrics
-      assert_equal "grid", m["display"], "the desktop end screen should be the two-column split"
-      assert_equal 2, m["tracks"], "expected exactly two grid tracks, got #{m['tracks']}"
-      assert_operator m["messageWidth"], :>=, 280,
-                      "the message column came out at #{m['messageWidth']}px — 44px display type " \
-                      "needs room, and a column this narrow means the split fired somewhere it " \
-                      "does not fit"
+
+      refute_equal "grid", m["display"],
+                   "the end screen is one column — a split here is the layout that kept " \
+                   "scrambling the editor's copy of this card"
+      assert_operator m["cardWidth"], :>=, 800,
+                      "the card should take the deck's width (850) rather than sitting as a " \
+                      "520px strip on a 1440px screen — that was the original complaint"
+      assert_operator m["messageWidth"], :<=, 620,
+                      "the card is wide but a #{m['messageWidth']}px line of prose is not " \
+                      "readable; the message stays capped inside it"
     end
   end
 
@@ -122,31 +133,15 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_viewport(390, 844) do
       play_to_the_end
       m = card_metrics
-      refute_equal "grid", m["display"], "a phone end screen should be the single flex column"
-      # The base rule. Without it the wrappers are real boxes shrink-to-fitting
-      # inside a centred flex column, and every percentage width in the card
+      refute_equal "grid", m["display"]
+      # Without this the wrappers are real boxes shrink-to-fitting inside a
+      # centred flex column, and every percentage width in the card
       # (.play-end-actions, .leaderboard-card, .join-card) resolves against the
-      # wrapper instead of the card.
+      # wrapper instead of the card. It resized the phone player for a day.
       assert_equal "contents", m["colDisplay"],
-                   ".thankyou-col must be display:contents outside the split, or the card is no " \
-                   "longer the flex column its children are sized against"
-    end
-  end
-
-  # A portrait iPad and a landscape phone are the two shapes the player's own
-  # mobile boundary calls mobile. The split used to be keyed to a bare
-  # `min-width: 768px`, which called both of them desktop and handed 44px type a
-  # column barely wider than a word.
-  test "the shapes the player already calls mobile do not get the split" do
-    [ [ 768, 1024, "portrait tablet" ], [ 844, 390, "landscape phone" ] ].each do |w, h, label|
-      with_viewport(w, h) do
-        play_to_the_end
-        m = card_metrics
-        next if m["display"] != "grid"
-
-        assert_operator m["messageWidth"], :>=, 280,
-                        "#{label} (#{w}x#{h}): split with a #{m['messageWidth']}px message column"
-      end
+                   ".thankyou-col must be display:contents, or the card is no longer the flex " \
+                   "column its children are sized against"
+      assert_operator m["cardWidth"], :<=, 390
     end
   end
 
@@ -179,10 +174,37 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     end
   end
 
-  # The replica is only worth the name if the parts land where the player puts
-  # them. Geometry rather than screenshots: the message and the actions are in
-  # different columns, and nothing has drifted back into the wrong one.
-  test "the editor's thank-you card is laid out like the player's end screen" do
+  # THE invariant. The editor's card and the player's card are the same card,
+  # so at the same viewport they must come out the same width. Every version of
+  # this bug — the scrambled columns, the 520px strip beside an 850px deck —
+  # was this property quietly failing, and it is checkable without knowing what
+  # either is supposed to look like.
+  test "the editor's card and the player's card are the same card" do
+    [ 1440, 1152 ].each do |width|
+      player_width = nil
+      with_viewport(width, 950, mobile: false) do
+        play_to_the_end
+        player_width = card_metrics["cardWidth"]
+      end
+
+      sign_in_as @user
+      editor_width = nil
+      with_viewport(width, 950, mobile: false) do
+        visit survey_path(@survey)
+        assert_selector ".gate-ty-card", wait: 8
+        editor_width = page.evaluate_script(
+          "Math.round(document.querySelector('.gate-ty-card').getBoundingClientRect().width)"
+        )
+      end
+
+      assert_in_delta player_width, editor_width, 2,
+                      "at #{width}px the player's end screen is #{player_width}px and the " \
+                      "editor's replica is #{editor_width}px — the editor has stopped showing " \
+                      "the creator the thing a respondent will meet"
+    end
+  end
+
+  test "the editor's thank-you card puts what you edit above what they also see" do
     sign_in_as @user
     with_viewport(1440, 950, mobile: false) do
       visit survey_path(@survey)
@@ -192,34 +214,83 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
         (() => {
           const card = document.querySelector('.gate-ty-card')
           const r = s => { const el = card.querySelector(s); return el ? el.getBoundingClientRect() : null }
-          const title = r('.preview-thankyou-title'), body = r('.preview-thankyou-sub')
-          const url = r('#ty-forward-url')
+          const url = r('#ty-forward-url'), ghosts = r('.gate-ty-ghosts')
           return {
-            display: getComputedStyle(card).display,
-            tracks: getComputedStyle(card).gridTemplateColumns.trim().split(/\\s+/).length,
-            messageWidth: Math.round(r('.thankyou-col-message').width),
-            titleLeft: title && Math.round(title.left),
-            bodyLeft: body && Math.round(body.left),
-            urlLeft: url && Math.round(url.left),
-            titleRight: title && Math.round(title.right),
-            emoji: !!card.querySelector('.preview-thankyou-emoji')
+            urlBottom: url && Math.round(url.bottom),
+            ghostsTop: ghosts && Math.round(ghosts.top),
+            emoji: !!card.querySelector('.preview-thankyou-emoji'),
+            joinGhost: !!card.querySelector('.gate-ty-ghost-card')
           }
         })()
       JS
 
-      assert_equal "grid", m["display"], "the replica should use the same split as the player"
-      assert_equal 2, m["tracks"]
-      assert_operator m["messageWidth"], :>=, 280,
-                      "message column is #{m['messageWidth']}px — the editor's card is narrower " \
-                      "than the window by the width of the right panel, which is why this is a " \
-                      "container query and not a media query"
-      assert_in_delta m["titleLeft"], m["bodyLeft"], 1,
-                      "title and body should share the message column's left edge"
-      assert_operator m["urlLeft"], :>=, m["titleRight"],
-                      "the link-button input belongs in the actions column, to the right of the " \
-                      "message — if it is not, the wrappers are gone and grid auto-placement is back"
+      # The label used to sit ABOVE the Link button inputs, captioning the one
+      # editable thing in the column as though it were a preview.
+      assert_operator m["ghostsTop"], :>=, m["urlBottom"],
+                      "'They'll also see' must sit below the field the creator edits, not above it"
       refute m["emoji"], "the player has no 🎉, so a replica that shows one is not a replica"
+      refute m["joinGhost"],
+             "the account ask has its own editable card in the feed now — a greyed facsimile of " \
+             "it here would be a second, dead copy"
     end
+  end
+
+  # ── The account ask, which is edited in the feed rather than a side panel ──
+
+  test "the account-ask card appears when the ask is on, and carries the copy" do
+    sign_in_as @user
+    visit survey_path(@survey)
+    assert_selector ".gate-join-card", wait: 8
+
+    assert_selector "[data-gate-cards-target='joinCard']:not([hidden])"
+    assert_selector "[data-gate-cards-target='joinCta'][hidden]", visible: :all
+    # The three the creator owns are editable...
+    %w[joinTitle joinBody joinCtaText].each do |target|
+      assert_selector "[data-gate-cards-target='#{target}'][contenteditable='true']"
+    end
+    # ...and the respondent's own rows are shown but inert, so the shape is
+    # honest without pretending the boxes work. Both of them: the password row
+    # arrived with the choose-a-password change.
+    assert_selector ".gate-join-card .gate-join-ghost", count: 2
+  end
+
+  test "the account-ask card is absent when the ask is off" do
+    @survey.update_columns(join_prompt_enabled: false)
+    sign_in_as @user
+    visit survey_path(@survey)
+    assert_selector "[data-gate-cards-target='joinCta']:not([hidden])", wait: 8
+    assert_selector "[data-gate-cards-target='joinCard'][hidden]", visible: :all
+  end
+
+  test "the copy is edited in the feed, not in the publish panel" do
+    sign_in_as @user
+    visit survey_path(@survey)
+    assert_selector ".gate-join-card", wait: 8
+    # Two surfaces writing the same columns is how the editor and the player
+    # drifted apart before; the panel keeps the switch and nothing else.
+    assert_no_selector "input[name='join_title']", visible: :all
+    assert_no_selector "textarea[name='join_body']", visible: :all
+    assert_no_selector "input[name='join_cta']", visible: :all
+  end
+
+  test "editing the heading saves, and removing keeps it for next time" do
+    sign_in_as @user
+    visit survey_path(@survey)
+    assert_selector ".gate-join-card", wait: 8
+    dismiss_live_warning
+
+    find("[data-gate-cards-target='joinTitle']").click
+    page.send_keys("Keep your results")
+    assert eventually { @survey.reload.join_title == "Keep your results" },
+           "the heading should autosave; the row still says #{@survey.reload.join_title.inspect}"
+
+    find("[data-action*='gate-cards#removeJoin']").click
+    assert_selector "[data-gate-cards-target='joinCta']:not([hidden])", wait: 5
+    assert eventually { !@survey.reload.join_prompt_enabled? },
+           "removing the card turns the ask off"
+    assert_equal "Keep your results", @survey.join_title,
+                 "the creator's words are kept — turning the ask back on should not hand them " \
+                 "the house copy instead"
   end
 
   test "the preview overlay's end screen is not scrambled" do

@@ -1233,6 +1233,11 @@ ru:
     why_condition_label: "Enabling condition"
     why_framework: "Playverto reads Acting in the world as a sequence — Awareness → Intention → Agency. Tagging each question makes the “activation gap” visible: where people are aware but not acting, or ready but not able."
     ty_also_sees: "Также увидят"
+    join_card: "Предложите им присоединиться"
+    remove_join_card: "Убрать предложение аккаунта"
+    join_title_label: "Заголовок предложения"
+    join_body_label: "Текст предложения"
+    join_cta_label: "Кнопка предложения"
   dashboard_card:
     publish_warning: "Опубликовать «%{title}»? После публикации вопросы будут заблокированы и недоступны для редактирования — убедитесь, что всё именно так, как вы хотите."
     preview: "Предпросмотр"
