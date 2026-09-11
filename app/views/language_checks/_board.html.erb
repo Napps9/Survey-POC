@@ -1,0 +1,137 @@
+<%# The Language check board — every card's wording, one line per language.
+    Rendered by BOTH the creator's screen and the public reviewer link, so
+    there is one renderer for one screen and the two can never drift about
+    what a badge means or which languages a line has.
+
+    Locals:
+      survey    — the Verto
+      cards     — LanguageCheckLines.for(survey)
+      locales   — the languages this viewer may ACT on (a link's scope, or all)
+      checks    — LanguageCheck.index_for(survey), keyed [cid, locale]
+      notes     — LanguageCheckNote.index_for(survey), keyed [cid, locale]
+      editable  — whether this viewer may rewrite the wording
+      post_url  — where a line's actions post
+      filter    — "all" | "pending" | "changes" | "stale" | a locale code
+%>
+<%
+  primary = survey.default_locale
+  # The primary line is ALWAYS drawn, even for a link scoped to one secondary
+  # language — read-only there, but drawn. Checking a translation means
+  # comparing it against something, and a reviewer shown only the Spanish is
+  # being asked whether it is good Spanish rather than whether it says what the
+  # question says. Acting on it is a separate question, answered by `locales`
+  # and enforced server-side in RecordsLanguageChecks#review_scope.
+  shown_locales = ([ primary ] + locales).uniq & survey.verto_locales
+
+  # Every line's state, computed once: the progress strip, the filter counts and
+  # each badge are three readings of ONE answer, and computing it three times is
+  # how they end up disagreeing.
+  states = {}
+  cards.each do |card|
+    source        = card[:lines].find { |l| l[:primary] }
+    source_digest = source && LanguageCheckLines.digest(source[:content])
+    card[:lines].each do |line|
+      next unless shown_locales.include?(line[:locale])
+      digest = LanguageCheckLines.digest(line[:content])
+      row    = checks[[ card[:cid], line[:locale] ]]
+      states[[ card[:cid], line[:locale] ]] = {
+        state:  LanguageCheck.state_for(row, digest, line[:primary] ? nil : source_digest),
+        row:    row,
+        digest: digest
+      }
+    end
+  end
+
+  # Progress counts the lines this viewer is actually responsible for. A
+  # Spanish reviewer's bar must not sit at a third full because the French
+  # they cannot see is untouched.
+  mine     = states.select { |(_, locale), _| locales.include?(locale) }
+  total    = mine.size
+  approved = mine.count { |_, v| v[:state] == "approved" }
+  flagged  = mine.count { |_, v| v[:state] == "changes_requested" }
+  stale    = mine.count { |_, v| v[:state] == "stale" }
+  filter   = params[:filter].presence || "all"
+%>
+
+<div class="lc-progress" role="status">
+  <div class="lc-progress-bar" aria-hidden="true">
+    <span style="width: <%= total.zero? ? 0 : (approved * 100.0 / total).round %>%;"></span>
+  </div>
+  <div class="lc-progress-text">
+    <strong><%= t("language_check.progress", approved: approved, total: total) %></strong>
+    <% if flagged.positive? %><span class="lc-count lc-count--flagged"><%= t("language_check.count_flagged", count: flagged) %></span><% end %>
+    <% if stale.positive? %><span class="lc-count lc-count--stale"><%= t("language_check.count_stale", count: stale) %></span><% end %>
+  </div>
+</div>
+
+<%# Filters are links, not JavaScript: the page is one server render and a
+    reviewer arriving on a phone from a messaging app gets a working filter
+    before any script has run. %>
+<div class="lc-filters" role="group" aria-label="<%= t("language_check.filter_label") %>">
+  <% [ [ "all", t("language_check.filter_all") ],
+       [ "pending", t("language_check.filter_pending") ],
+       [ "changes", t("language_check.filter_changes") ],
+       [ "stale", t("language_check.filter_stale") ] ].each do |value, label| %>
+    <a class="lc-filter<%= ' is-active' if filter == value %>"
+       href="<%= url_for(filter: (value == "all" ? nil : value)) %>"><%= label %></a>
+  <% end %>
+  <% if locales.size > 1 %>
+    <% locales.each do |code| %>
+      <% loc = SupportedLocales.find(code) %>
+      <a class="lc-filter<%= ' is-active' if filter == code %>"
+         href="<%= url_for(filter: code) %>"><%= loc&.flag %> <%= code.upcase %></a>
+    <% end %>
+  <% end %>
+</div>
+
+<% shown = 0 %>
+<% cards.each do |card| %>
+  <%
+    # The filter picks which of this viewer's OWN lines to show. The primary
+    # line rides along with whatever survives, as the source they are reading
+    # against — filtering it out would leave a Spanish line with nothing to
+    # compare to, which is the one thing this screen exists to prevent.
+    matched = card[:lines].select do |line|
+      next false unless locales.include?(line[:locale])
+      state = states[[ card[:cid], line[:locale] ]][:state]
+      case filter
+      when "pending" then state == "pending"
+      when "changes" then state == "changes_requested"
+      when "stale"   then state == "stale"
+      when "all"     then true
+      else line[:locale] == filter
+      end
+    end
+    visible =
+      if matched.empty?
+        []
+      else
+        card[:lines].select do |line|
+          shown_locales.include?(line[:locale]) &&
+            (line[:primary] || matched.include?(line))
+        end
+      end
+  %>
+  <% next if visible.empty? %>
+  <% shown += 1 %>
+
+  <section class="lc-card" id="card-<%= card[:cid] %>">
+    <div class="lc-card-head">
+      <span class="lc-card-num"><%= t("language_check.card_number", number: card[:index] + 1) %></span>
+      <span class="lc-card-type"><%= CardTypes.badge(card[:type]) %></span>
+    </div>
+
+    <% visible.each do |line| %>
+      <%= render "language_checks/line",
+                 survey: survey, card: card, line: line, primary: primary,
+                 meta: states[[ card[:cid], line[:locale] ]],
+                 notes: notes[[ card[:cid], line[:locale] ]] || [],
+                 actionable: locales.include?(line[:locale]),
+                 editable: editable, post_url: post_url, filter: filter %>
+    <% end %>
+  </section>
+<% end %>
+
+<% if shown.zero? %>
+  <p class="lc-empty"><%= t("language_check.nothing_matches") %></p>
+<% end %>

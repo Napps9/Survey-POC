@@ -47,8 +47,8 @@ module EnglishSpellings
   IDENTICAL = %w[
     analysis audience audiences confidence democratise difference differences
     ellis experience experiences neurodivergence otherwise preference
-    preferences promise raised recalled respelling sentence sequence sequences
-    spelled yours
+    preferences promise raised recalled reference respelling sentence sequence
+    sequences spelled yours
   ].freeze
 
   # An i18n interpolation name is CODE, not prose. `%{organisations}` is a Ruby

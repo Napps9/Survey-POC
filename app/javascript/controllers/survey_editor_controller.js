@@ -93,7 +93,15 @@ export default class extends Controller {
     // First-class named flows ({id, name, color, exit} — Survey#flows_list).
     // Copied to a mutable working set in connect(); serialize() sends it back.
     flows: { type: Array, default: [] },
-    live: { type: Boolean, default: false }
+    live: { type: Boolean, default: false },
+    // The wording revision this page was rendered at. Sent back with every
+    // save so the server can tell which translations the Language check screen
+    // has changed since: serialize() rebuilds every language's i18n entry from
+    // a store seeded at page load, so without this a tab older than a
+    // reviewer's fix would write the old wording back over it. The number is
+    // never updated client-side — a page that has not reloaded has not seen
+    // anything newer, which is exactly what it is meant to admit.
+    translationsRevision: { type: Number, default: 0 }
   }
 
   // Largest body flushSave will entrust to a keepalive request on unload. The
@@ -2275,7 +2283,11 @@ export default class extends Controller {
              // only when tokenisation is on at page load, so a page from
              // before it was switched on provably knows nothing about tokens
              // and the server must not read its silence as deletion.
-             tokens_authoritative: !!this.tokenisationValue }
+             tokens_authoritative: !!this.tokenisationValue,
+             // The wording revision this page was rendered at — see the value's
+             // own comment. Absent on an older cached client, which the server
+             // reads as maximally stale rather than as up to date.
+             translations_revision: this.translationsRevisionValue }
   }
 
   // ── Quiz: correct-answer marking ─────────────────────────────────────────

@@ -471,6 +471,15 @@ class SurveysController < ApplicationController
       # exactly as it always has. Before the flow compile, so the compile sees
       # the final deck.
       attrs[:cards] = Survey.keep_setup_media(survey.cards, attrs[:cards]) if survey.setup_pending?
+      # The Language check screen writes wording straight into the deck, and a
+      # reviewer's link is live while the creator has the editor open. This page
+      # rebuilds every card — every language's i18n entry included — from a
+      # store seeded at page load, so a tab older than a reviewer's fix would
+      # write the old wording back over it. It sends the revision it was
+      # rendered at; anything edited since is carried forward from the database
+      # for exactly those (cid, locale) pairs. Everything the client could
+      # actually see still wins. See Survey.keep_reviewed_translations.
+      attrs[:cards] = keep_reviewed_translations(survey, attrs[:cards], payload["translations_revision"])
       # First-class flows compile down to the per-card `next` pointers the
       # player resolves (see FlowCompiler). Run on every save so the STORED
       # deck can never disagree with the stored flows, whatever the client
@@ -1611,6 +1620,22 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  # The (cid, locale) pairs the Language check screen has edited since the
+  # revision the editor page was rendered at. A payload with no revision in it
+  # is an editor from before this shipped: it is treated as maximally stale, so
+  # a reviewer's edit is never lost to a cached page.
+  def keep_reviewed_translations(survey, incoming, client_revision)
+    return incoming if survey.translations_revision.zero?
+
+    since = client_revision.nil? ? 0 : client_revision.to_i
+    return incoming if since >= survey.translations_revision
+
+    pairs = LanguageCheck.where(survey_id: survey.id)
+                         .where("edit_revision > ?", since)
+                         .pluck(:cid, :locale)
+    Survey.keep_reviewed_translations(survey.cards, incoming, pairs, primary: survey.default_locale)
+  end
 
   # The top few choice-question movements between a baseline and a latest
   # wave: for each question's baseline-leading option, how its share moved

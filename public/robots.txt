@@ -33,6 +33,7 @@
 
 User-agent: *
 Disallow: /test/
+Disallow: /language-check/
 Disallow: /invites/
 Disallow: /funder_invites/
 Disallow: /blazer

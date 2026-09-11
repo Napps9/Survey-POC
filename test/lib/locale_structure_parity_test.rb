@@ -21,13 +21,22 @@ require "test_helper"
 # LocaleRespondentParityTest instead — `player` as a whole is 61 keys, and not
 # all of them are this feature's.
 #
+# `language_check` joined on the same terms (80 keys × 24 locales, backfilled
+# with the namespace). It has the strongest claim of any of them: the Language
+# check screen is handed to people OUTSIDE the account through a share link,
+# who have never seen this product, and half of them are there precisely
+# because they do not read English. A hole in this namespace shows a French
+# reviewer an English button — on the one page whose entire subject is whether
+# the words are right in their language.
+#
 # Widening this to EVERY namespace is still desirable and still needs the
 # remaining backfill first: `editor.*` carries a handful of keys missing from
 # 18-24 locales, left by other work.
 class LocaleStructureParityTest < ActiveSupport::TestCase
   NAMESPACES = %w[js defaults card templates demographics ask unsubscribe
                   you player_sign_in player_session player_sign_in_mailer
-                  player_notification_mailer player_unsubscribe].freeze
+                  player_notification_mailer player_unsubscribe
+                  language_check].freeze
 
   def locale_files
     Dir[Rails.root.join("config/locales/*.yml")]

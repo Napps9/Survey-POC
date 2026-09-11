@@ -13530,3 +13530,227 @@ body.generating-overlay-active .bottom-bar { display: none; }
   text-decoration: underline; text-underline-offset: 3px;
 }
 .you-link-quiet { color: rgba(255,255,255,.38); }
+
+/* ── Language check ────────────────────────────────────────────────────────
+   The wording-review screen (/surveys/:id/language_check) and the public
+   reviewer link it hands out (/language-check/:token). One stylesheet for
+   both, because they render the same board partial and a reviewer and a
+   creator looking at the same line should see the same thing.
+
+   Plain CSS on Playverto-dark rather than Tailwind utilities, matching the
+   player/dashboard files this sits beside. Sized for a phone first: a review
+   link is overwhelmingly opened from a message, on a handset, by somebody who
+   has never seen this product before. */
+.lc-page { min-height: 100%; background: #1C2034; color: #F7F7F7; }
+.lc-wrap { max-width: 840px; margin: 0 auto; padding: 28px 16px 72px; }
+.lc-wrap--narrow { max-width: 560px; }
+
+.lc-top { margin-bottom: 22px; }
+.lc-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.lc-back {
+  display: inline-block; margin-bottom: 12px; font-size: 13px;
+  color: rgba(255,255,255,.55); text-decoration: none;
+}
+.lc-back:hover { color: #01EACB; }
+.lc-title { font-family: "Alata", sans-serif; font-size: 25px; line-height: 1.25; margin: 0 0 6px; font-weight: 400; }
+.lc-sub { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.55; margin: 0 0 4px; }
+.lc-sub--quiet { color: rgba(255,255,255,.42); font-size: 13px; }
+
+/* Progress — how much of this Verto's wording has actually been signed off.
+   The one number a creator opens this screen to see. */
+.lc-progress { margin: 0 0 14px; }
+.lc-progress-bar {
+  height: 6px; border-radius: 100px; background: rgba(255,255,255,.09); overflow: hidden;
+}
+.lc-progress-bar span {
+  display: block; height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, #01EACB, #6EE7D8); transition: width .3s;
+}
+.lc-progress-text {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-top: 8px; font-size: 13px; color: rgba(255,255,255,.62);
+}
+.lc-progress-text strong { font-family: "Alata", sans-serif; font-weight: 400; color: #fff; }
+.lc-count { font-size: 12px; }
+.lc-count--flagged { color: #FBBF24; }
+.lc-count--stale { color: #FB923C; }
+
+.lc-filters { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 20px; }
+.lc-filter {
+  padding: 5px 12px; border-radius: 100px; font-size: 12.5px; text-decoration: none;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.7);
+}
+.lc-filter:hover { border-color: rgba(1,234,203,.45); color: #fff; }
+.lc-filter.is-active { background: rgba(1,234,203,.14); border-color: rgba(1,234,203,.5); color: #01EACB; }
+
+/* One card, with a line per language stacked inside it. The card is the unit a
+   reviewer reads: one question, every language, top to bottom. */
+.lc-card {
+  background: rgba(22,26,44,.93); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 16px; margin-bottom: 14px; overflow: hidden;
+}
+.lc-card-head {
+  display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.02);
+}
+.lc-card-num { font-family: "Alata", sans-serif; font-size: 12px; color: rgba(255,255,255,.45); letter-spacing: .06em; }
+.lc-card-type {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+  color: rgba(255,255,255,.4);
+}
+
+.lc-line { padding: 15px 16px; border-top: 1px solid rgba(255,255,255,.06); }
+.lc-line:first-of-type { border-top: 0; }
+/* The primary language reads as the source it is: a left rule in the brand
+   teal, so a reviewer scanning down a long page can always tell at a glance
+   which line everything below it is a translation OF. */
+.lc-line--primary { border-left: 3px solid rgba(1,234,203,.55); background: rgba(1,234,203,.03); }
+.lc-line--approved { border-left: 3px solid rgba(52,211,153,.5); }
+.lc-line--changes_requested { border-left: 3px solid rgba(251,191,36,.6); }
+.lc-line--stale { border-left: 3px solid rgba(251,146,60,.6); }
+.lc-line.is-focused { background: rgba(255,255,255,.03); }
+
+.lc-line-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+.lc-lang { display: inline-flex; align-items: center; gap: 7px; }
+.lc-flag { font-size: 15px; }
+.lc-lang-name { font-family: "Alata", sans-serif; font-size: 13.5px; color: rgba(255,255,255,.85); }
+
+.lc-chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 100px;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.6);
+}
+.lc-chip--primary { background: rgba(1,234,203,.14); border-color: rgba(1,234,203,.4); color: #01EACB; }
+.lc-chip--edit { background: rgba(1,234,203,.12); border-color: rgba(1,234,203,.35); color: #01EACB; }
+.lc-chip--read { background: rgba(255,255,255,.06); color: rgba(255,255,255,.6); }
+.lc-chip--paused { background: rgba(251,191,36,.14); border-color: rgba(251,191,36,.4); color: #FBBF24; }
+
+.lc-state {
+  margin-left: auto; font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+  padding: 3px 9px; border-radius: 100px;
+}
+.lc-state--pending { color: rgba(255,255,255,.45); background: rgba(255,255,255,.05); }
+.lc-state--approved { color: #34D399; background: rgba(52,211,153,.12); }
+.lc-state--changes_requested { color: #FBBF24; background: rgba(251,191,36,.12); }
+.lc-state--stale { color: #FB923C; background: rgba(251,146,60,.12); }
+
+.lc-untranslated {
+  margin: 0 0 9px; font-size: 12px; color: #FB923C;
+  padding: 6px 10px; border-radius: 9px;
+  background: rgba(251,146,60,.08); border: 1px solid rgba(251,146,60,.25);
+}
+
+.lc-words { display: flex; flex-direction: column; gap: 10px; }
+.lc-field { display: flex; flex-direction: column; gap: 4px; }
+.lc-field-label {
+  font-family: "Alata", sans-serif; font-size: 10px; text-transform: uppercase;
+  letter-spacing: .09em; color: rgba(255,255,255,.35);
+}
+/* Marks ONE field that fell back to the primary language on an otherwise
+   translated line — a card can be translated everywhere but its sub-text. */
+.lc-field-fallback {
+  display: inline-block; margin-inline-start: 6px; padding: 1px 6px; border-radius: 100px;
+  background: rgba(251,146,60,.12); border: 1px solid rgba(251,146,60,.3); color: #FB923C;
+  font-size: 9px; letter-spacing: .06em;
+}
+.lc-line--primary .lc-field-fallback { display: none; }
+
+.lc-text { margin: 0; font-size: 14.5px; line-height: 1.55; color: rgba(255,255,255,.82); }
+.lc-text--lead { font-size: 16px; color: #fff; }
+.lc-list { margin: 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 3px; }
+.lc-list li { font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,.72); }
+.lc-list--pages li { font-size: 13px; color: rgba(255,255,255,.66); }
+
+.lc-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.lc-verb-form { display: inline-flex; gap: 8px; }
+.lc-btn {
+  padding: 7px 15px; border-radius: 100px; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 13px; line-height: 1.2;
+  border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff;
+  transition: background .15s, border-color .15s;
+}
+.lc-btn:hover { background: rgba(255,255,255,.12); }
+.lc-btn--approve { background: #01EACB; border-color: #01EACB; color: #1C2034; }
+.lc-btn--approve:hover { background: #00C4AB; }
+.lc-btn--flag { background: rgba(251,191,36,.14); border-color: rgba(251,191,36,.45); color: #FBBF24; }
+.lc-btn--flag:hover { background: rgba(251,191,36,.22); }
+.lc-btn--ghost { background: transparent; color: rgba(255,255,255,.72); }
+.lc-btn:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+
+.lc-byline { margin: 8px 0 0; font-size: 11.5px; color: rgba(255,255,255,.38); }
+
+/* 16px inputs throughout: anything smaller makes iOS Safari zoom the page on
+   focus, and a reviewer retyping a Spanish option on a phone hits one every
+   few seconds. Same reason as .you-input above. */
+.lc-input {
+  display: block; width: 100%; box-sizing: border-box;
+  font-family: "ABeeZee", sans-serif; font-size: 1rem; line-height: 1.5;
+  padding: 9px 12px; border-radius: 10px; color: #fff; resize: vertical;
+  background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.24);
+}
+.lc-input::placeholder { color: rgba(255,255,255,.42); }
+.lc-input:focus-visible { outline: 2px solid #01EACB; outline-offset: 1px; border-color: #01EACB; }
+
+.lc-edit {
+  margin-top: 13px; padding: 13px; border-radius: 12px;
+  background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.1);
+}
+.lc-edit-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.lc-note-hint { margin: 6px 0 0; font-size: 12px; color: rgba(255,255,255,.42); line-height: 1.5; }
+
+.lc-notes {
+  margin-top: 13px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,.1);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.lc-note { padding: 9px 12px; border-radius: 10px; background: rgba(255,255,255,.04); }
+.lc-note.is-resolved { opacity: .5; }
+.lc-note-body { margin: 0; font-size: 13.5px; line-height: 1.55; color: rgba(255,255,255,.8); white-space: pre-wrap; }
+.lc-note-by { margin: 5px 0 0; font-size: 11.5px; color: rgba(255,255,255,.38); }
+.lc-note-form { display: flex; flex-direction: column; gap: 8px; }
+.lc-note-form .lc-btn { align-self: flex-start; }
+
+.lc-empty, .lc-blank-sub { font-size: 14px; color: rgba(255,255,255,.55); line-height: 1.6; }
+.lc-blank {
+  padding: 28px 20px; border-radius: 16px; text-align: center;
+  background: rgba(22,26,44,.93); border: 1px solid rgba(255,255,255,.1);
+}
+.lc-blank p { margin: 0 0 8px; }
+.lc-blank .lc-btn { margin-top: 10px; }
+
+/* Reviewer links — the half of the creator's screen that does the sending. */
+.lc-links { margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.1); }
+.lc-links-title { font-family: "Alata", sans-serif; font-size: 18px; font-weight: 400; margin: 0 0 6px; }
+.lc-links-sub { font-size: 13.5px; color: rgba(255,255,255,.55); line-height: 1.6; margin: 0 0 16px; }
+.lc-links-error { font-size: 13px; color: #F87171; margin: 0 0 12px; }
+.lc-link {
+  padding: 13px 15px; border-radius: 14px; margin-bottom: 11px;
+  background: rgba(22,26,44,.93); border: 1px solid rgba(255,255,255,.1);
+}
+.lc-link.is-paused { opacity: .62; }
+.lc-link-head { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-bottom: 10px; }
+.lc-link-name { font-family: "Alata", sans-serif; font-size: 14.5px; }
+.lc-link-tags { display: inline-flex; flex-wrap: wrap; gap: 5px; margin-left: auto; }
+.lc-link-url { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lc-link-url .lc-input { flex: 1 1 220px; font-size: .95rem; }
+.lc-link-locales { margin: 12px 0; display: flex; flex-direction: column; gap: 6px; }
+.lc-checkline {
+  display: flex; align-items: flex-start; gap: 9px; cursor: pointer;
+  font-size: 13.5px; color: rgba(255,255,255,.78); line-height: 1.45;
+}
+.lc-checkline input[type="checkbox"] { width: 15px; height: 15px; accent-color: #01EACB; flex-shrink: 0; margin-top: 1px; }
+.lc-new-link {
+  margin-top: 14px; padding: 15px; border-radius: 14px;
+  background: rgba(0,0,0,.2); border: 1px dashed rgba(255,255,255,.16);
+  display: flex; flex-direction: column; gap: 11px; align-items: flex-start;
+}
+.lc-new-link .lc-input { width: 100%; }
+
+.lc-identify {
+  padding: 14px 15px; border-radius: 14px; margin-bottom: 20px;
+  background: rgba(22,26,44,.93); border: 1px solid rgba(255,255,255,.1);
+}
+.lc-identify-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
+.lc-identify-row .lc-input { flex: 1 1 200px; }
+.lc-powered { margin-top: 30px; text-align: center; font-size: 12px; color: rgba(255,255,255,.3); }

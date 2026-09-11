@@ -1,0 +1,211 @@
+<%# One (card, language) line: the words, what state the review is in, and the
+    three things anyone can do about it. See _board for the shared locals.
+
+    `actionable` is false for a line drawn only as CONTEXT — the primary
+    language under a link scoped to one secondary. Such a line is read, never
+    ruled on, and the server refuses an action on it independently
+    (RecordsLanguageChecks#review_scope); this only stops the page offering
+    buttons that would bounce. %>
+<%
+  loc       = SupportedLocales.find(line[:locale])
+  content   = line[:content]
+  fields    = LanguageCheckLines.present_fields(content)
+  state     = meta[:state]
+  row       = meta[:row]
+  untranslated = !line[:primary] && LanguageCheckLines.untranslated?(content)
+  anchor    = "line-#{card[:cid]}-#{line[:locale]}"
+  # A translated line is rendered in its OWN direction, not the page's: an
+  # Arabic translation inside an English creator's dashboard is still Arabic,
+  # and laying it out left-to-right would make a reviewer judge a line the
+  # respondent will never see.
+  dir       = loc&.rtl? ? "rtl" : "ltr"
+  open_notes = notes.count { |n| n.resolved_at.nil? }
+%>
+<%# The state class paints the left rule. Only on a line whose state is also
+    NAMED beside it — a coloured edge with no badge to explain it is a hint at
+    something the reader has no way to read. %>
+<div class="lc-line<%= " lc-line--#{state}" if actionable %><%= ' lc-line--primary' if line[:primary] %>" id="<%= anchor %>"
+     data-controller="language-check" data-language-check-anchor-value="<%= anchor %>">
+
+  <div class="lc-line-head">
+    <span class="lc-lang">
+      <span class="lc-flag" aria-hidden="true"><%= loc&.flag %></span>
+      <span class="lc-lang-name"><%= loc&.english_name || line[:locale] %></span>
+      <% if line[:primary] %><span class="lc-chip lc-chip--primary"><%= t("language_check.primary") %></span><% end %>
+      <%# A line drawn only as the source a reviewer is reading against says so,
+          so a blank space where the buttons are reads as deliberate rather than
+          as something that failed to load. %>
+      <% unless actionable %><span class="lc-chip lc-chip--read"><%= t("language_check.for_reference") %></span><% end %>
+    </span>
+
+    <% if actionable %>
+      <span class="lc-state lc-state--<%= state %>">
+        <%= t("language_check.state.#{state}") %>
+      </span>
+    <% end %>
+  </div>
+
+  <% if untranslated %>
+    <p class="lc-untranslated"><%= t("language_check.untranslated_note") %></p>
+  <% end %>
+
+  <div class="lc-words" dir="<%= dir %>" lang="<%= line[:locale] %>" data-language-check-target="words">
+    <% fell_back = Array(content["untranslated"]) %>
+    <% fields.each do |field| %>
+      <div class="lc-field">
+        <span class="lc-field-label">
+          <%= t("language_check.field.#{field}") %>
+          <%# Per FIELD, not per line: a card can be translated everywhere but
+              its sub-text, and a French reviewer reading English sub-text under
+              a French flag with nothing to say so is being asked to approve a
+              translation that does not exist. The line-level banner above only
+              fires when NOTHING is translated. %>
+          <% if fell_back.include?(field) %>
+            <span class="lc-field-fallback"><%= t("language_check.primary") %></span>
+          <% end %>
+        </span>
+        <% case field
+           when *LanguageCheckLines::SCALAR_FIELDS %>
+          <p class="lc-text<%= ' lc-text--lead' if field == 'text' %>"><%= content[field] %></p>
+        <% when *LanguageCheckLines::LIST_FIELDS %>
+          <ol class="lc-list">
+            <% content[field].each { |label| %><li><%= label %></li><% } %>
+          </ol>
+        <% when "pages" %>
+          <ol class="lc-list lc-list--pages">
+            <% content[field].each { |page| %><li><%= page["text"] %></li><% } %>
+          </ol>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ── The three verbs ──────────────────────────────────────────────────── %>
+  <% if actionable %>
+  <div class="lc-actions">
+    <%= form_with url: post_url, method: :post, data: { turbo: false }, class: "lc-verb-form" do %>
+      <%= hidden_field_tag :cid, card[:cid] %>
+      <%= hidden_field_tag :locale, line[:locale] %>
+      <%= hidden_field_tag :filter, filter %>
+      <% if state == "approved" %>
+        <button type="submit" name="verb" value="reset" class="lc-btn lc-btn--ghost">
+          <%= t("language_check.undo_approval") %>
+        </button>
+      <% else %>
+        <button type="submit" name="verb" value="approve" class="lc-btn lc-btn--approve">
+          <%= t("language_check.approve") %>
+        </button>
+      <% end %>
+      <% unless state == "changes_requested" %>
+        <button type="submit" name="verb" value="request_changes" class="lc-btn lc-btn--flag">
+          <%= t("language_check.request_changes") %>
+        </button>
+      <% end %>
+    <% end %>
+
+    <% if editable %>
+      <button type="button" class="lc-btn lc-btn--ghost"
+              data-action="click->language-check#toggleEdit"
+              data-language-check-target="editToggle"
+              aria-expanded="false" aria-controls="edit-<%= anchor %>">
+        <%= t("language_check.edit") %>
+      </button>
+    <% end %>
+
+    <button type="button" class="lc-btn lc-btn--ghost"
+            data-action="click->language-check#toggleNotes"
+            aria-expanded="<%= open_notes.positive? %>" aria-controls="notes-<%= anchor %>">
+      <%= open_notes.positive? ? t("language_check.comments_count", count: open_notes) : t("language_check.comment") %>
+    </button>
+  </div>
+  <% end %>
+
+  <% if actionable && row&.reviewer_label.present? && state != "pending" %>
+    <p class="lc-byline">
+      <%= t("language_check.reviewed_by", name: row.reviewer_label,
+            when: time_ago_in_words(row.reviewed_at || row.updated_at)) %>
+    </p>
+  <% end %>
+  <% if actionable && row&.edited_at.present? %>
+    <p class="lc-byline">
+      <%= t("language_check.edited_by", name: row.edited_by_name.presence || t("language_check.anonymous_reviewer"),
+            when: time_ago_in_words(row.edited_at)) %>
+    </p>
+  <% end %>
+
+  <%# ── Edit ─────────────────────────────────────────────────────────────
+      A plain form, hidden until asked for. Every field the line shows gets an
+      input, in the same order, so what a reviewer edits is visibly the thing
+      they were just reading. Lists are fixed-length on purpose — option N in
+      every language is a label for option N, and the model refuses a resize
+      anyway (Survey.align_labels); showing N boxes says so before they try. %>
+  <% if editable && actionable %>
+    <div class="lc-edit" id="edit-<%= anchor %>" data-language-check-target="editPanel" hidden>
+      <%= form_with url: post_url, method: :post, data: { turbo: false } do %>
+        <%= hidden_field_tag :cid, card[:cid] %>
+        <%= hidden_field_tag :locale, line[:locale] %>
+        <%= hidden_field_tag :filter, filter %>
+        <%= hidden_field_tag :verb, "edit" %>
+
+        <% fields.each do |field| %>
+          <div class="lc-edit-field">
+            <label class="lc-field-label" for="f-<%= anchor %>-<%= field %>"><%= t("language_check.field.#{field}") %></label>
+            <% case field
+               when *LanguageCheckLines::SCALAR_FIELDS %>
+              <textarea id="f-<%= anchor %>-<%= field %>" name="fields[<%= field %>]" rows="2"
+                        dir="<%= dir %>" lang="<%= line[:locale] %>"
+                        class="lc-input"><%= content[field] %></textarea>
+            <% when *LanguageCheckLines::LIST_FIELDS %>
+              <% content[field].each_with_index do |label, i| %>
+                <input type="text" name="fields[<%= field %>][]" value="<%= label %>"
+                       dir="<%= dir %>" lang="<%= line[:locale] %>" class="lc-input"
+                       aria-label="<%= t("language_check.field_item", field: t("language_check.field.#{field}"), number: i + 1) %>" />
+              <% end %>
+            <% when "pages" %>
+              <% content[field].each_with_index do |page, i| %>
+                <input type="hidden" name="fields[pages][][id]" value="<%= page["id"] %>" />
+                <textarea name="fields[pages][][text]" rows="2" dir="<%= dir %>" lang="<%= line[:locale] %>"
+                          class="lc-input"
+                          aria-label="<%= t("language_check.field_item", field: t("language_check.field.pages"), number: i + 1) %>"><%= page["text"] %></textarea>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if line[:primary] && survey.editing_locked? %>
+          <p class="lc-note-hint"><%= t("language_check.primary_locked_hint") %></p>
+        <% end %>
+
+        <div class="lc-actions">
+          <button type="submit" class="lc-btn lc-btn--approve"><%= t("language_check.save_wording") %></button>
+          <button type="button" class="lc-btn lc-btn--ghost"
+                  data-action="click->language-check#toggleEdit"><%= t("language_check.cancel") %></button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# ── Comments ─────────────────────────────────────────────────────────── %>
+  <% if actionable %>
+  <div class="lc-notes" id="notes-<%= anchor %>" data-language-check-target="notesPanel" <%= "hidden" if open_notes.zero? %>>
+    <% notes.each do |note| %>
+      <div class="lc-note<%= ' is-resolved' if note.resolved_at %>">
+        <p class="lc-note-body"><%= note.body %></p>
+        <p class="lc-note-by"><%= t("language_check.note_by", name: note.author_label,
+                                     when: time_ago_in_words(note.created_at)) %></p>
+      </div>
+    <% end %>
+
+    <%= form_with url: post_url, method: :post, data: { turbo: false }, class: "lc-note-form" do %>
+      <%= hidden_field_tag :cid, card[:cid] %>
+      <%= hidden_field_tag :locale, line[:locale] %>
+      <%= hidden_field_tag :filter, filter %>
+      <%= hidden_field_tag :verb, "note" %>
+      <textarea name="body" rows="2" class="lc-input"
+                maxlength="<%= LanguageCheckNote::MAX_BODY %>"
+                placeholder="<%= t("language_check.comment_placeholder", language: loc&.english_name || line[:locale]) %>"></textarea>
+      <button type="submit" class="lc-btn lc-btn--ghost"><%= t("language_check.post_comment") %></button>
+    <% end %>
+  </div>
+  <% end %>
+</div>

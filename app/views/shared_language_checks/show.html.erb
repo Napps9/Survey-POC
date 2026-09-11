@@ -1,0 +1,45 @@
+<% content_for :title, "#{t("language_check.title")} · Playverto" %>
+
+<div class="lc-page lc-page--shared">
+  <div class="lc-wrap">
+
+    <div class="lc-top">
+      <div class="lc-brand">
+        <%= image_tag "playverto.svg", alt: "Playverto", style: "height:22px;width:auto;" %>
+        <span class="lc-chip <%= @editable ? "lc-chip--edit" : "lc-chip--read" %>">
+          <%= @editable ? t("language_check.link_can_edit") : t("language_check.link_read_only") %>
+        </span>
+      </div>
+      <h1 class="lc-title"><%= t("language_check.shared_title") %></h1>
+      <p class="lc-sub"><%= t("language_check.shared_subtitle", title: @survey.theme.presence || @survey.title.to_s) %></p>
+      <p class="lc-sub lc-sub--quiet">
+        <%= @editable ? t("language_check.shared_intro_edit") : t("language_check.shared_intro_read") %>
+      </p>
+    </div>
+
+    <%# Who is reviewing. Optional on purpose — a reviewer who would rather not
+        be named still gets to review, and their notes read "A reviewer". Asked
+        once, remembered in a signed per-link cookie. %>
+    <section class="lc-identify">
+      <%= form_with url: shared_language_check_name_path(@link.token), method: :post, data: { turbo: false } do %>
+        <label class="lc-field-label" for="lc-reviewer-name"><%= t("language_check.your_name_label") %></label>
+        <div class="lc-identify-row">
+          <input type="text" id="lc-reviewer-name" name="reviewer_name" class="lc-input"
+                 maxlength="<%= LanguageCheck::MAX_NAME %>"
+                 value="<%= @reviewer_name %>"
+                 placeholder="<%= t("language_check.your_name_placeholder") %>" />
+          <button type="submit" class="lc-btn lc-btn--ghost"><%= t("language_check.save_name") %></button>
+        </div>
+        <p class="lc-note-hint"><%= t("language_check.your_name_hint") %></p>
+      <% end %>
+    </section>
+
+    <%= render "language_checks/board",
+               survey: @survey, cards: @cards, locales: @locales,
+               checks: @checks, notes: @notes, editable: @editable,
+               post_url: shared_language_check_lines_path(@link.token),
+               filter: params[:filter].presence || "all" %>
+
+    <p class="lc-powered"><%= t("language_check.powered_by") %></p>
+  </div>
+</div>

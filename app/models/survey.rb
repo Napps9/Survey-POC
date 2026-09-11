@@ -26,6 +26,13 @@ class Survey < ApplicationRecord
   # Told-them records, same delete_all reasoning as player_claims above.
   has_many :player_notifications, dependent: :delete_all
   has_many :flow_generations, dependent: :destroy
+  # Language check — the per-(card, language) review state, the notes left on
+  # those lines, and the shareable links that let somebody without an account
+  # leave either. All three go with the Verto: they are commentary on THIS
+  # deck's wording and mean nothing without it.
+  has_many :language_checks, dependent: :delete_all
+  has_many :language_check_notes, dependent: :delete_all
+  has_many :language_check_links, dependent: :destroy
   # Builds outlive the Verto they produced — they're the account's generation
   # log, deleted with the organisation, not the survey. Nullify rather than
   # nothing because verto_builds.survey_id carries a real FK: without this,
@@ -246,6 +253,244 @@ class Survey < ApplicationRecord
         "explanation" => t["explanation"].presence
       }.compact
       card.merge("i18n" => (card["i18n"] || {}).merge(locale.to_s => entry))
+    end
+  end
+
+  # ── Language check edits ───────────────────────────────────────────────────
+  # Write one line's wording back into the deck, from the Language check screen.
+  # This is the "and all edits appear in the Verto itself" half of that feature:
+  # there is no parallel store of suggested text, a reviewer's fix IS the card's
+  # text the moment they save it, and the player serves it on the next request.
+  #
+  # `fields` is a subset of LanguageCheckLines::FIELDS, as typed. What it may
+  # change depends entirely on which language is being edited, and the reason is
+  # that the two are not the same kind of thing:
+  #
+  #   * A SECONDARY language's words are labels for someone else's answers.
+  #     Nothing is keyed by them — responses are stored against the canonical
+  #     option (see merge_card_translations) — so they are always safe to edit,
+  #     live Verto or not.
+  #   * The PRIMARY language's option labels ARE the answer key. Stored answers
+  #     carry them, and quiz `correct` and the token map are keyed by them. So
+  #     canonical lists are editable only while the deck still is
+  #     (editing_locked?), exactly the guard switch_primary_locale! uses, and
+  #     for exactly the same reason. Question text and sub-text carry no keys
+  #     and stay editable — fixing a typo in a live question is the single most
+  #     common thing a reviewer will want to do.
+  #
+  # List fields are written POSITIONALLY and never resized: option N in any
+  # language is a label for option N. A submitted list longer or shorter than
+  # the canonical one is truncated/padded against it rather than rejected, so a
+  # reviewer cannot shear a deck's alignment by adding a line in a textarea.
+  #
+  # Returns true when something actually changed; false when the edit was a
+  # no-op, so the caller can leave the revision counter (and the row's
+  # edited_at) alone rather than logging an edit nobody made.
+  def apply_language_edit!(cid:, locale:, fields:)
+    locale = locale.to_s
+    raise ArgumentError, "not one of this Verto's languages" unless verto_locales.include?(locale)
+
+    deck  = Array(cards).deep_dup
+    index = deck.index { |c| c.is_a?(Hash) && c["cid"].to_s == cid.to_s }
+    return false if index.nil?
+
+    updated = self.class.apply_card_language_edit(
+      deck[index], locale, fields,
+      primary: default_locale, structural: !editing_locked?
+    )
+    return false if updated == deck[index]
+
+    deck[index] = updated
+    # increment! would issue its own UPDATE; one write for both keeps the deck
+    # and the revision that describes it in a single statement.
+    update!(cards: deck, translations_revision: translations_revision + 1)
+    true
+  end
+
+  # One card's half of the edit above. Class method so it is testable on a bare
+  # hash; returns a new hash, never mutates.
+  def self.apply_card_language_edit(card, locale, fields, primary:, structural:)
+    return card unless card.is_a?(Hash)
+    submitted = (fields || {}).stringify_keys.slice(*LanguageCheckLines::FIELDS)
+    return card if submitted.empty?
+
+    locale == primary.to_s ?
+      apply_canonical_edit(card, submitted, structural: structural) :
+      apply_translation_edit(card, locale, submitted)
+  end
+
+  # The primary language: canonical fields, written in place. See the list
+  # restriction in apply_language_edit!.
+  #
+  # Every field edited here drops its rich-text twin (`text_html`,
+  # `description_html`, `options_html`, a page's `html`). Those are
+  # presentation-only copies of the SAME words, and the player renders the twin
+  # in preference to the plain text whenever the two still agree
+  # (ApplicationHelper#rich_card_text). Leaving a twin behind after rewriting
+  # the words underneath it means the respondent keeps reading the old
+  # sentence, in bold — the reviewer's fix landing in the column and never
+  # reaching the screen, which is the worst failure this feature could have.
+  # Dropping it is also exactly what sanitize_cards_images! would do on the
+  # next editor save (clean_equivalent refuses a diverged twin); doing it here
+  # means the deck is never briefly serving one.
+  def self.apply_canonical_edit(card, submitted, structural:)
+    out = card.dup
+
+    LanguageCheckLines::SCALAR_FIELDS.each do |field|
+      next unless submitted.key?(field)
+      # `text` is a question and must not be blanked — a card with no words is
+      # not an edit, it is a card nobody can answer. Sub-text and a quiz
+      # explanation are genuinely optional, so clearing them is a real choice.
+      value = submitted[field].to_s.strip
+      next if field == "text" && value.blank?
+      next if out[field].to_s == value
+      out[field] = value
+      out.delete("#{field}_html")
+    end
+
+    if structural
+      if submitted.key?("options") && out["options"].is_a?(Array)
+        aligned = align_labels(out["options"], submitted["options"])
+        if aligned != out["options"]
+          # Per slot: a twin is only stale for the option whose words moved, and
+          # dropping the whole array would strip formatting a reviewer never
+          # touched.
+          if out["options_html"].is_a?(Array)
+            html = Array(out["options_html"])
+            out["options_html"] = aligned.each_with_index.map do |label, i|
+              label == out["options"][i] ? html[i] : nil
+            end
+          end
+          out["options"] = aligned
+        end
+      end
+      if submitted.key?("responses") && out["responses"].is_a?(Array)
+        labels = align_labels(out["responses"].map { |r| r.is_a?(Hash) ? r["label"].to_s : "" },
+                              submitted["responses"])
+        out["responses"] = out["responses"].each_with_index.map do |r, i|
+          r.is_a?(Hash) && labels[i].present? ? r.merge("label" => labels[i]) : r
+        end
+      end
+    end
+
+    if submitted.key?("pages") && out["pages"].is_a?(Array)
+      by_id = page_texts(submitted["pages"])
+      out["pages"] = out["pages"].map do |p|
+        next p unless p.is_a?(Hash)
+        text = by_id[p["id"].to_s].to_s
+        next p if text.blank? || text == p["text"].to_s
+        p.merge("text" => text).except("html")
+      end
+    end
+
+    out
+  end
+
+  # A secondary language: the card's i18n entry for that locale, in the shape
+  # merge_card_translations writes and the player reads.
+  def self.apply_translation_edit(card, locale, submitted)
+    entry = card.dig("i18n", locale)
+    entry = {} unless entry.is_a?(Hash)
+    entry = entry.dup
+
+    LanguageCheckLines::SCALAR_FIELDS.each do |field|
+      next unless submitted.key?(field)
+      value = submitted[field].to_s.strip
+      # Blank removes the override, which is not the same as storing "". The
+      # player falls back to the primary language for a missing field, so
+      # clearing a translation means "show the original here" — a real and
+      # useful answer for a brand name a translator should have left alone.
+      value.blank? ? entry.delete(field) : entry[field] = value
+    end
+
+    LanguageCheckLines::LIST_FIELDS.each do |field|
+      next unless submitted.key?(field)
+      canonical = field == "responses" ?
+        Array(card["responses"]).map { |r| r.is_a?(Hash) ? r["label"].to_s : "" } :
+        Array(card[field]).map(&:to_s)
+      next if canonical.empty?
+      entry[field] = align_labels(canonical, submitted[field], blank_to: "")
+    end
+
+    if submitted.key?("pages") && card["pages"].is_a?(Array)
+      by_id = page_texts(submitted["pages"])
+      entry["pages"] = Array(card["pages"]).filter_map do |p|
+        next unless p.is_a?(Hash) && p["id"].present?
+        { "id" => p["id"].to_s, "text" => by_id[p["id"].to_s].to_s }
+      end
+    end
+
+    entry = entry.reject { |_, v| v.is_a?(String) && v.blank? }
+    i18n  = (card["i18n"] || {}).dup
+    entry.empty? ? i18n.delete(locale) : i18n[locale] = entry
+    out = card.dup
+    i18n.empty? ? out.delete("i18n") : out["i18n"] = i18n
+    out
+  end
+
+  # Positional, never resizing: the canonical list decides how many labels
+  # there are, because its length is the alignment every stored answer depends
+  # on. A submitted slot that is blank keeps the canonical label (the primary
+  # language) or becomes "" (a translation, where blank means "fall back"),
+  # depending on which side is being written.
+  def self.align_labels(canonical, submitted, blank_to: nil)
+    given = Array(submitted).map { |v| v.to_s.strip }
+    canonical.each_with_index.map do |canon, i|
+      value = given[i].to_s
+      value.present? ? value : (blank_to.nil? ? canon.to_s : blank_to)
+    end
+  end
+
+  def self.page_texts(submitted)
+    Array(submitted).each_with_object({}) do |p, h|
+      next unless p.is_a?(Hash) && p["id"].present?
+      h[p["id"].to_s] = p["text"].to_s.strip
+    end
+  end
+
+  # Carry the database's wording forward over an editor payload that provably
+  # could not have seen it.
+  #
+  # SurveysController#update replaces `cards` wholesale from the editor's DOM,
+  # i18n entries included — rebuilt from a store seeded once at page load. So an
+  # editor tab opened before a reviewer fixed the French writes the old French
+  # back on its next autosave, and nothing says so. `pairs` is the set of
+  # (cid, locale) the Language check screen has changed since the revision the
+  # client was rendered at; only those are overruled, so the creator's own
+  # translation edits in that same tab still land.
+  #
+  # Same shape and same reasoning as keep_setup_media — see its comment for the
+  # general case of two writers holding different truths about one deck.
+  def self.keep_reviewed_translations(existing, incoming, pairs, primary:)
+    return incoming if pairs.blank?
+
+    by_cid = Array(existing).each_with_object({}) do |c, h|
+      h[c["cid"].to_s] = c if c.is_a?(Hash) && c["cid"].present?
+    end
+    wanted = pairs.group_by { |cid, _| cid.to_s }.transform_values { |ps| ps.map(&:last).map(&:to_s) }
+
+    Array(incoming).map do |card|
+      next card unless card.is_a?(Hash)
+      locales = wanted[card["cid"].to_s]
+      next card if locales.blank?
+      stored = by_cid[card["cid"].to_s]
+      next card unless stored.is_a?(Hash)
+
+      locales.reduce(card) do |out, locale|
+        if locale == primary.to_s
+          # The primary language's words are the card's own fields. Only the
+          # ones the Language check screen can write are carried — the rest of
+          # the card (type, imagery, branching, token map) is the editor's to
+          # change and must pass through untouched.
+          kept = stored.slice(*(LanguageCheckLines::SCALAR_FIELDS + %w[options responses pages]))
+          out.merge(kept.compact)
+        else
+          entry = stored.dig("i18n", locale)
+          i18n  = (out["i18n"] || {}).dup
+          entry.is_a?(Hash) ? i18n[locale] = entry : i18n.delete(locale)
+          i18n.empty? ? out.except("i18n") : out.merge("i18n" => i18n)
+        end
+      end
     end
   end
 

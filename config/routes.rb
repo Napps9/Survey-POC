@@ -68,6 +68,16 @@ Rails.application.routes.draw do
   get  "results/:token/report/renders/:id",            to: "shared_results#render_status", as: :shared_results_render
   get  "results/:token/report/renders/:id/download",   to: "shared_results#render_download", as: :download_shared_results_render
 
+  # Shareable language-review links (no auth) — the Language check screen, sent
+  # to somebody who speaks the language but has no reason to own an account.
+  # Outside /play/ for the same reason the results links are: that path is the
+  # service worker's whole scope, and a page that rewrites a live deck is the
+  # last thing that should be served from an offline cache. The token is the
+  # authorisation; see SharedLanguageChecksController for the full posture.
+  get  "language-check/:token",       to: "shared_language_checks#show",        as: :shared_language_check
+  post "language-check/:token/lines", to: "shared_language_checks#update_line", as: :shared_language_check_lines
+  post "language-check/:token/name",  to: "shared_language_checks#identify",    as: :shared_language_check_name
+
   # Auth
   resource  :session,       only: [ :new, :create, :destroy ]
   resources :passwords,     param: :token, only: [ :new, :create, :edit, :update ]
@@ -210,6 +220,14 @@ Rails.application.routes.draw do
   # reasoning, same shape.
   post "surveys/:id/follow_up_notice", to: "surveys#notify_follow_up", as: :survey_follow_up_notice
   post "surveys/:id/languages",       to: "surveys#update_languages", as: :survey_languages
+  # The Language check screen: every card's wording in every language the Verto
+  # has, side by side. Reading it is open to every seat; minting a review link
+  # is admin-only (LanguageCheckLinksController).
+  get  "surveys/:id/language_check",       to: "language_checks#show",        as: :survey_language_check
+  post "surveys/:id/language_check/lines", to: "language_checks#update_line", as: :survey_language_check_lines
+  post   "surveys/:survey_id/language_check/links",     to: "language_check_links#create",  as: :survey_language_check_links
+  patch  "surveys/:survey_id/language_check/links/:id", to: "language_check_links#update",  as: :survey_language_check_link
+  delete "surveys/:survey_id/language_check/links/:id", to: "language_check_links#destroy"
   get  "surveys/:id/contacts",        to: "surveys#contacts",         as: :survey_contacts
   # Separate from #settings because it can spend at Anthropic (re-tailoring the
   # Heritage card), and the settings endpoint must stay free to call.

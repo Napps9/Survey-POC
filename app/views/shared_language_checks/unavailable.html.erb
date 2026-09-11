@@ -1,0 +1,15 @@
+<% content_for :title, "#{t("language_check.unavailable_title")} · Playverto" %>
+
+<%# One page for every reason a review link does not work — paused, revoked,
+    the Verto deleted, the languages gone. Which of those it is is not the
+    holder's business, and saying would tell an unrelated person something
+    about somebody else's account. %>
+<div class="lc-page lc-page--shared">
+  <div class="lc-wrap lc-wrap--narrow">
+    <div class="lc-blank">
+      <p class="lc-title"><%= t("language_check.unavailable_title") %></p>
+      <p class="lc-blank-sub"><%= t("language_check.unavailable_body") %></p>
+    </div>
+    <p class="lc-powered"><%= t("language_check.powered_by") %></p>
+  </div>
+</div>

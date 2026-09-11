@@ -86,6 +86,12 @@
      data-survey-editor-default-locale-value="<%= @survey.default_locale %>"
      data-survey-editor-locales-value="<%= @survey.verto_locales.to_json %>"
      data-survey-editor-rtl-locales-value="<%= SupportedLocales.all.select(&:rtl?).map(&:code).to_json %>"
+     <%# The wording revision this page was rendered at. Sent back with every
+         autosave so SurveysController#update can tell which translations the
+         Language check screen has changed since — this page rebuilds every
+         language's text from a store seeded right here, and would otherwise
+         write a reviewer's fix back out. See Survey.keep_reviewed_translations. %>
+     data-survey-editor-translations-revision-value="<%= @survey.translations_revision %>"
      data-survey-editor-quiz-value="<%= @survey.quiz? %>"
      data-survey-editor-tokenisation-value="<%= @survey.tokenisation_enabled? %>"
      data-survey-editor-token-types-value="<%= @survey.token_types.to_json %>"
@@ -1942,6 +1948,23 @@
               Tick a language and the Verto translates itself into it in the background — give it a minute, then reload. Unticking keeps the translation stored, so re-ticking is instant.
             </div>
           <% end %>
+
+          <%# Language check — every question in every language, side by side,
+              with a link you can send to somebody who speaks it and has no
+              account. A separate screen rather than a panel: the editor is one
+              card in one language, this is one question across all of them.
+              See LanguageChecksController. %>
+          <a href="<%= survey_language_check_path(@survey) %>" class="lc-editor-entry"
+             style="display:block;margin-top:14px;padding:10px 14px;border-radius:12px;background:rgba(1,234,203,0.08);border:1px solid rgba(1,234,203,0.3);color:#01EACB;font-family:'ABeeZee',sans-serif;font-size: var(--text-md);text-decoration:none;text-align:center;">
+            <%= t("language_check.title") %> →
+          </a>
+          <div style="margin-top:6px;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.5);line-height:1.45;">
+            <% if @survey.multilingual? %>
+              Read every question in <%= @survey.verto_locales.size %> languages at once, approve what reads well, and send the page to a reviewer without an account.
+            <% else %>
+              Add a second language above and you can check both side by side, or send the page to a native speaker to check for you.
+            <% end %>
+          </div>
 
           <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0 0 10px;" do %>
             <input type="hidden" name="auto_detect_language" value="0" />

@@ -1,0 +1,227 @@
+require "application_system_test_case"
+
+# Browser coverage for the Language check screen, on both sides of it: the
+# creator's and the account-less reviewer's.
+#
+# Worth a browser test for two reasons an integration test cannot reach. The
+# edit form and the comment thread are folded away by a Stimulus controller, so
+# what a reviewer can actually get at is a DOM question. And the whole screen is
+# built to work with no JavaScript at all — every action is a plain form POST —
+# which is a claim only a real browser can check, by turning the controller off
+# and using the page anyway.
+class LanguageCheckSystemTest < ApplicationSystemTestCase
+  CARDS = [
+    { "type" => "multiple_choice", "cid" => "c_mc", "text" => "Favourite colour?",
+      "description" => "Pick one", "options" => %w[Blue Green],
+      "i18n" => { "es" => { "text" => "¿Color favorito?", "options" => %w[Azul Verde] } } },
+    { "type" => "open_ended", "cid" => "c_oe", "text" => "Tell us more" }
+  ].freeze
+
+  def setup
+    super
+    @org  = Organisation.create!(name: "Studio", slug: "lc-#{SecureRandom.hex(3)}")
+    @user = User.create!(name: "Nick", email_address: "lc-#{SecureRandom.hex(3)}@test.com",
+                         password: "verylongpassword")
+    @user.verify_email!
+    @org.memberships.create!(user: @user, role: "admin")
+
+    @survey = @org.surveys.create!(title: "Colours", theme: "Colours", audience_age: "adults",
+                                   key_insight: "k", default_locale: "en", locales: %w[en es fr],
+                                   cards: CARDS)
+  end
+
+  def mc_card
+    @survey.reload.cards.find { |c| c["cid"] == "c_mc" }
+  end
+
+  test "the creator reaches the screen from the editor's Language panel" do
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+
+    click_button "Publish & share →"
+    # The Publish panel is a tall scroller and the Language block sits well
+    # down it, so the summary is in the DOM but out of the viewport — Capybara
+    # refuses to click what it cannot see. Bring it into view first, the way a
+    # creator would by scrolling.
+    summary = find("summary.publish-block-title", text: "Language", visible: :all)
+    scroll_to(summary)
+    summary.click
+    click_link(class: "lc-editor-entry", match: :first)
+
+    assert_current_path survey_language_check_path(@survey)
+    assert_text "Favourite colour?"
+    assert_text "¿Color favorito?"
+  end
+
+  test "every language of a card is on screen at once, original first" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    within "#card-c_mc" do
+      langs = all(".lc-lang-name").map(&:text)
+      assert_equal [ "English (UK)", "Spanish", "French" ], langs,
+                   "the original leads, the translations follow — that is the reading order"
+    end
+  end
+
+  test "a line with no translation says so instead of passing English off as French" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    within "#line-c_mc-fr" do
+      assert_text "Favourite colour?"
+      assert_text "Not translated yet"
+    end
+  end
+
+  test "approving a line updates its badge and the progress count" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    assert_text "0 of 6 lines approved"
+    within("#line-c_mc-es") { click_button "Approve" }
+
+    assert_text "1 of 6 lines approved"
+    # The badge is text-transform: uppercase, so assert on the state class the
+    # server decided rather than on restyled copy.
+    assert_selector "#line-c_mc-es .lc-state--approved"
+  end
+
+  test "the creator edits the Spanish and the player serves the new words" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    within "#line-c_mc-es" do
+      click_button "Edit wording"
+      fill_in "f-line-c_mc-es-text", with: "¿Cuál es tu color favorito?"
+      click_button "Save wording"
+    end
+
+    assert_text "¿Cuál es tu color favorito?"
+    assert_equal "¿Cuál es tu color favorito?", mc_card.dig("i18n", "es", "text")
+  end
+
+  test "an approved line that is then edited reads as approved-then-edited" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+
+    within("#line-c_mc-es") { click_button "Approve" }
+    within "#line-c_mc-es" do
+      click_button "Edit wording"
+      fill_in "f-line-c_mc-es-text", with: "Otra cosa"
+      click_button "Save wording"
+    end
+
+    assert_selector "#line-c_mc-es .lc-state--stale"
+  end
+
+  # ── The reviewer's side ────────────────────────────────────────────────────
+
+  test "a reviewer with no account opens the link, names themselves and approves" do
+    link = @survey.language_check_links.create!(name: "Marta", locales: [ "es" ])
+
+    visit shared_language_check_path(link.token)
+    dismiss_cookie_banner
+
+    assert_text "Check this Verto's wording"
+    assert_text "¿Color favorito?"
+    assert_text "Favourite colour?", exact: false
+
+    fill_in "lc-reviewer-name", with: "Marta"
+    click_button "Save"
+
+    within("#line-c_mc-es") { click_button "Approve" }
+
+    row = LanguageCheck.find_by!(survey: @survey, cid: "c_mc", locale: "es")
+    assert_equal "approved", row.status
+    assert_equal "Marta", row.reviewed_by_name
+  end
+
+  test "a reviewer scoped to Spanish is shown the original but given nothing to press on it" do
+    link = @survey.language_check_links.create!(locales: [ "es" ])
+    visit shared_language_check_path(link.token)
+    dismiss_cookie_banner
+
+    assert_selector "#line-c_mc-en"
+    within "#line-c_mc-en" do
+      assert_selector ".lc-chip--read", text: /for reference/i
+      assert_no_button "Approve"
+      assert_no_button "Edit wording"
+    end
+    within("#line-c_mc-es") { assert_button "Approve" }
+    assert_no_selector "#line-c_mc-fr"
+  end
+
+  test "a read-only link offers approving and commenting but no edit button" do
+    link = @survey.language_check_links.create!(locales: [ "es" ], can_edit: false)
+    visit shared_language_check_path(link.token)
+    dismiss_cookie_banner
+
+    within "#line-c_mc-es" do
+      assert_button "Approve"
+      assert_button "Comment"
+      assert_no_button "Edit wording"
+    end
+  end
+
+  test "a reviewer leaves a comment and the creator reads it" do
+    link = @survey.language_check_links.create!(locales: [ "es" ])
+    visit shared_language_check_path(link.token)
+    dismiss_cookie_banner
+
+    within "#line-c_mc-es" do
+      click_button "Comment"
+      find("textarea[name='body']").set("“Verde” should be “Verde claro” here.")
+      click_button "Post comment"
+    end
+
+    assert_text "Verde claro"
+
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    within("#line-c_mc-es") { assert_text "Verde claro" }
+  end
+
+  test "a revoked link stops working immediately" do
+    link = @survey.language_check_links.create!(locales: [ "es" ])
+    visit shared_language_check_path(link.token)
+    dismiss_cookie_banner
+    assert_text "¿Color favorito?"
+
+    link.destroy!
+    visit shared_language_check_path(link.token)
+    assert_text "This review link isn't available"
+  end
+
+  # ── No JavaScript ──────────────────────────────────────────────────────────
+
+  test "the screen works with its Stimulus controller disabled" do
+    # The claim the whole screen is built on: every action is a plain form POST,
+    # so a reviewer whose browser never ran the controller can still use it.
+    # Approximated by stripping the controller's hooks from the DOM — what is
+    # left is the markup a scriptless browser would have.
+    link = @survey.language_check_links.create!(locales: [ "es" ])
+    visit shared_language_check_path(link.token)
+    dismiss_cookie_banner
+
+    execute_script(<<~JS)
+      document.querySelectorAll("[data-controller='language-check']").forEach(el => {
+        el.removeAttribute("data-controller")
+      })
+      document.querySelectorAll(".lc-edit, .lc-notes").forEach(el => { el.hidden = false })
+    JS
+
+    within "#line-c_mc-es" do
+      fill_in "f-line-c_mc-es-text", with: "Sin JavaScript"
+      click_button "Save wording"
+    end
+
+    assert_equal "Sin JavaScript", mc_card.dig("i18n", "es", "text")
+  end
+end

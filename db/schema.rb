@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_11_073000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_11_090300) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -511,6 +511,63 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_073000) do
     t.index ["partnership_id"], name: "index_invites_on_partnership_id"
     t.index ["token"], name: "index_invites_on_token", unique: true
     t.check_constraint "kind IN ('member', 'partner', 'licensee')", name: "chk_invites_kind"
+  end
+
+  create_table "language_check_links", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.boolean "can_edit", default: true, null: false
+    t.datetime "created_at", null: false
+    t.integer "created_by_user_id"
+    t.datetime "last_seen_at"
+    t.json "locales", default: [], null: false
+    t.string "name"
+    t.integer "survey_id", null: false
+    t.string "token", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_user_id"], name: "index_language_check_links_on_created_by_user_id"
+    t.index ["survey_id"], name: "index_language_check_links_on_survey_id"
+    t.index ["token"], name: "index_language_check_links_on_token", unique: true
+  end
+
+  create_table "language_check_notes", force: :cascade do |t|
+    t.string "author_name"
+    t.integer "author_user_id"
+    t.text "body", null: false
+    t.string "cid", null: false
+    t.datetime "created_at", null: false
+    t.integer "language_check_link_id"
+    t.string "locale", null: false
+    t.datetime "resolved_at"
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_user_id"], name: "index_language_check_notes_on_author_user_id"
+    t.index ["language_check_link_id"], name: "index_language_check_notes_on_language_check_link_id"
+    t.index ["survey_id", "cid", "locale"], name: "index_language_check_notes_on_survey_card_locale"
+    t.index ["survey_id"], name: "index_language_check_notes_on_survey_id"
+  end
+
+  create_table "language_checks", force: :cascade do |t|
+    t.string "cid", null: false
+    t.string "content_digest"
+    t.datetime "created_at", null: false
+    t.integer "edit_revision", default: 0, null: false
+    t.datetime "edited_at"
+    t.string "edited_by_name"
+    t.integer "language_check_link_id"
+    t.string "locale", null: false
+    t.datetime "reviewed_at"
+    t.string "reviewed_by_name"
+    t.integer "reviewed_by_user_id"
+    t.string "source_digest"
+    t.string "status", default: "pending", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["language_check_link_id"], name: "index_language_checks_on_language_check_link_id"
+    t.index ["reviewed_by_user_id"], name: "index_language_checks_on_reviewed_by_user_id"
+    t.index ["survey_id", "cid", "locale"], name: "index_language_checks_on_survey_card_locale", unique: true
+    t.index ["survey_id", "edit_revision"], name: "index_language_checks_on_survey_edit_revision"
+    t.index ["survey_id"], name: "index_language_checks_on_survey_id"
+    t.check_constraint "status IN ('pending', 'approved', 'changes_requested')", name: "chk_language_checks_status"
   end
 
   create_table "leaderboard_standings", force: :cascade do |t|
@@ -1066,6 +1123,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_073000) do
     t.json "token_types", default: [], null: false
     t.boolean "tokenisation_enabled", default: false, null: false
     t.string "tokens_note"
+    t.integer "translations_revision", default: 0, null: false
     t.datetime "unpublished_at"
     t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_surveys_on_deleted_at"
@@ -1154,6 +1212,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_073000) do
   add_foreign_key "invites", "organisations"
   add_foreign_key "invites", "partnerships"
   add_foreign_key "invites", "users", column: "invited_by_id"
+  add_foreign_key "language_check_links", "surveys"
+  add_foreign_key "language_check_links", "users", column: "created_by_user_id"
+  add_foreign_key "language_check_notes", "language_check_links"
+  add_foreign_key "language_check_notes", "surveys"
+  add_foreign_key "language_check_notes", "users", column: "author_user_id"
+  add_foreign_key "language_checks", "language_check_links"
+  add_foreign_key "language_checks", "surveys"
+  add_foreign_key "language_checks", "users", column: "reviewed_by_user_id"
   add_foreign_key "leaderboard_standings", "surveys"
   add_foreign_key "memberships", "organisations"
   add_foreign_key "memberships", "users"
