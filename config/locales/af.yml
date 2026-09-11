@@ -1963,7 +1963,6 @@ af:
     deleted: "Jou rekening is geskrap."
     tabs_label: "Jou rekening"
     tab_vertos: "Vertos"
-    tab_wallet: "Beursie"
     back: "Jou Vertos"
     not_found: "Daardie Verto is nie in jou rekening nie."
     answered_on: "Jy het op %{date} geantwoord"
@@ -1998,6 +1997,8 @@ af:
     next_meta: "Nou oop"
     next_empty: "Nog niks nuuts nie. Jy sal 'n e-pos kry wanneer een van die organisasies wat jy beantwoord het iets publiseer."
     wallet_note: "Elke Verto stel sy eie punte en sy eie bedrae, dus is hierdie hopies nie dieselfde ding as mekaar nie. Daar is 'n totaal omdat dit lekker is om een te hê; daar is geen ranglys oor Vertos heen nie, want dit sou net meet watter Verto jy toevallig gespeel het."
+    wallet_pill: "Jou beursie: %{total} ingesamel"
+    wallet_see_all: "Sien alles"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Jy kry dit omdat jy gevra het om te hoor van organisasies wie se Vertos jy beantwoord het."

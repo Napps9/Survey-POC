@@ -1469,7 +1469,6 @@ en:
     deleted: "Your account has been deleted."
     tabs_label: "Your account"
     tab_vertos: "Vertos"
-    tab_wallet: "Wallet"
     back: "Your Vertos"
     not_found: "That Verto isn't in your account."
     answered_on: "You answered on %{date}"
@@ -1486,6 +1485,11 @@ en:
     wallet_eyebrow: "Collected"
     wallet_title: "Your wallet"
     wallet_empty: "No points yet. Not every Verto awards them — the ones that do will show up here."
+    # The pill in the corner of every account page. %{total} is already
+    # formatted and delimited by the view, so it is a string here, not a count
+    # to pluralise on.
+    wallet_pill: "Your wallet: %{total} collected"
+    wallet_see_all: "See all"
     # Two counts in one sentence, and i18n pluralises on `count` alone — so the
     # halves are counted separately and composed here.
     wallet_across: "Across %{vertos} and %{organisations}."

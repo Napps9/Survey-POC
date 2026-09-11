@@ -1,12 +1,13 @@
 <%# The account's own nav. aria-current rather than a class alone, so the
-    state is announced and not only coloured. %>
+    state is announced and not only coloured.
+
+    Two tabs, not three: the wallet moved to the pill in the top corner, where
+    it can carry its own total instead of being a word that gives no reason to
+    press it. %>
 <nav class="you-tabs" aria-label="<%= t("you.tabs_label") %>">
   <%= link_to t("you.tab_vertos"), you_path,
         class: "you-tab#{" is-on" if current == :vertos}",
         "aria-current": (current == :vertos ? "page" : nil) %>
-  <%= link_to t("you.tab_wallet"), you_wallet_path,
-        class: "you-tab#{" is-on" if current == :wallet}",
-        "aria-current": (current == :wallet ? "page" : nil) %>
   <%= link_to t("you.tab_next"), you_next_path,
         class: "you-tab#{" is-on" if current == :next}",
         "aria-current": (current == :next ? "page" : nil) %>

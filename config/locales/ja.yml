@@ -1956,7 +1956,6 @@ ja:
     deleted: "アカウントを削除しました。"
     tabs_label: "あなたのアカウント"
     tab_vertos: "Vertos"
-    tab_wallet: "ウォレット"
     back: "あなたの Vertos"
     not_found: "その Verto はあなたのアカウントにありません。"
     answered_on: "%{date} に回答しました"
@@ -1991,6 +1990,8 @@ ja:
     next_meta: "受付中"
     next_empty: "まだ新しいものはありません。回答した団体のいずれかが何かを公開したら、メールでお知らせします。"
     wallet_note: "Verto ごとに独自のポイントと独自の数量を設定しているため、これらの山は互いに同じものではありません。合計があるのは、あるとうれしいからです。Vertos をまたぐ順位表はありません。たまたまどの Verto をプレイしたかを測るだけになるからです。"
+    wallet_pill: "あなたのウォレット：%{total} 獲得"
+    wallet_see_all: "すべて見る"
   player_notification_mailer:
     via: "%{org} · Playverto 経由"
     why: "回答した Vertos の団体からの知らせを希望されたため、このメールをお送りしています。"

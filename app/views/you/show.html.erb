@@ -9,10 +9,13 @@
         language switcher there, and an avatar chip landed underneath it. The
         account is named under the heading instead, which says more than an
         initial did anyway — on a shared device, WHICH account you are in is
-        the thing worth knowing. %>
+        the thing worth knowing. The wallet pill below reaches that corner the
+        only way anything can — through the layout's own fixed cluster. %>
     <div class="you-bar">
       <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
     </div>
+
+    <%= render "you/wallet_pill", rows: @purse_rows, total: @purse_total, current: :vertos %>
 
     <% if !player_signed_in? %>
       <div class="you-card">

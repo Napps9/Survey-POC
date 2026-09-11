@@ -1968,7 +1968,6 @@ pl:
     deleted: "Twoje konto zostało usunięte."
     tabs_label: "Twoje konto"
     tab_vertos: "Vertos"
-    tab_wallet: "Portfel"
     back: "Twoje Vertos"
     not_found: "Tego Verto nie ma na twoim koncie."
     answered_on: "Odpowiedziałeś %{date}"
@@ -2003,6 +2002,8 @@ pl:
     next_meta: "Otwarte teraz"
     next_empty: "Na razie nic nowego. Dostaniesz e-mail, gdy któraś z organizacji, którym odpowiedziałeś, coś opublikuje."
     wallet_note: "Każde Verto ustala własne żetony i własne wartości, więc te stosy nie są tym samym co siebie nawzajem. Suma istnieje, bo miło ją mieć; nie ma rankingu między Vertos, bo mierzyłby tylko to, w które Verto akurat zagrałeś."
+    wallet_pill: "Twój portfel: zebrano %{total}"
+    wallet_see_all: "Zobacz wszystko"
   player_notification_mailer:
     via: "%{org} · przez Playverto"
     why: "Dostajesz to, bo poprosiłeś o wiadomości od organizacji, których Vertos wypełniłeś."

@@ -1957,7 +1957,6 @@ vi:
     deleted: "Tài khoản của bạn đã bị xóa."
     tabs_label: "Tài khoản của bạn"
     tab_vertos: "Vertos"
-    tab_wallet: "Ví"
     back: "Vertos của bạn"
     not_found: "Verto đó không có trong tài khoản của bạn."
     answered_on: "Bạn đã trả lời ngày %{date}"
@@ -1992,6 +1991,8 @@ vi:
     next_meta: "Đang mở"
     next_empty: "Chưa có gì mới. Bạn sẽ nhận được email khi một trong các tổ chức bạn đã trả lời đăng điều gì đó."
     wallet_note: "Mỗi Verto tự đặt điểm và số lượng riêng, nên các chồng điểm này không phải là cùng một thứ. Có một tổng số vì có nó thì thấy vui; không có bảng xếp hạng giữa các Vertos, vì nó chỉ đo được bạn tình cờ chơi Verto nào."
+    wallet_pill: "Ví của bạn: đã thu được %{total}"
+    wallet_see_all: "Xem tất cả"
   player_notification_mailer:
     via: "%{org} · qua Playverto"
     why: "Bạn nhận được thư này vì bạn đã xin nghe tin từ các tổ chức có Vertos mà bạn đã trả lời."

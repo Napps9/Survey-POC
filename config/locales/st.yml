@@ -1995,7 +1995,6 @@ st:
     deleted: "Akhaonto ya hao e hlakotswe."
     tabs_label: "Akhaonto ya hao"
     tab_vertos: "Di-Verto"
-    tab_wallet: "Sepatjhe"
     back: "Di-Verto tsa hao"
     not_found: "Verto eo ha e yo akhaontong ya hao."
     answered_on: "O arabile ka %{date}"
@@ -2030,6 +2029,8 @@ st:
     next_meta: "Bula hona jwale"
     next_empty: "Ha ho letho le lecha hajwale. O tla fumana imeile ha o mong wa mekgatlo eo o e arabileng a phatlalatsa ho hong."
     wallet_note: "Verto ka nngwe e beha ditokene tsa yona le dipalo tsa yona, kahoo dikgobo tsena ha di tshwane. Ho na le kakaretso hobane ho kgotsofatsa ho ba le yona — ha ho tafole ya liki ho pholletsa le di-Verto, hobane e ne e tla lekanya feela hore o bapetse Verto ya mang."
+    wallet_pill: "Sepatjhe sa hao: %{total} se bokelletsweng"
+    wallet_see_all: "Sheba tsohle"
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O fumana sena hobane o kopile ho utlwa ho mekgatlo eo o arabileng di-Verto tsa yona."

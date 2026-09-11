@@ -10,6 +10,7 @@
       <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
     </div>
 
+    <%= render "you/wallet_pill", rows: @purse_rows, total: @purse_total, current: :next %>
     <%= render "you/tabs", current: :next %>
 
     <div class="you-head">

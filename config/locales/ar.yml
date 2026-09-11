@@ -1973,7 +1973,6 @@ ar:
     deleted: "تم حذف حسابك."
     tabs_label: "حسابك"
     tab_vertos: "Vertos"
-    tab_wallet: "المحفظة"
     back: "Vertos الخاصة بك"
     not_found: "هذا الـ Verto ليس في حسابك."
     answered_on: "أجبت في %{date}"
@@ -2008,6 +2007,8 @@ ar:
     next_meta: "مفتوح الآن"
     next_empty: "لا جديد بعد. ستصلك رسالة عندما تنشر إحدى المؤسسات التي أجبتها شيئًا."
     wallet_note: "كل Verto يحدد رموزه الخاصة ومقاديره الخاصة، لذا فهذه الأكوام ليست الشيء نفسه. يوجد مجموع لأن وجوده مُرضٍ؛ ولا يوجد ترتيب بين Vertos، لأنه لن يقيس سوى أي Verto صادف أن لعبته."
+    wallet_pill: "محفظتك: تم جمع %{total}"
+    wallet_see_all: "عرض الكل"
   player_notification_mailer:
     via: "%{org} · عبر Playverto"
     why: "تصلك هذه الرسالة لأنك طلبت أن تسمع من المؤسسات التي أجبت عن Vertos الخاصة بها."

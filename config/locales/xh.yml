@@ -1997,7 +1997,6 @@ xh:
     deleted: "I-akhawunti yakho icinyiwe."
     tabs_label: "I-akhawunti yakho"
     tab_vertos: "Ii-Verto"
-    tab_wallet: "Isipaji"
     back: "Ii-Verto zakho"
     not_found: "Loo Verto ayikho kwi-akhawunti yakho."
     answered_on: "Uphendule ngo-%{date}"
@@ -2032,6 +2031,8 @@ xh:
     next_meta: "Vula ngoku"
     next_empty: "Akukho nto intsha okwangoku. Uya kufumana i-imeyile xa omnye wemibutho oyiphendulileyo epapasha into."
     wallet_note: "I-Verto nganye imisela iithokheni zayo namanani ayo, ngoko ezi mfumba azifani. Kukho inani lilonke kuba kuyakholisa ukuba nalo — akukho thebhile yeligi kuzo zonke ii-Verto, kuba ibiya kulinganisa kuphela ukuba udlale i-Verto kabani."
+    wallet_pill: "Isipaji sakho: %{total} okuqokelelweyo"
+    wallet_see_all: "Jonga konke"
   player_notification_mailer:
     via: "%{org} · nge-Playverto"
     why: "Ufumana oku kuba ucele ukuva kwimibutho oyiphendulileyo ii-Verto zayo."

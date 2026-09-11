@@ -1995,7 +1995,6 @@ tn:
     deleted: "Akhaonto ya gago e phimotswe."
     tabs_label: "Akhaonto ya gago"
     tab_vertos: "Di-Verto"
-    tab_wallet: "Sekhwama"
     back: "Di-Verto tsa gago"
     not_found: "Verto eo ga e yo mo akhaontong ya gago."
     answered_on: "O arabile ka %{date}"
@@ -2030,6 +2029,8 @@ tn:
     next_meta: "Bula jaanong"
     next_empty: "Ga go na sepe se sesha gape. O tla amogela imeile fa mongwe wa mekgatlho e o e arabileng a gatisa sengwe."
     wallet_note: "Verto nngwe le nngwe e beya ditokene tsa yona le dipalo tsa yona, ka jalo dikgobokanyo tseno ga di tshwane. Go na le palogotlhe ka gonne go a kgatlhisa go nna le yona — ga go na tafole ya liki mo di-Verto tsotlhe, ka gonne e ne e tla lekanya fela gore o tshameketse Verto ya ga mang."
+    wallet_pill: "Sekhwama sa gago: %{total} se se kokoantsweng"
+    wallet_see_all: "Bona tsotlhe"
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O amogela seno ka gonne o kopile go utlwa go mekgatlho e o arabileng di-Verto tsa yona."

@@ -32,7 +32,11 @@
       <%# Unauthenticated chrome-less pages (login, register, password). The
           player has its own content-language switcher in its nav. %>
       <% unless controller_name == "player" || @chromeless %>
-        <div class="lang-switcher-fixed"><%= render "shared/locale_switcher" %></div>
+        <%# One fixed cluster in the top corner, not two: the account parks its
+            wallet pill here via content_for, and a second independently-fixed
+            element would have to guess how wide the language code is to avoid
+            landing on top of it. %>
+        <div class="lang-switcher-fixed"><%= yield :top_corner %><%= render "shared/locale_switcher" %></div>
       <% end %>
       <%= yield %>
       <%# Same non-player, non-chromeless gate as the locale switcher above —

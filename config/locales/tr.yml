@@ -1958,7 +1958,6 @@ tr:
     deleted: "Hesabın silindi."
     tabs_label: "Hesabın"
     tab_vertos: "Vertos"
-    tab_wallet: "Cüzdan"
     back: "Vertos'ların"
     not_found: "O Verto hesabında değil."
     answered_on: "%{date} tarihinde yanıtladın"
@@ -1993,6 +1992,8 @@ tr:
     next_meta: "Şu anda açık"
     next_empty: "Henüz yeni bir şey yok. Yanıtladığın kuruluşlardan biri bir şey yayımladığında e-posta alacaksın."
     wallet_note: "Her Verto kendi jetonlarını ve kendi miktarlarını belirler, bu yüzden bu yığınlar birbiriyle aynı şey değil. Bir toplam var çünkü bir toplamın olması keyifli; Vertos arasında sıralama yok, çünkü yalnızca hangi Verto'yu oynadığını ölçerdi."
+    wallet_pill: "Cüzdanın: %{total} toplandı"
+    wallet_see_all: "Tümünü gör"
   player_notification_mailer:
     via: "%{org} · Playverto aracılığıyla"
     why: "Bunu alıyorsun çünkü Vertos'larını yanıtladığın kuruluşlardan haber almak istedin."

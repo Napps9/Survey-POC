@@ -1,0 +1,71 @@
+<%# The wallet, as a pill in the corner of every account page.
+
+    It is a LINK first and a hover surface second, which is the whole reason it
+    can replace a tab: a tap opens the wallet, on a phone where there is no
+    hover and on a keyboard where there is no pointer. The breakdown is a peek
+    a mouse gets for free — nothing lives in it that the page it links to does
+    not also say.
+
+    Drawn only when something has been collected. A "0" pill would be an
+    affordance promising a screen whose whole content is "no points yet", and
+    the wallet already made the choice not to show a zero.
+
+    It renders into the layout's fixed top corner rather than where it is
+    called, because that corner is where the language switcher already is and
+    the two have to share one cluster. So the partial fills `:top_corner` and
+    emits nothing itself — call it anywhere in the page body.
+
+    Locals: rows (every Verto with a pile, newest first), total, current. %>
+<% content_for :top_corner do %>
+<% if rows.any? %>
+  <div class="you-purse" data-controller="wallet-pill"
+       data-action="mouseenter->wallet-pill#open mouseleave->wallet-pill#close">
+    <%= link_to you_wallet_path,
+          class: "you-purse-pill#{" is-on" if current == :wallet}",
+          "aria-label": t("you.wallet_pill", total: number_with_delimiter(total)),
+          "aria-current": (current == :wallet ? "page" : nil),
+          data: { action: "focus->wallet-pill#open blur->wallet-pill#close" } do %>
+      <%# A wallet, not a coin: each Verto sets its own token icons, so borrowing
+          one of them to stand for the total would say that all of it is that
+          Verto's currency. (A stack of coins was the first try and read as a
+          database cylinder at 15px.) %>
+      <svg class="you-purse-mark" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1.6" y="3.4" width="12.8" height="9.2" rx="2.4"
+              stroke="currentColor" stroke-width="1.4"/>
+        <path d="M14.4 6.7h-2.5a1.85 1.85 0 0 0 0 3.7h2.5"
+              stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      </svg>
+      <span class="you-purse-total"><%= number_with_delimiter(total) %></span>
+    <% end %>
+
+    <%# aria-hidden, and not as a shortcut: the pill's own label carries the
+        total, and every row in here is on the wallet page the pill points at,
+        so a screen reader following the pill loses nothing. Exposing it would
+        put the same five Vertos in the reading order of every account page.
+        The link inside is tabindex=-1 for the same reason — and because
+        focusable content inside aria-hidden is a trap rather than a shortcut. %>
+    <div class="you-purse-popover" data-wallet-pill-target="popover" aria-hidden="true" hidden>
+      <div class="you-purse-head"><%= t("you.wallet_eyebrow") %></div>
+      <% rows.first(YouController::PURSE_PREVIEW).each do |row| %>
+        <div class="you-purse-row">
+          <div class="you-purse-verto"><%= row[:survey].theme.presence || row[:survey].title %></div>
+          <%# That Verto's own tokens, named and counted the way that Verto names
+              and counts them. Two Vertos routinely both call a token "gold" for
+              two different things, so the piles are never added together — not
+              here, and not on the page this links to. %>
+          <div class="you-purse-piles">
+            <% row[:piles].each do |pile| %>
+              <span class="you-pile">
+                <%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <%= link_to you_wallet_path, class: "you-purse-all", tabindex: -1 do %>
+        <%= t("you.wallet_see_all") %> <span aria-hidden="true">→</span>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<% end %>

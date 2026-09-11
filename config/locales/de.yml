@@ -1958,7 +1958,6 @@ de:
     deleted: "Dein Konto wurde gelöscht."
     tabs_label: "Dein Konto"
     tab_vertos: "Vertos"
-    tab_wallet: "Brieftasche"
     back: "Deine Vertos"
     not_found: "Dieses Verto ist nicht in deinem Konto."
     answered_on: "Du hast am %{date} geantwortet"
@@ -1993,6 +1992,8 @@ de:
     next_meta: "Jetzt geöffnet"
     next_empty: "Noch nichts Neues. Du bekommst eine E-Mail, sobald eine der Organisationen, die du beantwortet hast, etwas veröffentlicht."
     wallet_note: "Jedes Verto legt seine eigenen Punkte und seine eigenen Beträge fest — diese Stapel sind also nicht dasselbe wie einander. Es gibt eine Gesamtsumme, weil es befriedigend ist, eine zu haben; es gibt keine Rangliste über Vertos hinweg, weil sie nur messen würde, welches Verto du zufällig gespielt hast."
+    wallet_pill: "Deine Brieftasche: %{total} gesammelt"
+    wallet_see_all: "Alle ansehen"
   player_notification_mailer:
     via: "%{org} · über Playverto"
     why: "Du bekommst das, weil du von den Organisationen hören wolltest, deren Vertos du beantwortet hast."

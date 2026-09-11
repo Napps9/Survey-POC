@@ -27,7 +27,12 @@ module EnglishSpellings
     "democratising" => "democratizing", "analysing"     => "analyzing",
     "analysed"      => "analyzed",      "unanalysed"    => "unanalyzed",
     "cancelled"     => "canceled",      "labelled"      => "labeled",
-    "programme"     => "program"
+    "programme"     => "program",
+    # Both forms: SUSPECT catches a bare `ise$` but not `ises$`, so "pluralises"
+    # had been sitting in an en.yml comment undetected while "pluralise" three
+    # lines above it failed the guard. A list that decides one and not the other
+    # respells half a paragraph.
+    "pluralise"     => "pluralize",     "pluralises"    => "pluralizes"
   }.freeze
 
   PATTERN = /\b(#{BRITISH_TO_AMERICAN.keys.sort_by { |w| -w.length }.join('|')})\b/i

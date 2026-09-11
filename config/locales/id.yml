@@ -1957,7 +1957,6 @@ id:
     deleted: "Akunmu telah dihapus."
     tabs_label: "Akunmu"
     tab_vertos: "Vertos"
-    tab_wallet: "Dompet"
     back: "Vertos-mu"
     not_found: "Verto itu tidak ada di akunmu."
     answered_on: "Kamu menjawab pada %{date}"
@@ -1992,6 +1991,8 @@ id:
     next_meta: "Terbuka sekarang"
     next_empty: "Belum ada yang baru. Kamu akan menerima email saat salah satu organisasi yang kamu jawab menerbitkan sesuatu."
     wallet_note: "Setiap Verto menetapkan poinnya sendiri dan jumlahnya sendiri, jadi tumpukan-tumpukan ini bukan hal yang sama satu sama lain. Ada total karena menyenangkan punya satu; tidak ada papan peringkat antar-Vertos, karena itu hanya akan mengukur Verto mana yang kebetulan kamu mainkan."
+    wallet_pill: "Dompetmu: %{total} terkumpul"
+    wallet_see_all: "Lihat semua"
   player_notification_mailer:
     via: "%{org} · lewat Playverto"
     why: "Kamu menerima ini karena kamu minta mendengar dari organisasi yang Vertos-nya sudah kamu jawab."

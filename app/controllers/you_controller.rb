@@ -17,6 +17,14 @@ class YouController < ApplicationController
   allow_signed_out_players only: :show
 
   before_action :no_store
+  # Only the pages that draw the pill. sign_out and destroy render nothing.
+  before_action :set_purse, only: %i[show verto next_up wallet]
+
+  # How many Vertos the wallet pill's hover breakdown shows before handing over
+  # to the wallet itself. Five is a peek, not a second wallet — the pill exists
+  # to answer "what have I got" in one glance, and a list long enough to scroll
+  # would only be the page it links to, rendered worse.
+  PURSE_PREVIEW = 5
 
   def show
     @claims = kept_claims
@@ -56,17 +64,15 @@ class YouController < ApplicationController
   end
 
   # The wallet: one row per Verto, and one number that spans them.
+  #
+  # The rows are the purse's, so the pill's total and this page's total are one
+  # computation and cannot disagree; the standing is added here and only here,
+  # because it costs a query per row and the pill has no use for it.
   def wallet
-    # group_by preserves first-seen order, so the rows keep kept_claims' own
-    # newest-answered-first ordering.
-    @rows = kept_claims.group_by(&:survey_id).filter_map do |_id, claims|
-      survey = claims.first.survey
-      piles  = piles_for(survey, claims)
-      next if piles.empty?
-
-      { survey: survey, piles: piles, standing: standing_for(survey, claims) }
+    @rows = @purse_rows.map do |row|
+      row.merge(standing: standing_for(row[:survey], row[:claims]))
     end
-    @total = @rows.sum { |row| row[:piles].sum { |p| p[:amount] } }
+    @total = @purse_total
     @organisations = @rows.map { |row| row[:survey].organisation_id }.uniq.size
   end
 
@@ -88,18 +94,52 @@ class YouController < ApplicationController
 
   private
 
-  # Every Verto this account holds, newest first, minus the ones whose Verto has
-  # been deleted since. Shared by all three pages so they can never disagree
-  # about what the account contains — the header saying "3" and the list showing
-  # 2 is the one thing that would make a respondent trust neither.
-  def kept_claims
-    return [] unless player_signed_in?
+  # What the account has collected, on every page rather than only the wallet:
+  # the pill in the corner carries the total everywhere, and its hover
+  # breakdown carries the first PURSE_PREVIEW rows.
+  #
+  # Built from the same rows the wallet renders, deliberately. A pill showing a
+  # number the page behind it doesn't agree with is worse than no pill.
+  def set_purse
+    @purse_rows  = token_rows
+    @purse_total = @purse_rows.sum { |row| row[:piles].sum { |p| p[:amount] } }
+  end
 
-    current_player.player_claims
-                  .includes(:response, survey: :organisation)
-                  .newest_first
-                  .reject { |c| c.survey.nil? || c.survey.deleted_at.present? }
-                  .sort_by { |c| -played_at(c).to_i }
+  # One row per Verto that awarded anything, newest-answered first.
+  #
+  # group_by preserves first-seen order, so the rows keep kept_claims' own
+  # ordering. A Verto that awarded nothing is not a row: an empty pile is not a
+  # holding, and listing it would pad the wallet with Vertos that have nothing
+  # to show.
+  def token_rows
+    kept_claims.group_by(&:survey_id).filter_map do |_id, claims|
+      survey = claims.first.survey
+      piles  = piles_for(survey, claims)
+      next if piles.empty?
+
+      { survey: survey, claims: claims, piles: piles }
+    end
+  end
+
+  # Every Verto this account holds, newest first, minus the ones whose Verto has
+  # been deleted since. Shared by every page and by the pill in the corner, so
+  # they can never disagree about what the account contains — the header saying
+  # "3" and the list showing 2 is the one thing that would make a respondent
+  # trust neither.
+  #
+  # Memoised because the purse now needs it on every action alongside whatever
+  # the action itself wanted, and it is the page's one real query.
+  def kept_claims
+    @kept_claims ||=
+      if player_signed_in?
+        current_player.player_claims
+                      .includes(:response, survey: :organisation)
+                      .newest_first
+                      .reject { |c| c.survey.nil? || c.survey.deleted_at.present? }
+                      .sort_by { |c| -played_at(c).to_i }
+      else
+        []
+      end
   end
 
   # Ordered by when they ANSWERED, not when the claim was written — both pages

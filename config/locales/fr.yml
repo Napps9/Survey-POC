@@ -1958,7 +1958,6 @@ fr:
     deleted: "Votre compte a été supprimé."
     tabs_label: "Votre compte"
     tab_vertos: "Vertos"
-    tab_wallet: "Portefeuille"
     back: "Vos Vertos"
     not_found: "Ce Verto n'est pas dans votre compte."
     answered_on: "Vous avez répondu le %{date}"
@@ -1993,6 +1992,8 @@ fr:
     next_meta: "Ouvert maintenant"
     next_empty: "Rien de nouveau pour l'instant. Vous recevrez un e-mail quand l'une des organisations auxquelles vous avez répondu publiera quelque chose."
     wallet_note: "Chaque Verto définit ses propres jetons et ses propres montants : ces piles ne sont donc pas la même chose l'une que l'autre. Il y a un total parce qu'il est satisfaisant d'en avoir un ; il n'y a pas de classement entre Vertos, car cela ne mesurerait que le Verto qu'il vous est arrivé de jouer."
+    wallet_pill: "Votre portefeuille : %{total} cumulés"
+    wallet_see_all: "Tout voir"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Vous recevez ceci parce que vous avez demandé des nouvelles des organisations dont vous avez répondu aux Vertos."

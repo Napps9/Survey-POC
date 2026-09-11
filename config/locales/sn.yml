@@ -1968,7 +1968,6 @@ sn:
     deleted: "Akaundi yako yadzimwa."
     tabs_label: "Akaundi yako"
     tab_vertos: "MaVerto"
-    tab_wallet: "Chikwama"
     back: "MaVerto ako"
     not_found: "Verto iroro harisi muakaundi yako."
     answered_on: "Wakapindura pa%{date}"
@@ -2003,6 +2002,8 @@ sn:
     next_meta: "Vhura izvozvi"
     next_empty: "Hapana chitsva parizvino. Uchawana email kana rimwe remasangano awakapindura richiburitsa chimwe chinhu."
     wallet_note: "Verto rimwe nerimwe rinozvitarira matokeni aro nehuwandu hwaro, saka mirwi iyi haifanani. Pane huwandu hwose nekuti zvinofadza kuva nahwo — hapana tafura yeligi pamaVerto ose, nekuti yaingoyera kuti wakatamba Verto raani."
+    wallet_pill: "Chikwama chako: %{total} zvakaunganidzwa"
+    wallet_see_all: "Ona zvose"
   player_notification_mailer:
     via: "%{org} · kuburikidza nePlayverto"
     why: "Uri kuwana izvi nekuti wakakumbira kunzwa kubva kumasangano awakapindura maVerto awo."

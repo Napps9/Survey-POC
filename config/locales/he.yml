@@ -1965,7 +1965,6 @@ he:
     deleted: "החשבון שלכם נמחק."
     tabs_label: "החשבון שלכם"
     tab_vertos: "Vertos"
-    tab_wallet: "ארנק"
     back: "ה-Vertos שלכם"
     not_found: "ה-Verto הזה אינו בחשבון שלכם."
     answered_on: "עניתם ב-%{date}"
@@ -2000,6 +1999,8 @@ he:
     next_meta: "פתוח עכשיו"
     next_empty: "עדיין אין חדש. תקבלו אימייל כשאחד הארגונים שענִיתם לו יפרסם משהו."
     wallet_note: "כל Verto קובע את הנקודות שלו ואת הסכומים שלו, ולכן הערימות האלה אינן אותו הדבר זו כזו. יש סך הכול כי נעים שיהיה; אין טבלת דירוג בין Vertos, כי היא רק הייתה מודדת באיזה Verto יצא לכם לשחק."
+    wallet_pill: "הארנק שלכם: %{total} שנאספו"
+    wallet_see_all: "הצגת הכול"
   player_notification_mailer:
     via: "%{org} · באמצעות Playverto"
     why: "אתם מקבלים את זה כי ביקשתם לשמוע מארגונים שענִיתם ל-Vertos שלהם."

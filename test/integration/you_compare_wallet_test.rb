@@ -182,8 +182,10 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
     sign_in_with([ a, b ])
 
     get you_wallet_path
+    # Scoped to the list: the pill's hover breakdown draws the same component
+    # for the same rows, in the same order, in the corner of this very page.
     assert_equal [ "🌱 2 New", "🍂 1 Old" ],
-                 css_select(".you-pile").map { |e| e.text.split.join(" ") }
+                 css_select(".you-list .you-pile").map { |e| e.text.split.join(" ") }
 
     get you_path
     assert_equal [ newer.id, older.id ].map { |id| you_verto_path(id) },
@@ -273,8 +275,119 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
     get you_path
     assert_select ".you-tab[aria-current=page]", text: I18n.t("you.tab_vertos")
 
+    get you_next_path
+    assert_select ".you-tab[aria-current=page]", text: I18n.t("you.tab_next")
+  end
+
+  # ── The wallet pill ───────────────────────────────────────────────────────
+  #
+  # The wallet stopped being a tab and became a pill in the top corner, so the
+  # tests that used to say "the tab is there and marks the page" say it about
+  # the pill — and about the thing a tab could never do, which is carry the
+  # number that makes it worth pressing.
+
+  def pilled(owner, name, icon, amount, id: "gold")
+    s = survey(owner: owner, tokenisation_enabled: true,
+               token_types: [ { "id" => id, "name" => name, "icon" => icon } ])
+    [ s, answered(s, tokens: { id => amount }) ]
+  end
+
+  test "the pill carries the total on every page of the account, and marks the wallet" do
+    o = org
+    first,  a = pilled(o, "Ideas", "🚲", 34)
+    _second, b = pilled(o, "Green", "🌳", 88)
+    sign_in_with([ a, b ])
+
+    [ you_path, you_next_path, you_verto_path(first) ].each do |path|
+      get path
+      assert_select "a.you-purse-pill[href=?]", you_wallet_path, 1, "no wallet pill on #{path}"
+      assert_select ".you-purse-total", text: "122"
+      # Off the wallet, the pill is a way there and not a marker of where you
+      # are. Two aria-currents on one page is a page that cannot say.
+      assert_select ".you-purse-pill[aria-current]", 0, "#{path} marked the pill as the current page"
+    end
+
     get you_wallet_path
-    assert_select ".you-tab[aria-current=page]", text: I18n.t("you.tab_wallet")
+    assert_select ".you-purse-pill[aria-current=page]", 1
+    # And the one number is one computation: the pill and the page it links to
+    # cannot disagree about what the account holds.
+    assert_select ".you-purse-total", text: "122"
+    assert_select ".you-total", text: "122"
+  end
+
+  test "the pill's breakdown keeps each Verto's tokens apart, and offers the rest" do
+    o = org
+    _first,  a = pilled(o, "Ideas", "🚲", 34)
+    _second, b = pilled(o, "Green", "🌳", 88)
+    sign_in_with([ a, b ])
+
+    get you_path
+
+    # Two Vertos, both using the id "gold" for two different things — the
+    # breakdown names each Verto and counts its own tokens under it.
+    assert_select ".you-purse-row", 2
+    assert_select ".you-purse-row .you-pile", text: /🚲\s*34\s*Ideas/
+    assert_select ".you-purse-row .you-pile", text: /🌳\s*88\s*Green/
+    assert_select ".you-purse-verto", text: "Car-free High Street", count: 2
+    assert_select "a.you-purse-all[href=?]", you_wallet_path, text: /#{I18n.t("you.wallet_see_all")}/
+  end
+
+  test "the breakdown is a peek at five, not a second wallet" do
+    o = org
+    claims = 7.times.map { |i| pilled(o, "Leaves", "🍃", i + 1, id: "leaf-#{i}").last }
+    sign_in_with(claims)
+
+    get you_path
+    assert_select ".you-purse-row", YouController::PURSE_PREVIEW
+    # The rest are not lost, they are behind the CTA.
+    assert_select "a.you-purse-all[href=?]", you_wallet_path
+
+    get you_wallet_path
+    assert_select ".you-list .you-verto", 7
+    assert_select ".you-total", text: "28"
+  end
+
+  test "the breakdown is a peek for a pointer, never a second reading of the page" do
+    # Every row in it is on the wallet the pill points at, and the pill's own
+    # label already carries the total. Exposing it would put the same five
+    # Vertos into the reading order of every page of the account.
+    o = org
+    _s, a = pilled(o, "Ideas", "🚲", 34)
+    sign_in_with([ a ])
+
+    get you_path
+
+    assert_select ".you-purse-popover[aria-hidden=true][hidden]", 1
+    assert_select ".you-purse-pill[aria-label=?]",
+                  I18n.t("you.wallet_pill", total: "34")
+    # Nothing inside it is reachable by tab — focusable content inside
+    # aria-hidden is a trap rather than a shortcut.
+    assert_select ".you-purse-popover a[tabindex=?]", "-1", 1
+    assert_select ".you-purse-popover a:not([tabindex])", 0
+  end
+
+  test "with nothing collected there is no pill, because there is nothing to press it for" do
+    # The wallet already made this choice: it says "no points yet" rather than
+    # showing a zero. A pill showing 0 would be an affordance promising that
+    # sentence.
+    s = survey
+    sign_in_with([ answered(s) ])
+
+    get you_path
+    assert_select ".you-purse", 0
+
+    # The page itself is still reachable, and still says so.
+    get you_wallet_path
+    assert_response :success
+    assert_select ".you-sub", text: I18n.t("you.wallet_empty")
+    assert_select ".you-purse", 0
+  end
+
+  test "signed out there is no pill at all" do
+    get you_path
+
+    assert_response :success
+    assert_select ".you-purse", 0
   end
 
   test "every Verto in the list opens its own page" do

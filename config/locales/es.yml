@@ -1958,7 +1958,6 @@ es:
     deleted: "Tu cuenta ha sido eliminada."
     tabs_label: "Tu cuenta"
     tab_vertos: "Vertos"
-    tab_wallet: "Cartera"
     back: "Tus Vertos"
     not_found: "Ese Verto no está en tu cuenta."
     answered_on: "Respondiste el %{date}"
@@ -1993,6 +1992,8 @@ es:
     next_meta: "Abierto ahora"
     next_empty: "Todavía no hay nada nuevo. Recibirás un correo cuando alguna de las organizaciones que has respondido publique algo."
     wallet_note: "Cada Verto define sus propias fichas y sus propias cantidades, así que estos montones no son lo mismo entre sí. Hay un total porque resulta satisfactorio tenerlo; no hay clasificación entre Vertos, porque solo mediría qué Verto te tocó jugar."
+    wallet_pill: "Tu cartera: %{total} acumulados"
+    wallet_see_all: "Ver todo"
   player_notification_mailer:
     via: "%{org} · a través de Playverto"
     why: "Recibes esto porque pediste saber de las organizaciones cuyos Vertos has respondido."

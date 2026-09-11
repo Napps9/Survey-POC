@@ -1958,7 +1958,6 @@ nl:
     deleted: "Je account is verwijderd."
     tabs_label: "Jouw account"
     tab_vertos: "Vertos"
-    tab_wallet: "Portemonnee"
     back: "Jouw Vertos"
     not_found: "Die Verto staat niet in je account."
     answered_on: "Je hebt geantwoord op %{date}"
@@ -1993,6 +1992,8 @@ nl:
     next_meta: "Nu open"
     next_empty: "Nog niets nieuws. Je krijgt een e-mail zodra een van de organisaties waarvan je een Verto beantwoordde iets publiceert."
     wallet_note: "Elke Verto bepaalt zijn eigen punten en zijn eigen aantallen, dus deze stapels zijn niet hetzelfde als elkaar. Er is een totaal omdat het prettig is er een te hebben; er is geen ranglijst over Vertos heen, want die zou alleen meten welke Verto je toevallig hebt gespeeld."
+    wallet_pill: "Jouw portemonnee: %{total} verzameld"
+    wallet_see_all: "Bekijk alles"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Je krijgt dit omdat je hebt gevraagd om te horen van organisaties waarvan je een Verto hebt beantwoord."
