@@ -276,19 +276,24 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     end
   end
 
-  # ...and opaque is not enough on its own: the account card must composite to
-  # the SAME colour the respondent sees, which means keeping the brand tint over
-  # #1C2034 rather than being painted a flat dark grey. Both halves, because
-  # dropping the tint to fix the transparency is the same bug pointing the other
-  # way.
+  # ...and opaque is not enough on its own: the creator's card must be the SAME
+  # colour the respondent sees. Both halves, because painting over the card to
+  # stop the photo showing through is the same bug pointing the other way.
+  #
+  # This used to compare the editor's background-IMAGE against the player's
+  # tint, because the card was rgba(primary, 0.12) and the editor reproduced it
+  # as a flat gradient over an opaque #1C2034. The card is a solid #272D4A now
+  # (Playverto's own surface — it offers a Playverto account, not the Verto),
+  # so there is no tint to reproduce and the editor simply inherits. Comparing
+  # the computed colours states the property directly, and still fails if
+  # either side starts painting its own.
   test "the account-ask card is the same colour as the block it configures" do
-    # The tint the respondent's card is actually painted with, in this Verto's
-    # palette — read off the player's own .join-card rather than hard-coded, so
-    # the check follows a rebrand.
-    player_tint = nil
+    # Read off the player's own .join-card rather than hard-coded, so the check
+    # follows the card wherever its surface goes next.
+    player_bg = nil
     with_viewport(1440, 950, mobile: false) do
       play_to_the_end
-      player_tint = page.evaluate_script(
+      player_bg = page.evaluate_script(
         "getComputedStyle(document.querySelector('.join-card')).backgroundColor"
       )
     end
@@ -297,14 +302,20 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_viewport(1440, 950, mobile: false) do
       visit survey_path(@survey)
       assert_selector ".gate-join-card", wait: 8
-      image = page.evaluate_script(
-        "getComputedStyle(document.querySelector('.gate-join-card')).backgroundImage"
-      )
-      assert_includes image, player_tint,
-                      "the editor's account card is opaque but no longer carries the tint the " \
-                      "player paints the block with (#{player_tint}) — background-image is " \
-                      "#{image.inspect}. Opaque and the WRONG colour is the same bug pointing " \
-                      "the other way: painting over the brand to stop the photo showing through."
+      editor = page.evaluate_script(<<~JS)
+        (() => { const s = getComputedStyle(document.querySelector('.gate-join-card'))
+                 return { color: s.backgroundColor, image: s.backgroundImage } })()
+      JS
+
+      assert_equal player_bg, editor["color"],
+                   "the editor's account card is a different colour from the one the respondent " \
+                   "meets (player #{player_bg}, editor #{editor['color']}) — the creator is " \
+                   "editing a card nobody sees."
+      # A gradient over the top would composite to something else again, which
+      # is exactly how the two drifted apart the first time.
+      assert_equal "none", editor["image"],
+                   "the editor's account card paints over the inherited surface " \
+                   "(#{editor['image'].inspect}), so the two can drift again."
     end
   end
 
