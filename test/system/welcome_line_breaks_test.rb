@@ -104,7 +104,7 @@ class WelcomeLineBreaksTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: 393, height: 768)
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     assert_selector ".preview-card.active .q-subtitle", wait: 5
 
     r = page.evaluate_script(<<~JS)

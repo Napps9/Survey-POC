@@ -84,7 +84,7 @@ class PlayerTypeFloorTest < ApplicationSystemTestCase
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
     page.execute_script("document.documentElement.style.fontSize = '#{root_font}'") if root_font
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
   end
 
   # The floors, as the stylesheet states them, in resolved pixels.

@@ -30,7 +30,7 @@ class TapCardSwipeTest < ApplicationSystemTestCase
   def open_tap_card
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # past the welcome card
     assert_selector ".preview-card.active .rotate-card", count: 3, wait: 5
   end

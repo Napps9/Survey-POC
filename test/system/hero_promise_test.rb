@@ -61,7 +61,7 @@ class HeroPromiseTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: PHONE[0], height: PHONE[1])
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     card.times { click_button "Next"; sleep 0.35 }
     sleep 0.4
   end

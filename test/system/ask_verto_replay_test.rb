@@ -156,9 +156,11 @@ class AskVertoReplayTest < ApplicationSystemTestCase
     # over 0.28s. Capybara will therefore happily click a consent tab that is
     # at x=1406 in a 1280px viewport — the click lands on nothing, _showPane
     # never runs, and the pane stays display:none. Wait for the pane the chip
-    # selects, then for the slide, the same as the floating-chrome test below.
+    # selects, then for the tab itself to stop moving — a fixed 0.4s covered
+    # the 0.28s slide only when the machine was quick, and under parallel
+    # workers it was not.
     assert_selector ".ask-paper[data-pane='detail'].is-active"
-    sleep 0.4 # the 0.28s column slide, settled
+    settle_box(find(".ask-tab[data-pane='consent']"))
 
     find(".ask-tab[data-pane='consent']").click
     assert_selector ".ask-tab[data-pane='consent'].is-active"
@@ -250,13 +252,13 @@ class AskVertoReplayTest < ApplicationSystemTestCase
 
     find(".ask-rail-handle").click
     assert_selector ".ask-grid.is-rail-open"
-    sleep 0.4 # the 0.28s column slide, settled
+    settle_box(find(".ask-lpanel", visible: :all)) # the 0.28s column slide, settled
     assert_equal back_before, evaluate_script(back_pill),
       "the back pill must hold the top-left corner while the threads folder is out"
 
     find(".ask-fab-sources").click
     assert_selector ".ask-grid.is-panel-open"
-    sleep 0.4
+    settle_box(find(".ask-panel", visible: :all))
     assert_equal pinned_before, evaluate_script(pinned),
       "the pinned cluster must hold the top-right corner while the sources folder is out"
   end

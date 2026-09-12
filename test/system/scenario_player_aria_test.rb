@@ -27,7 +27,7 @@ class ScenarioPlayerAriaTest < ApplicationSystemTestCase
   def open_book
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # past the welcome card
     assert_selector ".preview-card.active .book-page", count: 3, wait: 5 # 2 narrative + answer
   end
@@ -104,7 +104,7 @@ class ScenarioPlayerAriaTest < ApplicationSystemTestCase
 
     visit "/play/#{survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # past the welcome card, into the scenario
     assert_selector ".preview-card.active .book-page", count: 3, wait: 5
 
@@ -132,7 +132,7 @@ class ScenarioPlayerAriaTest < ApplicationSystemTestCase
 
     visit "/play/#{survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # welcome -> q1
     find(".preview-card.active li[role='radio']", match: :first).click
     click_button "Next" # q1 -> q2, an ordinary step

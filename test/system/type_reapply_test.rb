@@ -99,8 +99,9 @@ class TypeReapplyTest < ApplicationSystemTestCase
 
     reapply_type("multiple_choice")
 
-    # A type change marks the editor dirty, so the rebuild reaches the server.
-    sleep 3
+    # A type change marks the editor dirty, so the rebuild reaches the server —
+    # waited for, not assumed to have happened inside a fixed three seconds.
+    wait_until { stored_options == [ "Under 18", "18-24", "25-34" ] }
     assert_equal [ "Under 18", "18-24", "25-34" ], stored_options,
                  "the autosave that follows a type change persisted the reverted labels"
   end
@@ -128,8 +129,9 @@ class TypeReapplyTest < ApplicationSystemTestCase
                  evaluate_script("document.querySelector(\"[data-card-cid='c1']\").dataset.cardType"),
                  "the type switch aborted mid-apply and left the card half-applied"
 
-    # A type change marks the editor dirty, so the rebuild reaches the server.
-    sleep 3
+    # A type change marks the editor dirty, so the rebuild reaches the server —
+    # waited for, not assumed to have happened inside a fixed three seconds.
+    wait_until { @survey.reload.cards.find { |c| c["cid"] == "c1" }["type"] == "yes_no" }
     assert_equal "yes_no", @survey.reload.cards.find { |c| c["cid"] == "c1" }["type"],
                  "the applied type never reached the server"
   end
@@ -196,7 +198,7 @@ class TypeReapplyTest < ApplicationSystemTestCase
 
     # And the save that follows keeps the alignment: the server names the blank
     # stop from the default scale but never moves a label the creator kept.
-    sleep 3
+    wait_until { stored_options("r1")[2] == "Sometimes" }
     stored = stored_options("r1")
     assert_equal 5, stored.size
     assert_equal "Sometimes", stored[2],

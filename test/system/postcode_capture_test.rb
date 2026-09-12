@@ -71,7 +71,7 @@ class PostcodeCaptureTest < ApplicationSystemTestCase
     s.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
     visit "/play/#{s.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next"
 
     assert_selector ".location-search-field", wait: 5
@@ -88,7 +88,7 @@ class PostcodeCaptureTest < ApplicationSystemTestCase
     s.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
     visit "/play/#{s.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next"
     assert_selector ".location-postcode-field", wait: 5
 
@@ -109,7 +109,7 @@ class PostcodeCaptureTest < ApplicationSystemTestCase
     s.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
     visit "/play/#{s.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next"
     assert_selector ".location-postcode-field", wait: 5
 

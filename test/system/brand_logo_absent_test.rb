@@ -41,7 +41,7 @@ class BrandLogoAbsentTest < ApplicationSystemTestCase
   def open_player
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
   end
 
   test "an org with no logo gets no masthead, and no empty band where it was" do

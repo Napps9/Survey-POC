@@ -113,7 +113,7 @@ class TestModeFrameTest < ApplicationSystemTestCase
   # pointer-events: none measures perfectly and breaks everything under it.
   test "the ring never eats a tap meant for the card" do
     open(testing_url)
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next"
     assert_selector ".preview-card.active .choice-list-item", minimum: 3, wait: 5
 

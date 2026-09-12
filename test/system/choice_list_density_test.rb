@@ -28,7 +28,7 @@ class ChoiceListDensityTest < ApplicationSystemTestCase
   def open(survey)
     visit "/play/#{survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # past the welcome card
     assert_selector ".preview-card.active .choice-list-item", minimum: 1, wait: 5
   end

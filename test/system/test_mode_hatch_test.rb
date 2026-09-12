@@ -153,7 +153,7 @@ class TestModeHatchTest < ApplicationSystemTestCase
     find(".test-hatch-confirm").click
     assert_selector ".play-test-frame", wait: 5
 
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     all(".preview-card[data-card-index] .choice-item, .preview-card[data-card-index] [data-picker-target='item']").first&.click
     click_button "Next" if has_button?("Next", wait: 2)
 

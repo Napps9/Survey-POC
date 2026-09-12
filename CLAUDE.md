@@ -13,7 +13,7 @@ Before every push to Main, the full local suite must be green:
 
 ```
 bin/rails test        # ~3,400 tests, ~70s with one worker per core
-bin/rails test:system # ~500 browser tests, run on its own, ~9 min at 4 workers
+bin/rails test:system # ~500 browser tests, run on its own, ~5 min at 4 workers
 bin/rubocop
 bin/brakeman --no-pager
 bin/importmap audit
@@ -179,6 +179,16 @@ therefore doesn't deploy — but don't rely on that: push green.
   passing fan-arc test look like a geometry bug in someone else's commit;
   2026-09-12 it failed a locked-feed test twice, in the gate run that added the
   build.
+- System tests pay for waits, not for pages: a bare player visit is 0.7s. The
+  base class (`test/application_system_test_case.rb`) carries the idioms that
+  keep it that way — `agree_to_consent_gate` (reads the server-rendered gate,
+  never waits for a button that isn't coming; `SystemTestHygieneTest` bans the
+  old three-second guard), `sign_in_as` (mints the session cookie; the form
+  has its own test), `dismiss_cookie_banner` (the cookie is preset; the call
+  now waits for the page's Stimulus controllers to connect, which the
+  Accept-all click used to do by accident), `wait_until` for a server-side
+  state, `settle_box` before reading geometry. A fixed `sleep` is for proving
+  nothing happens; for anything that does happen, wait for it.
 - The PDF renders (report + share card) exec wkhtmltopdf from the
   `wkhtmltopdf-binary` gem. The suite passes on Ubuntu runners because they
   already carry its shared libraries; production is `ruby:slim`, which

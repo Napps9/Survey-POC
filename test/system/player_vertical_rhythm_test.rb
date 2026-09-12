@@ -53,7 +53,7 @@ class PlayerVerticalRhythmTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: size[0], height: size[1])
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
   end
 
   # Advance until the named type is on screen. The deck has no welcome card, so

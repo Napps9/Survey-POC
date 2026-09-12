@@ -47,15 +47,25 @@ class LottieSingleMountTest < ApplicationSystemTestCase
     page.evaluate_script('document.querySelectorAll(".card-lottie-mount svg").length')
   end
 
+  # The animation is fetched and drawn asynchronously after the controller
+  # connects, so the first count has to wait for the mount; a stacked second
+  # copy is there at the same instant as the one that stacks on it, so the
+  # exact count straight after is still the check.
+  def wait_for_first_mount
+    assert_selector ".card-lottie-mount svg", minimum: 1, visible: :all, wait: 10
+  end
+
   test "a Lottie card mounts exactly one animation on first render" do
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
+    wait_for_first_mount
     assert_equal 1, mounted_svgs, "a freshly rendered card should hold one animation"
   end
 
   test "re-attaching an already-rendered card does not stack a second animation" do
     visit "/test/#{@survey.test_token}"
     dismiss_cookie_banner
+    wait_for_first_mount
     assert_equal 1, mounted_svgs
 
     # What preview_verto_controller does: clone a card that has ALREADY drawn
@@ -81,6 +91,7 @@ class LottieSingleMountTest < ApplicationSystemTestCase
   test "a card that disconnects and reconnects still shows its animation" do
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
+    wait_for_first_mount
     assert_equal 1, mounted_svgs
 
     page.execute_script(<<~JS)

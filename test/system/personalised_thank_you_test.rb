@@ -30,7 +30,7 @@ class PersonalisedThankYouTest < ApplicationSystemTestCase
   def play_to_the_end
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # past the welcome card
     assert_selector ".preview-card.active .freeform-wrap", wait: 5
     find("[data-player-target='finishBtn']").click

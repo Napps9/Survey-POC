@@ -1,5 +1,11 @@
 require "test_helper"
 require "capybara/rails"
+# Ferrum sleeps after EVERY click — 100ms by default, read from this variable
+# when the gem loads, hence above the require. The suite makes ~750 clicks a
+# run, so that default was over a minute of nothing; 30ms is two frames, enough
+# for a rAF-deferred class change, and every click that starts a navigation is
+# already followed by a retrying matcher.
+ENV["FERRUM_CLICK_WAIT"] ||= "0.03"
 require "capybara/cuprite"
 require "tailwindcss/commands"
 
@@ -18,6 +24,13 @@ require "tailwindcss/commands"
 # unchanged stylesheet is rewritten byte-identical. A build failure fails the
 # run loudly instead of testing whatever was on disk.
 system(*Tailwindcss::Commands.compile_command, exception: true) unless ENV["SKIP_TAILWIND_BUILD"]
+
+# Per-test wall time, one CSV line per test (seconds, class, test — seconds
+# first because test names contain commas) — so the next slow test is found by
+# `sort -rn tmp/system_timings.csv | head` rather than by inference. Started
+# afresh here, in the parent before the workers fork, so it holds one run.
+SYSTEM_TIMINGS = Rails.root.join("tmp/system_timings.csv")
+SYSTEM_TIMINGS.write("")
 
 # Browser tests (P2-5). Until now the suite was integration-level only, so
 # anything that lives in JavaScript could be checked by hand in a browser and
@@ -120,17 +133,94 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     path
   end
 
+  # The cookie banner overlays the bottom of every page and swallows clicks
+  # aimed at anything under it, so every test used to click Accept all — a
+  # lazy module import plus a click on every page, and the full 2s wait
+  # wherever the banner was absent: about 330 executions a run. The cookie the
+  # banner's controller reads (cookie_consent_controller.js) is preset instead,
+  # before the first visit, in the same shape Accept all would write minus the
+  # analytics opt-in. A test OF the banner opts out with
+  # `self.real_cookie_banner = true` and gets the real thing.
+  class_attribute :real_cookie_banner, default: false
+
+  CONSENT_COOKIE_NAME  = "verto_cookie_consent"
+  CONSENT_COOKIE_VALUE = ERB::Util.url_encode({ necessary: true, analytics: false }.to_json).freeze
+
+  def before_setup
+    @started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    super
+  end
+
+  def after_teardown
+    super
+  ensure
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - @started_at
+    SYSTEM_TIMINGS.open("a") { |f| f.puts [ elapsed.round(3), self.class.name, name ].join(",") }
+  end
+
+  # Poll for a condition, returning whether it came true within the timeout —
+  # no raise, so the assertion that follows reports what was actually seen.
+  # For a state the SERVER reaches (a debounced autosave landing): a fixed
+  # sleep passes only when the machine is quick enough, and under parallel
+  # workers it often is not.
+  def wait_until(timeout: 10, interval: 0.1)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+    loop do
+      return true if yield
+      return false if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+
+      sleep interval
+    end
+  end
+
+  # Returns once three consecutive animation frames report the same box for
+  # the node — bounded, so a node that never settles cannot hang the test. For
+  # a test that READS geometry, or CLICKS something that arrived by animation:
+  # the three-second consent guard and the Accept-all click used to give the
+  # layout that long to settle by accident, and a phone viewport's first paint
+  # or a panel's 0.28s slide can still be moving when the page reports loaded.
+  # Three frames rather than two so a slide that has only just started, with
+  # its first two reads landing before it moves, cannot pass as settled.
+  def settle_box(node, max_frames: 90)
+    page.evaluate_async_script(<<~JS, node)
+      const [el, done] = arguments
+      let last = null, same = 0, frames = 0
+      const tick = () => {
+        const r = el.getBoundingClientRect()
+        const key = [r.x, r.y, r.width, r.height].map(Math.round).join(",")
+        same = key === last ? same + 1 : 0
+        last = key
+        if (same >= 2 || ++frames > #{max_frames}) return done()
+        requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    JS
+  end
+
   # The player writes to sessionStorage and registers a Service Worker, so each
   # test starts from a clean slate rather than inheriting the last one's.
   def setup
     super
     page.driver.clear_memory_cache if page.driver.respond_to?(:clear_memory_cache)
+    page.driver.set_cookie(CONSENT_COOKIE_NAME, CONSENT_COOKIE_VALUE, path: "/") unless real_cookie_banner
+  end
+
+  # Sign in by minting exactly what a successful form login leaves behind
+  # (Authentication#start_new_session_for): one Session row and one signed
+  # session_id cookie. The form itself — load the page, type, POST, render a
+  # dashboard the test then leaves — was three navigations before the page
+  # under test, about 95 times a run; SignInTest drives it for real.
+  def sign_in_as(user)
+    session = user.sessions.create!(user_agent: "system test", ip_address: "127.0.0.1")
+    jar = ActionDispatch::Cookies::CookieJar.build(ActionDispatch::TestRequest.create, {})
+    jar.signed[:session_id] = { value: session.id, httponly: true, same_site: :lax }
+    page.driver.set_cookie("session_id", jar[:session_id], path: "/", httponly: true, samesite: "Lax")
   end
 
   # Sign in through the real form. The password field is submitted with Enter
   # deliberately: a generic submit selector on these pages hits the language
   # switcher instead.
-  def sign_in_as(user, password: "verylongpassword")
+  def sign_in_through_form(user, password: "verylongpassword")
     visit new_session_path
     fill_in "email_address", with: user.email_address
     fill_in "password", with: password
@@ -138,10 +228,65 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     assert_no_current_path new_session_path, wait: 5
   end
 
-  # The cookie banner overlays the bottom of every page and will swallow clicks
-  # aimed at anything underneath it.
+  # With the consent cookie preset (see setup) there is no banner to dismiss —
+  # but the Accept-all click was, by accident, the wait every test relied on:
+  # the banner only shows once ITS controller connects, so by the time the
+  # click landed the page's module graph had loaded. Keep that wait, and make
+  # it explicit: every controller named on the page, connected. It costs the
+  # real load time and nothing more. A test that opted into the real banner
+  # still clicks it. Kept under this name so the ~160 call sites read as they
+  # always did.
   def dismiss_cookie_banner
-    click_button "Accept all" if has_button?("Accept all", wait: 2)
+    if real_cookie_banner
+      click_button "Accept all" if has_button?("Accept all", wait: 2)
+    else
+      wait_for_stimulus
+    end
+  end
+
+  # Importmap loads modules progressively; a gesture that starts the moment
+  # text is on screen can beat a controller to its element — faster than any
+  # human. Returns whether every controller connected within the timeout, and
+  # says on stderr which did not, so a page paying the whole ceiling is seen
+  # in the run's output rather than inferred from its timing.
+  def wait_for_stimulus(timeout: 5)
+    unconnected = nil
+    connected = wait_until(timeout: timeout, interval: 0.05) do
+      unconnected = evaluate_script(<<~JS)
+        (() => {
+          const app = window.Stimulus || window.application
+          if (!app) return ["(no Stimulus application on window)"]
+          return Array.from(document.querySelectorAll("[data-controller]")).flatMap(el =>
+            el.dataset.controller.split(/\s+/).filter(Boolean)
+              .filter(id => !app.getControllerForElementAndIdentifier(el, id)))
+        })()
+      JS
+      unconnected.empty?
+    end
+    warn "wait_for_stimulus: still not connected after #{timeout}s on #{current_path}: #{unconnected.uniq.join(', ')}" unless connected
+    connected
+  end
+
+  # Get past the survey-level consent gate, if this deck has one.
+  #
+  # Whether the gate exists is decided server-side (Survey#show_consent_gate?)
+  # and is in the first paint: `data-consent-pending` on the player overlay and
+  # the banner with its button in the HTML. A consent_gate CARD, hoisted to the
+  # front of the deck, shows the same button on its own card and is
+  # server-rendered too. So the answer is known the moment `visit` returns,
+  # with no wait at all.
+  #
+  # The idiom this replaces —
+  #   click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+  # — waited the full three seconds on every deck WITHOUT a demographic card,
+  # which is nearly every fixture deck: about 175 times a run, nine minutes of
+  # a serial pass, for a button that was never going to render. A bare player
+  # visit costs 0.7s; through that guard it cost 3.7-4.5s.
+  # SystemTestHygieneTest keeps the idiom from coming back.
+  def agree_to_consent_gate
+    return unless has_css?("[data-consent-pending], [data-card-type='consent_gate']", visible: :all, wait: 0)
+
+    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
   end
 
   # Resizing the WINDOW won't do: Chromium clamps its window to roughly 500px,

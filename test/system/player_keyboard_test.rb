@@ -52,7 +52,7 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
     dismiss_cookie_banner
     # Every Verto collects the demographic tail, so P0-6's default consent gate
     # stands in front of the deck.
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
   end
 
   test "a choice option can be selected with the keyboard alone" do

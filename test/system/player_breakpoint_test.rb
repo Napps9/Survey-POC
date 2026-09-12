@@ -48,7 +48,7 @@ class PlayerBreakpointTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: width, height: height)
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next" # onto the card with a hero image
     dir = page.evaluate_script(
       "getComputedStyle(document.querySelector('.preview-card.active .split-card')).flexDirection"

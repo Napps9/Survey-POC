@@ -113,7 +113,7 @@ class PlayerInputZoomTest < ApplicationSystemTestCase
   test "every text control in the deck clears the iOS zoom floor" do
     open_player
     fill_in_respondent_code
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
 
     seen = []
     8.times do

@@ -35,7 +35,7 @@ class PlayerFontScaleTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: width, height: height)
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
   end
 
   def computed_size(selector)
@@ -84,7 +84,7 @@ class PlayerFontScaleTest < ApplicationSystemTestCase
     page.execute_script("localStorage.setItem('verto_font_scale', 'larger')")
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     click_button "Next"
 
     assert_equal "larger", find(".preview-overlay")["data-font-scale"],

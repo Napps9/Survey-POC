@@ -56,7 +56,7 @@ class PlayerDesktopCtaClipTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: width, height: height)
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
     assert_selector ".preview-card.active", wait: 5
     click_button "Next"
     sleep 0.4

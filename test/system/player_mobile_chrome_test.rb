@@ -45,7 +45,7 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
     page.driver.browser.resize(width: width, height: height)
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    click_button "Agree & continue" if has_button?("Agree & continue", wait: 3)
+    agree_to_consent_gate
   end
 
   # The hero's share of the card. The answer panel rides 22px up over the
@@ -288,6 +288,9 @@ class PlayerMobileChromeTest < ApplicationSystemTestCase
   # the first time.
   test "no band of backdrop shows beneath the card" do
     open_player
+    # A geometry read: let the phone viewport's first paint finish moving. The
+    # consent guard's three-second wait used to cover this by accident.
+    settle_box(find(".preview-card.active .split-card"))
     m = page.evaluate_script(<<~JS)
       (() => {
         const ov   = document.querySelector(".preview-overlay")
