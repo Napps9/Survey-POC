@@ -2153,3 +2153,4 @@ fr:
     single_language_rail_body: "Ajoutez une deuxième langue à gauche et cet écran affichera chaque question côte à côte, prête à être envoyée à quelqu'un qui la parle."
     rail_failed: "Échec de la traduction"
     rail_retry: "Réessayer"
+    rail_generate_one: "Traduire celle-ci"

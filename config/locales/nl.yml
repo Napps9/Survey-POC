@@ -2153,3 +2153,4 @@ nl:
     single_language_rail_body: "Voeg links een tweede taal toe en dit scherm zet elke vraag naast elkaar, klaar om te sturen naar iemand die die taal spreekt."
     rail_failed: "Vertalen mislukt"
     rail_retry: "Opnieuw proberen"
+    rail_generate_one: "Deze taal vertalen"

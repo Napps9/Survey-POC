@@ -2153,3 +2153,4 @@ it:
     single_language_rail_body: "Aggiungi una seconda lingua qui a sinistra e questa schermata mostrerà ogni domanda affiancata, pronta da mandare a chi la parla."
     rail_failed: "Traduzione non riuscita"
     rail_retry: "Riprova"
+    rail_generate_one: "Traduci questa lingua"

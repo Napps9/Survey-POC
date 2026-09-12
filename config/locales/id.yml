@@ -2152,3 +2152,4 @@ id:
     single_language_rail_body: "Tambahkan bahasa kedua di sebelah kiri dan layar ini akan menampilkan setiap pertanyaan berdampingan, siap dikirim ke orang yang menguasainya."
     rail_failed: "Gagal menerjemahkan"
     rail_retry: "Coba lagi"
+    rail_generate_one: "Terjemahkan yang ini"

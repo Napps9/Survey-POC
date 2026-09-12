@@ -2190,3 +2190,4 @@ st:
     single_language_rail_body: "Eketsa puo ya bobedi ka lehlakoreng le letshehadi mme leqephe lena le tla bontsha potso ka nngwe e bapisitswe, e itokiseditse ho romelwa ho motho ya buang puo eo."
     rail_failed: "Phetolelo e hlolehile"
     rail_retry: "Leka hape"
+    rail_generate_one: "Fetolela ena"

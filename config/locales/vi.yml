@@ -2152,3 +2152,4 @@ vi:
     single_language_rail_body: "Thêm ngôn ngữ thứ hai ở bên trái, màn hình này sẽ hiển thị từng câu hỏi cạnh nhau, sẵn sàng gửi cho người biết ngôn ngữ đó."
     rail_failed: "Không dịch được"
     rail_retry: "Thử lại"
+    rail_generate_one: "Dịch ngôn ngữ này"

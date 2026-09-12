@@ -2151,3 +2151,4 @@ ja:
     single_language_rail_body: "左側で2つ目の言語を追加すると、この画面にすべての質問が並んで表示され、その言語を話す人にそのまま送れます。"
     rail_failed: "翻訳できませんでした"
     rail_retry: "もう一度試す"
+    rail_generate_one: "この言語を翻訳"

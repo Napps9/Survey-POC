@@ -2158,3 +2158,4 @@ af:
     single_language_rail_body: "Voeg 'n tweede taal aan die linkerkant by, en hierdie skerm wys elke vraag langs mekaar, gereed om te stuur aan iemand wat daardie taal praat."
     rail_failed: "Kon nie vertaal nie"
     rail_retry: "Probeer weer"
+    rail_generate_one: "Vertaal hierdie een"

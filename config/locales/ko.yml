@@ -2151,3 +2151,4 @@ ko:
     single_language_rail_body: "왼쪽에서 두 번째 언어를 추가하면 이 화면에서 모든 질문을 나란히 보여 주므로, 그 언어를 쓰는 사람에게 바로 보낼 수 있습니다."
     rail_failed: "번역 실패"
     rail_retry: "다시 시도"
+    rail_generate_one: "이 언어 번역"

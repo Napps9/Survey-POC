@@ -2153,3 +2153,4 @@ tr:
     single_language_rail_body: "Soldaki listeden ikinci bir dil ekleyin; bu ekran her soruyu yan yana gösterir ve o dili konuşan birine göndermeye hazır olur."
     rail_failed: "Çevrilemedi"
     rail_retry: "Tekrar dene"
+    rail_generate_one: "Bunu çevir"

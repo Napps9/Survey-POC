@@ -2192,3 +2192,4 @@ xh:
     single_language_rail_body: "Yongeza ulwimi lwesibini ngasekhohlo, uze esi sikrini sibonise umbuzo ngamnye ecaleni komnye, sele silungele ukuthunyelwa kumntu oluthethayo."
     rail_failed: "Ayiguqulelwanga"
     rail_retry: "Zama kwakhona"
+    rail_generate_one: "Guqulela olu"

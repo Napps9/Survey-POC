@@ -2153,3 +2153,4 @@ de:
     single_language_rail_body: "Füge links eine zweite Sprache hinzu, dann zeigt dieser Screen jede Frage nebeneinander — bereit, sie jemandem zu schicken, der die Sprache spricht."
     rail_failed: "Fehlgeschlagen"
     rail_retry: "Erneut versuchen"
+    rail_generate_one: "Diese Sprache übersetzen"

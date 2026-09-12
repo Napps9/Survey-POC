@@ -2163,3 +2163,4 @@ pl:
     single_language_rail_body: "Dodaj drugi język po lewej, a ten ekran pokaże wszystkie pytania obok siebie — gotowe do wysłania komuś, kto się nim posługuje."
     rail_failed: "Tłumaczenie nieudane"
     rail_retry: "Spróbuj ponownie"
+    rail_generate_one: "Przetłumacz ten język"

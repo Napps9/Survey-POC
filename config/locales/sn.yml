@@ -2163,3 +2163,4 @@ sn:
     single_language_rail_body: "Wedzera mutauro wechipiri kuruboshwe uye peji rino richaratidza mibvunzo yose yakamiswa padivi pemwe, yakagadzirira kutumirwa kumunhu anotaura mutauro iwoyo."
     rail_failed: "Kushandura kwakundikana"
     rail_retry: "Edza zvakare"
+    rail_generate_one: "Shandura mutauro uyu"

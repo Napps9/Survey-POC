@@ -2153,3 +2153,4 @@ sw:
     single_language_rail_body: "Ongeza lugha ya pili upande wa kushoto na ukurasa huu utaonyesha kila swali sambamba, tayari kutumwa kwa mtu anayeizungumza."
     rail_failed: "Tafsiri imeshindikana"
     rail_retry: "Jaribu tena"
+    rail_generate_one: "Tafsiri hii"
