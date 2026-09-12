@@ -158,6 +158,7 @@ sw:
       points_intro: "Utangulizi wa pointi"
       prioritise: "Panga vipaumbele"
       scenario: "Hali"
+    modal_aria: "Kuhusu swali hili"
   ask_submission_mailer:
     confirmation_subject: "Data yako ya Verto imewasilishwa kwa Ask Verto"
     confirmation_heading: "Imewasilishwa kwa ukaguzi"
@@ -307,6 +308,8 @@ sw:
     join_email_placeholder: "yako@barua.com"
     join_fine: "Barua pepe moja ili kuingia. Hatuchapishi chochote, na unaweza kufuta akaunti kwa mguso mmoja."
     join_embedded: "Verto hii imepachikwa kwenye tovuti nyingine, kwa hivyo hatuwezi kuona kingine chochote ulichocheza hapa. Kiungo bado kitahifadhi hii."
+    modal_continue: "Nimeelewa"
+    modal_reopen: "Soma tena"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ sw:
     join_title_label: "Kichwa cha ombi"
     join_body_label: "Ujumbe wa ombi"
     join_cta_label: "Kitufe cha ombi"
+    modal_add: "Ongeza dirisha"
+    modal_on: "Dirisha limewashwa"
+    modal_toggle_title: "Ongeza dirisha linaloeleza kadi hii"
+    modal_chrome: "Dirisha · linaonekana juu ya kadi hii"
+    modal_remove: "Ondoa"
+    modal_remove_confirm: "Uondoe kweli?"
+    modal_remove_title: "Ondoa dirisha hili"
+    modal_title_placeholder: "Kabla hujajibu…"
+    modal_body_placeholder: "Eleza kwa maneno yako mwenyewe swali hili linauliza nini…"
+    modal_expand: "Ona dirisha hili kama anavyoliona anayejibu"
+    modal_collapse: "Kunja dirisha hili"
   dashboard_card:
     publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"
@@ -2066,6 +2080,8 @@ sw:
       stale: "Iliidhinishwa, kisha ikabadilishwa"
     field:
       text: "Swali"
+      modal_title: "Kichwa cha dirisha"
+      modal_body: "Maandishi ya dirisha"
       description: "Maelezo ya ziada"
       explanation: "Maelezo ya jibu"
       options: "Majibu"

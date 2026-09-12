@@ -159,6 +159,7 @@ af:
       points_intro: "Punte-intro"
       prioritise: "Prioritiseer"
       scenario: "Scenario"
+    modal_aria: "Oor hierdie vraag"
   ask_submission_mailer:
     confirmation_subject: "Jou Verto-data is aan Ask Verto voorgelê"
     confirmation_heading: "Voorgelê vir hersiening"
@@ -308,6 +309,8 @@ af:
     join_email_placeholder: "jou@epos.com"
     join_fine: "Een e-pos om aan te meld. Ons plaas nooit iets nie, en jy kan die rekening met een tik skrap."
     join_embedded: "Hierdie Verto is in 'n ander werf ingebed, dus kan ons niks anders sien wat jy hier gespeel het nie. Die skakel sal hierdie een steeds hou."
+    modal_continue: "Verstaan"
+    modal_reopen: "Lees weer"
   defaults:
     range: ["Stem heeltemal nie saam nie", "Stem nie saam nie", "Neutraal", "Stem saam", "Stem heeltemal saam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1243,6 +1246,17 @@ af:
     join_title_label: "Opskrif van die versoek"
     join_body_label: "Boodskap van die versoek"
     join_cta_label: "Knoppie van die versoek"
+    modal_add: "Voeg venster by"
+    modal_on: "Venster aan"
+    modal_toggle_title: "Voeg 'n venster by wat hierdie kaart verduidelik"
+    modal_chrome: "Venster · verskyn oor hierdie kaart"
+    modal_remove: "Verwyder"
+    modal_remove_confirm: "Regtig verwyder?"
+    modal_remove_title: "Verwyder hierdie venster"
+    modal_title_placeholder: "Voordat jy antwoord…"
+    modal_body_placeholder: "Verduidelik in jou eie woorde wat hierdie vraag vra…"
+    modal_expand: "Sien hierdie venster soos 'n respondent dit sien"
+    modal_collapse: "Vou hierdie venster op"
   dashboard_card:
     publish_warning: "Publiseer “%{title}”? Sodra dit regstreeks is, word sy vrae gesluit en kan nie gewysig word nie — maak seker alles lees presies soos jy dit wil hê."
     preview: "Voorskou"
@@ -2071,6 +2085,8 @@ af:
       stale: "Goedgekeur, toe gewysig"
     field:
       text: "Vraag"
+      modal_title: "Venster-opskrif"
+      modal_body: "Venster-teks"
       description: "Subteks"
       explanation: "Antwoordverduideliking"
       options: "Antwoorde"

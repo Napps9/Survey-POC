@@ -160,6 +160,7 @@ sn:
       points_intro: "Sumo yezvibodzwa"
       prioritise: "Ronga Nekukosha"
       scenario: "Mamiriro"
+    modal_aria: "Nezvemubvunzo uyu"
   ask_submission_mailer:
     confirmation_subject: "Dhata reVerto yako yatumirwa kuAsk Verto"
     confirmation_heading: "Yatumirwa Kuti Iongororwe"
@@ -309,6 +310,8 @@ sn:
     join_email_placeholder: "your@email.com"
     join_fine: "Email imwe chete yokupinda. Hatimbotumira chinhu, uye unogona kudzima akaundi nekudzvanya kamwe chete."
     join_embedded: "Verto iri rakaiswa mune imwe saiti, saka hatikwanisi kuona chimwe chinhu chawakatamba pano. Link richange richiri kuchengeta iri."
+    modal_continue: "Ndanzwisisa"
+    modal_reopen: "Verenga zvakare"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Positional; keep every array's length exact.
   defaults:
@@ -1246,6 +1249,17 @@ sn:
     join_title_label: "Musoro wechikumbiro"
     join_body_label: "Meseji yechikumbiro"
     join_cta_label: "Bhatani rechikumbiro"
+    modal_add: "Wedzera hwindo"
+    modal_on: "Hwindo rakavhurwa"
+    modal_toggle_title: "Wedzera hwindo rinotsanangura kadhi iri"
+    modal_chrome: "Hwindo · rinoonekwa pamusoro pekadhi iri"
+    modal_remove: "Bvisa"
+    modal_remove_confirm: "Uri kubvisa zvechokwadi?"
+    modal_remove_title: "Bvisa hwindo iri"
+    modal_title_placeholder: "Usati wapindura…"
+    modal_body_placeholder: "Tsanangura nemashoko ako kuti mubvunzo uyu unobvunzei…"
+    modal_expand: "Ona hwindo iri semaonero anoita anopindura"
+    modal_collapse: "Peta hwindo iri"
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"
@@ -2076,6 +2090,8 @@ sn:
       stale: "Yabvumidzwa, ikazogadziriswa"
     field:
       text: "Mubvunzo"
+      modal_title: "Musoro wehwindo"
+      modal_body: "Zvakanyorwa muhwindo"
       description: "Mashoko ewedzero"
       explanation: "Tsananguro yemhinduro"
       options: "Mhinduro"

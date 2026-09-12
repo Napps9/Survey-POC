@@ -167,6 +167,7 @@ xh:
       points_intro: "Intshayelelo yamanqaku"
       prioritise: "Lungelelanisa ngokobubaluleko"
       scenario: "Imeko"
+    modal_aria: "Malunga nalo mbuzo"
   ask_submission_mailer:
     confirmation_subject: "Idatha yakho yeVerto ithunyelwe kwiAsk Verto"
     confirmation_heading: "Ithunyelwe ukuze ihlolwe"
@@ -316,6 +317,8 @@ xh:
     join_email_placeholder: "your@email.com"
     join_fine: "I-imeyile enye yokungena. Asikaze siposte nantoni na, kwaye ungayicima i-akhawunti ngokucofa kanye."
     join_embedded: "Le Verto ifakwe kwenye indawo yewebhu, ngoko asinako ukubona enye into oyidlalileyo apha. Ikhonkco lisaya kuligcina eli."
+    modal_continue: "Ndiyaqonda"
+    modal_reopen: "Funda kwakhona"
   # Umxholo wesikhundla iKHADI entsha yohlobo ngalunye eqala ngawo — iinketho
   # zempendulo, iileyibhile zomlinganiselo, iingxelo. Ngokungafaniyo
   # nolwakhiwo lwe-UI (olulandela ulwimi lomboni), ezi zisonjululwa kulwimi
@@ -1258,6 +1261,17 @@ xh:
     join_title_label: "Umxholo wesicelo"
     join_body_label: "Umyalezo wesicelo"
     join_cta_label: "Iqhosha lesicelo"
+    modal_add: "Yongeza ifestile"
+    modal_on: "Ifestile ivuliwe"
+    modal_toggle_title: "Yongeza ifestile echaza eli khadi"
+    modal_chrome: "Ifestile · ivela phezu kweli khadi"
+    modal_remove: "Susa"
+    modal_remove_confirm: "Uqinisekile ukuba uyayisusa?"
+    modal_remove_title: "Susa le festile"
+    modal_title_placeholder: "Phambi kokuba uphendule…"
+    modal_body_placeholder: "Chaza ngamazwi akho ukuba lo mbuzo ubuza ntoni…"
+    modal_expand: "Bona le festile njengoko ibonwa ngophendulayo"
+    modal_collapse: "Songa le festile"
   dashboard_card:
     publish_warning: "Papasha “%{title}”? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     preview: "Jonga kuqala"
@@ -2105,6 +2119,8 @@ xh:
       stale: "Ivunyiwe, yaza yahlelwa"
     field:
       text: "Umbuzo"
+      modal_title: "Isihloko sefestile"
+      modal_body: "Umbhalo wefestile"
       description: "Umbhalo ongezantsi"
       explanation: "Ingcaciso yempendulo"
       options: "Iimpendulo"

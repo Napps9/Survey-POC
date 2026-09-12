@@ -158,6 +158,7 @@ hi:
       points_intro: "पॉइंट परिचय"
       prioritise: "प्राथमिकता तय करें"
       scenario: "परिदृश्य"
+    modal_aria: "इस सवाल के बारे में"
   ask_submission_mailer:
     confirmation_subject: "आपका Verto डेटा Ask Verto को सबमिट हुआ"
     confirmation_heading: "समीक्षा के लिए भेजा गया"
@@ -307,6 +308,8 @@ hi:
     join_email_placeholder: "aapka@email.com"
     join_fine: "साइन इन के लिए एक ईमेल। हम कभी कुछ पोस्ट नहीं करते, और आप एक टैप में खाता हटा सकते हैं।"
     join_embedded: "यह Verto किसी दूसरी साइट में जुड़ा है, इसलिए आपने यहाँ और क्या खेला है वह हम नहीं देख सकते। फिर भी लिंक इसे रखेगा।"
+    modal_continue: "समझ गए"
+    modal_reopen: "फिर से पढ़ें"
   defaults:
     range: ["बिल्कुल असहमत", "असहमत", "तटस्थ", "सहमत", "पूरी तरह सहमत"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ hi:
     join_title_label: "निमंत्रण का शीर्षक"
     join_body_label: "निमंत्रण का संदेश"
     join_cta_label: "निमंत्रण का बटन"
+    modal_add: "विंडो जोड़ें"
+    modal_on: "विंडो चालू"
+    modal_toggle_title: "इस कार्ड को समझाने वाली एक पॉप-अप विंडो जोड़ें"
+    modal_chrome: "विंडो · इस कार्ड के ऊपर दिखती है"
+    modal_remove: "हटाएँ"
+    modal_remove_confirm: "सच में हटाएँ?"
+    modal_remove_title: "यह विंडो हटाएँ"
+    modal_title_placeholder: "जवाब देने से पहले…"
+    modal_body_placeholder: "अपने शब्दों में बताएं कि यह सवाल क्या पूछ रहा है…"
+    modal_expand: "यह विंडो वैसे देखें जैसे जवाब देने वाले को दिखती है"
+    modal_collapse: "यह विंडो समेटें"
   dashboard_card:
     publish_warning: "“%{title}” प्रकाशित करें? लाइव होने के बाद इसके सवाल लॉक हो जाएँगे और संपादित नहीं हो सकेंगे — सुनिश्चित करें कि सब कुछ बिल्कुल वैसा ही है जैसा आप चाहते हैं।"
     preview: "पूर्वावलोकन"
@@ -2066,6 +2080,8 @@ hi:
       stale: "मंज़ूर, फिर बदली"
     field:
       text: "सवाल"
+      modal_title: "विंडो का शीर्षक"
+      modal_body: "विंडो का पाठ"
       description: "विवरण"
       explanation: "उत्तर का स्पष्टीकरण"
       options: "उत्तर"

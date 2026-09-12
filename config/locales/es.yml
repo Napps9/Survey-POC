@@ -158,6 +158,7 @@ es:
       points_intro: "Intro de puntos"
       prioritise: "Priorizar"
       scenario: "Escenario"
+    modal_aria: "Sobre esta pregunta"
   ask_submission_mailer:
     confirmation_subject: "Tus datos de Verto se enviaron a Ask Verto"
     confirmation_heading: "Enviado a revisión"
@@ -307,6 +308,8 @@ es:
     join_email_placeholder: "tu@correo.com"
     join_fine: "Un correo para identificarte. Nunca publicamos nada y puedes eliminar la cuenta con un toque."
     join_embedded: "Este Verto está incrustado en otro sitio, así que no podemos ver nada más que hayas jugado aquí. El enlace guardará este de todos modos."
+    modal_continue: "Entendido"
+    modal_reopen: "Leer de nuevo"
   defaults:
     range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ es:
     join_title_label: "Título de la invitación"
     join_body_label: "Mensaje de la invitación"
     join_cta_label: "Botón de la invitación"
+    modal_add: "Añadir ventana"
+    modal_on: "Ventana activa"
+    modal_toggle_title: "Añade una ventana emergente que explique esta tarjeta"
+    modal_chrome: "Ventana · se muestra sobre esta tarjeta"
+    modal_remove: "Quitar"
+    modal_remove_confirm: "¿Seguro que quieres quitarla?"
+    modal_remove_title: "Quitar esta ventana"
+    modal_title_placeholder: "Antes de responder…"
+    modal_body_placeholder: "Explica qué pregunta esto, con tus propias palabras…"
+    modal_expand: "Ver esta ventana como la ve quien responde"
+    modal_collapse: "Plegar esta ventana"
   dashboard_card:
     publish_warning: "¿Publicar “%{title}”? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."
     preview: "Vista previa"
@@ -2066,6 +2080,8 @@ es:
       stale: "Aprobada y luego editada"
     field:
       text: "Pregunta"
+      modal_title: "Título de la ventana"
+      modal_body: "Texto de la ventana"
       description: "Descripción"
       explanation: "Explicación de la respuesta"
       options: "Respuestas"

@@ -158,6 +158,7 @@ uk:
       points_intro: "Вступ про бали"
       prioritise: "Пріоритети"
       scenario: "Сценарій"
+    modal_aria: "Про це запитання"
   ask_submission_mailer:
     confirmation_subject: "Ваші дані Verto надіслано в Ask Verto"
     confirmation_heading: "Надіслано на перевірку"
@@ -307,6 +308,8 @@ uk:
     join_email_placeholder: "vashe@email.ua"
     join_fine: "Один лист для входу. Ми нічого не публікуємо, а обліковий запис можна видалити одним дотиком."
     join_embedded: "Це Verto вбудоване в інший сайт, тож ми не бачимо нічого іншого, що ви тут проходили. Посилання все одно збереже це."
+    modal_continue: "Зрозуміло"
+    modal_reopen: "Прочитати ще раз"
   defaults:
     range: ["Цілком не погоджуюсь", "Не погоджуюсь", "Нейтрально", "Погоджуюсь", "Цілком погоджуюсь"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1238,6 +1241,17 @@ uk:
     join_title_label: "Заголовок пропозиції"
     join_body_label: "Текст пропозиції"
     join_cta_label: "Кнопка пропозиції"
+    modal_add: "Додати вікно"
+    modal_on: "Вікно увімкнено"
+    modal_toggle_title: "Додати спливне вікно з поясненням до цієї картки"
+    modal_chrome: "Вікно · показується поверх цієї картки"
+    modal_remove: "Прибрати"
+    modal_remove_confirm: "Точно прибрати?"
+    modal_remove_title: "Прибрати це вікно"
+    modal_title_placeholder: "Перш ніж відповісти…"
+    modal_body_placeholder: "Поясніть своїми словами, про що це запитання…"
+    modal_expand: "Показати це вікно так, як його бачить респондент"
+    modal_collapse: "Згорнути це вікно"
   dashboard_card:
     publish_warning: "Опублікувати «%{title}»? Після публікації питання буде заблоковано й редагувати їх не можна — переконайтеся, що все саме так, як ви хочете."
     preview: "Попередній перегляд"
@@ -2076,6 +2090,8 @@ uk:
       stale: "Схвалено, потім змінено"
     field:
       text: "Питання"
+      modal_title: "Заголовок вікна"
+      modal_body: "Текст вікна"
       description: "Опис"
       explanation: "Пояснення відповіді"
       options: "Варіанти"

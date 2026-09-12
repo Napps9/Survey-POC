@@ -158,6 +158,7 @@ nl:
       points_intro: "Punten-intro"
       prioritise: "Prioriteren"
       scenario: "Scenario"
+    modal_aria: "Over deze vraag"
   ask_submission_mailer:
     confirmation_subject: "Je Verto-data is ingediend bij Ask Verto"
     confirmation_heading: "Ingediend voor beoordeling"
@@ -307,6 +308,8 @@ nl:
     join_email_placeholder: "jouw@email.nl"
     join_fine: "Eén e-mail om in te loggen. We plaatsen nooit iets, en je kunt het account met één tik verwijderen."
     join_embedded: "Deze Verto is ingebed in een andere site, dus we kunnen niets anders zien wat je hier hebt gespeeld. De link bewaart deze wel."
+    modal_continue: "Duidelijk"
+    modal_reopen: "Opnieuw lezen"
   defaults:
     range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ nl:
     join_title_label: "Kop van het verzoek"
     join_body_label: "Bericht van het verzoek"
     join_cta_label: "Knop van het verzoek"
+    modal_add: "Venster toevoegen"
+    modal_on: "Venster aan"
+    modal_toggle_title: "Voeg een venster toe dat deze kaart uitlegt"
+    modal_chrome: "Venster · verschijnt over deze kaart"
+    modal_remove: "Verwijderen"
+    modal_remove_confirm: "Echt verwijderen?"
+    modal_remove_title: "Dit venster verwijderen"
+    modal_title_placeholder: "Voordat je antwoordt…"
+    modal_body_placeholder: "Leg in je eigen woorden uit wat deze vraag vraagt…"
+    modal_expand: "Bekijk dit venster zoals een deelnemer het ziet"
+    modal_collapse: "Dit venster inklappen"
   dashboard_card:
     publish_warning: "“%{title}” publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     preview: "Voorbeeld"
@@ -2066,6 +2080,8 @@ nl:
       stale: "Goedgekeurd, daarna bewerkt"
     field:
       text: "Vraag"
+      modal_title: "Venstertitel"
+      modal_body: "Venstertekst"
       description: "Subtekst"
       explanation: "Antwoorduitleg"
       options: "Antwoorden"

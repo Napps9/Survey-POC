@@ -168,6 +168,7 @@ tn:
       points_intro: "Matseno a dintlha"
       prioritise: "Rulaganya ka Thato"
       scenario: "Tiragalo"
+    modal_aria: "Ka potso e"
   ask_submission_mailer:
     confirmation_subject: "Data ya gago ya Verto e rometswe go Ask Verto"
     confirmation_heading: "E rometswe go sekasekwa"
@@ -317,6 +318,8 @@ tn:
     join_email_placeholder: "your@email.com"
     join_fine: "Imeile e le nngwe go tsena. Ga re ke re phasalatsa sepe, mme o ka phimola akhaonto ka go tobetsa gangwe."
     join_embedded: "Verto eno e tsentswe mo saeteng e nngwe, ka jalo ga re kgone go bona sepe se sengwe se o se tshameketseng fano. Kgolagano e sa tla boloka eno."
+    modal_continue: "Ke tlhaloganya"
+    modal_reopen: "Bala gape"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -1258,6 +1261,17 @@ tn:
     join_title_label: "Setlhogo sa kopo"
     join_body_label: "Molaetsa wa kopo"
     join_cta_label: "Konopo ya kopo"
+    modal_add: "Oketsa letlhabaphefo"
+    modal_on: "Letlhabaphefo le bulegile"
+    modal_toggle_title: "Oketsa letlhabaphefo le le tlhalosang karata e"
+    modal_chrome: "Letlhabaphefo · le bonala mo godimo ga karata e"
+    modal_remove: "Tlosa"
+    modal_remove_confirm: "A o tlhomamisa gore o a le tlosa?"
+    modal_remove_title: "Tlosa letlhabaphefo le"
+    modal_title_placeholder: "Pele o araba…"
+    modal_body_placeholder: "Tlhalosa ka mafoko a gago gore potso e e botsa eng…"
+    modal_expand: "Bona letlhabaphefo le jaaka yo o arabang a le bona"
+    modal_collapse: "Mena letlhabaphefo le"
   dashboard_card:
     publish_warning: "Phasaladitsa “%{title}”? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     preview: "Leba"
@@ -2103,6 +2117,8 @@ tn:
       stale: "E dumeletswe, morago ya fetolwa"
     field:
       text: "Potso"
+      modal_title: "Setlhogo sa letlhabaphefo"
+      modal_body: "Mokwalo wa letlhabaphefo"
       description: "Setlhogwana"
       explanation: "Tlhaloso ya karabo"
       options: "Dikarabo"

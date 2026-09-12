@@ -8,4 +8,12 @@
   <%= render "shared/split_left",     card: card, progress: progress, mode: :player %>
   <%= render "shared/card_component", card: card, mode: :player, card_index: card_index,
         locale: locale, default_locale: default_locale %>
+  <%# The creator's intro modal, if this card has one. Inside .split-card so it
+      covers both halves and clips to the card's own radius; server-rendered
+      and `hidden` until the player opens it on the card's first arrival. %>
+  <% if card_has_modal?(card) %>
+    <%= render "shared/card_modal", card: card,
+          display: localized_card(card, locale, default_locale), mode: :player,
+          display_locale: (locale.presence || default_locale) %>
+  <% end %>
 </div>

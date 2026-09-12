@@ -158,6 +158,7 @@ ar:
       points_intro: "مقدمة النقاط"
       prioritise: "ترتيب الأولوية"
       scenario: "سيناريو"
+    modal_aria: "عن هذا السؤال"
   ask_submission_mailer:
     confirmation_subject: "تم تقديم بيانات Verto الخاصة بك إلى Ask Verto"
     confirmation_heading: "قُدّم للمراجعة"
@@ -307,6 +308,8 @@ ar:
     join_email_placeholder: "بريدك@مثال.com"
     join_fine: "رسالة واحدة لتسجيل الدخول. لا ننشر شيئًا أبدًا، ويمكنك حذف الحساب بلمسة واحدة."
     join_embedded: "هذا الـ Verto مضمّن في موقع آخر، لذا لا يمكننا رؤية أي شيء آخر لعبته هنا. سيحتفظ الرابط بهذا على أي حال."
+    modal_continue: "فهمت"
+    modal_reopen: "اقرأها مرة أخرى"
   defaults:
     range: ["غير موافق بشدة", "غير موافق", "محايد", "موافق", "موافق بشدة"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ ar:
     join_title_label: "عنوان طلب الحساب"
     join_body_label: "رسالة طلب الحساب"
     join_cta_label: "زر طلب الحساب"
+    modal_add: "أضف نافذة"
+    modal_on: "النافذة مفعّلة"
+    modal_toggle_title: "أضف نافذة منبثقة تشرح هذه البطاقة"
+    modal_chrome: "نافذة · تظهر فوق هذه البطاقة"
+    modal_remove: "إزالة"
+    modal_remove_confirm: "هل تريد إزالتها فعلاً؟"
+    modal_remove_title: "إزالة هذه النافذة"
+    modal_title_placeholder: "قبل أن تجيب…"
+    modal_body_placeholder: "اشرح بكلماتك ما الذي يسأل عنه هذا السؤال…"
+    modal_expand: "اعرض هذه النافذة كما يراها المشارك"
+    modal_collapse: "اطوِ هذه النافذة"
   dashboard_card:
     publish_warning: "نشر «%{title}»؟ بعد النشر تُقفل أسئلتها ولا يمكن تعديلها — تأكد أن كل شيء كما تريد تمامًا."
     preview: "معاينة"
@@ -2081,6 +2095,8 @@ ar:
       stale: "تمت الموافقة ثم التعديل"
     field:
       text: "السؤال"
+      modal_title: "عنوان النافذة"
+      modal_body: "نص النافذة"
       description: "النص الفرعي"
       explanation: "شرح الإجابة"
       options: "الإجابات"

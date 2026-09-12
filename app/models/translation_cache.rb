@@ -34,6 +34,12 @@ class TranslationCache < ApplicationRecord
     end
     canonical["pages"]       = pages if pages.any?
     canonical["explanation"] = card["explanation"].to_s if card["explanation"].present?
+    # The intro modal's words, for exactly the reason above: a card that gains
+    # a modal must miss the cache, or its already-translated Verto would keep
+    # serving the entry that predates it and the modal would stay English in
+    # every other language with nothing to show why.
+    canonical["modal_title"] = card["modal_title"].to_s if card["modal_title"].present?
+    canonical["modal_body"]  = card["modal_body"].to_s  if card["modal_body"].present?
 
     Digest::SHA256.hexdigest(canonical.to_json)
   end

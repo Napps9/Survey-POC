@@ -158,6 +158,7 @@ it:
       points_intro: "Intro punti"
       prioritise: "Dai priorità"
       scenario: "Scenario"
+    modal_aria: "Su questa domanda"
   ask_submission_mailer:
     confirmation_subject: "I tuoi dati Verto sono stati inviati ad Ask Verto"
     confirmation_heading: "Inviato per la revisione"
@@ -307,6 +308,8 @@ it:
     join_email_placeholder: "tua@email.com"
     join_fine: "Un'e-mail per accedere. Non pubblichiamo mai nulla e puoi eliminare l'account con un tocco."
     join_embedded: "Questo Verto è incorporato in un altro sito, quindi non possiamo vedere nient'altro che tu abbia giocato qui. Il link conserverà comunque questo."
+    modal_continue: "Ho capito"
+    modal_reopen: "Rileggi"
   defaults:
     range: ["Per niente d'accordo", "In disaccordo", "Neutrale", "D'accordo", "Completamente d'accordo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ it:
     join_title_label: "Titolo dell'invito"
     join_body_label: "Messaggio dell'invito"
     join_cta_label: "Pulsante dell'invito"
+    modal_add: "Aggiungi finestra"
+    modal_on: "Finestra attiva"
+    modal_toggle_title: "Aggiungi una finestra che spiega questa scheda"
+    modal_chrome: "Finestra · appare sopra questa scheda"
+    modal_remove: "Rimuovi"
+    modal_remove_confirm: "Rimuovere davvero?"
+    modal_remove_title: "Rimuovi questa finestra"
+    modal_title_placeholder: "Prima di rispondere…"
+    modal_body_placeholder: "Spiega con parole tue che cosa chiede questa domanda…"
+    modal_expand: "Vedi questa finestra come la vede chi risponde"
+    modal_collapse: "Richiudi questa finestra"
   dashboard_card:
     publish_warning: "Pubblicare “%{title}”? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."
     preview: "Anteprima"
@@ -2066,6 +2080,8 @@ it:
       stale: "Approvata, poi modificata"
     field:
       text: "Domanda"
+      modal_title: "Titolo della finestra"
+      modal_body: "Testo della finestra"
       description: "Descrizione"
       explanation: "Spiegazione della risposta"
       options: "Risposte"

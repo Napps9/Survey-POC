@@ -158,6 +158,7 @@ he:
       points_intro: "מבוא נקודות"
       prioritise: "תעדוף"
       scenario: "תרחיש"
+    modal_aria: "על השאלה הזו"
   ask_submission_mailer:
     confirmation_subject: "נתוני ה-Verto שלכם נשלחו ל-Ask Verto"
     confirmation_heading: "נשלח לבדיקה"
@@ -307,6 +308,8 @@ he:
     join_email_placeholder: "שלכם@אימייל.com"
     join_fine: "אימייל אחד כדי להתחבר. אנחנו אף פעם לא מפרסמים כלום, ואפשר למחוק את החשבון בנגיעה אחת."
     join_embedded: "ה-Verto הזה מוטמע באתר אחר, ולכן איננו יכולים לראות שום דבר אחר ששיחקתם כאן. הקישור עדיין ישמור את זה."
+    modal_continue: "הבנתי"
+    modal_reopen: "לקרוא שוב"
   defaults:
     range: ["מאוד לא מסכים", "לא מסכים", "ניטרלי", "מסכים", "מסכים מאוד"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ he:
     join_title_label: "כותרת ההזמנה"
     join_body_label: "הודעת ההזמנה"
     join_cta_label: "כפתור ההזמנה"
+    modal_add: "הוספת חלון"
+    modal_on: "החלון פעיל"
+    modal_toggle_title: "הוספת חלון קופץ שמסביר את הכרטיס הזה"
+    modal_chrome: "חלון · מוצג מעל הכרטיס הזה"
+    modal_remove: "הסרה"
+    modal_remove_confirm: "באמת להסיר?"
+    modal_remove_title: "הסרת החלון הזה"
+    modal_title_placeholder: "לפני שתענו…"
+    modal_body_placeholder: "הסבירו במילים שלכם מה השאלה הזו שואלת…"
+    modal_expand: "הצגת החלון כפי שהמשיבים רואים אותו"
+    modal_collapse: "קיפול החלון"
   dashboard_card:
     publish_warning: "לפרסם את “%{title}”? לאחר הפרסום השאלות נעולות ולא ניתנות לעריכה — ודאו שהכול בדיוק כפי שאתם רוצים."
     preview: "תצוגה מקדימה"
@@ -2073,6 +2087,8 @@ he:
       stale: "אושרה ואז נערכה"
     field:
       text: "שאלה"
+      modal_title: "כותרת החלון"
+      modal_body: "טקסט החלון"
       description: "טקסט משני"
       explanation: "הסבר לתשובה"
       options: "תשובות"

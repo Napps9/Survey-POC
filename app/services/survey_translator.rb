@@ -56,6 +56,14 @@ class SurveyTranslator
               explanation: {
                 type: "string",
                 description: "Translated quiz answer explanation, shown after the respondent answers. Empty string if the source had none."
+              },
+              modal_title: {
+                type: "string",
+                description: "Translated heading of the intro modal shown over this card. Empty string if the source had none."
+              },
+              modal_body: {
+                type: "string",
+                description: "Translated body of the intro modal shown over this card — the creator's explanation of what the question is asking. Empty string if the source had none."
               }
             },
             required: %w[text options]
@@ -83,6 +91,10 @@ class SurveyTranslator
       position, and never invent, drop, merge or renumber one.
     - Translate `explanation` (the after-the-answer quiz feedback) when the
       source card has one; omit it otherwise.
+    - Translate `modal_title` and `modal_body` (the pop-up shown over the card
+      before it is answered) when the source card has them; omit them
+      otherwise. This is the creator explaining the question in their own
+      voice — keep that voice, not a formal register.
     - Keep translations concise to fit UI constraints: question text short
       (aim under ~70 characters), option labels short (aim under ~20 characters).
     - Preserve numbers, and leave proper nouns / brand names untranslated.
@@ -174,6 +186,8 @@ class SurveyTranslator
       end
       entry[:pages] = pages if pages.any?
       entry[:explanation] = card["explanation"].to_s if card["explanation"].present?
+      entry[:modal_title] = card["modal_title"].to_s if card["modal_title"].present?
+      entry[:modal_body]  = card["modal_body"].to_s  if card["modal_body"].present?
       entry
     end
 
@@ -228,6 +242,14 @@ class SurveyTranslator
 
       if card["explanation"].present?
         entry["explanation"] = t["explanation"].presence || card["explanation"].to_s
+      end
+
+      # Same shape as `explanation`: carried only for the cards that have one,
+      # falling back to the source words so a modal is never blank in a
+      # language the model skipped — blank here would mean a respondent gets an
+      # empty pop-up, not the English one.
+      %w[modal_title modal_body].each do |field|
+        entry[field] = t[field].presence || card[field].to_s if card[field].present?
       end
 
       entry

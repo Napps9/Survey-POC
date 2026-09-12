@@ -36,9 +36,10 @@ module LanguageCheckLines
   # title is the Verto's own title, reviewed once at the top of the screen.
   SKIPPED_TYPES = %w[].freeze
 
-  # Ordered so the screen reads the way a card does: the question, its
-  # sub-text, the answers, then the extras only some types carry.
-  SCALAR_FIELDS = %w[text description explanation].freeze
+  # Ordered so the screen reads the way a card does: the intro modal a
+  # respondent meets FIRST, then the question, its sub-text, the answers, then
+  # the extras only some types carry.
+  SCALAR_FIELDS = %w[modal_title modal_body text description explanation].freeze
   LIST_FIELDS   = %w[options responses].freeze
   PAGE_FIELD    = "pages".freeze
   FIELDS        = (SCALAR_FIELDS + LIST_FIELDS + [ PAGE_FIELD ]).freeze
@@ -75,16 +76,18 @@ module LanguageCheckLines
   # every line uses. Blank fields are kept as empty values rather than dropped
   # so a translated line can be compared field-for-field against it.
   def canonical_content(card)
-    {
-      "text"        => card["text"].to_s,
-      "description" => card["description"].to_s,
-      "explanation" => card["explanation"].to_s,
+    # The scalars are read OFF SCALAR_FIELDS rather than listed again. They
+    # were listed, and the list went stale the first time the constant grew:
+    # a field in SCALAR_FIELDS but not here has no canonical value, so
+    # translated_content can never fall back to it and the reviewer is shown a
+    # blank where the player shows the primary wording.
+    SCALAR_FIELDS.index_with { |field| card[field].to_s }.merge(
       "options"     => Array(card["options"]).map(&:to_s),
       "responses"   => Array(card["responses"]).filter_map { |r| r["label"].to_s if r.is_a?(Hash) },
       "pages"       => Array(card["pages"]).filter_map do |p|
         { "id" => p["id"].to_s, "text" => p["text"].to_s } if p.is_a?(Hash) && p["id"].present?
       end
-    }
+    )
   end
 
   # One secondary language's words, with the player's own fallback applied:

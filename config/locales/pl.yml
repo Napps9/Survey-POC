@@ -158,6 +158,7 @@ pl:
       points_intro: "Intro punktów"
       prioritise: "Priorytetyzuj"
       scenario: "Scenariusz"
+    modal_aria: "O tym pytaniu"
   ask_submission_mailer:
     confirmation_subject: "Twoje dane Verto zostały przesłane do Ask Verto"
     confirmation_heading: "Przesłano do oceny"
@@ -307,6 +308,8 @@ pl:
     join_email_placeholder: "twoj@email.pl"
     join_fine: "Jeden e-mail, żeby się zalogować. Nigdy nic nie publikujemy, a konto usuniesz jednym dotknięciem."
     join_embedded: "To Verto jest osadzone na innej stronie, więc nie widzimy nic innego, w co tu grałeś. Link i tak zachowa to jedno."
+    modal_continue: "Rozumiem"
+    modal_reopen: "Przeczytaj ponownie"
   defaults:
     range: ["Zdecydowanie się nie zgadzam", "Nie zgadzam się", "Neutralnie", "Zgadzam się", "Zdecydowanie się zgadzam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1238,6 +1241,17 @@ pl:
     join_title_label: "Nagłówek prośby o konto"
     join_body_label: "Treść prośby o konto"
     join_cta_label: "Przycisk prośby o konto"
+    modal_add: "Dodaj okno"
+    modal_on: "Okno włączone"
+    modal_toggle_title: "Dodaj okno, które wyjaśnia tę kartę"
+    modal_chrome: "Okno · pojawia się na tej karcie"
+    modal_remove: "Usuń"
+    modal_remove_confirm: "Na pewno usunąć?"
+    modal_remove_title: "Usuń to okno"
+    modal_title_placeholder: "Zanim odpowiesz…"
+    modal_body_placeholder: "Wyjaśnij własnymi słowami, o co pyta to pytanie…"
+    modal_expand: "Zobacz to okno tak, jak widzi je osoba odpowiadająca"
+    modal_collapse: "Zwiń to okno"
   dashboard_card:
     publish_warning: "Opublikować „%{title}”? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     preview: "Podgląd"
@@ -2076,6 +2090,8 @@ pl:
       stale: "Zatwierdzone, potem zmienione"
     field:
       text: "Pytanie"
+      modal_title: "Nagłówek okna"
+      modal_body: "Tekst okna"
       description: "Podtytuł"
       explanation: "Wyjaśnienie odpowiedzi"
       options: "Odpowiedzi"

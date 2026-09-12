@@ -23,6 +23,11 @@ export default class extends Controller {
     this.overlayTarget.classList.remove("hidden")
     this.overlayTarget.classList.add("flex")
     this.currentValue = 0
+    // Each Preview is a fresh run, so every intro modal is unmet again. Keyed
+    // by element rather than by cid: these cards are rebuilt from the editor's
+    // DOM on every open, and a creator previewing right after adding a card
+    // has one with no cid yet.
+    this._modalSeen = new WeakSet()
     this.thankyouTarget.classList.remove("active")
     this._update()
   }
@@ -110,6 +115,10 @@ export default class extends Controller {
 
     this.cardTargets.forEach((c, i) =>
       c.classList.toggle("active", i === idx))
+    // The creator's intro modal, if this card has one and this preview run has
+    // not met it yet. Same placement as the player's: before the nav work, so
+    // the attribute that hides the nav is set by the time it runs.
+    this._syncCardModal(this.cardTargets[idx])
 
     this.progressTarget.textContent = `Card ${idx + 1} of ${total}`
 
@@ -212,6 +221,78 @@ export default class extends Controller {
     })
   }
 
+  // ── The creator's intro modal, in Preview ─────────────────────────────────
+  // This overlay is a second, independent implementation of the deck walk (see
+  // _scenarioController's note on why), so the modal needs its open/dismiss
+  // here too. It is the player's behaviour, deliberately: once per card per
+  // preview, the nav away while it is up, the re-open pill afterwards — a
+  // preview that skipped the pop-up would be a preview of a different Verto.
+
+  _playeriseCardModal(clone) {
+    const layer = clone.querySelector("[data-role='card-modal']")
+    if (!layer) return
+    // The editor renders a replica on EVERY card (the serialiser needs its
+    // nodes there whether or not a modal exists, and CSS hides the ones that
+    // are off). The player renders one only where there is a modal, and this
+    // clone has to look like the player's markup, not the editor's — otherwise
+    // every card in Preview opens an empty pop-up over itself.
+    const words = [ "card-modal-title", "card-modal-body" ]
+      .some(role => layer.querySelector(`[data-role='${role}']`)?.textContent.trim())
+    if (!words) {
+      layer.remove()
+      clone.querySelector("[data-role='card-modal-reopen']")?.remove()
+      return
+    }
+    layer.classList.remove("is-editing", "is-folded")
+    layer.hidden = true
+    const cta = layer.querySelector(".card-modal-cta")
+    if (cta) {
+      cta.removeAttribute("tabindex")
+      cta.dataset.action = "click->preview-verto#dismissCardModal"
+    }
+    const reopen = clone.querySelector("[data-role='card-modal-reopen']")
+    if (reopen) reopen.dataset.action = "click->preview-verto#reopenCardModal"
+  }
+
+  _syncCardModal(card) {
+    const layer = card?.querySelector("[data-role='card-modal']")
+    if (layer && layer.hidden && !this._modalSeen?.has(card)) this._openCardModal(card)
+    else if (!layer || this._modalSeen?.has(card)) this._closeCardModal({ seen: false })
+  }
+
+  _openCardModal(card) {
+    const layer = card.querySelector("[data-role='card-modal']")
+    if (!layer) return
+    layer.hidden = false
+    card.querySelector(".split-card")?.classList.add("card-modal-open")
+    card.querySelector("[data-role='card-modal-reopen']")?.setAttribute("hidden", "")
+    this.overlayTarget.setAttribute("data-card-modal-open", "")
+  }
+
+  _closeCardModal({ seen }) {
+    this.overlayTarget.removeAttribute("data-card-modal-open")
+    this.cardTargets.forEach(card => {
+      const layer = card.querySelector("[data-role='card-modal']")
+      if (!layer || layer.hidden) return
+      layer.hidden = true
+      card.querySelector(".split-card")?.classList.remove("card-modal-open")
+      if (seen) {
+        this._modalSeen.add(card)
+        card.querySelector("[data-role='card-modal-reopen']")?.removeAttribute("hidden")
+      }
+    })
+  }
+
+  dismissCardModal() {
+    this._closeCardModal({ seen: true })
+    this._update()
+  }
+
+  reopenCardModal(event) {
+    const card = event.currentTarget.closest("[data-preview-verto-target='card']")
+    if (card) this._openCardModal(card)
+  }
+
   _stripEditorChrome(clone) {
     // 1. Remove editor-only chrome elements outright. quiz-correct-block /
     //    token-award-block are the creator's Tokenomics/Quiz mode controls
@@ -251,7 +332,13 @@ export default class extends Controller {
       // apart. The .nps-label-row wrapper STAYS: it is the flex item the column
       // lays its stops out with, on the player as much as here, so removing it
       // would collapse the scale rather than tidy it.
-      ".nps-label-delete, .nps-scale-add"
+      ".nps-label-delete, .nps-scale-add, " +
+      // The intro modal's editor strip — the label, the fold chevron and
+      // Remove. The modal itself STAYS: this overlay is "preview as a
+      // respondent", and the pop-up over the question is part of what a
+      // respondent gets. Turning the replica into the real thing is
+      // _playeriseCardModal below.
+      ".card-modal-chrome"
     ).forEach(el => el.remove())
 
     // 1b. The tap card's statement pager is the one piece of editor chrome that
@@ -354,6 +441,15 @@ export default class extends Controller {
     clone.querySelectorAll("[contenteditable]").forEach(el =>
       el.removeAttribute("contenteditable")
     )
+
+    // 3b. The intro modal, turned from the creator's editable replica into the
+    //     thing a respondent meets: the editor's fold and border classes go,
+    //     it starts shut (this overlay opens it on arrival, as the player
+    //     does), and its CTA is re-pointed at THIS controller — the real one
+    //     names player#dismissCardModal, which nothing here answers to, so
+    //     leaving it would put an undismissable pop-up over the card the
+    //     creator came to look at.
+    this._playeriseCardModal(clone)
 
     // 4. Drop editor-only marker attributes.
     clone.querySelectorAll("[data-card-component], [data-card-media]").forEach(el => {

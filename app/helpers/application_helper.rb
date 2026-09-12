@@ -175,15 +175,22 @@ module ApplicationHelper
       "responses"   => Array(card["responses"]).map { |r| r.is_a?(Hash) ? r["label"].to_s : "" }.presence,
       # Rich-text layer (primary locale only — translations are plain), so
       # the editor's store starts with the same html the DOM shows.
+      # The intro modal's words — respondent-facing copy the language tabs swap
+      # like any other, so they ride the store rather than being read back off
+      # the DOM alone.
+      "modal_title" => card["modal_title"],
+      "modal_body"  => card["modal_body"],
       "text_html"        => card["text_html"],
       "description_html" => card["description_html"],
+      "modal_body_html"  => card["modal_body_html"],
       "options_html"     => card["options_html"]
     }
     if card["i18n"].is_a?(Hash)
       out["i18n"] = card["i18n"].transform_values do |tr|
         tr = tr || {}
         { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"],
-          "pages" => tr["pages"], "responses" => tr["responses"] }.compact
+          "pages" => tr["pages"], "responses" => tr["responses"],
+          "modal_title" => tr["modal_title"], "modal_body" => tr["modal_body"] }.compact
       end
     end
     out.compact
@@ -226,6 +233,16 @@ module ApplicationHelper
     # scalar, so a straight fall-back to the source string.
     if card["explanation"].present?
       merged["explanation"] = tr["explanation"].presence || card["explanation"]
+    end
+
+    # The intro modal's words. Plain scalars like `explanation`, so a straight
+    # per-field fall-back to the source. The body's rich-text layer needs no
+    # handling here: rich_card_text only paints html when the shown string is
+    # still the primary one, so a translated body renders plain by the same
+    # rule that already governs a translated question.
+    if card["modal_title"].present? || card["modal_body"].present?
+      merged["modal_title"] = tr["modal_title"].presence || card["modal_title"]
+      merged["modal_body"]  = tr["modal_body"].presence  || card["modal_body"]
     end
 
     merged
@@ -286,6 +303,26 @@ module ApplicationHelper
     return shown unless html.present? && shown == card[field].to_s
 
     RichTextSanitizer.clean(html).html_safe
+  end
+
+  # Does this card carry an intro modal? Presence of the words IS the flag
+  # (Survey.sanitize_cards_images!), so every caller asks the same question the
+  # same way rather than each picking a field to test.
+  def card_has_modal?(card)
+    return false unless card.is_a?(Hash)
+    card["modal_title"].to_s.strip.present? || card["modal_body"].to_s.strip.present?
+  end
+
+  # The speech-bubble that marks the intro modal everywhere it appears — the
+  # rail control, the editor chrome strip, the player's re-open pill. One
+  # drawing, so the three are recognisably the same thing. Stroke-based like
+  # the delete bin beside it in the rail, and sized by its caller.
+  def card_modal_icon(size = 13)
+    tag.svg(width: size, height: size, viewBox: "0 0 24 24", fill: "none",
+            aria: { hidden: true }, style: "flex-shrink:0;") do
+      tag.path(d: "M4 5.5h16a1 1 0 011 1v9a1 1 0 01-1 1h-8.5L7 20.5V16.5H4a1 1 0 01-1-1v-9a1 1 0 011-1z",
+               stroke: "currentColor", "stroke-width": "1.7", "stroke-linejoin": "round")
+    end
   end
 
   def rich_option_text(card, shown, index)

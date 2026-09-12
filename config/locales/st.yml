@@ -168,6 +168,7 @@ st:
       points_intro: "Selelekela sa lintlha"
       prioritise: "Beha Thato"
       scenario: "Boemo"
+    modal_aria: "Ka potso ena"
   ask_submission_mailer:
     confirmation_subject: "Datha ya hao ya Verto e rometswe ho Ask Verto"
     confirmation_heading: "E rometswe bakeng sa tlhahlobo"
@@ -317,6 +318,8 @@ st:
     join_email_placeholder: "your@email.com"
     join_fine: "Imeile e le nngwe ho kena. Ha re ke re phatlalatse letho, mme o ka hlakola akhaonto ka ho tobetsa hang."
     join_embedded: "Verto ena e kentswe sebakeng se seng sa marang-rang, kahoo re ke ke ra bona letho le leng leo o le bapetseng mona. Sehokelo se sa tla boloka ena."
+    modal_continue: "Ke utloile"
+    modal_reopen: "Bala hape"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -1258,6 +1261,17 @@ st:
     join_title_label: "Sehlooho sa kopo"
     join_body_label: "Molaetsa wa kopo"
     join_cta_label: "Konopo ya kopo"
+    modal_add: "Eketsa fensetere"
+    modal_on: "Fensetere e bulehile"
+    modal_toggle_title: "Eketsa fensetere e hlalosang karete ena"
+    modal_chrome: "Fensetere · e hlaha holim'a karete ena"
+    modal_remove: "Tlosa"
+    modal_remove_confirm: "Na o hlile o e tlosa?"
+    modal_remove_title: "Tlosa fensetere ena"
+    modal_title_placeholder: "Pele o araba…"
+    modal_body_placeholder: "Hlalosa ka mantsoe a hau hore na potso ena e botsa eng…"
+    modal_expand: "Bona fensetere ena joalo ka ha ea arabang a e bona"
+    modal_collapse: "Mena fensetere ena"
   dashboard_card:
     publish_warning: "Phatlalatsa “%{title}”? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     preview: "Pontsho"
@@ -2103,6 +2117,8 @@ st:
       stale: "E amohetswe, eaba e fetolwa"
     field:
       text: "Potso"
+      modal_title: "Sehlooho sa fensetere"
+      modal_body: "Mongolo oa fensetere"
       description: "Mongolo o tlatsetsang"
       explanation: "Tlhaloso ya karabo"
       options: "Dikarabo"

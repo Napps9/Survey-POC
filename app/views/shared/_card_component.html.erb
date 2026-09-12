@@ -182,6 +182,31 @@
 
 <div class="split-right<%= ' split-right--book' if Survey::PAGED_TYPES.include?(type) %>">
 
+  <%# Re-open the intro modal, on a card that has one: the modal interrupts
+      once and never again (going back and forward lands on a shut one), so
+      without this the words are gone the moment somebody taps past them — and
+      they are the words explaining the question they are now looking at.
+      Hidden until the modal has actually been dismissed, so it never sits over
+      an open one.
+
+      Rendered on EVERY editor card, and hidden there for the life of the
+      page: the editor's Preview overlay clones this markup and turns it into
+      the respondent's view (preview_verto#_playeriseCardModal), so a pill the
+      editor never rendered would be a pill Preview could never show — and
+      "preview as a respondent" would quietly differ from what a respondent
+      gets. Unconditional rather than gated on card_has_modal?, because in the
+      editor a card GAINS a modal after this page was rendered; the clone drops
+      the pill again wherever it found no words. Building it in JS instead
+      would be a second copy of this button, free to drift from it. %>
+  <% if mode == :editor || (mode == :player && card_has_modal?(card)) %>
+    <button type="button" class="card-modal-reopen" hidden
+            data-role="card-modal-reopen"
+            data-action="click->player#reopenCardModal">
+      <%= card_modal_icon(13) %>
+      <span><%= t("player.modal_reopen", locale: display_locale, default: "Read again") %></span>
+    </button>
+  <% end %>
+
   <%# Creator's logo, centred at the top of the right (content) panel on the
       welcome card — player and editor (the editor's Preview overlay clones
       the editor DOM, so without the editor branch the promised "your logo on

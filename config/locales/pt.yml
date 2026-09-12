@@ -158,6 +158,7 @@ pt:
       points_intro: "Intro de pontos"
       prioritise: "Priorizar"
       scenario: "Cenário"
+    modal_aria: "Sobre esta pergunta"
   ask_submission_mailer:
     confirmation_subject: "Os seus dados Verto foram submetidos ao Ask Verto"
     confirmation_heading: "Submetido para revisão"
@@ -307,6 +308,8 @@ pt:
     join_email_placeholder: "o.teu@email.com"
     join_fine: "Um e-mail para iniciar sessão. Nunca publicamos nada e podes eliminar a conta com um toque."
     join_embedded: "Este Verto está incorporado noutro site, por isso não conseguimos ver mais nada que tenhas jogado aqui. O link guardará este à mesma."
+    modal_continue: "Percebi"
+    modal_reopen: "Ler de novo"
   defaults:
     range: ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ pt:
     join_title_label: "Título do convite"
     join_body_label: "Mensagem do convite"
     join_cta_label: "Botão do convite"
+    modal_add: "Adicionar janela"
+    modal_on: "Janela ativa"
+    modal_toggle_title: "Adiciona uma janela que explica este cartão"
+    modal_chrome: "Janela · aparece sobre este cartão"
+    modal_remove: "Remover"
+    modal_remove_confirm: "Remover mesmo?"
+    modal_remove_title: "Remover esta janela"
+    modal_title_placeholder: "Antes de responder…"
+    modal_body_placeholder: "Explica o que esta pergunta procura saber, por palavras tuas…"
+    modal_expand: "Ver esta janela como a vê quem responde"
+    modal_collapse: "Fechar esta janela"
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"
@@ -2066,6 +2080,8 @@ pt:
       stale: "Aprovada e depois alterada"
     field:
       text: "Pergunta"
+      modal_title: "Título da janela"
+      modal_body: "Texto da janela"
       description: "Texto de apoio"
       explanation: "Explicação da resposta"
       options: "Respostas"

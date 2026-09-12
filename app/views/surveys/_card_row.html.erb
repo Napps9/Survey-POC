@@ -145,6 +145,23 @@
               title="<%= t('editor.why', default: 'Why') %>"
               aria-label="<%= t('editor.why', default: 'Why') %>"
               data-action="click->publish-panel#showWhy"><span class="rail-icon">?</span><span class="rail-label"><%= t('editor.why', default: 'Why') %></span></button>
+      <%# Intro modal. A full-rail-width control under the Card N / Why pair —
+          one of the everyday controls, not one of the structural ones in
+          .rail-bottom: a modal is this card's content, not the deck's shape.
+          It is a TOGGLE with two readings, which is why the label and the
+          class both flip: off it invites (tinted, like Add question), on it
+          reports (filled) and jumps to the panel the creator is about to
+          type in. Offered on every type — a modal explains whatever card it
+          is hung on, and a live Verto can gain one, because hanging it on the
+          card moves no card and so re-points no stored answer. %>
+      <button type="button" class="card-modal-btn<%= " is-on" if card_has_modal?(card) %>"
+              data-role="card-modal-btn"
+              aria-pressed="<%= card_has_modal?(card) %>"
+              title="<%= t('editor.modal_toggle_title') %>"
+              data-action="click->survey-editor#toggleCardModal">
+        <%= card_modal_icon %>
+        <span class="rail-label" data-role="card-modal-btn-label"><%= card_has_modal?(card) ? t("editor.modal_on") : t("editor.modal_add") %></span>
+      </button>
       <% if is_q %>
         <%# Passive glance indicator — visible only while the card is Required
             (toggled live from the Answer Type tab's Card settings). %>
@@ -221,10 +238,19 @@
 
   <div class="card-col">
     <%# Horizontal split-card %>
-    <div class="split-card">
+    <div class="split-card<%= " has-card-modal" if card_has_modal?(card) %>">
       <%= render "shared/split_left",     card: card, progress: progress, mode: :editor %>
       <%= render "shared/card_component", card: card, mode: :editor, default_locale: default_locale,
             quiz: local_assigns.fetch(:quiz, false), tokenisation: local_assigns.fetch(:tokenisation, false) %>
+      <%# The modal, inside .split-card so it paints over BOTH halves and clips
+          to the card's own 24px radius — the same box the player puts it in,
+          which is the point of rendering an editable replica at all. Always in
+          the DOM (hidden by .has-card-modal on the parent) so toggling it on
+          needs no re-render and the contenteditable nodes the serialiser reads
+          are never missing: a card whose modal is off still round-trips its
+          empty strings through autosave and stores nothing. %>
+      <%= render "shared/card_modal", card: card, mode: :editor,
+            display_locale: default_locale %>
     </div><%# /split-card %>
   </div><%# /card-col %>
 

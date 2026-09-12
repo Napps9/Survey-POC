@@ -13946,3 +13946,216 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .lc-identify-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
 .lc-identify-row .lc-input { flex: 1 1 200px; }
 .lc-powered { margin-top: 30px; text-align: center; font-size: 12px; color: rgba(255,255,255,.3); }
+
+/* ── The card intro modal ──────────────────────────────────────────────────
+   A creator-written pop-up shown OVER the card it explains, the first time a
+   respondent lands on it. One set of rules for the player and the editor's
+   editable replica: the editor's job is to show the creator what a respondent
+   will meet, so anything that only applied to one of the two would be a lie
+   in the feed.
+
+   It borrows the consent banner's vocabulary rather than inventing a second
+   "panel over the question" — the same #1C2034 fill, the same brand-CTA
+   button, the same 0.55 dim on the card behind. The one difference is
+   position: consent is a strip along the bottom of the deck, this is centred
+   over the ONE card it belongs to, because that is what says which question
+   it is about. */
+.card-modal-layer {
+  position: absolute; inset: 0;
+  z-index: 30;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  /* No scrim of its own. The card behind is already at 0.55 (see
+     .card-modal-open below) and the two compound: measured on a live deck, a
+     scrim on top of that dim took the question from readable-but-quiet to
+     barely legible, which defeats the point of leaving it visible at all. The
+     consent gate reaches the same look with the dim alone; so does this. (The
+     editor's replica DOES paint one — there is no dim there, because the
+     creator is editing the card underneath. See .is-editing below.) */
+}
+.card-modal-layer[hidden] { display: none; }
+.card-modal-panel {
+  width: 100%; max-width: 460px;
+  max-height: 100%;
+  display: flex; flex-direction: column;
+  background: #1C2034; color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+/* The scrollable half. A creator can write more than a card's height holds,
+   and the CTA must never be the thing that goes off the bottom — it is the
+   only way out of the modal. */
+.card-modal-main {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 22px 24px 0;
+  min-height: 0; overflow-y: auto;
+}
+.card-modal-title {
+  font-family: "Alata", sans-serif; font-size: 17px; line-height: 1.3;
+  color: #fff; outline: none;
+  white-space: pre-line;
+}
+.card-modal-text {
+  font-family: "ABeeZee", sans-serif; font-size: 14px; line-height: 1.6;
+  color: rgba(255,255,255,0.85); outline: none;
+  /* Same contract as .q-title: the creator's Enter is stored as \n and this
+     is what renders it as the break they typed. */
+  white-space: pre-line;
+}
+.card-modal-cta {
+  flex: 0 0 auto;
+  margin: 16px 24px 20px;
+  padding: 13px 22px; border-radius: 100px; border: none; cursor: pointer;
+  background: var(--brand-cta, #01EACB); color: var(--brand-cta-text, #1C2034);
+  font-family: "Alata", sans-serif; font-size: 15px; letter-spacing: 0.04em;
+}
+.card-modal-cta:hover { filter: brightness(1.08); }
+.card-modal-cta:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* The card behind, while the modal is open. Scoped to the two halves rather
+   than applied to .split-card, because the modal is a CHILD of .split-card and
+   dimming the parent would dim the modal with it. */
+.split-card.card-modal-open > .split-left,
+.split-card.card-modal-open > .split-right { opacity: 0.55; }
+
+/* Deck nav while a modal is open — gone, not disabled. One way forward, the
+   same shape (and the same reasoning) as data-consent-pending above: a Next
+   button beside a modal invites a respondent to skip the sentence that was
+   written to help them. */
+.preview-overlay[data-card-modal-open] .preview-btn,
+.preview-overlay[data-card-modal-open] .preview-progress-text,
+.preview-overlay[data-card-modal-open] .quiz-score-chip,
+.preview-overlay[data-card-modal-open] .token-score-chip { display: none; }
+
+/* Re-open. Player only, and only after the modal has been dismissed — a small,
+   quiet pill in the question panel's top corner, because the words it brings
+   back explain the question the respondent is now looking at. */
+.card-modal-reopen {
+  position: absolute; top: 14px; inset-inline-end: 16px;
+  z-index: 3;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px 5px 9px; border-radius: 100px;
+  background: rgba(28,32,52,0.04);
+  border: 1px solid rgba(28,32,52,0.28);
+  color: rgba(28,32,52,0.72);
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.15s;
+}
+.card-modal-reopen:hover {
+  background: rgba(28,32,52,0.09); border-color: rgba(28,32,52,0.5);
+  color: #1C2034;
+}
+.card-modal-reopen[hidden] { display: none; }
+
+/* ── The editor's replica ──────────────────────────────────────────────────
+   Rendered on every card so the contenteditable nodes serialize() reads are
+   never missing (a card with no modal simply round-trips empty strings, which
+   store nothing). Shown only where .has-card-modal says the creator has turned
+   one on. */
+.split-card .card-modal-layer.is-editing { display: none; }
+.split-card.has-card-modal .card-modal-layer.is-editing { display: flex; }
+/* The replica names itself. Without this strip a dark panel floating over a
+   card in the feed reads as another card rather than as something that happens
+   at play time. */
+.card-modal-layer.is-editing .card-modal-panel {
+  border: 1.5px solid #0CA7FF;
+}
+.card-modal-chrome {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 10px 9px 14px;
+  background: rgba(12,167,255,0.12);
+  border-bottom: 1px solid rgba(12,167,255,0.3);
+  color: #7FD4FF;
+}
+/* Deliberately NOT uppercased. Folded, this line carries the creator's own
+   heading (survey_editor#_paintCardModalLabel), and shouting somebody's
+   sentence back at them reads as a system message rather than as their words.
+   Alata at 11px with the letter-spacing is enough to read as chrome. */
+.card-modal-chrome-label {
+  flex: 1 1 auto; min-width: 0;
+  font-family: "Alata", sans-serif; font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.card-modal-remove {
+  flex: 0 0 auto;
+  padding: 3px 10px; border-radius: 100px;
+  background: transparent; border: 1px solid rgba(255,92,147,0.55);
+  color: #FF5C93; font-family: "ABeeZee", sans-serif; font-size: 11px;
+  cursor: pointer; transition: all 0.15s;
+}
+.card-modal-remove:hover { background: #341A27; border-color: #FF1E6F; }
+/* Armed (first tap), exactly like .card-delete-btn: this clears text that the
+   browser's contenteditable undo cannot put back, so it asks once. */
+.card-modal-remove.is-armed {
+  background: #DB0E58; border-color: #DB0E58; color: #fff;
+  animation: delete-armed-pulse 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-modal-remove.is-armed { animation: none; box-shadow: 0 2px 12px rgba(219,14,88,0.6); }
+}
+/* The editor's replica is a mock-up, not a working modal: it paints its own
+   scrim (nothing dims the card here — the creator is editing that card too)
+   and its CTA does nothing. */
+.card-modal-layer.is-editing { background: rgba(28,32,52,0.28); }
+.card-modal-layer.is-editing .card-modal-cta { cursor: default; }
+/* Everything OUTSIDE the panel stays clickable, so the question, the options
+   and the card's own chrome are still reachable with the replica open. Without
+   this the layer swallows every click on the card it is describing — which is
+   the card the creator came to edit. */
+.card-modal-layer.is-editing { pointer-events: none; }
+.card-modal-layer.is-editing .card-modal-panel { pointer-events: auto; }
+
+/* Folded: a slim bar at the top of the card carrying the modal's heading.
+   This is the resting state, because unfolded the replica is an accurate
+   picture of a respondent's view and therefore sits squarely over the question
+   the creator is still writing. */
+.card-modal-layer.is-folded { align-items: flex-start; padding: 12px; background: none; }
+.card-modal-layer.is-folded .card-modal-panel { box-shadow: 0 8px 20px rgba(0,0,0,0.35); }
+.card-modal-layer.is-folded .card-modal-main,
+.card-modal-layer.is-folded .card-modal-cta { display: none; }
+.card-modal-layer.is-folded .card-modal-chrome { border-bottom: none; }
+.card-modal-fold {
+  flex: 1 1 auto; min-width: 0;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0; background: none; border: none; cursor: pointer;
+  color: inherit; text-align: start;
+}
+.card-modal-fold-chevron {
+  font-size: 11px; opacity: 0.7;
+  transition: transform 0.15s;
+}
+.card-modal-layer.is-folded .card-modal-fold-chevron { transform: rotate(-90deg); }
+.card-modal-fold:focus-visible { outline: 2px solid #0CA7FF; outline-offset: 2px; border-radius: 6px; }
+/* Folded, the label is the creator's own heading (survey_editor keeps it in
+   step as they type), so it must not be clipped to nothing by the row. */
+.card-modal-chrome-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── The rail control ──────────────────────────────────────────────────────
+   Two readings in one button: off it invites (tinted, like Add question), on
+   it reports (filled, in the blue this app already gives narrative cards). */
+.card-modal-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 5px 8px; border-radius: 100px;
+  background: rgba(12,167,255,0.1); border: 1px solid rgba(12,167,255,0.32);
+  color: #0CA7FF;
+  font-family: "ABeeZee", sans-serif; font-size: 11.5px;
+  cursor: pointer; transition: all 0.15s;
+}
+.card-modal-btn:hover { background: rgba(12,167,255,0.2); border-color: #0CA7FF; }
+.card-modal-btn.is-on {
+  background: #0A3A55; border: 1.5px solid #0CA7FF; color: #7FD4FF;
+}
+.card-modal-btn:focus-visible { outline: 2px solid #0CA7FF; outline-offset: 2px; }
+
+/* ── Phone ─────────────────────────────────────────────────────────────────
+   The modal becomes a bottom sheet, which is the shape the consent gate
+   already takes here: a centred panel on a 390px screen is a panel with
+   nowhere to sit, and the CTA belongs under the thumb. */
+@media (max-width: 767px) {
+  .card-modal-layer { align-items: flex-end; padding: 12px; }
+  .card-modal-panel { max-width: none; }
+  .card-modal-cta { padding: 15px 22px; font-size: 16px; }
+  .card-modal-reopen { top: 10px; inset-inline-end: 12px; }
+}

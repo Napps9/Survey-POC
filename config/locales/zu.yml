@@ -166,6 +166,7 @@ zu:
       points_intro: "Isingeniso Samaphoyinti"
       prioritise: "Beka izigaba zokubaluleka"
       scenario: "Isibonelo"
+    modal_aria: "Mayelana nalo mbuzo"
   ask_submission_mailer:
     confirmation_subject: "Idatha yakho ye-Verto ithunyelwe ku-Ask Verto"
     confirmation_heading: "Kuthunyelwe ukuze kubuyekezwe"
@@ -315,6 +316,8 @@ zu:
     join_email_placeholder: "your@email.com"
     join_fine: "I-imeyili eyodwa yokungena. Asikaze sithumele lutho, futhi ungasusa i-akhawunti ngokuthepha kanye."
     join_embedded: "Leli Verto lifakwe kwenye isayithi, ngakho asikwazi ukubona okunye okudlalile lapha. Ilinki isazoligcina leli."
+    modal_continue: "Ngiyezwa"
+    modal_reopen: "Funda futhi"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -1256,6 +1259,17 @@ zu:
     join_title_label: "Isihloko sesicelo"
     join_body_label: "Umlayezo wesicelo"
     join_cta_label: "Inkinobho yesicelo"
+    modal_add: "Engeza iwindi"
+    modal_on: "Iwindi livuliwe"
+    modal_toggle_title: "Engeza iwindi elichaza leli khadi"
+    modal_chrome: "Iwindi · livela phezu kwaleli khadi"
+    modal_remove: "Susa"
+    modal_remove_confirm: "Uqinisekile ukuthi uyasusa?"
+    modal_remove_title: "Susa leli windi"
+    modal_title_placeholder: "Ngaphambi kokuphendula…"
+    modal_body_placeholder: "Chaza ngamazwi akho ukuthi lo mbuzo ubuza ini…"
+    modal_expand: "Bona leli windi njengoba libonwa ophendulayo"
+    modal_collapse: "Goqa leli windi"
   dashboard_card:
     publish_warning: "Shicilela “%{title}”? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     preview: "Buka kuqala"
@@ -2101,6 +2115,8 @@ zu:
       stale: "Kugunyaziwe, kwase kuhlelwa"
     field:
       text: "Umbuzo"
+      modal_title: "Isihloko sewindi"
+      modal_body: "Umbhalo wewindi"
       description: "Umbhalo ongezansi"
       explanation: "Incazelo yempendulo"
       options: "Izimpendulo"

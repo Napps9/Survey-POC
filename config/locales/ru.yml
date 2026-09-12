@@ -158,6 +158,7 @@ ru:
       points_intro: "Вступление о баллах"
       prioritise: "Приоритеты"
       scenario: "Сценарий"
+    modal_aria: "Об этом вопросе"
   ask_submission_mailer:
     confirmation_subject: "Ваши данные Verto отправлены в Ask Verto"
     confirmation_heading: "Отправлено на проверку"
@@ -307,6 +308,8 @@ ru:
     join_email_placeholder: "vash@email.ru"
     join_fine: "Одно письмо для входа. Мы ничего не публикуем, а аккаунт можно удалить одним касанием."
     join_embedded: "Это Verto встроено в другой сайт, поэтому мы не видим ничего другого, что вы здесь проходили. Ссылка всё равно сохранит это."
+    modal_continue: "Понятно"
+    modal_reopen: "Прочитать ещё раз"
   defaults:
     range: ["Совершенно не согласен", "Не согласен", "Нейтрально", "Согласен", "Полностью согласен"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1238,6 +1241,17 @@ ru:
     join_title_label: "Заголовок предложения"
     join_body_label: "Текст предложения"
     join_cta_label: "Кнопка предложения"
+    modal_add: "Добавить окно"
+    modal_on: "Окно включено"
+    modal_toggle_title: "Добавить всплывающее окно с пояснением к этой карточке"
+    modal_chrome: "Окно · показывается поверх этой карточки"
+    modal_remove: "Убрать"
+    modal_remove_confirm: "Точно убрать?"
+    modal_remove_title: "Убрать это окно"
+    modal_title_placeholder: "Прежде чем ответить…"
+    modal_body_placeholder: "Объясните своими словами, о чём этот вопрос…"
+    modal_expand: "Показать это окно так, как его видит респондент"
+    modal_collapse: "Свернуть это окно"
   dashboard_card:
     publish_warning: "Опубликовать «%{title}»? После публикации вопросы будут заблокированы и недоступны для редактирования — убедитесь, что всё именно так, как вы хотите."
     preview: "Предпросмотр"
@@ -2075,6 +2089,8 @@ ru:
       stale: "Одобрено, затем изменено"
     field:
       text: "Вопрос"
+      modal_title: "Заголовок окна"
+      modal_body: "Текст окна"
       description: "Подзаголовок"
       explanation: "Пояснение к ответу"
       options: "Ответы"

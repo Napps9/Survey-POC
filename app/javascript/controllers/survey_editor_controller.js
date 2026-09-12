@@ -206,6 +206,11 @@ export default class extends Controller {
     this.element.addEventListener("focusout", () => this._hideLabelCount())
     // Typing fires beforeinput then input; the counter reads the settled value.
     this.element.addEventListener("input", (e) => {
+      // The folded modal bar shows the creator's own heading, so it follows
+      // the keystrokes rather than the heading it was rendered with.
+      if (e.target?.dataset?.role === "card-modal-title") {
+        this._paintCardModalLabel(e.target.closest("[data-survey-editor-target='card']"))
+      }
       const label = this._budgetedLabelOf(e.target)
       if (!label) return
       if (this._isCapped(label)) this._trimLabel(label)
@@ -787,10 +792,15 @@ export default class extends Controller {
       // words only; a response's key, colour and glyph are language-neutral.
       responses: Array.isArray(c.responses) ? c.responses.slice() : [],
       pages: Array.isArray(c.pages) ? c.pages.map(p => ({ id: p?.id || "", text: p?.text || "", html: p?.html || null })) : [],
+      // The intro modal's words, translated per language like everything else
+      // here — a Spanish respondent meets a Spanish modal.
+      modal_title: c.modal_title || "",
+      modal_body: c.modal_body || "",
       // Rich-text layer — meaningful on the PRIMARY entry only (translations
       // are plain by design; the server strips any html they might carry).
       text_html: c.text_html || null,
       description_html: c.description_html || null,
+      modal_body_html: c.modal_body_html || null,
       options_html: Array.isArray(c.options_html) ? c.options_html.slice() : []
     }
   }
@@ -842,11 +852,25 @@ export default class extends Controller {
         text: el.textContent.trim(),
         html: this._readHtml(el)
       })),
+      // The intro modal's words. innerText for the body for the same reason
+      // the question uses it — a creator writes paragraphs into it and the
+      // line breaks have to survive the round trip. The title is one line, so
+      // textContent, like an option label.
+      modal_title: this._modalTitleEl(cardEl)?.textContent.trim() || "",
+      modal_body: this._readPlain(this._modalBodyEl(cardEl)),
       text_html: this._readHtml(titleEl),
       description_html: this._readHtml(descEl),
+      modal_body_html: this._readHtml(this._modalBodyEl(cardEl)),
       options_html: optEls.map(el => this._readHtml(el))
     }
   }
+
+  // The modal's two editable nodes. Scoped to THIS card's own modal layer:
+  // every card in the feed carries one, so an unscoped query would read the
+  // first card's modal onto every card in the deck.
+  _modalLayer(cardEl)   { return cardEl.querySelector("[data-role='card-modal']") }
+  _modalTitleEl(cardEl) { return cardEl.querySelector("[data-role='card-modal-title']") }
+  _modalBodyEl(cardEl)  { return cardEl.querySelector("[data-role='card-modal-body']") }
 
   // Line-break-preserving plain text. trim() only cuts the ends; interior
   // newlines survive. The collapse handles how engines count an EMPTY line:
@@ -894,6 +918,16 @@ export default class extends Controller {
     if (titleEl) write(titleEl, content.text_html, content.text || fallback.text || titleEl.textContent)
     const descEl = cardEl.querySelector(".q-subtitle, .activity-desc")
     if (descEl) write(descEl, content.description_html, content.description || fallback.description || "")
+    // The intro modal. Blank rather than falling back to the primary wording:
+    // every other field here falls back because the player renders the primary
+    // for an untranslated field, and so does this one — but an empty node is
+    // what makes the placeholder show, which is the editor's own way of saying
+    // "this language has no words for this yet". The stored primary is
+    // untouched either way; serialize() only writes a translation it was given.
+    const modalTitleEl = this._modalTitleEl(cardEl)
+    if (modalTitleEl) modalTitleEl.textContent = content.modal_title || ""
+    const modalBodyEl = this._modalBodyEl(cardEl)
+    if (modalBodyEl) write(modalBodyEl, content.modal_body_html, content.modal_body || "")
     const opts = content.options || [], fopts = fallback.options || []
     const optsHtml = content.options_html || []
     this._optionEls(cardEl).forEach((el, k) => {
@@ -1241,6 +1275,9 @@ export default class extends Controller {
   }
 
   refreshCard(card) {
+    // Before the traffic-light early-return below: the folded modal bar exists
+    // on every card type, including the ones that carry no light at all.
+    this._paintCardModalLabel(card)
     const light = card.querySelector("[data-role='card-light']")
     if (!light) {
       // Not a scored question (welcome/token-checkpoint) — hide the pinned
@@ -1802,6 +1839,135 @@ export default class extends Controller {
     this.markDirty()
   }
 
+  // ── The intro modal ───────────────────────────────────────────────────────
+  // The creator writes it where the respondent will meet it: an editable
+  // replica floating over the card, exactly like the consent gate and the
+  // thank-you screen. There is no stored "modal on" flag — the words are the
+  // modal (Survey.sanitize_cards_images!) — so the on/off state lives entirely
+  // in the DOM as .has-card-modal, and what it controls is whether the replica
+  // is visible and whether its nodes hold anything for serialize() to read.
+
+  toggleCardModal(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (!card) return
+    const split = card.querySelector(".split-card")
+    if (!split) return
+    // Already on: this is a "take me to it", not a toggle. Removing is the
+    // replica's own Remove button — the same rule the card itself follows,
+    // where the one delete CTA lives on the thing being deleted and is never
+    // mirrored somewhere a stray click can reach it.
+    if (split.classList.contains("has-card-modal")) { this._focusCardModal(card); return }
+    split.classList.add("has-card-modal")
+    this._paintCardModalBtn(card)
+    this._focusCardModal(card)
+    // Nothing is dirty yet — an open, empty modal stores nothing. It becomes a
+    // real edit on the first keystroke, which markDirty picks up like any other
+    // typing in the feed.
+  }
+
+  // Fold / unfold the replica. Folded it is a slim bar carrying the creator's
+  // own heading; unfolded it is the card a respondent will actually see, which
+  // is accurate and therefore in the way of the question underneath.
+  toggleCardModalFold(event) {
+    const layer = event.currentTarget.closest("[data-role='card-modal']")
+    if (!layer) return
+    const folded = layer.classList.toggle("is-folded")
+    event.currentTarget.setAttribute("aria-expanded", String(!folded))
+    event.currentTarget.setAttribute("title", t(folded ? "editor.modal_expand" : "editor.modal_collapse"))
+    if (!folded) this._modalTitleEl(layer.closest("[data-survey-editor-target='card']"))?.focus({ preventScroll: true })
+  }
+
+  // Folded, the bar's label is the modal's heading — so it has to follow what
+  // the creator types rather than being stamped once at render. Falls back to
+  // the generic label for a modal with no heading yet, which is what makes an
+  // empty one still readable as a modal.
+  _paintCardModalLabel(card) {
+    const label = card.querySelector("[data-role='card-modal-chrome-label']")
+    if (!label) return
+    const title = this._modalTitleEl(card)?.textContent.trim()
+    label.textContent = title || t("editor.modal_chrome")
+  }
+
+  removeCardModal(event) {
+    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
+    if (!card) return
+    const btn = event.currentTarget
+    // Arm before destroying, the same two-tap the card's own delete uses, and
+    // only when there is something to lose: undo here is the browser's
+    // contenteditable undo, which cannot put back text this method clears
+    // programmatically. An empty modal closes on the first tap.
+    if (this._modalHasWords(card) && !btn.classList.contains("is-armed")) {
+      btn.classList.add("is-armed")
+      btn.textContent = t("editor.modal_remove_confirm")
+      clearTimeout(this._modalRemoveTimer)
+      this._modalRemoveTimer = setTimeout(() => {
+        btn.classList.remove("is-armed")
+        btn.textContent = t("editor.modal_remove")
+      }, 3000)
+      return
+    }
+    clearTimeout(this._modalRemoveTimer)
+    btn.classList.remove("is-armed")
+    btn.textContent = t("editor.modal_remove")
+
+    card.querySelector(".split-card")?.classList.remove("has-card-modal")
+    // Back to the resting state, so turning one on again opens the same way it
+    // did the first time rather than mid-expanded from a modal that is gone.
+    this._modalLayer(card)?.classList.add("is-folded")
+    // Blank the nodes rather than just hiding them: serialize() reads the DOM,
+    // so leaving the words in a hidden layer would keep storing a modal the
+    // creator has removed. Every language's entry goes with it — the modal is
+    // gone from the deck, not from one tab.
+    const title = this._modalTitleEl(card), body = this._modalBodyEl(card)
+    if (title) title.textContent = ""
+    if (body) body.textContent = ""
+    this._paintCardModalLabel(card)
+    const entry = this._store.get(card)
+    if (entry) {
+      Object.values(entry).forEach(content => {
+        if (!content) return
+        content.modal_title = ""
+        content.modal_body = ""
+        content.modal_body_html = null
+      })
+    }
+    this._paintCardModalBtn(card)
+    this.markDirty()
+  }
+
+  _modalHasWords(card) {
+    return !!(this._modalTitleEl(card)?.textContent.trim() ||
+              this._modalBodyEl(card)?.textContent.trim())
+  }
+
+  // The rail control reads its card's state: an invitation while there is no
+  // modal, a report once there is one.
+  _paintCardModalBtn(card) {
+    const btn = card.querySelector("[data-role='card-modal-btn']")
+    if (!btn) return
+    const on = !!card.querySelector(".split-card.has-card-modal")
+    btn.classList.toggle("is-on", on)
+    btn.setAttribute("aria-pressed", String(on))
+    const label = btn.querySelector("[data-role='card-modal-btn-label']")
+    if (label) label.textContent = on ? t("editor.modal_on") : t("editor.modal_add")
+  }
+
+  _focusCardModal(card) {
+    const el = this._modalTitleEl(card) || this._modalBodyEl(card)
+    if (!el) return
+    // Unfold first — the nodes are display:none while the bar is folded, and
+    // focus() on a hidden node silently does nothing.
+    const layer = this._modalLayer(card)
+    layer?.classList.remove("is-folded")
+    const fold = layer?.querySelector(".card-modal-fold")
+    if (fold) {
+      fold.setAttribute("aria-expanded", "true")
+      fold.setAttribute("title", t("editor.modal_collapse"))
+    }
+    card.scrollIntoView({ behavior: "smooth", block: "center" })
+    el.focus({ preventScroll: true })
+  }
+
   // Range-card reaction-animation theme. Record it on the wrap (serialize()
   // carries it into the card JSON) and swap the left-panel Lottie's URL set so
   // the preview updates live (lottie-player#urlsValueChanged re-renders).
@@ -1932,6 +2098,20 @@ export default class extends Controller {
       // (RichTextSanitizer.clean_equivalent) — plain text stays canonical.
       if (out.text && prim.text_html) out.text_html = prim.text_html
       if (out.description && prim.description_html) out.description_html = prim.description_html
+
+      // The intro modal. Emitted only when there are words — presence IS the
+      // flag server-side (Survey.sanitize_cards_images!), so a card whose
+      // modal editor is open but still empty serialises byte-identically to
+      // before this feature existed, and Remove — which blanks the nodes
+      // rather than hiding them — deletes the modal on the next autosave with
+      // no separate key to keep in step.
+      const modalTitle = (prim.modal_title || "").trim()
+      const modalBody  = (prim.modal_body || "").trim()
+      if (modalTitle) out.modal_title = modalTitle
+      if (modalBody) {
+        out.modal_body = modalBody
+        if (prim.modal_body_html) out.modal_body_html = prim.modal_body_html
+      }
 
       // A card's left panel holds a Lottie animation OR a video OR a photo.
       // Carry whichever it is — plus the creator credit — through autosave,
@@ -2249,6 +2429,11 @@ export default class extends Controller {
         const tEntry = {}
         if ((t.text || "").trim()) tEntry.text = t.text.trim()
         if ((t.description || "").trim()) tEntry.description = t.description.trim()
+        // Only offered where the primary HAS a modal: a translation can't
+        // introduce one the source language doesn't have, and the server drops
+        // an orphaned entry anyway.
+        if (modalTitle && (t.modal_title || "").trim()) tEntry.modal_title = t.modal_title.trim()
+        if (modalBody && (t.modal_body || "").trim()) tEntry.modal_body = t.modal_body.trim()
         if (primOpts.length) {
           const topts = t.options || []
           tEntry.options = primOpts.map((p, k) => ((topts[k] || "").trim()) || p)

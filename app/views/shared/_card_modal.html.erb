@@ -1,0 +1,93 @@
+<%# The card intro modal — a creator-written pop-up shown OVER the card it
+    explains, the first time a respondent lands on it.
+
+    One partial, two modes, for the same reason _card_component is one: the
+    editor's job is to show the creator the thing the respondent will meet, so
+    the editor's version is the player's version plus contenteditable and a
+    chrome strip. A second implementation would drift, and the drift would be
+    invisible until a respondent saw it.
+
+    Locals:
+      card           — the card hash, PRIMARY language (rich_card_text needs it
+                       to decide whether the stored html still describes the
+                       string being shown)
+      display        — the same card in the display language; defaults to card
+      mode           — :editor or :player
+      display_locale — the language the respondent is reading
+
+    In :editor mode the partial renders whenever the modal EDITOR IS OPEN,
+    which includes "open but empty" — a creator who has just clicked Add modal
+    and typed nothing. Nothing is stored for that state (presence of the words
+    IS the modal — Survey.sanitize_cards_images!), so the empty shell is
+    editor-only chrome and never reaches a respondent. %>
+<%
+  mode           ||= :player
+  display        ||= card
+  display_locale   = (defined?(display_locale) && display_locale.presence) || SupportedLocales::DEFAULT
+  editable         = (mode == :editor)
+  ce_attr          = editable ? 'contenteditable="true"'.html_safe : "".html_safe
+  modal_title      = display["modal_title"].to_s
+%>
+<%# Folded on arrival, in the editor only. Unfolded it covers the card — which
+    is the truth about what a respondent sees, and exactly wrong for a creator
+    who is still writing the question underneath it. So the replica opens to a
+    slim bar carrying the modal's heading, and expands to the real thing on a
+    click (or the moment the rail control adds one). %>
+<div class="card-modal-layer<%= " is-editing is-folded" if editable %>"
+     data-role="card-modal"
+     <%= "hidden".html_safe unless editable %>
+     role="dialog" aria-modal="true"
+     aria-label="<%= t("card.modal_aria", locale: display_locale, default: "About this question") %>">
+  <div class="card-modal-panel">
+    <% if editable %>
+      <%# Editor-only chrome. It names what this is and when it appears,
+          because an unlabelled panel floating over a card in the feed reads
+          as a card rather than as something that happens at play time — and
+          folded it is the whole control, so the label doubles as a preview of
+          the heading the creator wrote. %>
+      <div class="card-modal-chrome">
+        <button type="button" class="card-modal-fold"
+                aria-expanded="false"
+                title="<%= t("editor.modal_expand") %>"
+                data-action="click->survey-editor#toggleCardModalFold">
+          <%= card_modal_icon(14) %>
+          <span class="card-modal-chrome-label" data-role="card-modal-chrome-label"><%= t("editor.modal_chrome") %></span>
+          <span class="card-modal-fold-chevron" aria-hidden="true">▾</span>
+        </button>
+        <button type="button" class="card-modal-remove"
+                title="<%= t("editor.modal_remove_title") %>"
+                data-action="click->survey-editor#removeCardModal"><%= t("editor.modal_remove") %></button>
+      </div>
+    <% end %>
+
+    <div class="card-modal-main">
+      <%# The title is optional: a modal that is one short paragraph needs no
+          heading, and an empty node would still take its line-height. In the
+          editor it is always present (the placeholder fills it); for a
+          respondent it renders only when it has words. %>
+      <% if editable || modal_title.present? %>
+        <div class="card-modal-title<%= " gate-placeholder" if editable %>"
+             <%= ce_attr %>
+             <% if editable %>data-role="card-modal-title"
+                data-default-text="<%= t("editor.modal_title_placeholder") %>"<% end %>><%= modal_title %></div>
+      <% end %>
+
+      <%# Rich text on the body only — the title is one line, and no other
+          single-line field in the app carries a formatting layer either. %>
+      <div class="card-modal-text<%= " gate-placeholder" if editable %>"
+           <%= ce_attr %>
+           <% if editable %>data-role="card-modal-body" data-rich-text
+              data-default-text="<%= t("editor.modal_body_placeholder") %>"<% end %>><%= rich_card_text(card, display, "modal_body") %></div>
+    </div>
+
+    <%# The dismiss button is PLATFORM copy, not the creator's. It reads "Got
+        it" in the respondent's own language in all 26 of them, which a
+        creator-typed word could only be in the ones they speak. Inert in the
+        editor (tabindex -1, no action) so the replica can't be "pressed". %>
+    <button type="button" class="card-modal-cta"
+            <%= 'tabindex="-1"'.html_safe if editable %>
+            <%= 'data-action="click->player#dismissCardModal"'.html_safe unless editable %>>
+      <%= t("player.modal_continue", locale: display_locale, default: "Got it") %>
+    </button>
+  </div>
+</div>

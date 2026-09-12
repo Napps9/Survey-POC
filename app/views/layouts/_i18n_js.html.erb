@@ -30,7 +30,12 @@
         # that normally carries it doesn't happen on a type switch), so its two
         # strings have to reach the browser or the button renders as a raw
         # dotted key — the one failure this slice exists to prevent.
-        "change_animation", "change_animation_title"
+        "change_animation", "change_animation_title",
+        # The intro modal's rail control and its Remove button, both of which
+        # survey_editor_controller relabels as their state changes (off/on,
+        # armed/stood-down) — so the words have to reach the browser.
+        "modal_add", "modal_on", "modal_remove", "modal_remove_confirm",
+        "modal_chrome", "modal_expand", "modal_collapse"
       ),
       "player" => ns.call("player", locale).slice(
         "consent_agree", "consent_decline", "visit_website",

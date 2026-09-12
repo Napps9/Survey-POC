@@ -221,6 +221,11 @@ export default class extends Controller {
     if (window.parent !== window) {
       try { window.parent.postMessage({ verto: "ready" }, "*") } catch (_e) { /* host gone */ }
     }
+    // Which intro modals this run has already shown. Read up here rather than
+    // beside the first _update(), because _update() is reached from several
+    // paths (the quiz state restore, the already-played branch) and every one
+    // of them asks this set whether to open a modal.
+    this._modalSeen = this._loadModalSeen()
 
     this._sessionToken = this._ensureToken()
     // The durable identity is minted for the leaderboard, the contact gate,
@@ -828,10 +833,16 @@ export default class extends Controller {
 
   _dismissConsentBanner() {
     this._clearConsentPending()
+    // The deck is live now, so a first card carrying an intro modal can finally
+    // have one — _syncCardModal refuses to open one while the banner is up
+    // (see there). Before the focus move below, so an opened modal wins the
+    // focus rather than the Next button behind it.
+    this._update()
     // The banner never occupied layout, but the nav buttons just appeared and
     // the deck just became live — re-measure on the next frame and put focus
     // where the respondent's next act is.
     requestAnimationFrame(() => { this._fitCardHeight(); this._fitCard() })
+    if (this.element.hasAttribute("data-card-modal-open")) return
     const btn = this.nextBtnTarget.classList.contains("hidden") ? this.finishBtnTarget : this.nextBtnTarget
     btn?.focus()
   }
@@ -2379,6 +2390,11 @@ export default class extends Controller {
     const idx   = this.currentValue
     cards.forEach((c, i) => c.classList.toggle("active", i === idx))
     this._animateCardEntry(cards[idx], idx)
+    // The creator's intro modal, if this card carries one and this run has not
+    // already met it. Before the nav work below, because an open modal hides
+    // the nav (the attribute it sets is read by CSS, exactly as the consent
+    // banner's is) and the branch that leaves early must leave with it set.
+    this._syncCardModal(cards[idx])
 
     // Self-driving shapes: "consent_gate" is a real multi-page card the
     // creator placed in the deck, and the respondent-code gate is a leading
@@ -2442,6 +2458,106 @@ export default class extends Controller {
     this._fitFooter()
     this._fitCard()
   }
+
+  // ── The creator's intro modal ─────────────────────────────────────────────
+  // A pop-up the creator wrote to explain the card it sits on, shown the FIRST
+  // time the respondent lands there. Its mechanics are the consent banner's,
+  // deliberately: an attribute on the overlay dims the deck and takes the nav
+  // away, so there is exactly one way forward while it is open and no second
+  // definition of "a panel over the question" to keep in step with the first.
+  //
+  // Once per card per run. Going back and forward again finds it shut — being
+  // told the same thing twice reads as a bug, and the re-open pill on the card
+  // is how somebody who tapped past it too fast gets the words back.
+
+  _syncCardModal(card) {
+    // Never while the survey-level consent banner is up. That state makes the
+    // whole deck `inert` and dims it, so a modal opened underneath it would be
+    // a pop-up the respondent can see, cannot dismiss, and did not ask for —
+    // two panels over one question, one of them dead. _dismissConsentBanner
+    // re-runs _update(), so a first card that has one still gets it, a moment
+    // later, with the deck live.
+    if (this.element.hasAttribute("data-consent-pending")) return
+    const open = !!card && card.dataset.cardModal === "true" && !this._modalSeen.has(this._modalKey(card))
+    open ? this._openCardModal(card) : this._closeCardModal({ seen: false })
+  }
+
+  _openCardModal(card) {
+    const layer = card.querySelector("[data-role='card-modal']")
+    if (!layer) return
+    layer.hidden = false
+    card.querySelector(".split-card")?.classList.add("card-modal-open")
+    card.querySelector("[data-role='card-modal-reopen']")?.setAttribute("hidden", "")
+    this.element.setAttribute("data-card-modal-open", "")
+    // The dismiss button, not the panel: it is the only control in there, so
+    // it is where a keyboard or screen-reader respondent should land, and Enter
+    // from that position does the one thing the modal is for.
+    layer.querySelector(".card-modal-cta")?.focus({ preventScroll: true })
+  }
+
+  // `seen` records the dismissal. Navigation calls this with seen:false — it is
+  // only tidying up a modal the respondent has left behind, and must not mark
+  // as read a card they never opened one on.
+  _closeCardModal({ seen }) {
+    this.element.removeAttribute("data-card-modal-open")
+    this.cardTargets.forEach(card => {
+      if (card.dataset.cardModal !== "true") return
+      const layer = card.querySelector("[data-role='card-modal']")
+      if (!layer || layer.hidden) return
+      layer.hidden = true
+      card.querySelector(".split-card")?.classList.remove("card-modal-open")
+      // The pill appears only once the words have actually been dismissed —
+      // "read again" over a modal nobody has read yet is an offer to do
+      // something they are already doing.
+      if (seen) {
+        this._modalSeen.add(this._modalKey(card))
+        this._persistModalSeen()
+        card.querySelector("[data-role='card-modal-reopen']")?.removeAttribute("hidden")
+      }
+    })
+  }
+
+  dismissCardModal() {
+    this._closeCardModal({ seen: true })
+    // The nav was hidden by the attribute, not by a class _update() owns, so
+    // re-running it is what puts Back/Next back with the right labels for this
+    // card — and it re-reads the answered state, which a modal shown over an
+    // already-answered card (stepping back) would otherwise leave stale.
+    this._update()
+  }
+
+  reopenCardModal(event) {
+    const card = event.currentTarget.closest("[data-player-target='card']")
+    if (card) this._openCardModal(card)
+  }
+
+  // Keyed by cid, not by index: a cid names one card for the life of the deck,
+  // and under answer-branching the same card can be reached by more than one
+  // path. Falls back to the answer index for a card with no cid (a pre-cid
+  // deck), which is still stable within a run.
+  _modalKey(card) {
+    return card.dataset.cardCid || `i${card.dataset.cardIndex}`
+  }
+
+  // Across a reload, not across a visit. A refresh mid-run keeps the same
+  // response row (see _ensureToken, the same storage and the same key shape),
+  // so re-interrupting on every card already read would punish a dropped
+  // connection; a fresh visit is a fresh run and meets them again.
+  _loadModalSeen() {
+    try {
+      return new Set(JSON.parse(sessionStorage.getItem(this._modalSeenKey()) || "[]"))
+    } catch (_) {
+      return new Set()
+    }
+  }
+
+  _persistModalSeen() {
+    try {
+      sessionStorage.setItem(this._modalSeenKey(), JSON.stringify([ ...this._modalSeen ]))
+    } catch (_) { /* private mode — the run still works, it just re-shows on reload */ }
+  }
+
+  _modalSeenKey() { return `verto_modals_${this.submitUrlValue}` }
 
   // ── Quiz: per-card grading, reveal, lock, running score ──────────────────
 

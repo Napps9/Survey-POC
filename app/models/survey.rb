@@ -183,6 +183,8 @@ class Survey < ApplicationRecord
       "options"     => (card["options"].presence if card["options"].is_a?(Array)),
       "pages"       => (Array(card["pages"]).map { |p| p.slice("id", "text") }.presence if card["pages"].is_a?(Array)),
       "explanation" => card["explanation"].presence,
+      "modal_title" => card["modal_title"].presence,
+      "modal_body"  => card["modal_body"].presence,
       "responses"   => (Array(card["responses"]).map { |r| r["label"].to_s }.presence if card["responses"].is_a?(Array))
     }.compact
 
@@ -190,6 +192,17 @@ class Survey < ApplicationRecord
       out["text"]        = entry["text"] if entry["text"].present?
       out["description"] = entry["description"] if entry["description"].present?
       out["explanation"] = entry["explanation"] if entry["explanation"].present?
+      # The modal's words move with the rest. Its rich-text layer does not:
+      # `modal_body_html` describes the OLD language's characters, so promoting
+      # a translation without dropping it would leave formatting spans pointing
+      # at text that is no longer there — the sanitiser's equivalence check
+      # drops it on the next save anyway, and doing it here keeps the swap
+      # atomic rather than one-save-later.
+      if entry["modal_title"].present? || entry["modal_body"].present?
+        out["modal_title"] = entry["modal_title"] if entry["modal_title"].present?
+        out["modal_body"]  = entry["modal_body"]  if entry["modal_body"].present?
+        out.delete("modal_body_html")
+      end
 
       # Pages swap by id — the id is the page's identity across languages.
       if out["pages"].is_a?(Array) && entry["pages"].is_a?(Array)
@@ -253,7 +266,12 @@ class Survey < ApplicationRecord
         # secondary locale. Only written when the translation carried them, so
         # an ordinary question card's i18n entry stays the same shape as before.
         "pages"       => Array(t["pages"]).presence,
-        "explanation" => t["explanation"].presence
+        "explanation" => t["explanation"].presence,
+        # The intro modal's words. Respondent-facing copy like everything else
+        # here, so a Spanish respondent meets a Spanish modal rather than the
+        # creator's English over a translated question.
+        "modal_title" => t["modal_title"].presence,
+        "modal_body"  => t["modal_body"].presence
       }.compact
       card.merge("i18n" => (card["i18n"] || {}).merge(locale.to_s => entry))
     end
@@ -575,6 +593,22 @@ class Survey < ApplicationRecord
   MAX_CARD_SUBJECT  = 60 # CardSubjectExtractor's photographable-noun-phrase stamp
   MAX_SCENARIO_PAGES       = 6
   MAX_SCENARIO_PAGE_LENGTH = 600
+  # The intro modal — a creator-written pop-up shown OVER the card it explains,
+  # the first time a respondent lands on it.
+  #
+  # Stored as two flat scalars on the card rather than as a card of its own,
+  # and that is the whole design. A card's INDEX in `cards` is the key every
+  # stored answer is filed under, so a modal inserted as a card would re-point
+  # every answer after it and no Verto that has collected anything could ever
+  # gain one. Hung on the card it explains, it changes no positions — which is
+  # also what "appears over the NEXT question" means, stated as data.
+  #
+  # Flat scalars rather than a nested hash because the translation machinery is
+  # built around field families: adding these two to
+  # LanguageCheckLines::SCALAR_FIELDS is the whole of their translation,
+  # review and write-back story (see apply_translation_edit / apply_primary_edit).
+  MAX_MODAL_TITLE = 120
+  MAX_MODAL_BODY  = 600
   # The plain-language "what this card tells you" line in the Why panel. Free
   # text, so bounded rather than allowlisted — the competency and condition
   # beside it are checked against Framework instead.
@@ -1409,6 +1443,40 @@ class Survey < ApplicationRecord
         end
       else
         c.delete("pages")
+      end
+
+      # The intro modal (see MAX_MODAL_TITLE). Bounded scalars, and PRESENCE IS
+      # THE FLAG: a card carries a modal iff it has title or body words, so
+      # there is one representation of "has a modal" rather than a boolean that
+      # can disagree with the copy beside it. A creator who opens the modal
+      # editor and types nothing has autosaved nothing — same contract the
+      # join-block and share-copy placeholders already have.
+      #
+      # Not gated on card type. A modal explains whatever card it is hung on,
+      # and there is no type it would be meaningless for.
+      title = c["modal_title"].to_s.strip.first(MAX_MODAL_TITLE)
+      body  = c["modal_body"].to_s.strip.first(MAX_MODAL_BODY)
+      title.present? ? c["modal_title"] = title : c.delete("modal_title")
+      body.present?  ? c["modal_body"]  = body  : c.delete("modal_body")
+      # Rich-text layer for the body, the same equivalence contract text_html
+      # has: presentation only, and dropped the moment it stops reading as its
+      # plain twin (which includes the twin being deleted).
+      html = body.present? ? RichTextSanitizer.clean_equivalent(c["modal_body_html"], body) : nil
+      html ? c["modal_body_html"] = html : c.delete("modal_body_html")
+      # A translation can only translate a modal the primary language HAS.
+      # Without this, clearing the modal off a card would leave its Spanish
+      # copy behind and the player would render a modal in Spanish only.
+      if c["i18n"].is_a?(Hash)
+        c["i18n"] = c["i18n"].transform_values do |tr|
+          next tr unless tr.is_a?(Hash)
+          tr = tr.dup
+          tr.delete("modal_title") if title.blank?
+          tr.delete("modal_body")  if body.blank?
+          tr["modal_title"] = tr["modal_title"].to_s.strip.first(MAX_MODAL_TITLE) if tr.key?("modal_title")
+          tr["modal_body"]  = tr["modal_body"].to_s.strip.first(MAX_MODAL_BODY)   if tr.key?("modal_body")
+          # Translations are plain by design, exactly like `pages` above.
+          tr.except("modal_body_html")
+        end
       end
 
       # Per-card free-text cap. Clamped into FREE_TEXT_LIMIT_RANGE rather than

@@ -158,6 +158,7 @@ vi:
       points_intro: "Giới thiệu điểm"
       prioritise: "Ưu tiên"
       scenario: "Tình huống"
+    modal_aria: "Về câu hỏi này"
   ask_submission_mailer:
     confirmation_subject: "Dữ liệu Verto của bạn đã được gửi tới Ask Verto"
     confirmation_heading: "Đã gửi để duyệt"
@@ -307,6 +308,8 @@ vi:
     join_email_placeholder: "ban@email.com"
     join_fine: "Một email để đăng nhập. Chúng tôi không bao giờ đăng gì, và bạn có thể xóa tài khoản chỉ bằng một chạm."
     join_embedded: "Verto này được nhúng trong một trang khác, nên chúng tôi không thấy được gì khác bạn đã chơi ở đây. Liên kết vẫn sẽ giữ lại cái này."
+    modal_continue: "Đã hiểu"
+    modal_reopen: "Đọc lại"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ vi:
     join_title_label: "Tiêu đề lời mời"
     join_body_label: "Nội dung lời mời"
     join_cta_label: "Nút lời mời"
+    modal_add: "Thêm cửa sổ"
+    modal_on: "Cửa sổ đang bật"
+    modal_toggle_title: "Thêm một cửa sổ giải thích thẻ này"
+    modal_chrome: "Cửa sổ · hiện lên trên thẻ này"
+    modal_remove: "Gỡ bỏ"
+    modal_remove_confirm: "Gỡ bỏ thật chứ?"
+    modal_remove_title: "Gỡ bỏ cửa sổ này"
+    modal_title_placeholder: "Trước khi bạn trả lời…"
+    modal_body_placeholder: "Giải thích bằng lời của bạn xem câu hỏi này hỏi điều gì…"
+    modal_expand: "Xem cửa sổ này như người trả lời nhìn thấy"
+    modal_collapse: "Thu gọn cửa sổ này"
   dashboard_card:
     publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"
@@ -2065,6 +2079,8 @@ vi:
       stale: "Đã duyệt, rồi bị sửa"
     field:
       text: "Câu hỏi"
+      modal_title: "Tiêu đề cửa sổ"
+      modal_body: "Nội dung cửa sổ"
       description: "Mô tả"
       explanation: "Giải thích đáp án"
       options: "Lựa chọn"

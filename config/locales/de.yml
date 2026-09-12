@@ -158,6 +158,7 @@ de:
       points_intro: "Punkte-Intro"
       prioritise: "Priorisieren"
       scenario: "Szenario"
+    modal_aria: "Über diese Frage"
   ask_submission_mailer:
     confirmation_subject: "Deine Verto-Daten wurden bei Ask Verto eingereicht"
     confirmation_heading: "Zur Prüfung eingereicht"
@@ -307,6 +308,8 @@ de:
     join_email_placeholder: "deine@email.de"
     join_fine: "Eine E-Mail zum Anmelden. Wir veröffentlichen nie etwas, und du kannst das Konto mit einem Tippen löschen."
     join_embedded: "Dieses Verto ist in eine andere Website eingebettet — wir können also nicht sehen, was du hier sonst gespielt hast. Der Link behält dieses trotzdem."
+    modal_continue: "Alles klar"
+    modal_reopen: "Nochmal lesen"
   defaults:
     range: ["Stimme überhaupt nicht zu", "Stimme nicht zu", "Neutral", "Stimme zu", "Stimme voll zu"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ de:
     join_title_label: "Überschrift der Einladung"
     join_body_label: "Text der Einladung"
     join_cta_label: "Button der Einladung"
+    modal_add: "Hinweis hinzufügen"
+    modal_on: "Hinweis aktiv"
+    modal_toggle_title: "Ein Pop-up hinzufügen, das diese Karte erklärt"
+    modal_chrome: "Hinweis · erscheint über dieser Karte"
+    modal_remove: "Entfernen"
+    modal_remove_confirm: "Wirklich entfernen?"
+    modal_remove_title: "Diesen Hinweis entfernen"
+    modal_title_placeholder: "Bevor du antwortest…"
+    modal_body_placeholder: "Erkläre in deinen eigenen Worten, worum es bei dieser Frage geht…"
+    modal_expand: "Diesen Hinweis so anzeigen, wie Teilnehmende ihn sehen"
+    modal_collapse: "Diesen Hinweis einklappen"
   dashboard_card:
     publish_warning: "„%{title}“ veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     preview: "Vorschau"
@@ -2066,6 +2080,8 @@ de:
       stale: "Freigegeben, dann geändert"
     field:
       text: "Frage"
+      modal_title: "Hinweis-Überschrift"
+      modal_body: "Hinweis-Text"
       description: "Beschreibung"
       explanation: "Erklärung zur Antwort"
       options: "Antworten"

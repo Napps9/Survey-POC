@@ -158,6 +158,7 @@ ja:
       points_intro: "ポイント紹介"
       prioritise: "優先順位付け"
       scenario: "シナリオ"
+    modal_aria: "この質問について"
   ask_submission_mailer:
     confirmation_subject: "VertoデータをAsk Vertoに提出しました"
     confirmation_heading: "審査に提出しました"
@@ -307,6 +308,8 @@ ja:
     join_email_placeholder: "your@email.com"
     join_fine: "サインイン用のメールが 1 通だけ。何かを投稿することは一切なく、アカウントはワンタップで削除できます。"
     join_embedded: "この Verto は別のサイトに埋め込まれているため、ここでプレイしたほかのものは見えません。それでもリンクはこの 1 件を保存します。"
+    modal_continue: "わかりました"
+    modal_reopen: "もう一度読む"
   defaults:
     range: ["全くそう思わない", "そう思わない", "どちらとも言えない", "そう思う", "強くそう思う"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -1236,6 +1239,17 @@ ja:
     join_title_label: "案内の見出し"
     join_body_label: "案内の本文"
     join_cta_label: "案内のボタン"
+    modal_add: "説明を追加"
+    modal_on: "説明あり"
+    modal_toggle_title: "このカードを説明するポップアップを追加します"
+    modal_chrome: "説明 · このカードの上に表示されます"
+    modal_remove: "削除"
+    modal_remove_confirm: "本当に削除しますか？"
+    modal_remove_title: "この説明を削除"
+    modal_title_placeholder: "答える前に…"
+    modal_body_placeholder: "この質問が何を聞いているのか、自分の言葉で説明してください…"
+    modal_expand: "回答者に見えるとおりに表示する"
+    modal_collapse: "この説明をたたむ"
   dashboard_card:
     publish_warning: "「%{title}」を公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     preview: "プレビュー"
@@ -2064,6 +2078,8 @@ ja:
       stale: "承認後に編集"
     field:
       text: "質問"
+      modal_title: "説明の見出し"
+      modal_body: "説明の本文"
       description: "補足説明"
       explanation: "回答の解説"
       options: "選択肢"
