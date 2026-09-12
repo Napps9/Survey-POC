@@ -2203,6 +2203,7 @@ en:
     rail_translated: "Translated"
     rail_failed: "Couldn't translate"
     rail_retry: "Try again"
+    rail_generate_one: "Translate this one"
     rail_progress: "%{done}/%{total}"
     rail_add: "Add languages"
     rail_generate: "Generate translations"

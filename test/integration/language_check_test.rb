@@ -360,6 +360,66 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
     assert_equal %w[en es fr de], @survey.reload.verto_locales
   end
 
+  test "a language stuck mid-run offers a way out instead of a permanent spinner" do
+    sign_in
+    # A row abandoned by a dead worker: nothing will ever close it, so the
+    # screen has to stop believing it and offer the creator a way forward.
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
+                               attempts: 1, started_at: 2.hours.ago)
+
+    get survey_language_check_path(@survey)
+    assert_response :success
+    # The status CLASS, not the copy: the label carries an apostrophe that ERB
+    # escapes, and the class is what the server actually decided.
+    assert_match "lc-rail-status--failed", response.body
+    assert_match I18n.t("language_check.rail_retry"), response.body
+    assert_no_match(/lc-rail-status--working/, response.body,
+                    "a row nothing will ever close must stop claiming to be in progress")
+  end
+
+  test "an untranslated language with no run at all can still be asked for" do
+    sign_in
+    get survey_language_check_path(@survey)
+    assert_response :success
+    # French has no i18n entries and no SurveyTranslation row — a language added
+    # before any of this existed. It must not be a dead end.
+    assert_match I18n.t("language_check.rail_generate_one"), response.body
+  end
+
+  test "retrying a language re-queues it" do
+    sign_in
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "failed",
+                               attempts: 3, last_error: "boom")
+
+    assert_enqueued_with(job: TranslateLocalesJob) do
+      post retry_survey_language_check_language_path(@survey), params: { locale: "fr" }
+    end
+
+    row = SurveyTranslation.find_by(survey: @survey, locale: "fr")
+    assert_equal "queued", row.status
+    assert_equal 0, row.attempts, "a retry is a fresh run, not one already out of attempts"
+    assert_nil row.last_error
+  end
+
+  test "a viewer seat cannot retry a language" do
+    viewer = User.create!(name: "V", email_address: "v4-#{SecureRandom.hex(3)}@test.com",
+                          password: "verylongpassword")
+    @org.memberships.create!(user: viewer, role: "viewer")
+    sign_in(viewer)
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "failed", attempts: 3)
+
+    assert_no_enqueued_jobs(only: TranslateLocalesJob) do
+      post retry_survey_language_check_language_path(@survey), params: { locale: "fr" }
+    end
+  end
+
+  test "retrying a language the Verto does not have does nothing" do
+    sign_in
+    assert_no_enqueued_jobs(only: TranslateLocalesJob) do
+      post retry_survey_language_check_language_path(@survey), params: { locale: "ja" }
+    end
+  end
+
   test "a viewer seat cannot add languages" do
     viewer = User.create!(name: "V", email_address: "v3-#{SecureRandom.hex(3)}@test.com",
                           password: "verylongpassword")

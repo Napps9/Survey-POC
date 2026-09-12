@@ -43,4 +43,32 @@ class SurveyTranslation < ApplicationRecord
   end
 
   def in_progress? = %w[queued running].include?(status)
+
+  # How long a language may claim to be in progress before the screen stops
+  # believing it.
+  #
+  # A row goes stale rather than failing when nothing CLOSED it: the process
+  # was re-execed mid-call by the memory watchdog, the queue entry was lost, a
+  # deploy landed on top of it. In every one of those cases the job is not
+  # coming back and no code path is left to say so — so the only honest reading
+  # is the clock. Generous enough that a genuinely slow deck is never called
+  # dead: one Claude call per language runs in tens of seconds, and this is
+  # fifteen minutes.
+  STALE_AFTER = 15.minutes
+
+  def stale?
+    in_progress? && (started_at || updated_at || created_at) < STALE_AFTER.ago
+  end
+
+  # What the screen should SAY, which is not always what the column holds — a
+  # row abandoned by a dead process still reads "running" for ever.
+  def display_status
+    return "failed" if stale?
+    status
+  end
+
+  def stalled_reason
+    return last_error if last_error.present?
+    "this took longer than expected and stopped without finishing" if stale?
+  end
 end

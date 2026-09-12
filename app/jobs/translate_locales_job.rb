@@ -50,12 +50,33 @@ class TranslateLocalesJob < ApplicationJob
     end
   end
 
+  # Every exit from here leaves each locale's row saying something TRUE.
+  #
+  # The first cut of this returned early — no survey, or the locale no longer
+  # on the Verto — and left the row it had just created sitting at "queued".
+  # The rail reads that as "Translating…", so a language that was never going
+  # to be translated advertised itself as in progress indefinitely: the exact
+  # symptom this rewrite existed to remove, reintroduced one layer up. A row
+  # nobody will ever come back for has to be closed by whoever walks away
+  # from it.
   def perform(survey_id, locales)
+    asked  = SupportedLocales.sanitize_list(locales, fallback: [])
     survey = Survey.find_by(id: survey_id)
-    return unless survey
 
-    wanted = SupportedLocales.sanitize_list(locales, fallback: []) & survey.secondary_locales
-    return if wanted.empty?
+    unless survey
+      # Nothing to translate into and nothing to translate — close the rows so
+      # they cannot outlive the Verto they describe.
+      SurveyTranslation.where(survey_id: survey_id, locale: asked)
+                       .find_each { |r| r.failed!("this Verto no longer exists", retryable: false) }
+      return
+    end
+
+    wanted  = asked & survey.secondary_locales
+    dropped = asked - wanted
+    dropped.each do |locale|
+      SurveyTranslation.find_by(survey_id: survey.id, locale: locale)
+                       &.failed!("this Verto is no longer offered in that language", retryable: false)
+    end
 
     wanted.each { |locale| translate_one(survey, locale) }
   end

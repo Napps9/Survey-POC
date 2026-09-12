@@ -189,6 +189,86 @@ class TranslateLocalesJobTest < ActiveSupport::TestCase
     assert_nil entry("c1", "ja")
   end
 
+  # ── Nothing is left claiming to be in progress ─────────────────────────────
+  #
+  # Every one of these leaves a row at "queued", which the rail renders as
+  # "Translating…" — so each is a language that advertises itself as coming
+  # and never arrives. That is the exact symptom this job was rewritten to
+  # remove, and the first cut of the rewrite reintroduced it in perform's
+  # early returns.
+
+  test "a language the Verto no longer offers is closed, not left queued" do
+    SurveyTranslation.enqueue!(@survey, "fr")
+    @survey.update!(locales: %w[en es])   # French dropped before the job ran
+
+    with_translator { perform_enqueued_jobs { TranslateLocalesJob.perform_later(@survey.id, [ "fr" ]) } }
+
+    row = SurveyTranslation.find_by(survey: @survey, locale: "fr")
+    assert_equal "failed", row.status, "a row nobody will come back for has to be closed by whoever walks away"
+    assert_match(/no longer offered/, row.last_error)
+  end
+
+  test "a destroyed Verto takes its translation rows with it" do
+    # The stronger guarantee, and the reason the job's own missing-survey guard
+    # is belt to this braces: a foreign key means the rows cannot outlive the
+    # Verto in the first place, so there is nothing left to report "Translating…"
+    # about a Verto that no longer exists.
+    SurveyTranslation.enqueue!(@survey, "es")
+    id = @survey.id
+    assert_equal 1, SurveyTranslation.where(survey_id: id).count
+
+    @survey.destroy!
+    assert_equal 0, SurveyTranslation.where(survey_id: id).count
+  end
+
+  test "a job for a Verto that is already gone exits without raising" do
+    # Reachable only if the rows were removed out from under it — a raw delete,
+    # a future schema change. It must not crash the worker.
+    with_translator do
+      perform_enqueued_jobs { TranslateLocalesJob.perform_later(-1, [ "es" ]) }
+    end
+  end
+
+  test "a language never asked for is not reported as in progress" do
+    assert_nil SurveyTranslation.find_by(survey: @survey, locale: "de")
+  end
+
+  # ── The clock is the last honest reading ───────────────────────────────────
+
+  test "a run abandoned by a dead process reads as failed once it goes stale" do
+    # Nothing CLOSES this row: the process was re-execed mid-call, or the queue
+    # entry was lost. No code path is left to write anything, so the only thing
+    # that can tell the truth is how long it has been sitting there.
+    row = SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
+                                     attempts: 1, started_at: 2.hours.ago)
+    assert row.stale?
+    assert_equal "failed", row.display_status, "the rail must stop believing it"
+    assert_match(/longer than expected/, row.stalled_reason)
+  end
+
+  test "a run that is merely slow is still believed" do
+    row = SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
+                                     attempts: 1, started_at: 30.seconds.ago)
+    assert_not row.stale?
+    assert_equal "running", row.display_status
+    assert_nil row.stalled_reason
+  end
+
+  test "a queued row that no worker ever picked up eventually stops claiming to be coming" do
+    row = SurveyTranslation.create!(survey: @survey, locale: "fr", status: "queued",
+                                     attempts: 0, started_at: nil,
+                                     created_at: 3.hours.ago, updated_at: 3.hours.ago)
+    assert row.stale?, "started_at is nil when a job never ran — fall back to the row's own age"
+    assert_equal "failed", row.display_status
+  end
+
+  test "a finished run never goes stale however old it is" do
+    row = SurveyTranslation.create!(survey: @survey, locale: "fr", status: "done",
+                                     finished_at: 1.year.ago, started_at: 1.year.ago)
+    assert_not row.stale?
+    assert_equal "done", row.display_status
+  end
+
   test "asking again after a failure starts a fresh run rather than one already spent" do
     row = SurveyTranslation.create!(survey: @survey, locale: "fr", status: "failed",
                                      attempts: SurveyTranslation::MAX_ATTEMPTS,

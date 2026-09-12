@@ -22,32 +22,44 @@
           <span aria-hidden="true"><%= loc&.flag %></span>
           <span class="lc-rail-name"><%= loc&.english_name || code %></span>
         </span>
-        <%# Status comes from the RUN, not from the URL. A reload, a new tab or a
-            visit an hour later all report the same thing, and a language whose
-            job was discarded says so instead of showing a count that reads as
-            a slow success. %>
-        <% run = runs[code] %>
-        <% if cov[:primary] %>
+        <%# Status comes from the RUN, not from the URL — a reload, a new tab or a
+            visit an hour later all report the same thing. display_status rather
+            than status, because a row abandoned by a re-execed process still
+            holds "running" for ever and the clock is the only honest reading of
+            it (SurveyTranslation#stale?). %>
+        <% run   = runs[code] %>
+        <% state = cov[:primary] ? "primary" : done ? "done" : (run&.display_status || "none") %>
+        <% if state == "primary" %>
           <span class="lc-chip lc-chip--primary"><%= t("language_check.primary") %></span>
-        <% elsif run&.in_progress? && !done %>
-          <span class="lc-rail-status lc-rail-status--working"><%= t("language_check.rail_translating") %></span>
-        <% elsif done %>
+        <% elsif state == "done" %>
           <span class="lc-rail-status lc-rail-status--done"><%= t("language_check.rail_translated") %></span>
-        <% elsif run&.status == "failed" %>
+        <% elsif state == "queued" || state == "running" %>
+          <span class="lc-rail-status lc-rail-status--working"><%= t("language_check.rail_translating") %></span>
+        <% elsif state == "failed" %>
           <span class="lc-rail-status lc-rail-status--failed"><%= t("language_check.rail_failed") %></span>
         <% else %>
           <span class="lc-rail-status">
             <%= t("language_check.rail_progress", done: cov[:translated], total: cov[:total]) %>
           </span>
         <% end %>
-        <% if editable && run&.status == "failed" %>
+        <%# Offered on ANY language that is not finished and not actively being
+            worked on — not only on a row that managed to record a failure.
+            The cases where this screen leaves somebody stuck are exactly the
+            ones where nothing got written down: a language added before this
+            existed, a row lost with its process, a job that never reached a
+            worker. Asking again is cheap and idempotent (the job requests only
+            the cards still missing an entry), so the useful default is to let
+            them ask. %>
+        <% if editable && !cov[:primary] && state != "done" && state != "queued" && state != "running" %>
           <%= form_with url: retry_survey_language_check_language_path(survey), method: :post,
                         data: { turbo: false }, class: "lc-rail-retry" do %>
             <%= hidden_field_tag :locale, code %>
-            <button type="submit" class="lc-rail-retry-btn"><%= t("language_check.rail_retry") %></button>
+            <button type="submit" class="lc-rail-retry-btn">
+              <%= run ? t("language_check.rail_retry") : t("language_check.rail_generate_one") %>
+            </button>
           <% end %>
-          <% if run.last_error.present? %>
-            <span class="lc-rail-why" title="<%= run.last_error %>"><%= run.last_error.truncate(90) %></span>
+          <% if (why = run&.stalled_reason).present? %>
+            <span class="lc-rail-why" title="<%= why %>"><%= why.truncate(90) %></span>
           <% end %>
         <% end %>
       </li>
