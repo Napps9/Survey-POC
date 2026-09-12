@@ -39,14 +39,20 @@ class ExportManifestTest < ActiveSupport::TestCase
   end
 
   test "a file that does not match its entry is refused, not imported" do
-    Tempfile.create([ "fake", ".csv.gz" ], ExportManifest::DIR) do |file|
+    # The fake lives in Dir.tmpdir, not in ExportManifest::DIR: the listing
+    # test above globs that directory, and a parallel worker running it would
+    # find this file there. claims? is keyed on the directory, so it is told
+    # yes for the duration instead.
+    Tempfile.create([ "fake", ".csv.gz" ]) do |file|
       Zlib::GzipWriter.wrap(file.tap(&:binmode)) { |gz| gz.write("Viewing ID,Language\nabc,en\n") }
       ExportManifest.instance_variable_set(:@entries,
         ExportManifest.entries.merge(File.basename(file.path) => { "sha256" => "0" * 64 }))
 
-      error = assert_raises(ExportManifest::Mismatch) { ExportManifest.verify!(file.path) }
-      assert_match(/does not match its manifest entry/, error.message)
-      assert_match(/Refusing to import/, error.message)
+      stub_method(ExportManifest, :claims?, true) do
+        error = assert_raises(ExportManifest::Mismatch) { ExportManifest.verify!(file.path) }
+        assert_match(/does not match its manifest entry/, error.message)
+        assert_match(/Refusing to import/, error.message)
+      end
     end
   ensure
     ExportManifest.reset!

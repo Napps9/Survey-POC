@@ -4,17 +4,19 @@ require "test_helper"
 # copy / flip / roll-back mechanics production uses for disk → bucket, with no
 # bucket and no network.
 class ObjectStorageMigratorTest < ActiveSupport::TestCase
-  BUCKET_ROOT = Rails.root.join("tmp/storage_bucket")
-
   setup do
     # Only this test's blobs count. delete_all skips callbacks, so nothing is
     # purged from disk; the rows roll back with the transaction.
     ActiveStorage::Attachment.delete_all
     ActiveStorage::Blob.delete_all
-    FileUtils.rm_rf(BUCKET_ROOT)
   end
 
-  teardown { FileUtils.rm_rf(BUCKET_ROOT) }
+  # The destination directory (tmp/storage_bucket, config/storage.yml) is
+  # deliberately NOT wiped in setup or teardown. Every blob has a SecureRandom
+  # key, so leftovers can't collide — the same reasoning the whole suite relies
+  # on for tmp/storage. And the directory is shared by every parallel worker:
+  # a wipe here deleted a sibling worker's freshly copied blobs mid-test, which
+  # was the one failure `PARALLEL_WORKERS=4 bin/rails test` produced.
 
   def make_blob(bytes = "png-bytes-#{SecureRandom.hex(4)}")
     ActiveStorage::Blob.create_and_upload!(io: StringIO.new(bytes), filename: "card.png", content_type: "image/png")

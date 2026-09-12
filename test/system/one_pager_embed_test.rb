@@ -14,7 +14,7 @@ require "application_system_test_case"
 class OnePagerEmbedTest < ApplicationSystemTestCase
   def copy_of(pager, origin, token)
     one_pager_copy(pager, origin: origin, token: token,
-                   dest: "tmp/one_pager_embed_#{File.basename(pager, '.html')}.html")
+                   dest: "tmp/one_pager_embed_#{File.basename(pager, '.html')}_#{Process.pid}.html")
   end
 
   def published_survey

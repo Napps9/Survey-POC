@@ -73,12 +73,23 @@ class FreeformAnswersModalTest < ApplicationSystemTestCase
   # Enter after typing, rather than waiting out the 300ms debounce: on a
   # loaded CI runner the timer has lagged past the assertion's wait, leaving
   # the unfiltered list in place. Enter runs the same search at once.
+  #
+  # Enter is pressed with no pointer involved. Cuprite's Element#send_keys
+  # CLICKS the element first, at coordinates it computes just beforehand —
+  # and the debounce from the typing above can return in that gap, the list
+  # shrinks to its matches, the centred panel re-lays out, and the click
+  # lands on the backdrop, which closes the panel. About one run in three
+  # locally, more under parallel workers.
+  def search_for(text)
+    find("[data-freeform-answers-target='search']").set(text) # types, then blurs
+    execute_script("document.querySelector(\"[data-freeform-answers-target='search']\").focus()")
+    page.driver.browser.keyboard.type(:enter)
+  end
+
   test "searching asks the server across every answer" do
     open_panel
 
-    search = find("[data-freeform-answers-target='search']")
-    search.set("Answer 12")
-    search.send_keys(:enter)
+    search_for("Answer 12")
     within("[data-freeform-answers-target='modal']") do
       # "Answer 12" and "Answer 120".."Answer 129" — eleven, some of them
       # beyond the first page the panel had loaded.
@@ -87,8 +98,7 @@ class FreeformAnswersModalTest < ApplicationSystemTestCase
       assert_no_button "Load more", wait: 2
     end
 
-    search.set("nothing here")
-    search.send_keys(:enter)
+    search_for("nothing here")
     within("[data-freeform-answers-target='modal']") do
       assert_text "No answers match.", wait: 15
       assert_selector ".freeform-item", count: 0

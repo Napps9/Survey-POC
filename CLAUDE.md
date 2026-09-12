@@ -12,8 +12,8 @@ unless the owner asks for one — repo owner's standing instruction, 2026-06-11.
 Before every push to Main, the full local suite must be green:
 
 ```
-bin/rails test        # ~2,670 tests
-bin/rails test:system # ~385, run on its own
+bin/rails test        # ~3,400 tests, ~70s with one worker per core
+bin/rails test:system # ~500 browser tests, run on its own, ~9 min at 4 workers
 bin/rubocop
 bin/brakeman --no-pager
 bin/importmap audit
@@ -26,9 +26,17 @@ the rebase, or that the change is server-side and "covered by the integration
 tests". Owner's standing instruction, 2026-08-25, after exactly that reasoning
 was used to skip one.
 
-Other sessions push to Main through the day, so a 20-minute system run often
+Other sessions push to Main through the day, so even a ten-minute gate often
 finishes to find origin has moved. Rebase and run it again. Losing the race is
 the expected cost, not a reason to trim the gate.
+
+Both suites fork **one worker per core** (`test/test_helper.rb`); each worker
+gets its own SQLite file and, for system tests, its own Puma and Chrome.
+`PARALLEL_WORKERS=N` overrides that — never above the core count (6 workers on
+4 cores flaked three browser timings, 2026-09-12), and `PARALLEL_WORKERS=1` is
+the old serial run for bisecting a cross-test interaction. A test that writes a
+file must name it per test or per process (`SecureRandom`, `Process.pid`):
+`public/` and `tmp/` are shared by every worker.
 
 ## Work log (Trello)
 
@@ -88,11 +96,11 @@ to run it after every push.
 
 ## Deploys
 
-Render deploys the `Main` branch automatically, gated on CI: `render.yaml`
-sets `autoDeployTrigger: checksPass`, so a commit only deploys after all
-GitHub checks (test, lint, scan_ruby, scan_js in `.github/workflows/ci.yml`)
-pass on it. A red push to Main therefore doesn't deploy — but don't rely on
-that: push green.
+Render deploys `Main` when CI's `deploy` job POSTs the service's Deploy Hook,
+which it does only once every other job in `.github/workflows/ci.yml` (test,
+test_postgres, system_test, lint, scan_ruby, scan_js, build_image) is green on
+that commit; `render.yaml` has `autoDeployTrigger: off`. A red push to Main
+therefore doesn't deploy — but don't rely on that: push green.
 
 ## Gotchas
 
@@ -162,13 +170,15 @@ that: push green.
   in `app/assets/tailwind/application.css`; match the file you're editing.
 - System tests render the **compiled** `app/assets/builds/tailwind.css`, which is
   gitignored and is NOT rebuilt just because `app/assets/tailwind/application.css`
-  changed underneath it. Pull, rebase or switch branches across a CSS commit and
-  the browser keeps serving the stylesheet from whenever the build last ran, so
-  a layout test fails locally on markup it can see and rules it can't. CI never
-  hits this (fresh checkout ⇒ no build ⇒ it compiles one). Run
-  `bin/rails tailwindcss:build` before believing a local CSS-dependent system
-  failure — 2026-08-14, a stale build made a passing fan-arc test look like a
-  geometry bug in someone else's commit.
+  changed underneath it — `bin/rails test:system` passes a path argument, and any
+  path argument skips `test:prepare` (and this app leaves the test_unit railtie
+  off, so there is no `test:prepare` anyway); only `db:test:prepare` builds it.
+  So `test/application_system_test_case.rb` builds it itself, once per run, at
+  load: every way of running system tests sees the CSS of the tree it is
+  testing. `SKIP_TAILWIND_BUILD=1` opts out. 2026-08-14, a stale build made a
+  passing fan-arc test look like a geometry bug in someone else's commit;
+  2026-09-12 it failed a locked-feed test twice, in the gate run that added the
+  build.
 - The PDF renders (report + share card) exec wkhtmltopdf from the
   `wkhtmltopdf-binary` gem. The suite passes on Ubuntu runners because they
   already carry its shared libraries; production is `ruby:slim`, which

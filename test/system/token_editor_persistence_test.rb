@@ -65,7 +65,10 @@ class TokenEditorPersistenceTest < ApplicationSystemTestCase
 
     # Type an amount for Option B, then submit the intro-picker form inside
     # the debounce window — the exact gesture that used to discard the value.
+    # The marker on <body> identifies THIS page: the form's POST → redirect →
+    # GET renders a new body (Turbo swaps it), and the marker goes with the old.
     execute_script(<<~JS)
+      document.body.dataset.tokenProbe = "before-submit"
       const card  = document.querySelector("[data-card-cid='c1']")
       const row   = card.querySelector('[data-token-mode-section="per_answer"] .token-award-row[data-canonical="Option B"]')
       const input = row.querySelector(".token-amount-input")
@@ -79,9 +82,15 @@ class TokenEditorPersistenceTest < ApplicationSystemTestCase
     # on the DOM (not just the DB) is the point: a late PATCH could satisfy
     # the database while the re-rendered editor still showed 0 — the stale
     # page the NEXT autosave would then persist.
-    Timeout.timeout(15) do
+    #
+    # It has to be the RE-RENDERED page's input: the one on this page reads 7
+    # the instant the script above set it, so a wait on it alone was satisfied
+    # before the save had gone anywhere, and the database assertion below then
+    # raced the flush (and lost, under load).
+    Timeout.timeout(20) do
       sleep 0.25 until evaluate_script(<<~JS) == "7"
-        document.querySelector("[data-card-cid='c1'] [data-token-mode-section='per_answer'] .token-award-row[data-canonical='Option B'] .token-amount-input")?.value
+        document.body.dataset.tokenProbe ? null :
+          document.querySelector("[data-card-cid='c1'] [data-token-mode-section='per_answer'] .token-award-row[data-canonical='Option B'] .token-amount-input")?.value
       JS
     end
     assert_equal 7, stored_tokens.dig("Option B", "t1")

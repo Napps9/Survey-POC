@@ -12,9 +12,21 @@ require "application_system_test_case"
 # measured. Every page in ONE_PAGERS gets the same three tests.
 class OnePagerFitTest < ApplicationSystemTestCase
   # Named after its source, so two pages under test can't overwrite each
-  # other's probe.
+  # other's probe — and after this process, because parallel workers all serve
+  # the same public/ directory from their own servers and databases: a probe
+  # written by one worker points at a port and a token only that worker has.
+  # Process.pid is read at run time (inside the forked worker), never in the
+  # class body, where it would be the parent's.
+  def probe_basename(pager)
+    "__fit_probe_#{File.basename(pager, '.html')}_#{Process.pid}.html"
+  end
+
   def probe_path(pager)
-    "public/__fit_probe_#{File.basename(pager, '.html')}.html"
+    "public/#{probe_basename(pager)}"
+  end
+
+  def probe_url(pager)
+    "/#{probe_basename(pager)}"
   end
 
   def serve_probe_copy(pager, origin, token)
@@ -76,14 +88,12 @@ class OnePagerFitTest < ApplicationSystemTestCase
   end
 
   ONE_PAGERS.each do |pager|
-    probe_url = "/__fit_probe_#{File.basename(pager, '.html')}.html"
-
     test "#{pager}: the embedded Verto is never clipped by the laptop screen" do
       survey = published_survey
       origin = Capybara.current_session.server.base_url
       serve_probe_copy(pager, origin, survey.publish_token)
 
-      visit "#{origin}#{probe_url}"
+      visit "#{origin}#{probe_url(pager)}"
       assert_selector "#demoMockup.is-live", wait: 15
 
       card = within_frame(find(".screen-embed")) do
@@ -115,7 +125,7 @@ class OnePagerFitTest < ApplicationSystemTestCase
       origin = Capybara.current_session.server.base_url
       serve_probe_copy(pager, origin, survey.publish_token)
 
-      visit "#{origin}#{probe_url}"
+      visit "#{origin}#{probe_url(pager)}"
       assert_selector "#demoMockup.is-live", wait: 15
 
       move_demo_to("phone")
@@ -159,7 +169,7 @@ class OnePagerFitTest < ApplicationSystemTestCase
       page.driver.browser.page.command("Emulation.setDeviceMetricsOverride",
                                        width: 390, height: 900, deviceScaleFactor: 1, mobile: true)
       begin
-        visit "#{origin}#{probe_url}"
+        visit "#{origin}#{probe_url(pager)}"
         # Waiting on the demo would be wrong here: verto-for-research hides its
         # whole Try it section below 860px, deliberately, so a phone doesn't
         # download a player it will never show. The benefits list is the
@@ -226,7 +236,7 @@ class OnePagerFitTest < ApplicationSystemTestCase
       origin = Capybara.current_session.server.base_url
       serve_probe_copy(pager, origin, survey.publish_token)
 
-      visit "#{origin}#{probe_url}"
+      visit "#{origin}#{probe_url(pager)}"
       assert_selector "#demoMockup.is-live", wait: 15
 
       scale = page.evaluate_script(<<~JS)
@@ -249,7 +259,7 @@ class OnePagerFitTest < ApplicationSystemTestCase
       origin = Capybara.current_session.server.base_url
       serve_probe_copy(pager, origin, survey.publish_token)
 
-      visit "#{origin}#{probe_url}"
+      visit "#{origin}#{probe_url(pager)}"
       assert_selector "#demoMockup.is-live", wait: 15
 
       box = page.evaluate_script(<<~JS)
@@ -303,7 +313,7 @@ class OnePagerFitTest < ApplicationSystemTestCase
                   width: width, height: height, deviceScaleFactor: 1, mobile: true)
       cdp.command("Emulation.setTouchEmulationEnabled", enabled: true, maxTouchPoints: 5)
       begin
-        visit "#{origin}/__fit_probe_verto-for-research.html"
+        visit "#{origin}#{probe_url(pager)}"
         assert_selector ".benefits li", minimum: 1, wait: 15
 
         state = page.evaluate_script(<<~JS)

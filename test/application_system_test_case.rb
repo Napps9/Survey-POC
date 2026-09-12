@@ -1,6 +1,23 @@
 require "test_helper"
 require "capybara/rails"
 require "capybara/cuprite"
+require "tailwindcss/commands"
+
+# The browser renders the COMPILED app/assets/builds/tailwind.css, and nothing
+# on the way here rebuilds it: `bin/rails test:system` passes a path argument,
+# and any path argument skips test:prepare (railties' test_command.rb) — and
+# this app leaves rails/test_unit/railtie off, so there is no test:prepare to
+# skip. Only db:test:prepare builds it, which CI runs and a local gate does not.
+# Pull, rebase or switch branches across a CSS commit and the browser kept
+# rendering the build from before it: 2026-08-14 a stale build made a passing
+# fan-arc test look like a geometry bug in someone else's commit; 2026-09-12 it
+# failed a locked-feed test twice in the gate run that added this.
+#
+# So build it here: once per run, in the parent before the workers fork, with
+# the gem's own command — no second Rails boot, well under a second, and an
+# unchanged stylesheet is rewritten byte-identical. A build failure fails the
+# run loudly instead of testing whatever was on disk.
+system(*Tailwindcss::Commands.compile_command, exception: true) unless ENV["SKIP_TAILWIND_BUILD"]
 
 # Browser tests (P2-5). Until now the suite was integration-level only, so
 # anything that lives in JavaScript could be checked by hand in a browser and

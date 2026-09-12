@@ -72,23 +72,25 @@ class BrandLibraryDeleteTest < ApplicationSystemTestCase
   # Apply is armed by a pending URL, not by what is on screen. Delete the tile
   # that armed it and Apply stayed lit, pointing at a blob that had just been
   # purged — one click from putting a 404 on the card.
+  #
+  # Both states are asserted with retrying matchers. The delete is a fetch, and
+  # a one-shot read of the button straight after the click raced it — under
+  # parallel workers the read landed before the response and reported Apply
+  # still armed, with the tile already gone in the failure screenshot.
   test "removing the tile that armed Apply disarms it" do
     open_picker
     find(".media-library-cell .media-library-item").click
-    assert_equal false, apply_disabled?, "picking a tile should arm Apply"
+    assert_selector "#{APPLY_BTN}:not(:disabled)" # picking a tile arms Apply
 
     accept_confirm { find(".media-library-cell .media-library-del").click }
 
-    assert_equal true, apply_disabled?,
-                 "Apply is still armed for an image that no longer exists — applying it " \
-                 "would put a purged blob URL on the card"
+    assert_no_selector ".media-library-cell .media-library-item"
+    # Apply still armed here would be armed for an image that no longer exists —
+    # applying it would put a purged blob URL on the card.
+    assert_selector "#{APPLY_BTN}:disabled"
   end
 
-  def apply_disabled?
-    page.evaluate_script(
-      "!!document.querySelector('[data-media-picker-target=applyBtn]').disabled"
-    )
-  end
+  APPLY_BTN = "[data-media-picker-target=applyBtn]".freeze
 
   test "a member sees the brand library but is offered no way to delete from it" do
     member = User.create!(name: "M", email_address: "lib-mem-#{SecureRandom.hex(3)}@test.com",

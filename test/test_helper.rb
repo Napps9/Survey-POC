@@ -10,7 +10,14 @@ require "rails/test_help"
 Moderation.hold_enabled = false
 
 class ActiveSupport::TestCase
-  parallelize(workers: 1)
+  # One forked worker per core, each with its own SQLite file — and, under
+  # test:system, its own Puma and Chrome. Measured 2026-09-12 on 4 cores:
+  # `rails test` 224s -> 71s, `rails test:system` ~20 min -> ~8.6 min, green.
+  # PARALLEL_WORKERS overrides this. Never set it ABOVE the core count: 6
+  # workers on 4 cores ran faster still and flaked three browser timings.
+  # PARALLEL_WORKERS=1 is the old serial run, for bisecting a suspected
+  # cross-test interaction.
+  parallelize(workers: :number_of_processors)
 
   # Run the block with the moderation hold on, as it is in production.
   def with_moderation_hold

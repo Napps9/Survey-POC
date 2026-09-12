@@ -19,6 +19,7 @@
 /db/*.sqlite3
 /db/*.sqlite3-*
 /public/assets
+/public/__fit_probe_*
 /node_modules
 /yarn-error.log
 /coverage/
