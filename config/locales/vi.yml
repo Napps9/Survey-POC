@@ -2133,3 +2133,5 @@ vi:
     rail_all_added: "Verto này đã có mọi ngôn ngữ mà Playverto hỗ trợ."
     links_admin_only: "Chỉ quản trị viên tài khoản mới tạo được liên kết kiểm tra. Hãy đề nghị một quản trị viên gửi liên kết cho bạn, hoặc cấp quyền quản trị cho bạn."
     single_language_rail_body: "Thêm ngôn ngữ thứ hai ở bên trái, màn hình này sẽ hiển thị từng câu hỏi cạnh nhau, sẵn sàng gửi cho người biết ngôn ngữ đó."
+    rail_failed: "Không dịch được"
+    rail_retry: "Thử lại"

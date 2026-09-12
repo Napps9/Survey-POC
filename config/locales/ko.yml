@@ -2132,3 +2132,5 @@ ko:
     rail_all_added: "이 Verto는 이미 Playverto가 지원하는 모든 언어로 제공됩니다."
     links_admin_only: "검토 링크는 계정 관리자만 만들 수 있습니다. 관리자에게 링크를 보내 달라고 하거나, 나를 관리자로 지정해 달라고 요청하세요."
     single_language_rail_body: "왼쪽에서 두 번째 언어를 추가하면 이 화면에서 모든 질문을 나란히 보여 주므로, 그 언어를 쓰는 사람에게 바로 보낼 수 있습니다."
+    rail_failed: "번역 실패"
+    rail_retry: "다시 시도"

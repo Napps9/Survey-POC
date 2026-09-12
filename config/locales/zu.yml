@@ -2169,3 +2169,5 @@ zu:
     rail_all_added: "Le-Verto isevele ikuzo zonke izilimi ezisekelwa yi-Playverto."
     links_admin_only: "Isixhumanisi sokubuyekeza singadalwa umlawuli we-akhawunti kuphela. Cela omunye wabo akuthumele isixhumanisi, noma akwenze umlawuli."
     single_language_rail_body: "Engeza ulwimi lwesibini ngakwesobunxele bese lesi sikrini sibonisa umbuzo ngamunye eceleni komunye, sesilungele ukuthunyelwa kumuntu olukhulumayo."
+    rail_failed: "Akuhunyushwanga"
+    rail_retry: "Zama futhi"

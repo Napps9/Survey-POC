@@ -2171,3 +2171,5 @@ tn:
     rail_all_added: "Verto e e setse e le mo dipuong tsotlhe tse Playverto e di tshegetsang."
     links_admin_only: "Ke molaodi wa akhaonto fela yo o ka dirang kgokaganyo ya tlhatlhobo. Kopa mongwe wa bona gore a go romelele kgokaganyo eo, kgotsa a go dire molaodi."
     single_language_rail_body: "Oketsa puo ya bobedi ka fa molemeng mme sekirini se se tla bontsha potso nngwe le nngwe ka fa thoko, e siametse go romelwa kwa mothong yo o buang puo eo."
+    rail_failed: "Thanolo e paletse"
+    rail_retry: "Leka gape"

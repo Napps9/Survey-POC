@@ -2134,3 +2134,5 @@ pt:
     rail_all_added: "Este Verto já está em todos os idiomas que o Playverto suporta."
     links_admin_only: "Só um administrador da conta pode criar um link de revisão. Peça a um deles que lhe envie o link ou que o torne administrador."
     single_language_rail_body: "Adicione um segundo idioma à esquerda e este ecrã passa a mostrar todas as perguntas lado a lado, prontas a enviar a alguém que o fale."
+    rail_failed: "Tradução falhou"
+    rail_retry: "Tentar novamente"

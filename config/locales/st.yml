@@ -2171,3 +2171,5 @@ st:
     rail_all_added: "Verto ena e se e le ka dipuo tsohle tseo Playverto e di tshehetsang."
     links_admin_only: "Ke molaodi wa akhaonto feela ya ka thehang kgokahano ya tlhahlobo. Kopa e mong wa bona hore a o romelle kgokahano eo, kapa a o etse molaodi."
     single_language_rail_body: "Eketsa puo ya bobedi ka lehlakoreng le letshehadi mme leqephe lena le tla bontsha potso ka nngwe e bapisitswe, e itokiseditse ho romelwa ho motho ya buang puo eo."
+    rail_failed: "Phetolelo e hlolehile"
+    rail_retry: "Leka hape"

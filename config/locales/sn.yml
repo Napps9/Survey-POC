@@ -2144,3 +2144,5 @@ sn:
     rail_all_added: "Verto iyi yatova mumitauro yose inotsigirwa nePlayverto."
     links_admin_only: "Rinki yekuongorora inogona kugadzirwa nemutungamiri weakaundi chete. Kumbira mumwe wavo kuti akutumire rinki, kana kuti akuite mutungamiri."
     single_language_rail_body: "Wedzera mutauro wechipiri kuruboshwe uye peji rino richaratidza mibvunzo yose yakamiswa padivi pemwe, yakagadzirira kutumirwa kumunhu anotaura mutauro iwoyo."
+    rail_failed: "Kushandura kwakundikana"
+    rail_retry: "Edza zvakare"

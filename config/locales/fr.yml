@@ -2134,3 +2134,5 @@ fr:
     rail_all_added: "Ce Verto est déjà dans toutes les langues que Playverto prend en charge."
     links_admin_only: "Seul un administrateur du compte peut créer un lien de relecture. Demandez à l'un des vôtres de vous envoyer le lien, ou de vous nommer administrateur."
     single_language_rail_body: "Ajoutez une deuxième langue à gauche et cet écran affichera chaque question côte à côte, prête à être envoyée à quelqu'un qui la parle."
+    rail_failed: "Échec de la traduction"
+    rail_retry: "Réessayer"

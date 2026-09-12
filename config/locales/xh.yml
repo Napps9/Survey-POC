@@ -2173,3 +2173,5 @@ xh:
     rail_all_added: "Le Verto sele ikwiilwimi zonke ezixhaswa yiPlayverto."
     links_admin_only: "Ikhonkco lophononongo linokwenziwa ngumlawuli we-akhawunti kuphela. Cela omnye wabo akuthumele ikhonkco, okanye akwenze umlawuli."
     single_language_rail_body: "Yongeza ulwimi lwesibini ngasekhohlo, uze esi sikrini sibonise umbuzo ngamnye ecaleni komnye, sele silungele ukuthunyelwa kumntu oluthethayo."
+    rail_failed: "Ayiguqulelwanga"
+    rail_retry: "Zama kwakhona"

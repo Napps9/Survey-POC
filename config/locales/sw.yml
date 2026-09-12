@@ -2134,3 +2134,5 @@ sw:
     rail_all_added: "Verto hii tayari iko katika kila lugha ambayo Playverto inaunga mkono."
     links_admin_only: "Ni msimamizi wa akaunti pekee anayeweza kutengeneza kiungo cha ukaguzi. Mwombe mmoja wa wasimamizi wako akutumie kiungo hicho, au akufanye msimamizi."
     single_language_rail_body: "Ongeza lugha ya pili upande wa kushoto na ukurasa huu utaonyesha kila swali sambamba, tayari kutumwa kwa mtu anayeizungumza."
+    rail_failed: "Tafsiri imeshindikana"
+    rail_retry: "Jaribu tena"

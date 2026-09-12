@@ -2134,3 +2134,5 @@ tr:
     rail_all_added: "Bu Verto zaten Playverto'nun desteklediği her dilde."
     links_admin_only: "İnceleme bağlantısını yalnızca bir hesap yöneticisi oluşturabilir. Yöneticilerinizden birinden bağlantıyı size göndermesini ya da sizi yönetici yapmasını isteyin."
     single_language_rail_body: "Soldaki listeden ikinci bir dil ekleyin; bu ekran her soruyu yan yana gösterir ve o dili konuşan birine göndermeye hazır olur."
+    rail_failed: "Çevrilemedi"
+    rail_retry: "Tekrar dene"

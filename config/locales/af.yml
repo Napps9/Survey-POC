@@ -2139,3 +2139,5 @@ af:
     rail_all_added: "Hierdie Verto is reeds in elke taal wat Playverto ondersteun."
     links_admin_only: "Net 'n rekening-admin kan 'n beoordelingskakel skep. Vra een van julle admins om jou die skakel te stuur, of om jou 'n admin te maak."
     single_language_rail_body: "Voeg 'n tweede taal aan die linkerkant by, en hierdie skerm wys elke vraag langs mekaar, gereed om te stuur aan iemand wat daardie taal praat."
+    rail_failed: "Kon nie vertaal nie"
+    rail_retry: "Probeer weer"

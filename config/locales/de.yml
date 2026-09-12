@@ -2134,3 +2134,5 @@ de:
     rail_all_added: "Dieses Verto gibt es schon in allen Sprachen, die Playverto unterstützt."
     links_admin_only: "Nur ein Konto-Admin kann einen Prüflink erstellen. Bitte einen deiner Admins, dir den Link zu schicken oder dich zum Admin zu machen."
     single_language_rail_body: "Füge links eine zweite Sprache hinzu, dann zeigt dieser Screen jede Frage nebeneinander — bereit, sie jemandem zu schicken, der die Sprache spricht."
+    rail_failed: "Fehlgeschlagen"
+    rail_retry: "Erneut versuchen"

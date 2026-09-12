@@ -2134,3 +2134,5 @@ nl:
     rail_all_added: "Deze Verto is al beschikbaar in elke taal die Playverto ondersteunt."
     links_admin_only: "Alleen een beheerder van het account kan een beoordelingslink maken. Vraag een van je beheerders om je de link te sturen, of om je beheerder te maken."
     single_language_rail_body: "Voeg links een tweede taal toe en dit scherm zet elke vraag naast elkaar, klaar om te sturen naar iemand die die taal spreekt."
+    rail_failed: "Vertalen mislukt"
+    rail_retry: "Opnieuw proberen"

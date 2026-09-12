@@ -2192,6 +2192,8 @@ en-US:
     rail_title: "Languages"
     rail_translating: "Translating…"
     rail_translated: "Translated"
+    rail_failed: "Couldn't translate"
+    rail_retry: "Try again"
     rail_progress: "%{done}/%{total}"
     rail_add: "Add languages"
     rail_generate: "Generate translations"
