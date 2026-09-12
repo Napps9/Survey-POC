@@ -11,9 +11,19 @@ on:
   # queued and one startup_failure, and the deploy waited on both.
   workflow_dispatch:
 
+# One run per ref at a time; a newer push cancels the older run. On Main this
+# is the SAFE direction, not just the cheap one: the deploy job's hook tells
+# Render to deploy the branch's current head, not the commit that went green —
+# so a run for commit A finishing after commit B was pushed would deploy B
+# untested. Cancelling A leaves B's own run to deploy B once it is green.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -25,6 +35,10 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      # One forked worker per runner core (test/test_helper.rb does the same
+      # locally); each gets its own SQLite file. nproc rather than a literal so
+      # a runner with a different core count is neither oversubscribed — which
+      # flakes browser timings — nor left idle.
       - name: Run tests
         env:
           RAILS_ENV: test
@@ -33,10 +47,11 @@ jobs:
           ANTHROPIC_API_KEY: ci-stub-key-no-real-calls
         run: |
           bin/rails db:test:prepare
-          bin/rails test
+          PARALLEL_WORKERS=$(nproc) bin/rails test
 
   test_postgres:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     # The suite, on production's engine. Dev and test run SQLite while Render
     # runs Postgres, and the two disagree on real things — LOWER() over a json
@@ -66,6 +81,9 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
+      # Each worker creates and loads its own survey_poc_test_N database; the
+      # service container's postgres role is a superuser, so CREATE DATABASE
+      # needs no extra grant.
       - name: Run tests against Postgres
         env:
           RAILS_ENV: test
@@ -73,10 +91,21 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/survey_poc_test
         run: |
           bin/rails db:test:prepare
-          bin/rails test
+          PARALLEL_WORKERS=$(nproc) bin/rails test
 
   system_test:
     runs-on: ubuntu-latest
+    # A wedged Chrome used to hold the deploy for GitHub's six-hour default.
+    timeout-minutes: 15
+    strategy:
+      # A flake in one shard must not cancel the others: "Re-run failed jobs"
+      # then costs one shard's few minutes, not the whole suite's.
+      fail-fast: false
+      matrix:
+        # The one knob for re-balancing. bin/ci_shard deals the sorted file
+        # list across however many entries are here; with the 2026-09-12
+        # timings four shards finish within ~40s of each other.
+        shard: [ 0, 1, 2, 3 ]
 
     steps:
       - name: Checkout code
@@ -88,29 +117,41 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      # Browser tests (P2-5). A separate job from `test` on purpose: they drive
-      # a real Chrome, so if one goes flaky it is visible and separable rather
+      # Browser tests (P2-5). Separate from `test` on purpose: they drive a
+      # real Chrome, so if one goes flaky it is visible and separable rather
       # than taking the unit suite — and therefore the deploy — down with it.
+      # Sharded because this job was the whole critical path: one job took
+      # 25-28 minutes while everything else finished inside 3.5. Each shard
+      # runs its files with one forked worker per core, each worker with its
+      # own Puma and Chrome — the same as `bin/rails test:system` locally.
       # ubuntu-latest ships Chrome; ApplicationSystemTestCase finds it, and
       # falls back to Ferrum's own detection if the path ever moves.
-      - name: Run system tests
+      #
+      # Explicit file paths bypass the runner's default exclusion of
+      # test/system, which is what lets `bin/rails test` run browser tests
+      # here. They also skip test:prepare, but nothing depends on it: the
+      # system test base class builds the Tailwind stylesheet itself at load.
+      - name: Run system tests (shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         env:
           RAILS_ENV: test
           ANTHROPIC_API_KEY: ci-stub-key-no-real-calls
         run: |
+          set -euo pipefail
           bin/rails db:test:prepare
-          bin/rails test:system
+          files=$(bin/ci_shard ${{ matrix.shard }} ${{ strategy.job-total }})
+          PARALLEL_WORKERS=$(nproc) bin/rails test $files
 
       - name: Upload failure screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: system-test-screenshots
+          name: system-test-screenshots-${{ matrix.shard }}
           path: tmp/screenshots
           if-no-files-found: ignore
 
   scan_ruby:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -127,6 +168,7 @@ jobs:
 
   scan_js:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -143,6 +185,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -165,6 +208,7 @@ jobs:
   # carries the deploy exactly as before.
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [ test, test_postgres, system_test, scan_ruby, scan_js, lint, build_image ]
     if: github.ref == 'refs/heads/Main' && github.event_name == 'push'
 
@@ -188,6 +232,7 @@ jobs:
 
   build_image:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code

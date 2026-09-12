@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Prints the test/system files that make up one shard of the CI matrix.
+#
+#   bin/ci_shard INDEX COUNT        # INDEX is 0-based
+#   bin/ci_shard 2 4 | xargs bin/rails test   # reproduce shard 2 of 4 locally
+#
+# The split is the sorted file list, every COUNTth file starting at INDEX —
+# deterministic, so every file lands in exactly one shard and the matrix in
+# .github/workflows/ci.yml covers the whole suite whatever files are added.
+# Measured on 2026-09-12's timings a 4-way split is within ~40s of wall time
+# per shard at 4 workers; if the shards' "Finished in" lines drift further
+# apart than that, weight this split by measured time rather than by name.
+set -euo pipefail
+
+index=${1:?usage: bin/ci_shard INDEX COUNT}
+count=${2:?usage: bin/ci_shard INDEX COUNT}
+
+if [ "$index" -ge "$count" ] || [ "$index" -lt 0 ]; then
+  echo "bin/ci_shard: INDEX must be between 0 and COUNT-1" >&2
+  exit 2
+fi
+
+find test/system -name '*_test.rb' | LC_ALL=C sort | awk -v i="$index" -v n="$count" '(NR - 1) % n == i'
