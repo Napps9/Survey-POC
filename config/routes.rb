@@ -210,6 +210,11 @@ Rails.application.routes.draw do
   get  "surveys/:id/qr",              to: "surveys#qr",       as: :qr_survey
   post "surveys/:id/card_image",      to: "surveys#card_image", as: :card_image_survey
   post "surveys/:id/card_lottie",     to: "surveys#card_lottie", as: :card_lottie_survey
+  # One card's intro modal. Its own endpoint rather than part of the autosave
+  # PATCH because it is the one content edit a LOCKED deck may take — see
+  # SurveysController#update_card_modal for why that is safe here and nowhere
+  # else.
+  patch "surveys/:id/card_modal",     to: "surveys#update_card_modal", as: :card_modal_survey
   post "surveys/:id/settings",        to: "surveys#update_settings", as: :survey_settings
   # Publishing what a Verto changed. Its own route, and its own button in the
   # editor, because it is the one control in that panel that cannot follow the

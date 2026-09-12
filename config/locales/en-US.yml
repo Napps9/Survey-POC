@@ -1220,6 +1220,7 @@ en-US:
     remove: 'Remove'
     animation_theme: "Animation"
     live_locked_bar: "This Verto is live — questions are locked to protect data quality."
+    live_locked_modal_note: "You can still add or reword a card's modal — it explains a question without changing it."
     live_edit_bar: "Editing a live Verto — moving, adding or removing questions re-points answers already collected."
     live_results: "View results →"
     publish_confirm: "Publish this Verto? Once it's live, its questions are locked and can't be edited — make sure everything reads exactly as you want."

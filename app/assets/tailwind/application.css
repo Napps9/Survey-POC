@@ -10164,6 +10164,16 @@ body.generating-overlay-active .bottom-bar { display: none; }
    creators unable to even scroll through to review a locked Verto. */
 .editor-feed-locked { user-select: none; }
 .editor-feed-locked .survey-card-wrap { opacity: 0.88; pointer-events: none; }
+/* ...except the intro modal, which a locked deck MAY still take. The lock is
+   about card positions — answers are stored against them — and a modal moves no
+   card, so the reasoning that freezes this feed does not reach it. The control
+   and the panel it opens are handed back their clicks and their caret; nothing
+   else in the wrap is. Text selection too: the creator is writing here, and the
+   feed-wide `user-select: none` above would make their own sentence
+   unselectable. */
+.editor-feed-locked .card-modal-btn,
+.editor-feed-locked .card-modal-layer { pointer-events: auto; }
+.editor-feed-locked .card-modal-panel { user-select: text; }
 
 /* ── Question-type ⓘ info button (answer-type panel + all-types grid) ── */
 .type-opt-info {

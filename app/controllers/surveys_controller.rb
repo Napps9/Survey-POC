@@ -137,7 +137,13 @@ class SurveysController < ApplicationController
                                update_audience_country card_image card_lottie moderate_image
                                pexels_search shuffle_assets setup_status generate_card
                                generate_flow restore_card optimise_card render_card
-                               add_demographic_card ]
+                               add_demographic_card update_card_modal ]
+  # update_card_modal is gated here like every other editing action, and that is
+  # NOT in tension with its skipping editing_locked?. The two answer different
+  # questions: this gate asks whether this MEMBER may edit this Verto at all (a
+  # viewer never may), editing_locked? asks whether this DECK is frozen against
+  # changes that would re-point stored answers. A modal is exempt from the
+  # second and squarely inside the first.
 
   # Admin-only, in the company of :contacts rather than of :publish — and that
   # is the deliberate choice, not the lazy one. Both of these SEND MAIL to
@@ -193,6 +199,7 @@ class SurveysController < ApplicationController
     # Unsaved unless this Verto has actually been offered — rendering the panel
     # must not enrol a Verto in the corpus by looking at it.
     @corpus_entry = CorpusEntry.for(@survey)
+    backfill_card_cids(@survey)
     render :show
   end
 
@@ -740,6 +747,45 @@ class SurveysController < ApplicationController
   rescue => e
     ErrorReporting.report("SurveysController#card_lottie", e)
     render json: { ok: false, error: "That animation couldn't be stored." }, status: :unprocessable_entity
+  end
+
+  # PATCH /surveys/:id/card_modal
+  # One card's intro modal — the ONE content endpoint that does not ask
+  # editing_locked?, and the only one that should.
+  #
+  # The lock's reason is stated at the top of this file: answers are stored
+  # against card POSITION, so a deck change re-points every answer already
+  # collected. A modal is a per-card field. It moves no card, adds and removes
+  # none, and is not an answer, so the reasoning simply does not reach it —
+  # which is why a Verto that is live, or has collected a thousand responses,
+  # can still gain the sentence that explains a question people are evidently
+  # misreading. That was the ask (2026-09-12): the lock was refusing an edit it
+  # has no stake in.
+  #
+  # The safety is structural, not a promise. #update takes a whole deck and
+  # rebuilds it, which is exactly what must stay locked; this takes a cid and
+  # three strings and merges them onto the card that cid names
+  # (Survey#update_card_modal!). No payload it accepts can reorder, insert or
+  # delete a card, so there is no shape of it that puts a stored answer at risk.
+  # Organisation scoping is unchanged — a creator edits the Vertos they can
+  # already see.
+  def update_card_modal
+    survey = Current.organisation.surveys.kept.find(params[:id])
+
+    ok = survey.update_card_modal!(
+      cid:       params[:cid].to_s,
+      title:     params[:modal_title].to_s,
+      body:      params[:modal_body].to_s,
+      body_html: params[:modal_body_html].presence
+    )
+    return render json: { ok: false, error: "That card is no longer in this Verto." }, status: :not_found unless ok
+
+    render json: { ok: true }
+  rescue ActiveRecord::RecordNotFound
+    raise
+  rescue => e
+    ErrorReporting.report("SurveysController#update_card_modal", e)
+    render json: { ok: false, error: "That modal couldn't be saved." }, status: :unprocessable_entity
   end
 
   # GET /surveys/:id/qr(.png)
@@ -1624,6 +1670,37 @@ class SurveysController < ApplicationController
   end
 
   private
+
+  # Give every card a cid, if this deck has any without one.
+  #
+  # cids are minted by Survey.sanitize_cards_images!, and the only thing that
+  # calls it is the editor's own autosave (#update). So a Verto that was
+  # generated, imported or seeded and published WITHOUT ever being edited has
+  # none — and once it is published the lock means it never will. That was
+  # invisible until the intro modal, which addresses a card by cid precisely so
+  # a locked deck can be edited without anything being able to move a card:
+  # no cid, no way to name the card, and the one edit a locked deck may take
+  # was unavailable on exactly the decks most likely to need it.
+  #
+  # Safe on a locked deck, and that is the whole reason it can run here: minting
+  # an id adds a key to a card. It moves no card, adds and removes none, so the
+  # positions every stored answer is filed under are untouched — the same
+  # argument that lets #update_card_modal sit outside the lock.
+  #
+  # Idempotent, and a no-op for the decks that already have them (which is all
+  # of them, after one pass), so this costs a scan on render and nothing else.
+  def backfill_card_cids(survey)
+    cards = Array(survey.cards)
+    return if cards.empty?
+    return unless cards.any? { |c| c.is_a?(Hash) && c["cid"].to_s.strip.blank? }
+
+    survey.update_columns(cards: Survey.ensure_cids!(cards), updated_at: Time.current)
+  rescue => e
+    # Never fail the editor over a backfill. Without cids the modal control is
+    # the only thing that stops working, and it says so rather than the page
+    # refusing to open.
+    ErrorReporting.report("SurveysController#backfill_card_cids", e)
+  end
 
   # The (cid, locale) pairs the Language check screen has edited since the
   # revision the editor page was rendered at. A payload with no revision in it

@@ -1250,6 +1250,7 @@ ja:
     modal_body_placeholder: "この質問が何を聞いているのか、自分の言葉で説明してください…"
     modal_expand: "回答者に見えるとおりに表示する"
     modal_collapse: "この説明をたたむ"
+    live_locked_modal_note: "カードの説明は今も追加・書き直しできます。質問を変えずに説明するためのものです。"
   dashboard_card:
     publish_warning: "「%{title}」を公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     preview: "プレビュー"

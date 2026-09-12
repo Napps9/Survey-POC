@@ -1250,6 +1250,7 @@ it:
     modal_body_placeholder: "Spiega con parole tue che cosa chiede questa domanda…"
     modal_expand: "Vedi questa finestra come la vede chi risponde"
     modal_collapse: "Richiudi questa finestra"
+    live_locked_modal_note: "Puoi ancora aggiungere o riscrivere la finestra di una scheda: spiega una domanda senza modificarla."
   dashboard_card:
     publish_warning: "Pubblicare “%{title}”? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."
     preview: "Anteprima"

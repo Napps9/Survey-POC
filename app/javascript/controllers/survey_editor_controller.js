@@ -94,6 +94,10 @@ export default class extends Controller {
     // Copied to a mutable working set in connect(); serialize() sends it back.
     flows: { type: Array, default: [] },
     live: { type: Boolean, default: false },
+    // Where one card's intro modal is saved on its own. A locked deck suppresses
+    // autosave entirely (see flushSave), and the modal is the one content edit
+    // such a deck may still take — SurveysController#update_card_modal.
+    cardModalUrl: { type: String, default: "" },
     // The wording revision this page was rendered at. Sent back with every
     // save so the server can tell which translations the Language check screen
     // has changed since: serialize() rebuilds every language's i18n entry from
@@ -206,10 +210,15 @@ export default class extends Controller {
     this.element.addEventListener("focusout", () => this._hideLabelCount())
     // Typing fires beforeinput then input; the counter reads the settled value.
     this.element.addEventListener("input", (e) => {
-      // The folded modal bar shows the creator's own heading, so it follows
-      // the keystrokes rather than the heading it was rendered with.
-      if (e.target?.dataset?.role === "card-modal-title") {
-        this._paintCardModalLabel(e.target.closest("[data-survey-editor-target='card']"))
+      const modalRole = e.target?.dataset?.role
+      if (modalRole === "card-modal-title" || modalRole === "card-modal-body") {
+        const card = e.target.closest("[data-survey-editor-target='card']")
+        // The folded modal bar shows the creator's own heading, so it follows
+        // the keystrokes rather than the heading it was rendered with.
+        if (modalRole === "card-modal-title") this._paintCardModalLabel(card)
+        // On a LOCKED deck the ordinary autosave never fires, so the modal
+        // saves itself. On a draft this is a no-op and autosave carries it.
+        this._saveCardModal(card)
       }
       const label = this._budgetedLabelOf(e.target)
       if (!label) return
@@ -1932,7 +1941,64 @@ export default class extends Controller {
       })
     }
     this._paintCardModalBtn(card)
+    // Removing has to reach the server by the same door typing does. On a
+    // locked deck markDirty is a no-op, so without this the modal would vanish
+    // from the editor and go on greeting respondents.
+    this._saveCardModal(card)
     this.markDirty()
+  }
+
+  // ── Saving a modal on a LOCKED deck ───────────────────────────────────────
+  // A live Verto (or any that has collected an answer) suppresses autosave
+  // outright — serialize() rebuilds the whole deck from the DOM, and that is
+  // precisely what the lock exists to refuse. The modal is the one content edit
+  // such a deck may take, so it goes out on its own: one cid, three strings,
+  // through an endpoint that cannot reshape a deck (see
+  // SurveysController#update_card_modal).
+  //
+  // Only on a locked deck. On a draft the ordinary autosave already carries the
+  // modal with everything else, and a second writer would race it.
+
+  _saveCardModal(card) {
+    if (!this.liveValue || !this.cardModalUrlValue) return
+    const cid = card?.dataset.cardCid
+    // No cid, nothing to address. A card minted in this session has none until
+    // the server mints one — but a card added in this session only exists on a
+    // deck that is not locked, so this cannot strand a modal a creator typed.
+    if (!cid) return
+
+    this._modalSaveTimers ||= {}
+    clearTimeout(this._modalSaveTimers[cid])
+    this._modalSaveTimers[cid] = setTimeout(() => this._flushCardModal(card, cid), 700)
+  }
+
+  async _flushCardModal(card, cid) {
+    const bodyEl = this._modalBodyEl(card)
+    this.flash(t("editor.saving"), "text-smoke/60")
+    try {
+      const res = await fetch(this.cardModalUrlValue, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')?.content
+        },
+        body: JSON.stringify({
+          cid,
+          modal_title: this._modalTitleEl(card)?.textContent.trim() || "",
+          modal_body: this._readPlain(bodyEl),
+          modal_body_html: this._readHtml(bodyEl)
+        })
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const time = new Date().toLocaleTimeString()
+      this.flash(t("editor.saved", { time }), "text-aquamarine")
+    } catch (_) {
+      // Said out loud rather than shown as "Saved" over an edit that never
+      // landed: this deck is collecting answers, and a creator fixing a
+      // question people are misreading needs to know whether the fix is live.
+      this.flash(t("editor.save_failed", { msg: "" }), "text-hot-pink")
+    }
   }
 
   _modalHasWords(card) {
@@ -2060,6 +2126,14 @@ export default class extends Controller {
     // the overall score, so the lights track edits as they're typed.
     const active = document.activeElement?.closest?.("[data-survey-editor-target='card']")
     if (active) { this.refreshCard(active); this.refreshScore() } else { this.refreshAll() }
+
+    // A locked deck has no deck-wide save to schedule — the server refuses one
+    // (423) and flushSave has always bailed here. _doSave did not, which went
+    // unnoticed only because the locked feed swallowed every click: nothing
+    // could type, so markDirty never ran. The intro modal types there now, and
+    // it carries its own save (_saveCardModal), so this returns after the
+    // repaint rather than queueing a request that exists to be rejected.
+    if (this.liveValue) return
 
     this.flash(t("editor.unsaved"), "text-light-yellow")
     this._dirty = true

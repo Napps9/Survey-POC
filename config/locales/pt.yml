@@ -1250,6 +1250,7 @@ pt:
     modal_body_placeholder: "Explica o que esta pergunta procura saber, por palavras tuas…"
     modal_expand: "Ver esta janela como a vê quem responde"
     modal_collapse: "Fechar esta janela"
+    live_locked_modal_note: "Ainda podes acrescentar ou reescrever a janela de um cartão: explica uma pergunta sem a alterar."
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"

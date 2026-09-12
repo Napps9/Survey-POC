@@ -110,6 +110,11 @@
          liveValue is what switches autosave and every structural action off
          client-side, so an account allowed past the lock needs it false. %>
      data-survey-editor-live-value="<%= editing_locked?(@survey) %>"
+     <%# Where one card's intro modal saves on its own. A locked deck switches
+         autosave off entirely (above), and the modal is the one content edit it
+         may still take — it moves no card, so it re-points no stored answer.
+         See SurveysController#update_card_modal. %>
+     data-survey-editor-card-modal-url-value="<%= card_modal_survey_path(@survey) %>"
      data-swipe-card-urls="<%= AssetPopulator.swipe_card_urls.to_json %>"
      data-action="type-panel:changed->survey-editor#markDirty card-editor:changed->survey-editor#markDirty scenario:changed->survey-editor#markDirty option-style:changed->survey-editor#markDirty rich-text:changed->survey-editor#markDirty input->survey-editor#markDirty type-panel:cardSelected->publish-panel#closeForCard type-panel:cardSelected->editor-panel#open type-panel:cardSelected->editor-scroll-sync#armSuppression gate-cards:status->survey-editor#gateStatus setup-status:progress->survey-editor#setupStatus media-picker:consentImage->gate-cards#setConsentImage card-editor:changed->survey-editor#syncBranchingEvent card-editor:changed->survey-editor#syncTokenRowsEvent card-editor:changed->survey-editor#syncResponseScaleEvent card-editor:changed->survey-editor#syncMaxChoicesEvent type-panel:changed->survey-editor#syncMaxChoicesEvent focusout->survey-editor#syncBranchingEvent focusout->survey-editor#syncTokenRowsEvent focusout->editor-scroll-sync#focusOut survey-editor:refreshed->flows#repaint survey-editor:refreshed->journey#refreshed keydown.esc@window->share-modal#closeOnEsc"
      <%# Define the (potentially large) background data URL ONCE here; the card
@@ -184,6 +189,13 @@
         <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 14px;background:rgba(255,30,111,0.1);border-bottom:1px solid rgba(255,30,111,0.3);">
           <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#FF8FB6;">
             🔒 <%= t("editor.live_locked_bar") %>
+          </span>
+          <%# What a locked deck CAN still take. Without this the bar says only
+              what is refused, and a creator watching people misread a question
+              has no way to learn that the one edit which would help them is
+              available — see SurveysController#update_card_modal. %>
+          <span style="font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:rgba(255,255,255,0.6);">
+            <%= t("editor.live_locked_modal_note") %>
           </span>
           <%= link_to t("editor.live_results"), survey_results_path(@survey),
                 style: "font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);color:#fff;text-decoration:underline;text-underline-offset:3px;" %>

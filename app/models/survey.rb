@@ -1124,6 +1124,82 @@ class Survey < ApplicationRecord
     card["image"].present? || card["video"].present? || card["lottie"].present?
   end
 
+  # The intro modal's fields, normalised in place on ONE card. Extracted from
+  # sanitize_cards_images! because the locked-deck path (update_card_modal!
+  # below) has to bound the same three keys the same way, and a second copy of
+  # these rules is a second set of limits to keep in step — the drift would show
+  # up as a modal that is 600 characters through one door and unbounded through
+  # the other.
+  #
+  # PRESENCE IS THE FLAG: a card carries a modal iff it has title or body words,
+  # so there is one representation of "has a modal" rather than a boolean that
+  # can disagree with the copy beside it. A creator who opens the modal editor
+  # and types nothing has saved nothing — the same contract the join-block and
+  # share-copy placeholders already have.
+  #
+  # Not gated on card type. A modal explains whatever card it is hung on, and
+  # there is no type it would be meaningless for.
+  def self.sanitize_card_modal!(card)
+    title = card["modal_title"].to_s.strip.first(MAX_MODAL_TITLE)
+    body  = card["modal_body"].to_s.strip.first(MAX_MODAL_BODY)
+    title.present? ? card["modal_title"] = title : card.delete("modal_title")
+    body.present?  ? card["modal_body"]  = body  : card.delete("modal_body")
+    # Rich-text layer for the body, the same equivalence contract text_html has:
+    # presentation only, and dropped the moment it stops reading as its plain
+    # twin (which includes the twin being deleted).
+    html = body.present? ? RichTextSanitizer.clean_equivalent(card["modal_body_html"], body) : nil
+    html ? card["modal_body_html"] = html : card.delete("modal_body_html")
+    # A translation can only translate a modal the primary language HAS. Without
+    # this, clearing the modal off a card would leave its Spanish copy behind and
+    # the player would render a modal in Spanish only.
+    if card["i18n"].is_a?(Hash)
+      card["i18n"] = card["i18n"].transform_values do |tr|
+        next tr unless tr.is_a?(Hash)
+        tr = tr.dup
+        tr.delete("modal_title") if title.blank?
+        tr.delete("modal_body")  if body.blank?
+        tr["modal_title"] = tr["modal_title"].to_s.strip.first(MAX_MODAL_TITLE) if tr.key?("modal_title")
+        tr["modal_body"]  = tr["modal_body"].to_s.strip.first(MAX_MODAL_BODY)   if tr.key?("modal_body")
+        # Translations are plain by design, exactly like `pages`.
+        tr.except("modal_body_html")
+      end
+    end
+    card
+  end
+
+  # Write one card's intro modal, and NOTHING else — the narrow door that lets a
+  # locked deck gain, reword or lose a modal (SurveysController#update_card_modal).
+  #
+  # editing_locked? exists because answers are stored against card POSITION, so
+  # a deck change re-points every answer already collected. That reasoning does
+  # not reach a modal: it is a per-card field, it moves no card, it adds and
+  # removes none, and nothing about it is an answer. This method is the proof
+  # rather than the claim — it takes a cid and three strings, addresses the card
+  # BY CID (never by index, so a deck it half-understands cannot be scrambled),
+  # and rebuilds each card as `card.merge(modal fields)`. There is no payload
+  # shape it accepts that could reorder, insert, delete or otherwise reshape the
+  # deck, which is why it can sit outside the lock while
+  # SurveysController#update stays firmly inside it.
+  #
+  # Returns true when a card matched, false when the cid names nothing.
+  def update_card_modal!(cid:, title:, body:, body_html: nil)
+    cid = cid.to_s
+    return false if cid.blank?
+
+    found = false
+    updated = Array(cards).map do |card|
+      next card unless card.is_a?(Hash) && card["cid"].to_s == cid
+      found = true
+      self.class.sanitize_card_modal!(
+        card.merge("modal_title" => title, "modal_body" => body, "modal_body_html" => body_html)
+      )
+    end
+    return false unless found
+
+    update!(cards: updated)
+    true
+  end
+
   # `structural: false` keeps a deck's existing SHAPE: the two passes at the
   # tail that remove or move a card already in the deck (drop_retired_cards,
   # hoist_consent_gate) are skipped. SurveysController#update passes it for a
@@ -1445,39 +1521,7 @@ class Survey < ApplicationRecord
         c.delete("pages")
       end
 
-      # The intro modal (see MAX_MODAL_TITLE). Bounded scalars, and PRESENCE IS
-      # THE FLAG: a card carries a modal iff it has title or body words, so
-      # there is one representation of "has a modal" rather than a boolean that
-      # can disagree with the copy beside it. A creator who opens the modal
-      # editor and types nothing has autosaved nothing — same contract the
-      # join-block and share-copy placeholders already have.
-      #
-      # Not gated on card type. A modal explains whatever card it is hung on,
-      # and there is no type it would be meaningless for.
-      title = c["modal_title"].to_s.strip.first(MAX_MODAL_TITLE)
-      body  = c["modal_body"].to_s.strip.first(MAX_MODAL_BODY)
-      title.present? ? c["modal_title"] = title : c.delete("modal_title")
-      body.present?  ? c["modal_body"]  = body  : c.delete("modal_body")
-      # Rich-text layer for the body, the same equivalence contract text_html
-      # has: presentation only, and dropped the moment it stops reading as its
-      # plain twin (which includes the twin being deleted).
-      html = body.present? ? RichTextSanitizer.clean_equivalent(c["modal_body_html"], body) : nil
-      html ? c["modal_body_html"] = html : c.delete("modal_body_html")
-      # A translation can only translate a modal the primary language HAS.
-      # Without this, clearing the modal off a card would leave its Spanish
-      # copy behind and the player would render a modal in Spanish only.
-      if c["i18n"].is_a?(Hash)
-        c["i18n"] = c["i18n"].transform_values do |tr|
-          next tr unless tr.is_a?(Hash)
-          tr = tr.dup
-          tr.delete("modal_title") if title.blank?
-          tr.delete("modal_body")  if body.blank?
-          tr["modal_title"] = tr["modal_title"].to_s.strip.first(MAX_MODAL_TITLE) if tr.key?("modal_title")
-          tr["modal_body"]  = tr["modal_body"].to_s.strip.first(MAX_MODAL_BODY)   if tr.key?("modal_body")
-          # Translations are plain by design, exactly like `pages` above.
-          tr.except("modal_body_html")
-        end
-      end
+      sanitize_card_modal!(c)
 
       # Per-card free-text cap. Clamped into FREE_TEXT_LIMIT_RANGE rather than
       # rejected, and dropped when it equals the default so a deck only carries

@@ -1250,6 +1250,7 @@ ko:
     modal_body_placeholder: "이 질문이 무엇을 묻는지 직접 설명해 주세요…"
     modal_expand: "응답자에게 보이는 대로 표시"
     modal_collapse: "이 설명 접기"
+    live_locked_modal_note: "카드 설명은 지금도 추가하거나 고쳐 쓸 수 있습니다. 질문을 바꾸지 않고 설명해 줍니다."
   dashboard_card:
     publish_warning: "“%{title}”을(를) 게시할까요? 라이브가 되면 질문이 잠겨 수정할 수 없어요 — 모든 내용이 원하는 대로인지 확인하세요."
     preview: "미리보기"

@@ -1260,6 +1260,7 @@ sn:
     modal_body_placeholder: "Tsanangura nemashoko ako kuti mubvunzo uyu unobvunzei…"
     modal_expand: "Ona hwindo iri semaonero anoita anopindura"
     modal_collapse: "Peta hwindo iri"
+    live_locked_modal_note: "Uchiri kugona kuwedzera kana kunyorazve hwindo rekadhi — rinotsanangura mubvunzo usingachinji."
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"

@@ -1250,6 +1250,7 @@ nl:
     modal_body_placeholder: "Leg in je eigen woorden uit wat deze vraag vraagt…"
     modal_expand: "Bekijk dit venster zoals een deelnemer het ziet"
     modal_collapse: "Dit venster inklappen"
+    live_locked_modal_note: "Je kunt het venster van een kaart nog toevoegen of herschrijven — het legt een vraag uit zonder die te veranderen."
   dashboard_card:
     publish_warning: "“%{title}” publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     preview: "Voorbeeld"

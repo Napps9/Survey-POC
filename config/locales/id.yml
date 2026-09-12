@@ -1250,6 +1250,7 @@ id:
     modal_body_placeholder: "Jelaskan dengan katamu sendiri apa yang ditanyakan pertanyaan ini…"
     modal_expand: "Lihat jendela ini seperti yang dilihat responden"
     modal_collapse: "Lipat jendela ini"
+    live_locked_modal_note: "Kamu masih bisa menambah atau menulis ulang jendela kartu — itu menjelaskan pertanyaan tanpa mengubahnya."
   dashboard_card:
     publish_warning: "Terbitkan “%{title}”? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     preview: "Pratinjau"

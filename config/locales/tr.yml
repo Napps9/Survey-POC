@@ -1250,6 +1250,7 @@ tr:
     modal_body_placeholder: "Bu sorunun ne sorduğunu kendi cümlelerinle açıkla…"
     modal_expand: "Bu pencereyi yanıtlayanın gördüğü gibi göster"
     modal_collapse: "Bu pencereyi katla"
+    live_locked_modal_note: "Bir kartın penceresini hâlâ ekleyebilir veya yeniden yazabilirsin — soruyu değiştirmeden açıklar."
   dashboard_card:
     publish_warning: "“%{title}” yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."
     preview: "Önizleme"

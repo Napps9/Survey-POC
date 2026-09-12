@@ -147,6 +147,41 @@ class CardModalTest < ApplicationSystemTestCase
                        visible: true
   end
 
+  # A LOCKED deck — live, collecting answers — takes the modal and nothing else.
+  # This is the browser half of CardModalLockedTest: the server accepting a
+  # modal-only write proves nothing if the feed still swallows the click, or if
+  # typing there queues the deck-wide autosave the server answers with a 423.
+  test "a live Verto can still gain a modal" do
+    @survey.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    assert @survey.editing_locked?, "precondition: the deck is locked"
+
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    find(".live-warning-close").click if has_css?(".live-warning-close", wait: 3)
+    assert_selector ".editor-feed-locked", wait: 5
+
+    find("[data-card-cid='q1'] [data-role='card-modal-btn']").click
+    assert_selector "[data-card-cid='q1'] [data-role='card-modal-title']", visible: true
+
+    execute_script(<<~JS)
+      const card  = document.querySelector("[data-card-cid='q1']")
+      const title = card.querySelector("[data-role='card-modal-title']")
+      const body  = card.querySelector("[data-role='card-modal-body']")
+      title.textContent = "One thing first"
+      title.dispatchEvent(new Event("input", { bubbles: true }))
+      body.textContent = "Answer for your own street."
+      body.dispatchEvent(new Event("input", { bubbles: true }))
+    JS
+
+    wait_until_saved { card_for("q1")["modal_body"] == "Answer for your own street." }
+    assert_equal "One thing first", card_for("q1")["modal_title"]
+    assert_equal CARDS.length, @survey.reload.cards.length, "no card was added or removed"
+
+    # The rest of the deck stays locked: the question itself is still refused.
+    assert_no_text I18n.t("editor.save_failed", msg: ""), wait: 2
+  end
+
   # ── Player ────────────────────────────────────────────────────────────────
 
   def play!

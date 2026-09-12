@@ -1250,6 +1250,7 @@ fr:
     modal_body_placeholder: "Explique ce que demande cette question, avec tes mots…"
     modal_expand: "Voir cette fenêtre comme la voit un répondant"
     modal_collapse: "Replier cette fenêtre"
+    live_locked_modal_note: "Tu peux encore ajouter ou reformuler la fenêtre d'une carte : elle explique une question sans la modifier."
   dashboard_card:
     publish_warning: "Publier « %{title} » ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     preview: "Aperçu"

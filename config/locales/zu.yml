@@ -1270,6 +1270,7 @@ zu:
     modal_body_placeholder: "Chaza ngamazwi akho ukuthi lo mbuzo ubuza ini…"
     modal_expand: "Bona leli windi njengoba libonwa ophendulayo"
     modal_collapse: "Goqa leli windi"
+    live_locked_modal_note: "Usengakwazi ukwengeza noma ukubhala kabusha iwindi lekhadi — lichaza umbuzo ngaphandle kokuwushintsha."
   dashboard_card:
     publish_warning: "Shicilela “%{title}”? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     preview: "Buka kuqala"
