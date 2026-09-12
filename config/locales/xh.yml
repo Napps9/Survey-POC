@@ -2033,6 +2033,8 @@ xh:
     wallet_note: "I-Verto nganye imisela iithokheni zayo namanani ayo, ngoko ezi mfumba azifani. Kukho inani lilonke kuba kuyakholisa ukuba nalo — akukho thebhile yeligi kuzo zonke ii-Verto, kuba ibiya kulinganisa kuphela ukuba udlale i-Verto kabani."
     wallet_pill: "Isipaji sakho: %{total} okuqokelelweyo"
     wallet_see_all: "Jonga konke"
+    compare_pending: "Uthelekiso luvuleka kwiimpendulo ezingu-%{needed} (ukuza kuthi ga ngoku %{have})"
+    compare_closed: "%{org} ayikayivuli le miphumo"
   player_notification_mailer:
     via: "%{org} · nge-Playverto"
     why: "Ufumana oku kuba ucele ukuva kwimibutho oyiphendulileyo ii-Verto zayo."

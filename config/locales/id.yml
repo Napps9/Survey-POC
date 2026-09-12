@@ -1993,6 +1993,8 @@ id:
     wallet_note: "Setiap Verto menetapkan poinnya sendiri dan jumlahnya sendiri, jadi tumpukan-tumpukan ini bukan hal yang sama satu sama lain. Ada total karena menyenangkan punya satu; tidak ada papan peringkat antar-Vertos, karena itu hanya akan mengukur Verto mana yang kebetulan kamu mainkan."
     wallet_pill: "Dompetmu: %{total} terkumpul"
     wallet_see_all: "Lihat semua"
+    compare_pending: "Perbandingan terbuka pada %{needed} jawaban (%{have} sejauh ini)"
+    compare_closed: "%{org} belum membuka hasil ini"
   player_notification_mailer:
     via: "%{org} · lewat Playverto"
     why: "Kamu menerima ini karena kamu minta mendengar dari organisasi yang Vertos-nya sudah kamu jawab."

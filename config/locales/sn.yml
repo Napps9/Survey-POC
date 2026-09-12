@@ -2004,6 +2004,8 @@ sn:
     wallet_note: "Verto rimwe nerimwe rinozvitarira matokeni aro nehuwandu hwaro, saka mirwi iyi haifanani. Pane huwandu hwose nekuti zvinofadza kuva nahwo — hapana tafura yeligi pamaVerto ose, nekuti yaingoyera kuti wakatamba Verto raani."
     wallet_pill: "Chikwama chako: %{total} zvakaunganidzwa"
     wallet_see_all: "Ona zvose"
+    compare_pending: "Kuenzanisa kunovhurika pamhinduro %{needed} (parizvino %{have})"
+    compare_closed: "%{org} haisati yavhura mhedzisiro iyi"
   player_notification_mailer:
     via: "%{org} · kuburikidza nePlayverto"
     why: "Uri kuwana izvi nekuti wakakumbira kunzwa kubva kumasangano awakapindura maVerto awo."

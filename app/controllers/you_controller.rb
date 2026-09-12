@@ -27,7 +27,8 @@ class YouController < ApplicationController
   PURSE_PREVIEW = 5
 
   def show
-    @claims = kept_claims
+    @claims  = kept_claims
+    @compare = comparison_availability(@claims)
   end
 
   # One Verto in the account: the answers they gave, next to everyone else's.
@@ -93,6 +94,37 @@ class YouController < ApplicationController
   end
 
   private
+
+  # Why each listed Verto can't be compared yet — said on the LIST, so nobody
+  # has to open a Verto to find out there is nothing to see in it. Two gates,
+  # and a respondent has no way to tell them apart from the outside:
+  #
+  #   :closed  — show_results_comparison is the creator's switch and defaults
+  #              to false, so this is the commonest answer by a distance.
+  #   { have: } — under MIN_REGION_SAMPLE_SIZE. Deliberately says the floor and
+  #              the count rather than "not enough yet": a respondent who can
+  #              see it is 2 of 5 knows to come back, and one who is told
+  #              "soon" learns nothing and asks support instead.
+  #   :ready   — nothing is drawn. The row already links to the comparison.
+  #
+  # One grouped COUNT for the whole list, not one per row: this runs on the
+  # page that lists every Verto an account holds.
+  def comparison_availability(claims)
+    surveys = claims.map(&:survey).uniq
+    answered = Response.where(survey_id: surveys.map(&:id), answered: true)
+                       .group(:survey_id).count
+
+    surveys.each_with_object({}) do |survey, out|
+      out[survey.id] =
+        if !survey.compare_results?
+          :closed
+        elsif answered[survey.id].to_i < Response::MIN_REGION_SAMPLE_SIZE
+          { have: answered[survey.id].to_i }
+        else
+          :ready
+        end
+    end
+  end
 
   # What the account has collected, on every page rather than only the wallet:
   # the pill in the corner carries the total everywhere, and its hover

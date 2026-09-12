@@ -1994,6 +1994,8 @@ it:
     wallet_note: "Ogni Verto stabilisce i propri gettoni e i propri importi, quindi questi mucchietti non sono la stessa cosa l'uno con l'altro. C'è un totale perché fa piacere averlo; non c'è una classifica tra Verto, perché misurerebbe soltanto quale Verto ti è capitato di giocare."
     wallet_pill: "Il tuo portafoglio: %{total} raccolti"
     wallet_see_all: "Vedi tutto"
+    compare_pending: "Il confronto si apre a %{needed} risposte (%{have} finora)"
+    compare_closed: "%{org} non ha aperto questi risultati"
   player_notification_mailer:
     via: "%{org} · tramite Playverto"
     why: "Ricevi questo messaggio perché hai chiesto di avere notizie dalle organizzazioni ai cui Verto hai risposto."

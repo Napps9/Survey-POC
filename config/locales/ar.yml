@@ -2009,6 +2009,8 @@ ar:
     wallet_note: "كل Verto يحدد رموزه الخاصة ومقاديره الخاصة، لذا فهذه الأكوام ليست الشيء نفسه. يوجد مجموع لأن وجوده مُرضٍ؛ ولا يوجد ترتيب بين Vertos، لأنه لن يقيس سوى أي Verto صادف أن لعبته."
     wallet_pill: "محفظتك: تم جمع %{total}"
     wallet_see_all: "عرض الكل"
+    compare_pending: "تُفتح المقارنة عند %{needed} إجابات (%{have} حتى الآن)"
+    compare_closed: "لم تفتح %{org} هذه النتائج"
   player_notification_mailer:
     via: "%{org} · عبر Playverto"
     why: "تصلك هذه الرسالة لأنك طلبت أن تسمع من المؤسسات التي أجبت عن Vertos الخاصة بها."

@@ -2031,6 +2031,8 @@ tn:
     wallet_note: "Verto nngwe le nngwe e beya ditokene tsa yona le dipalo tsa yona, ka jalo dikgobokanyo tseno ga di tshwane. Go na le palogotlhe ka gonne go a kgatlhisa go nna le yona — ga go na tafole ya liki mo di-Verto tsotlhe, ka gonne e ne e tla lekanya fela gore o tshameketse Verto ya ga mang."
     wallet_pill: "Sekhwama sa gago: %{total} se se kokoantsweng"
     wallet_see_all: "Bona tsotlhe"
+    compare_pending: "Tshwantshanyo e bulega fa go na le dikarabo tse %{needed} (go fitlha jaanong %{have})"
+    compare_closed: "%{org} ga e ise e bule dipholo tse"
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O amogela seno ka gonne o kopile go utlwa go mekgatlho e o arabileng di-Verto tsa yona."

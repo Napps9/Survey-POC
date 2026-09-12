@@ -36,6 +36,12 @@
             account does not become a way around small-cell suppression. %>
         <h2 class="you-h2"><%= t("you.comparison_title") %></h2>
         <p class="you-sub"><%= t("you.comparison_too_few") %></p>
+        <%# The prose says come back; this says when. A respondent who can see
+            it is 2 of 5 knows whether that means tomorrow or never. %>
+        <p class="you-fine">
+          <%= t("you.compare_pending", needed: Response::MIN_REGION_SAMPLE_SIZE,
+                have: @comparison[:total].to_i) %>
+        </p>
 
       <% else %>
         <h2 class="you-h2"><%= t("you.comparison_title") %></h2>

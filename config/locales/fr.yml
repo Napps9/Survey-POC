@@ -1994,6 +1994,8 @@ fr:
     wallet_note: "Chaque Verto définit ses propres jetons et ses propres montants : ces piles ne sont donc pas la même chose l'une que l'autre. Il y a un total parce qu'il est satisfaisant d'en avoir un ; il n'y a pas de classement entre Vertos, car cela ne mesurerait que le Verto qu'il vous est arrivé de jouer."
     wallet_pill: "Votre portefeuille : %{total} cumulés"
     wallet_see_all: "Tout voir"
+    compare_pending: "La comparaison s'ouvre à %{needed} réponses (%{have} pour l'instant)"
+    compare_closed: "%{org} n'a pas ouvert ces résultats"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Vous recevez ceci parce que vous avez demandé des nouvelles des organisations dont vous avez répondu aux Vertos."

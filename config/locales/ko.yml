@@ -1992,6 +1992,8 @@ ko:
     wallet_note: "Verto마다 자기 점수와 자기 수량을 정하므로, 이 더미들은 서로 같은 것이 아닙니다. 합계가 있는 것은 있으면 뿌듯하기 때문입니다. Vertos 사이의 순위표는 없습니다. 어떤 Verto를 우연히 플레이했는지만 재게 될 테니까요."
     wallet_pill: "내 지갑: 모은 점수 %{total}"
     wallet_see_all: "전체 보기"
+    compare_pending: "답변 %{needed}개부터 비교가 열립니다 (현재 %{have}개)"
+    compare_closed: "%{org}이(가) 이 결과를 공개하지 않았습니다"
   player_notification_mailer:
     via: "%{org} · Playverto를 통해"
     why: "답한 Vertos의 단체로부터 소식을 받기로 하셨기에 이 메일을 보냅니다."

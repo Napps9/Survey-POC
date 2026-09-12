@@ -279,6 +279,88 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
     assert_select ".you-tab[aria-current=page]", text: I18n.t("you.tab_next")
   end
 
+  # ── Why a Verto can't be compared ─────────────────────────────────────────
+  #
+  # Two gates gate the comparison, and from the outside a respondent cannot
+  # tell them apart — or tell either from "this is broken". The list says which
+  # one, on the row, so nobody opens a Verto to find out there is nothing in it.
+
+  test "a Verto whose results the creator hasn't opened says so on the list" do
+    s = survey(show_results_comparison: false)
+    crowd(s, 8)
+    sign_in_with([ answered(s) ])
+
+    get you_path
+
+    assert_select ".you-verto-note",
+                  text: I18n.t("you.compare_closed", org: s.organisation.name)
+  end
+
+  test "a Verto below the floor names the floor and the count, not 'soon'" do
+    # 2 of 5 tells a respondent whether to come back tomorrow or never.
+    # "Not enough yet" tells them nothing and sends them to support.
+    s = survey
+    crowd(s, 1)
+    sign_in_with([ answered(s) ])
+
+    assert_operator s.responses.where(answered: true).count, :<,
+                    Response::MIN_REGION_SAMPLE_SIZE
+    get you_path
+
+    assert_select ".you-verto-note",
+                  text: I18n.t("you.compare_pending",
+                               needed: Response::MIN_REGION_SAMPLE_SIZE, have: 2)
+  end
+
+  test "a Verto that can be compared is not labelled at all" do
+    # Opening it is the point of the row; a badge saying so is noise.
+    s = survey
+    crowd(s, 8)
+    sign_in_with([ answered(s) ])
+
+    get you_path
+
+    assert_select ".you-verto", 1
+    assert_select ".you-verto-note", 0
+  end
+
+  test "the Verto's own page says when the comparison opens, not just that it hasn't" do
+    s = survey
+    crowd(s, 2)
+    sign_in_with([ answered(s) ])
+
+    get you_verto_path(s)
+
+    assert_select ".you-sub", text: I18n.t("you.comparison_too_few")
+    assert_select ".you-fine",
+                  text: I18n.t("you.compare_pending",
+                               needed: Response::MIN_REGION_SAMPLE_SIZE, have: 3)
+  end
+
+  test "the reasons cost one query however many Vertos are listed" do
+    # This runs on the page that lists every Verto an account holds, so a
+    # per-row count is a per-row query. Counted rather than asserted by eye:
+    # the batching is the whole reason the line can live on the list.
+    o = org
+    claims = 4.times.map do
+      s = survey(owner: o)
+      crowd(s, 1)
+      answered(s)
+    end
+    sign_in_with(claims)
+
+    counts = 0
+    sub = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      counts += 1 if payload[:sql].to_s.match?(/COUNT\(\*\).*"responses"/i)
+    end
+    get you_path
+    ActiveSupport::Notifications.unsubscribe(sub)
+
+    assert_select ".you-verto-note", 4
+    assert_equal 1, counts,
+                 "expected one grouped COUNT over responses for the whole list, got #{counts}"
+  end
+
   # ── The wallet pill ───────────────────────────────────────────────────────
   #
   # The wallet stopped being a tab and became a pill in the top corner, so the

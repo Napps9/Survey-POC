@@ -1994,6 +1994,8 @@ sw:
     wallet_note: "Kila Verto huweka pointi zake na kiasi chake, kwa hivyo marundo haya si kitu kimoja. Kuna jumla kwa sababu inafurahisha kuwa nayo; hakuna orodha ya ushindani kati ya Vertos, kwa sababu ingepima tu ni Verto ipi ulibahatika kucheza."
     wallet_pill: "Pochi yako: %{total} zimekusanywa"
     wallet_see_all: "Tazama zote"
+    compare_pending: "Ulinganisho hufunguka kwa majibu %{needed} (hadi sasa %{have})"
+    compare_closed: "%{org} haijafungua matokeo haya"
   player_notification_mailer:
     via: "%{org} · kupitia Playverto"
     why: "Unapata hii kwa sababu uliomba kusikia kutoka kwa mashirika ambayo umejibu Vertos zao."

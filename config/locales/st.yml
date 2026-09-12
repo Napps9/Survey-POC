@@ -2031,6 +2031,8 @@ st:
     wallet_note: "Verto ka nngwe e beha ditokene tsa yona le dipalo tsa yona, kahoo dikgobo tsena ha di tshwane. Ho na le kakaretso hobane ho kgotsofatsa ho ba le yona — ha ho tafole ya liki ho pholletsa le di-Verto, hobane e ne e tla lekanya feela hore o bapetse Verto ya mang."
     wallet_pill: "Sepatjhe sa hao: %{total} se bokelletsweng"
     wallet_see_all: "Sheba tsohle"
+    compare_pending: "Papiso e buleha ha ho e-na le dikarabo tse %{needed} (ho fihlela jwale %{have})"
+    compare_closed: "%{org} ha e so bule diphetho tsena"
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O fumana sena hobane o kopile ho utlwa ho mekgatlo eo o arabileng di-Verto tsa yona."

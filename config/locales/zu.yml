@@ -2029,6 +2029,8 @@ zu:
     wallet_note: "I-Verto ngalinye limisa amathokheni alo nezinani zalo, ngakho lezi zinqwaba azifani. Kunenani eliphelele ngoba kuyajabulisa ukuba nalo — alikho ithebula lamaligi kuwo wonke ama-Verto, ngoba belizolinganisa kuphela ukuthi udlale i-Verto likabani."
     wallet_pill: "Isikhwama sakho: %{total} okuqoqiwe"
     wallet_see_all: "Buka konke"
+    compare_pending: "Ukuqhathanisa kuvuleka ezimpendulweni ezingu-%{needed} (kuze kube manje %{have})"
+    compare_closed: "%{org} ayikavuli le miphumela"
   player_notification_mailer:
     via: "%{org} · nge-Playverto"
     why: "Uthola lokhu ngoba ucele ukuzwa kuzinhlangano oziphendule ama-Verto azo."

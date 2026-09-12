@@ -64,6 +64,22 @@
                     <% end %>
                   </div>
                 <% end %>
+                <%# Why this one can't be compared, on the row rather than behind
+                    a tap. Said in the negative only: a Verto that CAN be
+                    compared needs no label, because opening it is the point of
+                    the row. %>
+                <% case @compare[survey.id] %>
+                <% when :closed %>
+                  <div class="you-verto-note">
+                    <%= t("you.compare_closed", org: survey.organisation.name) %>
+                  </div>
+                <% when Hash %>
+                  <div class="you-verto-note">
+                    <%= t("you.compare_pending",
+                          needed: Response::MIN_REGION_SAMPLE_SIZE,
+                          have: @compare[survey.id][:have]) %>
+                  </div>
+                <% end %>
                 <span class="you-verto-go" aria-hidden="true">→</span>
               </div>
             <% end %>

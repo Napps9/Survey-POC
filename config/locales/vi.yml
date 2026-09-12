@@ -1993,6 +1993,8 @@ vi:
     wallet_note: "Mỗi Verto tự đặt điểm và số lượng riêng, nên các chồng điểm này không phải là cùng một thứ. Có một tổng số vì có nó thì thấy vui; không có bảng xếp hạng giữa các Vertos, vì nó chỉ đo được bạn tình cờ chơi Verto nào."
     wallet_pill: "Ví của bạn: đã thu được %{total}"
     wallet_see_all: "Xem tất cả"
+    compare_pending: "So sánh mở khi có %{needed} câu trả lời (hiện có %{have})"
+    compare_closed: "%{org} chưa mở kết quả này"
   player_notification_mailer:
     via: "%{org} · qua Playverto"
     why: "Bạn nhận được thư này vì bạn đã xin nghe tin từ các tổ chức có Vertos mà bạn đã trả lời."

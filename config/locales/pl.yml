@@ -2004,6 +2004,8 @@ pl:
     wallet_note: "Każde Verto ustala własne żetony i własne wartości, więc te stosy nie są tym samym co siebie nawzajem. Suma istnieje, bo miło ją mieć; nie ma rankingu między Vertos, bo mierzyłby tylko to, w które Verto akurat zagrałeś."
     wallet_pill: "Twój portfel: zebrano %{total}"
     wallet_see_all: "Zobacz wszystko"
+    compare_pending: "Porównanie otworzy się przy %{needed} odpowiedziach (na razie %{have})"
+    compare_closed: "%{org} nie udostępniła tych wyników"
   player_notification_mailer:
     via: "%{org} · przez Playverto"
     why: "Dostajesz to, bo poprosiłeś o wiadomości od organizacji, których Vertos wypełniłeś."

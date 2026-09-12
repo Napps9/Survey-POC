@@ -1994,6 +1994,8 @@ nl:
     wallet_note: "Elke Verto bepaalt zijn eigen punten en zijn eigen aantallen, dus deze stapels zijn niet hetzelfde als elkaar. Er is een totaal omdat het prettig is er een te hebben; er is geen ranglijst over Vertos heen, want die zou alleen meten welke Verto je toevallig hebt gespeeld."
     wallet_pill: "Jouw portemonnee: %{total} verzameld"
     wallet_see_all: "Bekijk alles"
+    compare_pending: "De vergelijking opent bij %{needed} antwoorden (%{have} tot nu toe)"
+    compare_closed: "%{org} heeft deze resultaten niet vrijgegeven"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Je krijgt dit omdat je hebt gevraagd om te horen van organisaties waarvan je een Verto hebt beantwoord."

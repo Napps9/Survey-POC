@@ -1994,6 +1994,8 @@ de:
     wallet_note: "Jedes Verto legt seine eigenen Punkte und seine eigenen Beträge fest — diese Stapel sind also nicht dasselbe wie einander. Es gibt eine Gesamtsumme, weil es befriedigend ist, eine zu haben; es gibt keine Rangliste über Vertos hinweg, weil sie nur messen würde, welches Verto du zufällig gespielt hast."
     wallet_pill: "Deine Brieftasche: %{total} gesammelt"
     wallet_see_all: "Alle ansehen"
+    compare_pending: "Der Vergleich öffnet sich bei %{needed} Antworten (bisher %{have})"
+    compare_closed: "%{org} hat diese Ergebnisse nicht freigegeben"
   player_notification_mailer:
     via: "%{org} · über Playverto"
     why: "Du bekommst das, weil du von den Organisationen hören wolltest, deren Vertos du beantwortet hast."

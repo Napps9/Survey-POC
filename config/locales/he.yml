@@ -2001,6 +2001,8 @@ he:
     wallet_note: "כל Verto קובע את הנקודות שלו ואת הסכומים שלו, ולכן הערימות האלה אינן אותו הדבר זו כזו. יש סך הכול כי נעים שיהיה; אין טבלת דירוג בין Vertos, כי היא רק הייתה מודדת באיזה Verto יצא לכם לשחק."
     wallet_pill: "הארנק שלכם: %{total} שנאספו"
     wallet_see_all: "הצגת הכול"
+    compare_pending: "ההשוואה נפתחת ב-%{needed} תשובות (%{have} עד כה)"
+    compare_closed: "%{org} לא פתחה את התוצאות האלה"
   player_notification_mailer:
     via: "%{org} · באמצעות Playverto"
     why: "אתם מקבלים את זה כי ביקשתם לשמוע מארגונים שענִיתם ל-Vertos שלהם."
