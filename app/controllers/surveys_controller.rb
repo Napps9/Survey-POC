@@ -826,7 +826,7 @@ class SurveysController < ApplicationController
       desired = ([ primary ] + SupportedLocales.sanitize_list(params[:locales], fallback: [])).uniq
       added   = desired - @survey.verto_locales
       @survey.update!(locales: desired)
-      TranslateLocalesJob.perform_later(@survey.id, added) if added.any?
+      TranslateLocalesJob.enqueue_for(@survey, added) if added.any?
     end
 
     redirect_to survey_path(@survey, panel: "publish")

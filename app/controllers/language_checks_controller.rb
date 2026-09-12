@@ -26,6 +26,7 @@ class LanguageChecksController < ApplicationController
     @links  = @survey.language_check_links.order(created_at: :desc)
     @locales = @survey.verto_locales
     @coverage = LanguageCheckLines.coverage(@cards, @locales, @survey.default_locale)
+    @runs = SurveyTranslation.index_for(@survey)
     # What the sidebar can still offer. Registry order, so the list reads the
     # same here as in the editor's Language settings.
     @addable = SupportedLocales.all.reject { |loc| @locales.include?(loc.code) }
@@ -71,17 +72,26 @@ class LanguageChecksController < ApplicationController
     return redirect_back_to_screen unless can_edit_vertos?
 
     added = @survey.add_locales!(params[:locales])
-    TranslateLocalesJob.perform_later(@survey.id, added) if added.any?
-    redirect_back_to_screen(added: added)
+    TranslateLocalesJob.enqueue_for(@survey, added) if added.any?
+    redirect_back_to_screen
+  end
+
+  # POST /surveys/:id/language_check/languages/retry — run one language again
+  # after it failed. The rail only offers this on a spent row, so it is the
+  # creator saying "yes, try that again" rather than a second silent attempt.
+  def retry_language
+    locale = params[:locale].to_s
+    if can_edit_vertos? && @survey.secondary_locales.include?(locale)
+      TranslateLocalesJob.enqueue_for(@survey, [ locale ])
+    end
+    redirect_back_to_screen
   end
 
   private
 
-  def redirect_back_to_screen(added: [])
-    redirect_to survey_language_check_path(@survey,
-                                           filter: params[:filter].presence,
-                                           translating: (added.presence && added.join(",")),
-                                           anchor: "language-check-languages")
+  def redirect_back_to_screen
+    redirect_to survey_language_check_path(@survey, filter: params[:filter].presence,
+                                                    anchor: "language-check-languages")
   end
 
   def set_survey

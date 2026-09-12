@@ -26,7 +26,7 @@
     <div class="lc-layout">
       <%= render "language_checks/languages_rail",
                  survey: @survey, locales: @locales, coverage: @coverage,
-                 addable: @addable, editable: @editable %>
+                 addable: @addable, editable: @editable, runs: @runs %>
 
       <div class="lc-main">
         <% if @locales.size < 2 %>

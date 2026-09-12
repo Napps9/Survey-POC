@@ -7,15 +7,10 @@
     otherwise report a language as done that a reviewer is about to find in
     English. See LanguageCheckLines.coverage.
 
-    Locals: survey, locales, coverage, addable, editable %>
+    Locals: survey, locales, coverage, addable, editable, runs %>
 <aside class="lc-rail" id="language-check-languages">
   <h2 class="lc-rail-title"><%= t("language_check.rail_title") %></h2>
 
-  <%# Languages added a moment ago by the form below. The job runs in the
-      background, so the honest thing to show is that it has been asked for —
-      not a count of zero that reads as a failure. Comes from the redirect, so
-      it is gone on the next ordinary page view, like the run it describes. %>
-  <% just_added = params[:translating].to_s.split(",") & locales %>
 
   <ul class="lc-rail-list">
     <% locales.each do |code| %>
@@ -27,16 +22,33 @@
           <span aria-hidden="true"><%= loc&.flag %></span>
           <span class="lc-rail-name"><%= loc&.english_name || code %></span>
         </span>
+        <%# Status comes from the RUN, not from the URL. A reload, a new tab or a
+            visit an hour later all report the same thing, and a language whose
+            job was discarded says so instead of showing a count that reads as
+            a slow success. %>
+        <% run = runs[code] %>
         <% if cov[:primary] %>
           <span class="lc-chip lc-chip--primary"><%= t("language_check.primary") %></span>
-        <% elsif just_added.include?(code) && cov[:translated].zero? %>
+        <% elsif run&.in_progress? && !done %>
           <span class="lc-rail-status lc-rail-status--working"><%= t("language_check.rail_translating") %></span>
         <% elsif done %>
           <span class="lc-rail-status lc-rail-status--done"><%= t("language_check.rail_translated") %></span>
+        <% elsif run&.status == "failed" %>
+          <span class="lc-rail-status lc-rail-status--failed"><%= t("language_check.rail_failed") %></span>
         <% else %>
           <span class="lc-rail-status">
             <%= t("language_check.rail_progress", done: cov[:translated], total: cov[:total]) %>
           </span>
+        <% end %>
+        <% if editable && run&.status == "failed" %>
+          <%= form_with url: retry_survey_language_check_language_path(survey), method: :post,
+                        data: { turbo: false }, class: "lc-rail-retry" do %>
+            <%= hidden_field_tag :locale, code %>
+            <button type="submit" class="lc-rail-retry-btn"><%= t("language_check.rail_retry") %></button>
+          <% end %>
+          <% if run.last_error.present? %>
+            <span class="lc-rail-why" title="<%= run.last_error %>"><%= run.last_error.truncate(90) %></span>
+          <% end %>
         <% end %>
       </li>
     <% end %>

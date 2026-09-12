@@ -33,6 +33,9 @@ class Survey < ApplicationRecord
   has_many :language_checks, dependent: :delete_all
   has_many :language_check_notes, dependent: :delete_all
   has_many :language_check_links, dependent: :destroy
+  # Per-language translation runs — what the Language check rail reads to say
+  # whether a language is coming, done, or failed. See SurveyTranslation.
+  has_many :survey_translations, dependent: :delete_all
   # Builds outlive the Verto they produced — they're the account's generation
   # log, deleted with the organisation, not the survey. Nullify rather than
   # nothing because verto_builds.survey_id carries a real FK: without this,

@@ -13848,6 +13848,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .lc-rail-status--done { color: #34D399; }
 .lc-rail-status--working { color: #FBBF24; }
+.lc-rail-status--failed { color: #F87171; }
+.lc-rail-retry { flex-basis: 100%; margin-top: 4px; }
+.lc-rail-retry-btn {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; color: #01EACB;
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.lc-rail-why {
+  flex-basis: 100%; font-size: 11px; color: rgba(255,255,255,.38); line-height: 1.4;
+  overflow: hidden; text-overflow: ellipsis;
+}
 
 .lc-rail-details { border-top: 1px solid rgba(255,255,255,.08); padding-top: 12px; }
 .lc-rail-add-summary {

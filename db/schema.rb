@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_11_090300) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_12_080000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1022,6 +1022,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_090300) do
     t.index ["survey_id"], name: "index_survey_shares_on_survey_id"
   end
 
+  create_table "survey_translations", force: :cascade do |t|
+    t.integer "attempts", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "finished_at"
+    t.string "last_error"
+    t.string "locale", null: false
+    t.datetime "started_at"
+    t.string "status", default: "queued", null: false
+    t.integer "survey_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["survey_id", "locale"], name: "index_survey_translations_on_survey_and_locale", unique: true
+    t.index ["survey_id"], name: "index_survey_translations_on_survey_id"
+    t.check_constraint "status IN ('queued', 'running', 'done', 'failed')", name: "chk_survey_translations_status"
+  end
+
   create_table "survey_waves", force: :cascade do |t|
     t.datetime "closed_at"
     t.datetime "created_at", null: false
@@ -1264,6 +1279,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_11_090300) do
   add_foreign_key "survey_shares", "organisations", column: "partner_organisation_id"
   add_foreign_key "survey_shares", "partnership_vertos"
   add_foreign_key "survey_shares", "surveys"
+  add_foreign_key "survey_translations", "surveys"
   add_foreign_key "survey_waves", "surveys"
   add_foreign_key "surveys", "organisations"
   add_foreign_key "verto_builds", "organisations"
