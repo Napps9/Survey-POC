@@ -108,11 +108,13 @@ class CardModalTest < ApplicationSystemTestCase
     open_editor
     find("[data-card-cid='q2'] .card-modal-fold").click
 
-    remove = find("[data-card-cid='q2'] .card-modal-remove")
-    remove.click
-    assert_equal I18n.t("editor.modal_remove_confirm"), remove.text,
-                 "removing clears text the browser's own undo cannot put back, so it arms first"
-    remove.click
+    find("[data-card-cid='q2'] .card-modal-remove").click
+    # Removing clears text the browser's own undo cannot put back, so it arms
+    # first. Asserted with a retrying matcher on a fresh lookup: a one-shot
+    # read of the node held from before the click raced it on a loaded runner.
+    assert_selector "[data-card-cid='q2'] .card-modal-remove.is-armed",
+                    text: I18n.t("editor.modal_remove_confirm")
+    find("[data-card-cid='q2'] .card-modal-remove").click
 
     wait_until_saved { !card_for("q2").key?("modal_title") }
     refute card_for("q2").key?("modal_body")

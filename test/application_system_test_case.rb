@@ -1,11 +1,12 @@
 require "test_helper"
 require "capybara/rails"
-# Ferrum sleeps after EVERY click — 100ms by default, read from this variable
-# when the gem loads, hence above the require. The suite makes ~750 clicks a
-# run, so that default was over a minute of nothing; 30ms is two frames, enough
-# for a rAF-deferred class change, and every click that starts a navigation is
-# already followed by a retrying matcher.
-ENV["FERRUM_CLICK_WAIT"] ||= "0.03"
+# Ferrum sleeps 100ms after EVERY click (FERRUM_CLICK_WAIT, read when the gem
+# loads, so it would have to be set above this require). ~750 clicks a run
+# makes that over a minute of a serial pass, but lowering it to 30ms exposed a
+# one-shot read after a click in CardModalTest on a loaded runner, and there
+# are more such reads than can be audited in one pass. Left at the default
+# until they are; the gain is about fifteen seconds of wall time at four
+# workers.
 require "capybara/cuprite"
 require "tailwindcss/commands"
 
