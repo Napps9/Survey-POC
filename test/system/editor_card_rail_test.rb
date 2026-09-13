@@ -55,4 +55,44 @@ class EditorCardRailTest < ApplicationSystemTestCase
     assert_no_selector ".editor-grid.is-panel-open"
     refute_equal "none", delete_label_display
   end
+
+  # The rail is a TWO-COLUMN grid, and a control whose label is a whole phrase
+  # only gets a row to itself by being named in the `grid-column: 1 / -1` list
+  # in application.css. Miss the list and the control takes half a rail — about
+  # 62px, inside which any two-word label wraps and spills out of its pill.
+  #
+  # That is not hypothetical: the intro modal's control shipped missing from
+  # that list and rendered exactly like that. Nothing caught it, because the
+  # markup and the ERB comment both said "full-rail-width" and only the
+  # stylesheet disagreed — so the assertion has to be on measured geometry.
+  test "every phrase-labelled rail control gets the full rail, on one line" do
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    assert_text "A question?"
+
+    rail_width = evaluate_script(
+      "document.querySelector(\"[data-card-cid='c1'] .rail-top\").getBoundingClientRect().width"
+    )
+
+    %w[card-delete-btn card-duplicate-btn card-modal-btn rail-add-btn].each do |klass|
+      box = evaluate_script(<<~JS)
+        (() => {
+          const el = document.querySelector("[data-card-cid='c1'] .#{klass}");
+          if (!el) return null;
+          const r = el.getBoundingClientRect();
+          const label = el.querySelector(".rail-label");
+          const lh = label ? parseFloat(getComputedStyle(label).lineHeight) : 0;
+          const lines = label ? Math.round(label.getBoundingClientRect().height / lh) : 1;
+          return { width: r.width, height: r.height, lines };
+        })()
+      JS
+      next if box.nil? # not every control renders on every card type
+
+      assert_operator box["width"], :>, rail_width * 0.7,
+                      ".#{klass} took half a rail — add it to the grid-column: 1 / -1 list"
+      assert_equal 1, box["lines"],
+                   ".#{klass}'s label wrapped, which means it does not fit its pill"
+    end
+  end
 end

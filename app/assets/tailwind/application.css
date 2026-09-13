@@ -4886,6 +4886,7 @@ button.editor-leave-btn { cursor: pointer; }
 .card-rail .required-chip,
 .card-rail .card-duplicate-btn,
 .card-rail .card-delete-btn,
+.card-rail .card-modal-btn,
 .card-rail .rail-add-btn { grid-column: 1 / -1; }
 /* Circles, not pills: these three carry a glyph and no words, so a stretched
    lozenge only made them read as three different-sized buttons depending on the

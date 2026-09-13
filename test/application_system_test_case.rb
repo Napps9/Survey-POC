@@ -285,7 +285,24 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   def setup
     super
     page.driver.clear_memory_cache if page.driver.respond_to?(:clear_memory_cache)
-    page.driver.set_cookie(CONSENT_COOKIE_NAME, CONSENT_COOKIE_VALUE, path: "/") unless real_cookie_banner
+    # Set it, or REMOVE it — never neither. The opt-out used to only skip the
+    # set and rely on Capybara's between-test session reset to have cleared
+    # what the previous test left, which is an ordering assumption rather than
+    # a guarantee: a banner test that lands after a preset one in the same
+    # browser sees the preset cookie, finds no banner to click, and fails
+    # saying so. Measured 2026-09-13 — the diagnostics CookieBannerTest carries
+    # for exactly this caught the cookie ({"necessary":true,"analytics":false},
+    # the preset's own shape) on the page that should have had none. Removing
+    # it here makes the opt-out true by itself, whatever ran before.
+    # clear_cookies rather than remove_cookie: the latter demands a :domain or
+    # :url, and setup runs before this test has set anything of its own (the
+    # session cookie is minted later, by sign_in_as), so there is nothing here
+    # worth keeping.
+    if real_cookie_banner
+      page.driver.clear_cookies
+    else
+      page.driver.set_cookie(CONSENT_COOKIE_NAME, CONSENT_COOKIE_VALUE, path: "/")
+    end
   end
 
   # Sign in by minting exactly what a successful form login leaves behind

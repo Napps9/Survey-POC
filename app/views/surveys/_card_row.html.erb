@@ -148,6 +148,10 @@
       <%# Intro modal. A full-rail-width control under the Card N / Why pair —
           one of the everyday controls, not one of the structural ones in
           .rail-bottom: a modal is this card's content, not the deck's shape.
+          The full width comes from the `grid-column: 1 / -1` list in
+          application.css, NOT from anything here: the rail is a two-column
+          grid, so a control missing from that list gets half a rail (62px)
+          and its label wraps out of the pill. This one shipped missing.
           It is a TOGGLE with two readings, which is why the label and the
           class both flip: off it invites (tinted, like Add question), on it
           reports (filled) and jumps to the panel the creator is about to
