@@ -185,14 +185,20 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     end
   end
 
-  # Returns once three consecutive animation frames report the same box for
-  # the node — bounded, so a node that never settles cannot hang the test. For
-  # a test that READS geometry, or CLICKS something that arrived by animation:
-  # the three-second consent guard and the Accept-all click used to give the
-  # layout that long to settle by accident, and a phone viewport's first paint
-  # or a panel's 0.28s slide can still be moving when the page reports loaded.
-  # Three frames rather than two so a slide that has only just started, with
-  # its first two reads landing before it moves, cannot pass as settled.
+  # Returns once the webfonts have landed AND three consecutive animation
+  # frames report the same box for the node — bounded, so a node that never
+  # settles cannot hang the test. For a test that READS geometry, or CLICKS
+  # something that arrived by animation: the three-second consent guard and
+  # the Accept-all click used to give the layout that long to settle by
+  # accident, and a phone viewport's first paint or a panel's 0.28s slide can
+  # still be moving when the page reports loaded. Three frames rather than two
+  # so a slide that has only just started, with its first two reads landing
+  # before it moves, cannot pass as settled.
+  #
+  # The fonts first: every @font-face is font-display: swap, so the first
+  # paint is in the fallback face and the text reflows when the woff2 lands —
+  # a measurement taken before that swap is of the wrong font. Half the suite
+  # reads geometry and nothing else waits on document.fonts.
   def settle_box(node, max_frames: 90)
     page.evaluate_async_script(<<~JS, node)
       const [el, done] = arguments
@@ -205,8 +211,32 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
         if (same >= 2 || ++frames > #{max_frames}) return done()
         requestAnimationFrame(tick)
       }
-      requestAnimationFrame(tick)
+      document.fonts.ready.then(() => requestAnimationFrame(tick))
     JS
+  end
+
+  # Type keys with no pointer involved. Cuprite's Element#send_keys CLICKS the
+  # node at its geometric centre to focus it first (cuprite page.rb) — inside
+  # a popover, a modal, or anything mid-animation that click is its own
+  # gesture: it closed the wallet popover before Escape was typed, so the test
+  # then asserted that a closed popover was closed, and body's centre can land
+  # on a modal's backdrop. Focus stays wherever it already is; both Escape
+  # handlers in the app are document- or window-scoped. Ferrum's key aliases
+  # apply (:escape, :enter, [ :Meta, "z" ]). SystemTestHygieneTest keeps
+  # send_keys(:escape) out.
+  def press_keys(*keys)
+    page.driver.browser.keyboard.type(*keys)
+  end
+
+  # A deck shaped like a real one: every Verto created through the app gets
+  # DemographicQuestions' tail appended (birth month/year, location, gender),
+  # which is what makes Survey#default_consent_gate? true and puts the default
+  # consent gate in front of the deck. Hand-built fixture decks have no such
+  # tail, so 33 of the 36 files that call agree_to_consent_gate never meet a
+  # gate at all. Use this where the gate, or the tail, is part of what is
+  # under test; a test about one card's behaviour is fine without it.
+  def production_deck(cards, locale: "en")
+    DemographicQuestions.append_to(cards, locale: locale)
   end
 
   # The player writes to sessionStorage and registers a Service Worker, so each

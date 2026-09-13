@@ -126,7 +126,10 @@ class YouWalletPillTest < ApplicationSystemTestCase
 
     find(".you-purse-pill").hover
     assert_selector ".you-purse-popover", visible: true
-    find("body").send_keys(:escape)
+    # No pointer: send_keys clicks body's centre first, which the pill's
+    # document-level click handler took as "outside" and closed the popover
+    # before Escape was ever typed — this assertion could not fail.
+    press_keys(:escape)
     assert_no_selector ".you-purse-popover", visible: true
   end
 end

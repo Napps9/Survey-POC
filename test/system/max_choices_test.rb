@@ -156,7 +156,7 @@ class MaxChoicesSystemTest < ApplicationSystemTestCase
   # the one thing this option can't receive.
   def press_enter_on(label)
     page.execute_script("arguments[0].focus()", item(label))
-    page.driver.browser.keyboard.type(:Enter)
+    press_keys(:Enter)
   end
 
   def pointer_events_of(label)

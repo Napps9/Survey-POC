@@ -110,8 +110,10 @@ class PlayerFontScaleTest < ApplicationSystemTestCase
     assert_equal "large", evaluate_script("localStorage.getItem('verto_font_scale')")
 
     visit "/play/#{@survey.publish_token}"
-    assert_equal "large", find(".preview-overlay")["data-font-scale"]
-    assert_equal "true", find(".font-scale-btn[data-scale='large']")["aria-pressed"]
-    assert_equal "false", find(".font-scale-btn[data-scale='default']")["aria-pressed"]
+    # data-font-scale is written when the player controller connects, not
+    # server-rendered: retrying matchers, so the read cannot beat the connect.
+    assert_selector ".preview-overlay[data-font-scale='large']"
+    assert_selector ".font-scale-btn[data-scale='large'][aria-pressed='true']"
+    assert_selector ".font-scale-btn[data-scale='default'][aria-pressed='false']"
   end
 end

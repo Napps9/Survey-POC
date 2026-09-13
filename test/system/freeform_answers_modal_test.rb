@@ -66,7 +66,7 @@ class FreeformAnswersModalTest < ApplicationSystemTestCase
       assert_text "Showing 130 of 130"
     end
 
-    find("[data-freeform-answers-target='search']").send_keys(:escape)
+    press_keys(:escape) # the modal's Escape handler is window-scoped; no click needed to reach it
     assert_selector "[data-freeform-answers-target='modal'].hidden", visible: :all, wait: 5
   end
 
@@ -83,7 +83,7 @@ class FreeformAnswersModalTest < ApplicationSystemTestCase
   def search_for(text)
     find("[data-freeform-answers-target='search']").set(text) # types, then blurs
     execute_script("document.querySelector(\"[data-freeform-answers-target='search']\").focus()")
-    page.driver.browser.keyboard.type(:enter)
+    press_keys(:enter)
   end
 
   test "searching asks the server across every answer" do

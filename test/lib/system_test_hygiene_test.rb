@@ -15,6 +15,16 @@ class SystemTestHygieneTest < ActiveSupport::TestCase
       "guard the consent gate with agree_to_consent_gate (test/application_system_test_case.rb)"
   end
 
+  test "Escape is pressed with press_keys, never with send_keys" do
+    # Element#send_keys clicks the node's centre first; on a popover, a modal
+    # or a banner that click is a gesture of its own and can close the thing
+    # Escape was about to be tested against.
+    offenders = SYSTEM_TESTS.select { |f| f.read.match?(/send_keys\(:escape\)/) }
+
+    assert_empty offenders.map { |f| f.relative_path_from(Rails.root).to_s },
+      "press Escape with press_keys (test/application_system_test_case.rb)"
+  end
+
   test "a file a system test writes is named per test or per process" do
     # public/ and tmp/ are shared by every parallel worker, so a fixed name is
     # a collision waiting for a second worker.

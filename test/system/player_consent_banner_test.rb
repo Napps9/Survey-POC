@@ -16,16 +16,20 @@ class PlayerConsentBannerTest < ApplicationSystemTestCase
   def setup
     super
     @org    = Organisation.create!(name: "O", slug: "pcb2-#{SecureRandom.hex(3)}")
+    # A production-shaped deck (the demographic tail appended) with NO creator
+    # consent_text, so it is the DEFAULT gate — Survey#default_consent_gate?,
+    # the one every real Verto gets — that these tests drive, not the creator
+    # wording path that renders the same banner.
     @survey = @org.surveys.create!(
       title: "Banner", theme: "T", audience_age: "all", key_insight: "k",
       default_locale: "en", locales: [ "en" ],
-      consent_text: "Your anonymous answers may be used for research.",
-      cards: [
+      cards: production_deck([
         { "type" => "multiple_choice", "cid" => "q1", "text" => "First question?",
           "options" => [ "Yes", "No", "Maybe" ] },
         { "type" => "yes_no", "cid" => "q2", "text" => "Second question?" }
-      ]
+      ])
     )
+    assert @survey.default_consent_gate?, "precondition: the deck gets the default gate"
     @survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
   end
 
@@ -108,8 +112,8 @@ class PlayerConsentBannerTest < ApplicationSystemTestCase
     sleep 0.3
     focused = page.evaluate_script("document.activeElement?.classList?.contains('play-consent-banner')")
     assert focused, "keyboard users should start in the dialog that blocks everything else"
-    find(".play-consent-banner").send_keys(:escape)
-    sleep 0.2
+    press_keys(:escape) # focus is already in the banner, as asserted above
+    sleep 0.2 # negative wait: nothing may happen
     assert pending?, "consent is a choice, not a dismissable popup"
     assert_selector ".play-consent-banner", visible: true
   end

@@ -48,7 +48,7 @@ class EditorUndoTest < ApplicationSystemTestCase
   # normalize_keys turns a bare modifier symbol into nil (it records it as a
   # held modifier rather than emitting a key), so keyboard.down(:Meta) raises.
   def press_undo
-    page.driver.browser.keyboard.type([ :Meta, "z" ])
+    press_keys([ :Meta, "z" ])
   end
 
   # evaluate_script, not execute_script — the latter discards its return value,

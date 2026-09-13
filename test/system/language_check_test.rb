@@ -225,7 +225,9 @@ class LanguageCheckSystemTest < ApplicationSystemTestCase
 
     click_button "Send this to a reviewer"
     assert_selector "#language-check-share-modal:not(.hidden)"
-    find("body").send_keys(:escape)
+    # No pointer: send_keys clicks body's centre first, which can be the
+    # modal's backdrop — a click that closes the modal on its own.
+    press_keys(:escape)
     assert_selector "#language-check-share-modal.hidden", visible: false
   end
 

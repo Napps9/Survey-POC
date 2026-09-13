@@ -43,12 +43,16 @@ class EditorDevicePreviewLogoTest < ApplicationSystemTestCase
       %(<rect width="240" height="48" fill="#161B2E"/></svg>)
   end
 
-  def sign_in
-    visit new_session_path
-    fill_in "email_address", with: @user.email_address
-    fill_in "password", with: "verylongpassword"
-    click_on(class: "btn-primary", match: :first) rescue find("input[type=submit]").click
-    assert_no_selector "input[name=password]", wait: 10
+  def open_editor
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    # Waits for the page's Stimulus controllers to connect — device-frame among
+    # them. Without it the device click below can land before the controller
+    # is listening and is simply lost: the frame stays desktop, the logo stays
+    # absolute, and no sleep afterwards can bring the click back (it failed
+    # that way once in 511 at four workers, 2026-09-13).
+    dismiss_cookie_banner
+    assert_selector ".survey-card-wrap .split-right-logo", wait: 10
   end
 
   def logo_vs_title
@@ -72,13 +76,15 @@ class EditorDevicePreviewLogoTest < ApplicationSystemTestCase
 
   def switch_device(name)
     find("[data-device='#{name}']").click
-    sleep 0.6
+    # device-frame#set flips aria-pressed in the same tick it swaps the feed's
+    # device-* class, so the pressed button is the proof the click was taken;
+    # then the reframed card has to stop moving before its geometry is read.
+    assert_selector "[data-device='#{name}'][aria-pressed='true']"
+    settle_box(find(".survey-card-wrap .split-right-logo"))
   end
 
   test "the phone preview does not draw the welcome logo over the question" do
-    sign_in
-    visit survey_path(@survey)
-    assert_selector ".survey-card-wrap .split-right-logo", wait: 10
+    open_editor
 
     switch_device("mobile")
     m = logo_vs_title
@@ -97,9 +103,7 @@ class EditorDevicePreviewLogoTest < ApplicationSystemTestCase
   # The desktop frame must keep the float — this is not a bug there, and
   # flattening it everywhere would be a regression dressed as a fix.
   test "the desktop frame keeps the logo floating above the panel" do
-    sign_in
-    visit survey_path(@survey)
-    assert_selector ".survey-card-wrap .split-right-logo", wait: 10
+    open_editor
 
     switch_device("desktop")
     d = logo_vs_title

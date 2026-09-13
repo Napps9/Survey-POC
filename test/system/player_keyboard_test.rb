@@ -44,14 +44,15 @@ class PlayerKeyboardTest < ApplicationSystemTestCase
   # Ferrum takes its own aliases here (:left, not :ArrowLeft — a symbol is
   # downcased and looked up in KEYS_MAPPING, so the DOM name misses).
   def press(key)
-    page.driver.browser.keyboard.type(key)
+    press_keys(key)
   end
 
   def open_player
     visit "/play/#{@survey.publish_token}"
     dismiss_cookie_banner
-    # Every Verto collects the demographic tail, so P0-6's default consent gate
-    # stands in front of the deck.
+    # This fixture deck has no demographic tail, so no default gate renders and
+    # this is a no-op; kept so the walk reads like every other player test's.
+    # PlayerConsentBannerTest drives the gate itself, on a production_deck.
     agree_to_consent_gate
   end
 
