@@ -14,10 +14,10 @@ on:
   workflow_dispatch:
 
 # One run per ref at a time; a newer push cancels the older run. On Main this
-# is the SAFE direction, not just the cheap one: the deploy job's hook tells
-# Render to deploy the branch's current head, not the commit that went green —
-# so a run for commit A finishing after commit B was pushed would deploy B
-# untested. Cancelling A leaves B's own run to deploy B once it is green.
+# is safe as well as cheap: the deploy job names the commit's own image, so a
+# run for commit A that finished after commit B was pushed would deploy A's
+# image — never B untested. Cancelling A just leaves B's own run to deploy B
+# once it is green, without an older commit going live in between.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -211,36 +211,81 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-  # Deploys are triggered from HERE, the moment every check above is green,
-  # by POSTing the service's Render Deploy Hook. This is the ONLY path:
-  # render.yaml has autoDeployTrigger: off, because Render's own checksPass
-  # trigger was observed lagging a green commit by a full hour (2026-08-12,
-  # 89802a7: checks green 11:43, auto deploy 12:43). So a missing secret or a
-  # failed POST is a red job, never a quiet no-op — a green run that deploys
-  # nothing is the trap. Fires for a push AND for a workflow_dispatch on Main
-  # (the startup_failure hatch above); pull requests carry refs/pull/N/merge
-  # and stay excluded by the ref test.
+  # Deploys are triggered from HERE, the moment every check above is green.
+  # The service is image-backed (2026-09-13): this job moves :main onto the
+  # commit's image and POSTs the Render Deploy Hook naming it. An image-backed
+  # service has no auto-deploy, so this is the ONLY automated path, and a
+  # missing secret
+  # or a failed POST is a red job, never a quiet no-op — a green run that
+  # deploys nothing is the trap. (History: as a source build, Render's own
+  # checksPass trigger was seen lagging a green commit by an hour — 2026-08-12,
+  # 89802a7: checks green 11:43, auto deploy 12:43.) Fires for a push AND for
+  # a workflow_dispatch on Main (the startup_failure hatch above); pull
+  # requests carry refs/pull/N/merge and stay excluded by the ref test.
+  #
+  # Because this job MOVES :main, re-running it on an older run is a rollback:
+  # :main goes back to that commit and Render deploys it — and, because the
+  # re-run re-enters the ci-<ref> concurrency group above (cancel-in-progress),
+  # it cancels any newer commit's run still in flight, leaving that commit
+  # undeployed with only a grey "cancelled" to show for it. Deliberate is
+  # fine; "Re-run failed jobs" on a stale run by reflex is not.
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [ test, test_postgres, system_test, scan_ruby, scan_js, lint, build_image ]
     if: github.ref == 'refs/heads/Main'
+    permissions:
+      contents: read
+      packages: write
 
+    # Render runs the image build_image pushed — the service has been
+    # image-backed since 2026-09-13 (docs/DEPLOYMENT_RUNBOOK.md §7). Two things
+    # happen here, in this order, and only once every other job is green:
+    #
+    # 1. `:main` is moved onto this commit's image. build_image pushes only
+    #    `:<sha>`: it runs alongside the test jobs, not after them, so a tag
+    #    it moved would name red commits too (b127f9b, red on CI, sat on
+    #    `:main` for 4.5 hours on 2026-09-13). Moved here, `:main` always means
+    #    "the last commit every check passed" — which is what the service's
+    #    configured reference and the dashboard's "Deploy latest reference"
+    #    pull.
+    # 2. The deploy hook is POSTed with imgURL naming this commit's image, so
+    #    the deploy is of the image CI proved, not of whatever `:main` means
+    #    by the time Render pulls it.
+    #
+    # Image-backed services have no auto-deploy: this hook is the only
+    # automated way a commit reaches production (Manual Deploy and Rollback are
+    # the hands-on ones), so a missing secret or a failed POST is a red job,
+    # never a quiet one. `packages: write` is necessary, not belt-and-braces:
+    # the repository's default GITHUB_TOKEN is read-only.
     steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move the main tag onto this commit's image
+        run: docker buildx imagetools create -t ghcr.io/napps9/survey-poc:main "ghcr.io/napps9/survey-poc:${GITHUB_SHA}"
+
       - name: Trigger the Render deploy
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         # The URL embeds a key — it must never be echoed, so curl talks to it
-        # silently and only the outcome is printed.
+        # silently and only the outcome is printed. imgURL rides along as a
+        # query parameter; the hook URL already carries one (?key=…), hence
+        # the separator check.
         run: |
           if [ -z "$HOOK" ]; then
-            echo "::error::RENDER_DEPLOY_HOOK_URL is not set, and render.yaml has autoDeployTrigger off — nothing will deploy this commit."
+            echo "::error::RENDER_DEPLOY_HOOK_URL is not set — an image-backed service deploys only through this hook, so nothing will deploy this commit."
             exit 1
           fi
-          if curl -fsS -X POST "$HOOK" -o /dev/null; then
-            echo "Render deploy triggered."
+          case "$HOOK" in *\?*) sep='&' ;; *) sep='?' ;; esac
+          if curl -fsS -X POST "${HOOK}${sep}imgURL=ghcr.io/napps9/survey-poc:${GITHUB_SHA}" -o /dev/null; then
+            echo "Render deploy triggered for ghcr.io/napps9/survey-poc:${GITHUB_SHA}."
           else
-            echo "::error::Deploy hook POST failed — nothing else will deploy this commit; re-run this job or deploy from the Render dashboard."
+            echo "::error::Deploy hook POST failed — nothing else deploys this commit. :main already names it, so Render's Manual Deploy > Deploy latest reference deploys it; re-run this job only while nothing newer has been pushed to Main (a re-run moves :main back here and cancels any newer run in flight); otherwise let the newer run deploy, or use Deploy latest reference."
             exit 1
           fi
 
@@ -258,13 +303,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # On Main the image is also PUSHED to GHCR, tagged with the commit, so
-      # the thing Render deploys can be the thing CI proved — today Render
-      # rebuilds the identical image from source after the deploy hook and
-      # this build is thrown away. Switching the service to that image is a
-      # Render-side change (registry credential, image-backed service; see
-      # docs/DEPLOYMENT_RUNBOOK.md §7) that the owner makes; until then the
-      # push costs a few seconds and changes nothing about the deploy.
+      # On Main the image is also PUSHED to GHCR, tagged with the commit: it
+      # is what Render deploys (the service has been image-backed since
+      # 2026-09-13, docs/DEPLOYMENT_RUNBOOK.md §7). Only `:<sha>` is pushed
+      # here — this job runs alongside the test jobs, so a `:main` moved here
+      # would name red commits too; the deploy job moves `:main` once every
+      # check is green.
       - name: Log in to GHCR
         if: github.ref == 'refs/heads/Main'
         uses: docker/login-action@v3
@@ -282,9 +326,7 @@ jobs:
         with:
           context: .
           push: ${{ github.ref == 'refs/heads/Main' }}
-          tags: |
-            ghcr.io/napps9/survey-poc:${{ github.sha }}
-            ghcr.io/napps9/survey-poc:main
+          tags: ghcr.io/napps9/survey-poc:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

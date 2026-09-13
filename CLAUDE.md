@@ -120,14 +120,23 @@ to run it after every push.
 
 ## Deploys
 
-Render deploys `Main` when CI's `deploy` job POSTs the service's Deploy Hook,
-which it does only once every other job in `.github/workflows/ci.yml` (test,
-test_postgres, system_test, lint, scan_ruby, scan_js, build_image) is green on
-that commit; `render.yaml` has `autoDeployTrigger: off`, so that hook is the
-only path and the job goes red rather than quiet if the secret is missing or
+Render runs the production image CI builds, pulled from
+`ghcr.io/napps9/survey-poc` (image-backed since 2026-09-13: a source build was
+2–3 min per deploy, a pull is about one). Every Main run pushes `:<sha>`; once
+every other job in `.github/workflows/ci.yml` (test, test_postgres,
+system_test, lint, scan_ruby, scan_js, build_image) is green, the `deploy` job
+moves `:main` onto that sha and POSTs the service's Deploy Hook naming it — so
+`:main` always means the last green commit, and the deploy is of the exact
+image CI proved. Image-backed services have no auto-deploy: that hook is the
+only automated path, and the job goes red rather than quiet if the secret is missing or
 the POST fails. A `workflow_dispatch` on Main deploys too — that is the
-recovery for a run that died with `startup_failure`. A red push to Main
-therefore doesn't deploy — but don't rely on that: push green.
+recovery for a run that died with `startup_failure`; the dashboard's Manual
+Deploy → "Deploy latest reference" pulls `:main`, the last green commit (after
+a dashboard rollback that is the build rolled back from, so fix forward
+first). A red push to Main therefore doesn't deploy — but don't rely on that:
+push green.
+The switch itself (dashboard, `render.yaml`) is in `docs/DEPLOYMENT_RUNBOOK.md`
+§7.
 
 ## Gotchas
 

@@ -1,13 +1,18 @@
 services:
   - type: web
-    name: survey-poc
-    # Docker runtime so the process runs under jemalloc (installed in the
+    name: survey-poc  # "VertoNowMain" in the dashboard; keep this field — renaming a blueprint service recreates it on a sync
+    # The production image CI builds and pushes (ghcr.io/napps9/survey-poc;
+    # build_image and deploy in .github/workflows/ci.yml) — image-backed since
+    # 2026-09-13, in place of a source build on every deploy (2-3 minutes each;
+    # a pull is about one). The image runs under jemalloc (installed in the
     # Dockerfile and enabled by bin/docker-entrypoint) instead of glibc malloc —
-    # ~10-25% lower RSS and less fragmentation on the 512MB instance, with no
-    # behaviour change. The entrypoint runs db:prepare on boot; the Dockerfile's
-    # CMD (rails server) binds to $PORT via config/puma.rb. libvips is also
-    # available here for Active Storage image variants.
-    runtime: docker
+    # ~10-25% lower RSS and less fragmentation on the 512MB instance. The
+    # entrypoint runs db:prepare on boot; the Dockerfile's CMD (rails server)
+    # binds to $PORT via config/puma.rb. libvips is available for Active
+    # Storage image variants.
+    runtime: image
+    image:
+      url: ghcr.io/napps9/survey-poc:main
     # Live deployment facts (owner-confirmed 2026-09-01): the running web
     # service and database are BOTH in Frankfurt (EU Central) — this file
     # previously said oregon, which was stale against reality. A blueprint
@@ -16,21 +21,23 @@ services:
     # dashboard.
     plan: starter
     region: frankfurt
-    branch: Main
-    # Deploys are triggered by CI's `deploy` job POSTing this service's Deploy
-    # Hook the moment every check is green (see .github/workflows/ci.yml), so
-    # a green commit deploys within a minute of its checks finishing. Render's
-    # own checksPass trigger is off: it was observed starting a deploy a full
-    # hour after the checks passed (2026-08-12, 89802a7), and with both on
-    # every commit would deploy twice. Restore `checksPass` here if the hook
-    # path ever needs to be retired.
+    # How a commit reaches this service (the deploy job in
+    # .github/workflows/ci.yml): every Main run pushes :<sha>; once every
+    # check is green, the deploy job moves :main onto that sha and POSTs this
+    # service's Deploy Hook with imgURL naming it. So :main is always the last
+    # green commit, and the dashboard's Manual Deploy > "Deploy latest
+    # reference" deploys that (not what to press after a dashboard rollback:
+    # :main still names the build rolled back from until a fix-forward lands).
+    # An image-backed service has no auto-deploy and no branch — the hook is
+    # the only automated path — so neither `branch` nor `autoDeployTrigger`
+    # belongs here. History: as a source build, Render's
+    # checksPass trigger was seen starting a deploy an hour after the checks
+    # passed (2026-08-12, 89802a7), and the dashboard had it on regardless of
+    # this file — 80205d0 deployed twice on 2026-09-13. Moot now.
     #
-    # CI also pushes the image it builds to ghcr.io/napps9/survey-poc:<sha>
-    # on every green Main run; this service still rebuilds from source. The
-    # switch to deploying that image is the owner's, in the dashboard, and is
-    # written up in docs/DEPLOYMENT_RUNBOOK.md §7 — mirror it here
-    # (`image:` in place of `runtime: docker`) when it is made.
-    autoDeployTrigger: off
+    # This service is not blueprint-managed (the dashboard has disagreed with
+    # this file before): the dashboard is the truth, this file the record. The
+    # switch itself is written up in docs/DEPLOYMENT_RUNBOOK.md §7.
     healthCheckPath: /up
     # Runs once against a fresh instance before it's swapped into rotation -
     # not on every boot like bin/docker-entrypoint's own db:prepare still
@@ -257,6 +264,16 @@ services:
   # burst window that generates no reports. Once the app is on the bucket
   # (ACTIVE_STORAGE_SERVICE=bucket, docs/OBJECT_STORAGE_CUTOVER.md) the worker
   # reads and writes the same store as the web service and the limitation is gone.
+  #
+  # If it is ever created, give it the web service's `runtime: image` +
+  # `image.url` in place of `runtime: docker`, `branch` and `autoDeployTrigger`
+  # (none apply to an image-backed service), so both run the image CI proved —
+  # AND add a second POST to the deploy job in .github/workflows/ci.yml for
+  # this service's own Deploy Hook (same imgURL, after the web service's, red
+  # on failure like it). Deploy hooks are per service and an image-backed
+  # service never auto-deploys, so without that POST the worker would stay on
+  # the :main it was created from and run old job code against every schema
+  # the web service's preDeployCommand migrates after it.
   - type: worker
     name: vertonow-worker
     runtime: docker

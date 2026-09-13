@@ -11,6 +11,11 @@ item off there once you've done the matching section here.
 Render dashboard → the `survey-poc` service → **Deploys** tab → find the last
 known-good deploy → **Rollback to this deploy**.
 
+The service is image-backed (section 7): a rollback re-pulls the earlier
+deploy's image from GHCR by digest, so it works only while that `:<sha>`
+version still exists there — never prune the package — and it moves what is
+live, not the `:main` tag CI maintains.
+
 Two things that make this different from a typical Rails app's rollback:
 
 - **App code and schema roll back independently — code does not roll back the
@@ -258,37 +263,53 @@ locked because the model refuses it itself. An allowed account sees an amber
 "editing a live Verto" bar and a warning modal in place of the lock; the risk
 it describes is real, so keep the list short.
 
-## 7. Deploying the image CI already built (owner's switch)
+## 7. Deploying the image CI built (switched 2026-09-13)
 
-Every green run on `Main` now pushes the production image CI just built to
-`ghcr.io/napps9/survey-poc:<commit sha>` (and `:main`), from the
-`build_image` job in `.github/workflows/ci.yml`. Render still ignores it: the
-deploy hook makes Render rebuild the identical image from source, which is the
-part of push-to-live that CI's 3-4 minutes do not cover. Switching the service
-to the pushed image replaces that rebuild with a pull. It is a dashboard
-change, so it is the owner's, and it should be measured before it is made:
+The `VertoNowMain` service (the dashboard's name for what `render.yaml` and
+section 1 call `survey-poc`) is image-backed: it runs
+`ghcr.io/napps9/survey-poc:main`, the image CI's `build_image` job pushed,
+instead of rebuilding from source after every hook (2–3 minutes per deploy;
+a pull is about one). How a commit reaches production:
 
-1. **Measure first.** Open one recent deploy in the Render dashboard → `survey-poc`
-   → **Deploys** and note the time from "Build started" to "Live". If the
-   build is under a minute, stop here — the switch buys nothing.
-2. **Make the GHCR package pullable.** The package is created private on its
-   first push (GitHub → your profile → Packages → `survey-poc`). Either make
-   it public (a public repo's image contains nothing the repo does not), or
-   create a classic personal access token with `read:packages` for Render.
-3. **Tell Render to deploy the image.** Dashboard → `survey-poc` → Settings:
-   change the source from the GitHub repo to **Deploy an existing image**,
-   URL `ghcr.io/napps9/survey-poc:main`, with the credential from step 2 if
-   the package is private. `preDeployCommand`, the persistent disk and every
-   environment variable stay exactly as they are; only where the image comes
-   from changes. Then mirror it in `render.yaml` (`runtime: docker` →
-   `image: { url: ghcr.io/napps9/survey-poc:main }` plus `registryCredential`)
-   so the blueprint keeps matching the dashboard.
-4. **Keep the hook.** CI's `deploy` job still POSTs the deploy hook after the
-   image is pushed; on an image-backed service the hook pulls the tag and
-   restarts, which is the whole point. The `:main` tag always names the last
-   green commit because `build_image` only pushes from `Main`.
-5. **Rolling back** is unchanged (section 1): Render keeps every deployed
-   image, and "Rollback to this deploy" re-pulls the earlier sha.
+1. Every Main run pushes `ghcr.io/napps9/survey-poc:<sha>` (`build_image`,
+   alongside the test jobs).
+2. Once every other job is green, the `deploy` job moves `:main` onto that
+   sha (`docker buildx imagetools create`, a registry-side retag, no rebuild)
+   and POSTs the Deploy Hook with `imgURL=ghcr.io/napps9/survey-poc:<sha>`.
+   Render pulls that exact image and restarts.
 
-Undo: switch the source back to the GitHub repo. Nothing in the repo changes
-either way except the `render.yaml` mirror in step 3.
+What follows from that:
+
+- **`:main` is always the last green commit** (from this change onward; only
+  the deploy job moves it), so the dashboard's **Manual Deploy → Deploy latest
+  reference** deploys the last green commit — the recovery when a hook POST
+  failed. It is NOT the thing to press after a section 1 rollback: `:main`
+  still names the build you rolled back from until a fix-forward lands.
+- **Nothing deploys on its own.** An image-backed service ignores the
+  repository's pushes and checks, and the dashboard's auto-deploy setting no
+  longer applies to it. The hook (what CI uses), Manual Deploy → Deploy latest
+  reference, Rollback to this deploy, and the Render API all deploy only when
+  asked.
+- **Rollback (section 1) re-pulls from GHCR, not from Render.** Render records
+  each deploy's image digest and "Rollback to this deploy" pulls it again from
+  `ghcr.io/napps9/survey-poc`; Render holds no copy of a pulled image (it did
+  of the source builds this replaced). So never prune the package: the
+  `:<sha>` versions are the rollback history, and the "untagged" versions the
+  package UI shows are the per-platform and provenance manifests each tagged
+  image points at — deleting them breaks that tag. A dashboard rollback moves
+  what is live, not `:main`. To put an exact commit back from CI's side, POST
+  the hook yourself with `imgURL=ghcr.io/napps9/survey-poc:<known-good sha>`.
+- **The GHCR package is public** (a public repo's image contains nothing the
+  repo does not; CI builds it with no secrets), so the service has no registry
+  credential. If the package is ever made private, add a classic personal
+  access token with `read:packages` as a Render registry credential.
+- The switch was made in place (Settings → Build & Deploy → Repository →
+  Edit → Existing Image), with environment variables, the persistent disk
+  and the pre-deploy command untouched. `render.yaml` mirrors the image
+  source, but the service is not blueprint-managed: the dashboard is the
+  truth, the file the record.
+
+Undo: Settings → Repository → Edit → pick the GitHub repository again, and
+drop the `imgURL` parameter from the deploy job's POST in
+`.github/workflows/ci.yml`; Render then rebuilds from source on the next
+hook. The `:<sha>` pushes cost nothing either way.
