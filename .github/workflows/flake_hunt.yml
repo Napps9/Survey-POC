@@ -1,0 +1,79 @@
+# Nightly flake hunt.
+#
+# The gate and CI run the system suite once, at Ferrum's 100ms post-click
+# wait, in the same file order per shard — so a race that shows one run in
+# twenty never gets a name, and "six browser-timing flakes in eighty runs"
+# stays an anecdote. This runs the same shards under stress: a random test
+# order (the seed is printed, so a failure reproduces with
+# `bin/rails test <files> --seed=N`) and a 30ms click wait alongside the
+# ordinary 100ms, twice each — and keeps every shard's per-test timings and
+# failure screenshots whatever the outcome. A flake becomes a named test with
+# a screenshot and a timing.
+#
+# It gates nothing: it is not in the deploy job's `needs`, it has no
+# `continue-on-error` (a red nightly must be visible), and it declares no
+# concurrency group (ci.yml's group is per ref; sharing it would cancel a
+# real CI run on Main). The 30ms arm is the audit list that decides whether
+# FERRUM_CLICK_WAIT can ever be lowered on the gate — see the note above the
+# cuprite require in test/application_system_test_case.rb.
+name: Flake hunt (nightly)
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # SHARDS below must match the length of this list; bin/ci_shard takes
+        # the count explicitly because strategy.job-total is the whole matrix.
+        shard: [ 0, 1, 2, 3, 4, 5 ]
+        click_wait: [ "0.1", "0.03" ]
+        pass: [ 1, 2 ]
+    env:
+      SHARDS: 6
+      RAILS_ENV: test
+      ANTHROPIC_API_KEY: ci-stub-key-no-real-calls
+      # Read when the ferrum gem loads, so it has to be in the environment
+      # before Ruby starts — a job-level env is exactly that.
+      FERRUM_CLICK_WAIT: ${{ matrix.click_wait }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Record the browser
+        run: google-chrome --version || chromium --version || true
+
+      - name: Shard ${{ matrix.shard }}, click wait ${{ matrix.click_wait }}s, pass ${{ matrix.pass }}
+        run: |
+          set -euo pipefail
+          bin/rails db:test:prepare
+          seed=$RANDOM
+          echo "seed=$seed  (reproduce: bin/rails test <files> --seed=$seed)"
+          files=$(bin/ci_shard ${{ matrix.shard }} "$SHARDS")
+          PARALLEL_WORKERS=$(nproc) bin/rails test $files --seed="$seed"
+
+      - name: Keep timings and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake-hunt-wait${{ matrix.click_wait }}-pass${{ matrix.pass }}-shard${{ matrix.shard }}
+          path: |
+            tmp/system_timings.csv
+            tmp/capybara
+          if-no-files-found: ignore

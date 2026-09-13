@@ -60,6 +60,14 @@ run system env ANTHROPIC_API_KEY="$key" bin/rails test:system
 wait
 for c in rubocop brakeman importmap; do read -r status[$c] secs[$c] < "tmp/gate/$c.status"; done
 
+# A failed system run's screenshots (tmp/capybara) would be wiped by the very
+# rerun that tries to reproduce it — test_helper empties that directory at
+# load — so keep a copy where the logs are before anything else runs.
+if [ "${status[system]}" != pass ] && [ -n "$(ls -A tmp/capybara 2>/dev/null)" ]; then
+  rm -rf tmp/gate/capybara && cp -r tmp/capybara tmp/gate/capybara
+  echo "gate: failure screenshots copied to tmp/gate/capybara/ (a rerun empties tmp/capybara)" >&2
+fi
+
 failed=0
 for c in system rubocop brakeman importmap; do
   if [ "${status[$c]}" != pass ]; then

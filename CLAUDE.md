@@ -23,7 +23,10 @@ bin/importmap audit
 it fetches first and refuses to start if the branch is behind origin, runs the
 three static checks alongside the system suite, prints one summary line with
 real durations plus the `--test` flags for `bin/trello_log`, and fetches again
-at the end to say whether a push is still safe. Logs land in `tmp/gate/`.
+at the end to say whether a push is still safe. Logs land in `tmp/gate/`, and
+so does a copy of a failed system run's screenshots — the rerun that tries to
+reproduce the failure empties `tmp/capybara` at load (`KEEP_TEST_STORAGE=1`
+keeps it).
 
 **The full system suite runs before EVERY push — including after a rebase, and
 including when the commits you rebased onto touch none of your files.** No
@@ -35,6 +38,20 @@ was used to skip one.
 Other sessions push to Main through the day, so even a ten-minute gate often
 finishes to find origin has moved. Rebase and run it again. Losing the race is
 the expected cost, not a reason to trim the gate.
+
+**A red Main is fixed with a new commit, never with a re-run.** When a push
+turns CI red, land a fix-forward or a `git revert` — a NEW commit, gated like
+any other — rather than pressing "Re-run failed jobs" to get green. Every CI
+failure in this repo's history has been a browser test that raced (six in 80
+runs, zero product regressions caught), so a re-run's likely outcome is a
+green-by-luck that hides a race the local gate cannot see: by definition it
+passed locally. A red run withholds only its own deploy; the next green push
+deploys the branch head, so speed matters less than the new commit being
+gated. The one legitimate retry is a run that never started
+(`startup_failure`): a `workflow_dispatch` on Main. Owner's standing
+instruction, 2026-09-13. The nightly flake hunt
+(`.github/workflows/flake_hunt.yml`) is where races are meant to be found
+first — read its red runs before they reach a push.
 
 Both suites fork **one worker per core** (`test/test_helper.rb`); each worker
 gets its own SQLite file and, for system tests, its own Puma and Chrome.
