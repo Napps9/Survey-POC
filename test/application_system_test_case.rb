@@ -199,20 +199,61 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # paint is in the fallback face and the text reflows when the woff2 lands —
   # a measurement taken before that swap is of the wrong font. Half the suite
   # reads geometry and nothing else waits on document.fonts.
-  def settle_box(node, max_frames: 90)
-    page.evaluate_async_script(<<~JS, node)
-      const [el, done] = arguments
-      let last = null, same = 0, frames = 0
-      const tick = () => {
-        const r = el.getBoundingClientRect()
-        const key = [r.x, r.y, r.width, r.height].map(Math.round).join(",")
-        same = key === last ? same + 1 : 0
-        last = key
-        if (same >= 2 || ++frames > #{max_frames}) return done()
-        requestAnimationFrame(tick)
-      }
-      document.fonts.ready.then(() => requestAnimationFrame(tick))
-    JS
+  #
+  # The budget: Cuprite hands evaluate_async_script Capybara's
+  # default_max_wait_time as the SCRIPT timeout (cuprite driver.rb,
+  # session_wait_time) — 2s in this suite, which never sets it. Ninety frames
+  # is 1.5s at 60fps before any font has landed, and a runner with four
+  # Chromes on four cores paints a frame every 30-50ms: 2026-09-13 two CI jobs
+  # died here on Ferrum::ScriptTimeoutError. So this one call gets its own
+  # budget (using_wait_time, not the suite-wide default the retrying matchers
+  # use) and the script bounds itself at 80% of it — a wall-clock deadline on
+  # every tick, and a timer that finishes it even if no animation frame ever
+  # fires — so it always returns: a page that never settles is said on
+  # stderr, the way wait_for_stimulus says it, never raised. Returns whether
+  # the box settled. Ferrum's own CDP command timeout (`timeout: 20` on the
+  # driver) is the ceiling any `timeout:` here can reach.
+  def settle_box(node, max_frames: 90, timeout: 10)
+    # Below the driver's `timeout: 20` (its CDP command timeout, registered
+    # above): past it the driver raises Ferrum::TimeoutError before the script
+    # can answer, the opaque error this budget exists to remove.
+    raise ArgumentError, "settle_box timeout: must be 1..19s (the driver's own is 20)" unless timeout.between?(1, 19)
+
+    deadline_ms = (timeout * 800).to_i
+    result = Capybara.using_wait_time(timeout) do
+      page.evaluate_async_script(<<~JS, node)
+        const [el, done] = arguments
+        const started = performance.now(), deadline = started + #{deadline_ms}
+        let last = null, same = 0, frames = 0, finished = false, fonts = false
+        const finish = (settled) => {
+          if (finished) return
+          finished = true
+          done({ settled, frames, fonts, ms: Math.round(performance.now() - started) })
+        }
+        setTimeout(() => finish(false), #{deadline_ms} + 100)
+        const tick = () => {
+          if (finished) return
+          const r = el.getBoundingClientRect()
+          const key = [r.x, r.y, r.width, r.height].map(Math.round).join(",")
+          same = key === last ? same + 1 : 0
+          last = key
+          if (same >= 2) return finish(true)
+          if (++frames > #{max_frames} || performance.now() > deadline) return finish(false)
+          requestAnimationFrame(tick)
+        }
+        const fontsOrDeadline = Promise.race([
+          document.fonts.ready.then(() => { fonts = true }),
+          new Promise((resolve) => setTimeout(resolve, #{deadline_ms}))
+        ])
+        fontsOrDeadline.then(() => requestAnimationFrame(tick))
+      JS
+    end
+    unless result["settled"]
+      warn "settle_box: #{node.tag_name}.#{node[:class].to_s.split.join('.')} " \
+           "#{result['fonts'] ? 'still moving' : 'never saw the fonts land'} after " \
+           "#{result['frames']} frames / #{result['ms']}ms on #{current_path}"
+    end
+    result["settled"]
   end
 
   # Type keys with no pointer involved. Cuprite's Element#send_keys CLICKS the
