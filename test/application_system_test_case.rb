@@ -65,6 +65,17 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     BROWSER_CANDIDATES.find { |path| File.executable?(path.to_s) }
   end
 
+  # Say which browser this run drives. The local gate resolves to the
+  # container's Playwright build and CI to whatever ubuntu-latest ships, and
+  # until now neither log recorded which — a rendering or timing difference
+  # between the two had nowhere to be seen. Once per run, in the parent.
+  if (announced_browser = browser_path)
+    announced_version = `#{announced_browser} --version 2>/dev/null`.strip
+    warn "system tests: #{announced_version.empty? ? announced_browser : announced_version} (#{announced_browser})"
+  else
+    warn "system tests: browser left to Ferrum's own detection"
+  end
+
   Capybara.register_driver(:cuprite_headless) do |app|
     Capybara::Cuprite::Driver.new(
       app,
@@ -80,7 +91,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       # browser doesn't know that and dutifully goes to the internet for them.
       # Ferrum then gives up waiting ("still pending connections: …") and the
       # run fails on a public CDN's opinion of four 404s. That blocked a deploy
-      # once already: render.yaml gates on autoDeployTrigger: checksPass, so a
+      # once already: CI's deploy job only fires when every job is green, so a
       # flake here doesn't just annoy, it stops a ship.
       #
       # Blocked by "isn't the local server" rather than by naming hosts, so the
