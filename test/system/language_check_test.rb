@@ -167,6 +167,41 @@ class LanguageCheckSystemTest < ApplicationSystemTestCase
     assert_selector ".lc-rail-status--working"
   end
 
+  test "the rail refreshes itself when a translation finishes, without a reload" do
+    # The whole point of the poll: you should not have to guess when to press
+    # reload. The job is done out of band here — that is exactly what a
+    # background worker landing behind an open page looks like.
+    @survey.language_checks.destroy_all
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
+                               attempts: 1, started_at: 5.seconds.ago)
+
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+    assert_selector ".lc-rail-status--working"
+
+    # French lands while the page sits there.
+    cards = @survey.reload.cards.map do |c|
+      c.merge("i18n" => (c["i18n"] || {}).merge(
+        "fr" => { "text" => "fr:#{c['text']}", "options" => Array(c["options"]).map { |o| "fr:#{o}" } }
+      ))
+    end
+    @survey.update!(cards: cards)
+    SurveyTranslation.find_by(survey: @survey, locale: "fr").done!
+
+    # No reload from the test — the page has to notice on its own.
+    assert_selector ".lc-rail-item", text: /French/, wait: 15
+    assert_no_selector ".lc-rail-status--working", wait: 15
+    within(".lc-rail") { assert_text "Translated", wait: 15 }
+  end
+
+  test "a page with nothing running does not poll" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+    assert_selector "[data-language-status-working-value='false']"
+  end
+
   # ── The share modal ────────────────────────────────────────────────────────
 
   test "the reviewer links open from the top of the screen, not the bottom" do

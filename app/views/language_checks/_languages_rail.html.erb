@@ -8,7 +8,15 @@
     English. See LanguageCheckLines.coverage.
 
     Locals: survey, locales, coverage, addable, editable, runs %>
-<aside class="lc-rail" id="language-check-languages">
+<%
+  # Poll only while something is outstanding. display_status, not status, so a
+  # run abandoned by a dead worker does not keep a tab asking for ever.
+  working = locales.any? { |c| c != survey.default_locale && runs[c]&.display_status.in?(%w[queued running]) }
+%>
+<aside class="lc-rail" id="language-check-languages"
+       data-controller="language-status"
+       data-language-status-url-value="<%= survey_language_check_status_path(survey) %>"
+       data-language-status-working-value="<%= working %>">
   <h2 class="lc-rail-title"><%= t("language_check.rail_title") %></h2>
 
 
@@ -17,7 +25,7 @@
       <% loc  = SupportedLocales.find(code) %>
       <% cov  = coverage[code] || { total: 0, translated: 0, primary: false } %>
       <% done = cov[:total].positive? && cov[:translated] == cov[:total] %>
-      <li class="lc-rail-item<%= ' is-primary' if cov[:primary] %>">
+      <li class="lc-rail-item<%= ' is-primary' if cov[:primary] %>" data-language-row="<%= code %>">
         <span class="lc-rail-lang">
           <span aria-hidden="true"><%= loc&.flag %></span>
           <span class="lc-rail-name"><%= loc&.english_name || code %></span>
@@ -34,13 +42,14 @@
         <% elsif state == "done" %>
           <span class="lc-rail-status lc-rail-status--done"><%= t("language_check.rail_translated") %></span>
         <% elsif state == "queued" || state == "running" %>
-          <span class="lc-rail-status lc-rail-status--working"><%= t("language_check.rail_translating") %></span>
+          <span class="lc-rail-status lc-rail-status--working">
+            <%= t("language_check.rail_translating") %>
+            <span data-language-count><%= t("language_check.rail_progress", done: cov[:translated], total: cov[:total]) if cov[:total].positive? %></span>
+          </span>
         <% elsif state == "failed" %>
           <span class="lc-rail-status lc-rail-status--failed"><%= t("language_check.rail_failed") %></span>
         <% else %>
-          <span class="lc-rail-status">
-            <%= t("language_check.rail_progress", done: cov[:translated], total: cov[:total]) %>
-          </span>
+          <span class="lc-rail-status" data-language-count><%= t("language_check.rail_progress", done: cov[:translated], total: cov[:total]) %></span>
         <% end %>
         <%# Offered on ANY language that is not finished and not actively being
             worked on — not only on a row that managed to record a failure.

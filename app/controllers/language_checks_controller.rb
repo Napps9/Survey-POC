@@ -76,6 +76,44 @@ class LanguageChecksController < ApplicationController
     redirect_back_to_screen
   end
 
+  # GET /surveys/:id/language_check/status — what the rail polls while a
+  # language is being translated.
+  #
+  # The screen was a plain server render, so a translation finishing behind it
+  # changed nothing on the page: the only way to learn a language had landed
+  # was to guess when to press reload. Telling somebody "give it a minute, then
+  # reload" is a worse version of the spinner that never resolves — it still
+  # makes them do the waiting, and it still leaves them unsure whether nothing
+  # has happened or nothing is going to.
+  #
+  # Returns only what the rail needs to decide whether to keep asking, so the
+  # poll stays cheap on a page somebody leaves open.
+  def status
+    runs  = SurveyTranslation.index_for(@survey)
+    cards = LanguageCheckLines.for(@survey)
+    cover = LanguageCheckLines.coverage(cards, @survey.verto_locales, @survey.default_locale)
+
+    languages = @survey.verto_locales.map do |code|
+      run = runs[code]
+      {
+        locale:    code,
+        state:     code == @survey.default_locale ? "primary" :
+                     (cover[code][:translated] == cover[code][:total] && cover[code][:total].positive? ?
+                        "done" : (run&.display_status || "none")),
+        translated: cover[code][:translated],
+        total:      cover[code][:total]
+      }
+    end
+
+    render json: {
+      ok: true,
+      # display_status, so a run abandoned by a dead process stops the poll
+      # rather than keeping a tab asking for ever.
+      working: languages.any? { |l| %w[queued running].include?(l[:state]) },
+      languages: languages
+    }
+  end
+
   # POST /surveys/:id/language_check/languages/retry — run one language again
   # after it failed. The rail only offers this on a spent row, so it is the
   # creator saying "yes, try that again" rather than a second silent attempt.

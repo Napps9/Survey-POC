@@ -401,6 +401,70 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
     assert_nil row.last_error
   end
 
+  # ── The status poll ────────────────────────────────────────────────────────
+
+  test "the status endpoint says whether anything is still outstanding" do
+    sign_in
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
+                               attempts: 1, started_at: 10.seconds.ago)
+
+    get survey_language_check_status_path(@survey)
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body["working"], "a live run must keep the page asking"
+    fr = body["languages"].find { |l| l["locale"] == "fr" }
+    assert_equal "running", fr["state"]
+    assert_equal 2, fr["total"]
+  end
+
+  test "a stale run stops the poll rather than keeping a tab asking for ever" do
+    sign_in
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
+                               attempts: 1, started_at: 2.hours.ago)
+
+    get survey_language_check_status_path(@survey)
+    body = JSON.parse(response.body)
+    assert_not body["working"], "the clock is what decides a dead run, and the poll must respect it"
+    assert_equal "failed", body["languages"].find { |l| l["locale"] == "fr" }["state"]
+  end
+
+  test "a Verto with nothing running never starts the poll" do
+    sign_in
+    get survey_language_check_status_path(@survey)
+    assert_not JSON.parse(response.body)["working"]
+
+    get survey_language_check_path(@survey)
+    assert_match 'data-language-status-working-value="false"', response.body,
+                 "a page left open on a finished Verto must cost nothing"
+  end
+
+  test "the page arms the poll when a language is being translated" do
+    sign_in
+    SurveyTranslation.create!(survey: @survey, locale: "fr", status: "queued", attempts: 0)
+
+    get survey_language_check_path(@survey)
+    assert_match 'data-language-status-working-value="true"', response.body
+    assert_match survey_language_check_status_path(@survey), response.body
+  end
+
+  test "the completed original is never reported as outstanding" do
+    sign_in
+    get survey_language_check_status_path(@survey)
+    en = JSON.parse(response.body)["languages"].find { |l| l["locale"] == "en" }
+    assert_equal "primary", en["state"]
+  end
+
+  test "another organisation cannot poll this Verto's progress" do
+    other = User.create!(name: "O", email_address: "o2-#{SecureRandom.hex(3)}@test.com",
+                         password: "verylongpassword")
+    other_org = Organisation.create!(name: "O", slug: "o2-#{SecureRandom.hex(3)}")
+    other_org.memberships.create!(user: other, role: "admin")
+    sign_in(other)
+
+    get survey_language_check_status_path(@survey)
+    assert_response :not_found
+  end
+
   test "a viewer seat cannot retry a language" do
     viewer = User.create!(name: "V", email_address: "v4-#{SecureRandom.hex(3)}@test.com",
                           password: "verylongpassword")
