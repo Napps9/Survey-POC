@@ -1106,10 +1106,10 @@ en:
     m_more: "More"
     m_delete_card: "Delete this card"
     duplicate_card: 'Duplicate'
-    modal_add: "Add Pop Up"
-    modal_on: "Pop Up on"
+    modal_add: "Add pop-up"
+    modal_on: "Pop-up on"
     modal_toggle_title: "Add a pop-up that explains this card"
-    modal_chrome: "Pop Up · shown over this card"
+    modal_chrome: "Pop-up · shown over this card"
     modal_expand: "Show this pop-up as a respondent sees it"
     modal_collapse: "Fold this pop-up away"
     modal_remove: "Remove"
