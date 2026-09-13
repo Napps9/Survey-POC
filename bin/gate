@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# The push-to-Main gate (CLAUDE.md, "Git workflow") as one command.
+#
+#   bin/gate              run the five checks, in the order that fails fastest
+#   bin/gate --no-fetch   skip the origin checks (offline, or a throwaway branch)
+#
+# Fetches FIRST and refuses to start if this branch is behind origin: a rebase
+# before a six-minute run, not after it. Then the unit suite; then the system
+# suite with rubocop, brakeman and the importmap audit alongside it (they take
+# one core for about 25 seconds); then one summary line with real durations
+# and the five NAME:STATUS pairs bin/trello_log accepts; then a final fetch
+# that says whether a push is still safe. The rule in CLAUDE.md is the five
+# commands — this only runs them. Logs land in tmp/gate/.
+set -uo pipefail
+cd "$(dirname "$0")/.."
+
+fetch=1
+[ "${1:-}" = "--no-fetch" ] && fetch=0
+branch=$(git rev-parse --abbrev-ref HEAD)
+mkdir -p tmp/gate
+
+behind() { git fetch -q origin "$branch" 2>/dev/null && git rev-list --count "HEAD..origin/$branch" 2>/dev/null || echo 0; }
+
+if [ "$fetch" = 1 ]; then
+  n=$(behind)
+  if [ "$n" != 0 ]; then
+    echo "gate: $branch is behind origin/$branch by $n commit(s) — rebase first, then run the gate:" >&2
+    echo "      git pull --rebase origin $branch && bin/gate" >&2
+    exit 2
+  fi
+fi
+
+# The service constructors ENV.fetch the key and the suite stubs every real
+# client, so a placeholder is enough — set on the test commands only, never
+# session-wide: a session-wide stub would flip the ENV["ANTHROPIC_API_KEY"]
+# .present? gates in the app and disable the no-key fallbacks CLAUDE.md
+# documents for the Trello summary and i18n:translate.
+key="${ANTHROPIC_API_KEY:-stub}"
+
+declare -A secs status
+run() { # run NAME CMD... — timed, logged, status recorded
+  local name=$1; shift
+  local start=$SECONDS
+  if "$@" > "tmp/gate/$name.log" 2>&1; then status[$name]=pass; else status[$name]=fail; fi
+  secs[$name]=$(( SECONDS - start ))
+}
+
+run unit env ANTHROPIC_API_KEY="$key" bin/rails test
+if [ "${status[unit]}" != pass ]; then
+  tail -n 40 tmp/gate/unit.log
+  echo "gate: rails test failed after ${secs[unit]}s (tmp/gate/unit.log)" >&2
+  exit 1
+fi
+
+# The static checks are light; run them while the browsers are busy.
+( run rubocop bin/rubocop; echo "${status[rubocop]} ${secs[rubocop]}" > tmp/gate/rubocop.status ) &
+( run brakeman bin/brakeman --no-pager; echo "${status[brakeman]} ${secs[brakeman]}" > tmp/gate/brakeman.status ) &
+( run importmap bin/importmap audit; echo "${status[importmap]} ${secs[importmap]}" > tmp/gate/importmap.status ) &
+run system env ANTHROPIC_API_KEY="$key" bin/rails test:system
+wait
+for c in rubocop brakeman importmap; do read -r status[$c] secs[$c] < "tmp/gate/$c.status"; done
+
+failed=0
+for c in system rubocop brakeman importmap; do
+  if [ "${status[$c]}" != pass ]; then
+    failed=1
+    echo "---- $c failed (tmp/gate/$c.log):" >&2
+    tail -n 30 "tmp/gate/$c.log" >&2
+  fi
+done
+
+total=$(( secs[unit] + secs[system] ))
+echo
+echo "gate: unit ${secs[unit]}s ${status[unit]} · system ${secs[system]}s ${status[system]} · rubocop ${secs[rubocop]}s ${status[rubocop]} · brakeman ${secs[brakeman]}s ${status[brakeman]} · importmap ${secs[importmap]}s ${status[importmap]} · ${total}s in all"
+echo "trello: --test \"rails test:${status[unit]}\" --test \"rails test:system:${status[system]}\" --test \"rubocop:${status[rubocop]}\" --test \"brakeman:${status[brakeman]}\" --test \"importmap audit:${status[importmap]}\""
+
+[ "$failed" = 0 ] || exit 1
+
+if [ "$fetch" = 1 ]; then
+  n=$(behind)
+  if [ "$n" != 0 ]; then
+    echo "gate: green, but origin/$branch moved by $n commit(s) during the run — rebase and run the gate again (CLAUDE.md)." >&2
+    exit 3
+  fi
+  echo "gate: green and up to date with origin/$branch — safe to push."
+fi

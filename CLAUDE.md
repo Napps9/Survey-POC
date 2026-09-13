@@ -19,6 +19,12 @@ bin/brakeman --no-pager
 bin/importmap audit
 ```
 
+`bin/gate` runs exactly those five, in that order, and is the way to run them:
+it fetches first and refuses to start if the branch is behind origin, runs the
+three static checks alongside the system suite, prints one summary line with
+real durations plus the `--test` flags for `bin/trello_log`, and fetches again
+at the end to say whether a push is still safe. Logs land in `tmp/gate/`.
+
 **The full system suite runs before EVERY push — including after a rebase, and
 including when the commits you rebased onto touch none of your files.** No
 shortcut on the grounds that the overlap is zero, that the suite passed before
@@ -47,7 +53,7 @@ log a card summarizing what shipped:
 bin/trello_log "Short title of what shipped" "1-3 sentence summary" \
   --frontend "What changed in views/Stimulus/Tailwind, if anything." \
   --backend "What changed in models/controllers/services, if anything." \
-  --test "rails test:pass" --test "rubocop:pass" \
+  --test "rails test:pass" --test "rails test:system:pass" --test "rubocop:pass" \
   --test "brakeman:pass" --test "importmap audit:pass" \
   --screenshot tmp/screenshots/whatever.png \
   --points 5
@@ -64,7 +70,8 @@ into weekly lists, should one reappear.) `--frontend`/`--backend` are
 rendered as `## Frontend`/`## Backend` sections in the card description —
 omit whichever side didn't change. `--test NAME:STATUS` (repeatable) adds a
 "Tests" checklist item per suite, checked iff STATUS is `pass` — use the
-actual result of the four commands above, not a guess. `--screenshot PATH`
+actual result of the five commands above, not a guess (`bin/gate` prints the
+flags ready to paste). `--screenshot PATH`
 (repeatable) attaches a mockup/screenshot file to the card; only pass this
 when the change is user-visible and a screenshot was actually taken (e.g. via
 the `/verify` skill) — don't invent one. `--points N` sets a Fibonacci story
@@ -99,7 +106,10 @@ to run it after every push.
 Render deploys `Main` when CI's `deploy` job POSTs the service's Deploy Hook,
 which it does only once every other job in `.github/workflows/ci.yml` (test,
 test_postgres, system_test, lint, scan_ruby, scan_js, build_image) is green on
-that commit; `render.yaml` has `autoDeployTrigger: off`. A red push to Main
+that commit; `render.yaml` has `autoDeployTrigger: off`, so that hook is the
+only path and the job goes red rather than quiet if the secret is missing or
+the POST fails. A `workflow_dispatch` on Main deploys too — that is the
+recovery for a run that died with `startup_failure`. A red push to Main
 therefore doesn't deploy — but don't rely on that: push green.
 
 ## Gotchas

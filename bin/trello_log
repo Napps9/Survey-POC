@@ -40,6 +40,19 @@ if options[:points] && !TrelloClient::FIB_LABEL_COLORS.key?(options[:points])
   abort "Invalid --points #{options[:points]} (must be one of: #{TrelloClient::FIB_LABEL_COLORS.keys.join(', ')})"
 end
 
+# Validated here, before any card exists: an abort mid-checklist would leave a
+# half-populated card on the board. The name may itself carry colons ("rails
+# test:system"), so the status is whatever follows the LAST one — splitting on
+# the first turned "rails test:system:pass" into a checklist item named
+# "rails test" with status "system:pass", i.e. an unchecked box, silently.
+tests = options[:tests].map do |entry|
+  name, sep, result = entry.rpartition(":")
+  unless !sep.empty? && !name.empty? && result.match?(/\A(pass|fail)\z/i)
+    abort "Malformed --test entry (expected NAME:pass or NAME:fail): #{entry}"
+  end
+  [ name, result.casecmp?("pass") ]
+end
+
 summary = ARGV[1] || ""
 list_name = ENV["TRELLO_LIST_NAME"]
 auth = { key: ENV.fetch("TRELLO_API_KEY"), token: ENV.fetch("TRELLO_TOKEN") }
@@ -66,14 +79,11 @@ card_params[:idLabels] = TrelloClient.points_label_id(options[:points], auth) if
 
 card = TrelloClient.request(:post, "/cards", card_params)
 
-unless options[:tests].empty?
+unless tests.empty?
   checklist = TrelloClient.request(:post, "/checklists", auth.merge(idCard: card["id"], name: "Tests"))
-  options[:tests].each do |entry|
-    name, status = entry.split(":", 2)
-    abort "Malformed --test entry (expected NAME:STATUS): #{entry}" if status.nil?
-
+  tests.each do |name, checked|
     TrelloClient.request(:post, "/checklists/#{checklist['id']}/checkItems",
-                          auth.merge(name: name, checked: status.casecmp?("pass")))
+                          auth.merge(name: name, checked: checked))
   end
 end
 

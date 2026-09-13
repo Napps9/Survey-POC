@@ -24,6 +24,12 @@ services:
     # hour after the checks passed (2026-08-12, 89802a7), and with both on
     # every commit would deploy twice. Restore `checksPass` here if the hook
     # path ever needs to be retired.
+    #
+    # CI also pushes the image it builds to ghcr.io/napps9/survey-poc:<sha>
+    # on every green Main run; this service still rebuilds from source. The
+    # switch to deploying that image is the owner's, in the dashboard, and is
+    # written up in docs/DEPLOYMENT_RUNBOOK.md §7 — mirror it here
+    # (`image:` in place of `runtime: docker`) when it is made.
     autoDeployTrigger: off
     healthCheckPath: /up
     # Runs once against a fresh instance before it's swapped into rotation -

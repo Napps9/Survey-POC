@@ -257,3 +257,38 @@ else: organisation scoping is unchanged, and the primary-language switch stays
 locked because the model refuses it itself. An allowed account sees an amber
 "editing a live Verto" bar and a warning modal in place of the lock; the risk
 it describes is real, so keep the list short.
+
+## 7. Deploying the image CI already built (owner's switch)
+
+Every green run on `Main` now pushes the production image CI just built to
+`ghcr.io/napps9/survey-poc:<commit sha>` (and `:main`), from the
+`build_image` job in `.github/workflows/ci.yml`. Render still ignores it: the
+deploy hook makes Render rebuild the identical image from source, which is the
+part of push-to-live that CI's 3-4 minutes do not cover. Switching the service
+to the pushed image replaces that rebuild with a pull. It is a dashboard
+change, so it is the owner's, and it should be measured before it is made:
+
+1. **Measure first.** Open one recent deploy in the Render dashboard → `survey-poc`
+   → **Deploys** and note the time from "Build started" to "Live". If the
+   build is under a minute, stop here — the switch buys nothing.
+2. **Make the GHCR package pullable.** The package is created private on its
+   first push (GitHub → your profile → Packages → `survey-poc`). Either make
+   it public (a public repo's image contains nothing the repo does not), or
+   create a classic personal access token with `read:packages` for Render.
+3. **Tell Render to deploy the image.** Dashboard → `survey-poc` → Settings:
+   change the source from the GitHub repo to **Deploy an existing image**,
+   URL `ghcr.io/napps9/survey-poc:main`, with the credential from step 2 if
+   the package is private. `preDeployCommand`, the persistent disk and every
+   environment variable stay exactly as they are; only where the image comes
+   from changes. Then mirror it in `render.yaml` (`runtime: docker` →
+   `image: { url: ghcr.io/napps9/survey-poc:main }` plus `registryCredential`)
+   so the blueprint keeps matching the dashboard.
+4. **Keep the hook.** CI's `deploy` job still POSTs the deploy hook after the
+   image is pushed; on an image-backed service the hook pulls the tag and
+   restarts, which is the whole point. The `:main` tag always names the last
+   green commit because `build_image` only pushes from `Main`.
+5. **Rolling back** is unchanged (section 1): Render keeps every deployed
+   image, and "Rollback to this deploy" re-pulls the earlier sha.
+
+Undo: switch the source back to the GitHub repo. Nothing in the repo changes
+either way except the `render.yaml` mirror in step 3.

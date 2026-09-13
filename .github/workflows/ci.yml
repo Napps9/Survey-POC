@@ -5,10 +5,12 @@ on:
   push:
     branches: [ Main, main ]
   # A run that dies with `startup_failure` never started, so GitHub refuses to
-  # retry it — and render.yaml gates deploys on checks passing, so that commit
-  # sits undeployed with nothing to click. Without this trigger the only way
-  # back is an empty commit. 2026-08-26: one push produced two runs, one stuck
-  # queued and one startup_failure, and the deploy waited on both.
+  # retry it — and the deploy job below only fires from a green run, so that
+  # commit sits undeployed with nothing to click. A dispatch on Main runs the
+  # whole workflow, deploy included (its `if` tests the ref, not the event).
+  # Without this trigger the only way back is an empty commit. 2026-08-26: one
+  # push produced two runs, one stuck queued and one startup_failure, and the
+  # deploy waited on both.
   workflow_dispatch:
 
 # One run per ref at a time; a newer push cancels the older run. On Main this
@@ -103,9 +105,10 @@ jobs:
       fail-fast: false
       matrix:
         # The one knob for re-balancing. bin/ci_shard deals the sorted file
-        # list across however many entries are here; with the 2026-09-12
-        # timings four shards finish within ~40s of each other.
-        shard: [ 0, 1, 2, 3 ]
+        # list across however many entries are here; a six-way split of the
+        # 2026-09-13 per-file timings lands within ~40s across shards, which
+        # is why it is six and not a timing-weighted split.
+        shard: [ 0, 1, 2, 3, 4, 5 ]
 
     steps:
       - name: Checkout code
@@ -131,6 +134,12 @@ jobs:
       # test/system, which is what lets `bin/rails test` run browser tests
       # here. They also skip test:prepare, but nothing depends on it: the
       # system test base class builds the Tailwind stylesheet itself at load.
+      # The local gate drives the container's Playwright Chromium; this job
+      # drives whatever the runner image ships. Say which, so a rendering or
+      # timing difference between the two has somewhere to be seen.
+      - name: Record the browser
+        run: google-chrome --version || chromium --version || true
+
       - name: Run system tests (shard ${{ matrix.shard }} of ${{ strategy.job-total }})
         env:
           RAILS_ENV: test
@@ -203,17 +212,19 @@ jobs:
         run: bin/rubocop -f github
 
   # Deploys are triggered from HERE, the moment every check above is green,
-  # by POSTing the service's Render Deploy Hook. Render's own checksPass
-  # trigger stays on as the fallback — it has been observed lagging a green
-  # commit by a full hour (2026-08-12, 89802a7: checks green 11:43, auto
-  # deploy 12:43), which is what forced manual deploys. With the
-  # RENDER_DEPLOY_HOOK_URL secret unset this job is a no-op and the fallback
-  # carries the deploy exactly as before.
+  # by POSTing the service's Render Deploy Hook. This is the ONLY path:
+  # render.yaml has autoDeployTrigger: off, because Render's own checksPass
+  # trigger was observed lagging a green commit by a full hour (2026-08-12,
+  # 89802a7: checks green 11:43, auto deploy 12:43). So a missing secret or a
+  # failed POST is a red job, never a quiet no-op — a green run that deploys
+  # nothing is the trap. Fires for a push AND for a workflow_dispatch on Main
+  # (the startup_failure hatch above); pull requests carry refs/pull/N/merge
+  # and stay excluded by the ref test.
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [ test, test_postgres, system_test, scan_ruby, scan_js, lint, build_image ]
-    if: github.ref == 'refs/heads/Main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/Main'
 
     steps:
       - name: Trigger the Render deploy
@@ -223,19 +234,22 @@ jobs:
         # silently and only the outcome is printed.
         run: |
           if [ -z "$HOOK" ]; then
-            echo "RENDER_DEPLOY_HOOK_URL is not set — leaving this deploy to Render's checksPass trigger."
-            exit 0
+            echo "::error::RENDER_DEPLOY_HOOK_URL is not set, and render.yaml has autoDeployTrigger off — nothing will deploy this commit."
+            exit 1
           fi
           if curl -fsS -X POST "$HOOK" -o /dev/null; then
             echo "Render deploy triggered."
           else
-            echo "Deploy hook POST failed — Render's checksPass trigger remains the fallback." >&2
+            echo "::error::Deploy hook POST failed — nothing else will deploy this commit; re-run this job or deploy from the Render dashboard."
             exit 1
           fi
 
   build_image:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -244,16 +258,33 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Proves the exact Dockerfile Render deploys actually builds. No push,
-      # no registry credentials, no app secrets needed - docker build only
-      # runs bundle install, bootsnap precompile, and
-      # SECRET_KEY_BASE_DUMMY=1 assets:precompile (already in the Dockerfile).
+      # On Main the image is also PUSHED to GHCR, tagged with the commit, so
+      # the thing Render deploys can be the thing CI proved — today Render
+      # rebuilds the identical image from source after the deploy hook and
+      # this build is thrown away. Switching the service to that image is a
+      # Render-side change (registry credential, image-backed service; see
+      # docs/DEPLOYMENT_RUNBOOK.md §7) that the owner makes; until then the
+      # push costs a few seconds and changes nothing about the deploy.
+      - name: Log in to GHCR
+        if: github.ref == 'refs/heads/Main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Proves the exact Dockerfile Render deploys actually builds. No app
+      # secrets needed - docker build only runs bundle install, bootsnap
+      # precompile, and SECRET_KEY_BASE_DUMMY=1 assets:precompile (already in
+      # the Dockerfile).
       - name: Build the production image
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
-          tags: survey-poc:ci-${{ github.sha }}
+          push: ${{ github.ref == 'refs/heads/Main' }}
+          tags: |
+            ghcr.io/napps9/survey-poc:${{ github.sha }}
+            ghcr.io/napps9/survey-poc:main
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

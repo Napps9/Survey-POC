@@ -101,8 +101,10 @@ A few things that surprise people:
   cache layout). Player content/markup/CSS fixes ship on their own: the
   player HTML is network-first, so respondents pick them up on their next
   ordinary online visit.
-- **Deploys are gated on CI.** `autoDeployTrigger: checksPass` means a red push
-  to `Main` doesn't ship — but don't lean on that; push green.
+- **Deploys are gated on CI.** CI's `deploy` job POSTs the Render deploy hook
+  only once every other job is green on that commit (`render.yaml` has
+  `autoDeployTrigger: off`), so a red push to `Main` doesn't ship — but don't
+  lean on that; push green.
 
 ## Documentation
 
