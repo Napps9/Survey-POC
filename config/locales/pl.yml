@@ -1968,7 +1968,7 @@ pl:
     too_many: "To sporo prób — odczekaj kilka minut."
     link_sent: "Jeśli ten adres ma konto, link do logowania jest w drodze."
   you:
-    eyebrow: "Twoje Vertos"
+    eyebrow: "Moje Vertos"
     kept:
       one: "Zachowano 1 Verto"
       other: "Zachowano %{count} Vertos"
@@ -1981,9 +1981,7 @@ pl:
     delete: "Usuń moje konto"
     delete_confirm: "To usuwa twoje konto i listę Vertos, które zachowałeś. Twoje odpowiedzi zostają u organizacji, które o nie prosiły — zostały udzielone anonimowo i nie do nas należy ich usuwanie. Kontynuować?"
     deleted: "Twoje konto zostało usunięte."
-    tabs_label: "Twoje konto"
-    tab_vertos: "Vertos"
-    back: "Twoje Vertos"
+    back: "Moje Vertos"
     not_found: "Tego Verto nie ma na twoim koncie."
     answered_on: "Odpowiedziałeś %{date}"
     have_answered:
@@ -2006,7 +2004,6 @@ pl:
     wallet_orgs:
       one: "1 organizacja"
       other: "%{count} organizacji"
-    tab_next: "Dalej"
     impact_link_default: "Czytaj więcej"
     next_step_title: "Co dzieje się dalej"
     impact_title: "Co zmieniły twoje odpowiedzi"
@@ -2015,12 +2012,15 @@ pl:
     next_title: "Co dalej"
     next_because: "Ponieważ zagrałeś w %{verto}"
     next_meta: "Otwarte teraz"
-    next_empty: "Na razie nic nowego. Dostaniesz e-mail, gdy któraś z organizacji, którym odpowiedziałeś, coś opublikuje."
     wallet_note: "Każde Verto ustala własne żetony i własne wartości, więc te stosy nie są tym samym co siebie nawzajem. Suma istnieje, bo miło ją mieć; nie ma rankingu między Vertos, bo mierzyłby tylko to, w które Verto akurat zagrałeś."
     wallet_pill: "Twój portfel: zebrano %{total}"
     wallet_see_all: "Zobacz wszystko"
     compare_pending: "Porównanie otworzy się przy %{needed} odpowiedziach (na razie %{have})"
     compare_closed: "%{org} nie udostępniła tych wyników"
+    cta_compare: "Porównaj wyniki"
+    cta_impact: "Śledź, co z tego wyniknie"
+    cta_share: "Udostępnij innym"
+    share_copied: "Skopiowano link"
   player_notification_mailer:
     via: "%{org} · przez Playverto"
     why: "Dostajesz to, bo poprosiłeś o wiadomości od organizacji, których Vertos wypełniłeś."

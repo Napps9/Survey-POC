@@ -1968,7 +1968,7 @@ sn:
     too_many: "Ndiko kuedza kwakawanda — ipa maminitsi mashoma."
     link_sent: "Kana kero iyi iine akaundi, link yekupinda iri kuuya."
   you:
-    eyebrow: "MaVerto ako"
+    eyebrow: "MaVerto angu"
     kept:
       one: "Verto 1 rakachengetwa"
       other: "MaVerto %{count} akachengetwa"
@@ -1981,9 +1981,7 @@ sn:
     delete: "Dzima akaundi yangu"
     delete_confirm: "Izvi zvinodzima akaundi yako nerondedzero yemaVerto awakachengeta. Mhinduro dzako dzinoramba dziri kumasangano akabvunza — dzakapiwa pasina mazita uye hadzisi dzedu kuti tidzibvise. Unoenderera mberi?"
     deleted: "Akaundi yako yadzimwa."
-    tabs_label: "Akaundi yako"
-    tab_vertos: "MaVerto"
-    back: "MaVerto ako"
+    back: "MaVerto angu"
     not_found: "Verto iroro harisi muakaundi yako."
     answered_on: "Wakapindura pa%{date}"
     have_answered:
@@ -2006,7 +2004,6 @@ sn:
     wallet_orgs:
       one: "sangano 1"
       other: "masangano %{count}"
-    tab_next: "Zvinotevera"
     impact_link_default: "Verenga zvimwe"
     next_step_title: "Zvinoitika zvinotevera"
     impact_title: "Zvakaitwa nemhinduro dzako"
@@ -2015,12 +2012,15 @@ sn:
     next_title: "Zvinotevera"
     next_because: "Nekuti wakatamba %{verto}"
     next_meta: "Vhura izvozvi"
-    next_empty: "Hapana chitsva parizvino. Uchawana email kana rimwe remasangano awakapindura richiburitsa chimwe chinhu."
     wallet_note: "Verto rimwe nerimwe rinozvitarira matokeni aro nehuwandu hwaro, saka mirwi iyi haifanani. Pane huwandu hwose nekuti zvinofadza kuva nahwo — hapana tafura yeligi pamaVerto ose, nekuti yaingoyera kuti wakatamba Verto raani."
     wallet_pill: "Chikwama chako: %{total} zvakaunganidzwa"
     wallet_see_all: "Ona zvose"
     compare_pending: "Kuenzanisa kunovhurika pamhinduro %{needed} (parizvino %{have})"
     compare_closed: "%{org} haisati yavhura mhedzisiro iyi"
+    cta_compare: "Enzanisa mhedzisiro"
+    cta_impact: "Tevera zvinobuda pazviri"
+    cta_share: "Govana nevamwe"
+    share_copied: "Chinongedzo chakopwa"
   player_notification_mailer:
     via: "%{org} · kuburikidza nePlayverto"
     why: "Uri kuwana izvi nekuti wakakumbira kunzwa kubva kumasangano awakapindura maVerto awo."

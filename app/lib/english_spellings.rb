@@ -50,8 +50,8 @@ module EnglishSpellings
   # both variants. Every one of these is really in en.yml, which is why the
   # transform has to be a list and not a rule.
   IDENTICAL = %w[
-    analysis audience audiences confidence democratise difference differences
-    ellis experience experiences neurodivergence otherwise preference
+    analysis audience audiences confidence controller democratise difference
+    differences ellis experience experiences neurodivergence otherwise preference
     preferences promise raised recalled reference respelling sentence sequence
     sequences spelled yours
   ].freeze

@@ -1965,7 +1965,7 @@ he:
     too_many: "אלה הרבה ניסיונות — חכו כמה דקות."
     link_sent: "אם לכתובת הזו יש חשבון, קישור התחברות בדרך."
   you:
-    eyebrow: "ה-Vertos שלכם"
+    eyebrow: "ה-Vertos שלי"
     kept:
       one: "Verto אחד נשמר"
       other: "%{count} Vertos נשמרו"
@@ -1978,9 +1978,7 @@ he:
     delete: "מחיקת החשבון שלי"
     delete_confirm: "הפעולה מוחקת את החשבון שלכם ואת רשימת ה-Vertos ששמרתם. התשובות שלכם נשארות אצל הארגונים ששאלו — הן ניתנו באופן אנונימי ולא בידינו להסיר אותן. להמשיך?"
     deleted: "החשבון שלכם נמחק."
-    tabs_label: "החשבון שלכם"
-    tab_vertos: "Vertos"
-    back: "ה-Vertos שלכם"
+    back: "ה-Vertos שלי"
     not_found: "ה-Verto הזה אינו בחשבון שלכם."
     answered_on: "עניתם ב-%{date}"
     have_answered:
@@ -2003,7 +2001,6 @@ he:
     wallet_orgs:
       one: "ארגון אחד"
       other: "%{count} ארגונים"
-    tab_next: "הבא"
     impact_link_default: "קראו עוד"
     next_step_title: "מה קורה עכשיו"
     impact_title: "מה התשובות שלכם עשו"
@@ -2012,12 +2009,15 @@ he:
     next_title: "מה הלאה"
     next_because: "כי שיחקתם ב-%{verto}"
     next_meta: "פתוח עכשיו"
-    next_empty: "עדיין אין חדש. תקבלו אימייל כשאחד הארגונים שענִיתם לו יפרסם משהו."
     wallet_note: "כל Verto קובע את הנקודות שלו ואת הסכומים שלו, ולכן הערימות האלה אינן אותו הדבר זו כזו. יש סך הכול כי נעים שיהיה; אין טבלת דירוג בין Vertos, כי היא רק הייתה מודדת באיזה Verto יצא לכם לשחק."
     wallet_pill: "הארנק שלכם: %{total} שנאספו"
     wallet_see_all: "הצגת הכול"
     compare_pending: "ההשוואה נפתחת ב-%{needed} תשובות (%{have} עד כה)"
     compare_closed: "%{org} לא פתחה את התוצאות האלה"
+    cta_compare: "השוואת התוצאות"
+    cta_impact: "מעקב אחרי ההשפעה"
+    cta_share: "שיתוף עם אחרים"
+    share_copied: "הקישור הועתק"
   player_notification_mailer:
     via: "%{org} · באמצעות Playverto"
     why: "אתם מקבלים את זה כי ביקשתם לשמוע מארגונים שענִיתם ל-Vertos שלהם."

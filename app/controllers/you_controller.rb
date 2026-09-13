@@ -18,7 +18,7 @@ class YouController < ApplicationController
 
   before_action :no_store
   # Only the pages that draw the pill. sign_out and destroy render nothing.
-  before_action :set_purse, only: %i[show verto next_up wallet]
+  before_action :set_purse, only: %i[show verto wallet]
 
   # How many Vertos the wallet pill's hover breakdown shows before handing over
   # to the wallet itself. Five is a peek, not a second wallet — the pill exists
@@ -27,8 +27,9 @@ class YouController < ApplicationController
   PURSE_PREVIEW = 5
 
   def show
-    @claims  = kept_claims
-    @compare = comparison_availability(@claims)
+    @claims     = kept_claims
+    @compare    = comparison_availability(@claims)
+    @follow_ups = follow_ups_for(@claims)
   end
 
   # One Verto in the account: the answers they gave, next to everyone else's.
@@ -48,20 +49,6 @@ class YouController < ApplicationController
     @standing  = standing_for(@survey, @claims)
     @comparison = comparison_for(@survey, @answered)
     @follow_ups = @survey.follow_up_surveys
-  end
-
-  # What's next: the Vertos the creators of the ones they kept have pointed at.
-  #
-  # There is no feed and no ranking. The only fact this app has about a
-  # respondent is which Verto they played, so that fact IS the reason, and the
-  # reason is on every card — a respondent who cannot see why they are being
-  # shown something has been retargeted rather than helped.
-  def next_up
-    seen = kept_claims.map(&:survey_id).to_set
-    @suggestions = kept_claims.flat_map { |claim|
-      claim.survey.follow_up_surveys.map { |s| { survey: s, because: claim.survey } }
-    }.reject { |row| seen.include?(row[:survey].id) }
-     .uniq { |row| row[:survey].id }
   end
 
   # The wallet: one row per Verto, and one number that spans them.
@@ -123,6 +110,43 @@ class YouController < ApplicationController
         else
           :ready
         end
+    end
+  end
+
+  # What each listed Verto points at next, keyed by survey id and empty for most
+  # of them. There is no feed and no ranking anywhere in this: the only fact the
+  # app has about a respondent is which Verto they played, so that fact IS the
+  # reason a follow-up is shown, and it is shown ON the Verto that carries it
+  # rather than in a merged list where the reason would have to be re-stated.
+  #
+  # Survey#follow_up_surveys runs a query PER survey (it scopes through
+  # organisation.surveys), which is one query per row on the page that lists
+  # every Verto an account holds. Resolved here in one, preserving what that
+  # method guarantees: the creator's own order, only playable Vertos, and only
+  # ones belonging to the same organisation — a follow-up id pointing outside
+  # the org is not a follow-up, it is a stale id.
+  # A Verto already in the account is never suggested — carried over from the
+  # page this replaces, and the one piece of its logic that had nothing to do
+  # with being a merged list. "What's next" pointing at something sitting three
+  # rows below it is the suggestion reading as an accident.
+  def follow_ups_for(claims)
+    surveys = claims.map(&:survey).uniq
+    held    = surveys.map(&:id).to_set
+    wanted  = surveys.to_h do |s|
+      [ s.id, Array(s.follow_up_survey_ids).filter_map { |v| Integer(v, exception: false) } ]
+    end
+    ids = wanted.values.flatten.uniq - held.to_a
+    return surveys.to_h { |s| [ s.id, [] ] } if ids.empty?
+
+    found = Survey.kept.where(id: ids).includes(:organisation).index_by(&:id)
+    surveys.to_h do |survey|
+      rows = wanted[survey.id].filter_map do |id|
+        other = found[id]
+        next if other.nil? || other.organisation_id != survey.organisation_id || !other.playable?
+
+        other
+      end
+      [ survey.id, rows ]
     end
   end
 

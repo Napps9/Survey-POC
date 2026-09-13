@@ -1995,7 +1995,7 @@ st:
     too_many: "Ke boiteko bo bongata boo — bo fe metsotso e seng mekae."
     link_sent: "Haeba aterese eo e na le ak'haonte, sehokelo sa ho kena sea tla."
   you:
-    eyebrow: "Di-Verto tsa hao"
+    eyebrow: "Di-Verto tsa ka"
     kept:
       one: "Verto e 1 e bolokilweng"
       other: "Di-Verto tse %{count} tse bolokilweng"
@@ -2008,9 +2008,7 @@ st:
     delete: "Hlakola akhaonto ya ka"
     delete_confirm: "Sena se hlakola akhaonto ya hao le lenane la di-Verto tseo o di bolokileng. Dikarabo tsa hao di dula le mekgatlo e ileng ya botsa — di fanwe ntle le mabitso mme ha se tsa rona hore re di tlose. O a tswela pele?"
     deleted: "Akhaonto ya hao e hlakotswe."
-    tabs_label: "Akhaonto ya hao"
-    tab_vertos: "Di-Verto"
-    back: "Di-Verto tsa hao"
+    back: "Di-Verto tsa ka"
     not_found: "Verto eo ha e yo akhaontong ya hao."
     answered_on: "O arabile ka %{date}"
     have_answered:
@@ -2033,7 +2031,6 @@ st:
     wallet_orgs:
       one: "mokgatlo o 1"
       other: "mekgatlo e %{count}"
-    tab_next: "E latelang"
     impact_link_default: "Bala ho eketsehileng"
     next_step_title: "Se etsahalang ka mora moo"
     impact_title: "Seo dikarabo tsa hao di se entseng"
@@ -2042,12 +2039,15 @@ st:
     next_title: "Se latelang"
     next_because: "Hobane o bapetse %{verto}"
     next_meta: "Bula hona jwale"
-    next_empty: "Ha ho letho le lecha hajwale. O tla fumana imeile ha o mong wa mekgatlo eo o e arabileng a phatlalatsa ho hong."
     wallet_note: "Verto ka nngwe e beha ditokene tsa yona le dipalo tsa yona, kahoo dikgobo tsena ha di tshwane. Ho na le kakaretso hobane ho kgotsofatsa ho ba le yona — ha ho tafole ya liki ho pholletsa le di-Verto, hobane e ne e tla lekanya feela hore o bapetse Verto ya mang."
     wallet_pill: "Sepatjhe sa hao: %{total} se bokelletsweng"
     wallet_see_all: "Sheba tsohle"
     compare_pending: "Papiso e buleha ha ho e-na le dikarabo tse %{needed} (ho fihlela jwale %{have})"
     compare_closed: "%{org} ha e so bule diphetho tsena"
+    cta_compare: "Bapisa diphetho"
+    cta_impact: "Latela phello ha e ntse e hlaha"
+    cta_share: "Arolelana le ba bang"
+    share_copied: "Sehokelo se kopitsitswe"
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O fumana sena hobane o kopile ho utlwa ho mekgatlo eo o arabileng di-Verto tsa yona."

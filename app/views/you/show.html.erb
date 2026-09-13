@@ -24,8 +24,6 @@
       </div>
 
     <% else %>
-      <%= render "you/tabs", current: :vertos %>
-
       <div class="you-head">
         <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.eyebrow") %></div>
         <h1 class="you-h1"><%= t("you.kept", count: @claims.size) %></h1>
@@ -40,11 +38,18 @@
         <div class="you-list">
           <% @claims.each do |claim| %>
             <% survey = claim.survey %>
-            <%= link_to you_verto_path(survey), class: "you-verto" do %>
+            <%# The row is a CARD, not a link, now that it carries its own
+                actions — an <a> cannot hold three more. The title is the link
+                that the whole row used to be, so the destination is unchanged
+                and the tap target is the thing you would aim at anyway. %>
+            <div class="you-verto">
               <span class="you-verto-rule" aria-hidden="true"></span>
               <div class="you-verto-body">
                 <div class="you-verto-org"><%= survey.organisation.name %></div>
-                <h2 class="you-verto-title"><%= survey.theme.presence || survey.title %></h2>
+                <h2 class="you-verto-title">
+                  <%= link_to survey.theme.presence || survey.title,
+                        you_verto_path(survey), class: "you-verto-link" %>
+                </h2>
                 <%# When they PLAYED it, not when they claimed it — a device key
                     can claim a Verto months after the run, and the date that
                     means anything to them is the day they answered. %>
@@ -64,10 +69,6 @@
                     <% end %>
                   </div>
                 <% end %>
-                <%# Why this one can't be compared, on the row rather than behind
-                    a tap. Said in the negative only: a Verto that CAN be
-                    compared needs no label, because opening it is the point of
-                    the row. %>
                 <% case @compare[survey.id] %>
                 <% when :closed %>
                   <div class="you-verto-note">
@@ -80,9 +81,54 @@
                           have: @compare[survey.id][:have]) %>
                   </div>
                 <% end %>
-                <span class="you-verto-go" aria-hidden="true">→</span>
+
+                <%# ONE SLOT, two occupants. "Compare results" is the primary
+                    action on a row and the reason line stands exactly where it
+                    would have been — so a respondent never presses a button
+                    that leads to the sentence explaining why it leads nowhere.
+                    The cost of that choice, stated because it is real: on a row
+                    whose comparison is shut, the primary CTA is the one that is
+                    missing, and the two that remain are both secondary. %>
+                <div class="you-ctas">
+                  <% if @compare[survey.id] == :ready %>
+                    <%= link_to t("you.cta_compare"), you_verto_path(survey, anchor: "compare"),
+                          class: "you-cta you-cta-primary" %>
+                  <% end %>
+                  <%= link_to t("you.cta_impact"), you_verto_path(survey, anchor: "impact"),
+                        class: "you-cta" %>
+                  <%# Native share where the browser has it, clipboard where it
+                      does not, and an ordinary link to the Verto where neither
+                      works — the label it swaps to is passed from here so it is
+                      translated by Rails rather than needing a JS string. %>
+                  <% if survey.playable? %>
+                    <%= link_to t("you.cta_share"), play_survey_url(survey.publish_token),
+                          class: "you-cta",
+                          data: { controller: "share-verto",
+                                  action: "share-verto#share",
+                                  share_verto_title_value: survey.theme.presence || survey.title,
+                                  share_verto_copied_value: t("you.share_copied") } %>
+                  <% end %>
+                </div>
+
+                <%# What this Verto points at next, on the Verto that points —
+                    so the reason needs no restating. Drawn only when there IS
+                    one, which for most Vertos there is not. %>
+                <% if @follow_ups[survey.id].present? %>
+                  <div class="you-followups">
+                    <div class="you-followups-head"><%= t("you.next_title") %></div>
+                    <% @follow_ups[survey.id].each do |next_verto| %>
+                      <%= link_to play_survey_path(next_verto.publish_token), class: "you-followup" do %>
+                        <span class="you-followup-body">
+                          <span class="you-followup-title"><%= next_verto.theme.presence || next_verto.title %></span>
+                          <span class="you-followup-meta"><%= t("you.next_meta") %></span>
+                        </span>
+                        <span class="you-followup-go" aria-hidden="true">→</span>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% end %>
               </div>
-            <% end %>
+            </div>
           <% end %>
         </div>
       <% end %>

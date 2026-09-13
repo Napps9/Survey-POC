@@ -13518,6 +13518,64 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: rgba(255,255,255,.35); font-size: 18px;
 }
 .you-standing { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 8px; }
+
+/* ── What a row lets you do ────────────────────────────────────────────────
+   The row used to BE a link, with an arrow as its only affordance. It now says
+   what it opens, because "compare my answers", "see what came of it" and "send
+   it to someone" are three different reasons to press a Verto and an arrow
+   names none of them. */
+.you-ctas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.you-cta {
+  display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.14); background: transparent;
+  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: .02em;
+  color: rgba(255,255,255,.72); text-decoration: none; white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.you-cta:hover { border-color: rgba(255,255,255,.28); color: #fff; }
+.you-cta:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+/* Comparing is what the account is FOR — the one thing here a respondent
+   cannot get anywhere else — so it carries the accent and the other two read
+   as the alternatives they are. It is also the CTA that is often absent (see
+   the view): on a row whose comparison is shut, the emphasis is simply gone
+   rather than moving to something else. */
+.you-cta-primary {
+  border-color: rgba(1,234,203,.5); color: #01EACB; background: rgba(1,234,203,.08);
+}
+.you-cta-primary:hover { border-color: #01EACB; background: rgba(1,234,203,.16); color: #01EACB; }
+
+/* The title is the link the whole row used to be. */
+.you-verto-link { color: inherit; text-decoration: none; }
+.you-verto-link:hover { color: #01EACB; }
+.you-verto-link:focus-visible { outline: 2px solid #01EACB; outline-offset: 3px; border-radius: 6px; }
+
+/* ── What this Verto points at next ────────────────────────────────────────
+   Inset inside the Verto that points, rather than a page of its own: the
+   reason a follow-up is being shown IS the Verto above it, and a merged list
+   had to restate that reason on every card. Drawn only when there is one. */
+.you-followups {
+  margin-top: 12px; padding: 8px 12px 4px; border-radius: 12px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+}
+.you-followups-head {
+  font-family: "Alata", sans-serif; font-size: var(--text-2xs); letter-spacing: .12em;
+  text-transform: uppercase; color: #01EACB; padding-bottom: 2px;
+}
+.you-followup {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 8px 0; text-decoration: none; color: inherit;
+  border-top: 1px solid rgba(255,255,255,.05);
+}
+.you-followup:first-of-type { border-top: 0; }
+.you-followup:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; border-radius: 8px; }
+.you-followup-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.you-followup-title {
+  font-family: "Alata", sans-serif; font-size: 14px; line-height: 1.3; color: rgba(255,255,255,.9);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.you-followup-meta { font-size: 11px; color: rgba(255,255,255,.4); }
+.you-followup-go { color: rgba(255,255,255,.35); font-size: 16px; flex: none; }
+.you-followup:hover .you-followup-title { color: #01EACB; }
 /* Why a row can't be compared. Quieter than the piles above it — it is a
    reason, not a holding, and it must not compete with what they collected. */
 .you-verto-note { font-size: 11.5px; line-height: 1.45; color: rgba(255,255,255,.42); margin-top: 8px; }

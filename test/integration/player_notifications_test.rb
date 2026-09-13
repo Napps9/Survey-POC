@@ -412,7 +412,7 @@ class PlayerNotificationsTest < ActionDispatch::IntegrationTest
     assert_select ".you-impact-change", text: /Deliveries move/
   end
 
-  test "the Next tab names the reason and skips what they have already played" do
+  test "a follow-up sits on the Verto that points at it, and not one already played" do
     o = org
     played = survey(owner: o)
     fresh  = survey(owner: o, theme: "High Street, one year on")
@@ -426,20 +426,25 @@ class PlayerNotificationsTest < ActionDispatch::IntegrationTest
                        source: "signup")
     sign_in_as(pl)
 
-    get you_next_path
+    get you_path
 
-    assert_select ".you-verto", 1
-    assert_select ".you-verto-title", text: "High Street, one year on"
-    assert_select ".you-verto-org", text: I18n.t("you.next_because", verto: "Car-free High Street")
+    # Inside the row of the Verto that points, so the reason needs no restating
+    # — that sentence was the price of a merged list, and there isn't one now.
+    assert_select ".you-verto .you-followups .you-followup-title",
+                  text: "High Street, one year on"
+    # And the one they have already played is not offered back to them.
+    assert_select ".you-followup-title", text: "Already done this one", count: 0
+    assert_select ".you-followup", 1
   end
 
-  test "with nothing to suggest the Next tab names the condition" do
+  test "a Verto pointing nowhere draws no what's-next strip at all" do
     s = survey
     sign_in_as(keeper(s))
 
-    get you_next_path
+    get you_path
 
-    assert_select ".you-sub", text: I18n.t("you.next_empty")
+    assert_select ".you-verto", 1
+    assert_select ".you-followups", 0
   end
 
   test "only an admin can spend the organisation's one contact with a respondent" do

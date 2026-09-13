@@ -1958,7 +1958,7 @@ sw:
     too_many: "Hiyo ni majaribio mengi — subiri dakika chache."
     link_sent: "Ikiwa anwani hiyo ina akaunti, kiungo cha kuingia kinakuja."
   you:
-    eyebrow: "Vertos zako"
+    eyebrow: "Vertos zangu"
     kept:
       one: "Verto 1 imehifadhiwa"
       other: "Vertos %{count} zimehifadhiwa"
@@ -1971,9 +1971,7 @@ sw:
     delete: "Futa akaunti yangu"
     delete_confirm: "Hii inafuta akaunti yako na orodha ya Vertos ulizohifadhi. Majibu yako yanabaki na mashirika yaliyouliza — yalitolewa bila kutambulika na si haki yetu kuyaondoa. Uendelee?"
     deleted: "Akaunti yako imefutwa."
-    tabs_label: "Akaunti yako"
-    tab_vertos: "Vertos"
-    back: "Vertos zako"
+    back: "Vertos zangu"
     not_found: "Verto hiyo haipo kwenye akaunti yako."
     answered_on: "Ulijibu tarehe %{date}"
     have_answered:
@@ -1996,7 +1994,6 @@ sw:
     wallet_orgs:
       one: "shirika 1"
       other: "mashirika %{count}"
-    tab_next: "Inayofuata"
     impact_link_default: "Soma zaidi"
     next_step_title: "Kinachofuata"
     impact_title: "Majibu yako yalifanya nini"
@@ -2005,12 +2002,15 @@ sw:
     next_title: "Kinachokuja"
     next_because: "Kwa sababu ulicheza %{verto}"
     next_meta: "Imefunguliwa sasa"
-    next_empty: "Bado hakuna kipya. Utapata barua pepe mojawapo ya mashirika uliyojibu itakapochapisha kitu."
     wallet_note: "Kila Verto huweka pointi zake na kiasi chake, kwa hivyo marundo haya si kitu kimoja. Kuna jumla kwa sababu inafurahisha kuwa nayo; hakuna orodha ya ushindani kati ya Vertos, kwa sababu ingepima tu ni Verto ipi ulibahatika kucheza."
     wallet_pill: "Pochi yako: %{total} zimekusanywa"
     wallet_see_all: "Tazama zote"
     compare_pending: "Ulinganisho hufunguka kwa majibu %{needed} (hadi sasa %{have})"
     compare_closed: "%{org} haijafungua matokeo haya"
+    cta_compare: "Linganisha matokeo"
+    cta_impact: "Fuatilia matokeo yake"
+    cta_share: "Shiriki na wengine"
+    share_copied: "Kiungo kimenakiliwa"
   player_notification_mailer:
     via: "%{org} · kupitia Playverto"
     why: "Unapata hii kwa sababu uliomba kusikia kutoka kwa mashirika ambayo umejibu Vertos zao."

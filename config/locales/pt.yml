@@ -1958,7 +1958,7 @@ pt:
     too_many: "São muitas tentativas — espera alguns minutos."
     link_sent: "Se esse endereço tiver uma conta, está a caminho uma ligação de acesso."
   you:
-    eyebrow: "Os teus Vertos"
+    eyebrow: "Os meus Vertos"
     kept:
       one: "1 Verto guardado"
       other: "%{count} Vertos guardados"
@@ -1971,9 +1971,7 @@ pt:
     delete: "Eliminar a minha conta"
     delete_confirm: "Isto elimina a tua conta e a lista de Vertos que guardaste. As tuas respostas ficam com as organizações que perguntaram — foram dadas anonimamente e não nos cabe removê-las. Continuar?"
     deleted: "A tua conta foi eliminada."
-    tabs_label: "A tua conta"
-    tab_vertos: "Vertos"
-    back: "Os teus Vertos"
+    back: "Os meus Vertos"
     not_found: "Esse Verto não está na tua conta."
     answered_on: "Respondeste a %{date}"
     have_answered:
@@ -1996,7 +1994,6 @@ pt:
     wallet_orgs:
       one: "1 organização"
       other: "%{count} organizações"
-    tab_next: "Seguinte"
     impact_link_default: "Ler mais"
     next_step_title: "O que acontece a seguir"
     impact_title: "O que as tuas respostas mudaram"
@@ -2005,12 +2002,15 @@ pt:
     next_title: "O que vem a seguir"
     next_because: "Porque jogaste %{verto}"
     next_meta: "Aberto agora"
-    next_empty: "Ainda não há nada novo. Receberás um e-mail quando uma das organizações a que respondeste publicar alguma coisa."
     wallet_note: "Cada Verto define as suas próprias fichas e os seus próprios valores, por isso estes montes não são a mesma coisa uns que os outros. Há um total porque é satisfatório ter um; não há classificação entre Vertos, porque só mediria que Verto calhou jogares."
     wallet_pill: "A tua carteira: %{total} acumulados"
     wallet_see_all: "Ver tudo"
     compare_pending: "A comparação abre com %{needed} respostas (%{have} até agora)"
     compare_closed: "A %{org} não abriu estes resultados"
+    cta_compare: "Comparar resultados"
+    cta_impact: "Acompanha o impacto"
+    cta_share: "Partilhar com outras pessoas"
+    share_copied: "Ligação copiada"
   player_notification_mailer:
     via: "%{org} · através da Playverto"
     why: "Estás a receber isto porque pediste ter notícias das organizações cujos Vertos respondeste."

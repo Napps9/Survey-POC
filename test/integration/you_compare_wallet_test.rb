@@ -189,7 +189,7 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
 
     get you_path
     assert_equal [ newer.id, older.id ].map { |id| you_verto_path(id) },
-                 css_select("a.you-verto").map { |e| e["href"] }
+                 css_select("a.you-verto-link").map { |e| e["href"] }
   end
 
   test "a Verto that awards nothing is not a row in the wallet" do
@@ -268,15 +268,19 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
 
   # ── Getting between them ──────────────────────────────────────────────────
 
-  test "the tabs mark where you are" do
+  test "there is no tab row left to mark" do
+    # Wallet became the pill in the corner and Next became a strip inside the
+    # Verto that points, which left one tab in a row of one. The way back is
+    # the same back link the Verto page has always used.
     s = survey
     sign_in_with([ answered(s) ])
 
     get you_path
-    assert_select ".you-tab[aria-current=page]", text: I18n.t("you.tab_vertos")
+    assert_select ".you-tabs", 0
 
-    get you_next_path
-    assert_select ".you-tab[aria-current=page]", text: I18n.t("you.tab_next")
+    get you_wallet_path
+    assert_select ".you-tabs", 0
+    assert_select "a.you-back[href=?]", you_path
   end
 
   # ── Why a Verto can't be compared ─────────────────────────────────────────
@@ -361,6 +365,72 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
                  "expected one grouped COUNT over responses for the whole list, got #{counts}"
   end
 
+  # ── What a row lets you do ────────────────────────────────────────────────
+
+  test "Compare results and the reason line are one slot, never both" do
+    # The whole point of the arrangement: a respondent is never offered a
+    # button whose destination is the sentence explaining why there is nothing
+    # there. Asserted as an exclusive-or over the three states rather than as
+    # three separate presence checks, because "never both" is the property.
+    o = org
+    ready  = survey(owner: o)
+    thin   = survey(owner: o, theme: "Too few")
+    closed = survey(owner: o, theme: "Shut", show_results_comparison: false)
+    crowd(ready, 8)
+    crowd(closed, 8)
+    sign_in_with([ answered(ready), answered(thin), answered(closed) ])
+
+    get you_path
+
+    rows = css_select(".you-verto")
+    assert_equal 3, rows.size
+    rows.each do |row|
+      compare = row.css("a.you-cta-primary").any?
+      reason  = row.css(".you-verto-note").any?
+      title   = row.css(".you-verto-title").text.strip
+      assert compare ^ reason,
+             "#{title}: compare CTA and reason line must be exclusive (compare=#{compare}, reason=#{reason})"
+    end
+
+    # And the primary is the comparison, on the one row that has it.
+    assert_select "a.you-cta-primary", 1
+    assert_select "a.you-cta-primary", text: I18n.t("you.cta_compare")
+    assert_select "a.you-cta-primary[href=?]", you_verto_path(ready, anchor: "compare")
+  end
+
+  test "impact and share are offered on every row, comparison or not" do
+    o = org
+    closed = survey(owner: o, show_results_comparison: false)
+    sign_in_with([ answered(closed) ])
+
+    get you_path
+
+    assert_select "a.you-cta[href=?]", you_verto_path(closed, anchor: "impact"),
+                  text: I18n.t("you.cta_impact")
+    # Share hands over the PLAY url — the thing a friend can open — not the
+    # account page, which would be a link only this respondent can use.
+    assert_select "a.you-cta[href=?]", play_survey_url(closed.publish_token),
+                  text: I18n.t("you.cta_share")
+  end
+
+  test "a Verto nobody can play any more is not offered for sharing" do
+    o = org
+    s = survey(owner: o)
+    sign_in_with([ answered(s) ])
+    # Unpublishing is unpublished_at, not clearing published_at — published?
+    # reads the token and the close stamp (Survey#published?).
+    s.update!(unpublished_at: Time.current)
+    refute s.reload.playable?
+
+    get you_path
+
+    assert_select ".you-verto", 1
+    assert_select "a[data-controller=?]", "share-verto", 0
+    assert_select "a[href=?]", play_survey_url(s.publish_token), 0
+    # The row itself still works — they kept it, and keeping it is the point.
+    assert_select "a.you-verto-link[href=?]", you_verto_path(s)
+  end
+
   # ── The wallet pill ───────────────────────────────────────────────────────
   #
   # The wallet stopped being a tab and became a pill in the top corner, so the
@@ -380,7 +450,7 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
     _second, b = pilled(o, "Green", "🌳", 88)
     sign_in_with([ a, b ])
 
-    [ you_path, you_next_path, you_verto_path(first) ].each do |path|
+    [ you_path, you_verto_path(first) ].each do |path|
       get path
       assert_select "a.you-purse-pill[href=?]", you_wallet_path, 1, "no wallet pill on #{path}"
       assert_select ".you-purse-total", text: "122"
@@ -477,7 +547,7 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
     sign_in_with([ answered(s) ])
 
     get you_path
-    assert_select "a.you-verto[href=?]", you_verto_path(s)
+    assert_select "a.you-verto-link[href=?]", you_verto_path(s)
   end
 
   test "the account renders in en-US, not only in en" do

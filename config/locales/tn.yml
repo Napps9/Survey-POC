@@ -1995,7 +1995,7 @@ tn:
     too_many: "Ke maiteko a mantsi ao — a fe metsotso e se mekae."
     link_sent: "Fa aterese eo e na le akhaonto, kgolagano ya go tsena e mo tseleng."
   you:
-    eyebrow: "Di-Verto tsa gago"
+    eyebrow: "Di-Verto tsa me"
     kept:
       one: "Verto e le 1 e e bolokilweng"
       other: "Di-Verto tse %{count} tse di bolokilweng"
@@ -2008,9 +2008,7 @@ tn:
     delete: "Phimola akhaonto ya me"
     delete_confirm: "Se se phimola akhaonto ya gago le lenaane la di-Verto tse o di bolokileng. Dikarabo tsa gago di sala le mekgatlho e e neng e botsa — di neetswe kwa ntle ga maina mme ga se tsa rona gore re di tlose. A o tswelela?"
     deleted: "Akhaonto ya gago e phimotswe."
-    tabs_label: "Akhaonto ya gago"
-    tab_vertos: "Di-Verto"
-    back: "Di-Verto tsa gago"
+    back: "Di-Verto tsa me"
     not_found: "Verto eo ga e yo mo akhaontong ya gago."
     answered_on: "O arabile ka %{date}"
     have_answered:
@@ -2033,7 +2031,6 @@ tn:
     wallet_orgs:
       one: "mokgatlho o le 1"
       other: "mekgatlho e le %{count}"
-    tab_next: "E e latelang"
     impact_link_default: "Bala go oketsegileng"
     next_step_title: "Se se diregang morago ga moo"
     impact_title: "Se dikarabo tsa gago di se dirileng"
@@ -2042,12 +2039,15 @@ tn:
     next_title: "Se se latelang"
     next_because: "Ka gonne o tshameketse %{verto}"
     next_meta: "Bula jaanong"
-    next_empty: "Ga go na sepe se sesha gape. O tla amogela imeile fa mongwe wa mekgatlho e o e arabileng a gatisa sengwe."
     wallet_note: "Verto nngwe le nngwe e beya ditokene tsa yona le dipalo tsa yona, ka jalo dikgobokanyo tseno ga di tshwane. Go na le palogotlhe ka gonne go a kgatlhisa go nna le yona — ga go na tafole ya liki mo di-Verto tsotlhe, ka gonne e ne e tla lekanya fela gore o tshameketse Verto ya ga mang."
     wallet_pill: "Sekhwama sa gago: %{total} se se kokoantsweng"
     wallet_see_all: "Bona tsotlhe"
     compare_pending: "Tshwantshanyo e bulega fa go na le dikarabo tse %{needed} (go fitlha jaanong %{have})"
     compare_closed: "%{org} ga e ise e bule dipholo tse"
+    cta_compare: "Bapisa dipholo"
+    cta_impact: "Sala ditlamorago morago fa di direga"
+    cta_share: "Abelana le ba bangwe"
+    share_copied: "Kgokaganyo e kopitswe"
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O amogela seno ka gonne o kopile go utlwa go mekgatlho e o arabileng di-Verto tsa yona."

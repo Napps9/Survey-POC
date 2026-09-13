@@ -1956,7 +1956,7 @@ ja:
     too_many: "試行回数が多すぎます。数分お待ちください。"
     link_sent: "そのアドレスのアカウントがあれば、サインインリンクをお送りします。"
   you:
-    eyebrow: "あなたの Vertos"
+    eyebrow: "わたしの Vertos"
     kept:
       one: "1 件の Verto を保存中"
       other: "%{count} 件の Vertos を保存中"
@@ -1969,9 +1969,7 @@ ja:
     delete: "アカウントを削除"
     delete_confirm: "アカウントと、保存した Vertos の一覧を削除します。回答は質問した団体のもとに残ります。匿名で提供されたものであり、こちらで削除できるものではありません。続けますか？"
     deleted: "アカウントを削除しました。"
-    tabs_label: "あなたのアカウント"
-    tab_vertos: "Vertos"
-    back: "あなたの Vertos"
+    back: "わたしの Vertos"
     not_found: "その Verto はあなたのアカウントにありません。"
     answered_on: "%{date} に回答しました"
     have_answered:
@@ -1994,7 +1992,6 @@ ja:
     wallet_orgs:
       one: "1 団体"
       other: "%{count} 団体"
-    tab_next: "次へ"
     impact_link_default: "詳しく読む"
     next_step_title: "このあとの流れ"
     impact_title: "あなたの回答がもたらしたこと"
@@ -2003,12 +2000,15 @@ ja:
     next_title: "次はこちら"
     next_because: "%{verto} をプレイしたので"
     next_meta: "受付中"
-    next_empty: "まだ新しいものはありません。回答した団体のいずれかが何かを公開したら、メールでお知らせします。"
     wallet_note: "Verto ごとに独自のポイントと独自の数量を設定しているため、これらの山は互いに同じものではありません。合計があるのは、あるとうれしいからです。Vertos をまたぐ順位表はありません。たまたまどの Verto をプレイしたかを測るだけになるからです。"
     wallet_pill: "あなたのウォレット：%{total} 獲得"
     wallet_see_all: "すべて見る"
     compare_pending: "比較は回答%{needed}件で開きます（現在%{have}件）"
     compare_closed: "%{org} はこの結果を公開していません"
+    cta_compare: "結果を比べる"
+    cta_impact: "その後の変化を追う"
+    cta_share: "ほかの人に共有する"
+    share_copied: "リンクをコピーしました"
   player_notification_mailer:
     via: "%{org} · Playverto 経由"
     why: "回答した Vertos の団体からの知らせを希望されたため、このメールをお送りしています。"

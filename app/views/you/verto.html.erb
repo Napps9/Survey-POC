@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div class="you-card">
+    <div class="you-card" id="compare">
       <% case @comparison[:state] %>
       <% when :off %>
         <%# show_results_comparison is the creator's switch and it stays theirs.
@@ -94,7 +94,7 @@
         copy says the organisation hasn't said, not that nothing happened,
         because the app does not know which and must not imply the harsher
         reading of a creator who simply hasn't come back. %>
-    <div class="you-card you-impact">
+    <div class="you-card you-impact" id="impact">
       <% if @survey.impact_published? %>
         <h2 class="you-h2"><%= t("you.impact_title") %></h2>
         <div class="you-impact-headline"><%= @survey.impact_headline %></div>

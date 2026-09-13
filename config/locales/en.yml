@@ -1469,7 +1469,7 @@ en:
   # en-US.yml that raises I18n::MissingInterpolationArgument while `en` stays
   # green.
   you:
-    eyebrow: "Your Vertos"
+    eyebrow: "My Vertos"
     kept:
       one: "1 Verto kept"
       other: "%{count} Vertos kept"
@@ -1482,9 +1482,7 @@ en:
     delete: "Delete my account"
     delete_confirm: "This deletes your account and the list of Vertos you've kept. Your answers stay with the organisations that asked — they were given anonymously and aren't ours to remove. Continue?"
     deleted: "Your account has been deleted."
-    tabs_label: "Your account"
-    tab_vertos: "Vertos"
-    back: "Your Vertos"
+    back: "My Vertos"
     not_found: "That Verto isn't in your account."
     answered_on: "You answered on %{date}"
     have_answered:
@@ -1500,6 +1498,14 @@ en:
     # The floor and the count, not "not enough yet": 2 of 5 tells a respondent
     # whether to come back tomorrow or never.
     compare_pending: "Comparison opens at %{needed} answers (%{have} so far)"
+    # The three things a row lets you do. cta_compare is drawn only when the
+    # comparison is actually open; when it is not, compare_pending or
+    # compare_closed stands in its slot instead of a button to nowhere.
+    cta_compare: "Compare results"
+    cta_impact: "Watch the impact unfold"
+    cta_share: "Share with others"
+    # Swapped in by share_verto_controller when it falls back to the clipboard.
+    share_copied: "Link copied"
     compare_closed: "%{org} hasn't opened these results"
     standing: "%{name} · %{rank} of %{of}"
     wallet_eyebrow: "Collected"
@@ -1519,7 +1525,6 @@ en:
     wallet_orgs:
       one: "1 organisation"
       other: "%{count} organisations"
-    tab_next: "Next"
     impact_link_default: "Read more"
     next_step_title: "What happens next"
     impact_title: "What your answers did"
@@ -1528,7 +1533,6 @@ en:
     next_title: "What's next"
     next_because: "Because you played %{verto}"
     next_meta: "Open now"
-    next_empty: "Nothing new yet. You'll get an email when one of the organisations you've answered publishes something."
     wallet_note: "Each Verto sets its own tokens and its own amounts, so these piles aren't the same thing as each other. There's a total because it's satisfying to have one — there's no league table across Vertos, because it would only measure whose Verto you happened to play."
   # News about a Verto someone kept. The ORGANISATION is the sender in the
   # reader's eyes and Playverto is the "via" — that is the relationship the

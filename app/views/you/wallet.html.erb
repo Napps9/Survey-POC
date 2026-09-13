@@ -14,7 +14,7 @@
     </div>
 
     <%= render "you/wallet_pill", rows: @purse_rows, total: @purse_total, current: :wallet %>
-    <%= render "you/tabs", current: :wallet %>
+    <%= link_to you_path, class: "you-back" do %>‹ <%= t("you.back") %><% end %>
 
     <% if @rows.empty? %>
       <div class="you-card">

@@ -1958,7 +1958,7 @@ it:
     too_many: "Sono molti tentativi: aspetta qualche minuto."
     link_sent: "Se quell'indirizzo ha un account, un link di accesso è in arrivo."
   you:
-    eyebrow: "I tuoi Verto"
+    eyebrow: "I miei Verto"
     kept:
       one: "1 Verto conservato"
       other: "%{count} Verto conservati"
@@ -1971,9 +1971,7 @@ it:
     delete: "Elimina il mio account"
     delete_confirm: "Questo elimina il tuo account e l'elenco dei Verto che hai conservato. Le tue risposte restano alle organizzazioni che le hanno chieste: sono state date in forma anonima e non spetta a noi rimuoverle. Continuare?"
     deleted: "Il tuo account è stato eliminato."
-    tabs_label: "Il tuo account"
-    tab_vertos: "Verto"
-    back: "I tuoi Verto"
+    back: "I miei Verto"
     not_found: "Quel Verto non è nel tuo account."
     answered_on: "Hai risposto il %{date}"
     have_answered:
@@ -1996,7 +1994,6 @@ it:
     wallet_orgs:
       one: "1 organizzazione"
       other: "%{count} organizzazioni"
-    tab_next: "Prossimo"
     impact_link_default: "Leggi di più"
     next_step_title: "Cosa succede ora"
     impact_title: "Cosa hanno ottenuto le tue risposte"
@@ -2005,12 +2002,15 @@ it:
     next_title: "Cosa viene dopo"
     next_because: "Perché hai giocato %{verto}"
     next_meta: "Aperto ora"
-    next_empty: "Ancora nulla di nuovo. Riceverai un'e-mail quando una delle organizzazioni a cui hai risposto pubblicherà qualcosa."
     wallet_note: "Ogni Verto stabilisce i propri gettoni e i propri importi, quindi questi mucchietti non sono la stessa cosa l'uno con l'altro. C'è un totale perché fa piacere averlo; non c'è una classifica tra Verto, perché misurerebbe soltanto quale Verto ti è capitato di giocare."
     wallet_pill: "Il tuo portafoglio: %{total} raccolti"
     wallet_see_all: "Vedi tutto"
     compare_pending: "Il confronto si apre a %{needed} risposte (%{have} finora)"
     compare_closed: "%{org} non ha aperto questi risultati"
+    cta_compare: "Confronta i risultati"
+    cta_impact: "Segui l'impatto nel tempo"
+    cta_share: "Condividi con altri"
+    share_copied: "Link copiato"
   player_notification_mailer:
     via: "%{org} · tramite Playverto"
     why: "Ricevi questo messaggio perché hai chiesto di avere notizie dalle organizzazioni ai cui Verto hai risposto."

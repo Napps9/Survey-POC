@@ -1957,7 +1957,7 @@ id:
     too_many: "Itu terlalu banyak percobaan — tunggu beberapa menit."
     link_sent: "Jika alamat itu punya akun, tautan masuk sedang dikirim."
   you:
-    eyebrow: "Vertos-mu"
+    eyebrow: "Vertos-ku"
     kept:
       one: "1 Verto disimpan"
       other: "%{count} Vertos disimpan"
@@ -1970,9 +1970,7 @@ id:
     delete: "Hapus akun saya"
     delete_confirm: "Ini menghapus akunmu dan daftar Vertos yang kamu simpan. Jawabanmu tetap pada organisasi yang bertanya — jawaban itu diberikan secara anonim dan bukan hak kami untuk menghapusnya. Lanjutkan?"
     deleted: "Akunmu telah dihapus."
-    tabs_label: "Akunmu"
-    tab_vertos: "Vertos"
-    back: "Vertos-mu"
+    back: "Vertos-ku"
     not_found: "Verto itu tidak ada di akunmu."
     answered_on: "Kamu menjawab pada %{date}"
     have_answered:
@@ -1995,7 +1993,6 @@ id:
     wallet_orgs:
       one: "1 organisasi"
       other: "%{count} organisasi"
-    tab_next: "Berikutnya"
     impact_link_default: "Baca selengkapnya"
     next_step_title: "Apa yang terjadi selanjutnya"
     impact_title: "Apa yang dilakukan jawabanmu"
@@ -2004,12 +2001,15 @@ id:
     next_title: "Apa selanjutnya"
     next_because: "Karena kamu memainkan %{verto}"
     next_meta: "Terbuka sekarang"
-    next_empty: "Belum ada yang baru. Kamu akan menerima email saat salah satu organisasi yang kamu jawab menerbitkan sesuatu."
     wallet_note: "Setiap Verto menetapkan poinnya sendiri dan jumlahnya sendiri, jadi tumpukan-tumpukan ini bukan hal yang sama satu sama lain. Ada total karena menyenangkan punya satu; tidak ada papan peringkat antar-Vertos, karena itu hanya akan mengukur Verto mana yang kebetulan kamu mainkan."
     wallet_pill: "Dompetmu: %{total} terkumpul"
     wallet_see_all: "Lihat semua"
     compare_pending: "Perbandingan terbuka pada %{needed} jawaban (%{have} sejauh ini)"
     compare_closed: "%{org} belum membuka hasil ini"
+    cta_compare: "Bandingkan hasil"
+    cta_impact: "Ikuti perkembangan dampaknya"
+    cta_share: "Bagikan ke orang lain"
+    share_copied: "Tautan disalin"
   player_notification_mailer:
     via: "%{org} · lewat Playverto"
     why: "Kamu menerima ini karena kamu minta mendengar dari organisasi yang Vertos-nya sudah kamu jawab."

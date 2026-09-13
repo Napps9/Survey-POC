@@ -1957,7 +1957,7 @@ vi:
     too_many: "Đó là khá nhiều lần thử — hãy đợi vài phút."
     link_sent: "Nếu địa chỉ đó có tài khoản, một liên kết đăng nhập đang được gửi đi."
   you:
-    eyebrow: "Vertos của bạn"
+    eyebrow: "Vertos của tôi"
     kept:
       one: "Đã giữ 1 Verto"
       other: "Đã giữ %{count} Vertos"
@@ -1970,9 +1970,7 @@ vi:
     delete: "Xóa tài khoản của tôi"
     delete_confirm: "Thao tác này xóa tài khoản của bạn và danh sách Vertos bạn đã giữ. Câu trả lời của bạn vẫn ở lại với các tổ chức đã hỏi — chúng được đưa ra ẩn danh và không thuộc quyền chúng tôi để xóa. Tiếp tục?"
     deleted: "Tài khoản của bạn đã bị xóa."
-    tabs_label: "Tài khoản của bạn"
-    tab_vertos: "Vertos"
-    back: "Vertos của bạn"
+    back: "Vertos của tôi"
     not_found: "Verto đó không có trong tài khoản của bạn."
     answered_on: "Bạn đã trả lời ngày %{date}"
     have_answered:
@@ -1995,7 +1993,6 @@ vi:
     wallet_orgs:
       one: "1 tổ chức"
       other: "%{count} tổ chức"
-    tab_next: "Tiếp theo"
     impact_link_default: "Đọc thêm"
     next_step_title: "Điều gì xảy ra tiếp theo"
     impact_title: "Câu trả lời của bạn đã làm được gì"
@@ -2004,12 +2001,15 @@ vi:
     next_title: "Tiếp theo là gì"
     next_because: "Vì bạn đã chơi %{verto}"
     next_meta: "Đang mở"
-    next_empty: "Chưa có gì mới. Bạn sẽ nhận được email khi một trong các tổ chức bạn đã trả lời đăng điều gì đó."
     wallet_note: "Mỗi Verto tự đặt điểm và số lượng riêng, nên các chồng điểm này không phải là cùng một thứ. Có một tổng số vì có nó thì thấy vui; không có bảng xếp hạng giữa các Vertos, vì nó chỉ đo được bạn tình cờ chơi Verto nào."
     wallet_pill: "Ví của bạn: đã thu được %{total}"
     wallet_see_all: "Xem tất cả"
     compare_pending: "So sánh mở khi có %{needed} câu trả lời (hiện có %{have})"
     compare_closed: "%{org} chưa mở kết quả này"
+    cta_compare: "So sánh kết quả"
+    cta_impact: "Theo dõi tác động"
+    cta_share: "Chia sẻ với người khác"
+    share_copied: "Đã sao chép liên kết"
   player_notification_mailer:
     via: "%{org} · qua Playverto"
     why: "Bạn nhận được thư này vì bạn đã xin nghe tin từ các tổ chức có Vertos mà bạn đã trả lời."

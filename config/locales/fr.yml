@@ -1958,7 +1958,7 @@ fr:
     too_many: "Cela fait beaucoup de tentatives — patientez quelques minutes."
     link_sent: "Si cette adresse a un compte, un lien de connexion est en route."
   you:
-    eyebrow: "Vos Vertos"
+    eyebrow: "Mes Vertos"
     kept:
       one: "1 Verto conservé"
       other: "%{count} Vertos conservés"
@@ -1971,9 +1971,7 @@ fr:
     delete: "Supprimer mon compte"
     delete_confirm: "Ceci supprime votre compte et la liste des Vertos que vous avez conservés. Vos réponses restent auprès des organisations qui les ont demandées : elles ont été données anonymement et il ne nous appartient pas de les retirer. Continuer ?"
     deleted: "Votre compte a été supprimé."
-    tabs_label: "Votre compte"
-    tab_vertos: "Vertos"
-    back: "Vos Vertos"
+    back: "Mes Vertos"
     not_found: "Ce Verto n'est pas dans votre compte."
     answered_on: "Vous avez répondu le %{date}"
     have_answered:
@@ -1996,7 +1994,6 @@ fr:
     wallet_orgs:
       one: "1 organisation"
       other: "%{count} organisations"
-    tab_next: "Suite"
     impact_link_default: "En savoir plus"
     next_step_title: "Ce qui se passe ensuite"
     impact_title: "Ce que vos réponses ont changé"
@@ -2005,12 +2002,15 @@ fr:
     next_title: "La suite"
     next_because: "Parce que vous avez joué %{verto}"
     next_meta: "Ouvert maintenant"
-    next_empty: "Rien de nouveau pour l'instant. Vous recevrez un e-mail quand l'une des organisations auxquelles vous avez répondu publiera quelque chose."
     wallet_note: "Chaque Verto définit ses propres jetons et ses propres montants : ces piles ne sont donc pas la même chose l'une que l'autre. Il y a un total parce qu'il est satisfaisant d'en avoir un ; il n'y a pas de classement entre Vertos, car cela ne mesurerait que le Verto qu'il vous est arrivé de jouer."
     wallet_pill: "Votre portefeuille : %{total} cumulés"
     wallet_see_all: "Tout voir"
     compare_pending: "La comparaison s'ouvre à %{needed} réponses (%{have} pour l'instant)"
     compare_closed: "%{org} n'a pas ouvert ces résultats"
+    cta_compare: "Comparer les résultats"
+    cta_impact: "Suivez l'impact au fil du temps"
+    cta_share: "Partager avec d'autres"
+    share_copied: "Lien copié"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Vous recevez ceci parce que vous avez demandé des nouvelles des organisations dont vous avez répondu aux Vertos."

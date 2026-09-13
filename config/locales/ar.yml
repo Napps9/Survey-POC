@@ -1973,7 +1973,7 @@ ar:
     too_many: "هذه محاولات كثيرة — انتظر بضع دقائق."
     link_sent: "إذا كان لهذا العنوان حساب، فسيصلك رابط لتسجيل الدخول."
   you:
-    eyebrow: "Vertos الخاصة بك"
+    eyebrow: "Vertos الخاصة بي"
     kept:
       one: "تم الاحتفاظ بـ Verto واحد"
       other: "تم الاحتفاظ بـ %{count} من Vertos"
@@ -1986,9 +1986,7 @@ ar:
     delete: "حذف حسابي"
     delete_confirm: "هذا يحذف حسابك وقائمة Vertos التي احتفظت بها. تبقى إجاباتك لدى المؤسسات التي سألت — فقد قُدّمت دون تعريف بالهوية وليس من حقنا إزالتها. هل تريد المتابعة؟"
     deleted: "تم حذف حسابك."
-    tabs_label: "حسابك"
-    tab_vertos: "Vertos"
-    back: "Vertos الخاصة بك"
+    back: "Vertos الخاصة بي"
     not_found: "هذا الـ Verto ليس في حسابك."
     answered_on: "أجبت في %{date}"
     have_answered:
@@ -2011,7 +2009,6 @@ ar:
     wallet_orgs:
       one: "مؤسسة واحدة"
       other: "%{count} مؤسسة"
-    tab_next: "التالي"
     impact_link_default: "اقرأ المزيد"
     next_step_title: "ما الذي سيحدث بعد ذلك"
     impact_title: "ما الذي فعلته إجاباتك"
@@ -2020,12 +2017,15 @@ ar:
     next_title: "ما هو التالي"
     next_because: "لأنك لعبت %{verto}"
     next_meta: "مفتوح الآن"
-    next_empty: "لا جديد بعد. ستصلك رسالة عندما تنشر إحدى المؤسسات التي أجبتها شيئًا."
     wallet_note: "كل Verto يحدد رموزه الخاصة ومقاديره الخاصة، لذا فهذه الأكوام ليست الشيء نفسه. يوجد مجموع لأن وجوده مُرضٍ؛ ولا يوجد ترتيب بين Vertos، لأنه لن يقيس سوى أي Verto صادف أن لعبته."
     wallet_pill: "محفظتك: تم جمع %{total}"
     wallet_see_all: "عرض الكل"
     compare_pending: "تُفتح المقارنة عند %{needed} إجابات (%{have} حتى الآن)"
     compare_closed: "لم تفتح %{org} هذه النتائج"
+    cta_compare: "قارن النتائج"
+    cta_impact: "تابع أثر إجاباتك"
+    cta_share: "شاركه مع آخرين"
+    share_copied: "تم نسخ الرابط"
   player_notification_mailer:
     via: "%{org} · عبر Playverto"
     why: "تصلك هذه الرسالة لأنك طلبت أن تسمع من المؤسسات التي أجبت عن Vertos الخاصة بها."

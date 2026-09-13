@@ -1963,7 +1963,7 @@ af:
     too_many: "Dis baie pogings — wag 'n paar minute."
     link_sent: "As daardie adres 'n rekening het, is 'n aanmeldskakel op pad."
   you:
-    eyebrow: "Jou Vertos"
+    eyebrow: "My Vertos"
     kept:
       one: "1 Verto gehou"
       other: "%{count} Vertos gehou"
@@ -1976,9 +1976,7 @@ af:
     delete: "Skrap my rekening"
     delete_confirm: "Dit skrap jou rekening en die lys Vertos wat jy gehou het. Jou antwoorde bly by die organisasies wat gevra het — hulle is anoniem gegee en dit staan nie aan ons om hulle te verwyder nie. Gaan voort?"
     deleted: "Jou rekening is geskrap."
-    tabs_label: "Jou rekening"
-    tab_vertos: "Vertos"
-    back: "Jou Vertos"
+    back: "My Vertos"
     not_found: "Daardie Verto is nie in jou rekening nie."
     answered_on: "Jy het op %{date} geantwoord"
     have_answered:
@@ -2001,7 +1999,6 @@ af:
     wallet_orgs:
       one: "1 organisasie"
       other: "%{count} organisasies"
-    tab_next: "Volgende"
     impact_link_default: "Lees meer"
     next_step_title: "Wat volgende gebeur"
     impact_title: "Wat jou antwoorde gedoen het"
@@ -2010,12 +2007,15 @@ af:
     next_title: "Wat volg"
     next_because: "Omdat jy %{verto} gespeel het"
     next_meta: "Nou oop"
-    next_empty: "Nog niks nuuts nie. Jy sal 'n e-pos kry wanneer een van die organisasies wat jy beantwoord het iets publiseer."
     wallet_note: "Elke Verto stel sy eie punte en sy eie bedrae, dus is hierdie hopies nie dieselfde ding as mekaar nie. Daar is 'n totaal omdat dit lekker is om een te hê; daar is geen ranglys oor Vertos heen nie, want dit sou net meet watter Verto jy toevallig gespeel het."
     wallet_pill: "Jou beursie: %{total} ingesamel"
     wallet_see_all: "Sien alles"
     compare_pending: "Vergelyking maak oop by %{needed} antwoorde (%{have} tot dusver)"
     compare_closed: "%{org} het nie hierdie resultate oopgemaak nie"
+    cta_compare: "Vergelyk resultate"
+    cta_impact: "Volg die impak soos dit ontvou"
+    cta_share: "Deel met ander"
+    share_copied: "Skakel gekopieer"
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Jy kry dit omdat jy gevra het om te hoor van organisasies wie se Vertos jy beantwoord het."

@@ -97,7 +97,6 @@ Rails.application.routes.draw do
   # use. GET confirms; POST signs in.
   get    "you",                to: "you#show",              as: :you
   get    "you/wallet",         to: "you#wallet",            as: :you_wallet
-  get    "you/next",           to: "you#next_up",           as: :you_next
   # One Verto in the account. :id is the SURVEY id, and the lookup is scoped to
   # the signed-in player's own claims — so the id is not a capability, it is
   # just a name, and someone else's Verto is a 404 whether or not it exists.

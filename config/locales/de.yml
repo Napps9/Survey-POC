@@ -1958,7 +1958,7 @@ de:
     too_many: "Das sind viele Versuche — warte ein paar Minuten."
     link_sent: "Wenn es zu dieser Adresse ein Konto gibt, ist ein Anmeldelink unterwegs."
   you:
-    eyebrow: "Deine Vertos"
+    eyebrow: "Meine Vertos"
     kept:
       one: "1 Verto behalten"
       other: "%{count} Vertos behalten"
@@ -1971,9 +1971,7 @@ de:
     delete: "Mein Konto löschen"
     delete_confirm: "Das löscht dein Konto und die Liste der Vertos, die du behalten hast. Deine Antworten bleiben bei den Organisationen, die gefragt haben — sie wurden anonym gegeben und es steht uns nicht zu, sie zu entfernen. Fortfahren?"
     deleted: "Dein Konto wurde gelöscht."
-    tabs_label: "Dein Konto"
-    tab_vertos: "Vertos"
-    back: "Deine Vertos"
+    back: "Meine Vertos"
     not_found: "Dieses Verto ist nicht in deinem Konto."
     answered_on: "Du hast am %{date} geantwortet"
     have_answered:
@@ -1996,7 +1994,6 @@ de:
     wallet_orgs:
       one: "1 Organisation"
       other: "%{count} Organisationen"
-    tab_next: "Weiter"
     impact_link_default: "Mehr lesen"
     next_step_title: "Wie es weitergeht"
     impact_title: "Was deine Antworten bewirkt haben"
@@ -2005,12 +2002,15 @@ de:
     next_title: "Was als Nächstes kommt"
     next_because: "Weil du %{verto} gespielt hast"
     next_meta: "Jetzt geöffnet"
-    next_empty: "Noch nichts Neues. Du bekommst eine E-Mail, sobald eine der Organisationen, die du beantwortet hast, etwas veröffentlicht."
     wallet_note: "Jedes Verto legt seine eigenen Punkte und seine eigenen Beträge fest — diese Stapel sind also nicht dasselbe wie einander. Es gibt eine Gesamtsumme, weil es befriedigend ist, eine zu haben; es gibt keine Rangliste über Vertos hinweg, weil sie nur messen würde, welches Verto du zufällig gespielt hast."
     wallet_pill: "Deine Brieftasche: %{total} gesammelt"
     wallet_see_all: "Alle ansehen"
     compare_pending: "Der Vergleich öffnet sich bei %{needed} Antworten (bisher %{have})"
     compare_closed: "%{org} hat diese Ergebnisse nicht freigegeben"
+    cta_compare: "Ergebnisse vergleichen"
+    cta_impact: "Verfolge, was daraus wird"
+    cta_share: "Mit anderen teilen"
+    share_copied: "Link kopiert"
   player_notification_mailer:
     via: "%{org} · über Playverto"
     why: "Du bekommst das, weil du von den Organisationen hören wolltest, deren Vertos du beantwortet hast."
