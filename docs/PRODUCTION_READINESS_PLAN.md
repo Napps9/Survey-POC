@@ -37,9 +37,12 @@ readable against the audit it came from._
    The client-side "disable the button while it's in flight" polish remains.
 
 **P0 is complete.** What remains is P1 (reliability hardening) and P2 (polish,
-docs, a11y, test depth), plus the commercial track below. Two operational items
-are outstanding outside the repo: `rake brand_assets:backfill_thumbs` and `rake
-card_images:backfill` have never been run against production.
+docs, a11y, test depth), plus the commercial track below. One operational item
+is outstanding outside the repo: `rake brand_assets:backfill_thumbs` has never
+been run against production. (`rake card_images:backfill` was run 2026-09-14 —
+43 images, ~22 MB out of the database — and `brand_assets:fix_filenames` the
+same day, finding nothing to rename; the two inline images the backfill could
+not store are `rake card_images:shrink_oversized`'s job.)
 
 Plus, commercially: **there is no billing, subscription, or usage metering of any
 kind** — a prerequisite for a paid "customer-ready" product.
