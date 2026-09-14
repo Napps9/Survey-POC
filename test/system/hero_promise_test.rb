@@ -135,33 +135,35 @@ class HeroPromiseTest < ApplicationSystemTestCase
            "— dropping the STRIP is the exception, dropping the picture never was."
   end
 
-  # …and the answer panel floats ON that backdrop rather than filling the card,
-  # which is what makes the picture visible rather than a hairline edging. Both
-  # halves matter: inset too far and the stack is squeezed after all.
-  test "the tap matrix's answer panel floats on its backdrop, inset on every side" do
+  # …and nothing is drawn between the answer and that backdrop. The panel keeps
+  # the whole card, as the exception above requires, but it keeps it as a pane
+  # of glass: an opaque one would hide the very picture this card type now
+  # exists to show, which is the whole of "remove the white box".
+  test "the tap matrix's answer sits on its backdrop, with no panel over it" do
     open_at(3)
     m = page.evaluate_script(<<~JS)
       (() => {
         const c  = document.querySelector(".preview-card.active")
-        const sc = c.querySelector(".split-card").getBoundingClientRect()
-        const sr = c.querySelector(".split-right").getBoundingClientRect()
+        const sr = c.querySelector(".split-right")
         const st = c.querySelector(".rotate-card-stack").getBoundingClientRect()
-        return { left: sr.left - sc.left, right: sc.right - sr.right,
-                 top: sr.top - sc.top, bottom: sc.bottom - sr.bottom,
-                 stack: st.height }
+        const cs = getComputedStyle(sr)
+        return { bg: cs.backgroundColor, bgImage: cs.backgroundImage,
+                 ink: cs.color, stack: st.height }
       })()
     JS
 
-    %w[left right top bottom].each do |side|
-      assert_operator m[side], :>=, 8,
-                      "the panel touches the card's #{side} edge (#{m[side].round(1)}px), so the " \
-                      "picture behind it is invisible on that side and the creator's background " \
-                      "reads as a rendering fault rather than a design"
-    end
+    assert_includes [ "rgba(0, 0, 0, 0)", "transparent" ], m["bg"],
+                    "the answer panel paints #{m['bg']} over the card's picture — an opaque " \
+                    "panel is the white box, whatever colour it happens to be"
+    assert_equal "none", m["bgImage"],
+                 "the answer panel carries a background image of its own, which is a second " \
+                 "surface between the words and the photograph"
+    assert_equal "rgb(255, 255, 255)", m["ink"],
+                 "the panel is see-through but its ink is still the dark-on-white value — the " \
+                 "question is being drawn in near-black on a photograph"
     assert_operator m["stack"], :>=, 260,
                     "the stack is #{m['stack'].round(1)}px, under its own 260px floor — the " \
-                    "floating panel is eating the answer, which is the squeeze this whole file " \
-                    "exists to prevent"
+                    "answer is being squeezed, which is the thing this whole file prevents"
   end
 
   test "NPS has no header, for the same reason" do

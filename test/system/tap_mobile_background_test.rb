@@ -14,9 +14,10 @@ require "application_system_test_case"
 # see, on the one surface they were designing for.
 #
 # It is the background now: behind the whole card, with the question and the
-# stack floating on it as a white panel. Which makes the pill honest without
-# rewiring it — "Change media" changes the picture in front of you, because the
-# picture in front of you is the card's.
+# stack drawn straight onto it — no panel, nothing between the words and the
+# photograph but the scrim that makes them readable. Which makes the pill
+# honest without rewiring it — "Change media" changes the picture in front of
+# you, because the picture in front of you is the card's.
 class TapMobileBackgroundTest < ApplicationSystemTestCase
   PHONE   = [ 390, 844 ].freeze
   DESKTOP = [ 1280, 900 ].freeze
@@ -101,6 +102,40 @@ class TapMobileBackgroundTest < ApplicationSystemTestCase
            "background"
     assert_includes g["painted"].to_s, HERO,
                     "the picture behind the card is not the card's own image"
+  end
+
+  # The picture is only a background if you can see it. A scrim over it is
+  # required — white ink on an unscrimmed photograph is unreadable on a bright
+  # one — but it has to be the DERIVED one, which is darkened exactly as far as
+  # 4.5:1 needs and no further. An opaque panel, or a scrim at 1, is the white
+  # box again in another colour.
+  test "the words are drawn on the picture, not on a panel over it" do
+    play(build)
+    m = page.evaluate_script(<<~JS)
+      (() => {
+        const c  = document.querySelector(".preview-card.active")
+        const sr = c.querySelector(".split-right")
+        const sl = c.querySelector(".split-left")
+        const cs = getComputedStyle(sr)
+        const scrim = getComputedStyle(sl, "::after")
+        return { bg: cs.backgroundColor, ink: cs.color,
+                 title: getComputedStyle(c.querySelector(".q-title")).color,
+                 scrim: scrim.backgroundColor }
+      })()
+    JS
+
+    assert_includes [ "rgba(0, 0, 0, 0)", "transparent" ], m["bg"],
+                    "the answer panel paints #{m['bg']} over the picture"
+    assert_equal "rgb(255, 255, 255)", m["title"],
+                 "the question is still the opaque card's near-black ink, on a photograph"
+
+    alpha = m["scrim"][/rgba?\([^)]*?([\d.]+)\)/, 1].to_f
+    assert_operator alpha, :>, 0.4,
+                    "the scrim is #{m['scrim']} — too thin for white to clear 4.5:1 over a " \
+                    "bright photograph, which is every photograph a creator might pick"
+    assert_operator alpha, :<, 1.0,
+                    "the scrim is opaque (#{m['scrim']}), so the picture it covers might as " \
+                    "well not be there — that is the white box wearing navy"
   end
 
   test "a tap card with no picture still has no panel at all" do

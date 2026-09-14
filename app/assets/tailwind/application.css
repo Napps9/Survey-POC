@@ -8250,13 +8250,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
        was painted over by the panel and sheared off mid-word. Anything
        positioned against the hero's bottom edge has to clear this. */
     --play-lip:        22px;
-    /* How far the content panel floats in from the card's edges on the one
-       card that puts a picture BEHIND it rather than above it (the tap matrix
-       — see "a tap card that CARRIES a picture" further down). It is the width
-       of the visible picture, so it is a design number, not a padding: at 14
-       the photo reads as a deliberate mount rather than a hairline that looks
-       like a rendering fault. */
-    --play-panel-inset: 14px;
 
     --play-eyebrow:    0.75rem;    /* 12px — desktop's, no smaller */
     --play-title:      1.625rem;   /* 26px — the question. Above desktop's 22 on purpose */
@@ -8693,43 +8686,51 @@ body.generating-overlay-active .bottom-bar { display: none; }
     padding: 0;
     border-radius: 0;
   }
+  /* The words go ON the picture: no panel, no card, nothing between the
+     question and the photograph but the scrim that makes it readable. The
+     stack needs nothing — every .rotate-card carries its own opaque picture
+     and its own dark statement band — so the card is the creator's image and
+     the answer sits in it.
+
+     --brand-scrim is not a taste, and not a new number: BrandPalette derives
+     it from the Verto's OWN colour, darkening it only as far as white needs
+     to clear 4.5:1 once composited over the brightest photo a card can carry
+     (a white one). The end screen paints this exact value for this exact
+     reason and end_screen_contrast_test measures the result, so the picture
+     is as visible here as legibility allows and no further. The literal is
+     the fallback for an unbranded Verto, where no property is emitted at all
+     — same pairing as every other reader of it. */
+  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--brand-scrim, rgba(28,32,52,0.72));
+  }
   .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-right {
     position: relative;
     z-index: 1;
-    /* `width: auto` because the base rule pins 100% and a margin on top of
-       that is a panel wider than the card it floats on. */
-    width: auto;
-    /* Content-height, and this is the half that makes it a background rather
-       than a border. Left to grow (and to --play-right-min's 50svh floor) the
-       panel eats the card's whole slack as WHITE — measured on a 390x844
-       phone, the question, the stack and the reset row come to about 660 of
-       the card's 800px, so ~140px that could be picture was blank panel and
-       the creator's photo was a 14px edging. Content-sized, that slack goes
-       back to the picture, top and bottom.
-       The floor is safe to drop here precisely because this type has one of
-       its own: .rotate-card-stack is min-height 260 / max-height 420, so the
-       answer cannot be squeezed by giving the panel its content height —
-       which is not true of any other card type, and is why this is scoped to
-       the tap matrix rather than written as a general rule. */
-    flex: 0 1 auto;
-    min-height: 0;
-    margin: var(--play-panel-inset);
-    border-radius: 18px;
-    /* The runway the floating Back/Submit pills need becomes a MARGIN here,
-       not the panel's own padding. Padding keeps the pills' room inside the
-       white — a dead band of panel below the answer, which is what the shot
-       showed — where a margin puts the pills over the picture instead, which
-       is the whole point of a panel that floats. */
-    margin-bottom: var(--play-pill-zone);
-    padding-bottom: var(--play-pad-y);
+    background: transparent;
+    color: #fff;
   }
-  /* …and the slack the panel just gave up is split above and below it, so the
-     panel reads as floating ON the picture rather than sitting at the top of
-     it. `safe`, like every other centring on this card: the panel is the thing
-     that must never be pushed off the top edge if the two ever do exceed the
-     card. */
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) {
-    justify-content: safe center;
+  /* The ink the transparent panel leaves standing on a photograph. Each of
+     these is a dark-on-white value from the opaque card — black title, 60%
+     black sub, 40-45% black chrome — and each is the same weight of white, so
+     the hierarchy the card was drawn with survives the inversion instead of
+     flattening into one bright block. */
+  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-title { color: #fff; }
+  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-subtitle { color: rgba(255,255,255,0.82); }
+  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .rotate-reset-btn,
+  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-nav-count {
+    color: rgba(255,255,255,0.75);
+  }
+  /* The editor's own control, which a respondent never sees and a creator
+     cannot do without: a dashed border in 15% BLACK is invisible on a dark
+     photograph, so the card would offer no way to add a statement.
+     Its neighbours the pager chevrons are deliberately NOT on this list —
+     they are already opaque white circles with a dark glyph, so they read on
+     any photograph, and whitening their ink turned them into blank discs. */
+  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-add-btn {
+    border-color: rgba(255,255,255,0.35);
   }
 
   /* Prioritise on mobile: every option has to be on screen AT ONCE, and for
@@ -10790,7 +10791,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
   --play-gap:        clamp(8px, calc(var(--device-h) * 0.016), 14px);
   --play-bar-clear:  calc(10px + 6px + 12px);
   --play-lip:        22px;
-  --play-panel-inset: 14px;
   --play-eyebrow:    0.75rem;
   --play-title:      1.625rem;
   --play-subtitle:   0.9375rem;
@@ -10897,21 +10897,31 @@ body.generating-overlay-active .bottom-bar { display: none; }
   padding: 0;
   border-radius: 0;
 }
+.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left::after,
+.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--brand-scrim, rgba(28,32,52,0.72));
+}
 .device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-right,
 .device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-right {
   position: relative;
   z-index: 1;
-  width: auto;
-  flex: 0 1 auto;
-  min-height: 0;
-  margin: var(--play-panel-inset);
-  margin-bottom: var(--play-pill-zone);
-  padding-bottom: var(--play-pad-y);
-  border-radius: 18px;
+  background: transparent;
+  color: #fff;
 }
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video),
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) {
-  justify-content: safe center;
+.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-title,
+.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-title {
+  color: #fff;
+}
+.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count),
+.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count) {
+  color: rgba(255,255,255,0.8);
+}
+.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-add-btn,
+.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-add-btn {
+  border-color: rgba(255,255,255,0.35);
 }
 /* A card that HAS a strip keeps the design prompt inside it, as the block it
    was drawn to be — there is a panel to fill, and filling it is the invitation.
