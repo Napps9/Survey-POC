@@ -116,16 +116,34 @@ class SurveyTranslatorNpsAnchorsTest < ActiveSupport::TestCase
   # for it, and the digest is what an approval is an approval OF — so hashing
   # the blanks would have made every approval in the product read "Approved,
   # then edited" on a line whose words had not changed.
-  test "a field nobody filled in does not move a line's approval digest" do
+  # The digest is what an approval is an approval OF, so this asserts the hash
+  # a line HAD before the captions existed — reproduced, not approximated.
+  # Every card of every type gained two blank keys when they were added to
+  # SCALAR_FIELDS, and any change to the hashed payload lapses every approval
+  # in the product at once. Dropping every blank (the first thing I wrote) does
+  # that too: a card with no sub-text has always hashed one as "".
+  test "adding the captions left every existing approval digest untouched" do
     lines = LanguageCheckLines
     plain = { "cid" => "c1", "type" => "yes_no", "text" => "Agree?", "options" => %w[Yes No] }
-    content = lines.canonical_content(plain)
 
-    assert content.key?("nps_low_label"), "canonical_content builds a key per SCALAR_FIELD"
-    assert_equal lines.digest(content.except("nps_low_label", "nps_high_label")),
-                 lines.digest(content),
-                 "a blank field must not be part of the hash, or every approval lapses the day " \
-                 "a new field is added to the screen"
+    before_captions = %w[modal_title modal_body text description explanation]
+      .index_with { |f| plain[f].to_s }
+      .merge("options" => %w[Yes No], "responses" => [], "pages" => [])
+
+    assert_equal Digest::SHA256.hexdigest(before_captions.to_json),
+                 lines.digest(lines.canonical_content(plain)),
+                 "the hash of a line with no captions has to be the hash it already had, or " \
+                 "every approval anyone has given reads 'Approved, then edited' on a line " \
+                 "whose words have not changed"
+  end
+
+  test "a blank field that is NOT a caption still counts, as it always did" do
+    lines = LanguageCheckLines
+    content = lines.canonical_content({ "cid" => "c1", "type" => "yes_no", "text" => "Agree?" })
+
+    refute_equal lines.digest(content.except("description")), lines.digest(content),
+                 "dropping every blank would have moved the digest of every line with no " \
+                 "sub-text — the same damage, one step quieter"
   end
 
   test "a caption that IS filled in moves the digest, because the words moved" do

@@ -155,16 +155,23 @@ module LanguageCheckLines
   # `untranslated` is excluded deliberately — it is a derived annotation about
   # where the words came from, not the words themselves, and including it would
   # lapse every approval on a line the moment an unrelated field was filled in.
-  # A field that is blank on this card is left out entirely, rather than
-  # hashed as "". Every card of every type carries a key for every
-  # SCALAR_FIELD (canonical_content builds them off the list), so a field
-  # ADDED to that list would otherwise move the digest of every line in the
-  # product at once — and every approval anyone had ever given would read
-  # "Approved, then edited" on a line whose words had not changed. Dropping
-  # blanks makes the hash describe the words that are there, which is what an
-  # approval is an approval of.
+  # The NPS captions are left out when blank, and ONLY them. Every card of
+  # every type carries a key for every SCALAR_FIELD (canonical_content builds
+  # them off the list), so adding two to that list gave every line in the
+  # product two empty strings and moved its hash — and every approval anyone
+  # had ever given would have read "Approved, then edited" on a line whose
+  # words had not changed.
+  #
+  # Narrow on purpose, and measured: dropping EVERY blank looks tidier and does
+  # the same damage, because a card with no sub-text or no quiz explanation has
+  # always hashed those as "" and would move too. Rejecting just the new keys
+  # reproduces the pre-captions hash byte for byte (they were appended to
+  # SCALAR_FIELDS, so the remaining key order is unchanged), which is what
+  # keeps existing approvals standing. A caption a creator has actually written
+  # is a word on the line and belongs in the hash, so it stays in.
   def digest(content)
-    canonical = content.except("untranslated").reject { |_, v| v.blank? }
+    canonical = content.except("untranslated")
+                       .reject { |k, v| Survey::NPS_ANCHOR_KEYS.include?(k) && v.blank? }
     Digest::SHA256.hexdigest(canonical.to_json)
   end
 
