@@ -8766,21 +8766,22 @@ body.generating-overlay-active .bottom-bar { display: none; }
       .slider-label-text:not(.is-active)) {
     color: rgba(255,255,255,0.8);
   }
-  /* A prioritise card's rows are 3% BLACK on a white card — a tint, which is
-     all they need to read there and nothing at all on a picture: measured on
-     the phone frame, the row was invisible and its dark label sat straight on
-     the photograph. They become the same tint in the other direction, with the
-     ink to match. The tap stack needs none of this (every .rotate-card is an
-     opaque picture of its own) and NPS none either (its vessel is solid) —
-     this is the one of the three whose answer is drawn in ink. */
+  /* THE ANSWER IS SOLID. A prioritise card's rows are 3% BLACK on a white card
+     — a tint, which is all they need there and nothing at all on a picture:
+     measured in the phone frame, the row vanished and its dark label sat
+     straight on the photograph. A tint in the other direction fixed the label
+     and left the row see-through, which is not what an answer should be
+     ("the answers need to be solid not see through"). So they are opaque, and
+     they keep the ink they already have — a respondent is choosing between
+     these, and a thing you choose between should not have a photograph
+     showing through it.
+     The other two types need nothing here and that is the same rule, not an
+     exemption: every .rotate-card is an opaque picture of its own, and NPS's
+     vessel is solid already. */
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
     :is(.choice-list-item, .pick-item) {
-    background: rgba(255,255,255,0.14);
-    border-color: rgba(255,255,255,0.22);
-    color: #fff;
-  }
-  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .pick-text {
-    color: #fff;
+    background: #fff;
+    border-color: rgba(0,0,0,0.07);
   }
   /* The editor's own control, which a respondent never sees and a creator
      cannot do without: a dashed border in 15% BLACK is invisible on a dark
@@ -11005,12 +11006,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
   :is(.choice-list-item, .pick-item) {
-  background: rgba(255,255,255,0.14);
-  border-color: rgba(255,255,255,0.22);
-  color: #fff;
-}
-.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .pick-text {
-  color: #fff;
+  background: #fff;
+  border-color: rgba(0,0,0,0.07);
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .tap-add-btn {
   border-color: rgba(255,255,255,0.35);

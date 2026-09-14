@@ -222,6 +222,36 @@ class MobileBackgroundTest < ApplicationSystemTestCase
     assert_selector "[data-media-picker-target='searchInput']", visible: true
   end
 
+  # "The answers need to be solid not see through." A row a respondent chooses
+  # between is not a place to show a photograph off: the background is behind
+  # the answer, never inside it. The other two types satisfy this by
+  # construction — a tap statement is an opaque picture, an NPS vessel is solid
+  # — so prioritise is the one that has to be held to it.
+  test "a prioritise row on a background is opaque, not a tint over the picture" do
+    open_editor(build(live: false), device: "mobile")
+
+    # .choice-list-item carries `transition: background 0.12s`, and the device
+    # toggle is a class change — so a read taken straight after it catches the
+    # row part-way between the white card's tint and this one and reports a
+    # half-alpha that belongs to neither. Wait for the value to settle rather
+    # than assert on a frame of the animation.
+    row = nil
+    settled = wait_until do
+      row = evaluate_script(<<~JS)
+        (() => {
+          const el = document.querySelector("[data-card-cid='p1'] .choice-list-item")
+          const cs = getComputedStyle(el)
+          return { bg: cs.backgroundColor, ink: cs.color }
+        })()
+      JS
+      !row["bg"].start_with?("rgba")
+    end
+
+    assert settled, "the answer row settled at #{row['bg']} — a respondent can see the " \
+                    "background through the thing they are being asked to rank"
+    assert_equal "rgb(255, 255, 255)", row["bg"]
+  end
+
   test "the phone's Background control is offered on a card that already has a picture" do
     open_editor(build(live: false), device: "mobile")
 
