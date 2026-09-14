@@ -20,7 +20,16 @@
        request, because the host that would answer them is exactly what's
        down. The one script polls /up and reloads the moment the app answers,
        so nobody has to know to refresh. English-only for the same reason the
-       500 page is — a static file has no I18n. -->
+       500 page is — a static file has no I18n.
+
+       The scene is one inline SVG on a single 11s CSS loop. A crane stacks six
+       floors, one every 0.8s, each sliding in from behind the curtain leg and
+       lighting its windows as it lands; at 4.8s a star pops onto the roof and
+       the footlights come up on the finished building for three seconds; the
+       curtain closes over it, everything resets behind it, and it reopens on
+       an empty stage. Every reset happens while the curtain is shut, so the
+       loop never visibly jumps. Reduced motion gets the finished building,
+       lit, curtain open. -->
   <noscript><meta http-equiv="refresh" content="30"></noscript>
   <style>
     :root { --navy: #1C2034; --panel: #272D4A; --aqua: #01EACB; --pink: #FF1E6F; }
@@ -37,8 +46,9 @@
       border: 1px solid rgba(255,255,255,0.08); border-radius: 18px;
       padding: 40px 32px; text-align: center;
     }
+    @media (max-width: 480px) { .card { padding: 30px 22px; } }
     .wordmark {
-      font-size: 26px; letter-spacing: 1.4px; line-height: 1; margin-bottom: 28px;
+      font-size: 26px; letter-spacing: 1.4px; line-height: 1; margin-bottom: 22px;
     }
     .wordmark b { font-weight: 400; }
     .wordmark .a { color: #F7F7F7; }
@@ -47,23 +57,90 @@
     p { font-size: 15px; line-height: 1.6; color: rgba(247,247,247,0.7); margin: 0 0 24px; }
     .code {
       display: inline-block; font-size: 12px; letter-spacing: 1.5px;
-      color: rgba(247,247,247,0.35); margin-bottom: 18px; text-transform: uppercase;
+      color: rgba(247,247,247,0.5); margin-bottom: 18px; text-transform: uppercase;
     }
-    /* Three dots breathing in the brand aqua: "something is happening", without
-       a spinner that implies this page itself is loading. */
-    .pulse { display: flex; justify-content: center; gap: 10px; margin: 0 0 28px; }
-    .pulse span {
-      width: 10px; height: 10px; border-radius: 50%; background: var(--aqua);
-      opacity: 0.25; animation: breathe 1.6s ease-in-out infinite;
+
+    /* ── The stage ────────────────────────────────────────────────────────
+       One 11s period shared by every animation here. Each floor is staggered
+       by animation-delay (0.8s a floor) off the SAME keyframes; the crane's
+       trolley and cable have their own keyframes whose stops are those same
+       beats written out absolutely (beat i starts at 7.2727i%), so the hook
+       is always on the block it is carrying.
+
+       The timeline, in seconds: 0–4.8 six floors; 4.8 star + footlights up;
+       8.0 curtain closes; 8.8 everything hides and resets behind it; 9.4–10.1
+       curtain reopens on an empty stage; 11.0 the next floor slides in.
+
+       Every un-animated base state is the FINISHED scene — building up,
+       windows lit, star on the roof, footlights on, curtain open, crane hook
+       parked down at stage level — so reduced motion is just "stop", with no
+       second set of rules to keep in step. */
+    .stage { margin: 0 auto 22px; max-width: 360px; }
+    .stage svg { display: block; width: 100%; height: auto; }
+    @media (max-height: 620px) { .stage { max-width: 260px; } }
+    .b { transform-box: fill-box; transform-origin: 50% 0; --g: calc(var(--i) * 12px);
+         animation: drop 11s infinite, var(--v) 11s infinite;
+         animation-delay: calc(var(--i) * .8s), 0s; }
+    .w { animation: lit 11s infinite; animation-delay: calc(var(--i) * .8s); }
+    .tr { animation: tr 11s infinite; }
+    /* 81 = the distance from the trolley (y=37) down to stage floor level
+       (y=118), where a floor is picked up. It is also the parked hook of the
+       static scene, which is why it is the base and not just a keyframe. */
+    .cb { transform-origin: 222px 37px; transform: scaleY(81); animation: cb 11s infinite; }
+    .tv { animation: shut 11s ease-in-out infinite; }
+    .st { transform-box: fill-box; transform-origin: 50% 50%; animation: pop 11s infinite; }
+    .gl { animation: up 11s infinite; }
+    .fl { animation: lamps 11s infinite; }
+    /* One floor's beat: slide in from the wing, hook on, hoist, travel to
+       centre, swing, drop, land with a hop. 0.8s, then it holds at rest for
+       the remaining 10.2s. */
+    @keyframes drop {
+      0% { transform: translate(200px, var(--g)) rotate(0); }
+      2.73%, 3.09% { transform: translate(62px, var(--g)) rotate(0); }
+      4.18% { transform: translate(62px, -10px) rotate(0); }
+      5.27% { transform: translate(0, -10px) rotate(-5deg); }
+      5.64% { transform: translate(0, -10px) rotate(3deg); }
+      6% { transform: translate(0, -10px) rotate(0); animation-timing-function: ease-in; }
+      6.55% { transform: translate(0, 0) rotate(0); }
+      6.82% { transform: translate(0, -2px) rotate(0); }
+      7.18%, 100% { transform: none; }
     }
-    .pulse span:nth-child(2) { animation-delay: 0.25s; }
-    .pulse span:nth-child(3) { animation-delay: 0.5s; }
-    @keyframes breathe { 0%, 100% { opacity: 0.25; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
+    @keyframes lit { 0%, 6.55% { opacity: .15; } 7.18%, 100% { opacity: 1; } }
+    /* Each floor is hidden until its own beat and again from the moment the
+       curtain is shut, so neither the wait nor the reset is ever on screen. */
+    @keyframes v0 { 0%, 79.5% { visibility: visible; } 80%, 100% { visibility: hidden; } }
+    @keyframes v1 { 0%, 7% { visibility: hidden; } 7.27%, 79.5% { visibility: visible; } 80%, 100% { visibility: hidden; } }
+    @keyframes v2 { 0%, 14.3% { visibility: hidden; } 14.55%, 79.5% { visibility: visible; } 80%, 100% { visibility: hidden; } }
+    @keyframes v3 { 0%, 21.5% { visibility: hidden; } 21.82%, 79.5% { visibility: visible; } 80%, 100% { visibility: hidden; } }
+    @keyframes v4 { 0%, 28.8% { visibility: hidden; } 29.09%, 79.5% { visibility: visible; } 80%, 100% { visibility: hidden; } }
+    @keyframes v5 { 0%, 36.1% { visibility: hidden; } 36.36%, 79.5% { visibility: visible; } 80%, 100% { visibility: hidden; } }
+    @keyframes tr {
+      0%, 4.18%, 9.09%, 11.45%, 16.36%, 18.73%, 23.64%, 26%, 30.91%, 33.27%, 38.18%, 40.55%, 45.45%, 100% { transform: none; }
+      5.27%, 7.18%, 12.55%, 14.45%, 19.82%, 21.73%, 27.09%, 29%, 34.36%, 36.27%, 41.64%, 43.55% { transform: translateX(-62px); }
+    }
+    @keyframes cb {
+      2.73%, 3.09%, 10%, 10.36%, 17.27%, 17.64%, 24.55%, 24.91%, 31.82%, 32.18%, 39.09%, 39.45%, 46%, 100% { transform: scaleY(81); }
+      4.18%, 6% { transform: scaleY(71); animation-timing-function: ease-in; } 6.55%, 7.18% { transform: scaleY(81); }
+      11.45%, 13.27% { transform: scaleY(59); animation-timing-function: ease-in; } 13.82%, 14.45% { transform: scaleY(69); }
+      18.73%, 20.55% { transform: scaleY(47); animation-timing-function: ease-in; } 21.09%, 21.73% { transform: scaleY(57); }
+      26%, 27.82% { transform: scaleY(35); animation-timing-function: ease-in; } 28.36%, 29% { transform: scaleY(45); }
+      33.27%, 35.09% { transform: scaleY(23); animation-timing-function: ease-in; } 35.64%, 36.27% { transform: scaleY(33); }
+      40.55%, 42.36% { transform: scaleY(11); animation-timing-function: ease-in; } 42.91%, 43.55% { transform: scaleY(21); }
+    }
+    /* The last floor lands at 43.64%: the star pops and the house lights come
+       up together, and hold for three seconds before the curtain closes. */
+    @keyframes pop { 0%, 43.64% { transform: scale(0); } 46.36% { transform: scale(1.4); } 48.18%, 79.09% { transform: scale(1); } 79.5%, 100% { transform: scale(0); } }
+    @keyframes up { 0%, 43.64% { opacity: 0; } 46.36%, 79.09% { opacity: 1; } 79.5%, 100% { opacity: 0; } }
+    @keyframes lamps { 0%, 43.64% { opacity: .5; } 46.36%, 79.09% { opacity: 1; } 79.5%, 100% { opacity: .5; } }
+    @keyframes shut { 0%, 72.73% { transform: none; } 79.09%, 85.45% { transform: translateX(var(--s)); } 91.82%, 100% { transform: none; } }
     @media (prefers-reduced-motion: reduce) {
-      .pulse span { animation: none; opacity: 0.7; }
+      .stage * { animation: none !important; }
     }
+    /* Once the poller has given up (half an hour), stop repainting a scene
+       nobody is watching. The button below still works. */
+    .still .stage * { animation-play-state: paused; }
     button.cta {
-      display: inline-block; padding: 12px 26px; border-radius: 100px; border: 0;
+      display: inline-block; padding: 14px 26px; border-radius: 100px; border: 0;
       background: var(--aqua); color: var(--navy); font: inherit; font-size: 15px;
       letter-spacing: 0.4px; cursor: pointer;
     }
@@ -74,10 +151,45 @@
 <body>
   <div class="card">
     <div class="wordmark"><b><span class="a">play</span><span class="b">verto</span></b></div>
-    <div class="code">Deploying</div>
+    <div class="stage" aria-hidden="true">
+      <svg viewBox="0 0 320 150">
+        <defs>
+          <clipPath id="r"><rect width="320" height="150" rx="12"/></clipPath>
+          <linearGradient id="fg"><stop offset="0" stop-color="#1C2034" stop-opacity=".55"/><stop offset=".5" stop-color="#1C2034" stop-opacity=".1"/><stop offset="1" stop-color="#1C2034" stop-opacity=".55"/></linearGradient>
+          <pattern id="f" width="14" height="150" patternUnits="userSpaceOnUse"><rect width="14" height="150" fill="#FF1E6F"/><rect width="14" height="150" fill="url(#fg)"/></pattern>
+          <linearGradient id="gl" x2="0" y2="1"><stop offset="0" stop-color="#FFFA77" stop-opacity="0"/><stop offset="1" stop-color="#FFFA77" stop-opacity=".22"/></linearGradient>
+          <path id="win" d="M8 3h8v6H8zM24 3h8v6h-8zM40 3h8v6h-8z" fill="#FFFA77"/>
+        </defs>
+        <g clip-path="url(#r)">
+          <rect width="320" height="150" fill="#1C2034"/>
+          <g fill="#F7F7F7" opacity=".5"><circle cx="100" cy="58" r="1.2"/><circle cx="118" cy="42" r=".8"/><circle cx="212" cy="50" r="1"/></g>
+          <rect y="130" width="320" height="20" fill="#615BF5" opacity=".3"/>
+          <g fill="#0CA7FF"><rect x="245" y="36" width="4" height="94"/><rect x="136" y="33" width="126" height="3"/></g>
+          <rect x="240" y="27" width="14" height="8" rx="2" fill="#FFFA77"/>
+          <g class="tr"><rect x="218" y="31" width="8" height="6" rx="1" fill="#FFFA77"/><line class="cb" x1="222" y1="37" x2="222" y2="38" stroke="#F7F7F7"/></g>
+          <g class="b" style="--i:0;--v:v0"><rect x="132" y="118" width="56" height="12" rx="1.5" fill="#01EACB"/><use href="#win" x="132" y="118" class="w"/></g>
+          <g class="b" style="--i:1;--v:v1"><rect x="132" y="106" width="56" height="12" rx="1.5" fill="#615BF5"/><use href="#win" x="132" y="106" class="w"/></g>
+          <g class="b" style="--i:2;--v:v2"><rect x="132" y="94" width="56" height="12" rx="1.5" fill="#0CA7FF"/><use href="#win" x="132" y="94" class="w"/></g>
+          <g class="b" style="--i:3;--v:v3"><rect x="132" y="82" width="56" height="12" rx="1.5" fill="#FF1E6F"/><use href="#win" x="132" y="82" class="w"/></g>
+          <g class="b" style="--i:4;--v:v4"><rect x="132" y="70" width="56" height="12" rx="1.5" fill="#01EACB"/><use href="#win" x="132" y="70" class="w"/></g>
+          <g class="b" style="--i:5;--v:v5"><rect x="132" y="58" width="56" height="12" rx="1.5" fill="#615BF5"/><use href="#win" x="132" y="58" class="w"/></g>
+          <path class="st" d="M160 43l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.4 5-.6z" fill="#FFFA77"/>
+          <rect class="gl" x="70" y="98" width="180" height="32" fill="url(#gl)"/>
+          <line class="fl" x1="88" y1="133" x2="232" y2="133" stroke="#FFFA77" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 18"/>
+          <g class="tv" style="--s:162px"><rect id="tp" x="-162" width="164" height="150" fill="url(#f)"/></g>
+          <g class="tv" style="--s:-162px"><use href="#tp" transform="matrix(-1 0 0 1 320 0)"/></g>
+          <path id="cl" d="M0 0H64C58 30 40 56 36 80C40 104 54 126 56 150H0Z" fill="url(#f)"/>
+          <use href="#cl" transform="matrix(-1 0 0 1 320 0)"/>
+          <rect id="tb" x="27" y="76" width="16" height="5" rx="2.5" fill="#FFFA77"/>
+          <use href="#tb" transform="matrix(-1 0 0 1 320 0)"/>
+          <path d="M0 0H320V16Q300 32 280 16Q260 32 240 16Q220 32 200 16Q180 32 160 16Q140 32 120 16Q100 32 80 16Q60 32 40 16Q20 32 0 16Z" fill="url(#f)"/>
+          <path d="M320 16Q300 32 280 16Q260 32 240 16Q220 32 200 16Q180 32 160 16Q140 32 120 16Q100 32 80 16Q60 32 40 16Q20 32 0 16" fill="none" stroke="#FFFA77" stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+    <div class="code">Setting the stage</div>
     <h1>We're deploying a new feature</h1>
-    <p>Playverto is being updated and will be back in a few minutes. This page checks on its own and reloads the moment we're ready, so you can leave it open.</p>
-    <div class="pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p>Playverto is being updated and will be back in a few minutes. This page reloads on its own the moment we're ready, so you can leave it open.</p>
     <button class="cta" type="button" id="retry">Try again now</button>
     <p class="small">Any Verto link you were given will work again as soon as we're back.</p>
   </div>
@@ -97,7 +209,10 @@
       var delay = 4000
       var started = Date.now()
       function check() {
-        if (Date.now() - started > 30 * 60 * 1000) return
+        if (Date.now() - started > 30 * 60 * 1000) {
+          document.body.className += " still"
+          return
+        }
         fetch("/up", { cache: "no-store", credentials: "omit" })
           .then(function (res) { if (res.ok) window.location.reload() })
           .catch(function () {})

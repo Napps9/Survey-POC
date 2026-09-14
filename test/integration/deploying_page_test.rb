@@ -61,6 +61,57 @@ class DeployingPageTest < ActionDispatch::IntegrationTest
     assert_includes page, '<meta name="robots" content="noindex">'
   end
 
+  # ── The scene ──────────────────────────────────────────────────────────
+  # A crane stacking a building behind a theatre curtain, because a minute of
+  # downtime is a better moment to be charming than to be terse. It is one
+  # inline SVG driven by CSS keyframes: nothing to fetch, which is the whole
+  # constraint this page lives under.
+
+  test "the scene is decorative, so a screen reader reads the copy and not the set" do
+    assert_includes page, '<div class="stage" aria-hidden="true">'
+  end
+
+  test "every part of the scene shares one loop period" do
+    # The floors, the crane's trolley and cable, the curtain, the star, the
+    # footlights and the glow are separate animations that have to agree about
+    # where they are: the hook is only ever on the block it is carrying because
+    # its keyframes are that block's beat written out absolutely. A second
+    # period anywhere and they drift apart within a few loops.
+    periods = page.scan(/animation:[^;]*?(\d+(?:\.\d+)?)s/).flatten.uniq
+    assert_equal [ "11" ], periods, "every animation should run on the same 11s loop"
+  end
+
+  test "each floor is staggered off the shared keyframes rather than its own" do
+    html = page
+    assert_includes html, "animation-delay: calc(var(--i) * .8s)"
+    # And hidden until its own beat, and again from the moment the curtain is
+    # shut — otherwise the loop's reset (six floors vanishing) happens in full
+    # view and the scene visibly jumps every time round.
+    (0..5).each { |i| assert_match(/@keyframes v#{i} .*visibility: hidden/, html) }
+  end
+
+  test "reduced motion stops the scene and leaves the finished building" do
+    html = page
+    assert_match(/@media \(prefers-reduced-motion: reduce\) \{\s*\.stage \* \{ animation: none !important; \}/, html)
+    # This only works because every un-animated base state IS the finished
+    # scene. The crane's cable is the one that needs saying: its base length
+    # parks the hook at stage level, and a bare value here left it dangling in
+    # mid-air beside the building.
+    assert_includes html, "transform: scaleY(81); animation: cb 11s infinite"
+  end
+
+  test "the scene stops repainting once the poller has given up" do
+    html = page
+    # Half an hour in a tab nobody is watching, the page stops asking whether
+    # the app is back; it should stop animating a pattern-filled curtain too.
+    assert_includes html, ".still .stage * { animation-play-state: paused; }"
+    assert_includes html, 'document.body.className += " still"'
+  end
+
+  test "the one tap target is big enough to hit" do
+    assert_includes page, "padding: 14px 26px", "the retry button should clear 44px"
+  end
+
   test "is served from public/ with the revalidating cache policy static HTML gets" do
     get "/deploying.html"
     assert_response :success
