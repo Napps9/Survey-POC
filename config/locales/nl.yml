@@ -2108,6 +2108,8 @@ nl:
     save_prefs: "Voorkeuren opslaan"
     prefs_saved: "Voorkeuren opgeslagen."
     delete_body: "Hiermee verwijder je je account en de lijst met Vertos die je hebt bewaard. Je antwoorden blijven bij de organisaties die ze vroegen — ze zijn anoniem gegeven en het is niet aan ons om ze te verwijderen."
+    beta_tag: "Bèta"
+    beta_note: "Welkom bij je spelersaccount. Blijf op de hoogte van de onderwerpen waar je om geeft, vergelijk je resultaten, volg de impact die jouw antwoorden hebben gemaakt — en zet je punten erachter."
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Je krijgt dit omdat je hebt gevraagd om te horen van organisaties waarvan je een Verto hebt beantwoord."

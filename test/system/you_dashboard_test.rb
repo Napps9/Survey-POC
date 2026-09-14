@@ -108,6 +108,13 @@ class YouDashboardTest < ApplicationSystemTestCase
       assert_no_selector ".you-account-name", visible: true
       assert_selector ".you-avatar", visible: true
 
+      # The beta strip's tag stops being a lead-in and becomes a heading —
+      # beside three lines of text it would leave them a column too narrow.
+      beta_tag  = box_for(".you-beta-tag")
+      beta_text = box_for(".you-beta-text")
+      assert_operator beta_text["top"], :>, beta_tag["top"],
+                      "the beta strip did not stack at phone width"
+
       first_tile  = box_for(".you-tile:nth-of-type(1)")
       second_tile = box_for(".you-tile:nth-of-type(2)")
       third_tile  = box_for(".you-tile:nth-of-type(3)")

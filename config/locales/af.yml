@@ -2111,6 +2111,8 @@ af:
     save_prefs: "Stoor voorkeure"
     prefs_saved: "Voorkeure gestoor."
     delete_body: "Dit skrap jou rekening en die lys Vertos wat jy gehou het. Jou antwoorde bly by die organisasies wat gevra het — hulle is anoniem gegee en dit staan nie aan ons om hulle te verwyder nie."
+    beta_tag: "Beta"
+    beta_note: "Welkom by jou spelerrekening. Bly op hoogte van die dinge waarvoor jy omgee, vergelyk jou resultate, volg die verskil wat jou antwoorde gemaak het — en sit jou punte daaragter."
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Jy kry dit omdat jy gevra het om te hoor van organisasies wie se Vertos jy beantwoord het."

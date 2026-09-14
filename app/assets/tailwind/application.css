@@ -14086,6 +14086,40 @@ body.generating-overlay-active .bottom-bar { display: none; }
    that mark used to give the first card is given here instead. */
 .you-page-bar .you-shell { padding-top: 24px; }
 
+/* ── The beta strip ────────────────────────────────────────────────────────
+   Above the bar, full-bleed, on every account page. Positioned (like the bar
+   below it) so it draws over .you-orbs, which is absolutely positioned across
+   the whole page — an unpositioned strip would sit under the teal blur in the
+   top-left corner and lose half its contrast to it. Below the bar's z-index,
+   because both of the bar's menus hang down over what follows and the strip
+   is what they would be hanging over if the page were scrolled.
+
+   Tinted teal→indigo rather than given a colour of its own: it is the account
+   saying something about itself, not a warning, and the two accents are the
+   ones the hero underneath it already drifts between. */
+.you-beta {
+  position: relative; z-index: 40;
+  background: linear-gradient(90deg, rgba(1,234,203,0.13), rgba(97,91,245,0.15));
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-family: "ABeeZee", sans-serif;
+  padding: 9px 16px;
+}
+.you-beta-inner {
+  max-width: 1320px; margin: 0 auto;
+  display: flex; align-items: center; gap: 10px;
+}
+.you-beta-tag {
+  flex-shrink: 0;
+  padding: 2px 10px; border-radius: 100px;
+  background: rgba(1,234,203,0.16); border: 1px solid rgba(1,234,203,0.45);
+  color: #01EACB; font-size: 11px; line-height: 1.5;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.you-beta-text {
+  margin: 0; min-width: 0;
+  font-size: 13px; line-height: 1.45; color: rgba(255,255,255,0.8);
+}
+
 /* ── The top bar ───────────────────────────────────────────────────────────
    The creator's bar (.bottom-bar), in the account's colours: the mark on the
    left, where you are in the middle, who you are on the right. Not fixed —
@@ -14603,6 +14637,11 @@ a.you-tile:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
 @media (max-width: 767px) {
   .you-topbar { padding: 0 12px; }
   .you-topbar-centre, .you-account-name { display: none; }
+  /* The tag stops being a lead-in and becomes a heading: three words beside
+     three lines of text leaves the text a column too narrow to read. */
+  .you-beta { padding: 10px 12px; }
+  .you-beta-inner { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .you-beta-text { font-size: 12px; }
   .you-hero, .you-hero-account { padding-left: 18px; padding-right: 18px; }
   .you-h1-hero { font-size: 30px; }
   .you-main { padding-left: 18px; padding-right: 18px; }

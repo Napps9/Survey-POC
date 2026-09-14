@@ -105,12 +105,19 @@ class YouWalletPillTest < ApplicationSystemTestCase
 
     pill = box_for(".you-purse-pill")
     lang = box_for(".lang-switcher-btn")
+    bar  = box_for(".you-topbar")
 
     # Both in the bar, and not overlapping: the pill is the Wallet chip in the
     # bar's centre and the language button is on its right, and the bug this
     # guards is the pill landing on top of a language button whose width
     # depends on the code inside it.
-    assert_operator pill["top"], :<, 60, "the pill is not in the bar"
+    #
+    # Against the BAR's own centre rather than the viewport's top, which is
+    # what "y < 60" was standing in for: it meant "inside the bar" only for as
+    # long as the bar was the first thing on the page, and the beta strip now
+    # sits above it. The bar is a fixed 56px row, so a pill that wrapped out
+    # of it moves off that centre whatever the page above has done.
+    assert_in_delta bar["y"], pill["y"], 2, "the pill is not in the bar"
     assert_operator pill["right"], :<=, lang["left"] + 1,
                     "the pill overlaps the language button"
   end

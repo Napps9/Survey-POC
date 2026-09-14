@@ -2107,6 +2107,8 @@ id:
     save_prefs: "Simpan preferensi"
     prefs_saved: "Preferensi tersimpan."
     delete_body: "Ini menghapus akunmu dan daftar Vertos yang kamu simpan. Jawabanmu tetap pada organisasi yang bertanya — jawaban itu diberikan secara anonim dan bukan hak kami untuk menghapusnya."
+    beta_tag: "Beta"
+    beta_note: "Selamat datang di akun pemainmu. Ikuti terus kabar tentang hal-hal yang kamu pedulikan, bandingkan hasilmu, pantau dampak yang diciptakan jawabanmu — dan dukung dampak itu dengan poinmu."
   player_notification_mailer:
     via: "%{org} · lewat Playverto"
     why: "Kamu menerima ini karena kamu minta mendengar dari organisasi yang Vertos-nya sudah kamu jawab."

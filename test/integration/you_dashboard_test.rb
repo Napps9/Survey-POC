@@ -361,6 +361,29 @@ class YouDashboardTest < ActionDispatch::IntegrationTest
     assert_select "#vertos .you-verto.is-impact", 0
   end
 
+  # ── The beta strip ────────────────────────────────────────────────────────
+  #
+  # It is rendered from you/_bar rather than from this page, and that is the
+  # property worth pinning: it has to be on all four account pages, the wallet
+  # above all — that is where a respondent meets a token total with nothing to
+  # spend it on, and the strip is the sentence that answers them. Drawn before
+  # the bar, because a notice below the thing it is about is a footnote.
+
+  test "the beta strip is above the bar on every account page" do
+    s = survey
+    sign_in_with([ answered(s) ])
+
+    [ you_path, you_wallet_path, you_account_path, you_verto_path(s.id) ].each do |path|
+      get path
+
+      assert_response :success, path
+      assert_select ".you-beta .you-beta-tag", { text: I18n.t("you.beta_tag"), count: 1 }, path
+      assert_select ".you-beta .you-beta-text", { text: I18n.t("you.beta_note"), count: 1 }, path
+      assert_operator response.body.index("you-beta"), :<, response.body.index("you-topbar"),
+                      "#{path}: the strip is drawn below the bar"
+    end
+  end
+
   # ── The strip, the states, the cover ──────────────────────────────────────
 
   test "the three steps are drawn, and the share step names the floor" do
@@ -382,6 +405,9 @@ class YouDashboardTest < ActionDispatch::IntegrationTest
     assert_select ".you-topbar", 1
     assert_select ".you-account-btn", 0
     assert_select ".you-topbar-centre", 0
+    # The strip stays: someone deciding whether to give an address at the end
+    # of a Verto is exactly who the promise in it is addressed to.
+    assert_select ".you-beta .you-beta-text", text: I18n.t("you.beta_note")
     assert_select "h1.you-h1", text: I18n.t("you.signed_out_title")
     assert_select ".you-tiles", 0
     assert_select ".you-steps", 0

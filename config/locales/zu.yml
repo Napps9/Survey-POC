@@ -2141,6 +2141,8 @@ zu:
     save_prefs: "Londoloza okuthandwayo"
     prefs_saved: "Okuthandwayo kulondoloziwe."
     delete_body: "Lokhu kususa i-akhawunti yakho nohlu lwama-Verto owagcinile. Izimpendulo zakho zihlala nezinhlangano ezibuzile — zanikezwa ngaphandle kwegama futhi akuwona umsebenzi wethu ukuzisusa."
+    beta_tag: "Beta"
+    beta_note: "Siyakwamukela ku-akhawunti yakho yomdlali. Hlala wazi ngezindaba zezinto ozinakekelayo, qhathanisa imiphumela yakho, ulandelele ushintsho olulethwe yizimpendulo zakho — futhi ulusekele ngamathokheni akho."
   player_notification_mailer:
     via: "%{org} · nge-Playverto"
     why: "Uthola lokhu ngoba ucele ukuzwa kuzinhlangano oziphendule ama-Verto azo."

@@ -14,10 +14,15 @@
     layout skips its cluster when @own_top_bar is set) so the two menus on
     the right are one cluster and never guess at each other's width.
 
+    The beta strip rides above it, for the reason its own partial gives: it
+    is the bar, not the dashboard, that every account page has.
+
     Locals: current (:vertos, :verto, :wallet or :account). Reads @purse_rows
     and @purse_total, which set_purse builds for every page that draws this. %>
 <% rows  = @purse_rows.to_a
    total = @purse_total.to_i %>
+<%= render "you/beta_banner" %>
+
 <nav class="you-topbar" aria-label="<%= t("you.eyebrow") %>">
   <div class="you-topbar-left">
     <%= link_to you_path, class: "you-topbar-logo" do %>

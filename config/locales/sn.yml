@@ -2116,6 +2116,8 @@ sn:
     save_prefs: "Chengeta zvaunosarudza"
     prefs_saved: "Zvaunosarudza zvachengetwa."
     delete_body: "Izvi zvinodzima akaundi yako nerondedzero yemaVerto awakachengeta. Mhinduro dzako dzinoramba dziri kumasangano akabvunza — dzakapiwa pasina mazita uye hadzisi dzedu kuti tidzibvise."
+    beta_tag: "Beta"
+    beta_note: "Wagamuchirwa muakaundi yako yemutambi. Ramba uchiziva nezvezvinhu zvaunoda, enzanisa mhedzisiro yako, tevera shanduko yakaunzwa nemhinduro dzako — uye uitsigire nematokeni ako."
   player_notification_mailer:
     via: "%{org} · kuburikidza nePlayverto"
     why: "Uri kuwana izvi nekuti wakakumbira kunzwa kubva kumasangano awakapindura maVerto awo."

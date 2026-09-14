@@ -2108,6 +2108,8 @@ sw:
     save_prefs: "Hifadhi mapendeleo"
     prefs_saved: "Mapendeleo yamehifadhiwa."
     delete_body: "Hii inafuta akaunti yako na orodha ya Vertos ulizohifadhi. Majibu yako yanabaki na mashirika yaliyouliza — yalitolewa bila kutambulika na si haki yetu kuyaondoa."
+    beta_tag: "Beta"
+    beta_note: "Karibu kwenye akaunti yako ya mchezaji. Fuatilia habari za mambo unayoyajali, linganisha matokeo yako, fuatilia mabadiliko yaliyoletwa na majibu yako — na yaunge mkono kwa pointi zako."
   player_notification_mailer:
     via: "%{org} · kupitia Playverto"
     why: "Unapata hii kwa sababu uliomba kusikia kutoka kwa mashirika ambayo umejibu Vertos zao."

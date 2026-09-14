@@ -2108,6 +2108,8 @@ de:
     save_prefs: "Einstellungen speichern"
     prefs_saved: "Einstellungen gespeichert."
     delete_body: "Das löscht dein Konto und die Liste der Vertos, die du behalten hast. Deine Antworten bleiben bei den Organisationen, die gefragt haben — sie wurden anonym gegeben und es steht uns nicht zu, sie zu entfernen."
+    beta_tag: "Beta"
+    beta_note: "Willkommen in deinem Spielerkonto. Bleib auf dem Laufenden bei den Themen, die dir wichtig sind, vergleiche deine Ergebnisse, verfolge die Wirkung, die deine Antworten erzielt haben — und unterstütze sie mit deinen Punkten."
   player_notification_mailer:
     via: "%{org} · über Playverto"
     why: "Du bekommst das, weil du von den Organisationen hören wolltest, deren Vertos du beantwortet hast."

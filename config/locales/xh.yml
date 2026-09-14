@@ -2145,6 +2145,8 @@ xh:
     save_prefs: "Gcina ukhetho"
     prefs_saved: "Ukhetho lugciniwe."
     delete_body: "Oku kucima i-akhawunti yakho kunye noluhlu lwee-Verto ozigcinileyo. Iimpendulo zakho zihlala kwimibutho ebibuzile — zanikwa ngaphandle kwegama kwaye asizizo ezethu ukuba sizisuse."
+    beta_tag: "Beta"
+    beta_note: "Wamkelekile kwi-akhawunti yakho yomdlali. Hlala usazi ngeendaba zezinto ozikhathaleleyo, thelekisa iziphumo zakho, landelela utshintsho oluziswe ziimpendulo zakho — kwaye ulixhase ngeethokheni zakho."
   player_notification_mailer:
     via: "%{org} · nge-Playverto"
     why: "Ufumana oku kuba ucele ukuva kwimibutho oyiphendulileyo ii-Verto zayo."

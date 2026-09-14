@@ -2108,6 +2108,8 @@ pt:
     save_prefs: "Guardar preferências"
     prefs_saved: "Preferências guardadas."
     delete_body: "Isto elimina a tua conta e a lista de Vertos que guardaste. As tuas respostas ficam com as organizações que perguntaram — foram dadas anonimamente e não nos cabe removê-las."
+    beta_tag: "Beta"
+    beta_note: "Bem-vindo à tua Conta de Jogador. Fica a par das novidades sobre o que te importa, compara os teus resultados, acompanha o impacto que as tuas respostas criaram — e apoia-o com as tuas fichas."
   player_notification_mailer:
     via: "%{org} · através da Playverto"
     why: "Estás a receber isto porque pediste ter notícias das organizações cujos Vertos respondeste."
