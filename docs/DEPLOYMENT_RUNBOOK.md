@@ -373,3 +373,58 @@ a minute of 502s for the few who happened to click then.
   `docs/OBJECT_STORAGE_CUTOVER.md`, after `bin/rails object_storage:verify`
   passes on production. With no disk, Render keeps the old instance serving
   until the new one passes `/up`, and there is no gap for any page to fill.
+
+## 9. Google sign-in: the four redirect URIs
+
+`Error 400: redirect_uri_mismatch` on Google's own page is never an app bug —
+the app never sees the request. Google is refusing to redirect back to a URL
+the OAuth client does not list, so the fix is always in the Cloud Console, on
+the client named by `GOOGLE_CLIENT_ID`.
+
+**There are FOUR, because there are two strategies.** Creators sign in as a
+`User` through `/auth/google_oauth2`; respondents sign in as a `Player`
+through `/auth/google_player`. The same Google client is mounted twice under
+different names (`config/initializers/omniauth.rb`) precisely so that which
+kind of account a callback may create is decided by the URL Google was sent
+to, and not by a flag in a session the other flow could still be carrying.
+Two strategies × two environments:
+
+```
+http://localhost:3000/auth/google_oauth2/callback    dev, creators
+https://<APP_HOST>/auth/google_oauth2/callback       prod, creators
+http://localhost:3000/auth/google_player/callback    dev, respondents
+https://<APP_HOST>/auth/google_player/callback       prod, respondents
+```
+
+The signature of a missing `google_player` pair is that **creator sign-in
+keeps working while respondent sign-in fails** — they are different URLs and
+only one of them is registered. That is what happened when respondent Google
+sign-in first shipped (2026-09-14): the strategy landed with the pair
+documented in `.env.example` and nobody had added them to the console yet.
+
+**Check what this environment actually sends** rather than deriving it. In a
+shell on the service:
+
+```
+bin/rails runner 'puts OmniAuth.config.full_host'
+```
+
+Append `/auth/google_oauth2/callback` and `/auth/google_player/callback` to
+what it prints, and those two strings must appear in the console **character
+for character** — Google matches exactly, including scheme, port and trailing
+path, and ignores nothing.
+
+If that command prints something unexpected, the cause is the host resolution
+at the foot of the initializer, which is `APP_HOST`, then
+`RENDER_EXTERNAL_HOSTNAME`, then nothing:
+
+- prints `https://survey-poc.onrender.com` → `APP_HOST` is unset on the
+  service and it has fallen through to Render's own hostname. Either set
+  `APP_HOST` (it is `sync: false` in `render.yaml`, so it is set in the
+  dashboard, not the repo) or register the onrender URL too.
+- prints an empty line → neither is set, and OmniAuth derives the host from
+  the request instead. Behind Render's proxy that can arrive as `http://`,
+  which mismatches every `https://` URI on the client. Set `APP_HOST`.
+
+A changed redirect URI takes effect in Google within a minute or so; the
+console says up to a few hours, and in practice a hard refresh is enough.
