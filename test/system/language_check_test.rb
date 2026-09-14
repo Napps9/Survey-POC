@@ -47,7 +47,16 @@ class LanguageCheckSystemTest < ApplicationSystemTestCase
     summary = find("summary.publish-block-title", text: "Language", visible: :all)
     scroll_to(summary)
     summary.click
-    click_link(class: "lc-editor-entry", match: :first)
+    # Opening the <details> reflows everything below it in the scroller, and
+    # the share block above carries a thumbnail whose images arrive late — so
+    # the entry link is visible, and findable, while its box is still moving.
+    # Capybara resolves the centre and then clicks, which lands on whatever has
+    # slid into that point: the click does nothing and the assertion below sees
+    # the editor's own path. Settle the box first, the idiom this base class
+    # carries for exactly "CLICKS something that arrived by animation".
+    entry = find("a.lc-editor-entry", match: :first)
+    settle_box(entry)
+    entry.click
 
     assert_current_path survey_language_check_path(@survey)
     assert_text "Favourite colour?"
