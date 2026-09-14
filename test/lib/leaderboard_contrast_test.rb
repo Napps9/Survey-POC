@@ -6,12 +6,19 @@ require "test_helper"
 # colour tweak that quietly drops below the floor fails here with a number
 # rather than shipping as an unreadable board.
 #
-# The stack being audited: the thank-you card is a FIXED #1C2034 (deliberately
-# palette-independent — see the comment on .preview-thankyou-card), and the
-# board tints it with 12% of the brand primary. Alpha-white text is blended
-# over that tint before measuring. Default-palette fallbacks are what's
-# audited; --brand-cta-text is exempt because BrandPalette.contrast_text
+# The stack being audited: the board card is a FIXED #272D4A of its own, the
+# colour the account ask above it is painted. Alpha-white text is blended over
+# that before measuring. It used to be the thank-you card's #1C2034 with 12% of
+# the brand primary composited on top, and the ratios moved with whatever
+# palette the creator had chosen — which is exactly why the card stopped
+# reading it. --brand-cta-text remains exempt because BrandPalette.contrast_text
 # derives it per palette with this same maths.
+#
+# board_bg PARSES the card's colour rather than hardcoding it. That matters:
+# the old version pulled an rgba() out of the background and fell back to the
+# default tint when it found none, so turning the card solid would have left
+# this file quietly auditing a stack the app no longer renders — green, and
+# measuring nothing.
 class LeaderboardContrastTest < ActiveSupport::TestCase
   CSS = Rails.root.join("app/assets/tailwind/application.css").freeze
 
@@ -68,12 +75,15 @@ class LeaderboardContrastTest < ActiveSupport::TestCase
     ((l.max + 0.05) / (l.min + 0.05)).round(2)
   end
 
-  # The board's background: the fixed thank-you card colour with the
-  # default-palette 12% primary tint composited on top.
+  # The board's background: the card's own solid colour, read from the CSS.
   def board_bg
     @board_bg ||= begin
-      card = rgb(declared(".preview-thankyou-card", "background"))
-      blend(declared(".leaderboard-card", "background")[/rgba\([^)]*\)/] || "rgba(1,234,203,0.12)", card)
+      declaration = declared(".leaderboard-card", "background")
+      assert_not declaration.include?("var("),
+                 ".leaderboard-card background reads the palette again. The board is painted a " \
+                 "fixed colour precisely so a dark brand primary cannot make it unreadable — " \
+                 "and this file cannot audit a colour it does not know at test time."
+      rgb(declaration)
     end
   end
 

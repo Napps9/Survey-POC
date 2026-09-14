@@ -11026,24 +11026,42 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .leaderboard-card {
   margin: 18px auto 4px; padding: 16px 22px; border-radius: 18px;
   width: min(100%, 340px);
-  background: var(--brand-primary-soft, rgba(1,234,203,0.12));
-  /* Border fallbacks here and on .is-you are 0.75 alpha, not the 0.4 the
-     older result cards use: at 0.4 the boundary measures ~2.2:1 against the
-     tinted card, under the 3:1 UI-component floor the contrast test holds
-     these to. A set palette replaces the fallback with the full primary. */
-  border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
+  /* PLAYVERTO'S SURFACE, like the account ask directly above it — and for the
+     second half of the same reason that card was repainted. This one IS the
+     creator's (their board, their respondents), so brand-theming it was
+     defensible; it simply could not survive a dark palette. It was
+     primary_soft — rgba(primary, 0.12) over the thank-you card — with primary
+     on the border and the title, and measured on the shipped values the title
+     ran 8.0:1 on the default teal, 4.9:1 on a bright coral and 1.1:1 on a
+     near-navy brand. The third of those is an unreadable board, and it is the
+     creator's own palette that decides which they get. Painted the #272D4A the
+     account ask is painted, it is legible whatever they pick, and the two
+     cards read as one stack again.
+
+     The teal border keeps its 0.75 alpha rather than taking the account card's
+     0.45: at 0.45 the boundary measures 2.92:1 against this card's own fill,
+     under the 3:1 UI-component floor. Same hue and same intent as that card —
+     the alpha this one's contrast test has always held it to. */
+  background: #272D4A;
+  border: 1px solid rgba(1,234,203,0.75);
   display: flex; flex-direction: column; align-items: stretch; gap: 8px;
 }
 .leaderboard-title {
   font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--brand-primary, #01EACB); text-align: center;
+  text-transform: uppercase; color: #01EACB; text-align: center;
 }
 .leaderboard-row {
   display: flex; align-items: center; gap: 10px; padding: 2px 0;
 }
+/* White-alpha, not the brand tint this row used to carry. On a solid navy card
+   a dark brand primary disappears exactly as it did on the tinted one — fixing
+   the card and leaving this alone would have moved the same bug one level down,
+   onto the one row the respondent came to find. Neutral also keeps it clear of
+   the You badge, which is still the creator's colour (see below). The 0.45
+   border measures 3.40:1 against the row's own fill; 0.28 measured 2.22:1. */
 .leaderboard-row.is-you {
-  background: var(--brand-primary-soft, rgba(1,234,203,0.16));
-  border: 1px solid var(--brand-primary, rgba(1,234,203,0.75));
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.45);
   border-radius: 10px; padding: 4px 8px; margin: 0 -8px;
 }
 .leaderboard-rank {
@@ -11071,6 +11089,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
   font-family: "ABeeZee", sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.75);
   text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+/* The one thing on this card that still reads the palette, deliberately. Every
+   other brand colour here was removed because a dark primary made it illegible
+   — but --brand-cta-text is DERIVED per palette by BrandPalette.contrast_text,
+   with the same WCAG maths the contrast test uses, so this pair cannot go
+   unreadable whatever a creator picks. It is contrast-safe by construction
+   rather than by luck, which makes it the one place the creator's colour can
+   stay on a card that has otherwise stopped being theirs. */
 .leaderboard-you-badge {
   font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.06em;
   text-transform: uppercase; color: var(--brand-cta-text, #1C2034);
