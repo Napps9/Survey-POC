@@ -146,7 +146,7 @@
           <span><%= t("editor.change_media") %></span>
         </button>
         <button type="button" class="add-bg-fab"
-                data-action="click->media-picker#open"
+                data-action="click->media-picker#openCardBackground"
                 title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
           <span><%= t("editor.change_background", default: "Background") %></span>
         </button>
@@ -187,7 +187,7 @@
             single statement of that rule. %>
         <% if card_takes_backdrop?(card) %>
           <button type="button" class="add-bg-fab card-bg-fab"
-                  data-action="click->media-picker#open"
+                  data-action="click->media-picker#openCardBackground"
                   title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
             <span><%= t("editor.change_background", default: "Background") %></span>
           </button>
@@ -219,7 +219,7 @@
       <div class="split-left-cta-row">
         <%= render "shared/change_animation_cta", action: "openShapes" if is_nps %>
         <button type="button" class="add-bg-fab card-bg-fab"
-                data-action="click->media-picker#open"
+                data-action="click->media-picker#openCardBackground"
                 title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
           <span><%= t("editor.change_background", default: "Background") %></span>
         </button>

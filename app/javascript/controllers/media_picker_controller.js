@@ -178,6 +178,67 @@ export default class extends Controller {
     document.addEventListener("keydown", this._escListener)
   }
 
+  // The "Background" pill on a card's own panel. It opens the picker already
+  // AIMED at the backdrop, and that is the whole of this method: it used to
+  // share #open with "Change media", which opens the card's own media picker
+  // with the backdrop folded into a section below it. So the obvious thing to
+  // do in it — pick a photo, press Apply — filled the card's HERO, and the
+  // creator watched a control labelled Background change something else:
+  // "the pill shows but doesn't work, it's changing the left hand card image
+  // not the background". Reported against the mobile background, but the
+  // mis-aim was on every Background pill that isn't a range card's (range
+  // hides the media tabs outright, which is why it never showed there).
+  //
+  // Same modal, same library, same Apply — `animBg` mode is what routes the
+  // pick to media_bg instead of to card.image, and the section stays open
+  // above it so a colour is one click away from a picture.
+  openCardBackground(event) {
+    event?.preventDefault()
+    event?.stopPropagation()
+    const trigger = event?.currentTarget
+    const card    = trigger?.closest("[data-survey-editor-target='card']")
+                 || trigger?.closest(".survey-card-wrap")
+    if (!card) return
+    this._activeCard = card
+    this._mode = "animBg"
+    this._pendingUrl = null
+    this._pendingVideo = null
+    this._pendingSource = null
+    this._pendingCrop = null
+    this._setApplyEnabled(false)
+    this._showMediaSwapUI(true)
+    this.applyBtnTarget.hidden = false
+    this._switchTabKey("library")
+    // Every source a card's own picture gets: the Verto Library and the brand
+    // library on this tab, an upload on the other, and the stock search below
+    // — "you need to be able to pick any media you wish as a mobile
+    // background". Photos only is the one narrowing, and it is a storage fact
+    // rather than a choice: media_bg holds a colour and an image, and a video
+    // URL handed to it is rejected by sanitize_image_url on the way in. A
+    // toggle offering one would be a toggle whose picks silently do not stick.
+    this._setMedia("photos")
+    this._showMediaToggle(false)
+    this._showLottieSection(false)
+    // "Remove current media" clears the card's OWN picture, which is not what
+    // this modal is pointed at — offering it here is the same confusion one
+    // button along.
+    this.clearBtnTarget.hidden = true
+    this._syncAnimationBg(true)
+    this._syncAnimateAsset()
+    this._syncFocal()
+    // The curated strip comes too. These are chosen from the card's own words,
+    // which is as good a starting point for what sits behind the answer as for
+    // the picture itself — and leaving it out was the difference between a
+    // picker and a cut-down one.
+    this._renderRecommended(this._parseUrls(card.dataset.cardRecommendedImages),
+                            "Recommended for this card")
+    this._seedSearch()
+    this._setModalTitle("background")
+    this.backdropTarget.hidden = false
+    this._resetModalScroll()
+    document.addEventListener("keydown", this._escListener)
+  }
+
   // Opens the same modal but targets the Verto's backdrop instead of a card.
   openBackground(event) {
     event?.preventDefault()
@@ -2294,8 +2355,14 @@ export default class extends Controller {
     this._notifyDirty()
   }
 
-  _syncAnimationBg() {
-    const show = this._mode === "card" && this._cardTakesBackground
+  // The default covers openCardBackground's mode as well as #open's, and that
+  // matters beyond the first frame: setAnimBgColor and clearAnimBg both re-sync
+  // after writing, so a default that only knew about "card" would fold the
+  // section away the instant a creator picked a colour in a modal that opened
+  // on it. (openAnimBgImage is the exception and hides the section itself — it
+  // is a drill-down FROM it, and nothing re-syncs while it is open.)
+  _syncAnimationBg(show = this._mode === "animBg" ||
+                          (this._mode === "card" && this._cardTakesBackground)) {
     if (this.hasAnimBgSectionTarget) this.animBgSectionTarget.hidden = !show
     if (!show) return
     const bg = this._readAnimBg()

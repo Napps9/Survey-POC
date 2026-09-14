@@ -173,6 +173,55 @@ class MobileBackgroundTest < ApplicationSystemTestCase
     assert_includes p["heroUrl"], HERO
   end
 
+  # THE BUG THIS FILE EXISTS FOR, SECOND TIME: "the pill shows but doesn't
+  # work, it's changing the left hand card image not the background". The
+  # control was offered and stored nothing, because it opened #open — the
+  # card's OWN media picker, with the backdrop folded into a section below it.
+  # Pick a photo, press Apply, and the card's hero changed under a heading that
+  # said Background.
+  test "Background stores a background, and leaves the card's own picture alone" do
+    survey = build(live: false)
+    open_editor(survey, device: "mobile")
+    before = evaluate_script(%(document.querySelector("[data-card-cid='t1']").dataset.cardImage))
+
+    within("[data-card-cid='t1']") { find(".card-bg-fab").click }
+    # Open ON the background: the colour and Remove controls are what tell a
+    # creator which slot they are filling, and #open buried them in a section
+    # under the card's own media tabs.
+    assert_selector "[data-media-picker-target='animBgSection']", visible: true
+
+    tile = all("[data-media-picker-target='libraryItem']").find { |t| t[:"data-url"].present? }
+    assert tile, "the background picker offered nothing to pick"
+    picked = tile[:"data-url"]
+    tile.click
+    assert_selector "[data-media-picker-target='applyBtn']:not([disabled])"
+    find("[data-media-picker-target='applyBtn']").click
+    assert_no_selector ".media-modal-backdrop", visible: true
+
+    stored = evaluate_script(%(document.querySelector("[data-card-cid='t1']").dataset.cardMediaBg))
+    assert_equal picked, JSON.parse(stored.presence || "{}")["image"],
+                 "Apply did not write the background"
+    assert_equal before, evaluate_script(%(document.querySelector("[data-card-cid='t1']").dataset.cardImage)),
+                 "Background rewrote the card's own picture — the whole of the report"
+    assert_includes panel("t1")["painted"], picked,
+                    "the card did not repaint with the background just chosen"
+  end
+
+  # "You need to be able to pick any media you wish as a mobile background."
+  # The picker opens on the same sources a card's own picture gets — the
+  # library, an upload, the stock search and the curated strip — not a
+  # cut-down one.
+  test "the background picker offers every source the card's own picture gets" do
+    open_editor(build(live: false), device: "mobile")
+    within("[data-card-cid='t1']") { find(".card-bg-fab").click }
+
+    assert_selector ".media-modal-tabs", visible: true
+    assert_selector "[data-media-picker-target='tab'][data-tab='library']", visible: true
+    assert_selector "[data-media-picker-target='tab'][data-tab='upload']", visible: true
+    assert_selector "[data-media-picker-target='libraryItem']", minimum: 1
+    assert_selector "[data-media-picker-target='searchInput']", visible: true
+  end
+
   test "the phone's Background control is offered on a card that already has a picture" do
     open_editor(build(live: false), device: "mobile")
 
