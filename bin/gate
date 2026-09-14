@@ -2,32 +2,109 @@
 # The push-to-Main gate (CLAUDE.md, "Git workflow") as one command.
 #
 #   bin/gate              run the five checks, in the order that fails fastest
-#   bin/gate --no-fetch   skip the origin checks (offline, or a throwaway branch)
+#   bin/gate --push       and push to origin the moment it comes back green
+#   bin/gate --no-fetch   skip every origin check (offline, or a throwaway branch)
 #
 # Fetches FIRST and refuses to start if this branch is behind origin: a rebase
 # before a six-minute run, not after it. Then the unit suite; then the system
 # suite with rubocop, brakeman and the importmap audit alongside it (they take
 # one core for about 25 seconds); then one summary line with real durations
-# and the five NAME:STATUS pairs bin/trello_log accepts; then a final fetch
-# that says whether a push is still safe. The rule in CLAUDE.md is the five
-# commands — this only runs them. Logs land in tmp/gate/.
+# and the five NAME:STATUS pairs bin/trello_log accepts. The rule in CLAUDE.md
+# is the five commands — this only runs them. Logs land in tmp/gate/.
+#
+# Three things exist because other sessions push to Main all day:
+#
+#   * A WATCHER fetches every GATE_POLL seconds (45) for the whole run and
+#     aborts it the moment origin moves. The old script noticed at the end, so
+#     a push that landed in minute one still cost you the other six.
+#   * --push closes the gap between "safe to push" and the push. That gap used
+#     to be however long it took someone to read the line and type the command,
+#     and origin moves during it often enough to matter.
+#   * The header prints the measured push rate and what it implies for a run
+#     this long, so the cost is a number you can see rather than a feeling.
+#
+# Exit codes: 1 a check failed · 2 behind at the start · 3 origin moved.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-fetch=1
-[ "${1:-}" = "--no-fetch" ] && fetch=0
-branch=$(git rev-parse --abbrev-ref HEAD)
-mkdir -p tmp/gate
+# Job control, so every background check leads its own process group and the
+# watcher can take down a whole `rails test:system` tree — Puma and Chrome
+# included — with one signal rather than orphaning them.
+set -m
 
-behind() { git fetch -q origin "$branch" 2>/dev/null && git rev-list --count "HEAD..origin/$branch" 2>/dev/null || echo 0; }
+fetch=1
+push=0
+for arg in "$@"; do
+  case "$arg" in
+    --no-fetch) fetch=0 ;;
+    --push)     push=1 ;;
+    -h|--help)  sed -n '4,6p' "$0" | cut -c3-; exit 0 ;;
+    *) echo "gate: unknown flag $arg (--push, --no-fetch)" >&2; exit 64 ;;
+  esac
+done
+
+# Compare and push against the UPSTREAM, never the local branch name. Sessions
+# here routinely have Main checked out under another name, and taking the local
+# name would fetch a ref that doesn't exist — silently answering "not behind" to
+# every check — and then push a brand-new remote branch instead of Main.
+upstream=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || true)
+if [ -n "$upstream" ]; then
+  remote=${upstream%%/*}
+  branch=${upstream#*/}
+else
+  remote=origin
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  upstream="$remote/$branch"
+fi
+mkdir -p tmp/gate
+rm -f tmp/gate/.moved tmp/gate/.pgids
+poll=${GATE_POLL:-45}
+
+# -1 means "could not ask" — a fetch that failed, not a branch that is level.
+# The watcher and the opening check treat that as a blip and carry on; the
+# pre-push check refuses, because an unverified push is the thing being fixed.
+behind() {
+  git fetch -q "$remote" "$branch" 2>/dev/null || { echo -1; return; }
+  git rev-list --count "HEAD..$upstream" 2>/dev/null || echo -1
+}
 
 if [ "$fetch" = 1 ]; then
   n=$(behind)
-  if [ "$n" != 0 ]; then
-    echo "gate: $branch is behind origin/$branch by $n commit(s) — rebase first, then run the gate:" >&2
-    echo "      git pull --rebase origin $branch && bin/gate" >&2
+  if [ "$n" = -1 ]; then
+    echo "gate: could not reach $remote — running anyway, but the push check at the end will refuse." >&2
+  elif [ "$n" != 0 ]; then
+    echo "gate: HEAD is behind $upstream by $n commit(s) — rebase first, then run the gate:" >&2
+    echo "      git pull --rebase $remote $branch && bin/gate${push:+ --push}" >&2
     exit 2
   fi
+fi
+
+# --push pushes what is COMMITTED; the checks ran against the working tree. If
+# those differ, the thing proved green is not the thing that would go to Main.
+if [ "$push" = 1 ] && [ -n "$(git status --porcelain)" ]; then
+  echo "gate: --push needs a clean tree — the checks run on the working tree, the push sends the commit." >&2
+  git status --short >&2
+  exit 64
+fi
+
+# Commits per hour across the last 20 on origin, and the chance a run this long
+# gets invalidated by one: arrivals are Poisson, so P = 1 - e^(-rate x hours).
+# Memoryless, which is the point — there is no quiet moment to aim for, and a
+# session that waits for one is just not running the suite.
+push_rate() {
+  local n=20 count first last span
+  count=$(git rev-list --count "$upstream" 2>/dev/null) || return 1
+  [ "${count:-0}" -lt 2 ] && return 1
+  [ "$count" -lt "$n" ] && n=$count
+  last=$(git log -1 --format=%ct "$upstream" 2>/dev/null) || return 1
+  first=$(git log -1 --format=%ct "$upstream~$((n - 1))" 2>/dev/null) || return 1
+  span=$(( last - first ))
+  [ "$span" -le 0 ] && return 1
+  awk -v c="$((n - 1))" -v s="$span" 'BEGIN{printf "%.1f", c*3600.0/s}'
+}
+
+if [ "$fetch" = 1 ] && rate=$(push_rate); then
+  echo "gate: $upstream is taking $rate push/hour — a 7.5-minute run has a $(awk -v r="$rate" 'BEGIN{printf "%.0f", (1-exp(-r*7.5/60))*100}')% chance of being invalidated before it ends."
 fi
 
 # The service constructors ENV.fetch the key and the suite stubs every real
@@ -38,27 +115,67 @@ fi
 key="${ANTHROPIC_API_KEY:-stub}"
 
 declare -A secs status
-run() { # run NAME CMD... — timed, logged, status recorded
+run() { # run NAME CMD... — timed, logged, status recorded, killable as a group
   local name=$1; shift
   local start=$SECONDS
-  if "$@" > "tmp/gate/$name.log" 2>&1; then status[$name]=pass; else status[$name]=fail; fi
+  "$@" > "tmp/gate/$name.log" 2>&1 &
+  local pid=$!
+  echo "$pid" >> tmp/gate/.pgids
+  if wait "$pid"; then status[$name]=pass; else status[$name]=fail; fi
   secs[$name]=$(( SECONDS - start ))
 }
 
+# Fetch on a loop; on a move, flag it and take down whatever is running. The
+# flag is what the script reads — a killed check reports "fail", and calling
+# someone else's push your test failure would be a lie the logs can't correct.
+watch_origin() {
+  while :; do
+    sleep "$poll"
+    case "$(behind)" in 0|-1) continue ;; esac
+    : > tmp/gate/.moved
+    [ -s tmp/gate/.pgids ] && while read -r pg; do kill -TERM -- "-$pg" 2>/dev/null; done < tmp/gate/.pgids
+    return
+  done
+}
+
+watcher=
+if [ "$fetch" = 1 ]; then
+  watch_origin &
+  watcher=$!
+fi
+stop_watcher() { [ -n "$watcher" ] && kill "$watcher" 2>/dev/null; wait "$watcher" 2>/dev/null; :; }
+moved() { [ -e tmp/gate/.moved ]; }
+
+abort_moved() {
+  stop_watcher
+  echo >&2
+  echo "gate: $upstream moved mid-run — stopped after ${1}s instead of finishing the suite." >&2
+  echo "      git pull --rebase $remote $branch && bin/gate${2}" >&2
+  exit 3
+}
+flag=""; [ "$push" = 1 ] && flag=" --push"
+
 run unit env ANTHROPIC_API_KEY="$key" bin/rails test
+moved && abort_moved "${secs[unit]}" "$flag"
 if [ "${status[unit]}" != pass ]; then
+  stop_watcher
   tail -n 40 tmp/gate/unit.log
   echo "gate: rails test failed after ${secs[unit]}s (tmp/gate/unit.log)" >&2
   exit 1
 fi
 
-# The static checks are light; run them while the browsers are busy.
-( run rubocop bin/rubocop; echo "${status[rubocop]} ${secs[rubocop]}" > tmp/gate/rubocop.status ) &
-( run brakeman bin/brakeman --no-pager; echo "${status[brakeman]} ${secs[brakeman]}" > tmp/gate/brakeman.status ) &
-( run importmap bin/importmap audit; echo "${status[importmap]} ${secs[importmap]}" > tmp/gate/importmap.status ) &
+# The static checks are light; run them while the browsers are busy. Wait on
+# these three BY PID: a bare `wait` also waits for the watcher, which loops
+# until origin moves and so never returns on a run that isn't invalidated.
+statics=()
+( run rubocop bin/rubocop; echo "${status[rubocop]} ${secs[rubocop]}" > tmp/gate/rubocop.status ) &   statics+=($!)
+( run brakeman bin/brakeman --no-pager; echo "${status[brakeman]} ${secs[brakeman]}" > tmp/gate/brakeman.status ) & statics+=($!)
+( run importmap bin/importmap audit; echo "${status[importmap]} ${secs[importmap]}" > tmp/gate/importmap.status ) & statics+=($!)
 run system env ANTHROPIC_API_KEY="$key" bin/rails test:system
-wait
+wait "${statics[@]}" 2>/dev/null
+stop_watcher
 for c in rubocop brakeman importmap; do read -r status[$c] secs[$c] < "tmp/gate/$c.status"; done
+moved && abort_moved "$(( secs[unit] + secs[system] ))" "$flag"
 
 # A failed system run's screenshots (tmp/capybara) would be wiped by the very
 # rerun that tries to reproduce it — test_helper empties that directory at
@@ -83,12 +200,39 @@ echo "gate: unit ${secs[unit]}s ${status[unit]} · system ${secs[system]}s ${sta
 echo "trello: --test \"rails test:${status[unit]}\" --test \"rails test:system:${status[system]}\" --test \"rubocop:${status[rubocop]}\" --test \"brakeman:${status[brakeman]}\" --test \"importmap audit:${status[importmap]}\""
 
 [ "$failed" = 0 ] || exit 1
+[ "$fetch" = 1 ] || exit 0
 
-if [ "$fetch" = 1 ]; then
-  n=$(behind)
-  if [ "$n" != 0 ]; then
-    echo "gate: green, but origin/$branch moved by $n commit(s) during the run — rebase and run the gate again (CLAUDE.md)." >&2
+n=$(behind)
+if [ "$n" != 0 ]; then
+  echo "gate: green, but $upstream moved by $n commit(s) during the run — rebase and run the gate again (CLAUDE.md)." >&2
+  exit 3
+fi
+
+if [ "$push" = 0 ]; then
+  echo "gate: green and up to date with $upstream — safe to push."
+  exit 0
+fi
+
+if [ -z "$(git rev-list "$upstream..HEAD")" ]; then
+  echo "gate: green, but there is nothing to push — HEAD is already $upstream." >&2
+  exit 0
+fi
+
+# No force, ever: if origin moved between that fetch and this line, git's own
+# ref check rejects the push, which is the outcome we want.
+echo "gate: green — pushing $(git rev-list --count "$upstream..HEAD") commit(s) to $upstream."
+for attempt in 1 2 3 4; do
+  if git push "$remote" "HEAD:$branch"; then
+    echo "gate: pushed $(git rev-parse --short HEAD) to $branch — log it with bin/trello_log."
+    exit 0
+  fi
+  if [ "$(behind)" != 0 ]; then
+    echo "gate: push rejected — $upstream moved. Rebase and run the gate again (CLAUDE.md)." >&2
     exit 3
   fi
-  echo "gate: green and up to date with origin/$branch — safe to push."
-fi
+  [ "$attempt" = 4 ] && break
+  echo "gate: push failed and origin has not moved — retrying in $(( 2 ** attempt ))s." >&2
+  sleep $(( 2 ** attempt ))
+done
+echo "gate: push failed four times (CLAUDE.md's retry budget) — the commits are still here." >&2
+exit 1

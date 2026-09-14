@@ -28,6 +28,15 @@ so does a copy of a failed system run's screenshots — the rerun that tries to
 reproduce the failure empties `tmp/capybara` at load (`KEEP_TEST_STORAGE=1`
 keeps it).
 
+It also **fetches every 45 seconds throughout** and aborts the moment origin
+moves, rather than telling you at the end — a push that lands in minute one
+used to cost you the other six. And `bin/gate --push` pushes the instant it
+comes back green, which is the only way to close the gap between "safe to
+push" and the push; it refuses a dirty tree, because the checks run on the
+working tree and the push sends the commit. The header prints the measured
+push rate and what it implies for a run this long, so that cost is a number
+rather than a feeling. Exit 2 is behind-at-the-start, 3 is origin moved.
+
 **The full system suite runs before EVERY push — including after a rebase, and
 including when the commits you rebased onto touch none of your files.** No
 shortcut on the grounds that the overlap is zero, that the suite passed before
@@ -78,6 +87,25 @@ finish. Every session on this repo draws on one weekly usage budget shared with
 every other session running that day — an afternoon of four sessions shipping is
 worth more than one session's exhaustive proof of a diff that is already live.
 Owner's standing instruction, 2026-09-14.
+
+**Render a visual change and look at it before you spend a gate on it.** The
+`/verify` skill drives the real app; `test/application_system_test_case.rb`
+already builds the CSS. Either is seconds against seven and a half minutes. On
+14 September one piece of feedback about card backgrounds took six commits and
+six gates, and three of them — the white panel that should not have been
+there, the answer row you could see the photograph through, the scrim dimming
+the texture a creator had just chosen — are things that looking at the render
+would have caught and no test was ever going to. The other three were misread
+briefs, which a render does NOT catch: this buys you the *look* being wrong,
+not the *ask* being wrong. Reread the request for that.
+
+**Tried and rejected, so nobody rebuilds it:** a push queue or a lock, so
+sessions take turns on the gate. Pushes arrive at ~3.5/hour against a
+7.5-minute gate — 45% utilisation, which queues about six minutes of waiting
+to save 4.3 minutes of re-running, and collapses in exactly the 17:00-style
+bursts that are the problem. Also rejected: timing a push for a quiet moment.
+Arrivals are Poisson and therefore memoryless — there is no quiet moment to
+aim for, and a session waiting for one is a session not running the suite.
 
 **A red Main is fixed with a new commit, never with a re-run.** When a push
 turns CI red, land a fix-forward or a `git revert` — a NEW commit, gated like
