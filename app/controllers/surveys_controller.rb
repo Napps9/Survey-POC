@@ -441,6 +441,10 @@ class SurveysController < ApplicationController
     end
     payload = JSON.parse(request.body.read)
     warnings = []
+    # Which card lost which media, per warning code — see
+    # Survey.dropped_media_detail. Returned beside the codes so the editor can
+    # name the card, and logged below so the drop is traceable afterwards.
+    details  = []
 
     # Only touch the attributes present in the payload, so the brand-colour
     # PATCH (which sends just `brand_palette`) doesn't wipe title/cards, and the
@@ -458,7 +462,7 @@ class SurveysController < ApplicationController
       # (LiveEditing). It keeps its existing shape: the sanitiser's passes that
       # remove or move a card already in the deck are skipped, so the first
       # autosave after fixing a typo can't quietly re-point stored answers.
-      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings,
+      attrs[:cards] = Survey.sanitize_cards_images!(payload["cards"], warnings: warnings, details: details,
                                                     structural: !survey.editing_locked?)
       # Token config mirrors the setup-media carry below: the editor renders
       # token controls only when tokenisation is on, so a page loaded while it
@@ -528,7 +532,17 @@ class SurveysController < ApplicationController
     # Scoped to this one survey; never the org-wide backfill from a per-request hook.
     PortfolioCommonQuestionSync.ensure_cards_for_survey(survey) if payload.key?("cards")
 
-    render json: { ok: true, id: survey.id, updated_at: survey.updated_at, warnings: warnings.uniq }
+    # A dropped image is a silent repair the creator is told about in one
+    # sentence and nobody else is told about at all. "An image didn't stick"
+    # was reported against an upload that had saved fine; the card that really
+    # lost its picture, and what it had held, could not be found afterwards.
+    # One line per drop — the card and the shape of the value, never the value.
+    details.each do |d|
+      Rails.logger.warn("[SurveysController#update] survey #{survey.id} card #{d['cid']}: dropped #{d['code']} — #{d['value']}")
+    end
+
+    render json: { ok: true, id: survey.id, updated_at: survey.updated_at,
+                   warnings: warnings.uniq, warning_details: details }
   rescue ActiveRecord::RecordInvalid => e
     # Validation text is model-authored and creator-facing — the contact-form /
     # demographics wall in particular has to say WHY the save was refused, or

@@ -460,6 +460,7 @@ tr:
       saved: "%{time} kaydedildi"
       save_failed: 'Kaydetme başarısız: %{msg}'
       save_warning: 'Kaydedildi, ancak bir görsel kaydedilmedi — lütfen kontrol edip yeniden yükleyin.'
+      save_warning_card: 'Kaydedildi, ancak %{n} numaralı karttaki görsel kaydedilmedi — lütfen kontrol edip yeniden yükleyin.'
       save_warning_media: "Kaydedildi, ancak bir video veya animasyon kaydedilmedi — lütfen kontrol edip yeniden uygulayın."
       save_warning_duplicate: "Kaydedildi — yinelenen bir kart kaldırıldı (bir Verto'da o türden yalnızca bir kart bulunur)."
       save_warning_retired: "Kaydedildi — kullanımdan kaldırılmış türde bir kart kaldırıldı."

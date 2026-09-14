@@ -860,6 +860,37 @@ class Survey < ApplicationRecord
     sanitize_image_url(value)
   end
 
+  # One entry of a save response's `warning_details` (SurveysController#update):
+  # which card lost which piece of media, and the shape of what was rejected.
+  # The `warnings` codes say only that SOMETHING in the deck was dropped, and
+  # the editor's one sentence for them — "an image didn't stick" — was read by
+  # a creator who had just uploaded a picture as being about that picture,
+  # which had saved fine, while the card that actually lost its image (an old
+  # oversized inline upload, on another card) went unchecked. This is what
+  # lets the pill name the card, and what the controller writes to the log so
+  # the next such report can be traced without a reproduction.
+  #
+  # `index` is the statement slot for an option_images drop — the editor needs
+  # it to clear exactly that one picture off the page.
+  def self.dropped_media_detail(code, card, value, index: nil)
+    detail = { "code" => code, "cid" => card["cid"].to_s, "value" => describe_rejected_media(value) }
+    detail["index"] = index if index
+    detail
+  end
+
+  # A rejected media value as a log line can carry it: never the payload
+  # itself — an inline image is megabytes of base64 and the whole point is a
+  # line a person can read — just its type and size, or the first characters
+  # of a URL.
+  def self.describe_rejected_media(value)
+    v = value.to_s
+    if (m = v.match(%r{\Adata:([^;,]+)}))
+      "#{m[1]} data URL, #{v.bytesize} bytes"
+    else
+      v.strip.first(120)
+    end
+  end
+
   # A card's re-crop record: where its image was cut from image_source, as
   # fractions of the source's natural size — x/y the top-left, w/h the
   # extent, all 0..1 with a real area. Fractions rather than pixels so the
@@ -1210,7 +1241,12 @@ class Survey < ApplicationRecord
   # passes still run: on a deck that was normalised as a draft they can only
   # ever drop a duplicate the editor has JUST added, which puts every card back
   # where its answers already are.
-  def self.sanitize_cards_images!(cards, warnings: nil, structural: true)
+  # `details:` (an array) collects, beside each media code pushed onto
+  # `warnings`, WHICH card lost WHAT — see dropped_media_detail. The codes stay
+  # as they are: the editor's SAVE_WARNING_KEYS table and JsConstantParityTest
+  # are pinned to them, and a code says what kind of sentence to show; a detail
+  # says which card to put in it, and what to write in the log.
+  def self.sanitize_cards_images!(cards, warnings: nil, structural: true, details: nil)
     Array(ensure_cids!(cards)).map do |card|
       next card unless card.is_a?(Hash)
       c = card.dup
@@ -1566,9 +1602,13 @@ class Survey < ApplicationRecord
       end
 
       if c.key?("image")
-        had_image = c["image"].present?
-        c["image"] = sanitize_image_url(c["image"])
-        warnings << "image" if warnings && had_image && c["image"].nil?
+        original  = c["image"]
+        had_image = original.present?
+        c["image"] = sanitize_image_url(original)
+        if had_image && c["image"].nil?
+          warnings << "image" if warnings
+          details << dropped_media_detail("image", c, original) if details
+        end
       end
       if c.key?("option_images")
         before = Array(c["option_images"])
@@ -1581,8 +1621,10 @@ class Survey < ApplicationRecord
         # test ("something is present" AND "something is nil") read those blanks
         # as drops and fired on every autosave, telling the creator to re-upload
         # an image they had deliberately removed, forever, with nothing wrong.
-        if warnings && before.each_with_index.any? { |u, i| u.present? && after[i].nil? }
-          warnings << "option_images"
+        dropped = before.each_index.select { |i| before[i].present? && after[i].nil? }
+        if dropped.any?
+          warnings << "option_images" if warnings
+          dropped.each { |i| details << dropped_media_detail("option_images", c, before[i], index: i) } if details
         end
       end
 
@@ -1597,11 +1639,15 @@ class Survey < ApplicationRecord
         c.delete("video_poster") if c["video"].blank? || c["video_poster"].blank?
       end
       if c.key?("lottie")
-        had_lottie = c["lottie"].present?
-        c["lottie"] = sanitize_lottie_url(c["lottie"])
+        original_lottie = c["lottie"]
+        had_lottie = original_lottie.present?
+        c["lottie"] = sanitize_lottie_url(original_lottie)
         if c["lottie"].blank?
           c.delete("lottie")
-          warnings << "lottie" if warnings && had_lottie
+          if had_lottie
+            warnings << "lottie" if warnings
+            details << dropped_media_detail("lottie", c, original_lottie) if details
+          end
         else
           # Mirrors the client's exclusivity: applying an animation clears the
           # photo/video (and with them the credit fields, below). Warn on
@@ -1609,8 +1655,14 @@ class Survey < ApplicationRecord
           # reach this branch with both set (the client never sends both,
           # and Shuffle is guarded against it too), so if one does, whatever
           # put it there deserves a visible flag, not a silent drop.
-          warnings << "image" if warnings && c["image"].present?
-          warnings << "video" if warnings && c["video"].present?
+          if c["image"].present?
+            warnings << "image" if warnings
+            details << dropped_media_detail("image", c, c["image"]) if details
+          end
+          if c["video"].present?
+            warnings << "video" if warnings
+            details << dropped_media_detail("video", c, c["video"]) if details
+          end
           c.delete("image")
           c.delete("video")
           c.delete("video_poster")

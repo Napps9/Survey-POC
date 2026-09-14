@@ -66,6 +66,11 @@ const SAVE_WARNING_KEYS = {
   consent_gate_moved: "editor.save_warning_consent_moved"
 }
 
+// The codes whose drop is a picture ON A CARD — the ones `warning_details`
+// (cid per drop, and the statement index for a tap card) can point at, so the
+// sentence can name the card and the page can stop showing the picture.
+const CARD_IMAGE_CODES = [ "image", "option_images" ]
+
 // Token-award rows are keyed by canonical option label, so the types whose
 // labels are edited live in the card need their rows rebuilt as options change
 // (see syncTokenRowsFor) — yes_no's canonicals are fixed, the flat-award types
@@ -3485,7 +3490,9 @@ export default class extends Controller {
       // welcome card, moved the consent gate (sanitize_cards_images! fixes
       // rather than erroring) — so say WHICH, instead of just "Saved".
       if (Array.isArray(json.warnings) && json.warnings.length) {
-        this.flash(this._saveWarningMessage(json.warnings), "text-hot-pink")
+        const details = Array.isArray(json.warning_details) ? json.warning_details : []
+        this._clearDroppedMedia(details)
+        this.flash(this._saveWarningMessage(json.warnings, details), "text-hot-pink")
       } else {
         this.flash(t("editor.saved", { time: new Date(json.updated_at).toLocaleTimeString() }), "text-aquamarine")
       }
@@ -3500,9 +3507,55 @@ export default class extends Controller {
   // only because the status pill is a single nowrap line. Membership in
   // SAVE_WARNING_KEYS decides the fallback, not a t() miss: t() returns the
   // raw dotted key for an unknown one.
-  _saveWarningMessage(codes) {
+  //
+  // When the server also says WHICH card lost its picture (`warning_details`),
+  // the sentence names it by number. "An image didn't stick" was true of the
+  // deck and said nothing about the card: a creator who had just uploaded a
+  // picture read it as being about that one — which had saved fine — while the
+  // card that had actually lost its image went unchecked.
+  _saveWarningMessage(codes, details = []) {
     const code = codes.find((c) => SAVE_WARNING_KEYS[c])
-    return t(SAVE_WARNING_KEYS[code] || "editor.save_warning")
+    const key  = SAVE_WARNING_KEYS[code] || "editor.save_warning"
+    if (key === "editor.save_warning") {
+      const card = this._droppedImageCard(details)
+      if (card) return t("editor.save_warning_card", { n: card.dataset.cardNum })
+    }
+    return t(key)
+  }
+
+  // The first card the response names as having lost a picture, or null.
+  _droppedImageCard(details) {
+    for (const d of details) {
+      if (!CARD_IMAGE_CODES.includes(d?.code)) continue
+      const card = this._cardByCid(d.cid)
+      if (card) return card
+    }
+    return null
+  }
+
+  _cardByCid(cid) {
+    if (!cid) return null
+    return this.cardTargets.find((c) => c.dataset.cardCid === String(cid)) || null
+  }
+
+  // Take a dropped picture off the page as well. serialize() rebuilds every
+  // card from the DOM and nothing reads the deck back from a save, so an image
+  // the server had already refused stayed on screen looking saved — and was
+  // re-sent, re-dropped and re-warned on every autosave until a reload. Written
+  // through the media picker's own writers (the ones setup_status uses too),
+  // which mark nothing dirty: no save is scheduled, and the next genuine edit
+  // simply sends what the server already holds. A card whose panel is an
+  // animation keeps it — _setCardImage blanks the lottie as well, and the
+  // server kept that one.
+  _clearDroppedMedia(details) {
+    const picker = this.application.getControllerForElementAndIdentifier(this.element, "media-picker")
+    if (!picker) return
+    details.forEach((d) => {
+      const card = this._cardByCid(d?.cid)
+      if (!card) return
+      if (d.code === "image" && !card.dataset.cardLottie) picker._setCardImage(card, "")
+      if (d.code === "option_images" && Number.isInteger(d.index)) picker._setTapOptionImage(card, d.index, "")
+    })
   }
 
   // Plural, like undoBtnTargets: the mobile studio hides the float bar this

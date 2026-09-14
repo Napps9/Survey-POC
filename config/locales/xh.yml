@@ -476,6 +476,7 @@ xh:
       saved: "Kugciniwe %{time}"
       save_failed: "Ukugcina akuphumelelanga: %{msg}"
       save_warning: "Kugciniwe, kodwa umfanekiso awunamathelanga — khangela uze uwufake kwakhona."
+      save_warning_card: "Kugciniwe, kodwa umfanekiso okwikhadi %{n} awunamathelanga — khangela uze uwufake kwakhona."
       save_warning_media: "Kugciniwe, kodwa ividiyo okanye i-animation ayinamathelanga — khangela uze uyisebenzise kwakhona."
       save_warning_duplicate: "Kugciniwe — ikhadi eliphindiweyo lisusiwe (iVerto inelinye kuphela lolo hlobo)."
       save_warning_retired: "Kugciniwe — ikhadi lohlobo olungasasebenziyo lisusiwe."

@@ -8,6 +8,34 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-041 — The save warning named no card, and the log said nothing
+
+**BUG-041 — "Saved, but an image didn't stick" pointed at the wrong image.** A
+creator uploaded a picture, saw that sentence in the status pill, and found the
+picture on the Verto anyway — so was anything wrong? The upload had saved fine.
+The warning was `sanitize_cards_images!` dropping an image on ANOTHER card: an
+old inline upload over the byte cap, or a brand-library asset stored without an
+extension — decks that predate both fixes still exist, and the production
+backfills that would have converted them (`card_images:backfill`,
+`brand_assets:fix_filenames`) have never been run. The editor rebuilds every
+card from the DOM and never reads the deck back from a save, so the refused
+picture stayed on screen looking saved and was re-sent, re-dropped and
+re-warned about on every autosave until a reload. The pill said "an image", not
+which; the server logged nothing; there was nothing to trace afterwards.
+
+Now `sanitize_cards_images!` collects a detail per media drop (card cid, slot,
+and the SHAPE of the rejected value — type and size, never the payload),
+`#update` returns them as `warning_details` beside the codes and writes one log
+line per drop, and the editor names the card ("the image on card 3 didn't
+stick") and takes the refused picture off the page through the media picker's
+own writer, so the next autosave sends what the server holds and says "Saved".
+
+Why the usual check missed it: `SurveysUpdateTest` proved the warning fired for
+a bad image, and `SaveWarningMessageTest` proved the sentence matched the code.
+Both were right; neither asked whether the sentence could be acted on.
+
+---
+
 ## BUG-033 to BUG-040 — What a second pair of eyes found
 
 Eight defects from five independent adversarial reviews of the day's ~20

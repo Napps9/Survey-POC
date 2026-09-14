@@ -460,6 +460,7 @@ es:
       saved: Guardado %{time}
       save_failed: 'Error al guardar: %{msg}'
       save_warning: 'Guardado, pero una imagen no se guardó — revísala y vuelve a subirla.'
+      save_warning_card: 'Guardado, pero la imagen de la tarjeta %{n} no se guardó — revísala y vuelve a subirla.'
       save_warning_media: "Guardado, pero un vídeo o una animación no se guardó — revísalo y vuelve a aplicarlo."
       save_warning_duplicate: "Guardado — se eliminó una tarjeta duplicada (un Verto solo tiene una de ese tipo)."
       save_warning_retired: "Guardado — se eliminó una tarjeta de un tipo retirado."

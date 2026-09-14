@@ -486,6 +486,7 @@ en-US:
       saved: "Saved %{time}"
       save_failed: "Save failed: %{msg}"
       save_warning: "Saved, but an image didn't stick — check and re-upload it."
+      save_warning_card: "Saved, but the image on card %{n} didn't stick — check and re-upload it."
       save_warning_media: "Saved, but a video or animation didn't stick — check and re-apply it."
       save_warning_duplicate: "Saved — a duplicate card was removed (a Verto has only one of that type)."
       save_warning_retired: "Saved — a card of a retired type was removed."

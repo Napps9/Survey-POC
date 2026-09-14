@@ -273,6 +273,40 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     assert_equal [ "option_images" ], warnings
   end
 
+  # Beside each media code, `details:` says which card and (for a statement
+  # image) which slot, so the editor can name the card and clear that one
+  # picture off the page — and the controller can log the drop.
+  test "sanitize_cards_images! with details: names the card and slot behind each media code" do
+    oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
+    cards = [
+      { "cid" => "c1", "type" => "multiple_choice", "text" => "Q", "image" => oversized },
+      { "cid" => "c2", "type" => "tap_card", "text" => "Swipe", "option_images" => [ "", PEXELS_URL, oversized ] },
+      { "cid" => "c3", "type" => "multiple_choice", "text" => "Q", "lottie" => "https://lottie.host/abc/anim.json" },
+      { "cid" => "c4", "type" => "multiple_choice", "text" => "Q",
+        "lottie" => LOTTIE_BLOB_URL, "image" => ASSET_PATH, "video" => VIDEO_URL },
+      { "cid" => "c5", "type" => "multiple_choice", "text" => "Q", "image" => PEXELS_URL }
+    ]
+    warnings = []
+    details  = []
+    Survey.sanitize_cards_images!(cards, warnings: warnings, details: details)
+
+    assert_equal %w[image option_images lottie image video], details.map { |d| d["code"] }
+    assert_equal %w[c1 c2 c3 c4 c4], details.map { |d| d["cid"] }
+    assert_equal [ nil, 2, nil, nil, nil ], details.map { |d| d["index"] },
+                 "only a statement image carries a slot, and it is the slot that was dropped"
+    assert_equal warnings.uniq.sort, details.map { |d| d["code"] }.uniq.sort,
+                 "every code has a detail and every detail a code"
+    assert_equal "image/png data URL, #{oversized.bytesize} bytes", details[0]["value"]
+    assert_equal "https://lottie.host/abc/anim.json", details[2]["value"]
+  end
+
+  test "describe_rejected_media never carries the payload" do
+    oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
+    assert_equal "image/png data URL, #{oversized.bytesize} bytes", Survey.describe_rejected_media(oversized)
+    assert_equal "https://evil.example.com/x.jpg", Survey.describe_rejected_media(" https://evil.example.com/x.jpg ")
+    assert_equal 120, Survey.describe_rejected_media("/" + "a" * 500).length, "a long URL is cut, not carried"
+  end
+
   test "sanitize_cards_images! defaults to not tracking warnings" do
     oversized = "data:image/png;base64,#{"A" * (Survey::MAX_BACKGROUND_DATA_URL_BYTES + 1)}"
     cards = [ { "type" => "multiple_choice", "text" => "Q", "image" => oversized } ]

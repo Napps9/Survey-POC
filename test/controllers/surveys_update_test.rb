@@ -22,6 +22,19 @@ class SurveysUpdateTest < ActionDispatch::IntegrationTest
           headers: { "Content-Type" => "application/json" }
   end
 
+  # What the app logged during the block. Rails.logger is a BroadcastLogger, so
+  # a second sink can be hung on it without replacing what the suite already
+  # writes to.
+  def capture_log
+    io  = StringIO.new
+    tap = ActiveSupport::Logger.new(io)
+    Rails.logger.broadcast_to(tap)
+    yield
+    io.string
+  ensure
+    Rails.logger.stop_broadcasting_to(tap) if tap
+  end
+
   test "flags a warning and does not silently succeed when an oversized image is dropped" do
     patch_cards([ { type: "multiple_choice", text: "Q", image: OVERSIZED } ])
 
@@ -33,6 +46,51 @@ class SurveysUpdateTest < ActionDispatch::IntegrationTest
     assert_nil @survey.reload.cards.first["image"]
   end
 
+  # The codes say something in the deck was dropped; `warning_details` says
+  # WHICH card, so the editor can name it. A creator who had just uploaded a
+  # picture that saved fine was told "an image didn't stick": the drop was
+  # another card's older image, and neither the pill nor the log could say so.
+  test "warning_details names the card that lost its image, and the log records the drop" do
+    log = capture_log do
+      patch_cards([
+        { cid: "c_fine", type: "multiple_choice", text: "Q1", image: PEXELS_URL },
+        { cid: "c_lost", type: "multiple_choice", text: "Q2", image: OVERSIZED }
+      ])
+    end
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal [ "image" ], body["warnings"]
+
+    assert_equal 1, body["warning_details"].size
+    detail = body["warning_details"].first
+    assert_equal "image",  detail["code"]
+    assert_equal "c_lost", detail["cid"]
+    assert_equal "image/png data URL, #{OVERSIZED.bytesize} bytes", detail["value"],
+                 "the shape of the rejected value travels; the value itself never does"
+
+    # Only the drop lines: the request log above them echoes the whole payload.
+    drops = log.lines.grep(/\[SurveysController#update\] survey/)
+    assert_equal 1, drops.size, "one line per drop, and a card that kept its image is not a drop"
+    assert_match(/survey #{@survey.id} card c_lost: dropped image — image\/png data URL, #{OVERSIZED.bytesize} bytes/,
+                 drops.first)
+
+    cards = @survey.reload.cards
+    assert_equal PEXELS_URL, cards[0]["image"]
+    assert_nil cards[1]["image"]
+  end
+
+  test "a dropped tap-card statement image carries the slot it was in" do
+    patch_cards([ { cid: "c_tap", type: "tap_card", text: "Swipe", options: [ "A", "B" ],
+                    option_images: [ PEXELS_URL, OVERSIZED ] } ])
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal [ "option_images" ], body["warnings"]
+    assert_equal [ { "code" => "option_images", "cid" => "c_tap", "index" => 1 } ],
+                 body["warning_details"].map { |d| d.except("value") }
+  end
+
   test "returns an empty warnings array when nothing is dropped" do
     patch_cards([ { type: "multiple_choice", text: "Q", image: PEXELS_URL } ])
 
@@ -40,6 +98,7 @@ class SurveysUpdateTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_equal true, body["ok"]
     assert_equal [], body["warnings"]
+    assert_equal [], body["warning_details"]
     assert_equal PEXELS_URL, @survey.reload.cards.first["image"]
   end
 

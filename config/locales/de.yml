@@ -460,6 +460,7 @@ de:
       saved: Gespeichert %{time}
       save_failed: 'Speichern fehlgeschlagen: %{msg}'
       save_warning: 'Gespeichert, aber ein Bild wurde nicht übernommen — bitte prüfen und erneut hochladen.'
+      save_warning_card: 'Gespeichert, aber das Bild auf Karte %{n} wurde nicht übernommen — bitte prüfen und erneut hochladen.'
       save_warning_media: "Gespeichert, aber ein Video oder eine Animation wurde nicht übernommen — bitte prüfen und erneut anwenden."
       save_warning_duplicate: "Gespeichert — eine doppelte Karte wurde entfernt (ein Verto hat nur eine Karte dieses Typs)."
       save_warning_retired: "Gespeichert — eine Karte eines eingestellten Typs wurde entfernt."

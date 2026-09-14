@@ -460,6 +460,7 @@ id:
       saved: Tersimpan %{time}
       save_failed: 'Gagal menyimpan: %{msg}'
       save_warning: 'Disimpan, tetapi satu gambar tidak tersimpan — periksa dan unggah ulang.'
+      save_warning_card: 'Disimpan, tetapi gambar di kartu %{n} tidak tersimpan — periksa dan unggah ulang.'
       save_warning_media: "Disimpan, tetapi satu video atau animasi tidak tersimpan — periksa dan terapkan ulang."
       save_warning_duplicate: "Disimpan — satu kartu duplikat dihapus (sebuah Verto hanya memiliki satu kartu jenis itu)."
       save_warning_retired: "Disimpan — satu kartu dari jenis yang sudah tidak digunakan dihapus."

@@ -464,6 +464,7 @@ sn:
       saved: "Yachengetedzwa %{time}"
       save_failed: "Kuchengetedza Kwakundikana: %{msg}"
       save_warning: "Zvachengetedzwa, asi mufananidzo hauna kunamatira — tarisa uye uwuise zvakare."
+      save_warning_card: "Zvachengetedzwa, asi mufananidzo uri pakadhi %{n} hauna kunamatira — tarisa uye uwuise zvakare."
       save_warning_media: "Zvachengetedzwa, asi vhidhiyo kana animation hazvina kunamatira — tarisa uye uzvishandise zvakare."
       save_warning_duplicate: "Zvachengetedzwa — kadhi rakadzokororwa rabviswa (Verto ine rimwe chete remhando iyoyo)."
       save_warning_retired: "Zvachengetedzwa — kadhi remhando yakaregedzwa rabviswa."

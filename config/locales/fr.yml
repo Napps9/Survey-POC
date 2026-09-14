@@ -460,6 +460,7 @@ fr:
       saved: Enregistré %{time}
       save_failed: 'Échec de l''enregistrement : %{msg}'
       save_warning: 'Enregistré, mais une image n''a pas été conservée — vérifiez-la et réimportez-la.'
+      save_warning_card: 'Enregistré, mais l''image de la carte %{n} n''a pas été conservée — vérifiez-la et réimportez-la.'
       save_warning_media: "Enregistré, mais une vidéo ou une animation n'a pas été conservée — vérifiez-la et réappliquez-la."
       save_warning_duplicate: "Enregistré — une carte en double a été supprimée (un Verto n'en a qu'une de ce type)."
       save_warning_retired: "Enregistré — une carte d'un type retiré a été supprimée."

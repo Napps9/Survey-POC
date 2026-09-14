@@ -461,6 +461,7 @@ af:
       saved: "Gestoor %{time}"
       save_failed: "Kon nie stoor nie: %{msg}"
       save_warning: "Gestoor, maar 'n prent het nie vasgehaak nie — gaan na en laai dit weer op."
+      save_warning_card: "Gestoor, maar die prent op kaart %{n} het nie vasgehaak nie — gaan dit na en laai dit weer op."
       save_warning_media: "Gestoor, maar 'n video of animasie het nie vasgehaak nie — gaan na en pas dit weer toe."
       save_warning_duplicate: "Gestoor — 'n duplikaatkaart is verwyder ('n Verto het net een van daardie tipe)."
       save_warning_retired: "Gestoor — 'n kaart van 'n uitgetrede tipe is verwyder."
