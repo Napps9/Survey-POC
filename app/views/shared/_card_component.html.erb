@@ -412,13 +412,9 @@
 
     <% when "tap_card" %>
       <% option_images = Array(card["option_images"]) %>
-      <%# tap-stack:moved is the editor's half of the pager: on a phone the
-          panel's media pills act on the statement now on top, so the picker
-          keeps them in step (media-picker#tapMoved). Bound only where there is
-          a picker to hear it. %>
       <div class="rotate-wrap"
            data-controller="<%= editable ? 'tap-stack card-editor' : 'tap-stack' %>"
-           data-action="tap-stack:reset->tap-stack#reset tap-stack:goto->tap-stack#goto<%= " tap-stack:moved->media-picker#tapMoved" if editable %>">
+           data-action="tap-stack:reset->tap-stack#reset tap-stack:goto->tap-stack#goto">
         <div class="rotate-card-stack">
           <% Array(display["options"]).each_with_index do |opt, i| %>
             <% img = option_images[i] %>

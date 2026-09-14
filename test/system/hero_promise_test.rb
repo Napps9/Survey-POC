@@ -67,16 +67,29 @@ class HeroPromiseTest < ApplicationSystemTestCase
   end
 
   # The hero's height as a share of the card, and whether it is drawn at all.
+  #
+  # "Shown" means a HEADER: a strip in the card's flow, whose height is height
+  # the answer does not get. A panel taken out of the flow and stretched over
+  # the whole card is a different thing — a backdrop, which the answer floats
+  # on and which costs it nothing — and the two must not be confused here,
+  # because every exception below is about what the answer can afford.
   def hero
     page.evaluate_script(<<~JS)
       (() => {
         const c = document.querySelector(".preview-card.active")
         const sl = c.querySelector(".split-left")
         const sc = c.querySelector(".split-card")
-        const d = sl && getComputedStyle(sl).display
-        if (!sl || d === "none" || d === "contents") return { type: c.dataset.cardType, shown: false }
+        const cs = sl && getComputedStyle(sl)
+        if (!sl || cs.display === "none" || cs.display === "contents") {
+          return { type: c.dataset.cardType, shown: false }
+        }
+        const r  = sl.getBoundingClientRect()
+        const cr = sc.getBoundingClientRect()
+        if (cs.position === "absolute" && r.height >= cr.height - 1) {
+          return { type: c.dataset.cardType, shown: false, backdrop: true }
+        }
         return { type: c.dataset.cardType, shown: true,
-                 share: +(sl.getBoundingClientRect().height / sc.getBoundingClientRect().height).toFixed(3) }
+                 share: +(r.height / cr.height).toFixed(3) }
       })()
     JS
   end
@@ -104,7 +117,12 @@ class HeroPromiseTest < ApplicationSystemTestCase
 
   # ── The four exceptions ──
 
-  test "the tap matrix has no header, because its stack cannot shrink" do
+  # The exception still stands — and the picture is no longer thrown away to
+  # honour it. "No header" was read as "no picture" for as long as this test
+  # has existed, which is how a creator's upload came to land on a surface the
+  # phone does not draw ("it replaces the main desktop asset and not the mobile
+  # background"). A backdrop costs the stack nothing: it is out of the flow.
+  test "the tap matrix has no header — its picture goes behind the card instead" do
     open_at(3)
     h = hero
 
@@ -112,6 +130,38 @@ class HeroPromiseTest < ApplicationSystemTestCase
     assert_not h["shown"],
                "the tap matrix was given a header. Its card stack grows to fill the panel and " \
                "has nowhere to shrink to, which is why it is one of the excluded types."
+    assert h["backdrop"],
+           "the tap card's picture is not drawn at all. It is the card's background on a phone " \
+           "— dropping the STRIP is the exception, dropping the picture never was."
+  end
+
+  # …and the answer panel floats ON that backdrop rather than filling the card,
+  # which is what makes the picture visible rather than a hairline edging. Both
+  # halves matter: inset too far and the stack is squeezed after all.
+  test "the tap matrix's answer panel floats on its backdrop, inset on every side" do
+    open_at(3)
+    m = page.evaluate_script(<<~JS)
+      (() => {
+        const c  = document.querySelector(".preview-card.active")
+        const sc = c.querySelector(".split-card").getBoundingClientRect()
+        const sr = c.querySelector(".split-right").getBoundingClientRect()
+        const st = c.querySelector(".rotate-card-stack").getBoundingClientRect()
+        return { left: sr.left - sc.left, right: sc.right - sr.right,
+                 top: sr.top - sc.top, bottom: sc.bottom - sr.bottom,
+                 stack: st.height }
+      })()
+    JS
+
+    %w[left right top bottom].each do |side|
+      assert_operator m[side], :>=, 8,
+                      "the panel touches the card's #{side} edge (#{m[side].round(1)}px), so the " \
+                      "picture behind it is invisible on that side and the creator's background " \
+                      "reads as a rendering fault rather than a design"
+    end
+    assert_operator m["stack"], :>=, 260,
+                    "the stack is #{m['stack'].round(1)}px, under its own 260px floor — the " \
+                    "floating panel is eating the answer, which is the squeeze this whole file " \
+                    "exists to prevent"
   end
 
   test "NPS has no header, for the same reason" do
