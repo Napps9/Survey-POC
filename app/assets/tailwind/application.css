@@ -8647,89 +8647,115 @@ body.generating-overlay-active .bottom-bar { display: none; }
     flex: 1 1 auto;
     height: auto;
   }
-  /* …but a tap card that CARRIES a picture now SHOWS it, as the card's
-     background rather than as a strip. Dropping the strip was right and the
-     reasoning above still holds — a photo in a band above the stack duplicates
-     the stack's own imagery — but "no strip" was read as "no picture", and the
-     creator's upload then landed on the one surface a phone never draws:
-     "when you click Change media it does actually upload, but to the left hand
-     side on desktop… it replaces the main desktop asset and not the mobile
-     background." It IS the mobile background. It simply had nowhere to paint.
+  /* ── THE MOBILE BACKGROUND ────────────────────────────────────────────
+     A creator-chosen colour or picture behind the whole card, on the three
+     types whose answer takes the entire phone screen. It exists because those
+     three are the only cards a creator could not design for a phone at all:
+     every other type shows its own picture as a hero strip here, and these
+     drop the strip because their answer needs the card (see the rules just
+     above, and hero_promise_test). So the one surface that is nothing BUT a
+     phone had no design of its own, and the card's hero — which a phone never
+     draws — was the only thing on offer.
 
-     So the panel stops being a strip in the flow and becomes a layer behind
-     the whole card, with the content riding it as a floating white panel —
-     the construction this app shipped once before for its themed backdrop
-     ("full-colour mobile backdrop with white floating panels"). The picture
-     is at full strength, and every word on the card is still on opaque white,
-     so not one text colour has to be re-measured against an arbitrary photo.
+     It is a phone layer and nothing else. The value arrives as --card-bg-*
+     custom properties (ApplicationHelper#card_media_bg_style), which only
+     these rules read, so the desktop and tablet layouts cannot show it even
+     though they carry the same attribute: "allow creators to add that
+     background and it not affect anything on the desktop or tablet side".
+     The card's own picture is untouched and still the desktop panel's.
 
-     `z-index` is deliberately NOT set on the panel, and that is the whole
-     mechanism rather than an omission: `inset: 0` with a z-index would make
-     .split-left a stacking context, and .panel-progress, the photo credit and
-     the editor's own media pills are all markup INSIDE it — they would be
-     sealed in underneath the content panel, which is a progress bar a
-     respondent cannot see and a creator's Change media they cannot click.
-     Left at `auto` the panel creates no context, so those children keep
-     competing directly with .split-right's z-index the way they already do,
-     and only the backdrop itself (z-index auto, earlier in the tree) lands
-     below it. Every layer here is the one class that names it. */
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left {
+     `z-index` is deliberately NOT set on the panel, and that is the mechanism
+     rather than an omission: `inset: 0` with a z-index would make .split-left
+     a stacking context, and .panel-progress and the editor's own media pills
+     are markup INSIDE it — they would be sealed underneath the answer, which
+     is a progress bar a respondent cannot see and a Background a creator
+     cannot click. Left at `auto` the panel creates no context, so those
+     children go on competing with .split-right directly and only the backdrop
+     itself lands below it. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left {
     display: block;
     position: absolute;
     inset: 0;
-    /* The strip's sizing, unstated: an inset box takes the card. Each of these
-       is a property the hero-strip rule above sets, restated to nothing — not
-       tidiness, since that rule is (0,4,0) and this one is (0,5,0), so it wins
-       on specificity and whatever it leaves out it inherits. */
+    /* The hero strip's sizing, restated to nothing: an inset box takes the
+       card. (0,5,0) against the strip rule's (0,4,0), so this wins and
+       whatever it leaves out it would inherit.) */
     height: auto;
     min-height: 0;
     padding: 0;
     border-radius: 0;
+    background-color: var(--card-bg-color, var(--brand-panel, #2E3564));
+    background-image: var(--card-bg-image, none);
+    background-size: cover;
+    background-position: center;
   }
-  /* The words go ON the picture: no panel, no card, nothing between the
-     question and the photograph but the scrim that makes it readable. The
-     stack needs nothing — every .rotate-card carries its own opaque picture
-     and its own dark statement band — so the card is the creator's image and
-     the answer sits in it.
+  /* The card's HERO stays off, which is the whole point of the separation: the
+     backdrop gave .split-left a box back, and the box still holds the desktop
+     panel's photo, video, gradient and credit. Unhidden they would cover the
+     background the creator just chose with the picture they chose for another
+     screen — the two are different designs, and this is the line between
+     them. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left > :is(.split-left-img, .split-left-video, .split-left-overlay, .split-left-credit) {
+    display: none;
+  }
+  /* The words go ON the background: no panel, no card, nothing between the
+     question and the picture but the scrim that makes it readable.
 
-     --brand-scrim is not a taste, and not a new number: BrandPalette derives
-     it from the Verto's OWN colour, darkening it only as far as white needs
-     to clear 4.5:1 once composited over the brightest photo a card can carry
-     (a white one). The end screen paints this exact value for this exact
-     reason and end_screen_contrast_test measures the result, so the picture
-     is as visible here as legibility allows and no further. The literal is
-     the fallback for an unbranded Verto, where no property is emitted at all
-     — same pairing as every other reader of it. */
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left::after {
+     --brand-scrim is not a taste and not a new number: BrandPalette derives it
+     from the Verto's OWN colour, darkening it only as far as white needs to
+     clear 4.5:1 once composited over the brightest picture a card can carry (a
+     white one). The end screen paints this exact value for this exact reason
+     and end_screen_contrast_test measures the result, so the picture is as
+     visible here as legibility allows and no further. The literal is the
+     fallback for an unbranded Verto, where no property is emitted at all. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left::after {
     content: "";
     position: absolute;
     inset: 0;
     background: var(--brand-scrim, rgba(28,32,52,0.72));
   }
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-right {
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-right {
     position: relative;
     z-index: 1;
     background: transparent;
     color: #fff;
   }
-  /* The ink the transparent panel leaves standing on a photograph. Each of
-     these is a dark-on-white value from the opaque card — black title, 60%
-     black sub, 40-45% black chrome — and each is the same weight of white, so
+  /* The ink the transparent panel leaves standing on a picture. Each of these
+     is a dark-on-white value from the opaque card — black title, 60% black
+     sub, 40-45% black chrome — and each becomes the same weight of white, so
      the hierarchy the card was drawn with survives the inversion instead of
-     flattening into one bright block. */
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-title { color: #fff; }
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-subtitle { color: rgba(255,255,255,0.82); }
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .rotate-reset-btn,
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-nav-count {
-    color: rgba(255,255,255,0.75);
+     flattening into one bright block.
+     The pager chevrons are deliberately NOT on this list: they are already
+     opaque white circles with a dark glyph, so they read on any picture, and
+     whitening their ink turned them into blank discs. Nor is the eyebrow,
+     which is the Verto's own brand colour and chosen to carry. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .q-title {
+    color: #fff;
+  }
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
+    :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count, .nps-anchor-text,
+      .slider-label-text:not(.is-active)) {
+    color: rgba(255,255,255,0.8);
+  }
+  /* A prioritise card's rows are 3% BLACK on a white card — a tint, which is
+     all they need to read there and nothing at all on a picture: measured on
+     the phone frame, the row was invisible and its dark label sat straight on
+     the photograph. They become the same tint in the other direction, with the
+     ink to match. The tap stack needs none of this (every .rotate-card is an
+     opaque picture of its own) and NPS none either (its vessel is solid) —
+     this is the one of the three whose answer is drawn in ink. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
+    :is(.choice-list-item, .pick-item) {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.22);
+    color: #fff;
+  }
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .pick-text {
+    color: #fff;
   }
   /* The editor's own control, which a respondent never sees and a creator
      cannot do without: a dashed border in 15% BLACK is invisible on a dark
-     photograph, so the card would offer no way to add a statement.
-     Its neighbours the pager chevrons are deliberately NOT on this list —
-     they are already opaque white circles with a dark glyph, so they read on
-     any photograph, and whitening their ink turned them into blank discs. */
-  .preview-overlay .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-add-btn {
+     picture, so the card would offer no way to add a statement. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .tap-add-btn {
     border-color: rgba(255,255,255,0.35);
   }
 
@@ -10883,12 +10909,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list) .split-left {
   display: contents;
 }
-/* …and the tap matrix's own exception to that, mirroring the player's (search
-   "a tap card that CARRIES a picture"): no strip, but the picture is the
-   card's BACKGROUND, with the content floating on it. The creator designs the
-   phone here, so this frame has to show them the phone the player draws. */
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left,
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left {
+/* The MOBILE BACKGROUND, mirroring the player's (search "THE MOBILE
+   BACKGROUND"): on the three types that drop the strip, the creator's backdrop
+   is the card, with the answer drawn on it.
+
+   .device-mobile ONLY, and the missing .device-tablet line is the point rather
+   than an oversight. This is a phone layer — it is what "not affect anything
+   on the desktop or tablet side" means, and the tablet frame is one of the two
+   sides it must not affect. Every other rule in this block is stated for both
+   frames; if one is ever added here, the creator is being shown a tablet the
+   player does not draw. */
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left {
   display: block;
   position: absolute;
   inset: 0;
@@ -10896,31 +10927,44 @@ body.generating-overlay-active .bottom-bar { display: none; }
   min-height: 0;
   padding: 0;
   border-radius: 0;
+  background-color: var(--card-bg-color, var(--brand-panel, #2E3564));
+  background-image: var(--card-bg-image, none);
+  background-size: cover;
+  background-position: center;
 }
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left::after,
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-left::after {
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left > :is(.split-left-img, .split-left-video, .split-left-overlay, .split-left-credit) {
+  display: none;
+}
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left::after {
   content: "";
   position: absolute;
   inset: 0;
   background: var(--brand-scrim, rgba(28,32,52,0.72));
 }
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-right,
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .split-right {
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-right {
   position: relative;
   z-index: 1;
   background: transparent;
   color: #fff;
 }
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-title,
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .q-title {
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .q-title {
   color: #fff;
 }
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count),
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count) {
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
+  :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count, .nps-anchor-text,
+      .slider-label-text:not(.is-active)) {
   color: rgba(255,255,255,0.8);
 }
-.device-tablet .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-add-btn,
-.device-mobile .split-card:has(.rotate-wrap):has(.split-left-img, .split-left-video) .tap-add-btn {
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
+  :is(.choice-list-item, .pick-item) {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.22);
+  color: #fff;
+}
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .pick-text {
+  color: #fff;
+}
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .tap-add-btn {
   border-color: rgba(255,255,255,0.35);
 }
 /* A card that HAS a strip keeps the design prompt inside it, as the block it

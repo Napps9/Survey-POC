@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { applyFocal, focalPercent, focalZoom, optionMediaStyle, FOCAL_ZOOM_MAX } from "lib/option_media"
+import { isFullScreenAnswer } from "lib/full_screen_types"
 import { t } from "lib/i18n"
 
 // Modal that lets editors attach an image to a card's left panel.
@@ -2054,8 +2055,13 @@ export default class extends Controller {
     // a respondent will ever see. Only the CTA that ships on the bare panel —
     // range and Lottie cards have their own, and theirs stays whatever happens
     // to the card's image, because an animation keeps its transparency.
+    // …except on the three types whose answer takes the whole phone screen,
+    // where a picture arriving says nothing about the backdrop: the picture is
+    // the desktop panel's and the backdrop is the phone's, so hiding the
+    // control the moment a hero lands is hiding the only way to design the
+    // phone. See CardTypes::FULL_SCREEN_ANSWER_TYPES.
     const bg = card?.querySelector(".card-bg-fab")
-    if (bg) bg.hidden = hasMedia
+    if (bg) bg.hidden = hasMedia && !isFullScreenAnswer(card?.dataset.cardType)
   }
 
   // The same rule for one tap statement's chip: it exists only where there is
@@ -2216,6 +2222,10 @@ export default class extends Controller {
     const card = this._activeCard
     if (!card) return false
     if (card.dataset.cardType === "range" || card.dataset.cardLottie) return true
+    // …and the three types whose answer takes the whole phone screen, whatever
+    // else they carry: their picture is the DESKTOP panel's and their backdrop
+    // is the phone's, so one is never in front of the other.
+    if (isFullScreenAnswer(card.dataset.cardType)) return true
     return !card.dataset.cardImage && !card.dataset.cardVideo
   }
 
@@ -2244,10 +2254,31 @@ export default class extends Controller {
 
     const left = card.querySelector(".split-left")
     if (left) {
-      left.style.backgroundColor = clean.color || ""
-      left.style.backgroundImage = clean.image ? `url('${String(clean.image).replace(/'/g, "\\'")}')` : ""
-      left.style.backgroundSize     = clean.image ? "cover" : ""
-      left.style.backgroundPosition = clean.image ? "center" : ""
+      // A MOBILE background is handed over as custom properties, which only the
+      // phone blocks read — the same split ApplicationHelper#card_media_bg_style
+      // makes server-side, and the reason the desktop panel beside the creator
+      // does not change when they design the phone. Painting it as a plain
+      // background here would put it straight onto that panel, live, which is
+      // the one thing this feature must not do.
+      const mobileOnly = isFullScreenAnswer(card.dataset.cardType)
+      const url = clean.image ? `url('${String(clean.image).replace(/'/g, "\\'")}')` : ""
+      if (mobileOnly) {
+        left.style.backgroundColor = ""
+        left.style.backgroundImage = ""
+        left.style.backgroundSize     = ""
+        left.style.backgroundPosition = ""
+        clean.color ? left.style.setProperty("--card-bg-color", clean.color)
+                    : left.style.removeProperty("--card-bg-color")
+        url ? left.style.setProperty("--card-bg-image", url)
+            : left.style.removeProperty("--card-bg-image")
+      } else {
+        left.style.removeProperty("--card-bg-color")
+        left.style.removeProperty("--card-bg-image")
+        left.style.backgroundColor = clean.color || ""
+        left.style.backgroundImage = url
+        left.style.backgroundSize     = clean.image ? "cover" : ""
+        left.style.backgroundPosition = clean.image ? "center" : ""
+      }
       // The class, not just the paint. On a phone a media-less card has no hero
       // strip at all — .split-left is display: contents — and .has-media-bg is
       // what gives it one, so without this the creator picks a colour, watches

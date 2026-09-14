@@ -67,29 +67,16 @@ class HeroPromiseTest < ApplicationSystemTestCase
   end
 
   # The hero's height as a share of the card, and whether it is drawn at all.
-  #
-  # "Shown" means a HEADER: a strip in the card's flow, whose height is height
-  # the answer does not get. A panel taken out of the flow and stretched over
-  # the whole card is a different thing — a backdrop, which the answer floats
-  # on and which costs it nothing — and the two must not be confused here,
-  # because every exception below is about what the answer can afford.
   def hero
     page.evaluate_script(<<~JS)
       (() => {
         const c = document.querySelector(".preview-card.active")
         const sl = c.querySelector(".split-left")
         const sc = c.querySelector(".split-card")
-        const cs = sl && getComputedStyle(sl)
-        if (!sl || cs.display === "none" || cs.display === "contents") {
-          return { type: c.dataset.cardType, shown: false }
-        }
-        const r  = sl.getBoundingClientRect()
-        const cr = sc.getBoundingClientRect()
-        if (cs.position === "absolute" && r.height >= cr.height - 1) {
-          return { type: c.dataset.cardType, shown: false, backdrop: true }
-        }
+        const d = sl && getComputedStyle(sl).display
+        if (!sl || d === "none" || d === "contents") return { type: c.dataset.cardType, shown: false }
         return { type: c.dataset.cardType, shown: true,
-                 share: +(r.height / cr.height).toFixed(3) }
+                 share: +(sl.getBoundingClientRect().height / sc.getBoundingClientRect().height).toFixed(3) }
       })()
     JS
   end
@@ -117,12 +104,7 @@ class HeroPromiseTest < ApplicationSystemTestCase
 
   # ── The four exceptions ──
 
-  # The exception still stands — and the picture is no longer thrown away to
-  # honour it. "No header" was read as "no picture" for as long as this test
-  # has existed, which is how a creator's upload came to land on a surface the
-  # phone does not draw ("it replaces the main desktop asset and not the mobile
-  # background"). A backdrop costs the stack nothing: it is out of the flow.
-  test "the tap matrix has no header — its picture goes behind the card instead" do
+  test "the tap matrix has no header, because its stack cannot shrink" do
     open_at(3)
     h = hero
 
@@ -130,40 +112,6 @@ class HeroPromiseTest < ApplicationSystemTestCase
     assert_not h["shown"],
                "the tap matrix was given a header. Its card stack grows to fill the panel and " \
                "has nowhere to shrink to, which is why it is one of the excluded types."
-    assert h["backdrop"],
-           "the tap card's picture is not drawn at all. It is the card's background on a phone " \
-           "— dropping the STRIP is the exception, dropping the picture never was."
-  end
-
-  # …and nothing is drawn between the answer and that backdrop. The panel keeps
-  # the whole card, as the exception above requires, but it keeps it as a pane
-  # of glass: an opaque one would hide the very picture this card type now
-  # exists to show, which is the whole of "remove the white box".
-  test "the tap matrix's answer sits on its backdrop, with no panel over it" do
-    open_at(3)
-    m = page.evaluate_script(<<~JS)
-      (() => {
-        const c  = document.querySelector(".preview-card.active")
-        const sr = c.querySelector(".split-right")
-        const st = c.querySelector(".rotate-card-stack").getBoundingClientRect()
-        const cs = getComputedStyle(sr)
-        return { bg: cs.backgroundColor, bgImage: cs.backgroundImage,
-                 ink: cs.color, stack: st.height }
-      })()
-    JS
-
-    assert_includes [ "rgba(0, 0, 0, 0)", "transparent" ], m["bg"],
-                    "the answer panel paints #{m['bg']} over the card's picture — an opaque " \
-                    "panel is the white box, whatever colour it happens to be"
-    assert_equal "none", m["bgImage"],
-                 "the answer panel carries a background image of its own, which is a second " \
-                 "surface between the words and the photograph"
-    assert_equal "rgb(255, 255, 255)", m["ink"],
-                 "the panel is see-through but its ink is still the dark-on-white value — the " \
-                 "question is being drawn in near-black on a photograph"
-    assert_operator m["stack"], :>=, 260,
-                    "the stack is #{m['stack'].round(1)}px, under its own 260px floor — the " \
-                    "answer is being squeezed, which is the thing this whole file prevents"
   end
 
   test "NPS has no header, for the same reason" do

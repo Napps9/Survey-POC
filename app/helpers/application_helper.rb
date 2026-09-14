@@ -463,8 +463,16 @@ module ApplicationHelper
     bg = card_media_bg(card)
     return "" if bg.blank?
 
+    # A mobile-only backdrop is handed over as custom properties instead of as
+    # a background, and that IS the mechanism that keeps desktop and tablet out
+    # of it: only the phone blocks read --card-bg-*, so the same inline
+    # attribute that paints the panel on a range card paints nothing at all
+    # here until a phone rule asks for it. No second attribute, no duplicated
+    # value, and no way for the two to disagree about what the creator picked.
+    prefix = card_bg_is_mobile_only?(card) ? "--card-bg-" : "background-"
+
     parts = []
-    parts << "background-color:#{bg['color']}" if bg["color"].present?
+    parts << "#{prefix}color:#{bg['color']}" if bg["color"].present?
     if (img = bg["image"]).present?
       # Escaped for a single-quoted CSS url(), NOT URL-encoded: these URLs
       # legitimately carry query strings (Pexels crops are
@@ -473,9 +481,11 @@ module ApplicationHelper
       # Survey.sanitize_image_url; this only stops a quote or backslash from
       # closing the url() and escaping into the style attribute.
       escaped = img.delete("\n\r").gsub(/["'\\]/) { |c| "\\" + c }
-      parts << "background-image:url('#{escaped}')"
-      parts << "background-size:cover"
-      parts << "background-position:center"
+      parts << "#{prefix}image:url('#{escaped}')"
+      # Only the plain form needs these: the phone rule that reads --card-bg-*
+      # states its own cover/centre, because a property is a value and not a
+      # whole background.
+      parts += [ "background-size:cover", "background-position:center" ] if prefix == "background-"
     end
     parts.join(";")
   end
@@ -502,7 +512,29 @@ module ApplicationHelper
   def card_takes_backdrop?(card)
     return false unless card.is_a?(Hash)
     return true if card["type"].to_s == "range" || card["lottie"].present?
+    # …and the three types whose answer takes the whole phone screen, whatever
+    # else they carry. "A photo covers the panel" is a statement about the
+    # DESKTOP panel: on a phone these draw no hero at all, so their picture is
+    # not in front of the backdrop, it is on another screen entirely. Without
+    # this a creator could design the phone view of every card except the ones
+    # that are nothing but phone.
+    return true if CardTypes.full_screen_answer?(card["type"])
     card["image"].blank? && card["video"].blank?
+  end
+
+  # Whether that backdrop is the card's MOBILE background — a phone-only layer
+  # the desktop and tablet layouts must not show, because the picture those
+  # layouts show is the card's own hero and the two are set separately and on
+  # purpose ("allow creators to add that background and it not affect anything
+  # on the desktop or tablet side").
+  #
+  # It is the same stored value either way (card.media_bg); what differs is
+  # where it is allowed to paint, which is why the style helper below emits it
+  # as custom properties for these types and as a plain background for the
+  # rest. A range or Lottie card's backdrop is NOT mobile-only: it sits behind
+  # a transparent animation on every screen, which is what it was built for.
+  def card_bg_is_mobile_only?(card)
+    card.is_a?(Hash) && CardTypes.full_screen_answer?(card["type"])
   end
 
   def card_media_bg(card)

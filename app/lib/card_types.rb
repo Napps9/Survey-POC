@@ -123,6 +123,26 @@ module CardTypes
     !NON_QUESTION_TYPES.include?(type.to_s)
   end
 
+  # The three types whose ANSWER takes the whole phone screen, so the phone
+  # draws them no hero strip at all: a tap matrix (its stack cannot shrink), an
+  # NPS container (nor can its scale), a prioritise list (its rows are drag
+  # targets, so one below the fold cannot even be scrolled to). The reasoning
+  # is spelled out per type in application.css and measured in
+  # hero_promise_test.
+  #
+  # Named here because it now decides something beyond layout: these are
+  # exactly the cards on which a creator may set a MOBILE BACKGROUND. On every
+  # other type the phone shows the card's own picture as a hero, so a backdrop
+  # behind it would be a control that does nothing; on these three there is no
+  # hero to be behind, and the backdrop is the only design the phone can carry.
+  # Mirrored by media_picker#_cardTakesBackground and by the :has() lists in
+  # the stylesheet's two phone blocks.
+  FULL_SCREEN_ANSWER_TYPES = %w[tap_card nps prioritise].freeze
+
+  def full_screen_answer?(type)
+    FULL_SCREEN_ANSWER_TYPES.include?(type.to_s)
+  end
+
   # The picker list for one Verto: Points Checkpoint and Points Intro only
   # appear once tokenisation is on (they have nothing to show before then), and
   # Welcome disappears once the deck already has one — a second welcome card

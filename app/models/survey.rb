@@ -1421,7 +1421,15 @@ class Survey < ApplicationRecord
         # each the way that sanitiser will.
         animated = c["type"].to_s == "range" || sanitize_lottie_url(c["lottie"]).present?
         bare     = sanitize_image_url(c["image"]).blank? && sanitize_video_url(c["video"]).blank?
-        if (animated || bare) && out.any?
+        # …and the three types whose answer takes the whole phone screen, which
+        # keep a backdrop whatever else they carry. Their picture and their
+        # backdrop are different screens' designs, not two layers of one: the
+        # phone draws them no hero, so there is nothing for the backdrop to be
+        # hidden behind, and refusing to STORE one is what stopped a creator
+        # designing the phone view of exactly the cards that are only ever
+        # phone. See ApplicationHelper#card_takes_backdrop?.
+        full_screen = CardTypes.full_screen_answer?(c["type"])
+        if (animated || bare || full_screen) && out.any?
           c["media_bg"] = out
         else
           c.delete("media_bg")

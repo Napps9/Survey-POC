@@ -43,6 +43,18 @@ class JsConstantParityTest < ActiveSupport::TestCase
                  "the reverse offers routing the compiler will discard."
   end
 
+  # The editor decides whether to OFFER a mobile background from the JS list and
+  # the server decides whether to STORE one from the Ruby list. Out of step in
+  # one direction the creator sets a background that is silently dropped on the
+  # next autosave; in the other, a type that can carry one is never offered it.
+  test "lib/full_screen_types.js matches CardTypes::FULL_SCREEN_ANSWER_TYPES" do
+    assert_equal CardTypes::FULL_SCREEN_ANSWER_TYPES.sort,
+                 js_array("lib/full_screen_types.js", "FULL_SCREEN_ANSWER_TYPES").sort,
+                 "the mobile background is offered on the types in the JS list and stored for " \
+                 "the types in the Ruby one. A type in only one of them either loses what the " \
+                 "creator set, or is never offered the one design a phone can carry."
+  end
+
   test "lib/question_types.js matches CardTypes::NON_QUESTION_TYPES" do
     assert_equal CardTypes::NON_QUESTION_TYPES.sort,
                  js_array("lib/question_types.js", "NON_QUESTION_TYPES").sort,

@@ -177,6 +177,21 @@
                 title="<%= t("editor.reposition_title", default: "Reframe this card's media — drag to reposition, or crop and zoom a photo") %>">
           <span><%= t("editor.reposition", default: "Reposition") %></span>
         </button>
+        <%# …and on the three types whose answer takes the whole phone screen,
+            Background as well — even though this card already carries a photo.
+            Everywhere else that combination is a control that does nothing,
+            because the photo covers the panel the backdrop would paint on. Not
+            here: the phone draws these no hero at all, so the two are not two
+            layers of one screen but one design each for two screens, and this
+            is the only way to give the phone one. card_takes_backdrop? is the
+            single statement of that rule. %>
+        <% if card_takes_backdrop?(card) %>
+          <button type="button" class="add-bg-fab card-bg-fab"
+                  data-action="click->media-picker#open"
+                  title="<%= t("editor.change_background_title", default: "Customise this card's background colour or image") %>">
+            <span><%= t("editor.change_background", default: "Background") %></span>
+          </button>
+        <% end %>
       </div>
     <% else %>
       <button type="button" class="split-left-design-prompt"
