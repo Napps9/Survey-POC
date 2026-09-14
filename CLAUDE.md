@@ -250,7 +250,7 @@ The switch itself (dashboard, `render.yaml`) is in `docs/DEPLOYMENT_RUNBOOK.md`
   The Drive export needs the **Google Drive API** enabled on the Cloud
   project (the Sheets export only needs the Sheets API); a 403 there is
   passed through to the modal rather than shown as "try again".
-- `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js`)
+- `/play/:token` is served through a Service Worker (`app/views/pwa/service-worker.js.erb`)
   with **network-first (3.5s timeout) + offline cache fallback** for the
   player HTML. Content/markup/CSS fixes therefore reach respondents on their
   next ordinary online visit with **no** `CACHE_VERSION` bump. A bump is
@@ -260,3 +260,9 @@ The switch itself (dashboard, `render.yaml`) is in `docs/DEPLOYMENT_RUNBOOK.md`
   same-visit. History: the HTML used to be stale-while-revalidate, which
   pinned respondents on stale copies (one deploy shipped invisibly until a
   v2→v3 bump) — that's why it's network-first now; don't quietly revert it.
+  A 502/503/504 on a player navigation is Render answering for an app that
+  isn't there (every deploy is a stop/start while the service has its disk),
+  and the worker answers it with the cached Verto or `public/deploying.html`
+  — the branded "we're deploying" page, inlined into the worker by the one
+  ERB tag in that file. The studio and first-time visitors still see Render's
+  page; `docs/DEPLOYMENT_RUNBOOK.md` §8 says how to show them ours.

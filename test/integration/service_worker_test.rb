@@ -11,10 +11,61 @@ class ServiceWorkerTest < ActionDispatch::IntegrationTest
     get pwa_service_worker_path(format: :js)
     assert_response :success
     assert_match %r{\Atext/javascript}, response.content_type
-    # v41: submit-queue retries gained exponential backoff + Retry-After, and
-    # the opportunistic drain is rate-limited — worker behaviour changed, so
-    # the version moves (and delivers the new worker same-visit).
-    assert_includes response.body, '"playverto-v41"'
+    # v42: a 502/503/504 on a player navigation is answered from the cached
+    # Verto or the branded deploying page instead of being passed through as
+    # Render's page, and /up is no longer intercepted — worker behaviour
+    # changed, so the version moves (and delivers the new worker same-visit).
+    assert_includes response.body, '"playverto-v42"'
+  end
+
+  test "a gateway error on a player navigation is never passed through as Render's page" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # Render answers 502/503/504 for the app while a deploy replaces the
+    # instance (the persistent disk makes every deploy a stop/start). That is
+    # not the app speaking — a 410 for an unpublished Verto is, and still goes
+    # through — so it takes the offline path: cached Verto first, then the
+    # branded deploying page. 500 is deliberately not in the list: that is
+    # Rails answering with its own branded page.
+    assert_includes response.body, "return res.status === 502 || res.status === 503 || res.status === 504"
+    strategy = response.body[/async function networkFirstWithTimeout.*?\n\}/m]
+    assert strategy, "expected to find the networkFirstWithTimeout strategy in the worker"
+    assert_includes strategy, "if (answered && !appUnreachable(winner)) return winner"
+    assert_includes strategy, "if (answered) return deployingPage()"
+    assert_includes strategy, "return appUnreachable(res) ? deployingPage() : res"
+  end
+
+  test "the worker carries the deploying page inline, as one JS string literal" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # Inlined at render time rather than precached at install: nothing to
+    # fetch at the very moment the app is down, and no install to fail. The
+    # literal must be a single line of valid JSON (to_json's output), or the
+    # whole worker is a syntax error and the player silently loses offline
+    # support.
+    literal = response.body[/^const DEPLOYING_PAGE_HTML = (".*")$/, 1]
+    assert literal, "expected the deploying page as a one-line string literal"
+    html = JSON.parse(literal)
+    assert_equal File.read(Rails.root.join("public", "deploying.html")), html
+    assert_match(/deploying a new feature/i, html)
+
+    # Served as a 503 with a Retry-After, never cached: it is the answer for
+    # this minute, not for the Verto.
+    assert_includes response.body, "status: 503"
+    assert_includes response.body, '"Retry-After": "30"'
+    assert_includes response.body, '"Cache-Control": "no-store"'
+  end
+
+  test "the health check passes through the worker untouched" do
+    get pwa_service_worker_path(format: :js)
+    assert_response :success
+
+    # The deploying page polls /up to learn when the app is back. The catch-all
+    # networkFirst would cache its 200 and hand it back the next time the
+    # network failed — a probe that says "back" while it isn't.
+    assert_includes response.body, 'if (url.origin === self.location.origin && url.pathname === "/up") return'
   end
 
   test "the worker can reach the Pexels CDNs it refetches card art from" do

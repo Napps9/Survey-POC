@@ -97,7 +97,7 @@ A few things that surprise people:
   `en.yml`. A string the browser needs must go under the `js:` namespace, or it
   renders to respondents as a raw key.
 - **A `CACHE_VERSION` bump is needed only for service-worker behaviour
-  changes** (`app/views/pwa/service-worker.js` — strategies, submit queue,
+  changes** (`app/views/pwa/service-worker.js.erb` — strategies, submit queue,
   cache layout). Player content/markup/CSS fixes ship on their own: the
   player HTML is network-first, so respondents pick them up on their next
   ordinary online visit.

@@ -313,3 +313,63 @@ Undo: Settings → Repository → Edit → pick the GitHub repository again, and
 drop the `imgURL` parameter from the deploy job's POST in
 `.github/workflows/ci.yml`; Render then rebuilds from source on the next
 hook. The `:<sha>` pushes cost nothing either way.
+
+## 8. What visitors see during a deploy — and the branded "deploying" page
+
+Every deploy of the web service is a **stop/start, not zero-downtime**: the
+persistent disk (`render.yaml`, `disk:`) pins the service to one instance, so
+Render stops the running instance, starts the new one, waits for `/up`, and
+only then routes traffic. For that gap — the container start, the
+entrypoint's `db:prepare`, Puma's boot, roughly a minute — Render's edge
+answers every request itself with its black "502 Bad Gateway / This service
+is currently unavailable" page. Nothing in the app can replace that page for
+a visitor it has never seen, because the app is the thing being replaced.
+
+`public/deploying.html` is our version: on brand, "We're deploying a new
+feature — back in a few minutes", and it polls `/up` and reloads itself the
+moment the app answers. Who sees which page today:
+
+| Visitor | During the gap |
+|---|---|
+| A respondent who has opened a Verto before (the player's service worker is installed) | Their **cached Verto**, if they have one — the deploy looks like a slow network; a submit queues and drains when the app is back. Otherwise the **branded deploying page**. |
+| A first-time respondent, anyone in the studio, anyone without the worker | **Render's 502 page**, unchanged. |
+
+The worker (`app/views/pwa/service-worker.js.erb`) treats a 502/503/504 on a
+player navigation as "the app isn't there" rather than as an answer — a 410
+for an unpublished Verto still goes through — and carries the page inline,
+so there is nothing to fetch at the moment nothing is reachable.
+
+### Showing the branded page to everyone
+
+Render's **maintenance mode** (dashboard → the service → Settings →
+Maintenance Mode; paid instances only, which `starter` is) serves a page of
+your choosing for every request instead of routing to the instance, and
+accepts a **custom page URL**. Two constraints Render documents: the URL must
+not be on the service itself (it is the thing that is down), and a static
+site is the recommended host. So:
+
+1. Host a copy of `public/deploying.html` off the service — a Render static
+   site or GitHub Pages for this repository both work; keep it byte-identical
+   to the file here, which the tests pin.
+2. Paste its URL into the service's maintenance-mode settings.
+3. Switch maintenance mode **on before** a Manual Deploy and **off once** the
+   deploy is live. It is a manual switch today; the Render API
+   (`PATCH /v1/services/{id}` with `maintenanceMode`) would let the `deploy`
+   job in `.github/workflows/ci.yml` do it around the hook POST, at the cost
+   of a `RENDER_API_KEY` secret and a step that must run `if: always()` so a
+   failed job can never leave the site dark.
+
+The trade-off to know before automating it: maintenance mode is on for the
+**whole** deploy (image pull, pre-deploy `db:prepare`, boot), not just the
+stop/start gap, so everyone sees the page for two or three minutes instead of
+a minute of 502s for the few who happened to click then.
+
+### Making the gap smaller, or gone
+
+- Removing `db:prepare` from `bin/docker-entrypoint` once the
+  `preDeployCommand` is confirmed in the deploy log (the two-step migration
+  `render.yaml` describes) takes the migration check out of the boot path.
+- **Zero-downtime deploys come back when the disk goes** — phase 3 of
+  `docs/OBJECT_STORAGE_CUTOVER.md`, after `bin/rails object_storage:verify`
+  passes on production. With no disk, Render keeps the old instance serving
+  until the new one passes `/up`, and there is no gap for any page to fill.

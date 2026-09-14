@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Back in a few minutes · Playverto</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <!-- The page a visitor sees while a deploy replaces the running instance,
+       in place of Render's "502 Bad Gateway". Two things serve it:
+
+         1. The player's service worker (app/views/pwa/service-worker.js.erb),
+            which inlines this file and answers a 502/503/504 on a /play/:token
+            navigation with it — Render is answering for an app that isn't
+            there, and that page is not ours to show a respondent.
+         2. Render's maintenance mode, given a copy of this page hosted OFF the
+            service as its custom page (docs/DEPLOYMENT_RUNBOOK.md §8). The app
+            can't serve anything while it is the thing being replaced.
+
+       Self-contained like the other pages here: no stylesheet, font or image
+       request, because the host that would answer them is exactly what's
+       down. The one script polls /up and reloads the moment the app answers,
+       so nobody has to know to refresh. English-only for the same reason the
+       500 page is — a static file has no I18n. -->
+  <noscript><meta http-equiv="refresh" content="30"></noscript>
+  <style>
+    :root { --navy: #1C2034; --panel: #272D4A; --aqua: #01EACB; --pink: #FF1E6F; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 24px; background: var(--navy);
+      color: #F7F7F7;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      width: 100%; max-width: 460px; background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 18px;
+      padding: 40px 32px; text-align: center;
+    }
+    .wordmark {
+      font-size: 26px; letter-spacing: 1.4px; line-height: 1; margin-bottom: 28px;
+    }
+    .wordmark b { font-weight: 400; }
+    .wordmark .a { color: #F7F7F7; }
+    .wordmark .b { color: var(--pink); }
+    h1 { font-size: 20px; font-weight: 400; margin: 0 0 10px; letter-spacing: 0.3px; }
+    p { font-size: 15px; line-height: 1.6; color: rgba(247,247,247,0.7); margin: 0 0 24px; }
+    .code {
+      display: inline-block; font-size: 12px; letter-spacing: 1.5px;
+      color: rgba(247,247,247,0.35); margin-bottom: 18px; text-transform: uppercase;
+    }
+    /* Three dots breathing in the brand aqua: "something is happening", without
+       a spinner that implies this page itself is loading. */
+    .pulse { display: flex; justify-content: center; gap: 10px; margin: 0 0 28px; }
+    .pulse span {
+      width: 10px; height: 10px; border-radius: 50%; background: var(--aqua);
+      opacity: 0.25; animation: breathe 1.6s ease-in-out infinite;
+    }
+    .pulse span:nth-child(2) { animation-delay: 0.25s; }
+    .pulse span:nth-child(3) { animation-delay: 0.5s; }
+    @keyframes breathe { 0%, 100% { opacity: 0.25; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .pulse span { animation: none; opacity: 0.7; }
+    }
+    button.cta {
+      display: inline-block; padding: 12px 26px; border-radius: 100px; border: 0;
+      background: var(--aqua); color: var(--navy); font: inherit; font-size: 15px;
+      letter-spacing: 0.4px; cursor: pointer;
+    }
+    button.cta:hover { filter: brightness(1.08); }
+    .small { font-size: 13px; color: rgba(247,247,247,0.45); margin: 20px 0 0; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="wordmark"><b><span class="a">play</span><span class="b">verto</span></b></div>
+    <div class="code">Deploying</div>
+    <h1>We're deploying a new feature</h1>
+    <p>Playverto is being updated and will be back in a few minutes. This page checks on its own and reloads the moment we're ready, so you can leave it open.</p>
+    <div class="pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+    <button class="cta" type="button" id="retry">Try again now</button>
+    <p class="small">Any Verto link you were given will work again as soon as we're back.</p>
+  </div>
+  <script>
+    (function () {
+      document.getElementById("retry").addEventListener("click", function () {
+        window.location.reload()
+      })
+
+      // Ask /up (the health check Render itself polls) whether the app is back,
+      // and reload when it says so. Render answers for a down app with its own
+      // 502/503, never a 200, so "ok" means the app itself replied. The wait
+      // grows from 4s towards 30s with a little jitter — a class of respondents
+      // all landing here at once must not hammer the instance the second it
+      // boots — and a tab forgotten for half an hour stops asking; the button
+      // still works.
+      var delay = 4000
+      var started = Date.now()
+      function check() {
+        if (Date.now() - started > 30 * 60 * 1000) return
+        fetch("/up", { cache: "no-store", credentials: "omit" })
+          .then(function (res) { if (res.ok) window.location.reload() })
+          .catch(function () {})
+          .then(function () {
+            delay = Math.min(delay * 1.5, 30000)
+            setTimeout(check, delay + Math.random() * 2000)
+          })
+      }
+      setTimeout(check, delay)
+    })()
+  </script>
+</body>
+</html>

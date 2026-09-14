@@ -5,7 +5,10 @@
 // may go offline mid-Verto, not for a creator editing artwork.
 //
 // Strategies:
-//   • /play/:token        → network-first (short timeout) → cache fallback (offline)
+//   • /play/:token        → network-first (short timeout) → cache fallback (offline,
+//                           or the app unreachable behind a 502/503/504) → the
+//                           branded deploying page when there is nothing cached
+//   • /up                 → not intercepted (a health probe answered from cache lies)
 //   • /assets/*           → cache-first (fingerprinted; safe to keep)
 //   • Card images         → same-origin cache-first; cross-origin network-first
 //                           (opaque responses can't be judged, so the cache is
@@ -31,7 +34,10 @@
 // and nobody else: every already-registered worker kept enforcing the old
 // policy, kept refusing to fetch card art, and would have done so indefinitely.
 // Changing this constant is what forces the reinstall that picks the policy up.
-const CACHE_VERSION = "playverto-v41"
+//
+// This file is an ERB template (rendered by Rails::PwaController) for one
+// reason: DEPLOYING_PAGE_HTML below. Nothing else in it is dynamic.
+const CACHE_VERSION = "playverto-v42"
 const SHELL_CACHE   = `${CACHE_VERSION}-shell`
 const ASSET_CACHE   = `${CACHE_VERSION}-assets`
 const PAGE_CACHE    = `${CACHE_VERSION}-pages`
@@ -105,6 +111,13 @@ self.addEventListener("fetch", (event) => {
   // large, and the generic networkFirst below would clone every response on
   // its way past.
   if (req.destination === "video" || req.destination === "audio" || req.headers.has("range")) return
+
+  // The health check passes through untouched. The deploying page polls /up to
+  // learn when the app is back, and the catch-all networkFirst below would
+  // cache its 200 and hand that back the next time the network fails — a probe
+  // that says "back" while it isn't. Placed above the drain so the polling
+  // doesn't kick the submit queue at a server that is down.
+  if (url.origin === self.location.origin && url.pathname === "/up") return
 
   // Opportunistic queue drain on same-origin GETs (iOS fallback), rate-limited:
   // a page with N subresources used to kick the drain N times per navigation.
@@ -205,11 +218,19 @@ const PAGE_NETWORK_TIMEOUT_MS = 3500
 // its cache.put landed, so a returning respondent could keep a stale Verto
 // forever (hard refresh, which bypasses the worker, was the only way out).
 //
-// A response that ARRIVED is the answer, whatever its status — a 410 for an
+// A response the APP gave is the answer, whatever its status — a 410 for an
 // unpublished Verto must reach the respondent, not be papered over with the
 // cached copy (same principle as handleSubmit below). Only a clean 200 is
 // worth keeping for offline; a redirected response is not, because Chrome
 // refuses to satisfy a navigation from a cached redirect.
+//
+// A 502/503/504 is not the app speaking. Render answers those for it while a
+// deploy replaces the instance (the persistent disk makes every deploy a
+// stop/start — render.yaml) or while it is crash-looping, and what it sends
+// is Render's own "502 Bad Gateway" page. That is treated like a network
+// failure: the cached Verto if there is one, so a returning respondent can
+// carry on (their submit queues, exactly as it would offline), and the
+// branded deploying page when there is nothing cached.
 async function networkFirstWithTimeout(event, req, cacheName) {
   const cache = await caches.open(cacheName)
 
@@ -226,7 +247,8 @@ async function networkFirstWithTimeout(event, req, cacheName) {
     network.catch(() => null), // null = network failed outright
     new Promise(resolve => setTimeout(resolve, PAGE_NETWORK_TIMEOUT_MS, TIMED_OUT))
   ])
-  if (winner !== TIMED_OUT && winner !== null) return winner
+  const answered = winner !== TIMED_OUT && winner !== null
+  if (answered && !appUnreachable(winner)) return winner
 
   const cached = await cache.match(req)
   if (cached) {
@@ -236,13 +258,44 @@ async function networkFirstWithTimeout(event, req, cacheName) {
     return cached
   }
 
+  // Nothing cached and the host answered for a missing app: say so, in our
+  // words, and keep asking (the page polls /up and reloads when it's back).
+  if (answered) return deployingPage()
+
   // Nothing cached to fall back on: give the network its full time — a
   // first-ever visit on a slow connection should load slowly, not fail fast.
   try {
-    return await network
+    const res = await network
+    return appUnreachable(res) ? deployingPage() : res
   } catch (_) {
     return Response.error()
   }
+}
+
+// The statuses a gateway sends for an app it can't reach. Never 500 — that is
+// Rails answering, with its own branded page. (The app itself sends a 503
+// from a few busy endpoints, none of them a player navigation.)
+function appUnreachable(res) {
+  return res.status === 502 || res.status === 503 || res.status === 504
+}
+
+// public/deploying.html, inlined when the worker is rendered, so the worker
+// can answer with it when nothing else is reachable: no install-time precache
+// that can fail, no fetch at the very moment the app is down. Editing the
+// page changes the worker's bytes, which is what reinstalls it — a copy or
+// styling change there needs no CACHE_VERSION bump.
+const DEPLOYING_PAGE_HTML = <%== File.read(Rails.root.join("public", "deploying.html")).to_json %>
+
+function deployingPage() {
+  return new Response(DEPLOYING_PAGE_HTML, {
+    status: 503,
+    statusText: "Service Unavailable",
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Retry-After": "30"
+    }
+  })
 }
 
 async function networkFirst(req, cacheName) {
