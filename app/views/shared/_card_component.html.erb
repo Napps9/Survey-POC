@@ -758,6 +758,11 @@
            data-controller="slider"
            data-slider-steps-value="<%= n %>"
            data-slider-axis-value="<%= axis %>"
+           <%# Only an `auto` card lets slider#fitLabels turn the scale
+               vertical when the words won't fit horizontally at the type's
+               floor — an explicit horizontal is the creator's call and is
+               left alone. %>
+           data-slider-auto-value="<%= stored_axis == "auto" %>"
            <%= editable ? "".html_safe : tag.attributes(
                  tabindex: 0, role: "slider",
                  "aria-valuemin": 0, "aria-valuemax": n - 1,
@@ -783,7 +788,9 @@
               contenteditable, so they never carry the action. %>
           <% labels.each do |opt| %>
             <span class="slider-label-text" data-slider-target="label" <%= ce_attr %>
-                  <%= editable ? "".html_safe : 'data-action="click->slider#jump"'.html_safe %>><%= opt %></span>
+                  <%# A creator typing a longer word into a stop is the same
+                      event, to the fit, as the panel getting narrower. %>
+                  <%= (editable ? 'data-action="input->slider#refit"' : 'data-action="click->slider#jump"').html_safe %>><%= opt %></span>
           <% end %>
         </div>
         <% if editable %>

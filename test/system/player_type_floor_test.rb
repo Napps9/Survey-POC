@@ -110,7 +110,8 @@ class PlayerTypeFloorTest < ApplicationSystemTestCase
           return parseFloat(getComputedStyle(probe).fontSize)
         }
         const out = { title: px("--play-title"), subtitle: px("--play-subtitle"),
-                      eyebrow: px("--play-eyebrow"), label: px("--play-label") }
+                      eyebrow: px("--play-eyebrow"), label: px("--play-label"),
+                      scale: px("--play-scale-floor") }
         probe.remove()
         return out
       })()
@@ -155,7 +156,16 @@ class PlayerTypeFloorTest < ApplicationSystemTestCase
             // the wrong card. NPS labels the digits 0-10 down a fixed-height
             // column where 16px would collide; they still owe the absolute
             // floor, just not the answer-label one.
-            const r = (role === "label" && el.closest(".nps-slider-labels")) ? "nps-scale" : role
+            // A range card's scale words are the other documented exception.
+            // They run ACROSS the panel rather than down it, so five of them
+            // divide a phone into ~69px columns and a word wider than that
+            // used to break mid-word. slider_controller#fitLabels buys the
+            // room by shrinking the scale — and only the scale, and only as
+            // far as --play-scale-floor, which is what this role pins. NPS
+            // keeps its own smaller floor: 11 digits down a fixed column.
+            let r = role
+            if (role === "label" && el.closest(".nps-slider-labels")) r = "nps-scale"
+            else if (role === "label" && el.closest(".slider-labels")) r = "scale"
             out.push({ role: r, size: parseFloat(cs.fontSize),
                        tag: el.className.toString().split(" ")[0] })
           }
@@ -199,6 +209,16 @@ class PlayerTypeFloorTest < ApplicationSystemTestCase
         when "label"
           assert_operator size, :>=, floor["label"],
                           "#{name}: .#{tag} is answer text and fell below --play-label"
+        when "scale"
+          # A range card's scale words get one step of give and no more, so
+          # the widest word fits its column instead of breaking in half
+          # (slider_label_fit_test measures that end of it). This is the end
+          # that matters here: the give is bounded, and bounded by a token.
+          assert_operator size, :>=, floor["scale"],
+                          "#{name}: .#{tag} is scale text and fell below --play-scale-floor"
+          assert_operator size, :<=, floor["label"],
+                          "#{name}: .#{tag} came out ABOVE --play-label — the fit is only " \
+                          "allowed to take size off, never add it"
         when "input"
           assert_operator size, :>=, INPUT_FLOOR,
                           "#{name}: .#{tag} is #{size}px — iOS Safari zooms the page under #{INPUT_FLOOR}"

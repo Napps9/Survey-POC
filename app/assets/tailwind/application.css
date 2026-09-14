@@ -2855,9 +2855,24 @@
 }
 /* Grip lines sit on the brand-coloured thumb, so they read in white. */
 .s-line { width: 2px; height: 11px; background: rgba(255,255,255,0.8); border-radius: 1px; }
+/* How small a range card's scale word may be drawn, and no smaller. The
+   answer is the last thing on a card that gets to shrink, so this is not a
+   free variable slider_controller#fitLabels may spend: it spends the gap
+   between the option size and this floor to keep a word whole, and when that
+   is not enough it changes the LAYOUT rather than the type (see the note on
+   .preview-overlay .slider-label-text for why the floor is the absolute 12
+   and not something gentler). Stated once, at the root, so the floor is one
+   number in one place and player_type_floor_test reads it rather than
+   restating it. */
+:root { --play-scale-floor: 0.75rem; } /* 12px */
+
 .slider-labels { display: flex; justify-content: space-between; padding: 0 4px; margin-top: 6px; }
 .slider-label-text {
-  font-size: 13px; font-weight: 600; color: rgba(0,0,0,0.75);
+  /* --slider-label-fit is slider_controller#fitLabels' answer, in px, set on
+     the .slider-labels row when the widest word doesn't fit its column. It is
+     absent by default, so every tier below states its own size as the
+     fallback and the fit is the only thing that ever overrides it. */
+  font-size: var(--slider-label-fit, 13px); font-weight: 600; color: rgba(0,0,0,0.75);
   /* Equal shares of the row, so one long label can't take width off its
      neighbours.
      It does NOT put every label exactly under its own dot, and the comment
@@ -2880,7 +2895,11 @@
      word can outgrow the column outright. hyphens first, so a device with a
      dictionary for its lang breaks at "dis-agree"; break-word is the fallback
      for the ones without (headless Chromium included), which breaks mid-word
-     but never lets the label spill over its neighbour. */
+     but never lets the label spill over its neighbour.
+     It is now the LAST resort rather than the usual outcome: fitLabels sizes
+     the type so the widest word fits its column before this can fire, and
+     turns the scale vertical when it cannot. This stays as the guard for the
+     case neither reaches — an explicit `horizontal` on a folded phone. */
   overflow-wrap: break-word; hyphens: auto; line-height: 1.2;
 }
 .slider-label-text:first-child { text-align: left; }
@@ -2892,9 +2911,12 @@
    separate rows of words rather than one run of stops.
    The cap is the better lever: bounded at 17 characters (SCALE_LABEL_MAX), a
    label wraps to at most two lines inside its own column, so the five sit in
-   ONE row, each centred under its own dot. The type does NOT shrink to help —
-   see the note on .preview-overlay .slider-label-text for why, and for what
-   that costs on the narrowest phones. */
+   ONE row, each centred under its own dot.
+   The cap bounds a LABEL, though, and a column is broken by a WORD:
+   "Definitely" is 10 characters and still outgrows 69px at 16px, which is how
+   the scale came to print "Definitel / y". The type now shrinks that far and
+   no further — see .preview-overlay .slider-label-text for the floor and what
+   happens when even the floor is not enough. */
 /* The chosen step's label answers the thumb (same convention as the NPS
    is-active label). Scoped under .slider-labels so the NPS column, which
    shares the span class, keeps its own treatment. */
@@ -2955,6 +2977,14 @@
   height: 100%;
   padding: 0;
   margin-top: 0;
+  /* All the width the track doesn't want, rather than the auto basis a flex
+     item gets by default. Auto makes the column CONTENT-sized, which is a
+     feedback loop the moment anything sizes to it: fitLabels shrank the type
+     to fit the column, the column shrank by the same ratio because it was
+     measuring the type, and the widest word stayed exactly as far over the
+     line as it started (measured: 112.8px of word in 112.6px of column, then
+     110.6 in 110.4). Fixed by the panel, the fit converges in one pass. */
+  flex: 1 1 0; min-width: 0;
 }
 .slider-wrap[data-slider-axis-value="vertical"] .slider-label-text,
 .slider-wrap[data-slider-axis-value="vertical"] .slider-label-text:first-child,
@@ -9582,17 +9612,35 @@ body.generating-overlay-active .bottom-bar { display: none; }
      fixed-height vertical column (11 of them in 232px), where the readability
      argument for 16px doesn't apply and the extra leading would collide.
 
-     Flat, NOT a clamp. Now that the five stops sit in one row they divide the
-     panel between them — ~69px each on a 390px phone, ~48 on a 280px Fold —
-     and a column cannot shrink below its longest WORD, so on the narrowest
-     phones a wide one ("Disagree" is ~64px here) breaks across two lines
-     rather than wrapping at the space. Scaling the type down to fit is the
-     one fix that is not available: player_type_floor_test walks every answer
-     type across five viewports precisely to catch a clamp doing that, because
-     the answer is the last thing on the card that may get smaller. The lever
-     for it is the cap instead — 17 characters is room for a short scale word,
-     not a long one. */
-  .preview-overlay .slider-label-text { font-size: var(--play-label); }
+     Flat, NOT a clamp — and the distinction still matters. Now that the five
+     stops sit in one row they divide the panel between them — ~69px each on a
+     390px phone, ~48 on a 280px Fold — and a column cannot shrink below its
+     longest WORD, so a wide one ("Disagree" is ~64px here, "Definitely"
+     wider) used to break across two lines MID-WORD rather than wrapping at a
+     space. "Definitel / y" is not a scale a respondent can read.
+
+     A clamp is still the wrong fix: it shrinks on viewport width whether or
+     not anything needed it, on every card, and player_type_floor_test walks
+     five viewports precisely to catch one doing that — the answer is the last
+     thing on a card that may get smaller. What replaced it is a measurement:
+     slider_controller#fitLabels compares the widest word against the column
+     it has and shrinks ONLY that scale, ONLY when it doesn't fit, and only as
+     far as --play-scale-floor. Past that it stops spending type and turns
+     the scale vertical instead, where each stop gets a full-width row. So the
+     size here is what a scale that fits still renders at, and the floor is
+     the whole of the give.
+
+     The floor is 12px: the same ABSOLUTE_FLOOR the rest of the card owes, not
+     a softer one. It is low, and deliberately — 14px read better and made
+     "Somewhat" (81px of word in 69px of column on an ordinary phone) turn
+     ordinary agreement scales vertical, which is a much larger change to a
+     card than two points of type. A scale word is a caption under a track,
+     the shortest respondent-facing string on the card, and 12px legible beats
+     16px sheared in half.
+
+     The 17-character cap (SCALE_LABEL_MAX) stays what it was — it bounds the
+     label, and this bounds the word inside it. */
+  .preview-overlay .slider-label-text { font-size: var(--slider-label-fit, var(--play-label)); }
 
   /* Mobile-specific player tweaks live here — the footer-hide and
      advance-chip styles are now global (search "Player: footer hidden"). */
@@ -11096,8 +11144,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-tablet .q-title,    .device-mobile .q-title    { font-size: var(--play-title); }
 .device-tablet .q-subtitle, .device-mobile .q-subtitle { font-size: var(--play-subtitle); }
 .device-tablet .pick-text,  .device-mobile .pick-text,
-.device-tablet .choice-label, .device-mobile .choice-label,
-.device-tablet .slider-label-text, .device-mobile .slider-label-text { font-size: var(--play-label); }
+.device-tablet .choice-label, .device-mobile .choice-label { font-size: var(--play-label); }
+/* Split out from the row above so the scale keeps the fit the controller
+   measured. The frame is a real 390px viewport, so a creator meets exactly
+   the same too-narrow column the respondent does — which is where the broken
+   "Wouldn' / t matter" was reported from. */
+.device-tablet .slider-label-text,
+.device-mobile .slider-label-text { font-size: var(--slider-label-fit, var(--play-label)); }
 
 /* Touch ergonomics. These come from the phone media query too, so at desktop
    width the frame drew a 33px option row and 36px stars — targets a finger

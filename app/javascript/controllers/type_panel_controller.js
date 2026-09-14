@@ -672,7 +672,7 @@ function sliderHtml(opts, ctx = {}) {
   const nextAxis = { auto: "horizontal", horizontal: "vertical", vertical: "auto" }[storedAxis] || "horizontal"
   const axisToggleTitle = esc(t(`editor.slider_axis_${nextAxis}`, { default: "Change layout" }))
   return `
-    <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}" data-slider-axis-value="${axis}">
+    <div class="slider-wrap" data-controller="slider" data-slider-steps-value="${n}" data-slider-axis-value="${axis}" data-slider-auto-value="${storedAxis === "auto"}">
       <div class="slider-track-wrap">
         <div class="slider-track" data-slider-target="track"
              data-action="pointerdown->slider#start">
@@ -683,7 +683,7 @@ function sliderHtml(opts, ctx = {}) {
         </div>
       </div>
       <div class="slider-labels">
-        ${labels.map(o => `<span class="slider-label-text" contenteditable="true">${esc(o)}</span>`).join("")}
+        ${labels.map(o => `<span class="slider-label-text" data-slider-target="label" contenteditable="true" data-action="input->slider#refit">${esc(o)}</span>`).join("")}
       </div>
       <button type="button" class="slider-axis-toggle" data-action="click->type-panel#setSliderAxis" title="${axisToggleTitle}">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg>
