@@ -256,6 +256,65 @@ class MobileBackgroundTest < ApplicationSystemTestCase
                      "against a busy texture"
   end
 
+  # "The text colour goes white regardless of the background — we need it to
+  # react to the colour of the background, in this image it should be black."
+  #
+  # Driven from the stored `ink` rather than from a picture, because that is
+  # what the renderer actually reads: the measurement happens once in the
+  # editor and everything downstream is this class.
+  { "dark" => "rgb(28, 32, 52)", "light" => "rgb(255, 255, 255)" }.each do |ink, expected|
+    test "a background measured as #{ink} gives the card #{ink == 'dark' ? 'dark' : 'white'} ink" do
+      survey = @org.surveys.create!(
+        title: "Ink", theme: "football", audience_age: "adults", key_insight: "k",
+        default_locale: "en", locales: [ "en" ],
+        cards: [
+          { "type" => "welcome_card", "title" => "Hello" },
+          { "type" => "tap_card", "cid" => "t1", "text" => "What is your call?",
+            "options" => [ "One", "Two" ],
+            "media_bg" => { "image" => BG, "ink" => ink } }
+        ]
+      )
+      open_editor(survey, device: "mobile")
+
+      colours = page.evaluate_script(<<~JS)
+        (() => {
+          const c = document.querySelector("[data-card-cid='t1']")
+          return {
+            title: getComputedStyle(c.querySelector(".q-title")).color,
+            panel: getComputedStyle(c.querySelector(".split-right")).color,
+            shadow: getComputedStyle(c.querySelector(".q-title")).textShadow
+          }
+        })()
+      JS
+
+      assert_equal expected, colours["title"],
+                   "a #{ink} background put #{colours['title']} on the question"
+      assert_equal expected, colours["panel"]
+      # The glow inverts with the ink or it is a dark halo under dark letters.
+      wanted = ink == "dark" ? "255, 255, 255" : "0, 0, 0"
+      assert_includes colours["shadow"], wanted,
+                      "the shadow did not invert with the ink (#{colours['shadow']})"
+    end
+  end
+
+  test "a background with no measurement keeps the white default" do
+    survey = @org.surveys.create!(
+      title: "Ink", theme: "football", audience_age: "adults", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [
+        { "type" => "welcome_card", "title" => "Hello" },
+        { "type" => "tap_card", "cid" => "t1", "text" => "What is your call?",
+          "options" => [ "One", "Two" ], "media_bg" => { "image" => BG } }
+      ]
+    )
+    open_editor(survey, device: "mobile")
+
+    assert_equal "rgb(255, 255, 255)",
+                 evaluate_script(%(getComputedStyle(document.querySelector("[data-card-cid='t1'] .q-title")).color)),
+                 "an unmeasured picture flipped the ink anyway — null means leave it alone, " \
+                 "not guess"
+  end
+
   # "The answers need to be solid not see through." A row a respondent chooses
   # between is not a place to show a photograph off: the background is behind
   # the answer, never inside it. The other two types satisfy this by

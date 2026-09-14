@@ -91,8 +91,43 @@ class MobileBackgroundSaveTest < ActionDispatch::IntegrationTest
                   @survey.cards[1].merge("media_bg" => { "color" => "#2e3564" }) ])
     assert_response :success
 
-    assert_equal({ "color" => "#2e3564" },
+    # …with its ink decided for it, which is the next test's subject.
+    assert_equal({ "color" => "#2e3564", "ink" => "light" },
                  @survey.reload.cards.find { |c| c["cid"] == "t1" }["media_bg"])
+  end
+
+  # "The text colour goes white regardless of the background — we need it to
+  # react to the colour of the background."
+  test "the ink the editor measured survives the save" do
+    patch_cards([ @survey.cards[0],
+                  @survey.cards[1].merge("media_bg" => { "image" => BG, "ink" => "dark" }) ])
+    assert_response :success
+
+    assert_equal "dark", @survey.reload.cards.find { |c| c["cid"] == "t1" }.dig("media_bg", "ink"),
+                 "the measurement the editor took is gone, so the card renders white words on " \
+                 "whatever the picture turns out to be"
+  end
+
+  test "a colour with no picture is measured by the server, which needs no editor" do
+    patch_cards([ @survey.cards[0],
+                  @survey.cards[1].merge("media_bg" => { "color" => "#f4f4f4" }) ])
+    assert_response :success
+    assert_equal "dark", @survey.reload.cards.find { |c| c["cid"] == "t1" }.dig("media_bg", "ink"),
+                 "a near-white backdrop kept light ink — an import or a seed never goes near " \
+                 "the picker, so the server has to decide for itself"
+
+    patch_cards([ @survey.cards[0],
+                  @survey.cards[1].merge("media_bg" => { "color" => "#101425" }) ])
+    assert_response :success
+    assert_equal "light", @survey.reload.cards.find { |c| c["cid"] == "t1" }.dig("media_bg", "ink")
+  end
+
+  test "an ink with nothing behind it is not a backdrop" do
+    patch_cards([ @survey.cards[0], @survey.cards[1].merge("media_bg" => { "ink" => "dark" }) ])
+    assert_response :success
+
+    assert_nil @survey.reload.cards.find { |c| c["cid"] == "t1" }["media_bg"],
+               "a text colour with no colour and no picture behind it was stored as a backdrop"
   end
 
   test "a backdrop the server refuses is still reported rather than dropped in silence" do

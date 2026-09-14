@@ -5,6 +5,7 @@ import { analyzeCard, analyzeVerto, typeLabel, CAPPED_LABEL_TYPES,
 import { ROUTABLE_TYPES, OPTION_EDITED_TYPES, matchOpFor } from "lib/routable_types"
 import { isPaged } from "lib/paged_types"
 import { NON_QUESTION_TYPES } from "lib/question_types"
+import { isFullScreenAnswer } from "lib/full_screen_types"
 import { OPTION_STYLE_TYPES } from "lib/option_style_types"
 import { styleFromRow } from "lib/option_styles"
 import { hasFormatting } from "lib/rich_text"
@@ -2737,7 +2738,14 @@ export default class extends Controller {
       // warning either: "the background image I add to a range question
       // doesn't save, I have to re-add every time I load the editor".
       // Four places, one rule. Change one and change all four.
-      const takesBackdrop = type === "range" || !!lottie || (!video && !image)
+      // …and the three types whose answer takes the whole phone screen, which
+      // carry a MOBILE background whatever else they hold. Missing them here
+      // reproduced the exact bug the paragraph above describes, on the newest
+      // types rather than on range: the backdrop painted live, autosave left it
+      // out, the server dropped nothing so warned about nothing, and it was
+      // gone on the next reload.
+      const takesBackdrop = type === "range" || !!lottie || isFullScreenAnswer(type) ||
+                            (!video && !image)
       if (takesBackdrop && card.dataset.cardMediaBg) {
         try {
           const bg = JSON.parse(card.dataset.cardMediaBg)

@@ -8734,11 +8734,31 @@ body.generating-overlay-active .bottom-bar { display: none; }
      to be removed"). It was there to guarantee white ink 4.5:1 over the
      brightest picture a card could carry; the guarantee now comes from the ink
      itself (see the shadow below), which costs the picture nothing. */
+  /* THE INK REACTS TO THE BACKGROUND. White on a dark backdrop, near-black on
+     a light one — the card's words are drawn on the creator's picture and a
+     fixed colour is only ever right for half of them ("the text colour goes
+     white regardless of the background, we need it to react to the colour of
+     the background, in this image it should be black").
+     Stated as three tokens so the flip is one rule rather than one per text
+     bearer, and so the shadow inverts with the ink: a dark glow under white
+     letters, a light one under dark. .bg-ink-dark is written by the server
+     from a measurement the editor took when the creator picked — see
+     ApplicationHelper#card_bg_ink_class. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) {
+    --bg-ink: #fff;
+    --bg-ink-soft: rgba(255,255,255,0.8);
+    --bg-ink-shadow: 0 1px 3px rgba(0,0,0,0.55);
+  }
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg.bg-ink-dark) {
+    --bg-ink: #1C2034;
+    --bg-ink-soft: rgba(28,32,52,0.75);
+    --bg-ink-shadow: 0 1px 3px rgba(255,255,255,0.6);
+  }
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-right {
     position: relative;
     z-index: 1;
     background: transparent;
-    color: #fff;
+    color: var(--bg-ink);
   }
   /* The ink the transparent panel leaves standing on a picture. Each of these
      is a dark-on-white value from the opaque card — black title, 60% black
@@ -8750,12 +8770,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
      whitening their ink turned them into blank discs. Nor is the eyebrow,
      which is the Verto's own brand colour and chosen to carry. */
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .q-title {
-    color: #fff;
+    color: var(--bg-ink);
   }
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
     :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count, .nps-anchor-text,
       .slider-label-text:not(.is-active)) {
-    color: rgba(255,255,255,0.8);
+    color: var(--bg-ink-soft);
   }
   /* What the scrim used to do, done by the ink instead. A shadow darkens only
      the pixels immediately under each glyph, so the words keep an edge against
@@ -8766,7 +8786,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
     :is(.q-title, .q-eyebrow, .q-subtitle, .rotate-reset-btn, .tap-nav-count,
         .nps-anchor-text, .slider-label-text) {
-    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+    text-shadow: var(--bg-ink-shadow);
   }
   /* THE ANSWER IS SOLID. A prioritise card's rows are 3% BLACK on a white card
      — a tint, which is all they need there and nothing at all on a picture:
@@ -8789,7 +8809,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
      cannot do without: a dashed border in 15% BLACK is invisible on a dark
      picture, so the card would offer no way to add a statement. */
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .tap-add-btn {
-    border-color: rgba(255,255,255,0.35);
+    border-color: color-mix(in srgb, var(--bg-ink) 35%, transparent);
   }
 
   /* Prioritise on mobile: every option has to be on screen AT ONCE, and for
@@ -10986,19 +11006,33 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left > :is(.split-left-img, .split-left-video, .split-left-overlay, .split-left-credit) {
   display: none;
 }
+/* The ink reacts to the backdrop here too — see the player's copy for the
+   tokens and for where .bg-ink-dark comes from. The creator is choosing the
+   background in THIS frame, so it is the one that has to show them which way
+   the words will land. */
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) {
+  --bg-ink: #fff;
+  --bg-ink-soft: rgba(255,255,255,0.8);
+  --bg-ink-shadow: 0 1px 3px rgba(0,0,0,0.55);
+}
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg.bg-ink-dark) {
+  --bg-ink: #1C2034;
+  --bg-ink-soft: rgba(28,32,52,0.75);
+  --bg-ink-shadow: 0 1px 3px rgba(255,255,255,0.6);
+}
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-right {
   position: relative;
   z-index: 1;
   background: transparent;
-  color: #fff;
+  color: var(--bg-ink);
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .q-title {
-  color: #fff;
+  color: var(--bg-ink);
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
   :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count, .nps-anchor-text,
       .slider-label-text:not(.is-active)) {
-  color: rgba(255,255,255,0.8);
+  color: var(--bg-ink-soft);
 }
 /* The ink carries its own edge rather than the background carrying a tint —
    see the player's copy. One thing this deliberately does NOT do is guarantee
@@ -11010,7 +11044,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
   :is(.q-title, .q-eyebrow, .q-subtitle, .rotate-reset-btn, .tap-nav-count,
       .nps-anchor-text, .slider-label-text) {
-  text-shadow: 0 1px 3px rgba(0,0,0,0.55);
+  text-shadow: var(--bg-ink-shadow);
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
   :is(.choice-list-item, .pick-item) {
@@ -11018,7 +11052,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
   border-color: rgba(0,0,0,0.07);
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .tap-add-btn {
-  border-color: rgba(255,255,255,0.35);
+  border-color: color-mix(in srgb, var(--bg-ink) 35%, transparent);
 }
 /* A card that HAS a strip keeps the design prompt inside it, as the block it
    was drawn to be — there is a panel to fill, and filling it is the invitation.

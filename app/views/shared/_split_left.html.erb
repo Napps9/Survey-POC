@@ -38,7 +38,7 @@
     control that silently did nothing on the one surface it was asked for.
     .has-media-bg is what earns that card its strip back. %>
 <% has_media_bg = card_media_bg(card).present? %>
-<div class="split-left<%= " has-asset-breathe" if animate_asset %><%= " has-media-bg" if has_media_bg %>" style="<%= card_media_bg_style(card) %>">
+<div class="split-left<%= " has-asset-breathe" if animate_asset %><%= " has-media-bg" if has_media_bg %><%= card_bg_ink_class(card) %>" style="<%= card_media_bg_style(card) %>">
   <% if card["type"].to_s == "range" %>
     <%# Range: the LEFT panel plays a Lottie animation that swaps to match the
         slider position. The lottie-player controller listens for the

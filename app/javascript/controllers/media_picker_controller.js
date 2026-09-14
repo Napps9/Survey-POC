@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 import { applyFocal, focalPercent, focalZoom, optionMediaStyle, FOCAL_ZOOM_MAX } from "lib/option_media"
 import { isFullScreenAnswer } from "lib/full_screen_types"
+import { inkForColor, inkForImage } from "lib/backdrop_ink"
 import { t } from "lib/i18n"
 
 // Modal that lets editors attach an image to a card's left panel.
@@ -1639,7 +1640,14 @@ export default class extends Controller {
     if (this._mode === "animBg") {
       // Behind the animation, not instead of it — the card's own lottie/range
       // media is untouched.
-      if (this._pendingUrl) this._writeAnimBg({ ...this._readAnimBg(), image: this._pendingUrl })
+      if (this._pendingUrl) {
+        const card = this._activeCard
+        // The picture's own ink is unknown until it decodes, and the previous
+        // backdrop's answer is about a different picture — so it goes, rather
+        // than colouring this one until the measurement lands.
+        this._writeAnimBg({ ...this._readAnimBg(), image: this._pendingUrl, ink: null }, card)
+        this._measureBackdropInk(card, this._pendingUrl)
+      }
       this.close()
       return
     }
@@ -2309,9 +2317,24 @@ export default class extends Controller {
     const clean = {}
     if (bg?.color) clean.color = bg.color
     if (bg?.image) clean.image = bg.image
+    // Which ink the words take over this backdrop. Carried through so a colour
+    // measured here and a picture measured asynchronously below both survive
+    // the next write — a creator who sets a colour and then a picture must not
+    // have the picture's answer overwritten by the colour's.
+    // …and only on the types that read it: the ink colours words drawn ON the
+    // backdrop, which is the three full-screen types and nowhere else. The
+    // server drops it for anything else, so sending it would be the editor and
+    // the sanitiser disagreeing on every save about a value neither uses.
+    const inked = isFullScreenAnswer(card.dataset.cardType)
+    if (inked && bg?.ink) clean.ink = bg.ink
+    if (inked && !clean.image && clean.color) {
+      // A colour needs no decoding, so it is decided on the spot.
+      clean.ink = inkForColor(clean.color) || clean.ink
+    }
 
     if (Object.keys(clean).length) card.dataset.cardMediaBg = JSON.stringify(clean)
     else delete card.dataset.cardMediaBg
+    this._paintBackdropInk(card, clean.ink)
 
     const left = card.querySelector(".split-left")
     if (left) {
@@ -2388,6 +2411,33 @@ export default class extends Controller {
     this._showMediaToggle(false)
     this._showLottieSection(false)
     if (this.hasAnimBgSectionTarget) this.animBgSectionTarget.hidden = true
+  }
+
+  // The class the stylesheet flips its ink tokens on, mirroring
+  // ApplicationHelper#card_bg_ink_class so the live editor and the next server
+  // render agree without one waiting for the other.
+  _paintBackdropInk(card, ink) {
+    card?.querySelector(".split-left")?.classList.toggle("bg-ink-dark", ink === "dark")
+  }
+
+  // A picture has to be decoded before it can be measured, so this lands after
+  // the backdrop is already on screen — the card flips to dark ink a moment
+  // after a light picture appears, which is the right way round: the wrong ink
+  // for an instant on a picture already visible, rather than a card that waits
+  // on a download before it will show any words at all.
+  //
+  // Measured HERE and stored, not measured on the player: a respondent's phone
+  // would otherwise redo this on every visit, on the slowest connections,
+  // forever. inkForImage resolves null when the pixels cannot be read (a
+  // cross-origin picture with no CORS headers taints the canvas) and null
+  // leaves the ink alone rather than guessing.
+  async _measureBackdropInk(card, url) {
+    const ink = await inkForImage(url)
+    if (!ink) return
+    const bg = this._readAnimBg(card)
+    if (bg.image !== url) return // the creator moved on; this answer is stale
+
+    this._writeAnimBg({ ...bg, ink }, card)
   }
 
   clearAnimBg(event) {

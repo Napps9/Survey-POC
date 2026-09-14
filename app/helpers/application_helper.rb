@@ -541,7 +541,26 @@ module ApplicationHelper
     return nil unless card_takes_backdrop?(card)
 
     bg = card["media_bg"]
-    bg.is_a?(Hash) && bg.slice("color", "image").compact_blank.any? ? bg.slice("color", "image").compact_blank : nil
+    return nil unless bg.is_a?(Hash)
+
+    kept = bg.slice("color", "image").compact_blank
+    return nil if kept.empty?
+
+    # `ink` rides along but never keeps a backdrop alive on its own — it is a
+    # text colour, and a text colour with nothing behind it is not a backdrop.
+    ink = Survey.sanitize_backdrop_ink(bg["ink"])
+    ink.present? ? kept.merge("ink" => ink) : kept
+  end
+
+  # The class that flips the card's words to dark ink on a light background.
+  # "The text colour goes white regardless of the background — we need it to
+  # react to the colour of the background." It reacts here, off a measurement
+  # taken when the creator picked (lib/backdrop_ink.js), rather than in the
+  # browser on every visit: a respondent's phone would have to decode the
+  # picture before it could colour the question, which is a flash of the wrong
+  # ink on the slowest connections, every time.
+  def card_bg_ink_class(card)
+    card_media_bg(card)&.dig("ink") == "dark" ? " bg-ink-dark" : ""
   end
 
   # The tile's icon slot, in precedence order: the creator's explicit icon

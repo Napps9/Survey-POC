@@ -923,6 +923,30 @@ class Survey < ApplicationRecord
     { "x" => x.round(4), "y" => y.round(4), "w" => w.round(4), "h" => h.round(4) }
   end
 
+  # Which ink a mobile background carries — "light" (white) or "dark". The
+  # editor measures the creator's pick and sends the answer (lib/backdrop_ink.js);
+  # this is the sanitiser for it, and the same decision for a plain colour, so
+  # an imported or seeded deck is not stuck with whatever the default is.
+  #
+  # 0.38, not 0.5, and the threshold is shared with the JS on purpose: white
+  # (L = 1) clears 4.5:1 against a backdrop up to L = 0.183, and the card's dark
+  # ink clears it down to L = 0.25, so between those two limits every backdrop
+  # fails one ink or the other and the line goes where the failures are least
+  # bad. backdrop_ink_parity_test holds both sides to it.
+  LIGHT_BACKDROP_THRESHOLD = 0.38
+  BACKDROP_INKS = %w[light dark].freeze
+
+  def self.sanitize_backdrop_ink(value)
+    v = value.to_s.strip.downcase
+    BACKDROP_INKS.include?(v) ? v : nil
+  end
+
+  def self.backdrop_ink_for_color(hex)
+    return nil unless BrandPalette.valid_hex?(hex.to_s)
+
+    BrandPalette.luminance(hex.to_s) >= LIGHT_BACKDROP_THRESHOLD ? "dark" : "light"
+  end
+
   # One axis of a reposition: a 0-100 percentage, rounded to a whole number
   # because that is all a background-position can usefully carry here. nil for
   # anything that isn't a number, so junk is dropped rather than silently
@@ -1412,6 +1436,30 @@ class Survey < ApplicationRecord
         out["color"] = "#" + color.strip.delete_prefix("#").downcase if BrandPalette.valid_hex?(color)
         if (img = sanitize_image_url(bg["image"])).present?
           out["image"] = img
+        end
+        # Which ink the card's words take over this backdrop. The editor
+        # measures the picture it has in front of it and sends the answer; a
+        # plain colour is measured here, so a deck that never went through the
+        # picker (an import, a seed, a paste) still gets readable text rather
+        # than white on whatever it happens to be. A stored `ink` wins: it was
+        # measured against the IMAGE, which is what a respondent sees, and the
+        # colour underneath is only what shows before it loads.
+        # …and only on the types that READ it. The ink is the colour of words
+        # drawn ON the backdrop, which happens on the three full-screen types
+        # and nowhere else: a range or Lottie card's backdrop sits behind an
+        # animation with the card's text on its own white panel, and a bare
+        # card's paints a hero strip with the text below it. Storing an ink for
+        # those is storing a decision nothing will ever ask for.
+        #
+        # Only ever alongside something to read it against, too — an `ink` on
+        # its own is a text colour for a backdrop that does not exist, and
+        # out.any? below would keep the card a backdrop made of nothing else.
+        if out.any? && CardTypes.full_screen_answer?(c["type"])
+          if (ink = sanitize_backdrop_ink(bg["ink"])).present?
+            out["ink"] = ink
+          elsif out["image"].blank? && (ink = backdrop_ink_for_color(out["color"]))
+            out["ink"] = ink
+          end
         end
         # Reads the card's OWN lottie / image / video values, which at this
         # point have not been through their own sanitisers yet — a card carrying
