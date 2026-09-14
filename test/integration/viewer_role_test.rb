@@ -300,10 +300,6 @@ class ViewerRoleTest < ActionDispatch::IntegrationTest
     yield :add_demographic_card, true
     post survey_waves_path(@live), params: { label: "Wave 2" }
     yield :wave_create, false
-    get image_appeals_survey_path(@draft), as: :json
-    yield :image_appeals_index, true
-    post image_appeal_survey_path(@draft), params: { image: "data:image/png;base64,AA==" }, as: :json
-    yield :image_appeal_create, true
   end
 
   test "a viewer is refused at every editing door, in the language it was asked in" do

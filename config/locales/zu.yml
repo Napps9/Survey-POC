@@ -450,10 +450,6 @@ zu:
       stock_search_hint: "Sebenzisa amagama angukhiye ahambisana nombuzo ukuze uthole imiphumela engcono"
       load_more: "Layisha okwengeziwe"
       lottie_failed: "Leso sixhumanisi asibukeki njengesixhihixhihi se-LottieFiles."
-      appeal_note_prompt: "Ikhona okuthile ongathanda ukukutshela umbuyekezi? (akudingekile)"
-      appeal_submitting: "Kuthunyelwa ukuze kubuyekezwe…"
-      appeal_submitted: "Kuthunyelwe ukuze kubuyekezwe — sizokwazisa uma sekuhloliwe."
-      appeal_failed: "Akukwazanga ukuthunyelwa ukuze kubuyekezwe — sicela uzame futhi."
       emoji_none: "Ayikho i-emoji efanayo."
       emoji_all: "Konke"
       note_limit_count: "%{n} / %{recommended} okunconywayo · %{max} ubuningi"
@@ -1155,8 +1151,6 @@ zu:
     crop_hint: "Hudula ukuze uguqule indawo, sebenzisa isilaidi ukuze ukhulise"
     crop_skip: "Yeqa"
     crop_apply: "Sebenzisa lokhu kusika"
-    request_review: "Cela ukubuyekezwa"
-    approved_by_review: "Kuvunywe ngokubuyekezwa"
     required_chip: 'Kuyadingeka'
     ty_title_label: 'Isihloko sokubonga'
     ty_body_label: 'Umlayezo wokubonga'

@@ -11,9 +11,6 @@ class Survey < ApplicationRecord
   has_many :survey_waves, -> { order(:position) }, dependent: :destroy
   has_many :partnership_vertos, dependent: :destroy
   has_many :report_renders, dependent: :destroy
-  # Appeals filed against this Verto's rejected uploads — see
-  # ImageReviewRequest and ImageAppealsController.
-  has_many :image_review_requests, dependent: :destroy
   # Free-text answers held for moderation — see HeldText. delete_all: the
   # responses (declared above, so destroyed first) already take theirs with
   # them; this catches nothing in practice and costs one DELETE.

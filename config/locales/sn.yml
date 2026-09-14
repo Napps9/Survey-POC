@@ -440,10 +440,6 @@ sn:
       stock_search_hint: "Shandisa mazwi anoenderana nemubvunzo kuti uwane mhinduro dziri nani"
       load_more: "Rodha zvimwe"
       lottie_failed: "Rinki iyoyo haitaridziki seanimation yeLottieFiles."
-      appeal_note_prompt: "Pane chaunoda kuudza muongorori? (hazvina kumanikidzwa)"
-      appeal_submitting: "Kutumira Kuti Kuongororwe…"
-      appeal_submitted: "Yatumirwa kuti iongororwe — tichakuzivisa kana yaongororwa."
-      appeal_failed: "Hazvina kukwanisa kutumira izvozvo kuti kuongororwe — ndapota edza zvakare."
       emoji_none: "Hapana emoji inoenderana neizvozvo."
       emoji_all: "Zvose"
       note_limit_count: "%{n} / %{recommended} zvinokurudzirwa · %{max} zvakanyanya"
@@ -1145,8 +1141,6 @@ sn:
     crop_hint: "Zvuzvurudza kuti uchinje nzvimbo, shandisa cherengo kuti uswededze"
     crop_skip: "Pfuura"
     crop_apply: "Shandisa Chigero Ichi"
-    request_review: "Kumbira Kuongororwa"
-    approved_by_review: "Yabvumidzwa Neongororo"
     required_chip: 'Zvinodikanwa'
     ty_title_label: 'Musoro weKutenda'
     ty_body_label: 'Meseji yeKutenda'

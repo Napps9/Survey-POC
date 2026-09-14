@@ -452,10 +452,6 @@ tn:
       stock_search_hint: "Dirisa mafoko a botlhokwa a a amanang le potso go bona dipholo tse di botoka"
       load_more: "Tsenya tse dingwe"
       lottie_failed: "Kgokaganyo eo ga e lebege jaaka tshakgamiso ya LottieFiles."
-      appeal_note_prompt: "A go na le sengwe se o batlang go se bolelela mosekaseki? (ga se tlhokego)"
-      appeal_submitting: "E romela go sekasekwa…"
-      appeal_submitted: "E rometswe go sekasekwa — re tla go itsise fa e sena go sekasekwa."
-      appeal_failed: "Go paletswe go romela go sekasekwa — tsweetswee leka gape."
       emoji_none: "Ga go na emoji e e tshwanang."
       emoji_all: "Tsotlhe"
       note_limit_count: "%{n} / %{recommended} e e atlenegisiwang · %{max} bogolo"
@@ -1157,8 +1153,6 @@ tn:
     crop_hint: "Goga go fetola boemo, dirisa sekgoga go atolosa"
     crop_skip: "Tlolela"
     crop_apply: "Dirisa kgaolo e"
-    request_review: "Kopa tlhatlhobo"
-    approved_by_review: "E dumeletswe ke tlhatlhobo"
     required_chip: 'E a tlhokega'
     ty_title_label: 'Setlhogo sa tebogo'
     ty_body_label: 'Molaetsa wa tebogo'

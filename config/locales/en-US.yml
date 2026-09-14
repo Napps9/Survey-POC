@@ -460,10 +460,6 @@ en-US:
       stock_search_hint: "Use keywords associated with the question to get better results"
       load_more: "Load more"
       lottie_failed: "That link doesn't look like a LottieFiles animation."
-      appeal_note_prompt: "Anything you'd like to tell the reviewer? (optional)"
-      appeal_submitting: "Submitting for review…"
-      appeal_submitted: "Submitted for review — we'll let you know once it's checked."
-      appeal_failed: "Couldn't submit that for review — please try again."
       emoji_none: "No emoji match that."
       emoji_all: "All"
       note_limit_count: "%{n} / %{recommended} recommended · %{max} max"
@@ -1179,8 +1175,6 @@ en-US:
     reposition_apply: "Save position"
     reposition_chrome_statement: "Statement"
     reposition_chrome_answers: "Answers"
-    request_review: "Request review"
-    approved_by_review: "Approved by review"
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'

@@ -44,9 +44,9 @@ class ReportRenderTest < ActiveSupport::TestCase
     assert_includes render.errors[:kind].join, "included"
   end
 
-  # Matches the pattern already used for status (see enum_constraints_test.rb)
-  # and ImageReviewRequest's own kind: a console session or bulk update goes
-  # around the model, so the database CHECK is the actual backstop.
+  # Matches the pattern already used for status (see enum_constraints_test.rb):
+  # a console session or bulk update goes around the model, so the database
+  # CHECK is the actual backstop.
   test "kind is constrained in the database, not just the model" do
     survey = build_survey
     render = survey.report_renders.create!(user: nil)

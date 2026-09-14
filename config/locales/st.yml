@@ -452,10 +452,6 @@ st:
       stock_search_hint: "Sebelisa mantsoe a bohlokoa a amanang le potso ho fumana liphetho tse betere"
       load_more: "Kenya tse ling"
       lottie_failed: "Kgokahano eo ha e shebahale eka ke motsamao wa LottieFiles."
-      appeal_note_prompt: "Ho na le seo o batlang ho se bolella mohlahlobi? (ha ho a qobelleha)"
-      appeal_submitting: "E ntse e romela bakeng sa tlhahlobo…"
-      appeal_submitted: "E rometswe bakeng sa tlhahlobo — re tla o tsebisa hang ha e hlahlojwa."
-      appeal_failed: "Ho paletswe ho romela bakeng sa tlhahlobo — ka kopo leka hape."
       emoji_none: "Ha ho emoji e tshwanang le seo."
       emoji_all: "Tsohle"
       note_limit_count: "%{n} / %{recommended} e kgothaletswang · %{max} bongata"
@@ -1157,8 +1153,6 @@ st:
     crop_hint: "Hula ho fetola boemo, sebedisa seqhomane ho atolosa"
     crop_skip: "Tlola"
     crop_apply: "Sebedisa sekgao sena"
-    request_review: "Kopa tlhahlobo"
-    approved_by_review: "E amohetswe ke tlhahlobo"
     required_chip: 'E a Hlokahala'
     ty_title_label: 'Sehlooho sa kea leboha'
     ty_body_label: 'Molaetsa wa kea leboha'

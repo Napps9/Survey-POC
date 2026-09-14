@@ -452,10 +452,6 @@ xh:
       stock_search_hint: "Sebenzisa amagama angundoqo anxulumene nombuzo ukuze ufumane iziphumo ezingcono"
       load_more: "Layisha okungakumbi"
       lottie_failed: "Elo khonkco alibonakali njengoshukumo lweLottieFiles."
-      appeal_note_prompt: "Ikho into ongathanda ukuyixelela umhloli? (akuyomfuneko)"
-      appeal_submitting: "Kuthunyelwa ukuze kuhlolwe…"
-      appeal_submitted: "Kuthunyelwe ukuze kuhlolwe — siya kukwazisa xa sele kuhlolwe."
-      appeal_failed: "Ayikwazekanga ukuthumela ukuze kuhlolwe — nceda uzame kwakhona."
       emoji_none: "Akukho i-emoji ihambelana."
       emoji_all: "Konke"
       note_limit_count: "%{n} / %{recommended} ecetyiswayo · %{max} ubuninzi"
@@ -1157,8 +1153,6 @@ xh:
     crop_hint: "Tsala ukuze uyibeke kwenye indawo, sebenzisa isilayidi ukusondeza"
     crop_skip: "Yeka"
     crop_apply: "Sebenzisa esi sikroni"
-    request_review: "Cela uphononongo"
-    approved_by_review: "Ivunyelwe luphononongo"
     required_chip: 'Kuyimfuneko'
     ty_title_label: 'Isihloko sombulelo'
     ty_body_label: 'Umyalezo wombulelo'
