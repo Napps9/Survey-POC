@@ -4966,11 +4966,21 @@ button.editor-leave-btn { cursor: pointer; }
 .editor-grid.is-panel-open .card-rail .card-reorder {
   grid-template-columns: repeat(3, 30px);
 }
-/* Nothing spans the row once it's a circle — they pair up like the rest. */
+/* Nothing spans the row once it's a circle — they pair up like the rest.
+   The pop-up control is here so that, collapsed, it flows into the third
+   column of the Card N / Why row and the three read as one group. Left out,
+   it kept its expanded `1 / -1`, forced a row of its own and stretched across
+   it as an icon-only lozenge — the one control in the rail that was not a
+   circle. Both lists below name it: this one places it (the line the geometry
+   actually turns on — EditorCardRailTest fails without it), the next shapes
+   it like its siblings (belt-and-braces: a 30px column already makes it a
+   30px circle, so that membership is for consistency and for the day the
+   column width changes). */
 .editor-grid.is-panel-open .card-rail .card-light,
 .editor-grid.is-panel-open .card-rail .required-chip,
 .editor-grid.is-panel-open .card-rail .card-duplicate-btn,
 .editor-grid.is-panel-open .card-rail .card-delete-btn,
+.editor-grid.is-panel-open .card-rail .card-modal-btn,
 .editor-grid.is-panel-open .card-rail .rail-add-btn { grid-column: auto; }
 .editor-grid.is-panel-open .card-rail .rail-label,
 .editor-grid.is-panel-open .card-rail .card-light-word,
@@ -4982,6 +4992,7 @@ button.editor-leave-btn { cursor: pointer; }
 .editor-grid.is-panel-open .card-rail .card-duplicate-btn,
 .editor-grid.is-panel-open .card-rail .card-delete-btn,
 .editor-grid.is-panel-open .card-rail .rail-add-btn,
+.editor-grid.is-panel-open .card-rail .card-modal-btn,
 .editor-grid.is-panel-open .card-rail .required-chip {
   width: 30px; height: 30px; min-height: 30px; padding: 0;
   border-radius: 50%; justify-content: center; flex: 0 0 auto;

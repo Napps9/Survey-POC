@@ -95,4 +95,48 @@ class EditorCardRailTest < ApplicationSystemTestCase
                    ".#{klass}'s label wrapped, which means it does not fit its pill"
     end
   end
+
+  # Collapsed, the rail is a three-column grid of 30px circles and the pop-up
+  # control belongs in the Card N / Why row as its third circle. That takes
+  # the control's membership of the collapsed `grid-column: auto` list in
+  # application.css: without it the control keeps its expanded `1 / -1`,
+  # forces a row of its own and stretches across it as an icon-only lozenge —
+  # which is how it shipped (2026-09-14). Geometry again, because the markup
+  # cannot tell: DOM order already put it third.
+  #
+  # Measured, not assumed, what this guards: deleting that list membership
+  # fails the first assertion below; deleting the control's membership of the
+  # circle-shaping list does NOT, because a 30px grid column already forces
+  # the width and `border-radius: 100px` on a 30px box is a circle. That
+  # second membership is kept for consistency with every sibling and against a
+  # future column-width change, not because this test can see it.
+  test "collapsed, the pop-up control is a circle beside Card N and Why" do
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    assert_text "A question?"
+
+    find("[data-card-cid='c1'] .card-num-pill").click
+    assert_selector ".editor-grid.is-panel-open"
+
+    rows = evaluate_script(<<~JS)
+      (() => {
+        const q = sel => document.querySelector("[data-card-cid='c1'] " + sel).getBoundingClientRect();
+        const num = q(".card-num-pill"), why = q(".why-cta"), pop = q(".card-modal-btn");
+        return { num: { top: num.top, w: num.width, h: num.height },
+                 why: { top: why.top, w: why.width, h: why.height },
+                 pop: { top: pop.top, w: pop.width, h: pop.height, left: pop.left, whyRight: why.right } };
+      })()
+    JS
+
+    assert_in_delta rows["num"]["top"], rows["pop"]["top"], 1,
+                    "the pop-up control must share Card N's row when collapsed"
+    assert_in_delta rows["why"]["top"], rows["pop"]["top"], 1,
+                    "…and Why's — three circles on one line"
+    assert_operator rows["pop"]["left"], :>=, rows["pop"]["whyRight"],
+                    "it sits AFTER Why, as the row's third circle"
+    assert_in_delta 30, rows["pop"]["w"], 1, "collapsed it is the 30px circle every other control is"
+    assert_in_delta 30, rows["pop"]["h"], 1
+    assert_in_delta rows["why"]["w"], rows["pop"]["w"], 1, "the same size as its neighbours"
+  end
 end
