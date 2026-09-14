@@ -17,8 +17,18 @@ class YouController < ApplicationController
   allow_signed_out_players only: :show
 
   before_action :no_store
-  # Only the pages that draw the pill. sign_out and destroy render nothing.
-  before_action :set_purse, only: %i[show verto wallet]
+  # Only the pages that draw the bar. sign_out and destroy render nothing,
+  # and the three PATCHes redirect.
+  before_action :set_purse, only: %i[show verto wallet account]
+  # The fullscreen layout parks its language switcher in a fixed corner; these
+  # pages draw their own bar with the switcher inside it (you/_bar).
+  before_action :own_top_bar
+
+  # A password field, on a page only a signed-in respondent can reach — so the
+  # cap is against a stolen session guessing the current password, not against
+  # the internet. Named, because Rails keys the counter on the name.
+  rate_limit to: 10, within: 5.minutes, only: :update_password, name: "you_pw_ip",
+             with: -> { redirect_to you_account_path, alert: t("player_session.too_many") }
 
   # How many Vertos the wallet pill's hover breakdown shows before handing over
   # to the wallet itself. Five is a peek, not a second wallet — the pill exists
@@ -26,10 +36,100 @@ class YouController < ApplicationController
   # would only be the page it links to, rendered worse.
   PURSE_PREVIEW = 5
 
+  # The strategy name the respondent Google sign-in is mounted under — see
+  # config/initializers/omniauth.rb; PlayerOauthSessionsController stores
+  # auth.provider verbatim.
+  GOOGLE_PROVIDER = "google_player"
+
+  # The dashboard. One card per VERTO, not per run: a retake is what they
+  # think now, not a second Verto, so its claims are folded into the one row
+  # and its piles summed — exactly as token_rows and #verto already do.
   def show
     @claims     = kept_claims
-    @compare    = comparison_availability(@claims)
+    @rows       = verto_rows(@claims)
+    @answered   = answered_counts(@claims)
+    @compare    = comparison_availability(@claims, @answered)
     @follow_ups = follow_ups_for(@claims)
+    @questions  = @rows.to_h { |row| [ row[:survey].id, question_count(row[:survey]) ] }
+    @tiles      = tiles_for(@rows)
+    @next       = next_for(@rows)
+    @impacts    = impacts_for(@rows)
+  end
+
+  # ── Settings ──────────────────────────────────────────────────────────────
+
+  def account
+    load_account
+  end
+
+  # The name only. The address is not editable here: it is the one thing the
+  # account is keyed on, and changing it would need the same proof-of-inbox
+  # the sign-in link gives — which is the thing this page cannot send.
+  def update_account
+    name = params[:name].to_s.strip.first(Player::MAX_NAME + 1)
+    if current_player.update(name: name.presence)
+      redirect_to you_account_path, notice: t("you.saved")
+    else
+      load_account
+      flash.now[:alert] = current_player.errors.full_messages.to_sentence
+      render :account, status: :unprocessable_entity
+    end
+  end
+
+  # Set when there is none, change when there is. The current password is
+  # demanded only in the second case — an account that began with an emailed
+  # link or with Google has nothing to demand — and it is checked LAST, after
+  # the new one has been found acceptable, so a typo in the confirmation does
+  # not spend a guess against the rate limit above.
+  def update_password
+    player   = current_player
+    password = params[:password].to_s
+    had_one  = player.password_digest.present?
+
+    if password.length < Player::MIN_PASSWORD
+      return redirect_to you_account_path, alert: t("you.password_short", min: Player::MIN_PASSWORD)
+    end
+    if password != params[:password_confirmation].to_s
+      return redirect_to you_account_path, alert: t("you.password_mismatch")
+    end
+    if had_one && !player.authenticate(params[:current_password].to_s)
+      return redirect_to you_account_path, alert: t("you.password_wrong")
+    end
+
+    player.update!(password: password)
+    redirect_to you_account_path, notice: t(had_one ? "you.password_changed" : "you.password_set")
+  end
+
+  # The language is written to the cookie as well as the account, exactly as
+  # LocalesController does, so the page they land back on is already in it —
+  # switch_locale reads the cookie ahead of the account.
+  #
+  # The email toggles are honoured only for organisations this account holds
+  # a Verto from. An id from anywhere else is not an error, it is nothing: a
+  # preference row for an organisation that never mailed them would sit in
+  # the table meaning nothing, and the unsubscribe link in a real mail is the
+  # other writer of these rows.
+  def update_preferences
+    locale = I18n.locale
+    if params[:preferred_locale].present?
+      locale = SupportedLocales.coerce(params[:preferred_locale])
+      current_player.update(preferred_locale: locale)
+      cookies.permanent[:locale] = { value: locale, same_site: :lax }
+    end
+
+    emails = params[:emails].respond_to?(:to_unsafe_h) ? params[:emails].to_unsafe_h : {}
+    held_organisations.each do |organisation|
+      case emails[organisation.id.to_s]
+      when "0" then PlayerEmailPreference.unsubscribe!(player: current_player, organisation: organisation)
+      when "1" then PlayerEmailPreference.resubscribe!(player: current_player, organisation: organisation)
+      end
+    end
+
+    # In the language they just chose, not the one they arrived in: this flash
+    # is written in one request and read in the next, and that next request
+    # renders in the new locale. An English "Preferences saved." on a page that
+    # has just turned French reads as a page that half-worked.
+    redirect_to you_account_path, notice: t("you.prefs_saved", locale: locale)
   end
 
   # One Verto in the account: the answers they gave, next to everyone else's.
@@ -82,6 +182,91 @@ class YouController < ApplicationController
 
   private
 
+  def own_top_bar
+    @own_top_bar = true
+  end
+
+  # What the settings page shows, loaded by #account and again by the one
+  # action that re-renders it instead of redirecting.
+  def load_account
+    @player        = current_player
+    @organisations = held_organisations
+    @unsubscribed  = PlayerEmailPreference.where(player_id: current_player.id)
+                                          .pluck(:organisation_id).to_set
+    @has_password  = current_player.password_digest.present?
+    @google        = current_player.player_identities.exists?(provider: GOOGLE_PROVIDER)
+  end
+
+  # The organisations whose mail the account can switch off: the ones it holds
+  # a Verto from, in the order the Vertos are listed, so the toggles read in
+  # the order the dashboard does.
+  def held_organisations
+    kept_claims.map { |c| c.survey.organisation }.uniq
+  end
+
+  # One row per Verto, newest-played first. group_by preserves first-seen
+  # order, and kept_claims is already sorted, so the row order is the claim
+  # order and the newest claim is the first in each group.
+  def verto_rows(claims)
+    claims.group_by(&:survey_id).map do |_id, group|
+      survey = group.first.survey
+      { survey: survey, claims: group, played_at: played_at(group.first),
+        piles: piles_for(survey, group) }
+    end
+  end
+
+  # How many people have answered each listed Verto, in one grouped COUNT for
+  # the whole list rather than one per row: this runs on the page that lists
+  # every Verto an account holds. Feeds the comparison gate AND the card's
+  # own "N answered" line, which is why it is computed once and handed to both.
+  def answered_counts(claims)
+    ids = claims.map(&:survey_id).uniq
+    return {} if ids.empty?
+
+    Response.where(survey_id: ids, answered: true).group(:survey_id).count
+  end
+
+  # The creator card's own count (surveys/_dashboard_card), so the number a
+  # respondent sees is the number the creator sees.
+  def question_count(survey)
+    Array(survey.cards).count { |c| CardTypes.question?(c["type"]) }
+  end
+
+  def tiles_for(rows)
+    { vertos:       rows.size,
+      results_open: rows.count { |row| @compare[row[:survey].id] == :ready },
+      impact:       rows.count { |row| row[:survey].impact_published? || row[:survey].next_step? },
+      collected:    @purse_total }
+  end
+
+  # The follow-ups, as one list. The reason is still carried on each entry —
+  # the Verto that pointed — and when two Vertos point at the same one the
+  # first row's reason wins, because that is the one they played most recently.
+  def next_for(rows)
+    seen = Set.new
+    rows.flat_map do |row|
+      @follow_ups[row[:survey].id].filter_map do |next_verto|
+        next unless seen.add?(next_verto.id)
+
+        { survey: next_verto, because: row[:survey] }
+      end
+    end
+  end
+
+  # What came of their answers: the Vertos with an impact written, then the
+  # ones with only a promise of one. Published first because it is the thing
+  # the address was left for; a promise is worth listing, but after.
+  def impacts_for(rows)
+    published, rest = rows.partition { |row| row[:survey].impact_published? }
+    promised = rest.select { |row| row[:survey].next_step? }
+    published.map { |row| impact_entry(row, :impact) } +
+      promised.map { |row| impact_entry(row, :next_step) }
+  end
+
+  def impact_entry(row, kind)
+    { survey: row[:survey], kind: kind, answered: @answered[row[:survey].id].to_i }
+  end
+
   # Why each listed Verto can't be compared yet — said on the LIST, so nobody
   # has to open a Verto to find out there is nothing to see in it. Two gates,
   # and a respondent has no way to tell them apart from the outside:
@@ -94,12 +279,10 @@ class YouController < ApplicationController
   #              "soon" learns nothing and asks support instead.
   #   :ready   — nothing is drawn. The row already links to the comparison.
   #
-  # One grouped COUNT for the whole list, not one per row: this runs on the
-  # page that lists every Verto an account holds.
-  def comparison_availability(claims)
+  # `answered` is answered_counts' hash, passed in rather than computed here
+  # so the dashboard's one grouped COUNT serves this and the card's own line.
+  def comparison_availability(claims, answered = answered_counts(claims))
     surveys = claims.map(&:survey).uniq
-    answered = Response.where(survey_id: surveys.map(&:id), answered: true)
-                       .group(:survey_id).count
 
     surveys.each_with_object({}) do |survey, out|
       out[survey.id] =

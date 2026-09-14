@@ -1,0 +1,35 @@
+<%# A Verto the account does not hold yet, offered because one it does hold
+    points at it. The reason is on the card: there is no feed and no ranking
+    anywhere in this — the only fact the app has about a respondent is which
+    Verto they played, so that fact is the whole justification, and it is
+    said plainly rather than styled apart from the line it belongs to.
+
+    Locals: item ({ survey:, because: }) — the Verto offered and the one that
+    pointed at it. %>
+<%
+  survey  = item[:survey]
+  because = item[:because]
+  cover   = verto_cover_image(survey)
+%>
+<div class="you-verto is-next">
+  <span class="you-verto-rule" aria-hidden="true"></span>
+
+  <div class="you-verto-cover"<% if cover.present? %> style="background-image:url('<%= cover %>')"<% end %>>
+    <span class="you-verto-scrim" aria-hidden="true"></span>
+    <span class="you-verto-badge is-follow-up"><%= t("you.badge_follow_up") %></span>
+    <span class="you-verto-when"><%= t("you.questions", count: verto_question_count(survey)) %></span>
+  </div>
+
+  <div class="you-verto-body">
+    <div class="you-verto-org you-verto-because">
+      <%= t("you.next_because", verto: because.theme.presence || because.title) %>
+    </div>
+    <h2 class="you-verto-title"><%= survey.theme.presence || survey.title %></h2>
+    <div class="you-verto-org"><%= survey.organisation.name %></div>
+  </div>
+
+  <div class="you-verto-ctas">
+    <%= link_to "#{t("you.cta_play")} →", play_survey_path(survey.publish_token),
+          class: "you-cta you-cta-primary you-cta-play" %>
+  </div>
+</div>

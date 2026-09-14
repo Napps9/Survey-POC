@@ -1,0 +1,123 @@
+<%# The account's top bar, in the shape of the creator's (shared/_bottom_bar):
+    the mark on the left, where you are in the middle, who you are on the
+    right. Full-bleed, above the page's own column, on every /you page.
+
+    The Wallet chip IS the wallet pill that used to sit in the layout's fixed
+    corner — same wrapper, same controller, same hover breakdown — moved into
+    the row it always behaved like a tab of. It stays a LINK first: a tap
+    opens the wallet on a phone where there is no hover, and the breakdown is
+    a peek a mouse gets for free. The number is shown only when there is one;
+    the chip itself stays, because it is navigation now and a missing tab
+    reads as a missing page.
+
+    The language switcher lives here rather than in the layout's corner (the
+    layout skips its cluster when @own_top_bar is set) so the two menus on
+    the right are one cluster and never guess at each other's width.
+
+    Locals: current (:vertos, :verto, :wallet or :account). Reads @purse_rows
+    and @purse_total, which set_purse builds for every page that draws this. %>
+<% rows  = @purse_rows.to_a
+   total = @purse_total.to_i %>
+<nav class="you-topbar" aria-label="<%= t("you.eyebrow") %>">
+  <div class="you-topbar-left">
+    <%= link_to you_path, class: "you-topbar-logo" do %>
+      <%= image_tag "playverto.svg", alt: "Playverto" %>
+    <% end %>
+  </div>
+
+  <% if player_signed_in? %>
+    <div class="you-topbar-centre">
+      <%= link_to you_path,
+            class: "you-topbar-chip#{" is-active" if %i[vertos verto].include?(current)}",
+            "aria-current": (%i[vertos verto].include?(current) ? "page" : nil) do %>
+        <span class="you-topbar-dot is-teal" aria-hidden="true"></span><%= t("you.back") %>
+      <% end %>
+
+      <div class="you-purse" data-controller="wallet-pill"
+           data-action="mouseenter->wallet-pill#open mouseleave->wallet-pill#close">
+        <%= link_to you_wallet_path,
+              class: "you-topbar-chip you-purse-pill#{" is-active is-on" if current == :wallet}",
+              "aria-label": (total.positive? ? t("you.wallet_pill", total: number_with_delimiter(total)) : nil),
+              "aria-current": (current == :wallet ? "page" : nil),
+              data: { action: "focus->wallet-pill#open blur->wallet-pill#close" } do %>
+          <span class="you-topbar-dot is-yellow" aria-hidden="true"></span><%= t("you.nav_wallet") %><%
+          if total.positive? %> <span class="you-purse-total"><%= number_with_delimiter(total) %></span><% end %>
+        <% end %>
+
+        <%# aria-hidden, and not as a shortcut: the chip's own label carries
+            the total, and every row in here is on the wallet page the chip
+            points at, so a screen reader following the chip loses nothing.
+            Exposing it would put the same five Vertos in the reading order of
+            every account page. The link inside is tabindex=-1 for the same
+            reason — and because focusable content inside aria-hidden is a
+            trap rather than a shortcut. %>
+        <% if rows.any? %>
+          <div class="you-purse-popover" data-wallet-pill-target="popover" aria-hidden="true" hidden>
+            <div class="you-purse-head"><%= t("you.wallet_eyebrow") %></div>
+            <% rows.first(YouController::PURSE_PREVIEW).each do |row| %>
+              <div class="you-purse-row">
+                <div class="you-purse-verto"><%= row[:survey].theme.presence || row[:survey].title %></div>
+                <%# That Verto's own tokens, named and counted the way that
+                    Verto names and counts them. Two Vertos routinely both
+                    call a token "gold" for two different things, so the piles
+                    are never added together — not here, and not on the page
+                    this links to. %>
+                <div class="you-purse-piles">
+                  <% row[:piles].each do |pile| %>
+                    <span class="you-pile">
+                      <%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            <%= link_to you_wallet_path, class: "you-purse-all", tabindex: -1 do %>
+              <%= t("you.wallet_see_all") %> <span aria-hidden="true">→</span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="you-topbar-right">
+    <%= render "shared/locale_switcher" %>
+
+    <% if player_signed_in? %>
+      <div class="you-account" data-controller="account-menu">
+        <button type="button" class="you-account-btn"
+                aria-haspopup="true" aria-expanded="false"
+                aria-label="<%= t("you.menu_label") %>"
+                data-action="click->account-menu#toggle">
+          <span class="you-avatar" aria-hidden="true"><%= current_player.initial %></span>
+          <span class="you-account-name"><%= current_player.display_name %></span>
+          <svg class="you-account-caret" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <div class="you-account-popover" data-account-menu-target="popover" hidden>
+          <%# The address under the name, even when there is a name: on a
+              shared device WHICH account you are in is the thing worth
+              knowing, and two people can share a first name. %>
+          <div class="you-account-head">
+            <span class="you-avatar you-avatar-lg" aria-hidden="true"><%= current_player.initial %></span>
+            <div class="you-account-who">
+              <div class="you-account-who-name"><%= current_player.display_name %></div>
+              <div class="you-account-who-email"><%= current_player.email_address %></div>
+            </div>
+          </div>
+          <div class="you-account-rule" aria-hidden="true"></div>
+          <%= link_to t("you.menu_account"), you_account_path, class: "you-account-item" %>
+          <%= link_to you_wallet_path, class: "you-account-item" do %>
+            <%= t("you.nav_wallet") %><%
+            if total.positive? %><span class="you-account-item-total"><%= number_with_delimiter(total) %></span><% end %>
+          <% end %>
+          <div class="you-account-rule" aria-hidden="true"></div>
+          <%= button_to t("you.sign_out"), you_sign_out_path, method: :post,
+                class: "you-account-item", form: { class: "you-account-form" } %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</nav>

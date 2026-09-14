@@ -1,0 +1,123 @@
+<%# One Verto the account holds, in the creator tile's shape: a rule, a cover,
+    the name, the numbers, and what to do about it.
+
+    EXACTLY ONE primary button per card, chosen by what the Verto can do for
+    them right now. Comparing is what the account is for, so it leads whenever
+    the comparison is open. When it is not, the thing that gets it open — or
+    gets the organisation the answers it asked for — is sharing, so Share
+    steps up rather than the emphasis simply going missing. A Verto that is
+    closed AND no longer playable has nothing to press for, and says so by
+    having no primary at all rather than by promoting something secondary.
+
+    Locals: row ({ survey:, claims:, played_at:, piles: }). Reads @compare,
+    @answered and @questions, all keyed by survey id. %>
+<%
+  survey  = row[:survey]
+  compare = @compare[survey.id]
+  impact  = survey.impact_published?
+  promise = !impact && survey.next_step?
+  name    = survey.theme.presence || survey.title
+  needed  = Response::MIN_REGION_SAMPLE_SIZE
+  primary =
+    if compare == :ready then :compare
+    elsif survey.playable? then :share
+    end
+  # The pink border says "something to compare"; every other card is quiet —
+  # including the one with no primary, which is quieter still.
+  tone = if impact then "is-impact"
+         elsif promise then "is-promise"
+         elsif primary != :compare then "is-quiet"
+         end
+  badge = if impact then [ "is-impact", t("you.badge_impact") ]
+          elsif promise then [ "is-promise", t("you.badge_next_step") ]
+          elsif compare == :ready then [ "is-open", t("you.badge_results_open") ]
+          else [ "is-played", t("you.badge_played") ]
+          end
+  cover = verto_cover_image(survey)
+  # Native share where the browser has it, clipboard where it does not, and an
+  # ordinary link to the Verto where neither works — the label it swaps to is
+  # passed from here so it is translated by Rails rather than needing a JS
+  # string. Share hands over the PLAY url: the thing a friend can open.
+  share_data = { controller: "share-verto", action: "share-verto#share",
+                 share_verto_title_value: name, share_verto_copied_value: t("you.share_copied") }
+%>
+<div class="you-verto <%= tone %>">
+  <span class="you-verto-rule" aria-hidden="true"></span>
+
+  <%# The one inline style this page allows: the cover is creator data. %>
+  <div class="you-verto-cover"<% if cover.present? %> style="background-image:url('<%= cover %>')"<% end %>>
+    <span class="you-verto-scrim" aria-hidden="true"></span>
+    <span class="you-verto-badge <%= badge.first %>"><%= badge.last %></span>
+    <%# When they PLAYED it, not when they claimed it — a device key can claim
+        a Verto months after the run, and the date that means anything to
+        them is the day they answered. %>
+    <span class="you-verto-when"><%= t("you.played_on", date: l(row[:played_at].to_date, format: :long)) %></span>
+  </div>
+
+  <div class="you-verto-body">
+    <div class="you-verto-org"><%= survey.organisation.name %></div>
+    <h2 class="you-verto-title">
+      <%= link_to name, you_verto_path(survey), class: "you-verto-link" %>
+    </h2>
+  </div>
+
+  <div class="you-verto-strip">
+    <% row[:piles].each do |pile| %>
+      <span class="you-pile"><%= pile[:icon] %> <b><%= number_with_delimiter(pile[:amount]) %></b> <%= pile[:name] %></span>
+    <% end %>
+    <%# Whole translated strings, never a number coloured on its own: a
+        locale that puts the count last would otherwise be split in two. %>
+    <span class="you-verto-stat"><%= t("you.answered", count: @answered[survey.id].to_i) %></span>
+    <span class="you-verto-stat"><%= t("you.questions", count: @questions[survey.id].to_i) %></span>
+
+    <%# Why it can't be compared yet, said on the card so nobody opens a
+        Verto to find out there is nothing in it. The floor and the count,
+        not "soon": 2 of 5 says whether to come back tomorrow or never. %>
+    <% case compare %>
+    <% when Hash %>
+      <% have = compare[:have] %>
+      <div class="you-verto-gate">
+        <div class="you-verto-note">
+          <%= needed - have == 1 ? t("you.compare_one_more", have: have, needed: needed)
+                                 : t("you.compare_pending", needed: needed, have: have) %>
+        </div>
+        <div class="you-track" aria-hidden="true">
+          <span class="you-fill" style="width:<%= (have * 100.0 / needed).round %>%"></span>
+        </div>
+      </div>
+    <% when :closed %>
+      <div class="you-verto-note"><%= t("you.compare_closed", org: survey.organisation.name) %></div>
+    <% end %>
+  </div>
+
+  <%# The arrows are appended here rather than in the strings so an RTL
+      locale can drop or flip them without a copy change. %>
+  <div class="you-verto-ctas">
+    <% case primary %>
+    <% when :compare %>
+      <%= link_to "#{t("you.cta_compare")} →", you_verto_path(survey, anchor: "compare"),
+            class: "you-cta you-cta-primary you-cta-compare" %>
+    <% when :share %>
+      <%= link_to "#{t(compare == :closed ? "you.cta_share" : "you.cta_share_unlock")} →",
+            play_survey_url(survey.publish_token),
+            class: "you-cta you-cta-primary you-cta-share", data: share_data %>
+    <% end %>
+
+    <div class="you-verto-secondary">
+      <% if primary == :compare && survey.playable? %>
+        <%= link_to t("you.cta_share"), play_survey_url(survey.publish_token),
+              class: "you-cta you-cta-ghost you-cta-share", data: share_data %>
+      <% end %>
+      <% if impact %>
+        <%= link_to "#{t("you.cta_what_changed")} →", you_verto_path(survey, anchor: "impact"),
+              class: "you-cta you-cta-ghost you-cta-impact you-cta-tint-purple" %>
+      <% elsif promise %>
+        <%= link_to "#{t("you.next_step_title")} →", you_verto_path(survey, anchor: "impact"),
+              class: "you-cta you-cta-ghost you-cta-impact you-cta-tint-amber" %>
+      <% else %>
+        <%= link_to t("you.cta_impact_short"), you_verto_path(survey, anchor: "impact"),
+              class: "you-cta you-cta-ghost you-cta-impact" %>
+      <% end %>
+    </div>
+  </div>
+</div>

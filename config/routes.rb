@@ -108,6 +108,14 @@ Rails.application.routes.draw do
   get    "you/v/:id",          to: "you#verto",             as: :you_verto
   post   "you/sign-out",       to: "you#sign_out",          as: :you_sign_out
   delete "you",                to: "you#destroy"
+  # The settings page: name, a password, language and per-organisation mail.
+  # Three PATCHes rather than one, because each form has its own failure
+  # mode and redirecting back with one alert is only legible if the alert
+  # can say which form it is about.
+  get   "you/account",             to: "you#account",            as: :you_account
+  patch "you/account",             to: "you#update_account"
+  patch "you/account/password",    to: "you#update_password",    as: :you_account_password
+  patch "you/account/preferences", to: "you#update_preferences", as: :you_account_preferences
   # The two links at the foot of every mail a respondent gets. GET confirms,
   # POST acts — same split, same reason, as the sign-in link above and the
   # creator-facing unsubscribe at /e/u/:token.

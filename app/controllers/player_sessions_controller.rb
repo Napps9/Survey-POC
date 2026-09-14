@@ -6,12 +6,18 @@
 # being true on the owner's instruction (2026-09-10): the join block now takes
 # a password, so somebody coming back on a different device needs a door.
 #
-# There is NO respondent password reset. Building one needs outbound mail, and
-# the mail is the thing this change was made to stop depending on. #link is the
-# recovery route instead — the emailed sign-in link, kept alive for exactly
-# this, and reachable only by someone who knows the path. It is not linked from
-# any page: it cannot work until SMTP is fixed, and offering a respondent a
-# button that silently does nothing is the bug this whole thread started with.
+# The join block is no longer the only place a password comes from: a
+# signed-in respondent can set or change one on /you/account (YouController
+# #update_password), which is how an account that began with an emailed link
+# or with Google gets a password at all.
+#
+# There is still NO respondent password reset. Building one needs outbound
+# mail, and the mail is the thing this change was made to stop depending on.
+# #link is the recovery route instead — the emailed sign-in link, kept alive
+# for exactly this, and reachable only by someone who knows the path. It is
+# not linked from any page: it cannot work until SMTP is fixed, and offering a
+# respondent a button that silently does nothing is the bug this whole thread
+# started with.
 class PlayerSessionsController < ApplicationController
   include PlayerAuthentication
 

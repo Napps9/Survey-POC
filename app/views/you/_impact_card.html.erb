@@ -1,0 +1,61 @@
+<%# What came of their answers on one Verto: the impact the organisation
+    wrote, or — listed after every written one — the promise of one. No
+    cover, because the headline is the picture here: the whole point of
+    leaving an address was to find out this one sentence.
+
+    Locals: item ({ survey:, kind: (:impact | :next_step), answered: }). %>
+<%
+  survey   = item[:survey]
+  impact   = item[:kind] == :impact
+  name     = survey.theme.presence || survey.title
+  headline = impact ? survey.impact_headline : survey.next_step_headline
+  body     = impact ? survey.impact_body : survey.next_step_body
+%>
+<div class="you-verto you-impact-card <%= impact ? "is-impact" : "is-promise" %>">
+  <span class="you-verto-rule" aria-hidden="true"></span>
+
+  <div class="you-impact-body">
+    <div class="you-impact-head">
+      <span class="you-verto-badge is-static <%= impact ? "is-impact" : "is-promise" %>">
+        <%= t(impact ? "you.badge_impact" : "you.badge_next_step") %>
+      </span>
+      <span class="you-verto-org"><%= survey.organisation.name %> · <%= name %></span>
+    </div>
+
+    <% if headline.present? %>
+      <div class="you-impact-headline"><%= headline %></div>
+    <% end %>
+    <% if body.present? %>
+      <p class="you-sub"><%= body %></p>
+    <% end %>
+    <% if impact %>
+      <% survey.impact_changes_list.each do |line| %>
+        <div class="you-impact-change"><span aria-hidden="true">→</span> <%= line %></div>
+      <% end %>
+    <% end %>
+
+    <div class="you-impact-foot">
+      <span class="you-verto-note">
+        <%= t("you.have_answered", count: item[:answered]) %> ·
+        <% if impact %>
+          <%= t("you.impact_published_on", date: l(survey.impact_published_at.to_date, format: :long)) %>
+        <% else %>
+          <%= t("you.promise_meta") %>
+        <% end %>
+      </span>
+      <div class="you-impact-actions">
+        <% if survey.playable? %>
+          <%= link_to t("you.cta_share"), play_survey_url(survey.publish_token),
+                class: "you-cta you-cta-ghost you-cta-share",
+                data: { controller: "share-verto", action: "share-verto#share",
+                        share_verto_title_value: name,
+                        share_verto_copied_value: t("you.share_copied") } %>
+        <% end %>
+        <% if impact %>
+          <%= link_to "#{t("you.cta_read_impact")} →", you_verto_path(survey, anchor: "impact"),
+                class: "you-cta you-cta-ghost you-cta-tint-purple" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

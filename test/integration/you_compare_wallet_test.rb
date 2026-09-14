@@ -367,50 +367,59 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
 
   # ── What a row lets you do ────────────────────────────────────────────────
 
-  test "Compare results and the reason line are one slot, never both" do
-    # The whole point of the arrangement: a respondent is never offered a
-    # button whose destination is the sentence explaining why there is nothing
-    # there. Asserted as an exclusive-or over the three states rather than as
-    # three separate presence checks, because "never both" is the property.
+  test "exactly one primary per card: Compare when ready, Share otherwise, none when neither" do
+    # The whole point of the arrangement: a respondent is never offered two
+    # buttons of equal weight, and never one whose destination is the sentence
+    # explaining why there is nothing there. Asserted over the four states
+    # together rather than one at a time, because "exactly one" is the
+    # property — and the reason line stands with Share, not instead of it.
     o = org
     ready  = survey(owner: o)
     thin   = survey(owner: o, theme: "Too few")
     closed = survey(owner: o, theme: "Shut", show_results_comparison: false)
+    gone   = survey(owner: o, theme: "Gone", show_results_comparison: false)
     crowd(ready, 8)
     crowd(closed, 8)
-    sign_in_with([ answered(ready), answered(thin), answered(closed) ])
+    sign_in_with([ answered(ready), answered(thin), answered(closed), answered(gone) ])
+    gone.update!(unpublished_at: Time.current)
 
     get you_path
 
     rows = css_select(".you-verto")
-    assert_equal 3, rows.size
-    rows.each do |row|
-      compare = row.css("a.you-cta-primary").any?
-      reason  = row.css(".you-verto-note").any?
-      title   = row.css(".you-verto-title").text.strip
-      assert compare ^ reason,
-             "#{title}: compare CTA and reason line must be exclusive (compare=#{compare}, reason=#{reason})"
+    assert_equal 4, rows.size
+    primaries = rows.to_h do |row|
+      [ row.css(".you-verto-title").text.strip, row.css("a.you-cta-primary") ]
     end
+    primaries.each { |title, found| assert_operator found.size, :<=, 1, "#{title}: more than one primary" }
 
-    # And the primary is the comparison, on the one row that has it.
-    assert_select "a.you-cta-primary", 1
-    assert_select "a.you-cta-primary", text: I18n.t("you.cta_compare")
-    assert_select "a.you-cta-primary[href=?]", you_verto_path(ready, anchor: "compare")
+    assert_equal 1, primaries["Car-free High Street"].size
+    assert primaries["Car-free High Street"].first.classes.include?("you-cta-compare")
+    assert_equal you_verto_path(ready, anchor: "compare"), primaries["Car-free High Street"].first["href"]
+    assert primaries["Too few"].first.classes.include?("you-cta-share")
+    assert primaries["Shut"].first.classes.include?("you-cta-share")
+    assert_empty primaries["Gone"], "closed and unplayable, there is nothing to press for"
+
+    # The reason line stands on the two cards that cannot be compared yet, and
+    # on those alone.
+    assert_select ".you-verto-note", 3
+    assert_select "a.you-cta-primary.you-cta-compare", 1
+    assert_select "a.you-cta-primary", text: /#{I18n.t("you.cta_compare")}/, count: 1
   end
 
-  test "impact and share are offered on every row, comparison or not" do
+  test "the impact link is on every card, and Share on every card that can be played" do
     o = org
     closed = survey(owner: o, show_results_comparison: false)
     sign_in_with([ answered(closed) ])
 
     get you_path
 
-    assert_select "a.you-cta[href=?]", you_verto_path(closed, anchor: "impact"),
-                  text: I18n.t("you.cta_impact")
+    assert_select "a.you-cta.you-cta-impact[href=?]", you_verto_path(closed, anchor: "impact"),
+                  text: I18n.t("you.cta_impact_short")
     # Share hands over the PLAY url — the thing a friend can open — not the
-    # account page, which would be a link only this respondent can use.
-    assert_select "a.you-cta[href=?]", play_survey_url(closed.publish_token),
-                  text: I18n.t("you.cta_share")
+    # account page, which would be a link only this respondent can use. On a
+    # closed Verto it is the primary, since sharing is the one thing left.
+    assert_select "a.you-cta-primary.you-cta-share[href=?]", play_survey_url(closed.publish_token),
+                  text: /#{I18n.t("you.cta_share")}/
   end
 
   test "a Verto nobody can play any more is not offered for sharing" do
@@ -518,21 +527,25 @@ class YouCompareWalletTest < ActionDispatch::IntegrationTest
     assert_select ".you-purse-popover a:not([tabindex])", 0
   end
 
-  test "with nothing collected there is no pill, because there is nothing to press it for" do
+  test "with nothing collected the chip stays but carries no number, and no breakdown" do
     # The wallet already made this choice: it says "no points yet" rather than
-    # showing a zero. A pill showing 0 would be an affordance promising that
-    # sentence.
+    # showing a zero. The chip is navigation now, and a missing tab reads as a
+    # missing page — so it stays, with nothing on it to promise that sentence.
     s = survey
     sign_in_with([ answered(s) ])
 
     get you_path
-    assert_select ".you-purse", 0
+    assert_select "a.you-purse-pill[href=?]", you_wallet_path, 1
+    assert_select ".you-purse-total", 0
+    assert_select ".you-purse-popover", 0
+    assert_select ".you-purse-pill[aria-label]", 0
 
     # The page itself is still reachable, and still says so.
     get you_wallet_path
     assert_response :success
     assert_select ".you-sub", text: I18n.t("you.wallet_empty")
-    assert_select ".you-purse", 0
+    assert_select ".you-purse-total", 0
+    assert_select ".you-purse-popover", 0
   end
 
   test "signed out there is no pill at all" do

@@ -428,23 +428,24 @@ class PlayerNotificationsTest < ActionDispatch::IntegrationTest
 
     get you_path
 
-    # Inside the row of the Verto that points, so the reason needs no restating
-    # — that sentence was the price of a merged list, and there isn't one now.
-    assert_select ".you-verto .you-followups .you-followup-title",
-                  text: "High Street, one year on"
+    # In the What's next section, carrying the reason — the Verto that points
+    # — on the card, so nothing is offered without saying why.
+    assert_select "#next .you-verto.is-next .you-verto-title", text: "High Street, one year on"
+    assert_select "#next .you-verto-because",
+                  text: I18n.t("you.next_because", verto: "Car-free High Street")
     # And the one they have already played is not offered back to them.
-    assert_select ".you-followup-title", text: "Already done this one", count: 0
-    assert_select ".you-followup", 1
+    assert_select "#next .you-verto-title", text: "Already done this one", count: 0
+    assert_select "#next .you-verto", 1
   end
 
-  test "a Verto pointing nowhere draws no what's-next strip at all" do
+  test "a Verto pointing nowhere draws no What's next section at all" do
     s = survey
     sign_in_as(keeper(s))
 
     get you_path
 
     assert_select ".you-verto", 1
-    assert_select ".you-followups", 0
+    assert_select "#next", 0
   end
 
   test "only an admin can spend the organisation's one contact with a respondent" do

@@ -38,7 +38,23 @@ class Player < ApplicationRecord
   # longer is a paste accident or an attempt to make the index work.
   MAX_EMAIL = 254
 
+  # The name is optional and theirs to set on /you/account; Google's profile
+  # fills it in when it can (PlayerOauthSessionsController) and never over a
+  # name they typed. Capped because it is drawn in a 160px slot in the bar.
+  MAX_NAME = 80
+  validates :name, length: { maximum: MAX_NAME }, allow_nil: true
+  normalizes :name, with: ->(n) { n.strip }
+
   def email_verified? = email_verified_at.present?
+
+  # What the corner calls them. The address is the fallback rather than a
+  # blank because on a shared device WHICH account you are in is the thing
+  # worth knowing, and a name alone does not say it.
+  def display_name = name.presence || email_address
+
+  # For the avatar: one grapheme, not one byte, so a name that starts with an
+  # accented or a non-Latin letter gets that letter and not half of it.
+  def initial = display_name.grapheme_clusters.first.to_s.upcase
 
   # Stamped the first time someone follows a link from their own inbox, which
   # is the only proof this app ever has that the address belongs to them.

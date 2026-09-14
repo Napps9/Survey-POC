@@ -13600,7 +13600,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .you-page {
   position: relative;
   min-height: 100dvh;
-  background: #272D4A;
+  background: #1C2034;
   color: #F7F7F7;
   overflow: hidden;
 }
@@ -13617,51 +13617,70 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .you-shell { position: relative; max-width: 680px; margin: 0 auto; padding: 18px 18px 48px; }
 .you-shell-narrow { max-width: 460px; padding-top: 56px; text-align: center; }
 .you-mark { margin-bottom: 26px; }
-.you-mark-sm { opacity: .9; }
+/* Under the bar the shell no longer opens with its own mark, so the breath
+   that mark used to give the first card is given here instead. */
+.you-page-bar .you-shell { padding-top: 24px; }
 
-.you-bar { display: flex; align-items: center; gap: 10px; padding: 4px 0 14px; }
-/* The account's own nav, and the two pages behind it. Same surfaces and the
-   same type scale as the Vertos list above — this is one area, not three. */
-.you-tabs { display: flex; gap: 6px; padding: 2px 0 16px; }
-.you-tab {
-  font-family: "Alata", sans-serif; font-size: 13px; text-decoration: none;
-  color: rgba(255,255,255,.6); padding: 7px 14px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,.12);
+/* ── The top bar ───────────────────────────────────────────────────────────
+   The creator's bar (.bottom-bar), in the account's colours: the mark on the
+   left, where you are in the middle, who you are on the right. Not fixed —
+   these pages scroll as documents and the legal footer has to be reachable —
+   but stacked above the shell, because both menus on it hang down over the
+   content. Full-bleed; the pages centre their own columns beneath it. */
+.you-topbar {
+  position: relative; z-index: 50;
+  height: 56px; box-sizing: border-box;
+  background: #161B2E;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 0 16px;
+  font-family: "ABeeZee", sans-serif;
 }
-.you-tab.is-on { color: #1C2034; background: #01EACB; border-color: #01EACB; }
-.you-tab:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-topbar-left, .you-topbar-right {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+}
+.you-topbar-right { justify-content: flex-end; }
+.you-topbar-centre { display: flex; align-items: center; gap: 8px; }
+.you-topbar-logo {
+  display: flex; align-items: center; padding: 6px 10px; border-radius: 100px;
+  transition: background 0.15s;
+}
+.you-topbar-logo:hover { background: rgba(255,255,255,0.04); }
+.you-topbar-logo:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-topbar-logo img { height: 18px; width: auto; }
+
+.you-topbar-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 16px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.75);
+  font-family: "ABeeZee", sans-serif; font-size: 15px;
+  text-decoration: none; white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.you-topbar-chip:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.you-topbar-chip:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-topbar-chip.is-active {
+  background: rgba(1,234,203,0.12); border-color: rgba(1,234,203,0.5); color: #fff;
+}
+.you-topbar-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.you-topbar-dot.is-teal { background: #01EACB; }
+.you-topbar-dot.is-yellow { background: #FFFA77; }
 
 /* ── The wallet pill ───────────────────────────────────────────────────────
-   The wallet's entry point, in the layout's fixed top-corner cluster next to
-   the language button — so it borrows THAT button's surface (translucent navy
-   over blur) rather than the tabs', which would read as a tab that had escaped
-   its row. The total is the only thing on it, in the accent the piles already
-   use for their numbers, because a number is a reason to press something and
-   the word "Wallet" was not. */
+   The Wallet chip in the bar, and the hover breakdown behind it. The chip is
+   a .you-topbar-chip like its neighbour; what makes it the pill is the total
+   drawn on it, in the accent the piles already use for their numbers — a
+   number is a reason to press something. `is-on` is the marker the wallet
+   page sets (the pill's own tests and controller read it); the bar's
+   is-active carries the styling. */
 .you-purse { position: relative; display: inline-flex; }
-.you-purse-pill {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 6px 12px; border-radius: 100px; text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: rgba(20,23,38,0.5);
-  backdrop-filter: blur(8px);
-  color: rgba(255,255,255,0.85);
-  font-family: "ABeeZee", sans-serif;
-  white-space: nowrap; cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-.you-purse-pill:hover { background: rgba(20,23,38,0.72); color: #fff; }
-.you-purse-pill:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
-.you-purse-mark { opacity: .55; flex-shrink: 0; }
+.you-purse-pill { cursor: pointer; }
 .you-purse-total {
-  font-family: "Alata", sans-serif; font-size: var(--text-sm);
+  font-family: "Alata", sans-serif; font-size: 13px;
   letter-spacing: 0.02em; color: #01EACB; font-variant-numeric: tabular-nums;
 }
-/* On the wallet itself. Same is-on as a tab, because it is doing a tab's job. */
-.you-purse-pill.is-on { background: #01EACB; border-color: #01EACB; color: #1C2034; }
-.you-purse-pill.is-on:hover { background: #01EACB; color: #1C2034; }
-.you-purse-pill.is-on .you-purse-total { color: #1C2034; }
-.you-purse-pill.is-on .you-purse-mark { opacity: .7; }
 
 .you-purse-popover {
   position: absolute; top: calc(100% + 8px); inset-inline-end: 0;
@@ -13702,6 +13721,438 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .you-purse-all:hover { color: #fff; }
 
+/* ── The account menu ──────────────────────────────────────────────────────
+   Who you are, on the right of the bar, shaped like the creator's user pill
+   (.bottom-bar-user) with an avatar in front of the name. The avatar is a
+   fixed hue rather than one derived from the name: one respondent is one
+   colour on one device, and a name that changes must not change it. */
+.you-account { position: relative; display: inline-flex; }
+.you-account-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 4px; border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.75);
+  font-family: "ABeeZee", sans-serif; font-size: 15px;
+  cursor: pointer; white-space: nowrap; max-width: 220px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.you-account-btn:hover, .you-account-btn[aria-expanded="true"] { background: rgba(255,255,255,0.06); color: #fff; }
+.you-account-btn:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-avatar {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: hsl(210, 52%, 42%); color: #fff;
+  font-family: "Alata", sans-serif; font-size: 13px; line-height: 1;
+}
+.you-avatar-lg { width: 34px; height: 34px; font-size: 16px; }
+.you-account-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+.you-account-caret { opacity: 0.5; flex-shrink: 0; }
+
+.you-account-popover {
+  position: absolute; top: calc(100% + 8px); inset-inline-end: 0;
+  min-width: 240px; max-width: min(320px, calc(100vw - 32px));
+  background: #1C2034;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; gap: 2px;
+  z-index: 60; text-align: start;
+}
+.you-account-popover[hidden] { display: none; }
+.you-account-head { display: flex; align-items: center; gap: 10px; padding: 6px 10px 8px; min-width: 0; }
+.you-account-who { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.you-account-who-name {
+  font-size: 15px; color: #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.you-account-who-email {
+  font-size: 12px; color: rgba(255,255,255,0.45);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.you-account-rule { height: 1px; background: rgba(255,255,255,0.06); margin: 6px 4px; }
+/* One rule for the links and the sign-out button, so the three read as one
+   list — a <button> brings its own font and alignment and has to be told. */
+.you-account-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; box-sizing: border-box;
+  padding: 8px 10px; border-radius: 8px;
+  color: rgba(255,255,255,0.75);
+  font-family: "ABeeZee", sans-serif; font-size: 15px;
+  text-decoration: none; background: transparent; border: 0;
+  text-align: start; cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.you-account-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.you-account-item:focus-visible { outline: 2px solid #01EACB; outline-offset: -2px; }
+.you-account-item-total {
+  font-family: "Alata", sans-serif; font-size: 13px; color: #01EACB;
+  font-variant-numeric: tabular-nums;
+}
+.you-account-form { margin: 0; }
+
+/* ── The hero ──────────────────────────────────────────────────────────────
+   The band under the bar: an eyebrow, one big line, one plain one. Shared by
+   the dashboard and the account page; the account's is shorter and narrower. */
+.you-hero {
+  position: relative; overflow: hidden;
+  padding: 32px 36px 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.you-hero-account { padding: 28px 36px 32px; }
+/* The hero's own orbs, brighter than the page's and clipped to the band, so
+   the top of the page glows the way the creator's does. Three, not four:
+   the band is short and a fourth would only stack on the third. */
+.you-orbs-hero i { opacity: .28; }
+.you-orbs-hero i.a { left: -120px; top: -220px; }
+.you-orbs-hero i.b { right: -140px; top: -200px; bottom: auto; }
+.you-orbs-hero i.c { left: 42%; top: -260px; }
+.you-hero-inner { position: relative; max-width: 1320px; margin: 0 auto; }
+.you-hero-inner-narrow { max-width: 760px; }
+.you-hero .you-eyebrow {
+  gap: 8px; font-family: "ABeeZee", sans-serif; font-size: 13px;
+  letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.45);
+}
+.you-hero .you-dot { width: 8px; height: 8px; box-shadow: 0 0 12px rgba(1,234,203,0.7); }
+.you-h1-hero { font-size: 38px; line-height: 1.1; letter-spacing: -.4px; margin-top: 10px; }
+.you-accent { color: #01EACB; }
+.you-lead {
+  font-size: 15px; line-height: 1.55; color: rgba(255,255,255,0.55);
+  max-width: 560px; margin: 12px 0 0;
+}
+
+/* The centred column under the hero. */
+.you-main {
+  position: relative; box-sizing: border-box;
+  max-width: 1320px; margin: 0 auto; padding: 32px 36px 60px;
+  display: flex; flex-direction: column; gap: 36px;
+}
+.you-main-narrow { max-width: 760px; gap: 16px; }
+.you-flash { font-size: 13px; line-height: 1.45; padding: 10px 14px; border-radius: 12px; }
+.you-flash.is-notice { background: rgba(1,234,203,0.1); border: 1px solid rgba(1,234,203,0.3); color: #fff; }
+.you-flash.is-alert { background: rgba(255,30,111,0.1); border: 1px solid rgba(255,30,111,0.32); color: #fff; }
+
+/* ── The dashboard: tiles ──────────────────────────────────────────────────
+   The creator's stat row (.dash-stat), one accent per tile. The collected
+   tile is a link when there is anything in it, and the link is styled by
+   the same rule as the div so nothing shifts when it becomes one. */
+.you-tiles-wrap {
+  position: relative; padding: 24px 36px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.you-tiles {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;
+  max-width: 1320px; margin: 0 auto;
+}
+.you-tile {
+  display: block; box-sizing: border-box; min-width: 0;
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 18px;
+  padding: 18px 16px; text-align: center;
+  color: inherit; text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.you-tile.is-teal   { background: linear-gradient(135deg, rgba(1,234,203,0.18),   rgba(1,234,203,0.04)); }
+.you-tile.is-pink   { background: linear-gradient(135deg, rgba(255,30,111,0.18),  rgba(255,30,111,0.04)); }
+.you-tile.is-purple { background: linear-gradient(135deg, rgba(97,91,245,0.18),   rgba(97,91,245,0.04)); }
+.you-tile.is-yellow { background: linear-gradient(135deg, rgba(255,250,119,0.18), rgba(255,250,119,0.04)); }
+a.you-tile:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+a.you-tile:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-tile-value {
+  font-family: "Alata", sans-serif; font-size: 36px; line-height: 1;
+  letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
+}
+.you-tile.is-teal   .you-tile-value { color: #01EACB; }
+.you-tile.is-pink   .you-tile-value { color: #FF1E6F; }
+.you-tile.is-purple .you-tile-value { color: #615BF5; }
+.you-tile.is-yellow .you-tile-value { color: #FFFA77; }
+.you-tile-label {
+  font-family: "ABeeZee", sans-serif; font-size: 10px; color: rgba(255,255,255,0.5);
+  letter-spacing: .12em; text-transform: uppercase; margin-top: 8px;
+}
+
+/* ── The dashboard: sections ───────────────────────────────────────────────
+   A dot in the section's colour, a label, a line out to the count. */
+.you-section { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.you-section-head { display: flex; align-items: center; gap: 10px; }
+.you-section-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.you-section-dot.is-teal   { background: #01EACB; box-shadow: 0 0 10px rgba(1,234,203,0.7); }
+.you-section-dot.is-blue   { background: #0CA7FF; box-shadow: 0 0 10px rgba(12,167,255,0.7); }
+.you-section-dot.is-purple { background: #615BF5; box-shadow: 0 0 10px rgba(97,91,245,0.7); }
+.you-section-dot.is-pink   { background: #FF1E6F; box-shadow: 0 0 10px rgba(255,30,111,0.7); }
+.you-section-label {
+  font-family: "Alata", sans-serif; font-size: 13px; color: rgba(255,255,255,0.5);
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.you-section-line { flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
+.you-section-count { font-size: 13px; color: rgba(255,255,255,0.25); font-variant-numeric: tabular-nums; }
+.you-section .you-card { margin-top: 0; }
+
+/* 360px, not the creator grid's 280: a respondent's card carries two buttons
+   side by side under a full-width primary, and at 280 the pair is ~150px each
+   — narrow enough to wrap "Share with others" and "What changed" onto two
+   lines. 360 puts three across the 1320 column, which is the width the
+   approved mockup was drawn at, and still drops to two and then one. */
+.you-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 14px; }
+.you-grid-wide { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+
+/* ── The dashboard: one Verto ──────────────────────────────────────────────
+   The creator's tile (surveys/_dashboard_card) for the other side of the
+   table: a rule, a cover with a badge on it, the name, the numbers, and
+   what to press. Scoped to the grid because the wallet and the Verto page
+   still draw .you-verto as the plain row it was.
+
+   The border says what the card is for: pink when there is something to
+   compare (the creator's "live"), purple when an impact has been written,
+   amber when one has been promised, and near-invisible when the only thing
+   left to do is share it. */
+.you-grid .you-verto {
+  display: flex; flex-direction: column; overflow: hidden; min-width: 0;
+  border-radius: 18px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,30,111,0.22);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.you-grid .you-verto:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.28); }
+.you-grid .you-verto.is-quiet   { border-color: rgba(255,255,255,0.07); }
+.you-grid .you-verto.is-impact  { border-color: rgba(97,91,245,0.28); }
+.you-grid .you-verto.is-promise { border-color: rgba(255,194,75,0.28); }
+.you-grid .you-verto.is-next    { border-color: rgba(12,167,255,0.22); }
+.you-verto.is-impact  .you-verto-rule { background: linear-gradient(90deg, #615BF5, #01EACB); }
+.you-verto.is-promise .you-verto-rule { background: linear-gradient(90deg, #FFC24B, #615BF5); }
+.you-verto.is-next    .you-verto-rule { background: linear-gradient(90deg, #0CA7FF, #615BF5); }
+
+/* The cover. The gradient is the band a Verto without art gets; a cover is
+   set inline (the one inline style on the page — it is creator data) and,
+   being a longhand, overrides only the image half of this shorthand. */
+.you-verto-cover {
+  position: relative; height: 120px; flex: none;
+  background: linear-gradient(135deg, rgba(1,234,203,0.18), rgba(97,91,245,0.18));
+  background-size: cover; background-position: center;
+}
+.you-verto-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(28,32,52,0.35) 0%, rgba(28,32,52,0) 40%, rgba(28,32,52,0.55) 100%);
+}
+.you-verto-badge {
+  position: absolute; top: 10px; inset-inline-start: 12px;
+  font-family: "Alata", sans-serif; font-size: 10px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; white-space: nowrap;
+  padding: 3px 9px; border-radius: 100px; backdrop-filter: blur(4px);
+}
+.you-verto-badge.is-impact    { background: #615BF5; color: #fff; }
+.you-verto-badge.is-promise   { background: #FFC24B; color: #1C2034; }
+.you-verto-badge.is-open      { background: #01EACB; color: #1C2034; }
+.you-verto-badge.is-played    { background: rgba(28,32,52,0.55); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.18); }
+.you-verto-badge.is-follow-up { background: rgba(12,167,255,0.18); color: #0CA7FF; border: 1px solid rgba(12,167,255,0.35); }
+.you-verto-badge.is-static    { position: static; }
+.you-verto-cover .you-verto-when {
+  position: absolute; top: 11px; inset-inline-end: 12px; margin: 0;
+  font-size: 11px; color: rgba(255,255,255,0.85); text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.you-grid .you-verto-body { padding: 14px 16px 10px; }
+.you-grid .you-verto-title { font-size: 19px; overflow-wrap: anywhere; }
+.you-verto-because { color: rgba(255,255,255,0.75); }
+
+/* The numbers row: their piles, then how many answered and how many
+   questions. The gate — why it cannot be compared yet, with the bar that
+   says how far off it is — takes the row below on its own. */
+.you-verto-strip {
+  margin: 0 16px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+}
+.you-verto-stat { font-size: 12px; color: rgba(255,255,255,0.6); font-variant-numeric: tabular-nums; }
+.you-verto-gate { flex: 0 0 100%; display: flex; flex-direction: column; gap: 6px; }
+.you-verto-strip .you-verto-note { flex: 0 0 100%; margin-top: 0; }
+.you-verto-gate .you-verto-note { flex: none; }
+.you-track { height: 6px; border-radius: 100px; background: rgba(255,255,255,0.09); overflow: hidden; }
+.you-fill { display: block; height: 100%; border-radius: 100px; background: #FF1E6F; }
+
+/* ── What a card lets you do ───────────────────────────────────────────────
+   One primary, full width, in the creator's pink (teal for Play — it is a
+   door out of the account, not an action on a Verto in it), and a row of
+   ghosts under it. The impact ghost takes a tint when there is something to
+   read: purple for a written impact, amber for a promise. */
+.you-verto-ctas { margin-top: auto; padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.you-verto-secondary { display: flex; gap: 8px; }
+.you-verto-secondary:empty { display: none; }
+.you-cta {
+  display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+  text-align: center; text-decoration: none; line-height: 1.3;
+  transition: background .15s, color .15s, border-color .15s, filter .15s, transform .15s;
+}
+.you-cta:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-cta-primary {
+  width: 100%; padding: 11px 12px; border-radius: 12px;
+  background: #FF1E6F; color: #fff;
+  font-family: "Alata", sans-serif; font-size: 15px; letter-spacing: .03em;
+  box-shadow: 0 8px 20px rgba(255,30,111,0.28);
+}
+.you-cta-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.you-cta-play { background: #01EACB; color: #1C2034; box-shadow: 0 8px 20px rgba(1,234,203,0.28); }
+.you-cta-ghost {
+  flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.75);
+  font-family: "ABeeZee", sans-serif; font-size: 14px;
+}
+.you-cta-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.you-cta-tint-purple { background: rgba(97,91,245,0.14); border-color: rgba(97,91,245,0.32); color: #8B85FF; }
+.you-cta-tint-purple:hover { background: rgba(97,91,245,0.22); color: #8B85FF; }
+.you-cta-tint-amber { background: rgba(255,194,75,0.12); border-color: rgba(255,194,75,0.32); color: #FFC24B; }
+.you-cta-tint-amber:hover { background: rgba(255,194,75,0.2); color: #FFC24B; }
+
+/* ── The impact card ───────────────────────────────────────────────────────
+   No cover: the headline is the picture. The badge is the cover badge stood
+   still at the head of the text. */
+.you-impact-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.you-impact-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.you-impact-head .you-verto-org { min-width: 0; overflow-wrap: anywhere; }
+.you-impact-body .you-impact-headline, .you-impact-body .you-sub, .you-impact-body .you-impact-change { margin: 0; }
+.you-impact-foot {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 12px; margin-top: 4px;
+}
+.you-impact-foot .you-verto-note { margin-top: 0; }
+.you-impact-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.you-impact-actions .you-cta-ghost { flex: none; }
+
+/* ── Make it count ─────────────────────────────────────────────────────────
+   The three things a Verto goes further for, as a strip at the foot: the
+   one part of the page that explains what the rest is for, so it is there
+   even when the rest is empty. The line behind the circles is desktop-only;
+   stacked, the numbers say the order by themselves. */
+.you-steps {
+  border-radius: 18px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08); padding: 28px 36px 30px;
+}
+.you-steps-title {
+  font-family: "Alata", sans-serif; font-size: 24px; font-weight: 400; line-height: 1.2;
+  margin: 10px 0 26px;
+}
+.you-steps-list {
+  position: relative; list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px;
+}
+.you-steps-list::before {
+  content: ""; position: absolute; top: 20px; left: 16.6%; right: 16.6%; height: 1px;
+  background: rgba(1,234,203,0.25);
+}
+.you-step {
+  position: relative; display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 10px;
+}
+.you-step-n {
+  display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid rgba(1,234,203,0.5); background: #1C2034; color: #01EACB;
+  font-family: "Alata", sans-serif; font-size: 16px;
+}
+.you-step-title { font-family: "Alata", sans-serif; font-size: 17px; color: #fff; }
+.you-step-body { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.55; max-width: 300px; margin: 0; }
+
+/* ── The account page ──────────────────────────────────────────────────────
+   Four panels, four forms. The panel is the bar's surface (#161B2E) rather
+   than the card's (#1C2034) so the page reads as settings and not as another
+   Verto. */
+.you-panel {
+  background: #161B2E; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;
+  padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;
+}
+.you-panel.is-danger { border-color: rgba(216,0,39,0.3); }
+.you-panel-title { font-family: "Alata", sans-serif; font-size: 17px; font-weight: 400; margin: 0; }
+.you-panel-sub { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.5); margin: -8px 0 0; }
+.you-form { display: flex; flex-direction: column; gap: 14px; }
+.you-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.you-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.you-label {
+  font-family: "Alata", sans-serif; font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; color: rgba(255,255,255,0.45);
+}
+.you-panel .you-input { margin-top: 0; }
+.you-panel .you-btn { margin-top: 0; }
+/* The address, drawn as a field it cannot be typed into: same box as the
+   name above it, so the two read as one form, quieter so it reads as fact. */
+.you-input-ro {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,.18); border-color: rgba(255,255,255,.14);
+}
+.you-input-ro-text { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.you-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 100px; white-space: nowrap;
+  font-family: "Alata", sans-serif; font-size: 11px; letter-spacing: .04em;
+  color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05);
+}
+.you-tag.is-teal { color: #01EACB; border-color: rgba(1,234,203,0.4); background: rgba(1,234,203,0.1); }
+.you-tag-g {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; color: #1C2034;
+  font-family: "Alata", sans-serif; font-size: 9px; line-height: 1;
+}
+.you-help { font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.45); margin: 0; }
+.you-form-actions { display: flex; justify-content: flex-end; }
+.you-select {
+  max-width: 320px; cursor: pointer; appearance: none; padding-inline-end: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23ffffff' stroke-opacity='.6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+[dir="rtl"] .you-select { background-position: left 14px center; }
+.you-select option { color: #1C2034; }
+
+/* One organisation per row, with a switch. The switch is CSS only — the box
+   is the real control, drawn as a pill; with the stylesheet gone it is a
+   checkbox, which is what it is. */
+.you-rows { display: flex; flex-direction: column; }
+.you-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.06);
+}
+.you-row:first-child { border-top: 0; padding-top: 4px; }
+.you-row-name { font-size: 15px; color: #fff; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
+.you-toggle { position: relative; display: inline-block; width: 38px; height: 22px; flex: none; cursor: pointer; }
+.you-toggle-input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+.you-toggle-track {
+  position: absolute; inset: 0; border-radius: 100px; box-sizing: border-box;
+  background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.12);
+  transition: background 0.15s, border-color 0.15s;
+}
+.you-toggle-track::after {
+  content: ""; position: absolute; top: 2px; inset-inline-start: 2px;
+  width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  transition: inset-inline-start 0.15s;
+}
+.you-toggle-input:checked + .you-toggle-track { background: #01EACB; border-color: #01EACB; }
+.you-toggle-input:checked + .you-toggle-track::after { inset-inline-start: 18px; }
+.you-toggle-input:focus-visible + .you-toggle-track { outline: 2px solid #01EACB; outline-offset: 2px; }
+.you-btn-danger {
+  background: rgba(216,0,39,0.1); color: #FF6B85; border: 1px solid rgba(216,0,39,0.45);
+}
+.you-btn-danger:hover { background: rgba(216,0,39,0.18); }
+
+/* Phones: the bar keeps the mark and the two menus, the chips go (the menu
+   carries both destinations) and so does the name beside the avatar; the
+   columns lose their desktop gutter. */
+@media (max-width: 767px) {
+  .you-topbar { padding: 0 12px; }
+  .you-topbar-centre, .you-account-name { display: none; }
+  .you-hero, .you-hero-account { padding-left: 18px; padding-right: 18px; }
+  .you-h1-hero { font-size: 30px; }
+  .you-main { padding-left: 18px; padding-right: 18px; }
+  .you-panel { padding: 18px; }
+  .you-field-grid { grid-template-columns: minmax(0, 1fr); }
+  .you-tiles-wrap { padding: 18px 18px 22px; }
+  .you-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .you-tile-value { font-size: 30px; }
+  .you-grid, .you-grid-wide { grid-template-columns: minmax(0, 1fr); }
+  .you-steps { padding: 22px 18px 24px; }
+  .you-steps-title { font-size: 20px; }
+  .you-steps-list { grid-template-columns: minmax(0, 1fr); }
+  .you-steps-list::before { display: none; }
+}
+
 .you-back {
   display: inline-block; font-size: 13px; color: rgba(255,255,255,.55);
   text-decoration: none; padding: 2px 0 12px;
@@ -13726,64 +14177,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .you-standing { font-size: 12px; color: rgba(255,255,255,.5); margin-top: 8px; }
 
-/* ── What a row lets you do ────────────────────────────────────────────────
-   The row used to BE a link, with an arrow as its only affordance. It now says
-   what it opens, because "compare my answers", "see what came of it" and "send
-   it to someone" are three different reasons to press a Verto and an arrow
-   names none of them. */
-.you-ctas { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.you-cta {
-  display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 100px;
-  border: 1px solid rgba(255,255,255,.14); background: transparent;
-  font-family: "Alata", sans-serif; font-size: 12px; letter-spacing: .02em;
-  color: rgba(255,255,255,.72); text-decoration: none; white-space: nowrap;
-  transition: background .15s, color .15s, border-color .15s;
-}
-.you-cta:hover { border-color: rgba(255,255,255,.28); color: #fff; }
-.you-cta:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
-/* Comparing is what the account is FOR — the one thing here a respondent
-   cannot get anywhere else — so it carries the accent and the other two read
-   as the alternatives they are. It is also the CTA that is often absent (see
-   the view): on a row whose comparison is shut, the emphasis is simply gone
-   rather than moving to something else. */
-.you-cta-primary {
-  border-color: rgba(1,234,203,.5); color: #01EACB; background: rgba(1,234,203,.08);
-}
-.you-cta-primary:hover { border-color: #01EACB; background: rgba(1,234,203,.16); color: #01EACB; }
-
 /* The title is the link the whole row used to be. */
 .you-verto-link { color: inherit; text-decoration: none; }
 .you-verto-link:hover { color: #01EACB; }
 .you-verto-link:focus-visible { outline: 2px solid #01EACB; outline-offset: 3px; border-radius: 6px; }
 
-/* ── What this Verto points at next ────────────────────────────────────────
-   Inset inside the Verto that points, rather than a page of its own: the
-   reason a follow-up is being shown IS the Verto above it, and a merged list
-   had to restate that reason on every card. Drawn only when there is one. */
-.you-followups {
-  margin-top: 12px; padding: 8px 12px 4px; border-radius: 12px;
-  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
-}
-.you-followups-head {
-  font-family: "Alata", sans-serif; font-size: var(--text-2xs); letter-spacing: .12em;
-  text-transform: uppercase; color: #01EACB; padding-bottom: 2px;
-}
-.you-followup {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 8px 0; text-decoration: none; color: inherit;
-  border-top: 1px solid rgba(255,255,255,.05);
-}
-.you-followup:first-of-type { border-top: 0; }
-.you-followup:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; border-radius: 8px; }
-.you-followup-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.you-followup-title {
-  font-family: "Alata", sans-serif; font-size: 14px; line-height: 1.3; color: rgba(255,255,255,.9);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.you-followup-meta { font-size: 11px; color: rgba(255,255,255,.4); }
-.you-followup-go { color: rgba(255,255,255,.35); font-size: 16px; flex: none; }
-.you-followup:hover .you-followup-title { color: #01EACB; }
-/* Why a row can't be compared. Quieter than the piles above it — it is a
+/* Why a card can't be compared. Quieter than the piles beside it — it is a
    reason, not a holding, and it must not compete with what they collected. */
 .you-verto-note { font-size: 11.5px; line-height: 1.45; color: rgba(255,255,255,.42); margin-top: 8px; }
 .you-foot-note {
@@ -13797,7 +14196,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* What happened. The headline carries the weight, because the whole point of
    leaving an address was to find out this one sentence. */
 .you-impact-headline {
-  font-family: "Alata", sans-serif; font-size: 17px; line-height: 1.3;
+  font-family: "Alata", sans-serif; font-size: 19px; line-height: 1.3;
   margin: 0 0 8px; color: #fff;
 }
 .you-impact-change {
@@ -13933,13 +14332,14 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 .you-pile b { font-family: "Alata", sans-serif; font-weight: 400; color: #01EACB; font-variant-numeric: tabular-nums; }
 
-.you-foot { display: flex; gap: 18px; margin-top: 26px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.08); }
+/* The sign-in link on the join page. The account's own sign-out and delete
+   used to be two of these at the foot of the list; sign out is in the bar's
+   menu now and delete is a button on the account page. */
 .you-link {
   background: none; border: 0; padding: 0; cursor: pointer;
   font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(255,255,255,.6);
   text-decoration: underline; text-underline-offset: 3px;
 }
-.you-link-quiet { color: rgba(255,255,255,.38); }
 
 /* ── Language check ────────────────────────────────────────────────────────
    The wording-review screen (/surveys/:id/language_check) and the public

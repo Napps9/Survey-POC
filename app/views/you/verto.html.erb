@@ -3,11 +3,11 @@
     account's contribution is that they survive closing the tab, which until
     now they did not. Nothing is restyled for this surface on purpose: a
     respondent should recognise the screen they saw when they finished. %>
-<div class="you-page">
+<div class="you-page you-page-bar">
   <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <%= render "you/bar", current: :verto %>
   <div class="you-shell">
 
-    <%= render "you/wallet_pill", rows: @purse_rows, total: @purse_total, current: :verto %>
     <%= link_to you_path, class: "you-back" do %>‹ <%= t("you.back") %><% end %>
 
     <div class="you-head">

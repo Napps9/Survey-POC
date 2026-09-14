@@ -106,10 +106,11 @@ class YouWalletPillTest < ApplicationSystemTestCase
     pill = box_for(".you-purse-pill")
     lang = box_for(".lang-switcher-btn")
 
-    # Both in the top corner, and not overlapping: they share one fixed
-    # cluster, and the bug this guards is the pill landing on top of a language
-    # button whose width depends on the code inside it.
-    assert_operator pill["top"], :<, 60, "the pill is not in the top corner"
+    # Both in the bar, and not overlapping: the pill is the Wallet chip in the
+    # bar's centre and the language button is on its right, and the bug this
+    # guards is the pill landing on top of a language button whose width
+    # depends on the code inside it.
+    assert_operator pill["top"], :<, 60, "the pill is not in the bar"
     assert_operator pill["right"], :<=, lang["left"] + 1,
                     "the pill overlaps the language button"
   end
@@ -121,7 +122,10 @@ class YouWalletPillTest < ApplicationSystemTestCase
     find(".you-purse-pill").hover
     assert_selector ".you-purse-popover", visible: true
 
-    find(".you-h1").hover
+    # The mark, not the heading: the chip sits in the centre of the bar now
+    # and its panel hangs down over the heading, so a pointer sent there
+    # never leaves the panel.
+    find(".you-topbar-logo").hover
     assert_no_selector ".you-purse-popover", visible: true
 
     find(".you-purse-pill").hover

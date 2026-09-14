@@ -293,7 +293,8 @@ malformed scope resolves to the narrow one, because an unintended narrow
 opt-out is a support ticket and an unintended global one is a person cut off
 from mail they never meant to stop.
 
-**Self-service.** The account holder deletes the whole account from `/you` —
+**Self-service.** The account holder deletes the whole account from
+`/you/account` (the account page behind the name in the corner of `/you`) —
 the player, its sessions, its outstanding links, its mail preferences, its
 notification records and all of its claims. Never the `Response` rows: those are pseudonymous research data belonging to the
 creators who collected them, and are not this person's to delete from here.

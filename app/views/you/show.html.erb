@@ -1,146 +1,152 @@
-<%# A respondent's own Vertos. Signed out is a first-class state: there is no
-    sign-in form anywhere in this app, so the page explains where a link comes
-    from rather than sending anyone to a screen they cannot use. %>
-<div class="you-page">
+<%# The dashboard: every Verto this person has played, in the shape of the
+    creator's own (surveys/index) — a bar, a hero, a row of tiles, and a grid
+    of cards — because a respondent who goes on to make a Verto should
+    recognise the room.
+
+    Signed out is a first-class state: there is no sign-in form anywhere in
+    this app, so the page explains where a link comes from rather than
+    sending anyone to a screen they cannot use. %>
+<div class="you-page you-page-bar">
   <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
-  <div class="you-shell">
+  <%= render "you/bar", current: :vertos %>
 
-    <%# Nothing on the RIGHT of this bar: the fullscreen layout parks its
-        language switcher there, and an avatar chip landed underneath it. The
-        account is named under the heading instead, which says more than an
-        initial did anyway — on a shared device, WHICH account you are in is
-        the thing worth knowing. The wallet pill below reaches that corner the
-        only way anything can — through the layout's own fixed cluster. %>
-    <div class="you-bar">
-      <%= image_tag "playverto.svg", alt: "Playverto", width: 104, class: "you-mark-sm" %>
-    </div>
-
-    <%= render "you/wallet_pill", rows: @purse_rows, total: @purse_total, current: :vertos %>
-
-    <% if !player_signed_in? %>
+  <% if !player_signed_in? %>
+    <div class="you-shell">
       <div class="you-card">
         <h1 class="you-h1"><%= t("you.signed_out_title") %></h1>
         <p class="you-sub"><%= t("you.signed_out_body") %></p>
       </div>
+    </div>
 
-    <% else %>
-      <div class="you-head">
-        <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.eyebrow") %></div>
-        <h1 class="you-h1"><%= t("you.kept", count: @claims.size) %></h1>
-        <div class="you-whoami"><%= current_player.email_address %></div>
+  <% else %>
+    <section class="you-hero">
+      <div class="you-orbs you-orbs-hero" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>
+      <div class="you-hero-inner">
+        <div class="you-eyebrow"><span class="you-dot"></span><%= t("you.welcome_back") %></div>
+        <h1 class="you-h1 you-h1-hero"><%= t("you.heading_html") %></h1>
+        <p class="you-lead"><%= t("you.lead") %></p>
       </div>
+    </section>
 
-      <% if @claims.empty? %>
-        <div class="you-card">
-          <p class="you-sub"><%= t("you.empty") %></p>
+    <%# Four numbers, and the one that is a sum is a door: the wallet is the
+        page the collected total belongs to, so the tile opens it — but only
+        when there is something in it, a link to "no points yet" is a trick. %>
+    <section class="you-tiles-wrap">
+      <div class="you-tiles">
+        <div class="you-tile is-teal">
+          <div class="you-tile-value"><%= @tiles[:vertos] %></div>
+          <div class="you-tile-label"><%= t("you.tile_vertos") %></div>
         </div>
-      <% else %>
-        <div class="you-list">
-          <% @claims.each do |claim| %>
-            <% survey = claim.survey %>
-            <%# The row is a CARD, not a link, now that it carries its own
-                actions — an <a> cannot hold three more. The title is the link
-                that the whole row used to be, so the destination is unchanged
-                and the tap target is the thing you would aim at anyway. %>
-            <div class="you-verto">
-              <span class="you-verto-rule" aria-hidden="true"></span>
-              <div class="you-verto-body">
-                <div class="you-verto-org"><%= survey.organisation.name %></div>
-                <h2 class="you-verto-title">
-                  <%= link_to survey.theme.presence || survey.title,
-                        you_verto_path(survey), class: "you-verto-link" %>
-                </h2>
-                <%# When they PLAYED it, not when they claimed it — a device key
-                    can claim a Verto months after the run, and the date that
-                    means anything to them is the day they answered. %>
-                <div class="you-verto-when">
-                  <%= t("you.played_on",
-                        date: l((claim.response.completed_at || claim.claimed_at).to_date, format: :long)) %>
-                </div>
-                <% piles = Array(survey.token_types).filter_map do |tt|
-                     n = claim.response.token_totals.to_h[tt["id"]].to_i
-                     next if n.zero?
-                     [ tt["icon"], n, tt["name"] ]
-                   end %>
-                <% if piles.any? %>
-                  <div class="you-piles">
-                    <% piles.each do |icon, n, name| %>
-                      <span class="you-pile"><%= icon %> <b><%= number_with_delimiter(n) %></b> <%= name %></span>
-                    <% end %>
-                  </div>
-                <% end %>
-                <% case @compare[survey.id] %>
-                <% when :closed %>
-                  <div class="you-verto-note">
-                    <%= t("you.compare_closed", org: survey.organisation.name) %>
-                  </div>
-                <% when Hash %>
-                  <div class="you-verto-note">
-                    <%= t("you.compare_pending",
-                          needed: Response::MIN_REGION_SAMPLE_SIZE,
-                          have: @compare[survey.id][:have]) %>
-                  </div>
-                <% end %>
-
-                <%# ONE SLOT, two occupants. "Compare results" is the primary
-                    action on a row and the reason line stands exactly where it
-                    would have been — so a respondent never presses a button
-                    that leads to the sentence explaining why it leads nowhere.
-                    The cost of that choice, stated because it is real: on a row
-                    whose comparison is shut, the primary CTA is the one that is
-                    missing, and the two that remain are both secondary. %>
-                <div class="you-ctas">
-                  <% if @compare[survey.id] == :ready %>
-                    <%= link_to t("you.cta_compare"), you_verto_path(survey, anchor: "compare"),
-                          class: "you-cta you-cta-primary" %>
-                  <% end %>
-                  <%= link_to t("you.cta_impact"), you_verto_path(survey, anchor: "impact"),
-                        class: "you-cta" %>
-                  <%# Native share where the browser has it, clipboard where it
-                      does not, and an ordinary link to the Verto where neither
-                      works — the label it swaps to is passed from here so it is
-                      translated by Rails rather than needing a JS string. %>
-                  <% if survey.playable? %>
-                    <%= link_to t("you.cta_share"), play_survey_url(survey.publish_token),
-                          class: "you-cta",
-                          data: { controller: "share-verto",
-                                  action: "share-verto#share",
-                                  share_verto_title_value: survey.theme.presence || survey.title,
-                                  share_verto_copied_value: t("you.share_copied") } %>
-                  <% end %>
-                </div>
-
-                <%# What this Verto points at next, on the Verto that points —
-                    so the reason needs no restating. Drawn only when there IS
-                    one, which for most Vertos there is not. %>
-                <% if @follow_ups[survey.id].present? %>
-                  <div class="you-followups">
-                    <div class="you-followups-head"><%= t("you.next_title") %></div>
-                    <% @follow_ups[survey.id].each do |next_verto| %>
-                      <%= link_to play_survey_path(next_verto.publish_token), class: "you-followup" do %>
-                        <span class="you-followup-body">
-                          <span class="you-followup-title"><%= next_verto.theme.presence || next_verto.title %></span>
-                          <span class="you-followup-meta"><%= t("you.next_meta") %></span>
-                        </span>
-                        <span class="you-followup-go" aria-hidden="true">→</span>
-                      <% end %>
-                    <% end %>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+        <div class="you-tile is-pink">
+          <div class="you-tile-value"><%= @tiles[:results_open] %></div>
+          <div class="you-tile-label"><%= t("you.tile_results_open") %></div>
         </div>
+        <div class="you-tile is-purple">
+          <div class="you-tile-value"><%= @tiles[:impact] %></div>
+          <div class="you-tile-label"><%= t("you.tile_impact") %></div>
+        </div>
+        <% collected = capture do %>
+          <div class="you-tile-value"><%= number_with_delimiter(@tiles[:collected]) %></div>
+          <div class="you-tile-label"><%= t("you.tile_collected") %></div>
+        <% end %>
+        <% if @tiles[:collected].positive? %>
+          <%= link_to collected, you_wallet_path, class: "you-tile is-yellow" %>
+        <% else %>
+          <div class="you-tile is-yellow"><%= collected %></div>
+        <% end %>
+      </div>
+    </section>
+
+    <div class="you-main">
+      <% if notice.present? %><div class="you-flash is-notice" role="status"><%= notice %></div><% end %>
+      <% if alert.present? %><div class="you-flash is-alert" role="alert"><%= alert %></div><% end %>
+
+      <section class="you-section" id="vertos">
+        <div class="you-section-head">
+          <span class="you-section-dot is-teal" aria-hidden="true"></span>
+          <span class="you-section-label"><%= t("you.section_vertos") %></span>
+          <div class="you-section-line" aria-hidden="true"></div>
+          <span class="you-section-count"><%= @rows.size %></span>
+        </div>
+        <% if @rows.empty? %>
+          <div class="you-card">
+            <p class="you-sub"><%= t("you.empty") %></p>
+          </div>
+        <% else %>
+          <div class="you-grid">
+            <% @rows.each do |row| %>
+              <%= render "you/verto_card", row: row %>
+            <% end %>
+          </div>
+        <% end %>
+      </section>
+
+      <%# Where the Vertos they hold point. A section rather than a strip
+          inside each card, now that the cards are a grid — but the reason
+          still travels with each entry, and a Verto already in the account
+          is never offered back (see YouController#follow_ups_for). %>
+      <% if @next.any? %>
+        <section class="you-section" id="next">
+          <div class="you-section-head">
+            <span class="you-section-dot is-blue" aria-hidden="true"></span>
+            <span class="you-section-label"><%= t("you.section_next") %></span>
+            <div class="you-section-line" aria-hidden="true"></div>
+            <span class="you-section-count"><%= @next.size %></span>
+          </div>
+          <div class="you-grid">
+            <% @next.each do |item| %>
+              <%= render "you/next_card", item: item %>
+            <% end %>
+          </div>
+        </section>
       <% end %>
 
-      <div class="you-foot">
-        <%= button_to t("you.sign_out"), you_sign_out_path, method: :post,
-              class: "you-link", form: { style: "display:inline;margin:0;" } %>
-        <%= button_to t("you.delete"), you_path, method: :delete,
-              class: "you-link you-link-quiet",
-              form: { style: "display:inline;margin:0;",
-                      data: { turbo_confirm: t("you.delete_confirm") } } %>
-      </div>
-    <% end %>
-  </div>
+      <%# What their answers did: every impact an organisation has written,
+          then every promise of one. Most Vertos have neither, and the section
+          is simply absent then rather than drawn empty — the honest reading
+          of "hasn't said" is on each Verto's own page. %>
+      <% if @impacts.any? %>
+        <section class="you-section" id="impact">
+          <div class="you-section-head">
+            <span class="you-section-dot is-purple" aria-hidden="true"></span>
+            <span class="you-section-label"><%= t("you.section_impact") %></span>
+            <div class="you-section-line" aria-hidden="true"></div>
+            <span class="you-section-count"><%= @impacts.size %></span>
+          </div>
+          <div class="you-grid you-grid-wide">
+            <% @impacts.each do |item| %>
+              <%= render "you/impact_card", item: item %>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <%# Always drawn, signed in, even for an empty account: it is the one
+          part of the page that explains what the rest is for. %>
+      <section class="you-steps" id="count">
+        <div class="you-section-head you-section-head-bare">
+          <span class="you-section-dot is-pink" aria-hidden="true"></span>
+          <span class="you-section-label"><%= t("you.section_count") %></span>
+        </div>
+        <h2 class="you-steps-title"><%= t("you.count_title") %></h2>
+        <ol class="you-steps-list">
+          <li class="you-step">
+            <span class="you-step-n" aria-hidden="true">1</span>
+            <div class="you-step-title"><%= t("you.step_share_title") %></div>
+            <p class="you-step-body"><%= t("you.step_share_body", needed: Response::MIN_REGION_SAMPLE_SIZE) %></p>
+          </li>
+          <li class="you-step">
+            <span class="you-step-n" aria-hidden="true">2</span>
+            <div class="you-step-title"><%= t("you.step_compare_title") %></div>
+            <p class="you-step-body"><%= t("you.step_compare_body") %></p>
+          </li>
+          <li class="you-step">
+            <span class="you-step-n" aria-hidden="true">3</span>
+            <div class="you-step-title"><%= t("you.step_impact_title") %></div>
+            <p class="you-step-body"><%= t("you.step_impact_body") %></p>
+          </li>
+        </ol>
+      </section>
+    </div>
+  <% end %>
 </div>

@@ -18,6 +18,13 @@ class PlayerEmailPreference < ApplicationRecord
     find_by(player_id: player.id, organisation_id: organisation.id)
   end
 
+  # The row IS the refusal, so taking it back is deleting it. delete_all so
+  # that resubscribing where no row exists is a no-op rather than a lookup
+  # that has to decide what "already subscribed" means.
+  def self.resubscribe!(player:, organisation:)
+    where(player_id: player.id, organisation_id: organisation.id).delete_all
+  end
+
   def self.unsubscribed?(player_id, organisation_id)
     exists?(player_id: player_id, organisation_id: organisation_id)
   end
