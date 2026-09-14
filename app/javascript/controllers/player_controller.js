@@ -85,7 +85,7 @@ export default class extends Controller {
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "joinBlock", "joinAsk", "joinAlso", "joinAlsoBox", "joinAlsoLabel",
                     "joinEmbedded", "joinEmail", "joinPassword", "joinBtn", "joinGoogleBtn",
-                    "joinError", "joinDone",
+                    "joinError", "joinDone", "joinReveal", "joinForm",
                     "testConfirm"]
   static values  = {
     progressUrl: { type: String, default: "" },
@@ -3314,6 +3314,26 @@ export default class extends Controller {
         t(others.length === 1 ? "player.join_also_one" : "player.join_also_other", { count: others.length })
       this.joinAlsoTarget.classList.remove("hidden")
     }
+  }
+
+  // The card opens collapsed: its pitch and one button. This is that button.
+  //
+  // The form it reveals is 560px of the end screen on a phone, and until it
+  // was folded away the whole screen needed 1127px of an 844px viewport. Now
+  // the form is a cost paid only by somebody who has just said they want the
+  // account. Focus goes to the first thing they can act on — Google when it
+  // is offered, else the address — and deliberately NOT to a text field on
+  // its own when Google is there: focusing an input raises the keyboard,
+  // which on a phone hides half of the form that just appeared.
+  joinExpand(event) {
+    event?.preventDefault()
+    if (!this.hasJoinFormTarget) return
+    this.joinFormTarget.hidden = false
+    if (this.hasJoinRevealTarget) this.joinRevealTarget.hidden = true
+    event?.currentTarget?.setAttribute("aria-expanded", "true")
+    const first = this.hasJoinGoogleBtnTarget ? this.joinGoogleBtnTarget
+                : this.hasJoinEmailTarget     ? this.joinEmailTarget : null
+    first?.focus()
   }
 
   // Clear a stale error the moment they start fixing it — an error that

@@ -646,61 +646,51 @@
                data-default-text="<%= @survey.join_body_for_editor %>"
                data-action="input->gate-cards#queueJoinSave:stop"><%= @survey.join_body %></p>
 
-            <%# The player's own two rows, in the player's own arrangement: the
-                address alone, then the password with the button beside it, then
-                the length hint. The button used to sit on a third row of its
-                own and the hint was missing altogether, so the creator was
-                editing a button in a place the respondent never sees it.
+            <%# COLLAPSED, because that is how a respondent first meets it: the
+                pitch, the button, the sign-in line. The form only appears in
+                the player once the button is tapped, so the replica's first
+                paint is the player's first paint. %>
+            <div class="join-row join-row-cta">
+              <span class="join-btn gate-placeholder gate-editable" contenteditable="true"
+                      role="textbox"
+                      aria-label="<%= t("editor.join_cta_label", default: "Account ask button") %>"
+                      data-gate-cards-target="joinCtaText"
+                      data-default-text="<%= @survey.join_cta_for_editor %>"
+                      data-action="input->gate-cards#queueJoinSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.join_cta %></span>
+            </div>
 
-                aria-hidden moved from this container onto the individual ghosts
-                — the button lives in here now, and it is a focusable
-                contenteditable, which must never sit inside a hidden subtree. %>
-            <div class="join-ask">
-              <%# The respondent's other way in. Inert here like the input rows
-                  — it is not the creator's to press, and its words are
-                  Google's rather than theirs — but shown, because a preview
-                  that omits the shorter of the two roads is not a preview of
-                  what a respondent meets. Absent when the strategy has no
-                  credentials configured, exactly as it is in the player. %>
+            <p class="join-alt" aria-hidden="true">
+              <%= t("player.join_have_account") %>
+              <span class="join-alt-link"><%= t("player.join_sign_in") %></span>
+            </p>
+
+            <%# What the tap reveals — shown under the same "They'll also see"
+                label the thank-you card uses for its own respondent-side
+                controls, dimmed and inert, so the creator knows the form is
+                there without the replica pretending it is open. The rows are
+                the respondent's; none of this is theirs to edit. Absent when
+                the strategy has no credentials, exactly as it is in the player. %>
+            <div class="gate-ty-ghosts join-ghosts" aria-hidden="true">
+              <div class="gate-ty-ghost-label"><%= t("editor.ty_also_sees", default: "They'll also see") %></div>
               <% if SocialAuth.player_enabled? %>
-                <div class="join-google" aria-hidden="true">
+                <div class="join-google">
                   <%= render "shared/google_mark" %>
                   <span><%= t("auth.social_continue", provider: SocialAuth.label_for(:google_player)) %></span>
                 </div>
                 <div class="join-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
               <% end %>
               <div class="join-row">
-                <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_email_placeholder") %></span>
+                <span class="join-input gate-join-ghost"><%= t("player.join_email_placeholder") %></span>
               </div>
               <div class="join-row">
-                <%# The password row carries a Show toggle in the player, so it
-                    carries one here. Inert and not a ghost: .gate-join-ghost
-                    means "a box the RESPONDENT fills", and this is a control
-                    beside one. %>
                 <div class="password-field join-password-field">
-                  <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_password_placeholder") %></span>
-                  <span class="password-field__toggle" aria-hidden="true"><%= t("auth.show") %></span>
+                  <span class="join-input gate-join-ghost"><%= t("player.join_password_placeholder") %></span>
+                  <span class="password-field__toggle"><%= t("auth.show") %></span>
                 </div>
               </div>
-              <p class="join-note" aria-hidden="true"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
-              <%# The button has its own row in the player, so it has its own
-                  row here — this card is the creator's only view of the shape
-                  a respondent meets, and the word in it is theirs to write. %>
-              <div class="join-row join-row-cta">
-                <span class="join-btn gate-placeholder gate-editable" contenteditable="true"
-                      role="textbox"
-                      aria-label="<%= t("editor.join_cta_label", default: "Account ask button") %>"
-                      data-gate-cards-target="joinCtaText"
-                      data-default-text="<%= @survey.join_cta_for_editor %>"
-                      data-action="input->gate-cards#queueJoinSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.join_cta %></span>
-              </div>
+              <p class="join-note"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
+              <p class="join-fine"><%= t("player.join_fine") %></p>
             </div>
-
-            <p class="join-fine" aria-hidden="true"><%= t("player.join_fine") %></p>
-            <p class="join-alt" aria-hidden="true">
-              <%= t("player.join_have_account") %>
-              <span class="join-alt-link"><%= t("player.join_sign_in") %></span>
-            </p>
           </div>
         </div>
 

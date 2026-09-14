@@ -2306,7 +2306,9 @@
 .gate-ty-ghost-label {
   font-family: "Alata", sans-serif; font-size: var(--text-2xs);
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(255,255,255,0.4);
+  /* 0.4 was tuned for the dark thank-you card; that card has no surface now
+     and this label sits on the Verto's photo. Brighter, with a shadow. */
+  color: rgba(255,255,255,0.7); text-shadow: 0 1px 2px rgba(0,0,0,0.45);
   align-self: start; margin-bottom: 2px;
 }
 /* Stands in for the join block — same tinted, full-width shape, one line of
@@ -2337,7 +2339,13 @@
 .gate-ty-forward-input {
   width: 100%; box-sizing: border-box;
   padding: 7px 10px; border-radius: 8px;
-  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+  /* The 7% white over the SAME opaque ground the rest of the end screen stands
+     on. These are the creator's editable slots for the "Visit our site" pill,
+     and that pill is solid #272D4A in the player; when the outer thank-you
+     card went (2026-09-14) a bare 7% tint here sat straight on the photo —
+     caught by the see-through guard in EndScreenLayoutTest. */
+  background-color: #272D4A;
+  background-image: linear-gradient(rgba(255,255,255,0.07), rgba(255,255,255,0.07)); border: 1px solid rgba(255,255,255,0.15);
   color: #fff; font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
   outline: none; transition: box-shadow 0.15s, border-color 0.15s;
 }
@@ -2502,6 +2510,10 @@
    Show toggle, which is a span in the replica and a button in the player. */
 .gate-join-card .join-google,
 .gate-join-card .password-field__toggle { pointer-events: none; }
+/* The form the tap reveals, under the "They'll also see" rule: dimmed as one
+   block rather than per element, so it reads as a preview of a state the
+   card is not in — and never as something the creator could fill in. */
+.gate-join-card .join-ghosts { opacity: 0.55; pointer-events: none; user-select: none; }
 
 /* Structural edits are locked to the primary language, and the device frames
    preview only the question cards — hide the gate chrome in both, matching
@@ -6697,11 +6709,24 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    background image. Fixed dark surface keeps the light text/wordmark legible
    regardless of the Verto's palette. */
 .preview-thankyou-card {
-  background: #1C2034;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 24px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  padding: 44px 44px 40px;
+  /* NO SURFACE. This was an opaque #1C2034 card — border, 24px radius, a
+     50px shadow, 44px of padding — and on a phone that chrome cost 64px of
+     height and 44px of width around content that was already 283px taller
+     than the screen. The owner's call (2026-09-14, from mockups measured in
+     Chromium): one column, no outer card, the surfaces that remain solid.
+     So the end screen is the Verto's backdrop with its scrim, and the things
+     on it that are cards — the account ask, the leaderboard, a token result,
+     the pills — carry their own opaque paint; see each. The title and the
+     subtitle get a text-shadow for the same reason.
+
+     Still a flex column at the deck's width, and still the ONE element the
+     editor's replica, the Preview overlay and the player share, because that
+     shape is what the three surfaces agree on (see shared/_end_screen_shell). */
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
   /* The deck's own width — .split-card is 850px, so the last screen now agrees
      with every screen before it. */
   max-width: 850px;
@@ -6719,10 +6744,18 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .preview-thankyou-title {
   font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif)); font-size: 44px;
   color: #fff; letter-spacing: -0.5px;
+  /* On the backdrop now rather than on a card: the scrim carries most of the
+     contrast, this carries the rest over a bright patch of photo. */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
 }
 .preview-thankyou-sub {
   font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 16px;
-  color: rgba(255,255,255,0.45); max-width: 560px; line-height: 1.6;
+  /* Was 45% white, tuned for the dark card this sat on. On the backdrop it
+     vanished against a light patch of photo (measured on the library's
+     "people" image: unreadable). Brighter, with the same shadow the title
+     carries — still subordinate to the title, no longer missing. */
+  color: rgba(255,255,255,0.85); max-width: 560px; line-height: 1.6;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 /* The card is as wide as the deck; its CONTENTS are not, because a 750px line
    of prose is not readable and a 750px pill is not a button. The card gives
@@ -6849,7 +6882,11 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   padding: 11px 22px; border-radius: 100px;
   font-family: "Alata", sans-serif; font-size: 0.9375rem;
   letter-spacing: 0.05em; cursor: pointer; text-decoration: none;
-  background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.25);
+  /* Solid, the colour the account ask and the leaderboard are painted, so the
+     stack reads as one. These were transparent pills on the thank-you card;
+     with that card gone they would be see-through on the photo — the same
+     fault the account card had in the editor feed a week ago. */
+  background: #272D4A; color: #fff; border: 1px solid rgba(255,255,255,0.25);
 }
 .play-end-btn-primary {
   background: var(--brand-cta, #01EACB); color: var(--brand-cta-text, #1C2034);
@@ -6857,7 +6894,10 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 }
 .play-powered {
   display: flex; align-items: center; justify-content: center;
-  gap: 8px; margin-top: 22px; opacity: 0.45;
+  gap: 8px; margin-top: 22px;
+  /* Deliberately quiet, but quiet on a card and quiet on a photo are
+     different numbers: 0.45 disappeared on a light backdrop. */
+  opacity: 0.75; text-shadow: 0 1px 2px rgba(0,0,0,0.45);
 }
 /* Our wordmark, not the respondent's content — the one thing here that stays
    deliberately small. A class so it is at least reachable. */
@@ -9302,8 +9342,8 @@ body.generating-overlay-active .bottom-bar { display: none; }
      silently collapses the logo back to whatever --play-logo-h allows. */
   .preview-overlay .split-right-logo img { max-height: var(--play-logo-h); }
 
-  .preview-thankyou       { padding: 28px 20px; }
-  .preview-thankyou-card  { padding: 32px 22px; }
+  .preview-thankyou       { padding: 24px 18px; }
+  .preview-thankyou-card  { padding: 0; }
   /* The title is display type and keeps its scale — its floor is generous.
      The sub is prose the respondent is meant to read, so it goes back to
      desktop's size rather than being shaved to 14. */
@@ -11042,7 +11082,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* Final totals card on the thank-you screen — one row per token type. */
 .token-result-card {
   margin: 18px auto 4px; padding: 16px 22px; border-radius: 18px;
-  background: rgba(245,158,11,0.10); border: 1px solid rgba(245,158,11,0.4);
+  /* The amber tint over the SAME opaque ground the other cards on this
+     screen stand on. It used to be the tint alone, over the thank-you card;
+     with that card gone, 10% of anything over a photo composites to nothing. */
+  background-color: #272D4A;
+  background-image: linear-gradient(rgba(245,158,11,0.10), rgba(245,158,11,0.10));
+  border: 1px solid rgba(245,158,11,0.4);
   display: flex; flex-direction: column; align-items: stretch; gap: 8px;
 }
 .token-result-label {
@@ -11197,8 +11242,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
      a creator picks. */
   background: #272D4A;
   border: 1px solid rgba(1,234,203,0.45);
+  /* The shadow the outer thank-you card used to cast. This is THE card on
+     the end screen now, and a card on a photo without one floats oddly. */
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
   display: flex; flex-direction: column; gap: 10px; text-align: start;
 }
+/* The form behind the pitch. Hidden until the reveal button is tapped;
+   [hidden] alone loses to the display below, hence the explicit rule. */
+.join-form { display: flex; flex-direction: column; gap: 10px; }
+.join-form[hidden], .join-row-cta[hidden] { display: none; }
 .join-eyebrow {
   font-family: "Alata", sans-serif; font-size: 0.75rem; letter-spacing: 0.14em;
   text-transform: uppercase; color: #01EACB;

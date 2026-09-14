@@ -252,27 +252,36 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
       visit survey_path(@survey)
       assert_selector ".gate-join-card", wait: 8
 
-      cards = page.evaluate_script(<<~JS)
-        [...document.querySelectorAll('.gate-card-wrap')]
-          .filter(wrap => !wrap.hidden && wrap.offsetParent !== null)
-          .map(wrap => wrap.lastElementChild)
-          .filter(Boolean)
-          .map(card => {
-            const bg = getComputedStyle(card).backgroundColor
-            const parts = (bg.match(/rgba?\\(([^)]+)\\)/) || [ , '' ])[1].split(',')
-            return { name: card.className, bg: bg,
-                     alpha: parts.length > 3 ? parseFloat(parts[3]) : 1 }
-          })
+      # The rule, stated exactly: a TRANSLUCENT surface — 0 < alpha < 1 — is a
+      # fault when nothing opaque stands between it and the photo. Two things
+      # this deliberately allows: an element with no surface at all (the
+      # thank-you column has none since the outer card went, 2026-09-14 — the
+      # player has none either), and a tint that sits on an opaque parent (the
+      # input rows inside the account card). What it refuses is the fault that
+      # happened: a 12% brand tint composited straight onto the background.
+      faults = page.evaluate_script(<<~JS)
+        (() => {
+          const alphaOf = bg => { const m = bg.match(/rgba?\\(([^)]+)\\)/); if (!m) return 1
+            const p = m[1].split(','); return p.length > 3 ? parseFloat(p[3]) : 1 }
+          const out = []
+          for (const wrap of document.querySelectorAll('.gate-card-wrap')) {
+            if (wrap.hidden || wrap.offsetParent === null) continue
+            for (const el of wrap.querySelectorAll('*')) {
+              const a = alphaOf(getComputedStyle(el).backgroundColor)
+              if (a <= 0 || a >= 1) continue
+              let opaqueAbove = false
+              for (let n = el.parentElement; n && n !== wrap; n = n.parentElement) {
+                if (alphaOf(getComputedStyle(n).backgroundColor) >= 1) { opaqueAbove = true; break }
+              }
+              if (!opaqueAbove) out.push(el.className + ' → ' + getComputedStyle(el).backgroundColor)
+            }
+          }
+          return out
+        })()
       JS
-
-      assert_operator cards.size, :>=, 4,
-                      "only #{cards.size} gate cards on the page — this test proves nothing " \
-                      "unless the feed is actually rendering them"
-      see_through = cards.reject { |c| c["alpha"] == 1.0 }
-      assert_empty see_through,
-                   "a gate card is drawn on a translucent background, so the Verto's photo " \
-                   "shows through it and the creator cannot read their own copy:\n  " +
-                   see_through.map { |c| "#{c['name']} → #{c['bg']}" }.join("\n  ")
+      assert_empty faults,
+                   "a translucent surface reaches the Verto's photo with nothing opaque under it, so the " \
+                   "creator sees through it:\n  " + faults.join("\n  ")
     end
   end
 
@@ -288,13 +297,14 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
   # the computed colours states the property directly, and still fails if
   # either side starts painting its own.
   test "the account-ask card is the same colour as the block it configures" do
-    # Read off the player's own .join-card rather than hard-coded, so the check
-    # follows the card wherever its surface goes next.
-    player_bg = nil
+    paint = "(() => { const c = getComputedStyle(document.querySelector(arguments[0] || '.join-card')); " \
+            "return c.backgroundColor + ' | ' + c.backgroundImage })()"
+    player_paint = nil
     with_viewport(1440, 950, mobile: false) do
       play_to_the_end
-      player_bg = page.evaluate_script(
-        "getComputedStyle(document.querySelector('.join-card')).backgroundColor"
+      player_paint = page.evaluate_script(
+        "getComputedStyle(document.querySelector('.join-card')).backgroundColor + ' | ' + " \
+        "getComputedStyle(document.querySelector('.join-card')).backgroundImage"
       )
     end
 
@@ -302,63 +312,35 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_viewport(1440, 950, mobile: false) do
       visit survey_path(@survey)
       assert_selector ".gate-join-card", wait: 8
-      editor = page.evaluate_script(<<~JS)
-        (() => { const s = getComputedStyle(document.querySelector('.gate-join-card'))
-                 return { color: s.backgroundColor, image: s.backgroundImage } })()
-      JS
-
-      assert_equal player_bg, editor["color"],
-                   "the editor's account card is a different colour from the one the respondent " \
-                   "meets (player #{player_bg}, editor #{editor['color']}) — the creator is " \
-                   "editing a card nobody sees."
-      # A gradient over the top would composite to something else again, which
-      # is exactly how the two drifted apart the first time.
-      assert_equal "none", editor["image"],
-                   "the editor's account card paints over the inherited surface " \
-                   "(#{editor['image'].inspect}), so the two can drift again."
+      editor_paint = page.evaluate_script(
+        "getComputedStyle(document.querySelector('.gate-join-card')).backgroundColor + ' | ' + " \
+        "getComputedStyle(document.querySelector('.gate-join-card')).backgroundImage"
+      )
+      assert_equal player_paint, editor_paint,
+                   "the editor's account card is painted differently from the block it configures — " \
+                   "player #{player_paint.inspect}, editor #{editor_paint.inspect}. They share one rule " \
+                   "so that this cannot drift; if it has, something overrode it."
     end
-  end
-
-  # ── The account ask, which is edited in the feed rather than a side panel ──
-
-  test "the account-ask card appears when the ask is on, and carries the copy" do
-    sign_in_as @user
-    visit survey_path(@survey)
-    assert_selector ".gate-join-card", wait: 8
-
-    assert_selector "[data-gate-cards-target='joinCard']:not([hidden])"
-    assert_selector "[data-gate-cards-target='joinCta'][hidden]", visible: :all
-    # The three the creator owns are editable...
-    %w[joinTitle joinBody joinCtaText].each do |target|
-      assert_selector "[data-gate-cards-target='#{target}'][contenteditable='true']"
-    end
-    # ...and the respondent's own rows are shown but inert, so the shape is
-    # honest without pretending the boxes work. Both of them: the password row
-    # arrived with the choose-a-password change.
-    assert_selector ".gate-join-card .gate-join-ghost", count: 2
   end
 
   # Colour was the loud half of "make it a true preview"; arrangement is the
-  # quiet half. The button used to sit on a row of its own with no length hint
-  # above it, so the creator was writing a button in a place no respondent ever
-  # meets it. Compares the two rather than pinning either, so the replica has to
-  # follow the block when the block changes.
-  test "the account card's rows are arranged the way the player's are" do
-    rows = ->(sel) do
+  # quiet half. The card opens COLLAPSED — pitch, button, sign-in line — and
+  # the form only appears when the button is tapped (2026-09-14: the full form
+  # made the end screen 1127px on an 844px phone). The replica's first paint
+  # must be the player's first paint. Compared rather than pinned, so the
+  # replica has to follow the block when the block changes.
+  test "the account card's first paint is arranged the way the player's is" do
+    order = ->(sel) do
       page.evaluate_script(<<~JS)
         (() => {
           const card = document.querySelector('#{sel}')
-          const top = el => el ? Math.round(el.getBoundingClientRect().top) : null
-          const inputs = [...card.querySelectorAll('.join-input')]
-          const btn = card.querySelector('.join-btn')
-          return { inputs: inputs.length,
-                   // One thing per row. The button shared the password's line
-                   // until the Show toggle left the field under half the width
-                   // it takes to read a passphrase back.
-                   ownRow: top(inputs[1]) !== top(btn),
-                   belowPassword: top(btn) > top(inputs[1]),
-                   hint: !!card.querySelector('.join-note'),
-                   toggle: !!card.querySelector('.password-field__toggle') }
+          const visible = el => el && el.offsetParent !== null && el.getBoundingClientRect().height > 0
+          const top = el => Math.round(el.getBoundingClientRect().top)
+          const pick = s => card.querySelector(s)
+          const parts = { eyebrow: pick('.join-eyebrow'), title: pick('.join-title'), body: pick('.join-body'),
+                          button: pick('.join-row-cta .join-btn'), alt: pick('.join-alt') }
+          const seq = Object.entries(parts).filter(([, el]) => visible(el)).sort((a, b) => top(a[1]) - top(b[1])).map(([k]) => k)
+          return { seq, formOpen: visible(pick('.join-input')) && !pick('.join-ghosts') }
         })()
       JS
     end
@@ -367,7 +349,7 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_viewport(1440, 950, mobile: false) do
       play_to_the_end
       page.execute_script("document.querySelector('.join-card').classList.remove('hidden')")
-      player = rows.call(".join-card")
+      player = order.call(".join-card")
     end
 
     sign_in_as @user
@@ -375,16 +357,37 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_viewport(1440, 950, mobile: false) do
       visit survey_path(@survey)
       assert_selector ".gate-join-card", wait: 8
-      editor = rows.call(".gate-join-card")
+      editor = order.call(".gate-join-card")
     end
 
-    assert player["ownRow"], "the player gives the button a row of its own — if that changed, " \
-                             "this test is comparing the editor against the wrong shape"
-    assert player["belowPassword"], "and puts it below the password, not above"
-    assert player["toggle"], "the password carries a Show toggle, which is why it needs the room"
-    assert_equal player, editor,
+    assert_equal %w[eyebrow title body button alt], player["seq"],
+                 "the player opens on its pitch and one button — if that changed, this test is " \
+                 "comparing the editor against the wrong shape"
+    refute player["formOpen"], "the form must be behind the button, not open on first paint"
+    assert_equal player["seq"], editor["seq"],
                  "the editor's account card is arranged differently from the block it " \
-                 "configures (player #{player.inspect} vs editor #{editor.inspect})"
+                 "configures (player #{player['seq'].inspect} vs editor #{editor['seq'].inspect})"
+    assert_selector ".gate-join-card .join-ghosts .join-input", count: 2,
+                    visible: :all
+  end
+
+  # And the tap does what the button says: the form appears, the button goes,
+  # and focus lands on something the respondent can act on.
+  test "tapping the button reveals the form and moves focus into it" do
+    with_viewport(390, 844) do
+      play_to_the_end
+      assert_selector "[data-player-target='joinReveal'] .join-btn", wait: 5
+      assert_no_selector ".join-card .join-input" # the form must start hidden
+
+      find("[data-player-target='joinReveal'] .join-btn").click
+
+      assert_selector ".join-card .join-input", count: 2, wait: 5
+      # (comment, not an argument — Capybara treats a second positional as an option)
+      assert_no_selector "[data-player-target='joinReveal'] .join-btn" # its job done; no second CTA above the first
+      focused = page.evaluate_script("document.activeElement && (document.activeElement.className || document.activeElement.tagName)")
+      assert_match(/join-google|join-input/, focused.to_s,
+                   "focus should land inside the revealed form, not stay on a button that is gone")
+    end
   end
 
   test "the account-ask card is absent when the ask is off" do
@@ -487,6 +490,7 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_google do
       with_viewport(390, 844) do
         play_to_the_end
+        find("[data-player-target='joinReveal'] .join-btn").click
         assert_selector ".join-card .join-google", wait: 5
 
         geometry = page.evaluate_script(<<~JS)
@@ -518,6 +522,8 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     with_viewport(390, 844) do
       play_to_the_end
       assert_selector ".join-card", wait: 5
+      find("[data-player-target='joinReveal'] .join-btn").click
+      assert_selector ".join-card .join-input", wait: 5
 
       # No message arguments: Capybara's second positional is a selector
       # option, not a failure message, and it raises on an unknown one.

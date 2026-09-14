@@ -38,6 +38,15 @@ class PasswordVisibilityTest < ApplicationSystemTestCase
     assert_selector ".preview-card.active .freeform-wrap", wait: 5
     find("[data-player-target='finishBtn']").click
     assert_selector ".preview-thankyou.active", wait: 8
+    open_the_ask
+  end
+
+  # The card opens collapsed — its pitch and one button — and the password
+  # field is inside the form that button reveals.
+  def open_the_ask
+    assert_selector "[data-player-target='joinReveal'] .join-btn", wait: 5
+    find("[data-player-target='joinReveal'] .join-btn").click
+    assert_selector ".join-card .password-field", wait: 5
   end
 
   # What the field is actually doing, read off the DOM rather than inferred
@@ -223,7 +232,7 @@ class PasswordVisibilityTest < ApplicationSystemTestCase
     click_button "Next"
     assert_selector ".preview-card.active .freeform-wrap", wait: 8
     find("[data-player-target='finishBtn']").click
-    assert_selector ".join-card .password-field", wait: 8
+    open_the_ask
   end
 
   # The locales whose Show/Hide words are longest, read from the files rather

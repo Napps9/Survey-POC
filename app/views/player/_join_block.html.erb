@@ -22,54 +22,73 @@
   <p class="join-body"><%= @survey.join_body_text %></p>
 
   <div class="join-ask" data-player-target="joinAsk">
-    <%# Other Vertos this browser still holds a durable key for. Hidden until
-        the controller finds any, and checked by default: the person is being
-        offered their own history, not opted into someone else's. %>
-    <label class="join-also hidden" data-player-target="joinAlso">
-      <input type="checkbox" checked data-player-target="joinAlsoBox">
-      <span data-player-target="joinAlsoLabel"></span>
-    </label>
+    <%# COLLAPSED FIRST. The card opens on its pitch and one button; the form —
+        Google, the two rows, the hint, the fine print — appears when the button
+        is tapped. Measured on a 390×844 phone the full form made the end screen
+        1127px, 283px of which a respondent had to scroll for, and 560px of that
+        was this card; collapsed it fits with room. The cost is one tap, paid
+        only by somebody who has just said they want the account.
 
-    <%# Embedded in a third-party page, localStorage is partitioned or blocked
-        outright, so this browser can see nothing it played elsewhere. Said
-        plainly rather than silently offering less. %>
-    <p class="join-note hidden" data-player-target="joinEmbedded"><%= t("player.join_embedded") %></p>
-
-    <%# Continue with Google, above the address rows because it is the shorter
-        road: no password to invent at the end of a survey, and an address
-        Google has already verified, which is the one thing the emailed link
-        was ever for.
-
-        A button, not a form. OmniAuth's request phase is a CSRF-protected POST
-        and this page is service-worker cached, so its token can be any age —
-        the same fact that put #join under null_session. #joinGoogle posts the
-        run's claims to a cookie-free endpoint and follows the /you/ URL it
-        answers with, where the token is live. See PlayerJoinsController.
-
-        Rendered only when the strategy is actually configured, so an
-        unconfigured deploy shows the address form alone rather than a button
-        that 404s. %>
-    <% if SocialAuth.player_enabled? %>
-      <button type="button" class="join-google" data-player-target="joinGoogleBtn"
-              data-action="click->player#joinGoogle">
-        <%= render "shared/google_mark" %>
-        <span><%= t("auth.social_continue", provider: SocialAuth.label_for(:google_player)) %></span>
+        The reveal button carries the creator's CTA text, and so does the submit
+        inside the form: it is the same intent ("Create my account"), met twice
+        — once to say yes, once to send. Only one is ever visible. %>
+    <div class="join-row join-row-cta" data-player-target="joinReveal">
+      <button type="button" class="join-btn" aria-expanded="false"
+              aria-controls="join-form-<%= @survey.id %>"
+              data-action="click->player#joinExpand">
+        <%= @survey.join_cta_text %>
       </button>
-      <div class="join-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
-    <% end %>
+    </div>
 
-    <%# Three rows, one thing each. The address and the password were once side
-        by side — two 11rem fields fighting over a 430px column, and the
-        password is the field people mistype. The button shared the password's
-        row after that, which was the same mistake one step smaller. %>
-    <div class="join-row">
-      <input type="email" class="join-input"
-             inputmode="email" autocomplete="email" enterkeyhint="next"
-             spellcheck="false" autocapitalize="off"
-             placeholder="<%= t("player.join_email_placeholder") %>"
-             aria-label="<%= t("player.join_email_placeholder") %>"
-             data-player-target="joinEmail"
-             data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
+    <div class="join-form" id="join-form-<%= @survey.id %>" hidden data-player-target="joinForm">
+      <%# Other Vertos this browser still holds a durable key for. Hidden until
+          the controller finds any, and checked by default: the person is being
+          offered their own history, not opted into someone else's. %>
+      <label class="join-also hidden" data-player-target="joinAlso">
+        <input type="checkbox" checked data-player-target="joinAlsoBox">
+        <span data-player-target="joinAlsoLabel"></span>
+      </label>
+
+      <%# Embedded in a third-party page, localStorage is partitioned or blocked
+          outright, so this browser can see nothing it played elsewhere. Said
+          plainly rather than silently offering less. %>
+      <p class="join-note hidden" data-player-target="joinEmbedded"><%= t("player.join_embedded") %></p>
+
+      <%# Continue with Google, above the address rows because it is the shorter
+          road: no password to invent at the end of a survey, and an address
+          Google has already verified, which is the one thing the emailed link
+          was ever for.
+
+          A button, not a form. OmniAuth's request phase is a CSRF-protected POST
+          and this page is service-worker cached, so its token can be any age —
+          the same fact that put #join under null_session. #joinGoogle posts the
+          run's claims to a cookie-free endpoint and follows the /you/ URL it
+          answers with, where the token is live. See PlayerJoinsController.
+
+          Rendered only when the strategy is actually configured, so an
+          unconfigured deploy shows the address form alone rather than a button
+          that 404s. %>
+      <% if SocialAuth.player_enabled? %>
+        <button type="button" class="join-google" data-player-target="joinGoogleBtn"
+                data-action="click->player#joinGoogle">
+          <%= render "shared/google_mark" %>
+          <span><%= t("auth.social_continue", provider: SocialAuth.label_for(:google_player)) %></span>
+        </button>
+        <div class="join-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
+      <% end %>
+
+      <%# Three rows, one thing each. The address and the password were once side
+          by side — two 11rem fields fighting over a 430px column, and the
+          password is the field people mistype. The button shared the password's
+          row after that, which was the same mistake one step smaller. %>
+      <div class="join-row">
+        <input type="email" class="join-input"
+               inputmode="email" autocomplete="email" enterkeyhint="next"
+               spellcheck="false" autocapitalize="off"
+               placeholder="<%= t("player.join_email_placeholder") %>"
+               aria-label="<%= t("player.join_email_placeholder") %>"
+               data-player-target="joinEmail"
+               data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
     </div>
 
     <%# autocomplete="new-password" so a password manager offers to GENERATE
@@ -113,6 +132,7 @@
 
     <p class="join-error hidden" role="alert" data-player-target="joinError"></p>
     <p class="join-fine"><%= t("player.join_fine") %></p>
+    </div>
 
     <%# The door for somebody who already has an account.
         /you/sign-in has existed since passwords did, and until now nothing in
