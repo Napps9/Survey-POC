@@ -2144,7 +2144,7 @@ tn:
     prefs_saved: "Dikgetho di bolokilwe."
     delete_body: "Se se phimola akhaonto ya gago le lenaane la di-Verto tse o di bolokileng. Dikarabo tsa gago di sala le mekgatlho e e neng e botsa — di neetswe kwa ntle ga maina mme ga se tsa rona gore re di tlose."
     beta_tag: "Beta"
-    beta_note: "O amogetswe mo akhaonteng ya gago ya motshameki. Nna o itse dikgang tsa dilo tse o di tsayang tsia, bapisa dipholo tsa gago, latela phetogo e dikarabo tsa gago di e tlisitseng — mme o e tshegetse ka ditokene tsa gago."
+    beta_note: "O amogetswe mo akhaonteng ya gago ya motshameki. Ke fano fa dikarabo tsa gago di boelang kwa go wena: dipholo tsa gago fa thoko ga tsa batho botlhe, le merero e o thusitseng go e tshikinya. Re sa ntse re simolola."
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O amogela seno ka gonne o kopile go utlwa go mekgatlho e o arabileng di-Verto tsa yona."

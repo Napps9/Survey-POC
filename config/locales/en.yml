@@ -1604,11 +1604,12 @@ en:
     nav_wallet: "Wallet"
     menu_label: "Account menu"
     menu_account: "Account settings"
-    # The strip above the bar, on every account page: what the account is, and
-    # the four things it is for. The tag carries the beta so the sentence does
-    # not have to say it twice.
+    # The strip above the bar, on every account page: what this account is,
+    # what comes back to a respondent through it, and that it is still being
+    # built. The tag carries the beta so the sentence does not have to say it
+    # twice.
     beta_tag: "Beta"
-    beta_note: "Welcome to your Player Account. Stay tuned for updates on the things you care about, compare your results, follow up on the impact your answers created — and put your tokens behind it."
+    beta_note: "Welcome to your Player Account. This is where your answers come back to you: your results beside everyone else's, and the causes you helped move. We're just getting started."
     # ── The account page: name, sign-in, preferences, and the delete that was
     # a link at the foot of the list.
     account_eyebrow: "Account"

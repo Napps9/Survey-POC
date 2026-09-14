@@ -2108,7 +2108,7 @@ vi:
     prefs_saved: "Đã lưu tùy chọn."
     delete_body: "Thao tác này xóa tài khoản của bạn và danh sách Vertos bạn đã giữ. Câu trả lời của bạn vẫn ở lại với các tổ chức đã hỏi — chúng được đưa ra ẩn danh và không thuộc quyền chúng tôi để xóa."
     beta_tag: "Beta"
-    beta_note: "Chào mừng bạn đến với tài khoản người chơi của bạn. Theo dõi tin tức về những điều bạn quan tâm, so sánh kết quả của bạn, dõi theo tác động mà câu trả lời của bạn tạo ra — và dùng điểm của bạn để tiếp sức cho nó."
+    beta_note: "Chào mừng bạn đến với tài khoản người chơi của bạn. Đây là nơi câu trả lời của bạn quay lại với bạn: kết quả của bạn bên cạnh kết quả của mọi người, và những vấn đề bạn đã góp phần lay chuyển. Chúng tôi chỉ mới bắt đầu."
   player_notification_mailer:
     via: "%{org} · qua Playverto"
     why: "Bạn nhận được thư này vì bạn đã xin nghe tin từ các tổ chức có Vertos mà bạn đã trả lời."

@@ -2109,7 +2109,7 @@ fr:
     prefs_saved: "Préférences enregistrées."
     delete_body: "Ceci supprime votre compte et la liste des Vertos que vous avez conservés. Vos réponses restent auprès des organisations qui les ont demandées : elles ont été données anonymement et il ne nous appartient pas de les retirer."
     beta_tag: "Bêta"
-    beta_note: "Bienvenue dans votre compte joueur. Suivez l'actualité des sujets qui vous tiennent à cœur, comparez vos résultats, suivez l'impact que vos réponses ont produit — et soutenez-le avec vos jetons."
+    beta_note: "Bienvenue dans votre compte joueur. C'est ici que vos réponses vous reviennent : vos résultats à côté de ceux de tous les autres, et les causes que vous avez fait avancer. Ce n'est que le début."
   player_notification_mailer:
     via: "%{org} · via Playverto"
     why: "Vous recevez ceci parce que vous avez demandé des nouvelles des organisations dont vous avez répondu aux Vertos."

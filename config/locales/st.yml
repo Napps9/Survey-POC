@@ -2144,7 +2144,7 @@ st:
     prefs_saved: "Dikgetho di bolokilwe."
     delete_body: "Sena se hlakola akhaonto ya hao le lenane la di-Verto tseo o di bolokileng. Dikarabo tsa hao di dula le mekgatlo e ileng ya botsa — di fanwe ntle le mabitso mme ha se tsa rona hore re di tlose."
     beta_tag: "Beta"
-    beta_note: "O amohetswe akhaontong ya hao ya sebapadi. Dula o tseba ditaba tsa dintho tseo o di tsotellang, bapisa diphetho tsa hao, latela phetoho eo dikarabo tsa hao di e tlisitseng — mme o e tshehetse ka ditokene tsa hao."
+    beta_note: "O amohetswe akhaontong ya hao ya sebapadi. Ke mona moo dikarabo tsa hao di kgutlelang ho wena: diphetho tsa hao pela tsa batho bohle, le merero eo o thusitseng ho e sisinya. Re sa qala feela."
   player_notification_mailer:
     via: "%{org} · ka Playverto"
     why: "O fumana sena hobane o kopile ho utlwa ho mekgatlo eo o arabileng di-Verto tsa yona."
