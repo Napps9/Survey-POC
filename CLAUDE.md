@@ -39,6 +39,21 @@ Other sessions push to Main through the day, so even a ten-minute gate often
 finishes to find origin has moved. Rebase and run it again. Losing the race is
 the expected cost, not a reason to trim the gate.
 
+**Run the gate in the foreground, and never end a turn while it or CI is still
+running.** A session that reports "suite running" and stops is not waiting —
+nothing wakes it when the run finishes, so the result is never read and the
+push never happens. Backgrounding the suite was the right adaptation when it
+took 25 minutes; at ~6½ it fits inside a single turn, and the adaptation now
+costs far more than it saves. Measured across 12–14 September, this was the
+single largest source of lost time in the repo — larger than every CI failure,
+merge conflict and push collision combined: one change its own author had
+scoped at twenty minutes sat **12h45m** because the session parked and never
+processed two messages about it; another pushed with `rails test:system` still
+running, recorded in its own commit message; a third went idle reporting "CI
+running on main", leaving nobody watching the one job that can still fail.
+Drive a change through to pushed-and-logged in one turn, or say plainly what is
+blocking and stop on purpose. Owner's standing instruction, 2026-09-14.
+
 **A red Main is fixed with a new commit, never with a re-run.** When a push
 turns CI red, land a fix-forward or a `git revert` — a NEW commit, gated like
 any other — rather than pressing "Re-run failed jobs" to get green. Every CI
