@@ -1264,6 +1264,13 @@ it:
     verto_theme: "Argomento"
     redo: "Ripeti"
     ty_body_placeholder: "Aggiungi un breve messaggio (facoltativo)"
+    share_image_label: "Immagine di anteprima"
+    share_image_change: "Cambia l'immagine di anteprima"
+    share_image_hint: "L'immagine con cui si apre il link. Scegli una qualsiasi immagine che questo Verto usa già."
+    share_image_auto: "Automatica"
+    share_image_card: "Scheda %{number}"
+    share_image_backdrop: "Sfondo"
+    share_image_empty: "Questo Verto non ha ancora immagini proprie. Aggiungine una a una scheda e comparirà qui."
   dashboard_card:
     publish_warning: "Pubblicare “%{title}”? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."
     preview: "Anteprima"

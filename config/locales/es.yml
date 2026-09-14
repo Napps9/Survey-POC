@@ -1264,6 +1264,13 @@ es:
     verto_theme: "Tema"
     redo: "Rehacer"
     ty_body_placeholder: "Añade un mensaje breve (opcional)"
+    share_image_label: "Imagen de vista previa"
+    share_image_change: "Cambiar la imagen de vista previa"
+    share_image_hint: "La imagen con la que se despliega el enlace. Elige cualquier imagen que ya use este Verto."
+    share_image_auto: "Automática"
+    share_image_card: "Tarjeta %{number}"
+    share_image_backdrop: "Fondo"
+    share_image_empty: "Este Verto aún no tiene imágenes propias. Añade una a una tarjeta y aparecerá aquí."
   dashboard_card:
     publish_warning: "¿Publicar “%{title}”? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."
     preview: "Vista previa"

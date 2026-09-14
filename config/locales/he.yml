@@ -1264,6 +1264,13 @@ he:
     verto_theme: "נושא"
     redo: "בצע שוב"
     ty_body_placeholder: "הוסיפו הודעה קצרה (אופציונלי)"
+    share_image_label: "תמונת התצוגה המקדימה"
+    share_image_change: "החלפת תמונת התצוגה המקדימה"
+    share_image_hint: "התמונה שאיתה הקישור נפרש. בחרו כל תמונה שה-Verto הזה כבר משתמש בה."
+    share_image_auto: "אוטומטית"
+    share_image_card: "כרטיס %{number}"
+    share_image_backdrop: "רקע"
+    share_image_empty: "ל-Verto הזה אין עדיין תמונות משלו. הוסיפו תמונה לכרטיס והיא תופיע כאן."
   dashboard_card:
     publish_warning: "לפרסם את “%{title}”? לאחר הפרסום השאלות נעולות ולא ניתנות לעריכה — ודאו שהכול בדיוק כפי שאתם רוצים."
     preview: "תצוגה מקדימה"

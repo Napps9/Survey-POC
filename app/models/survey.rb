@@ -2553,6 +2553,11 @@ class Survey < ApplicationRecord
       share_title:             share_title,
       share_description:       share_description,
       share_message:           share_message,
+      # The picked preview picture comes too: the copy carries the same cards,
+      # the same backdrop and the same gate image, so the URL still points at a
+      # picture the copy itself has — and a wave 2 made by duplicating wave 1
+      # would otherwise quietly go back to being chosen for.
+      share_image:             share_image,
       consent_text:            consent_text,
       consent_image:           consent_image,
       consent_image_credit:    consent_image_credit,
@@ -2865,11 +2870,17 @@ class Survey < ApplicationRecord
     share_message.presence
   end
 
-  # Whether the creator has written any share copy — drives the editor's
+  # Whether the creator has set any of the share card — drives the editor's
   # CTA-versus-card state, the same way forward_url? and the thankyou_* columns
   # decide whether the thank-you slot is open.
+  #
+  # share_image counts. A creator who has only picked the preview picture has
+  # still made a decision about how this link presents itself, and leaving the
+  # card collapsed behind a "+ Share card" CTA would hide that decision on the
+  # next page load with nothing on screen saying it had been made.
   def share_copy?
-    share_title.present? || share_description.present? || share_message.present?
+    share_title.present? || share_description.present? || share_message.present? ||
+      share_image.present?
   end
 
   # The picture a shared /play link unfurls with. NEVER nil: a Verto with no
@@ -2885,7 +2896,21 @@ class Survey < ApplicationRecord
   # og:image, and promoting one to a blob is a migration this does not need —
   # sanitize_background_image confines data: URLs to that one column anyway, so
   # there is almost always a card image or the library behind it.
+  #
+  # share_image is the creator's own choice, made in the editor's share card,
+  # and it outranks the lot. Blank (or somehow unshareable) falls straight back
+  # into the derivation below, which is what the Automatic tile restores — so
+  # the override can always be undone without knowing what it replaced.
   def share_image_path
+    return share_image if shareable_image?(share_image)
+
+    default_share_image_path
+  end
+
+  # The picture this Verto would unfurl with if nobody had chosen one. Public
+  # because the editor's Automatic tile has to SHOW it: "let it pick" is only a
+  # real option if the creator can see what it picks.
+  def default_share_image_path
     [ consent_image, background_image, first_card_image ]
       .find { |candidate| shareable_image?(candidate) } ||
       AssetPopulator.share_image_url_for(self)
@@ -2899,7 +2924,12 @@ class Survey < ApplicationRecord
   # Fetchable by a crawler on the open internet: a Pexels URL is already
   # absolute and public, and the two same-origin forms become absolute in the
   # view. A data: URL is none of those things.
-  def shareable_image?(url)
+  #
+  # On the class as well as the instance because update_settings has to apply
+  # exactly this rule to an incoming share_image before storing it — a picture
+  # no crawler can fetch is not a preview image, and storing one would leave the
+  # creator looking at a thumbnail that never reaches a single chat app.
+  def self.shareable_image?(url)
     return false if url.blank?
 
     value = url.to_s
@@ -2907,6 +2937,8 @@ class Survey < ApplicationRecord
       value.match?(ACTIVE_STORAGE_IMAGE_URL) ||
       value.match?(ASSET_IMAGE_URL)
   end
+
+  def shareable_image?(url) = self.class.shareable_image?(url)
 
   # The first picture the deck itself carries, in card order — the Verto's own
   # imagery beats the library every time.

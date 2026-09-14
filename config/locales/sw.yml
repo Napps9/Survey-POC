@@ -1264,6 +1264,13 @@ sw:
     verto_theme: "Mada"
     redo: "Rudia"
     ty_body_placeholder: "Ongeza ujumbe mfupi (si lazima)"
+    share_image_label: "Picha ya onyesho"
+    share_image_change: "Badilisha picha ya onyesho"
+    share_image_hint: "Picha inayoonekana pamoja na kiungo. Chagua picha yoyote ambayo Verto hii tayari inatumia."
+    share_image_auto: "Otomatiki"
+    share_image_card: "Kadi %{number}"
+    share_image_backdrop: "Mandharinyuma"
+    share_image_empty: "Verto hii bado haina picha zake. Ongeza moja kwenye kadi nayo itaonekana hapa."
   dashboard_card:
     publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"

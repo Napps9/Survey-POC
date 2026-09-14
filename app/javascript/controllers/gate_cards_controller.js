@@ -1,5 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Mirrors Survey.shareable_image? — the three forms a crawler can actually
+// fetch when it comes for og:image (a Pexels CDN URL, a same-origin Active
+// Storage blob, an app-rooted asset path). Notably NOT a data: URL, which
+// sanitize_image_url accepts for a card panel and which og:image cannot carry.
+// The server is still the authority — update_settings applies the same rule and
+// stores nil for anything else — but a tile that could never stick is worse
+// than no tile, so the picker doesn't offer one.
+const SHAREABLE_IMAGE = new RegExp(
+  "^(?:" +
+    "https://images\\.pexels\\.com/[\\w\\-./]+\\.(?:png|jpe?g|webp)(?:\\?[\\w%\\-=&.+]*)?" +
+    "|/rails/active_storage/[^\\s'\"<>?]+\\.(?:png|jpe?g|webp|svg|gif)(?:\\?[^\\s'\"<>]*)?" +
+    "|/[\\w\\-./]+\\.(?:png|jpe?g|webp|svg|gif)" +
+  ")$", "i"
+)
+
 // In-feed consent-gate and thank-you cards. Each lives in the cards feed as
 // an editable replica of the player's design: a CTA (styled like Add
 // question) sits above the welcome card / below the last card until the
@@ -15,6 +30,7 @@ export default class extends Controller {
     "tyTitleCount", "tyBodyCount",
     "shareCta", "shareCard", "shareTitle", "shareStory", "shareMessage",
     "shareTitleCount", "shareStoryCount", "shareMessageCount",
+    "shareImage", "shareImageBtn", "shareImagePanel", "shareImageGrid",
     "joinCta", "joinCard", "joinTitle", "joinBody", "joinCtaText"
   ]
   static values = { url: String }
@@ -24,6 +40,13 @@ export default class extends Controller {
   connect() {
     if (this.hasShareTitleTarget) this._paintShareCounts()
     if (this.hasTyTitleTarget) this._paintThankyouCounts()
+  }
+
+  // The picture picker's dismiss listeners live on the document while it is
+  // open. Leaving them behind a teardown would leave a closure holding a
+  // detached panel and closing it on every click in the page.
+  disconnect() {
+    this._unbindShareImageDismiss()
   }
 
   addConsent() {
@@ -166,9 +189,20 @@ export default class extends Controller {
     this.shareStoryTarget.textContent = ""
     this.shareMessageTarget.textContent = ""
     this._paintShareCounts()
-    // Clearing all three puts the link back on the fallback tags, which is what
+    // The picked preview picture goes with the card, and the panel it was
+    // picked in goes with it: leaving share_image set would keep an override
+    // on a link whose card the creator has just taken off, with nothing on
+    // screen still showing it — and share_copy? would reopen the card on the
+    // next load as though the removal had not happened.
+    this.closeShareImage({ refocus: false })
+    if (this.hasShareImagePanelTarget) {
+      this.shareImagePanelTarget.dataset.current = ""
+      const auto = this.shareImagePanelTarget.dataset.autoUrl
+      if (this.hasShareImageTarget && auto) this.shareImageTarget.src = auto
+    }
+    // Clearing all four puts the link back on the fallback tags, which is what
     // removing the card means. Nothing is lost that the creator can still see.
-    this._save({ share_title: "", share_description: "", share_message: "" })
+    this._save({ share_title: "", share_description: "", share_message: "", share_image: "" })
   }
 
   // Text captured at queue time, not read from the DOM when the timer fires —
@@ -194,6 +228,174 @@ export default class extends Controller {
       [ this.shareStoryTarget, this.shareStoryCountTarget ],
       [ this.shareMessageTarget, this.shareMessageCountTarget ]
     ])
+  }
+
+  // ── Share card: the preview picture ───────────────────────────────────────
+  // The one part of the unfurl a creator could look at and not change. Behind
+  // it sits Survey#default_share_image_path — consent image, then backdrop,
+  // then the first card that has a picture, then a theme-matched one from the
+  // library — which is a fine guarantee and a poor decision: it hands the only
+  // thing a stranger sees before reading a word to whichever card happens to
+  // come first. So the derivation stays as the default and share_image is an
+  // override on top of it, picked from the pictures this Verto already carries.
+
+  toggleShareImage() {
+    if (!this.shareImagePanelTarget.hidden) return this.closeShareImage()
+    this._paintShareImageGrid()
+    this.shareImagePanelTarget.hidden = false
+    this.shareImageBtnTarget.setAttribute("aria-expanded", "true")
+    // Bound on open, dropped on close. The click that opened the panel is still
+    // bubbling towards the document as this runs, which is why the handler
+    // checks the trigger as well as the panel — without that it would arrive at
+    // the document a moment later and close what it had just opened.
+    this._shareImageAway = (event) => {
+      if (this.shareImagePanelTarget.contains(event.target)) return
+      if (this.shareImageBtnTarget.contains(event.target)) return
+      this.closeShareImage({ refocus: false })
+    }
+    this._shareImageEsc = (event) => { if (event.key === "Escape") this.closeShareImage() }
+    document.addEventListener("click", this._shareImageAway)
+    document.addEventListener("keydown", this._shareImageEsc)
+  }
+
+  closeShareImage({ refocus = true } = {}) {
+    if (!this.hasShareImagePanelTarget || this.shareImagePanelTarget.hidden) return
+    this.shareImagePanelTarget.hidden = true
+    this.shareImageBtnTarget.setAttribute("aria-expanded", "false")
+    // Focus goes back to what opened the panel, not to wherever the dismissing
+    // click landed — otherwise closing it steals the caret out of the headline.
+    if (refocus) this.shareImageBtnTarget.focus()
+    this._unbindShareImageDismiss()
+  }
+
+  _unbindShareImageDismiss() {
+    if (this._shareImageAway) document.removeEventListener("click", this._shareImageAway)
+    if (this._shareImageEsc) document.removeEventListener("keydown", this._shareImageEsc)
+    this._shareImageAway = null
+    this._shareImageEsc = null
+  }
+
+  // Delegated from the grid, so a tile built a moment ago is live without
+  // waiting for Stimulus to notice its action attribute.
+  pickShareImage(event) {
+    const tile = event.target.closest(".share-image-tile")
+    if (!tile) return
+    this._applyShareImage(tile.dataset.url || "")
+    this.closeShareImage()
+  }
+
+  // "" is the Automatic tile: it clears the override rather than storing a URL,
+  // so the link goes back to being chosen for the creator — and the thumbnail
+  // shows what that choice currently is, which is what the panel is carrying.
+  _applyShareImage(url) {
+    const panel = this.shareImagePanelTarget
+    panel.dataset.current = url
+    const shown = url || panel.dataset.autoUrl || ""
+    if (this.hasShareImageTarget && shown) this.shareImageTarget.src = shown
+    this._save({ share_image: url })
+  }
+
+  _paintShareImageGrid() {
+    const panel   = this.shareImagePanelTarget
+    const current = panel.dataset.current || ""
+    const found   = this._shareImageCandidates()
+    // Automatic first and always, whatever the deck is carrying: it is how the
+    // override is undone, and a Verto with no pictures of its own still has one.
+    const tiles = [
+      { url: "", label: panel.dataset.autoLabel || "", thumb: panel.dataset.autoUrl || "" },
+      ...found
+    ].map(tile => this._shareImageTile(tile, current))
+
+    if (!found.length && panel.dataset.emptyLabel) {
+      const note = document.createElement("p")
+      note.className = "share-image-empty"
+      note.textContent = panel.dataset.emptyLabel
+      tiles.push(note)
+    }
+    this.shareImageGridTarget.replaceChildren(...tiles)
+  }
+
+  _shareImageTile({ url, label, thumb }, current) {
+    const btn = document.createElement("button")
+    btn.type = "button"
+    btn.className = "share-image-tile"
+    btn.dataset.url = url
+    btn.setAttribute("aria-pressed", String(url === current))
+    if (url === current) btn.classList.add("is-picked")
+
+    const img = document.createElement("img")
+    img.className = "share-image-tile-img"
+    img.src = thumb || url
+    img.alt = ""
+    img.loading = "lazy"
+
+    const cap = document.createElement("span")
+    cap.className = "share-image-tile-label"
+    cap.textContent = label || ""
+
+    btn.append(img, cap)
+    return btn
+  }
+
+  // Every picture this Verto already carries, read from the feed at open time
+  // rather than from a list rendered with the page. The media picker writes a
+  // new card image straight onto data-card-image and repaints the panel — no
+  // reload — so a baked-in list would be missing exactly the picture the
+  // creator had just added, which is the one they came here to choose.
+  //
+  // Deduped by URL: the same photo used on three cards is one choice, not three.
+  _shareImageCandidates() {
+    const panel = this.shareImagePanelTarget
+    const tpl   = panel.dataset.cardLabel || ""
+    const seen  = new Set()
+    const out   = []
+    const push = (url, label) => {
+      const clean = (url || "").trim()
+      if (!clean || seen.has(clean) || !SHAREABLE_IMAGE.test(clean)) return
+      seen.add(clean)
+      out.push({ url: clean, label })
+    }
+
+    this.element.querySelectorAll("[data-survey-editor-target='card']").forEach(card => {
+      const label = tpl.replace("%{number}", card.dataset.cardNum || "")
+      push(card.dataset.cardImage, label)
+      // The animation backdrop. A card whose panel is a Lottie or a range
+      // reaction still carries a photograph, and it is a photograph of this
+      // Verto — the fall-through reaches these too (Survey#first_card_image).
+      this._jsonish(card.dataset.cardMediaBg, bg => push(bg?.image, label))
+      // A tap card's statement pictures. "Any card image" means these as well:
+      // they are often the strongest pictures in a deck, and the derivation
+      // this panel overrides could never reach them at all.
+      this._jsonish(card.dataset.cardOptionImages, imgs => {
+        if (Array.isArray(imgs)) imgs.forEach(img => push(img, label))
+      })
+      // A clip's poster frame — the only still a video card has.
+      push(card.dataset.cardVideoPoster, label)
+    })
+
+    // The Verto's backdrop and the consent gate's picture. Both are steps in
+    // the derivation this panel replaces, so leaving them out would make
+    // choosing deliberately a way to LOSE options rather than gain them.
+    push(this._cssUrl(this.element.querySelector("[data-media-picker-target='bgThumb']")?.style?.backgroundImage),
+         panel.dataset.backdropLabel)
+    if (this.hasConsentLeftTarget) {
+      push(this._cssUrl(this.consentLeftTarget.querySelector(".split-left-img")?.style?.backgroundImage),
+           panel.dataset.gateLabel)
+    }
+    return out
+  }
+
+  _jsonish(raw, fn) {
+    if (!raw) return
+    try { fn(JSON.parse(raw)) } catch (_e) { /* malformed — nothing to offer */ }
+  }
+
+  // url("…") → the bare URL. The backdrop and the gate picture live in inline
+  // styles rather than in a dataset, so this is the only place they can be read
+  // from — media_picker#_currentBg reads the same property the same way.
+  _cssUrl(value) {
+    const match = /^url\((['"]?)([\s\S]*)\1\)$/.exec((value || "").trim())
+    return match ? match[2] : ""
   }
 
   // The thank-you card's two boxes, which had no counters at all — so an end

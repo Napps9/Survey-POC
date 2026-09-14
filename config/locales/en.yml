@@ -1187,6 +1187,13 @@ en:
     share_description_label: 'Share story'
     share_message_label: 'Message respondents send'
     share_message_hint: 'Written as the respondent, in their voice. The link is added automatically.'
+    share_image_label: 'Preview image'
+    share_image_change: 'Change the preview image'
+    share_image_hint: 'The picture the link unfurls with. Pick any image this Verto already uses.'
+    share_image_auto: 'Automatic'
+    share_image_card: 'Card %{number}'
+    share_image_backdrop: 'Background'
+    share_image_empty: 'This Verto has no pictures of its own yet. Add one to a card and it shows up here.'
     tab_quiz: 'Quiz mode'
     tab_tokens: 'Tokenisation'
     note_limit_split_hint: "Past %{n} characters this gets cramped on the intro card — put the detail on its own card instead."

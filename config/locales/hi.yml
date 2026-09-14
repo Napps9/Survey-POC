@@ -1264,6 +1264,13 @@ hi:
     verto_theme: "विषय"
     redo: "फिर से करें"
     ty_body_placeholder: "एक छोटा संदेश जोड़ें (वैकल्पिक)"
+    share_image_label: "प्रीव्यू छवि"
+    share_image_change: "प्रीव्यू छवि बदलें"
+    share_image_hint: "लिंक जिस तस्वीर के साथ खुलता है। इस Verto में पहले से इस्तेमाल हो रही कोई भी छवि चुनें।"
+    share_image_auto: "स्वचालित"
+    share_image_card: "कार्ड %{number}"
+    share_image_backdrop: "पृष्ठभूमि"
+    share_image_empty: "इस Verto में अभी अपनी कोई तस्वीर नहीं है। किसी कार्ड में एक जोड़ें, वह यहाँ दिखेगी।"
   dashboard_card:
     publish_warning: "“%{title}” प्रकाशित करें? लाइव होने के बाद इसके सवाल लॉक हो जाएँगे और संपादित नहीं हो सकेंगे — सुनिश्चित करें कि सब कुछ बिल्कुल वैसा ही है जैसा आप चाहते हैं।"
     preview: "पूर्वावलोकन"

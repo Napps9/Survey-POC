@@ -1282,6 +1282,13 @@ zu:
     verto_theme: "Isihloko"
     redo: "Yenza futhi"
     ty_body_placeholder: "Engeza umlayezo omfushane (akuphoqelekile)"
+    share_image_label: "Isithombe sokubuka kuqala"
+    share_image_change: "Shintsha isithombe sokubuka kuqala"
+    share_image_hint: "Isithombe esivela nesixhumanisi. Khetha noma yisiphi isithombe le Verto esesivele isisebenzisa."
+    share_image_auto: "Okuzenzakalelayo"
+    share_image_card: "Ikhadi %{number}"
+    share_image_backdrop: "Ingemuva"
+    share_image_empty: "Le Verto ayikabi nazithombe zayo. Engeza esisodwa ekhadini bese sivela lapha."
   dashboard_card:
     publish_warning: "Shicilela “%{title}”? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     preview: "Buka kuqala"

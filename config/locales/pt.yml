@@ -1264,6 +1264,13 @@ pt:
     verto_theme: "Tema"
     redo: "Refazer"
     ty_body_placeholder: "Adicione uma mensagem curta (opcional)"
+    share_image_label: "Imagem de pré-visualização"
+    share_image_change: "Alterar a imagem de pré-visualização"
+    share_image_hint: "A imagem com que o link aparece. Escolha qualquer imagem que este Verto já utilize."
+    share_image_auto: "Automática"
+    share_image_card: "Cartão %{number}"
+    share_image_backdrop: "Fundo"
+    share_image_empty: "Este Verto ainda não tem imagens próprias. Adicione uma a um cartão e ela aparece aqui."
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"

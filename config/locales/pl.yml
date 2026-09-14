@@ -1266,6 +1266,13 @@ pl:
     verto_theme: "Temat"
     redo: "Ponów"
     ty_body_placeholder: "Dodaj krótką wiadomość (opcjonalnie)"
+    share_image_label: "Obraz podglądu"
+    share_image_change: "Zmień obraz podglądu"
+    share_image_hint: "Obraz, z którym wyświetla się link. Wybierz dowolny obraz, którego to Verto już używa."
+    share_image_auto: "Automatycznie"
+    share_image_card: "Karta %{number}"
+    share_image_backdrop: "Tło"
+    share_image_empty: "To Verto nie ma jeszcze własnych obrazów. Dodaj jeden do karty, a pojawi się tutaj."
   dashboard_card:
     publish_warning: "Opublikować „%{title}”? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     preview: "Podgląd"

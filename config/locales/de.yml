@@ -1264,6 +1264,13 @@ de:
     verto_theme: "Thema"
     redo: "Wiederholen"
     ty_body_placeholder: "Kurze Nachricht hinzufügen (optional)"
+    share_image_label: "Vorschaubild"
+    share_image_change: "Vorschaubild ändern"
+    share_image_hint: "Das Bild, mit dem der Link angezeigt wird. Wähle ein beliebiges Bild, das dieses Verto bereits verwendet."
+    share_image_auto: "Automatisch"
+    share_image_card: "Karte %{number}"
+    share_image_backdrop: "Hintergrund"
+    share_image_empty: "Dieses Verto hat noch keine eigenen Bilder. Füge eines zu einer Karte hinzu, dann erscheint es hier."
   dashboard_card:
     publish_warning: "„%{title}“ veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     preview: "Vorschau"

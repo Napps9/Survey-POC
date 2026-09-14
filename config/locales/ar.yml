@@ -1264,6 +1264,13 @@ ar:
     verto_theme: "الموضوع"
     redo: "إعادة"
     ty_body_placeholder: "أضف رسالة قصيرة (اختياري)"
+    share_image_label: "صورة المعاينة"
+    share_image_change: "تغيير صورة المعاينة"
+    share_image_hint: "الصورة التي يظهر بها الرابط. اختر أي صورة يستخدمها هذا الـ Verto بالفعل."
+    share_image_auto: "تلقائية"
+    share_image_card: "البطاقة %{number}"
+    share_image_backdrop: "الخلفية"
+    share_image_empty: "لا يملك هذا الـ Verto صورًا خاصة به بعد. أضف صورة إلى بطاقة لتظهر هنا."
   dashboard_card:
     publish_warning: "نشر «%{title}»؟ بعد النشر تُقفل أسئلتها ولا يمكن تعديلها — تأكد أن كل شيء كما تريد تمامًا."
     preview: "معاينة"

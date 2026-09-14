@@ -203,6 +203,117 @@ class ShareCardTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # ── The preview picture ───────────────────────────────────────────────────
+  # It used to be the one part of the unfurl a creator could look at and not
+  # change: Survey#share_image_path walked gate image → backdrop → first card →
+  # library and the editor drew whatever came out. Fine as a guarantee, poor as
+  # a decision — the only thing a stranger sees before reading a word went to
+  # whichever card happened to come first.
+
+  test "the thumbnail is the picker's trigger and the panel is there to open" do
+    org = sign_in_org("picker")
+    s   = survey_for(org, share_title: "Written")
+
+    get survey_path(s)
+    assert_response :success
+
+    assert_select "button.unfurl-thumb-btn[aria-expanded='false']" do
+      assert_select "img.unfurl-thumb[data-gate-cards-target='shareImage']", 1
+    end
+    assert_select ".share-image-picker[hidden]", 1
+    # Delegated on the grid: the tiles are built in JS from the live feed, and
+    # an action attribute on a fresh element is bound on Stimulus's schedule.
+    assert_select ".share-image-grid[data-action='click->gate-cards#pickShareImage']", 1
+  end
+
+  # "Let it pick" is only a real choice if the creator can see what it picks,
+  # so the Automatic tile carries the derivation's own answer — which is NOT
+  # the same as the current one once a pick is in place.
+  test "the panel carries what Automatic would restore, not the current pick" do
+    org  = sign_in_org("auto")
+    card = "https://images.pexels.com/photos/3/card.jpg"
+    s    = survey_for(org, cards: [ { "type" => "yes_no", "text" => "Q", "image" => card } ],
+                           share_image: "https://images.pexels.com/photos/9/picked.jpg")
+
+    get survey_path(s)
+    assert_select ".share-image-picker[data-auto-url=?]", card
+    assert_select ".share-image-picker[data-current=?]", s.share_image
+    assert_select "img.unfurl-thumb[src=?]", s.share_image
+  end
+
+  # The tiles are labelled in JS, where the card number is the only thing
+  # known — so the wording travels as a template rather than as a finished
+  # string, and the placeholder has to survive the trip through I18n.
+  test "the card label reaches the panel as a template with its placeholder" do
+    org = sign_in_org("label")
+    s   = survey_for(org, share_title: "Written")
+
+    get survey_path(s)
+    assert_select ".share-image-picker[data-card-label=?]", "Card %{number}"
+  end
+
+  test "update_settings stores a picked image and clears it back to automatic" do
+    org  = sign_in_org("pick")
+    s    = survey_for(org)
+    pick = "https://images.pexels.com/photos/9/picked.jpg"
+
+    post survey_settings_path(s), params: { share_image: pick }
+    assert_equal pick, s.reload.share_image
+    assert_equal pick, s.share_image_path
+
+    post survey_settings_path(s), params: { share_image: "" }
+    assert_nil s.reload.share_image
+    assert_equal s.default_share_image_path, s.share_image_path
+  end
+
+  # sanitize_image_url accepts a capped data: URL — right for a card panel,
+  # wrong here. og:image is fetched by a crawler, and storing base64 would
+  # leave the creator admiring a thumbnail no chat app ever renders.
+  test "update_settings refuses an image og:image could not carry" do
+    org = sign_in_org("refuse")
+    s   = survey_for(org)
+    png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+
+    post survey_settings_path(s), params: { share_image: "data:image/png;base64,#{png}" }
+    assert_nil s.reload.share_image
+
+    post survey_settings_path(s), params: { share_image: "https://evil.example.com/x.jpg" }
+    assert_nil s.reload.share_image
+  end
+
+  # Distribution, like the copy it sits with — a creator changes how their
+  # Verto presents itself for its whole life, live or not.
+  test "the preview picture stays editable after the Verto is published" do
+    org  = sign_in_org("livepic")
+    s    = survey_for(org, publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+    pick = "https://images.pexels.com/photos/9/picked.jpg"
+    assert_predicate s, :editing_locked?
+
+    post survey_settings_path(s), params: { share_image: pick }
+    assert_equal pick, s.reload.share_image
+  end
+
+  test "a picked image reaches og:image" do
+    pick = "https://images.pexels.com/photos/9/picked.jpg"
+    s = published_survey(background_image: "https://images.pexels.com/photos/1/backdrop.jpg",
+                         share_image: pick)
+
+    get "/play/#{s.publish_token}"
+    assert_response :success
+    assert_select "meta[property='og:image'][content=?]", pick
+    assert_select "meta[name='twitter:image'][content=?]", pick
+  end
+
+  # A creator who has only picked the picture has still made a decision about
+  # this link, and collapsing the card behind the CTA would hide it.
+  test "a picked image alone opens the share card" do
+    org = sign_in_org("openpic")
+    s   = survey_for(org, share_image: "https://images.pexels.com/photos/9/picked.jpg")
+
+    get survey_path(s)
+    assert_select "div.gate-card-wrap[data-gate-cards-target='shareCard']:not([hidden])", 1
+  end
+
   # ── The tags ──────────────────────────────────────────────────────────────
 
   # Social recruitment is a real distribution channel, and a link with no
@@ -256,13 +367,18 @@ class ShareCardTest < ActionDispatch::IntegrationTest
   # ── Model ─────────────────────────────────────────────────────────────────
 
   test "duplicating a Verto carries its share copy" do
-    org = sign_in_org("dup")
-    s   = survey_for(org, share_title: "H", share_description: "D", share_message: "M")
+    org  = sign_in_org("dup")
+    pick = "https://images.pexels.com/photos/9/picked.jpg"
+    s    = survey_for(org, share_title: "H", share_description: "D", share_message: "M",
+                           share_image: pick)
 
     copy = s.duplicate!
     assert_equal "H", copy.share_title
     assert_equal "D", copy.share_description
     assert_equal "M", copy.share_message
+    # The copy carries the same cards, backdrop and gate image, so the pick
+    # still points at a picture the copy itself has.
+    assert_equal pick, copy.share_image
   end
 
   test "share_message_text has no fallback — it is the creator's or absent" do

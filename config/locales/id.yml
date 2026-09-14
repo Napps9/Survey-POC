@@ -1264,6 +1264,13 @@ id:
     verto_theme: "Topik"
     redo: "Ulangi"
     ty_body_placeholder: "Tambahkan pesan singkat (opsional)"
+    share_image_label: "Gambar pratinjau"
+    share_image_change: "Ubah gambar pratinjau"
+    share_image_hint: "Gambar yang muncul bersama tautan. Pilih gambar apa pun yang sudah dipakai Verto ini."
+    share_image_auto: "Otomatis"
+    share_image_card: "Kartu %{number}"
+    share_image_backdrop: "Latar belakang"
+    share_image_empty: "Verto ini belum punya gambar sendiri. Tambahkan satu ke kartu dan gambar itu akan muncul di sini."
   dashboard_card:
     publish_warning: "Terbitkan “%{title}”? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     preview: "Pratinjau"

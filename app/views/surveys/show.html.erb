@@ -761,8 +761,23 @@
               <div class="unfurl-card">
                 <%# The real og:image, not a mock of one — Survey#share_image_path
                     is exactly what the meta tag emits, so this cannot drift
-                    from what a recipient actually sees. %>
-                <%= image_tag @survey.share_image_path, alt: "", class: "unfurl-thumb", loading: "lazy" %>
+                    from what a recipient actually sees.
+                    A BUTTON, because until now this was the one part of the
+                    unfurl the creator could look at and not change: the
+                    fall-through behind it (gate image → backdrop → first card
+                    → library) is a sensible default, not a decision, and this
+                    is the only thing a stranger sees before they have read a
+                    word of the copy above. %>
+                <button type="button" class="unfurl-thumb-btn"
+                        aria-haspopup="true" aria-expanded="false"
+                        aria-label="<%= t("editor.share_image_change", default: "Change the preview image") %>"
+                        title="<%= t("editor.share_image_change", default: "Change the preview image") %>"
+                        data-gate-cards-target="shareImageBtn"
+                        data-action="click->gate-cards#toggleShareImage">
+                  <%= image_tag @survey.share_image_path, alt: "", class: "unfurl-thumb", loading: "lazy",
+                                data: { gate_cards_target: "shareImage" } %>
+                  <span class="unfurl-thumb-pen" aria-hidden="true">✎</span>
+                </button>
                 <div class="unfurl-text">
                   <div id="share-title" class="unfurl-title gate-placeholder gate-editable" contenteditable="true"
                        role="textbox"
@@ -781,6 +796,57 @@
                   <div class="unfurl-domain"><%= request.host %></div>
                 </div>
               </div>
+            </div>
+
+            <%# The picture picker. Outside the bubble for the same reason the
+                counters and the respondent's message are: a chat app draws none
+                of this, and the bubble is meant to read as somebody else's app.
+
+                The tiles are gathered from the cards feed when the panel OPENS,
+                not rendered here. Card imagery changes all day without a page
+                load — the media picker repaints a card and writes the new URL
+                straight onto its data-card-image — so a list baked in at render
+                time would be a list of what the Verto looked like when the
+                creator arrived, and the picture they just added would be the
+                one picture missing from it. %>
+            <div class="share-image-picker" hidden
+                 data-gate-cards-target="shareImagePanel"
+                 <%# What the Automatic tile restores AND shows. "Let it pick"
+                     is only a real choice if the creator can see what it
+                     picks, so the tile carries the derivation's own answer. %>
+                 data-auto-url="<%= @survey.default_share_image_path %>"
+                 data-auto-label="<%= t("editor.share_image_auto", default: "Automatic") %>"
+                 <%# A template, not a finished string: the tiles are built in
+                     JS and the number is only known there. Passed through I18n
+                     with the placeholder as its own value so the wording (and
+                     where the number falls in it) stays the translator's. %>
+                 data-card-label="<%= t("editor.share_image_card", number: "%{number}", default: "Card %{number}") %>"
+                 data-backdrop-label="<%= t("editor.share_image_backdrop", default: "Background") %>"
+                 data-gate-label="<%= t("editor.consent_gate", default: "Consent gate") %>"
+                 data-empty-label="<%= t("editor.share_image_empty",
+                       default: "This Verto has no pictures of its own yet. Add one to a card and it shows up here.") %>"
+                 data-current="<%= @survey.share_image %>">
+              <div class="share-image-picker-head">
+                <span class="share-image-picker-title">
+                  <%= t("editor.share_image_label", default: "Preview image") %>
+                </span>
+                <button type="button" class="share-image-picker-close"
+                        aria-label="<%= t("editor.close") %>"
+                        data-action="click->gate-cards#closeShareImage">✕</button>
+              </div>
+              <p class="share-image-picker-hint">
+                <%= t("editor.share_image_hint",
+                      default: "The picture the link unfurls with. Pick any image this Verto already uses.") %>
+              </p>
+              <%# Delegated on the grid rather than declared on each tile: the
+                  tiles are built in JS, and an action attribute added to a
+                  fresh element is bound by Stimulus's observer on its own
+                  schedule. One listener on a container that is always here is
+                  bound before the first tile exists. %>
+              <div class="share-image-grid" role="group"
+                   aria-label="<%= t("editor.share_image_label", default: "Preview image") %>"
+                   data-gate-cards-target="shareImageGrid"
+                   data-action="click->gate-cards#pickShareImage"></div>
             </div>
 
             <%# The counters the labels used to carry. Out of the bubble,

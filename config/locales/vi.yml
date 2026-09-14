@@ -1264,6 +1264,13 @@ vi:
     verto_theme: "Chủ đề"
     redo: "Làm lại"
     ty_body_placeholder: "Thêm một tin nhắn ngắn (không bắt buộc)"
+    share_image_label: "Ảnh xem trước"
+    share_image_change: "Đổi ảnh xem trước"
+    share_image_hint: "Ảnh hiển thị cùng liên kết. Chọn bất kỳ ảnh nào Verto này đang dùng."
+    share_image_auto: "Tự động"
+    share_image_card: "Thẻ %{number}"
+    share_image_backdrop: "Nền"
+    share_image_empty: "Verto này chưa có ảnh riêng. Thêm một ảnh vào thẻ và ảnh sẽ xuất hiện ở đây."
   dashboard_card:
     publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"

@@ -1284,6 +1284,13 @@ xh:
     verto_theme: "Umxholo"
     redo: "Yenza kwakhona"
     ty_body_placeholder: "Yongeza umyalezo omfutshane (akunyanzelekile)"
+    share_image_label: "Umfanekiso wokujonga kuqala"
+    share_image_change: "Tshintsha umfanekiso wokujonga kuqala"
+    share_image_hint: "Umfanekiso ovela nekhonkco. Khetha nawuphi na umfanekiso le Verto esele iwusebenzisa."
+    share_image_auto: "Ngokuzenzekelayo"
+    share_image_card: "Ikhadi %{number}"
+    share_image_backdrop: "Umva"
+    share_image_empty: "Le Verto ayikabi nayo imifanekiso yayo. Yongeza omnye kwikhadi uze ubonakale apha."
   dashboard_card:
     publish_warning: "Papasha “%{title}”? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     preview: "Jonga kuqala"

@@ -1113,6 +1113,18 @@ class SurveysController < ApplicationController
     if params.key?(:share_message)
       attrs[:share_message] = params[:share_message].to_s.strip.first(Survey::MAX_SHARE_MESSAGE).presence
     end
+    # The preview picture, chosen from the Verto's own imagery in the share
+    # card. Same allowed forms as every other image column, and then a SECOND
+    # gate: it must be one og:image can actually carry. sanitize_image_url
+    # accepts a capped data: URL — right for a card panel, wrong here, because
+    # a crawler cannot fetch base64 and the creator would be left admiring a
+    # thumbnail no chat app ever sees. Blank (or refused) clears the override
+    # and puts the link back on Survey#default_share_image_path, which is what
+    # the card's Automatic tile means.
+    if params.key?(:share_image)
+      picked = Survey.sanitize_image_url(params[:share_image])
+      attrs[:share_image] = Survey.shareable_image?(picked) ? picked : nil
+    end
     if params.key?(:consent_text)
       attrs[:consent_text] = params[:consent_text].to_s.strip.first(2000).presence
     end

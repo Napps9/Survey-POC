@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_14_133100) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_14_150000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -1146,6 +1146,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_14_133100) do
     t.datetime "setup_pending_since"
     t.text "share_description"
     t.boolean "share_enabled", default: true, null: false
+    t.text "share_image"
     t.text "share_message"
     t.string "share_title"
     t.boolean "show_results_comparison", default: false, null: false

@@ -1264,6 +1264,13 @@ tr:
     verto_theme: "Konu"
     redo: "Yinele"
     ty_body_placeholder: "Kısa bir mesaj ekleyin (isteğe bağlı)"
+    share_image_label: "Önizleme görseli"
+    share_image_change: "Önizleme görselini değiştir"
+    share_image_hint: "Bağlantının açıldığı görsel. Bu Verto'nun hâlihazırda kullandığı herhangi bir görseli seçin."
+    share_image_auto: "Otomatik"
+    share_image_card: "%{number}. kart"
+    share_image_backdrop: "Arka plan"
+    share_image_empty: "Bu Verto'nun henüz kendine ait görseli yok. Bir karta görsel ekleyin, burada görünsün."
   dashboard_card:
     publish_warning: "“%{title}” yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."
     preview: "Önizleme"

@@ -1284,6 +1284,13 @@ st:
     verto_theme: "Sehlooho"
     redo: "Etsa hape"
     ty_body_placeholder: "Kenya molaetsa o mokgutshwane (ha se tlamo)"
+    share_image_label: "Setshwantsho sa ponelopele"
+    share_image_change: "Fetola setshwantsho sa ponelopele"
+    share_image_hint: "Setshwantsho seo sehokelo se hlahang le sona. Kgetha setshwantsho leha e le sefe seo Verto ena e seng e se sebedisa."
+    share_image_auto: "Ka boiketsiso"
+    share_image_card: "Karete %{number}"
+    share_image_backdrop: "Bokamorao"
+    share_image_empty: "Verto ena ha e e-so be le ditshwantsho tsa yona. Kenya se seng karetheng mme se tla hlaha mona."
   dashboard_card:
     publish_warning: "Phatlalatsa “%{title}”? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     preview: "Pontsho"

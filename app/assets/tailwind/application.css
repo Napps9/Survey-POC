@@ -2499,6 +2499,104 @@
   width: 76px; height: 76px; flex: 0 0 76px;
   object-fit: cover; border-radius: 6px;
   background: rgba(0,0,0,0.06);
+  display: block;
+}
+/* The thumbnail is the picker's trigger. It has to stay exactly the shape the
+   plain <img> was — this block is a replica of a chat app's unfurl, and a
+   button that grows a border or a focus ring stops it being one — so the
+   affordance is a pen badge in the corner instead, drawn on hover/focus. */
+.unfurl-thumb-btn {
+  position: relative;
+  flex: 0 0 76px; width: 76px; height: 76px;
+  padding: 0; border: 0; background: none;
+  border-radius: 6px; cursor: pointer;
+  display: block;
+}
+.unfurl-thumb-pen {
+  position: absolute; inset-block-end: 3px; inset-inline-end: 3px;
+  width: 20px; height: 20px; border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(17,24,39,0.78); color: #fff;
+  font-size: var(--text-2xs); line-height: 1;
+  opacity: 0; transition: opacity 0.12s;
+  pointer-events: none;
+}
+.unfurl-thumb-btn:hover .unfurl-thumb-pen,
+.unfurl-thumb-btn:focus-visible .unfurl-thumb-pen,
+.unfurl-thumb-btn[aria-expanded="true"] .unfurl-thumb-pen { opacity: 1; }
+.unfurl-thumb-btn:hover .unfurl-thumb,
+.unfurl-thumb-btn[aria-expanded="true"] .unfurl-thumb {
+  box-shadow: 0 0 0 2px rgba(1,180,155,0.75);
+}
+.unfurl-thumb-btn:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+
+/* The picker. On the dark surface, not in the bubble: the bubble is meant to
+   read as somebody else's chat app, and this is our control. */
+.share-image-picker {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 12px; padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+/* Explicit, because the display above would otherwise beat the UA's
+   [hidden] { display: none } and the panel would never close. */
+.share-image-picker[hidden] { display: none; }
+.share-image-picker-head {
+  display: flex; align-items: center; gap: 10px;
+}
+.share-image-picker-title {
+  font-family: 'Alata', sans-serif; font-size: var(--text-base);
+  color: #fff; line-height: 1.2;
+}
+.share-image-picker-close {
+  margin-inline-start: auto;
+  padding: 2px 6px; border-radius: 6px;
+  background: transparent; border: 0; cursor: pointer;
+  color: rgba(255,255,255,0.6); font-size: var(--text-sm); line-height: 1;
+}
+.share-image-picker-close:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.share-image-picker-hint {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-xs);
+  color: rgba(255,255,255,0.55); line-height: 1.45; margin: 0;
+}
+/* auto-fill rather than a fixed count: the panel is 560px at its widest and
+   about 300 on a narrow studio, and the tiles should reflow rather than shrink
+   past the point where a creator can tell two photographs apart. */
+.share-image-grid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  max-height: 268px; overflow-y: auto;
+}
+.share-image-tile {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 4px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer; text-align: start;
+}
+.share-image-tile:hover { border-color: rgba(1,234,203,0.5); background: rgba(255,255,255,0.08); }
+.share-image-tile:focus-visible { outline: 2px solid #01EACB; outline-offset: 2px; }
+.share-image-tile.is-picked {
+  border-color: #01EACB;
+  box-shadow: 0 0 0 1px #01EACB inset;
+}
+.share-image-tile-img {
+  width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
+  border-radius: 7px; background: rgba(255,255,255,0.06);
+  display: block;
+}
+.share-image-tile-label {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-2xs);
+  /* Full white rather than a dimmed one: this is 10px type on a panel that is
+     itself a 5% white over #1C2034, where anything less measured under 4.5:1. */
+  color: #fff; line-height: 1.25;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.share-image-empty {
+  grid-column: 1 / -1; margin: 0; align-self: center;
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-xs);
+  color: rgba(255,255,255,0.55); line-height: 1.45;
 }
 .unfurl-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 /* Dark type on a light bubble — this is the one place in the editor that is

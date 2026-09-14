@@ -1284,6 +1284,13 @@ tn:
     verto_theme: "Setlhogo"
     redo: "Dira gape"
     ty_body_placeholder: "Tsenya molaetsa o mokhutshwane (ga go patelesege)"
+    share_image_label: "Setshwantsho sa ponelopele"
+    share_image_change: "Fetola setshwantsho sa ponelopele"
+    share_image_hint: "Setshwantsho se kgolagano e tlhagang le sona. Tlhopha setshwantsho sengwe le sengwe se Verto eno e setseng e se dirisa."
+    share_image_auto: "Ka boyona"
+    share_image_card: "Karata %{number}"
+    share_image_backdrop: "Bokamorago"
+    share_image_empty: "Verto eno ga e ise e nne le ditshwantsho tsa yona. Tsenya se sengwe mo karateng mme se tla bonala fa."
   dashboard_card:
     publish_warning: "Phasaladitsa “%{title}”? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     preview: "Leba"

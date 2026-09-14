@@ -1272,6 +1272,13 @@ sn:
     verto_theme: "Musoro"
     redo: "Dzokorora"
     ty_body_placeholder: "Wedzera meseji pfupi (hazvisungirwi)"
+    share_image_label: "Mufananidzo wekutarisa"
+    share_image_change: "Chinja mufananidzo wekutarisa"
+    share_image_hint: "Mufananidzo unoonekwa nerinki. Sarudza chero mufananidzo uyo Verto ino yatova kushandisa."
+    share_image_auto: "Otomatiki"
+    share_image_card: "Kadhi %{number}"
+    share_image_backdrop: "Bhekigirawundi"
+    share_image_empty: "Verto ino haisati ine mifananidzo yayo. Wedzera mumwe pakadhi uye uchaonekwa pano."
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"

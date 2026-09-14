@@ -1269,6 +1269,13 @@ af:
     verto_theme: "Onderwerp"
     redo: "Herdoen"
     ty_body_placeholder: "Voeg 'n kort boodskap by (opsioneel)"
+    share_image_label: "Voorskoubeeld"
+    share_image_change: "Verander die voorskoubeeld"
+    share_image_hint: "Die prent waarmee die skakel oopgevou word. Kies enige beeld wat hierdie Verto reeds gebruik."
+    share_image_auto: "Outomaties"
+    share_image_card: "Kaart %{number}"
+    share_image_backdrop: "Agtergrond"
+    share_image_empty: "Hierdie Verto het nog geen eie prente nie. Voeg een by 'n kaart en dit verskyn hier."
   dashboard_card:
     publish_warning: "Publiseer “%{title}”? Sodra dit regstreeks is, word sy vrae gesluit en kan nie gewysig word nie — maak seker alles lees presies soos jy dit wil hê."
     preview: "Voorskou"

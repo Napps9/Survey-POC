@@ -1264,6 +1264,13 @@ fr:
     verto_theme: "Thème"
     redo: "Rétablir"
     ty_body_placeholder: "Ajoutez un court message (facultatif)"
+    share_image_label: "Image d'aperçu"
+    share_image_change: "Changer l'image d'aperçu"
+    share_image_hint: "L'image affichée avec le lien. Choisissez n'importe quelle image que ce Verto utilise déjà."
+    share_image_auto: "Automatique"
+    share_image_card: "Carte %{number}"
+    share_image_backdrop: "Arrière-plan"
+    share_image_empty: "Ce Verto n'a pas encore d'images à lui. Ajoutez-en une à une carte et elle apparaîtra ici."
   dashboard_card:
     publish_warning: "Publier « %{title} » ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     preview: "Aperçu"

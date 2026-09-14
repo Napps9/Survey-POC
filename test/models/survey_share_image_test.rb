@@ -127,4 +127,62 @@ class SurveyShareImageTest < ActiveSupport::TestCase
     assert_raises(NoMethodError) { s.shareable_image?("x") }
     assert_raises(NoMethodError) { s.first_card_image }
   end
+
+  # ── The creator's own pick ────────────────────────────────────────────────
+  # Everything above is the DEFAULT: a derivation that guarantees a picture and
+  # picks it for you. share_image is the override — the editor's share card
+  # offers the Verto's own imagery and stores the one chosen — and the property
+  # that matters is that it wins over the derivation without replacing it, so
+  # clearing the column always gets the old behaviour back.
+
+  test "a picked image outranks everything the derivation would have chosen" do
+    picked = "https://images.pexels.com/photos/9/picked.jpg"
+    s = survey(consent_image: "https://images.pexels.com/photos/1/consent.jpg",
+               background_image: "https://images.pexels.com/photos/2/background.jpg",
+               cards: [ { "type" => "yes_no", "text" => "Q", "image" => "https://images.pexels.com/photos/3/card.jpg" } ],
+               share_image: picked)
+    assert_equal picked, s.share_image_path
+  end
+
+  test "clearing the pick restores exactly the picture the derivation had" do
+    s = survey(consent_image: "https://images.pexels.com/photos/1/consent.jpg")
+    was = s.share_image_path
+
+    s.update!(share_image: "https://images.pexels.com/photos/9/picked.jpg")
+    refute_equal was, s.share_image_path
+
+    s.update!(share_image: nil)
+    assert_equal was, s.share_image_path
+  end
+
+  # What the editor's Automatic tile shows. It has to be the derivation's own
+  # answer, not the current one — a tile that pictures the override the creator
+  # is trying to undo says nothing about what undoing it would do.
+  test "default_share_image_path ignores the pick it is offering to replace" do
+    card = "/rails/active_storage/blobs/redirect/abc123/card.jpg"
+    s = survey(cards: [ { "type" => "yes_no", "text" => "Q", "image" => card } ],
+               share_image: "https://images.pexels.com/photos/9/picked.jpg")
+    assert_equal card, s.default_share_image_path
+    refute_equal s.default_share_image_path, s.share_image_path
+  end
+
+  # The same rule the fall-through applies to every other column: og:image is
+  # fetched by a crawler, and base64 is not a thing a crawler can fetch. The
+  # controller refuses one on the way in; this is the belt to that's braces,
+  # for a value that reached the column some other way.
+  test "an unfetchable pick falls through rather than being emitted" do
+    s = survey
+    s.update_columns(share_image: "data:image/png;base64,#{PNG_B64}")
+    path = s.reload.share_image_path
+    refute_match(/\Adata:/, path)
+    assert_match %r{verto-library/backgrounds/}, path
+  end
+
+  # share_copy? is what decides whether the editor draws the share card or the
+  # "+ Share card" CTA in its place. A creator who has only picked the picture
+  # has still made a decision, and collapsing the card would hide it.
+  test "picking an image alone opens the share card" do
+    refute_predicate survey, :share_copy?
+    assert_predicate survey(share_image: "https://images.pexels.com/photos/9/picked.jpg"), :share_copy?
+  end
 end
