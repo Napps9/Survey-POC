@@ -454,8 +454,8 @@ it:
       library_remove_failed: "Impossibile rimuoverla dalla libreria"
       confirm_delete: "Eliminare davvero?"
       unsaved: Modifiche non salvate
-      undo_restored: 'Scheda ripristinata'
-      undo_removed: 'Scheda rimossa'
+      undone: "Annullato"
+      redone: "Ripristinato"
       saving: Salvataggio…
       saved: Salvato %{time}
       save_failed: 'Salvataggio non riuscito: %{msg}'
@@ -1253,6 +1253,7 @@ it:
     modal_collapse: "Richiudi questa finestra"
     live_locked_modal_note: "Puoi ancora aggiungere o riscrivere la finestra di una scheda: spiega una domanda senza modificarla."
     verto_theme: "Argomento"
+    redo: "Ripeti"
   dashboard_card:
     publish_warning: "Pubblicare “%{title}”? Una volta live, le domande saranno bloccate e non modificabili — assicurati che tutto sia esattamente come vuoi."
     preview: "Anteprima"

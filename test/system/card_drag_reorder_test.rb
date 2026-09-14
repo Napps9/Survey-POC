@@ -90,7 +90,7 @@ class CardDragReorderTest < ApplicationSystemTestCase
     simulate_drag(grip_selector("c_spine1"), card_selector("c_spine2"))
     wait_for_order("c_welcome", "c_flow1", "c_flow2", "c_spine1", "c_spine2")
 
-    find(".editor-undo-btn").click
+    find("[data-survey-editor-target='undoBtn']").click
     wait_for_order("c_welcome", "c_spine1", "c_flow1", "c_flow2", "c_spine2")
   end
 

@@ -454,8 +454,8 @@ pt:
       library_remove_failed: "Não foi possível remover da biblioteca"
       confirm_delete: "Eliminar mesmo?"
       unsaved: Alterações não guardadas
-      undo_restored: 'Cartão restaurado'
-      undo_removed: 'Cartão removido'
+      undone: "Desfeito"
+      redone: "Refeito"
       saving: A guardar…
       saved: Guardado %{time}
       save_failed: 'Falha ao guardar: %{msg}'
@@ -1253,6 +1253,7 @@ pt:
     modal_collapse: "Fechar esta janela"
     live_locked_modal_note: "Ainda podes acrescentar ou reescrever a janela de um cartão: explica uma pergunta sem a alterar."
     verto_theme: "Tema"
+    redo: "Refazer"
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"

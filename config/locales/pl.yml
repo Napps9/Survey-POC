@@ -454,8 +454,8 @@ pl:
       library_remove_failed: "Nie udało się usunąć z biblioteki"
       confirm_delete: "Na pewno usunąć?"
       unsaved: Niezapisane zmiany
-      undo_restored: 'Przywrócono kartę'
-      undo_removed: 'Usunięto kartę'
+      undone: "Cofnięto"
+      redone: "Ponowiono"
       saving: Zapisywanie…
       saved: Zapisano %{time}
       save_failed: 'Zapis nie powiódł się: %{msg}'
@@ -1255,6 +1255,7 @@ pl:
     modal_collapse: "Zwiń to okno"
     live_locked_modal_note: "Nadal możesz dodać lub przeredagować okno karty — wyjaśnia pytanie, nie zmieniając go."
     verto_theme: "Temat"
+    redo: "Ponów"
   dashboard_card:
     publish_warning: "Opublikować „%{title}”? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     preview: "Podgląd"

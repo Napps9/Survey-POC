@@ -454,8 +454,8 @@ ar:
       library_remove_failed: "تعذّرت إزالتها من المكتبة"
       confirm_delete: "حذف فعلاً؟"
       unsaved: تغييرات غير محفوظة
-      undo_restored: 'تمت استعادة البطاقة'
-      undo_removed: 'تمت إزالة البطاقة'
+      undone: "تم التراجع"
+      redone: "تمت الإعادة"
       saving: جارٍ الحفظ…
       saved: تم الحفظ %{time}
       save_failed: 'فشل الحفظ: %{msg}'
@@ -1253,6 +1253,7 @@ ar:
     modal_collapse: "اطوِ هذه النافذة"
     live_locked_modal_note: "لا يزال بإمكانك إضافة نافذة البطاقة أو إعادة صياغتها — فهي تشرح السؤال دون تغييره."
     verto_theme: "الموضوع"
+    redo: "إعادة"
   dashboard_card:
     publish_warning: "نشر «%{title}»؟ بعد النشر تُقفل أسئلتها ولا يمكن تعديلها — تأكد أن كل شيء كما تريد تمامًا."
     preview: "معاينة"

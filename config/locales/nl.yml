@@ -454,8 +454,8 @@ nl:
       library_remove_failed: "Verwijderen uit de bibliotheek mislukt"
       confirm_delete: "Echt verwijderen?"
       unsaved: Niet-opgeslagen wijzigingen
-      undo_restored: 'Kaart hersteld'
-      undo_removed: 'Kaart verwijderd'
+      undone: "Ongedaan gemaakt"
+      redone: "Opnieuw gedaan"
       saving: Opslaan…
       saved: Opgeslagen %{time}
       save_failed: 'Opslaan mislukt: %{msg}'
@@ -1253,6 +1253,7 @@ nl:
     modal_collapse: "Dit venster inklappen"
     live_locked_modal_note: "Je kunt het venster van een kaart nog toevoegen of herschrijven — het legt een vraag uit zonder die te veranderen."
     verto_theme: "Onderwerp"
+    redo: "Opnieuw"
   dashboard_card:
     publish_warning: "“%{title}” publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     preview: "Voorbeeld"

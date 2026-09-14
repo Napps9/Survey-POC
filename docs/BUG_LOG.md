@@ -8,6 +8,54 @@ and what now stops it coming back. Newest first.
 
 ---
 
+## BUG-042 — An undo that covered nine gestures and greyed out after the rest
+
+**Severity:** the editor's Undo sat disabled after most edits, and a ⌘Z pressed
+after one of them undid an earlier structural change instead of the edit just
+made.
+**Found:** the owner, editing — "when you make a change it's often greyed out;
+it should work like undo in Word, every change is undoable."
+
+BUG-014 fixed the asymmetry between delete and add by making every
+*structural* gesture push an inverse. That left the stack operation-based,
+with nine call sites, and everything else — typing, options, NPS stops, tap
+statements, the answer type, the fifteen per-card switches, flow renames and
+exits, routing, media, ✨ Optimise, a "recently deleted" restore — marking the
+deck dirty and pushing nothing. The button read the stack's length, so it was
+right about the stack and wrong about the deck. The design comment gave two
+reasons: `serialize()` reads live DOM and there is no render-from-JSON path,
+so a snapshot couldn't be put back; and text is better left to the browser.
+The second is BUG-014's own lesson left unfinished: a stack that owns some
+changes silently misattributes the next keystroke.
+
+**Fix:** a snapshot history hooked at `markDirty()`, the one call every deck
+change already makes, so coverage is automatic — including for controllers the
+change never touched and the next one written. Per card, a snapshot is the
+`serialize()` JSON (content identity: selection, pulses and renumbering are
+not changes), the outerHTML (what to restore), its relocated quiz/token/logic
+blocks and its translation-store entry; plus the flows array and the title.
+The "no render path" objection is answered by keeping element identity: a card
+is restored by morphing its own element, so the Maps keyed on it survive, and
+a deleted card comes back as the same detached node. Typing coalesces per pause
+(700 ms) or per move to another field; every other gesture is one entry; the
+one gesture that spans an await (a flow from a route) holds the stack open.
+Redo is the same entry applied the other way, with a button beside Undo. ⌘Z
+inside a deck field belongs to the history now; fields outside the deck (the
+consent gate, the settings panels) keep the browser's. Optimise morphs in
+place too, which also fixes the panel's `activeCardEl` pointing at a detached
+node afterwards.
+
+**Guard:** `test/system/editor_undo_test.rb`, seventeen tests: typing (with
+redo, grouping and persistence), an option, the answer type, a switch, a flow
+rename, the Verto's name and theme, a translation tab, an optimise replace, the
+consent-gate exception, the live guard, and BUG-014's structural cases.
+
+**Lesson:** an operation stack is only as complete as its call sites, and the
+next feature never knows it owes one. Hook the choke point instead — and if a
+history is worth having, it is worth having for everything, or it lies.
+
+---
+
 ## BUG-041 — The save warning named no card, and the log said nothing
 
 **BUG-041 — "Saved, but an image didn't stick" pointed at the wrong image.** A

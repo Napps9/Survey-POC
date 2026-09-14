@@ -458,8 +458,8 @@ sn:
       library_remove_failed: "Hazvina kukwanisika kuubvisa mulaibhurari"
       confirm_delete: "Chokwadi Bvisa?"
       unsaved: "Shanduko Dzisati Dzachengetedzwa"
-      undo_restored: 'Kadhi Radzoswa'
-      undo_removed: 'Kadhi Rabviswa'
+      undone: "Yadzoserwa"
+      redone: "Yadzokororwa"
       saving: "Kuchengetedza…"
       saved: "Yachengetedzwa %{time}"
       save_failed: "Kuchengetedza Kwakundikana: %{msg}"
@@ -1263,6 +1263,7 @@ sn:
     modal_collapse: "Peta hwindo iri"
     live_locked_modal_note: "Uchiri kugona kuwedzera kana kunyorazve hwindo rekadhi — rinotsanangura mubvunzo usingachinji."
     verto_theme: "Musoro"
+    redo: "Dzokorora"
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"

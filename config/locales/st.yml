@@ -470,8 +470,8 @@ st:
       library_remove_failed: "Ho paletswe ho se tlosa polokelong"
       confirm_delete: "Na o batla ho hlakola hantle?"
       unsaved: "Diphetoho tse sa bolokwang"
-      undo_restored: 'Karete e kgutlisitswe'
-      undo_removed: 'Karete e tlositswe'
+      undone: "E khutlisitsoe"
+      redone: "E entsoe hape"
       saving: "E ntse e boloka…"
       saved: "E bolokilwe %{time}"
       save_failed: "Ho boloka ho paletswe: %{msg}"
@@ -1275,6 +1275,7 @@ st:
     modal_collapse: "Mena fensetere ena"
     live_locked_modal_note: "O ntse o ka eketsa kapa wa ngola bocha fensetere ea karete — e hlalosa potso ntle le ho e fetola."
     verto_theme: "Sehlooho"
+    redo: "Etsa hape"
   dashboard_card:
     publish_warning: "Phatlalatsa “%{title}”? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     preview: "Pontsho"

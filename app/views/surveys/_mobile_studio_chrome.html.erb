@@ -68,6 +68,11 @@
             data-action="click->survey-editor#undoClick click->mobile-studio#closeMenu">
       <%= t("editor.undo", default: "Undo") %>
     </button>
+    <button type="button" class="m-menu-item" disabled
+            data-survey-editor-target="redoBtn"
+            data-action="click->survey-editor#redoClick click->mobile-studio#closeMenu">
+      <%= t("editor.redo", default: "Redo") %>
+    </button>
     <% unless live_locked %>
       <button type="button" class="m-menu-item"
               data-action="click->mobile-studio#duplicateActive">

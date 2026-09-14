@@ -77,11 +77,37 @@ const CARD_IMAGE_CODES = [ "image", "option_images" ]
 // key nothing on labels, and tap_card is handled separately (statements).
 const TOKEN_SYNCED_TYPES = [ "multiple_choice", "select_many", "select_one_grid", "select_many_grid", "scenario" ]
 
+// ── Undo / redo ────────────────────────────────────────────────────────────
+// (the model itself is described above _bindUndo, in the class)
+const UNDO_MAX_ENTRIES = 100
+// A rough budget for the html the two stacks retain, in UTF-16 code units. A
+// card is 10-30k, so this is hundreds of changed cards before the oldest
+// entries are let go.
+const UNDO_MAX_CHARS = 8 * 1024 * 1024
+// A run of typing is one entry until the creator pauses this long.
+const UNDO_TYPING_MS = 700
+// A held group (a gesture that spans an await) is force-closed after this,
+// so a hung fetch cannot freeze the stack.
+const UNDO_HOLD_MS = 20000
+const UNDO_BLOCK_SELECTOR = ".quiz-correct-block, .token-award-block, .logic-branch-block"
+// Classes that describe the screen, not the deck: a snapshot drops them so a
+// restore never selects a card or restarts a pulse.
+const UNDO_PRESENTATION_CLASSES = [ "selected", "card-flash", "card-optimising" ]
+// Where ⌘Z belongs to this stack rather than to the browser: text inside a
+// deck card (or one of its relocated blocks) and the Verto's name. Fields
+// outside — the consent gate, the settings panels, the add-question modal —
+// keep the browser's own undo.
+const UNDO_OWNED_FIELDS = "[data-survey-editor-target='card'], .quiz-correct-block, .token-award-block, " +
+  ".logic-branch-block, [data-survey-editor-target='vertoTitle'], [data-mobile-studio-target='titleText'], " +
+  "[data-survey-editor-target='vertoTheme'], [data-mobile-studio-target='themeText']"
+// The fields a caret can be put back into after an undo, indexed per card.
+const UNDO_FIELD_SELECTOR = "[contenteditable='true'], input, textarea"
+
 export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
     "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale",
                     "maxChoices", "maxChoicesPicker", "npsClassic", "panelNpsClassic",
-                    "recallToggle", "panelRecall", "vertoTitle", "vertoTheme", "undoBtn"]
+                    "recallToggle", "panelRecall", "vertoTitle", "vertoTheme", "undoBtn", "redoBtn"]
   static values  = {
     url: String, title: String, theme: String, description: String,
     optimiseUrl: { type: String, default: "" },
@@ -132,6 +158,9 @@ export default class extends Controller {
     this._bindUndo()
     this._bindLabelCap()
     this.refreshAll()
+    // The state every later commit diffs against. Not on a live deck: it
+    // records nothing, so there is nothing to diff.
+    if (!this.liveValue) this._undoBase = this._snapshotDeck()
 
     // Safety net for the 1.5s autosave debounce: if the page is hidden or
     // navigated away while an edit is still pending, flush it immediately so the
@@ -162,26 +191,45 @@ export default class extends Controller {
     window.removeEventListener("beforeunload", this._flushHandler)
     window.removeEventListener("submit", this._submitFlushHandler, true)
     document.removeEventListener("visibilitychange", this._visibilityHandler)
-    document.removeEventListener("keydown", this._undoHandler)
+    this._unbindUndo()
     this._hideLabelCount()
   }
 
-  // ── Undo ──────────────────────────────────────────────────────────────────
-  // Operation-based, not snapshot-based, and that isn't a preference: serialize()
-  // rebuilds the deck by reading live DOM and there is no render-from-JSON path
-  // on this side, so a stored snapshot couldn't be put back. What's stored is the
-  // inverse of each structural change.
+  // ── Undo / redo ───────────────────────────────────────────────────────────
+  // Snapshot-based, and every deck edit is in it — typing included.
   //
-  // For a delete that means keeping the detached .card-slot NODE. Node identity
-  // is what makes it work — type-panel keys its relocated quiz/token/logic blocks
-  // off the card element itself (a Map, not a cid), so re-inserting the same node
-  // silently reunites the card with blocks parked in the sidebar. Rebuilding an
-  // equivalent node would lose all of it.
+  // The previous stack was operation-based and covered nine structural
+  // gestures; everything else (words, options, answer types, the card
+  // switches, flows, routing, media, ✨ Optimise) marked the deck dirty and
+  // pushed nothing, so the button sat greyed after most edits, and a ⌘Z after
+  // one of them undid whatever structural change came before it instead. Its
+  // comment gave two reasons. "serialize() reads live DOM and there is no
+  // render-from-JSON path, so a snapshot couldn't be put back" — true, and
+  // beside the point: a card is put back by morphing its OWN element
+  // (attributes and children from the captured html), so the element identity
+  // that _store and type-panel's block WeakMaps are keyed on survives, and a
+  // deleted card is re-inserted as the same detached node. "Text is better
+  // left to the browser" — a stack that owns some changes and not others is
+  // exactly the one that greys out and misattributes (BUG-014's lesson, taken
+  // to its end), so this one owns the deck's text too and claims ⌘Z inside
+  // its fields; fields outside the deck keep the browser's undo.
   //
-  // Scope, deliberately: structural card operations only. Text edits are left to
-  // the browser's own contenteditable undo, which is better at them than anything
-  // here would be. Gates, end screens and token types save through
-  // update_settings rather than serialize(), so they're outside this entirely.
+  // How: markDirty() is the one call every deck change already makes, so it is
+  // where changes are noticed (_noteUndoChange). A commit takes a snapshot —
+  // per card: the serialize() JSON as content identity, the outerHTML as the
+  // thing to restore, its (possibly relocated) quiz/token/logic blocks and its
+  // _store entry; plus the flows array, the title and the theme — diffs it against the
+  // last committed one, and pushes {before, after} holding only what differed.
+  // Presentation-only churn (selection, pulses, renumbering) is not a change:
+  // the JSON decides. Typing coalesces until a pause (UNDO_TYPING_MS) or a move
+  // to another field; every other gesture is one entry. Undo/redo reconcile
+  // the feed to a side (order and membership first, then each changed card in
+  // place), re-snapshot, and persist through the ordinary autosave.
+  //
+  // Outside it, by design: the in-feed gate cards and the settings panels
+  // (both save through update_settings, and a settings form reloads the page,
+  // which starts this history fresh), and any DOM change serialize() does not
+  // carry — those do not persist either.
 
   // ── Grid tile labels: a cap, and a counter that shows it ─────────────────
   //
@@ -508,121 +556,510 @@ export default class extends Controller {
     }
   }
 
-  MAX_UNDO = 25
-
   _bindUndo() {
     this._undoStack = []
-    this._refreshUndoButton()
-    this._undoHandler = (event) => {
-      const z = event.key === "z" || event.key === "Z"
-      if (!z || !(event.metaKey || event.ctrlKey) || event.shiftKey) return
-      // Typing? That's the browser's undo, not ours — it handles text far better.
-      const t = event.target
-      if (t?.isContentEditable || [ "INPUT", "TEXTAREA", "SELECT" ].includes(t?.tagName)) return
-      if (this.liveValue) return
-      if (!this._undoStack.length) return
-      event.preventDefault()
-      this._performUndo()
+    this._redoStack = []
+    this._undoBase  = null
+    this._undoHold  = 0
+    this._replaying = false
+    this._refreshUndoButtons()
+
+    this._undoKeyHandler = (event) => this._undoKeydown(event)
+    document.addEventListener("keydown", this._undoKeyHandler)
+    // The context menu's Undo and a phone's shake-to-undo arrive as a
+    // beforeinput, not a keystroke.
+    this._undoInputHandler = (event) => this._undoBeforeInput(event)
+    document.addEventListener("beforeinput", this._undoInputHandler, true)
+    // A run of typing closes when the creator moves on — to another field, or
+    // to a click anywhere else — so the next gesture gets an entry of its own.
+    // Capture phase: this has to run before the click's own handler mutates.
+    this._undoFocusHandler   = (event) => this._closeTypingRunUnless(event.target)
+    this._undoPointerHandler = (event) => this._closeTypingRunUnless(event.target)
+    this.element.addEventListener("focusin", this._undoFocusHandler, true)
+    this.element.addEventListener("pointerdown", this._undoPointerHandler, true)
+  }
+
+  _unbindUndo() {
+    document.removeEventListener("keydown", this._undoKeyHandler)
+    document.removeEventListener("beforeinput", this._undoInputHandler, true)
+    this.element.removeEventListener("focusin", this._undoFocusHandler, true)
+    this.element.removeEventListener("pointerdown", this._undoPointerHandler, true)
+    clearTimeout(this._undoTypingTimer)
+    clearTimeout(this._undoGestureTimer)
+    clearTimeout(this._undoHoldTimer)
+  }
+
+  // ⌘Z / Ctrl+Z undo; ⌘⇧Z, Ctrl+⇧Z and Ctrl+Y redo.
+  _undoKeydown(event) {
+    if (event.isComposing || event.altKey) return
+    const mod = event.metaKey || event.ctrlKey
+    if (!mod) return
+    const key  = (event.key || "").toLowerCase()
+    const undo = key === "z" && !event.shiftKey
+    const redo = (key === "z" && event.shiftKey) || (key === "y" && event.ctrlKey && !event.metaKey)
+    if (!undo && !redo) return
+    // A locked deck records nothing, so there is nothing to claim the key for
+    // — and the intro modal, the one edit it still takes, keeps native undo.
+    if (this.liveValue) return
+    if (!this._ownsUndoKey(event.target)) return
+    event.preventDefault()
+    if (undo) this.undo()
+    else this.redo()
+  }
+
+  _undoBeforeInput(event) {
+    const type = event.inputType
+    if (type !== "historyUndo" && type !== "historyRedo") return
+    if (this.liveValue || !this._ownsUndoKey(event.target)) return
+    event.preventDefault()
+    if (type === "historyUndo") this.undo()
+    else this.redo()
+  }
+
+  // Anywhere that is not a text field, or a text field the deck owns.
+  _ownsUndoKey(target) {
+    if (!(target instanceof Element)) return true
+    const field = target.isContentEditable || [ "INPUT", "TEXTAREA", "SELECT" ].includes(target.tagName)
+    return !field || !!target.closest(UNDO_OWNED_FIELDS)
+  }
+
+  // The chrome's ↩ / ↪ buttons — same stacks and live guard as the keys. Both
+  // are disabled whenever their stack is empty; the checks in undo()/redo()
+  // are belt and braces.
+  undoClick() { if (!this.liveValue) this.undo() }
+  redoClick() { if (!this.liveValue) this.redo() }
+
+  undo() {
+    this._flushUndoTimers()
+    const entry = this._undoStack.pop()
+    if (!entry) return
+    this._applySnapshotSide(entry.before)
+    this._redoStack.push(entry)
+    this._refreshUndoButtons()
+    this.flash(t("editor.undone"), "text-aquamarine")
+    this._restoreFocus(entry.focus)
+  }
+
+  redo() {
+    // A change typed since the undo closes the redo branch, the same way it
+    // would in any editor — committing it here is what does that.
+    this._flushUndoTimers()
+    const entry = this._redoStack.pop()
+    if (!entry) return
+    this._applySnapshotSide(entry.after)
+    this._undoStack.push(entry)
+    this._refreshUndoButtons()
+    this.flash(t("editor.redone"), "text-aquamarine")
+    this._restoreFocus(entry.focus)
+  }
+
+  // Plural: the mobile studio's overflow menu carries a second Undo and Redo
+  // (the desktop float bar's are hidden at phone width), and a button that
+  // never greys out claims there is something to undo when there is not.
+  _refreshUndoButtons() {
+    const noUndo = !this._undoStack?.length
+    const noRedo = !this._redoStack?.length
+    this.undoBtnTargets.forEach(btn => { btn.disabled = noUndo })
+    this.redoBtnTargets.forEach(btn => { btn.disabled = noRedo })
+  }
+
+  // ── Noticing changes ──────────────────────────────────────────────────────
+  // Called by markDirty with whatever event reached it (often none). Typing —
+  // an input event streaming from a text field, a slider or a colour well —
+  // keeps one entry open until the creator pauses; anything else is a gesture
+  // and commits on the next macrotask, so the several markDirty calls one
+  // gesture makes (a type switch rebuilds, dispatches, syncs) land in one
+  // entry. A macrotask rather than an animation frame: frames pause in a
+  // background tab and are throttled under load, and nothing here paints.
+  _noteUndoChange(event) {
+    if (!this._undoBase) return
+    if (this._undoHold > 0) { this._undoCommitWanted = true; return }
+    if (this._undoKind(event) === "typing") {
+      this._undoTypingField = document.activeElement
+      clearTimeout(this._undoTypingTimer)
+      this._undoTypingTimer = setTimeout(() => this._commitUndo(), UNDO_TYPING_MS)
+      return
     }
-    document.addEventListener("keydown", this._undoHandler)
+    clearTimeout(this._undoTypingTimer)
+    this._undoTypingTimer = null
+    if (!this._undoGestureTimer) this._undoGestureTimer = setTimeout(() => this._commitUndo(), 0)
   }
 
-  // The chrome's ↩ button — same stack and live guard as the keystroke, minus
-  // the focus rules that only make sense mid-typing. The button is disabled
-  // whenever the stack is empty, so the length check is belt and braces.
-  undoClick() {
-    if (this.liveValue || !this._undoStack.length) return
-    this._performUndo()
+  _undoKind(event) {
+    if (!event) return "gesture"
+    // The colour well fires per drag frame; each stop would be an entry.
+    if (event.type === "option-style:changed") return "typing"
+    if (event.type !== "input") return "gesture"
+    return this._isStreamingInput(event.target) ? "typing" : "gesture"
   }
 
-  _performUndo() {
-    // An entry may return false to mean "stale — nothing to undo" (a flow
-    // dissolved through the panel outlives its creation entry). Skip to the
-    // next real one instead of eating the gesture on a no-op.
-    let acted
-    do { acted = this._undoStack.pop()() } while (acted === false && this._undoStack.length)
-    this._refreshUndoButton()
-    if (acted === false) return
-    this._renumberAndPersist()
+  _isStreamingInput(node) {
+    if (!(node instanceof Element)) return false
+    if (node.isContentEditable || node.tagName === "TEXTAREA") return true
+    if (node.tagName !== "INPUT") return false
+    const type = (node.type || "text").toLowerCase()
+    return ![ "checkbox", "radio", "file", "button", "submit", "reset", "image" ].includes(type)
   }
 
-  _pushUndo(fn) {
-    this._undoStack.push(fn)
-    if (this._undoStack.length > this.MAX_UNDO) this._undoStack.shift()
-    this._refreshUndoButton()
+  // Focus or a pointer landing outside the field being typed in ends its run.
+  _closeTypingRunUnless(target) {
+    if (!this._undoTypingTimer) return
+    const field = this._undoTypingField
+    if (field && target instanceof Node && field.contains(target)) return
+    this._commitUndo()
   }
 
-  // Plural: the mobile studio's overflow menu carries a second Undo (the
-  // desktop float bar's is hidden at phone width), and a button that never
-  // greys out claims there is something to undo when there is not.
-  _refreshUndoButton() {
-    const empty = !this._undoStack.length
-    this.undoBtnTargets.forEach((btn) => { btn.disabled = empty })
+  _flushUndoTimers() {
+    if (this._undoTypingTimer || this._undoGestureTimer) this._commitUndo()
   }
 
-  // Where a slot currently sits, as a closure that puts it back there. Captured
-  // BEFORE the move, so a reorder undoes to its exact previous neighbour rather
-  // than to an index that other edits may have shifted.
-  //
-  // The next .card-slot specifically — NOT the literal nextElementSibling.
-  // _paintFlowChrome (called by every renumberCards(), including the one this
-  // very move triggers) unconditionally removes and rebuilds every
-  // .flow-header-row/.flow-tabs-row on each repaint, so a slot sitting right
-  // before one would capture a node that's already gone by the time undo
-  // runs — silently falling through to the parent.appendChild(slot) branch
-  // below and restoring to the END of the feed instead of its real neighbour.
-  // Real .card-slot elements are never torn down that way, only the chrome
-  // between them, so walking past any chrome to the next actual slot is what
-  // survives a repaint.
-  _slotRestorer(slot) {
-    const parent = slot.parentNode
-    let next = slot.nextElementSibling
-    while (next && !next.classList.contains("card-slot")) next = next.nextElementSibling
-    return () => {
-      if (!parent) return
-      if (next && next.parentNode === parent) parent.insertBefore(slot, next)
-      else parent.appendChild(slot)
+  // A gesture that spans an await (creating a flow mints it, then fetches its
+  // starter card) holds the stack open so both halves land in one entry.
+  beginUndoGroup() {
+    this._undoHold++
+    clearTimeout(this._undoHoldTimer)
+    this._undoHoldTimer = setTimeout(() => { this._undoHold = 0; this._releaseUndoGroup() }, UNDO_HOLD_MS)
+  }
+
+  endUndoGroup() {
+    if (this._undoHold > 0) this._undoHold--
+    if (this._undoHold > 0) return
+    clearTimeout(this._undoHoldTimer)
+    this._releaseUndoGroup()
+  }
+
+  _releaseUndoGroup() {
+    if (!this._undoCommitWanted) return
+    this._undoCommitWanted = false
+    this._commitUndo()
+  }
+
+  _commitUndo() {
+    clearTimeout(this._undoTypingTimer)
+    clearTimeout(this._undoGestureTimer)
+    this._undoTypingTimer = this._undoGestureTimer = null
+    if (this._undoHold > 0) { this._undoCommitWanted = true; return }
+    if (!this._undoBase || this._replaying) return
+    const focus = this._captureFocus()
+    const next  = this._snapshotDeck(this._undoBase)
+    const entry = this._diffSnapshots(this._undoBase, next)
+    this._undoBase = next
+    this._undoTypingField = null
+    if (!entry) return
+    entry.focus = focus
+    entry.chars = this._entryChars(entry)
+    this._undoStack.push(entry)
+    this._redoStack.length = 0
+    this._trimUndo()
+    this._refreshUndoButtons()
+  }
+
+  // ── Snapshots ─────────────────────────────────────────────────────────────
+  // One serialize() per snapshot. A card whose JSON matches the base's keeps
+  // the base's record, so only what changed is re-captured.
+  _snapshotDeck(base = null) {
+    const cards   = this.serialize().cards || []
+    const order   = this.cardTargets.slice()
+    const records = new Map()
+    order.forEach((el, i) => {
+      const json = JSON.stringify(cards[i] ?? null)
+      const prev = base?.records.get(el)
+      records.set(el, prev && prev.json === json ? prev : this._captureCardRecord(el, json))
+    })
+    return { order, records, flows: JSON.stringify(this.flowsList()),
+             title: this.titleValue || "", theme: this.themeValue || "" }
+  }
+
+  _captureCardRecord(el, json) {
+    const blocks = {}
+    Object.entries(this._undoBlocksFor(el)).forEach(([ kind, live ]) => {
+      blocks[kind] = live ? this._captureBlockHtml(live) : null
+    })
+    return { el, json, blocks, html: this._captureCardHtml(el),
+             store: JSON.stringify(this._store.get(el) ?? null) }
+  }
+
+  // A card's three relocatable blocks, wherever each currently lives: the
+  // panel's registry first (it moves them into the sidebar for the selected
+  // card), the card itself for one never registered.
+  _undoBlocksFor(el) {
+    const panel = this._typePanel()
+    return {
+      quiz:  panel?.quizBlockFor(el)  || el.querySelector(".quiz-correct-block"),
+      token: panel?.tokenBlockFor(el) || el.querySelector(".token-award-block"),
+      logic: panel?.logicBlockFor(el) || el.querySelector(".logic-branch-block")
     }
   }
 
-  // Called by type-panel immediately BEFORE it removes a slot, so the node is
-  // captured while it's still attached and its position is still known.
-  recordCardDeletion(slot) {
-    if (!slot) return
-    const restore = this._slotRestorer(slot)
-    this._pushUndo(() => {
-      restore()
-      this.flash(t("editor.undo_restored", { default: "Card restored" }), "text-aquamarine")
-    })
+  // The card's markup without its blocks (captured separately, since they may
+  // be elsewhere) and without the classes that only describe the screen.
+  _captureCardHtml(el) {
+    const clone = el.cloneNode(true)
+    clone.querySelectorAll(UNDO_BLOCK_SELECTOR).forEach(b => b.remove())
+    clone.classList.remove(...UNDO_PRESENTATION_CLASSES)
+    this._syncFormState(clone)
+    return clone.outerHTML
   }
 
-  // The mirror of recordCardDeletion, called AFTER a slot has been spliced in.
-  //
-  // Without this the stack was asymmetric, which is worse than having no undo
-  // at all: adding a card pushed nothing, so the next ⌘Z popped whatever
-  // delete or reorder happened before it and silently undid *that* instead —
-  // an action the creator had no reason to think was still pending.
-  recordCardInsertion(slot) {
-    if (!slot) return
-    this._pushUndo(() => {
-      slot.remove()
-      this.flash(t("editor.undo_removed", { default: "Card removed" }), "text-aquamarine")
-    })
+  _captureBlockHtml(block) {
+    const clone = block.cloneNode(true)
+    this._syncFormState(clone)
+    return clone.outerHTML
   }
 
-  // One gesture, one undo entry. Creating a flow from an answer splices several
-  // cards AND mints the flow, so pushing a per-card inverse would let ⌘Z strand
-  // a flow holding fewer cards than it was built with. This undoes the whole
-  // gesture, which is the only state the creator ever saw.
-  recordFlowCreation(flowId) {
-    if (!flowId) return
-    this._pushUndo(() => {
-      // The flow may have been dissolved through the panel since; undoing then
-      // would flash "removed" while removing nothing. Report stale instead.
-      if (!this.flowsList().some(f => f.id === flowId)) return false
-      this.removeFlow(flowId, { deleteCards: true })
-      this.flash(t("editor.undo_removed", { default: "Card removed" }), "text-aquamarine")
+  // cloneNode carries a control's live value, checkedness and selection, but
+  // outerHTML writes attributes only — so write the live state into the
+  // attributes the parsed markup will read back as defaults. Token amounts,
+  // the token on/off box, the quiz selects and textareas all live in
+  // properties rather than markup; the logic selects don't need this
+  // (refreshLogicTargets rebuilds them from data-logic-selected on every
+  // repaint), and syncing them anyway costs nothing.
+  _syncFormState(root) {
+    root.querySelectorAll("input").forEach(input => {
+      const type = (input.type || "text").toLowerCase()
+      if (type === "checkbox" || type === "radio") input.toggleAttribute("checked", input.checked)
+      else if (![ "file", "button", "submit", "reset", "image" ].includes(type)) input.setAttribute("value", input.value)
     })
+    root.querySelectorAll("textarea").forEach(ta => { ta.textContent = ta.value })
+    root.querySelectorAll("option").forEach(opt => opt.toggleAttribute("selected", opt.selected))
+  }
+
+  // Null when nothing the deck persists differs — a markDirty from a select
+  // that landed on the value it already had, a repaint, a selection.
+  _diffSnapshots(a, b) {
+    const changed = []
+    new Set([ ...a.records.keys(), ...b.records.keys() ]).forEach(el => {
+      const ra = a.records.get(el), rb = b.records.get(el)
+      if (!ra || !rb || ra.json !== rb.json) changed.push(el)
+    })
+    const orderChanged = a.order.length !== b.order.length || a.order.some((el, i) => el !== b.order[i])
+    const flowsChanged = a.flows !== b.flows
+    const titleChanged = a.title !== b.title
+    const themeChanged = a.theme !== b.theme
+    if (!changed.length && !orderChanged && !flowsChanged && !titleChanged && !themeChanged) return null
+    const side = (s) => ({
+      order:   s.order,
+      records: changed.map(el => s.records.get(el)).filter(Boolean),
+      flows:   flowsChanged ? s.flows : null,
+      title:   titleChanged ? s.title : null,
+      theme:   themeChanged ? s.theme : null
+    })
+    return { before: side(a), after: side(b) }
+  }
+
+  _entryChars(entry) {
+    const weigh = (r) => r.html.length + (r.store?.length || 0) +
+      Object.values(r.blocks).reduce((n, h) => n + (h?.length || 0), 0)
+    return [ ...entry.before.records, ...entry.after.records ].reduce((n, r) => n + weigh(r), 0)
+  }
+
+  _trimUndo() {
+    while (this._undoStack.length > UNDO_MAX_ENTRIES) this._undoStack.shift()
+    let chars = 0
+    for (let i = this._undoStack.length - 1; i >= 0; i--) {
+      chars += this._undoStack[i].chars || 0
+      if (chars > UNDO_MAX_CHARS) { this._undoStack.splice(0, i + 1); break }
+    }
+    this._pruneStore()
+  }
+
+  // _store is a strong Map, so a card that left the deck lives on for as long
+  // as its key does. Keep every element a snapshot still names (an undo may
+  // put it back), drop the rest — which bounds the detached nodes retained.
+  _pruneStore() {
+    const keep = new Set(this._undoBase?.order || [])
+    const note = (side) => { side.order.forEach(el => keep.add(el)); side.records.forEach(r => keep.add(r.el)) }
+    this._undoStack.forEach(e => { note(e.before); note(e.after) })
+    this._redoStack.forEach(e => { note(e.before); note(e.after) })
+    for (const el of [ ...this._store.keys() ]) {
+      if (!el.isConnected && !keep.has(el)) this._store.delete(el)
+    }
+  }
+
+  // ── Restoring a side ──────────────────────────────────────────────────────
+  _applySnapshotSide(side) {
+    this._replaying = true
+    try {
+      if (side.flows != null) this._flows = JSON.parse(side.flows)
+      if (side.title != null) this._restoreTitle(side.title)
+      if (side.theme != null) this._restoreTheme(side.theme)
+      const removed = this._reconcileOrder(side.order)
+      side.records.forEach(r => this._restoreCardRecord(r))
+      // A style popover open on a row that just changed under it would edit
+      // a row the markup no longer has.
+      this.application.getControllerForElementAndIdentifier(this.element, "option-style")?.close()
+      this._typePanel()?.afterUndoRestore?.({ removed, changed: side.records.map(r => r.el) })
+      this.refreshAll()
+      // The base is what is on screen NOW, re-read rather than assumed, so a
+      // capture that drifted from the restore shows up as a diff instead of
+      // hiding until the next edit.
+      this._undoBase = this._snapshotDeck(this._undoBase)
+      this.markDirty() // the ordinary autosave persists the restore
+    } finally {
+      this._replaying = false
+    }
+  }
+
+  // Put the slots in `order`, re-inserting the ones that had left the feed
+  // (the same detached nodes, so everything keyed on them still holds) and
+  // removing the ones that are not in it. Flow header/tab rows displaced on
+  // the way are rebuilt wholesale by the refreshAll() that follows, exactly as
+  // after any reorder.
+  _reconcileOrder(order) {
+    const feed = this.hasFeedTarget ? this.feedTarget : null
+    if (!feed) return []
+    const wanted  = new Set(order)
+    const removed = []
+    feed.querySelectorAll(":scope > .card-slot").forEach(slot => {
+      const card = slot.querySelector("[data-survey-editor-target='card']")
+      if (card && !wanted.has(card)) { removed.push(card); slot.remove() }
+    })
+    const nextSlot = (node) => {
+      let n = node.nextElementSibling
+      while (n && !n.classList.contains("card-slot")) n = n.nextElementSibling
+      return n
+    }
+    let prev = null
+    order.forEach(el => {
+      let slot = el.closest(".card-slot")
+      if (!slot) {
+        slot = document.createElement("div")
+        slot.className = "card-slot"
+        slot.appendChild(el)
+      }
+      if (prev) {
+        if (nextSlot(prev) !== slot) prev.after(slot)
+      } else {
+        const first = feed.querySelector(":scope > .card-slot")
+        if (first !== slot) {
+          if (first) first.before(slot)
+          else {
+            const ty = feed.querySelector("[data-gate-cards-target='tyCta']")
+            if (ty) ty.before(slot)
+            else feed.appendChild(slot)
+          }
+        }
+      }
+      prev = slot
+    })
+    return removed
+  }
+
+  _restoreCardRecord(r) {
+    const el   = r.el
+    const live = this._undoBlocksFor(el)
+    // Lift the blocks out before the morph replaces the children, so the
+    // elements the panel's registry holds survive it.
+    const wasInside = {}
+    Object.entries(live).forEach(([ kind, block ]) => {
+      wasInside[kind] = !!block && el.contains(block)
+      if (wasInside[kind]) block.remove()
+    })
+    this._morphElement(el, r.html)
+    const bound = {}
+    Object.entries(r.blocks).forEach(([ kind, html ]) => {
+      let block = live[kind]
+      if (html) {
+        if (block) this._morphElement(block, html)
+        else { block = this._parseElement(html); wasInside[kind] = true }
+        if (wasInside[kind]) el.appendChild(block)
+      } else if (block) {
+        block.remove()
+        block = null
+      }
+      bound[kind] = block
+    })
+    this._typePanel()?.bindBlocks?.(el, bound)
+    const entry = r.store ? JSON.parse(r.store) : null
+    if (entry) this._store.set(el, entry)
+    else this._store.delete(el)
+    // The html was captured under whichever language tab was open then; the
+    // words shown now come from the store for the tab open now.
+    if (entry) {
+      const active = this._activeLocale, primary = this.defaultLocaleValue
+      this._writeCard(el, entry[active], entry[primary], active)
+    }
+    el.classList.remove(...UNDO_PRESENTATION_CLASSES)
+  }
+
+  _parseElement(html) {
+    const tpl = document.createElement("template")
+    tpl.innerHTML = (html || "").trim()
+    return tpl.content.firstElementChild
+  }
+
+  // The element keeps its identity; its attributes and children become the
+  // markup's. Unchanged attributes are left alone so Stimulus sees no churn.
+  _morphElement(el, html) {
+    const src = this._parseElement(html)
+    if (!src) return
+    for (const name of el.getAttributeNames()) {
+      if (!src.hasAttribute(name)) el.removeAttribute(name)
+    }
+    for (const { name, value } of [ ...src.attributes ]) {
+      if (el.getAttribute(name) !== value) el.setAttribute(name, value)
+    }
+    el.replaceChildren(...src.childNodes)
+  }
+
+  _restoreTitle(title) {
+    this.titleValue = title
+    if (this.hasVertoTitleTarget) this.vertoTitleTarget.textContent = title
+    const pill = this.element.querySelector("[data-mobile-studio-target='titleText']")
+    if (pill) pill.textContent = title
+  }
+
+  _restoreTheme(theme) {
+    this.themeValue = theme
+    if (this.hasVertoThemeTarget) this.vertoThemeTarget.textContent = theme
+    const pill = this.element.querySelector("[data-mobile-studio-target='themeText']")
+    if (pill) pill.textContent = theme
+  }
+
+  // ── Caret ────────────────────────────────────────────────────────────────
+  // Where the creator was when the entry closed — a field in a card, by
+  // index, or the Verto's name — so undoing a run of typing puts them back
+  // there. Fields outside the deck (the panel switches, modals) are not
+  // recorded: an undo of a gesture leaves focus where it is.
+  _captureFocus() {
+    const ae = document.activeElement
+    if (!(ae instanceof Element)) return null
+    if (ae.closest("[data-survey-editor-target='vertoTitle'], [data-mobile-studio-target='titleText']")) return { title: true }
+    if (ae.closest("[data-survey-editor-target='vertoTheme'], [data-mobile-studio-target='themeText']")) return { theme: true }
+    const card = ae.closest("[data-survey-editor-target='card']")
+    if (!card) return null
+    const index = [ ...card.querySelectorAll(UNDO_FIELD_SELECTOR) ].indexOf(ae)
+    return index < 0 ? null : { card, index }
+  }
+
+  _restoreFocus(focus) {
+    if (!focus) return
+    let field = null
+    if (focus.title || focus.theme) {
+      const pill = this.element.querySelector(focus.title ? "[data-mobile-studio-target='titleText']" : "[data-mobile-studio-target='themeText']")
+      const desk = focus.title ? (this.hasVertoTitleTarget ? this.vertoTitleTarget : null)
+                               : (this.hasVertoThemeTarget ? this.vertoThemeTarget : null)
+      field = [ pill, desk ].find(f => f && f.offsetParent !== null) || null
+    } else if (focus.card?.isConnected) {
+      field = [ ...focus.card.querySelectorAll(UNDO_FIELD_SELECTOR) ][focus.index] || null
+    }
+    // A field inside a folded modal or a hidden flow: the undo is done, the
+    // caret just has nowhere visible to go.
+    if (!field || !field.isConnected || field.offsetParent === null) return
+    try {
+      field.focus({ preventScroll: true })
+      if (field.isContentEditable) {
+        const range = document.createRange()
+        range.selectNodeContents(field)
+        range.collapse(false)
+        const sel = window.getSelection()
+        sel.removeAllRanges()
+        sel.addRange(range)
+      } else if (typeof field.setSelectionRange === "function") {
+        const n = field.value.length
+        field.setSelectionRange(n, n)
+      }
+    } catch (_) { /* a number input refuses a selection range — fine */ }
   }
 
   // Shared tail: renumber, repaint and schedule the save that persists the undo.
@@ -753,6 +1190,9 @@ export default class extends Controller {
   switchLocale(event) {
     const locale = event.currentTarget.dataset.locale
     if (!locale || locale === this._activeLocale) return
+    // A run of typing under the old tab is its own entry, not part of
+    // whatever is typed under the new one.
+    this._flushUndoTimers()
     this._captureLocale(this._activeLocale)
     this._activeLocale = locale
     this._applyLocale(locale)
@@ -1022,10 +1462,8 @@ export default class extends Controller {
     const pinned = prevCard?.dataset.cardType === "welcome_card" &&
                    card?.dataset.cardType !== "consent_gate"
     if (!slot || !hit || !prevCard || pinned) return
-    const undo = this._slotRestorer(slot)   // captured before the move
     if (hit.hopped) hit.slot.after(slot)   // hopped a flow run ⇒ land just after it
     else hit.slot.before(slot)
-    this._pushUndo(undo)
     this._afterReorder(card)
   }
 
@@ -1045,10 +1483,8 @@ export default class extends Controller {
     const hit = this._reorderNeighbor(card, slot, 1)
     if (!slot || !hit) return
     if (this._gateBlockedBelow(card, hit)) return
-    const undo = this._slotRestorer(slot)   // captured before the move
     if (hit.hopped) hit.slot.before(slot)  // hopped a flow run ⇒ land just before it
     else hit.slot.after(slot)
-    this._pushUndo(undo)
     this._afterReorder(card)
   }
 
@@ -1149,7 +1585,6 @@ export default class extends Controller {
     this._dragCard  = card
     this._dragSlot  = slot
     this._dragGaps  = this._legalGapsFor(card, slot)
-    this._dragUndo  = this._slotRestorer(slot) // one gesture, captured once, before any move
     this._dragMoved = false
 
     event.dataTransfer.effectAllowed = "move"
@@ -1188,17 +1623,15 @@ export default class extends Controller {
   }
 
   // Fires on the drag SOURCE (the grip) whether the drop landed or was
-  // cancelled, so this — not drop — is the one place cleanup and the single
-  // undo entry for the whole gesture belong.
+  // cancelled, so this — not drop — is the one place cleanup belongs. The
+  // markDirty inside _afterReorder is what makes the whole gesture one undo
+  // entry: dragOver only paints, drop moves the slot once.
   dragEnd() {
-    if (this._dragMoved) {
-      this._pushUndo(this._dragUndo)
-      this._afterReorder(this._dragCard)
-    }
+    if (this._dragMoved) this._afterReorder(this._dragCard)
     this._dragGaps?.forEach(g => g.ref.classList.remove("is-drop-target"))
     this._dragHoverSlot?.classList.remove("is-drop-here-before", "is-drop-here-after")
     this._dragSlot?.classList.remove("is-dragging")
-    this._dragCard = this._dragSlot = this._dragGaps = this._dragUndo = this._dragHoverSlot = null
+    this._dragCard = this._dragSlot = this._dragGaps = this._dragHoverSlot = null
     this._dragMoved = false
   }
 
@@ -1527,24 +1960,33 @@ export default class extends Controller {
     }
   }
 
+  //
+  // Morphed in place rather than swapped: the element is what _store, the
+  // type panel's block registry, its activeCardEl and the undo snapshots all
+  // hold, so it stays and only its attributes and children change. (The swap
+  // used to leave activeCardEl pointing at the detached node, with the card's
+  // sidebar blocks parked for good.) The rendered html brings fresh
+  // quiz/token/logic blocks, so the ones bound before it — wherever the panel
+  // had relocated them — go.
   _replaceCard(oldEl, html, cardJson) {
-    const tmp = document.createElement("div")
-    tmp.innerHTML = (html || "").trim()
-    const newEl = tmp.firstElementChild
-    if (!newEl) return
+    if (!this._parseElement(html)) return
 
-    oldEl.replaceWith(newEl)
-    this._typePanel()?.registerCard(newEl)
+    const panel = this._typePanel()
+    Object.values(this._undoBlocksFor(oldEl)).forEach(block => {
+      if (block && !oldEl.contains(block)) block.remove()
+    })
+    this._morphElement(oldEl, html)
+    panel?.rebindCard?.(oldEl)
+    if (panel?.activeCardEl === oldEl) panel.reselectCard?.(oldEl)
 
-    this._store.delete(oldEl)
-    this.seedCardStore(newEl, cardJson)
+    this.seedCardStore(oldEl, cardJson)
 
-    this.refreshCard(newEl)
+    this.refreshCard(oldEl)
     this.refreshScore()
     this.markDirty()
-    newEl.classList.remove("card-optimising")
-    newEl.classList.add("card-flash")
-    setTimeout(() => newEl.classList.remove("card-flash"), 1300)
+    oldEl.classList.remove("card-optimising")
+    oldEl.classList.add("card-flash")
+    setTimeout(() => oldEl.classList.remove("card-flash"), 1300)
   }
 
   _csrf() {
@@ -1591,21 +2033,6 @@ export default class extends Controller {
     const open = panel.hidden
     panel.hidden = !open
     event.currentTarget.setAttribute("aria-expanded", String(open))
-  }
-
-  edit(event) {
-    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
-    if (card) this.refreshCard(card)
-    this.markDirty()
-  }
-
-  deleteCard(event) {
-    event.preventDefault()
-    const card = event.currentTarget.closest("[data-survey-editor-target='card']")
-    if (!confirm(t("editor.delete_card_confirm"))) return
-    card.remove()
-    this.refreshAll()
-    this.markDirty()
   }
 
   // ── Card settings (Answer Type tab) — Allow-Other / Required ──────────
@@ -2098,7 +2525,7 @@ export default class extends Controller {
   // so the editor had no way to rename a Verto. Reuses the ordinary autosave:
   // markDirty schedules the same 1.5s save every other edit uses.
 
-  renameVerto() {
+  renameVerto(event) {
     const el = this.vertoTitleTarget
     const next = el.textContent.replace(/\s+/g, " ").trim()
     // A blank is not a rename, it's a name mid-retype. Keep titleValue on the
@@ -2108,7 +2535,10 @@ export default class extends Controller {
     if (!next) return
     if (next === this.titleValue) return
     this.titleValue = next
-    this.markDirty()
+    // The event goes through so the undo stack can tell a keystroke here from
+    // a gesture: this action is bound with :stop, so the root's own
+    // input->markDirty never sees it.
+    this.markDirty(event)
   }
 
   // Enter would insert a newline into a single-line title; commit instead.
@@ -2133,12 +2563,12 @@ export default class extends Controller {
   // after the wizard, so a copy's "(Copy)" was permanent. serialize() sends
   // it as `theme`; #update caps it and stores it.
 
-  renameTheme() {
+  renameTheme(event) {
     const next = this.vertoThemeTarget.textContent.replace(/\s+/g, " ").trim()
     if (!next) return
     if (next === this.themeValue) return
     this.themeValue = next
-    this.markDirty()
+    this.markDirty(event) // the event, so the undo stack groups it as typing (see renameVerto)
   }
 
   commitTheme(event) {
@@ -2152,7 +2582,7 @@ export default class extends Controller {
     el.textContent = this.themeValue
   }
 
-  markDirty() {
+  markDirty(event) {
     // Repaint the card being edited (or everything on a structural change) and
     // the overall score, so the lights track edits as they're typed.
     const active = document.activeElement?.closest?.("[data-survey-editor-target='card']")
@@ -2165,6 +2595,11 @@ export default class extends Controller {
     // it carries its own save (_saveCardModal), so this returns after the
     // repaint rather than queueing a request that exists to be rejected.
     if (this.liveValue) return
+
+    // Every deck change passes through here, which is what makes this the
+    // place the undo stack notices them. An undo's own repaint-and-save must
+    // not be noticed as a further change (_replaying).
+    if (!this._replaying) this._noteUndoChange(event)
 
     this.flash(t("editor.unsaved"), "text-light-yellow")
     this._dirty = true

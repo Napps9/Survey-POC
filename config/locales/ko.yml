@@ -454,8 +454,8 @@ ko:
       library_remove_failed: "라이브러리에서 제거하지 못했습니다"
       confirm_delete: "정말 삭제할까요?"
       unsaved: 저장되지 않은 변경사항
-      undo_restored: '카드를 복원했습니다'
-      undo_removed: '카드를 삭제했습니다'
+      undone: "실행 취소됨"
+      redone: "다시 실행됨"
       saving: 저장 중…
       saved: "%{time}에 저장됨"
       save_failed: '저장 실패: %{msg}'
@@ -1253,6 +1253,7 @@ ko:
     modal_collapse: "이 설명 접기"
     live_locked_modal_note: "카드 설명은 지금도 추가하거나 고쳐 쓸 수 있습니다. 질문을 바꾸지 않고 설명해 줍니다."
     verto_theme: "주제"
+    redo: "다시 실행"
   dashboard_card:
     publish_warning: "“%{title}”을(를) 게시할까요? 라이브가 되면 질문이 잠겨 수정할 수 없어요 — 모든 내용이 원하는 대로인지 확인하세요."
     preview: "미리보기"

@@ -470,8 +470,8 @@ tn:
       library_remove_failed: "Go paletswe go se ntsha mo laeboraring"
       confirm_delete: "A o tlhomamisa go phimola?"
       unsaved: "Diphetogo tse di sa bolokwang"
-      undo_restored: 'Karata e busitswe'
-      undo_removed: 'Karata e tlositswe'
+      undone: "E busitswe"
+      redone: "E dirilwe gape"
       saving: "E a boloka…"
       saved: "E bolokilwe %{time}"
       save_failed: "Go boloka go paletswe: %{msg}"
@@ -1275,6 +1275,7 @@ tn:
     modal_collapse: "Mena letlhabaphefo le"
     live_locked_modal_note: "O sa ntse o ka oketsa kgotsa wa kwala sesha letlhabaphefo la karata — le tlhalosa potso ntle le go e fetola."
     verto_theme: "Setlhogo"
+    redo: "Dira gape"
   dashboard_card:
     publish_warning: "Phasaladitsa “%{title}”? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     preview: "Leba"

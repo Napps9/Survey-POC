@@ -117,19 +117,26 @@ export default class extends Controller {
     // linearly — same capture the flow map's canvas-drop does. The creator
     // can still pick "Continue in card order" explicitly in the panel.
     const converge = (defSel?.dataset.logicSelected || "") || continuation
-    const flow = editor.addFlow({ name: sel.dataset.canonical || "", exit: this._decodeTarget(converge) })
-    const card = await this._spliceCard({ type: "open_ended", text: "", flow_id: flow.id }, ownerSlot, flow.id)
-    if (!card) { editor.removeFlow(flow.id); return }
+    // One gesture, one undo entry: addFlow marks the deck dirty before the
+    // starter card is fetched, so without the hold ⌘Z would first strand a
+    // flow holding no cards. Held until both halves have landed (or the
+    // fetch failed and the flow was taken back).
+    editor.beginUndoGroup?.()
+    try {
+      const flow = editor.addFlow({ name: sel.dataset.canonical || "", exit: this._decodeTarget(converge) })
+      const card = await this._spliceCard({ type: "open_ended", text: "", flow_id: flow.id }, ownerSlot, flow.id)
+      if (!card) { editor.removeFlow(flow.id); return }
 
-    // Pin the otherwise before the new card becomes the linear fall-through.
-    if (defSel && !(defSel.dataset.logicSelected || "")) {
-      defSel.dataset.logicSelected = continuation
+      // Pin the otherwise before the new card becomes the linear fall-through.
+      if (defSel && !(defSel.dataset.logicSelected || "")) {
+        defSel.dataset.logicSelected = continuation
+      }
+      sel.dataset.logicSelected = `flow:${flow.id}`
+      editor.refreshAll()
+      editor.markDirty()
+    } finally {
+      editor.endUndoGroup?.()
     }
-    sel.dataset.logicSelected = `flow:${flow.id}`
-    // The gesture created a flow AND its starter card; undo both together.
-    editor.recordFlowCreation?.(flow.id)
-    editor.refreshAll()
-    editor.markDirty()
   }
 
   // ── Card duplication ─────────────────────────────────────────────────────
@@ -161,7 +168,6 @@ export default class extends Controller {
     const targetFlow = flowId !== undefined ? flowId : (cardEl.dataset.cardFlowId || null)
     const card = await this._spliceCard(copy, afterSlot || cardEl.closest(".card-slot"), targetFlow)
     if (!card) return null
-    editor.recordCardInsertion?.(card.closest(".card-slot"))
     editor.refreshAll()
     editor.markDirty()
     editor.focusFlowForCard(card) // reveal if its cluster shows another flow
@@ -289,10 +295,10 @@ export default class extends Controller {
         if (rs) rs.dataset.logicSelected = `flow:${flow.id}`
         if (defSel && !defSel.dataset.logicSelected && continuation) defSel.dataset.logicSelected = continuation
       }
-      // One undo entry for the whole gesture — the flow and every card it
-      // brought with it. Pushed after the routes are wired so ⌘Z can't leave a
-      // route pointing at a flow that no longer exists.
-      editor.recordFlowCreation?.(flow.id)
+      // One undo entry for the whole gesture — the flow, every card it brought
+      // and the routes wired to it. addFlow marks the deck dirty on its own,
+      // but everything from there to this markDirty runs in the one task, so
+      // the stack's commit (a macrotask) sees it all land at once.
       editor.refreshAll()
       editor.markDirty()
       this.closeGenerate()
@@ -592,7 +598,6 @@ export default class extends Controller {
     const afterSlot = members.length ? members[members.length - 1].closest(".card-slot") : null
     const card = await this._spliceCard({ type: "open_ended", text: "", flow_id: flowId }, afterSlot, flowId)
     if (!card) return
-    editor.recordCardInsertion?.(card.closest(".card-slot"))
     editor.refreshAll()
     editor.markDirty()
     editor.focusFlowForCard(card) // reveal if its cluster shows another flow

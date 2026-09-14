@@ -454,8 +454,8 @@ id:
       library_remove_failed: "Gagal menghapus dari pustaka"
       confirm_delete: "Yakin hapus?"
       unsaved: Perubahan belum disimpan
-      undo_restored: 'Kartu dipulihkan'
-      undo_removed: 'Kartu dihapus'
+      undone: "Dibatalkan"
+      redone: "Diulangi"
       saving: Menyimpan…
       saved: Tersimpan %{time}
       save_failed: 'Gagal menyimpan: %{msg}'
@@ -1253,6 +1253,7 @@ id:
     modal_collapse: "Lipat jendela ini"
     live_locked_modal_note: "Kamu masih bisa menambah atau menulis ulang jendela kartu — itu menjelaskan pertanyaan tanpa mengubahnya."
     verto_theme: "Topik"
+    redo: "Ulangi"
   dashboard_card:
     publish_warning: "Terbitkan “%{title}”? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     preview: "Pratinjau"

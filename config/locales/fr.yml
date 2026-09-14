@@ -454,8 +454,8 @@ fr:
       library_remove_failed: "Impossible de la retirer de la bibliothèque"
       confirm_delete: "Vraiment supprimer ?"
       unsaved: Modifications non enregistrées
-      undo_restored: 'Carte restaurée'
-      undo_removed: 'Carte supprimée'
+      undone: "Annulé"
+      redone: "Rétabli"
       saving: Enregistrement…
       saved: Enregistré %{time}
       save_failed: 'Échec de l''enregistrement : %{msg}'
@@ -1253,6 +1253,7 @@ fr:
     modal_collapse: "Replier cette fenêtre"
     live_locked_modal_note: "Tu peux encore ajouter ou reformuler la fenêtre d'une carte : elle explique une question sans la modifier."
     verto_theme: "Thème"
+    redo: "Rétablir"
   dashboard_card:
     publish_warning: "Publier « %{title} » ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     preview: "Aperçu"

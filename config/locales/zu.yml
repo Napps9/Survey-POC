@@ -468,8 +468,8 @@ zu:
       library_remove_failed: "Akukwazanga ukususwa kulayibrari"
       confirm_delete: "Ufuna ngempela ukususa?"
       unsaved: "Izinguquko ezingakalondolozwa"
-      undo_restored: 'Ikhadi libuyiselwe'
-      undo_removed: 'Ikhadi lisusiwe'
+      undone: "Kubuyiselwe emuva"
+      redone: "Kwenziwe futhi"
       saving: "Kuyalondolozwa…"
       saved: "Kulondoloziwe %{time}"
       save_failed: "Ukulondoloza kwehlulekile: %{msg}"
@@ -1273,6 +1273,7 @@ zu:
     modal_collapse: "Goqa leli windi"
     live_locked_modal_note: "Usengakwazi ukwengeza noma ukubhala kabusha iwindi lekhadi — lichaza umbuzo ngaphandle kokuwushintsha."
     verto_theme: "Isihloko"
+    redo: "Yenza futhi"
   dashboard_card:
     publish_warning: "Shicilela “%{title}”? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     preview: "Buka kuqala"

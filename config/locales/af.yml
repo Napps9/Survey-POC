@@ -455,8 +455,8 @@ af:
       library_remove_failed: "Kon dit nie uit die biblioteek verwyder nie"
       confirm_delete: "Regtig uitvee?"
       unsaved: "Ongestoorde veranderinge"
-      undo_restored: "Kaart herstel"
-      undo_removed: "Kaart verwyder"
+      undone: "Ontdaan"
+      redone: "Weer gedoen"
       saving: "Word gestoor…"
       saved: "Gestoor %{time}"
       save_failed: "Kon nie stoor nie: %{msg}"
@@ -1260,6 +1260,7 @@ af:
     modal_collapse: "Vou hierdie venster op"
     live_locked_modal_note: "Jy kan steeds 'n kaart se venster byvoeg of herskryf — dit verduidelik 'n vraag sonder om dit te verander."
     verto_theme: "Onderwerp"
+    redo: "Herdoen"
   dashboard_card:
     publish_warning: "Publiseer “%{title}”? Sodra dit regstreeks is, word sy vrae gesluit en kan nie gewysig word nie — maak seker alles lees presies soos jy dit wil hê."
     preview: "Voorskou"

@@ -272,10 +272,11 @@
             <span class="text-xs text-aquamarine" role="status" data-survey-editor-target="status"
                   style="font-size: var(--text-sm);white-space:nowrap;"><%= t("editor.all_saved", default: "Saved") %></span>
           </span>
-          <%# Undo — the visible face of the ⌘Z stack (structural card edits
-              only; text fields keep the browser's own undo). Disabled until
-              something is undoable; absent on live Vertos, where the server
-              refuses every structural mutation anyway. %>
+          <%# Undo / Redo — the visible face of the editor's history, which
+              holds every deck edit (words, options, types, switches, flows,
+              structure — see survey_editor_controller's undo section). Each
+              is disabled while its stack is empty; both are absent on live
+              Vertos, where the server refuses every deck edit anyway. %>
           <% unless live_locked %>
             <button type="button" class="editor-undo-btn" disabled
                     data-survey-editor-target="undoBtn"
@@ -288,6 +289,18 @@
                 <path d="M3 8h5.5a3.5 3.5 0 0 1 0 7H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
               <span class="editor-undo-label"><%= t("editor.undo", default: "Undo") %></span>
+            </button>
+            <button type="button" class="editor-undo-btn editor-redo-btn" disabled
+                    data-survey-editor-target="redoBtn"
+                    data-action="click->survey-editor#redoClick"
+                    title="<%= t("editor.redo", default: "Redo") %> (Ctrl+Y / ⌘⇧Z)"
+                    aria-label="<%= t("editor.redo", default: "Redo") %>"
+                    aria-keyshortcuts="Control+Y Meta+Shift+Z">
+              <svg class="editor-undo-arrow editor-redo-arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M6.5 4.5 3 8l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 8h5.5a3.5 3.5 0 0 1 0 7H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="editor-undo-label"><%= t("editor.redo", default: "Redo") %></span>
             </button>
           <% end %>
         </div>

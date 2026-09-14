@@ -454,8 +454,8 @@ he:
       library_remove_failed: "ההסרה מהספרייה נכשלה"
       confirm_delete: "באמת למחוק?"
       unsaved: שינויים שלא נשמרו
-      undo_restored: 'הכרטיס שוחזר'
-      undo_removed: 'הכרטיס הוסר'
+      undone: "בוטל"
+      redone: "בוצע שוב"
       saving: שומר…
       saved: נשמר %{time}
       save_failed: 'השמירה נכשלה: %{msg}'
@@ -1253,6 +1253,7 @@ he:
     modal_collapse: "קיפול החלון"
     live_locked_modal_note: "עדיין אפשר להוסיף או לנסח מחדש את חלון הכרטיס — הוא מסביר שאלה בלי לשנות אותה."
     verto_theme: "נושא"
+    redo: "בצע שוב"
   dashboard_card:
     publish_warning: "לפרסם את “%{title}”? לאחר הפרסום השאלות נעולות ולא ניתנות לעריכה — ודאו שהכול בדיוק כפי שאתם רוצים."
     preview: "תצוגה מקדימה"

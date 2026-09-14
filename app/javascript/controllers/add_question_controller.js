@@ -495,14 +495,11 @@ export default class extends Controller {
     )
     editorController?.registerCard(card)
 
-    // Put the inverse on the undo stack. Skipping this didn't just make "add"
-    // un-undoable — it left ⌘Z pointing at an older delete or reorder, so the
-    // next undo silently reverted something else.
+    // Seed the translation store before the editor is told (the markDirty in
+    // _notifyEditor is where the undo stack snapshots the deck, store entry
+    // included — so an undo of a generated card has the entry to put back).
     const editor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
-    // Seed the translation store BEFORE the undo entry, so an undo of a
-    // generated card does not leave a store entry pointing at a detached node.
     editor?.seedCardStore?.(card, cardJson)
-    editor?.recordCardInsertion(slot)
 
     card.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }

@@ -454,8 +454,8 @@ ja:
       library_remove_failed: "ライブラリから削除できませんでした"
       confirm_delete: "本当に削除？"
       unsaved: 未保存の変更
-      undo_restored: 'カードを元に戻しました'
-      undo_removed: 'カードを削除しました'
+      undone: "元に戻しました"
+      redone: "やり直しました"
       saving: 保存中…
       saved: "%{time}に保存済み"
       save_failed: '保存失敗: %{msg}'
@@ -1253,6 +1253,7 @@ ja:
     modal_collapse: "この説明をたたむ"
     live_locked_modal_note: "カードの説明は今も追加・書き直しできます。質問を変えずに説明するためのものです。"
     verto_theme: "テーマ"
+    redo: "やり直す"
   dashboard_card:
     publish_warning: "「%{title}」を公開しますか？公開後は質問がロックされ編集できません — すべてが望みどおりか確認してください。"
     preview: "プレビュー"

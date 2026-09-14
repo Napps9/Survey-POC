@@ -760,6 +760,33 @@ export default class extends Controller {
   tokenBlockFor(card) { return this._tokenBlocks?.get(card) }
   logicBlockFor(card) { return this._logicBlocks?.get(card) }
 
+  // The registry rewritten for one card, block by block — null UNBINDS, which
+  // registerCard never does (it only ever learns). survey-editor's undo calls
+  // this after morphing a card back to a snapshot in which a block may have
+  // existed, changed or not existed at all.
+  bindBlocks(card, { quiz, token, logic } = {}) {
+    const cid  = card.dataset.cardCid
+    const bind = (map, block) => {
+      if (!block) { map.delete(card); return }
+      map.set(card, block)
+      if (cid) block.dataset.ownerCid = cid
+    }
+    bind(this._quizBlocks,  quiz)
+    bind(this._tokenBlocks, token)
+    bind(this._logicBlocks, logic)
+  }
+
+  // registerCard with unbinding: for a card whose markup was rebuilt wholesale
+  // (✨ Optimise), so a block the new markup no longer has stops resolving to
+  // the detached old one.
+  rebindCard(card) {
+    this.bindBlocks(card, {
+      quiz:  card.querySelector(".quiz-correct-block"),
+      token: card.querySelector(".token-award-block"),
+      logic: card.querySelector(".logic-branch-block")
+    })
+  }
+
   // A hidden holding pen for the previously-active card's relocated blocks —
   // they stay attached to the document (so their inputs/values and Stimulus
   // bindings survive) without being visible anywhere until their card is
@@ -897,6 +924,27 @@ export default class extends Controller {
     const surveyEditor = this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")
     surveyEditor?.refreshCard(card)
     surveyEditor?.syncCardFlags(card)
+  }
+
+  // Re-run the selection for a card whose content just changed under the
+  // panel (an undo, an optimise): type list, feature slots, branching and Why
+  // all re-read it. As a scroll, not a click — no cardSelected dispatch, so
+  // the publish panel is not closed and a collapsed column not opened.
+  reselectCard(card) {
+    if (!card?.isConnected) return
+    this.activeCardEl = null
+    this.selectCardElement(card, { source: "scroll" })
+  }
+
+  // The panel's side of an undo/redo: the selected card may have been removed
+  // (deselect, as a delete does) or morphed (reselect, so the panel shows what
+  // the card is now rather than what it was).
+  afterUndoRestore({ removed = [], changed = [] } = {}) {
+    this._disarmDelete()
+    const active = this.activeCardEl
+    if (active && (!active.isConnected || removed.includes(active))) this.deselectCard()
+    else if (active && changed.includes(active)) this.reselectCard(active)
+    this._updateCount()
   }
 
   // Relocate the just-selected card's quiz/token blocks (if any) into the
@@ -1095,28 +1143,30 @@ export default class extends Controller {
     // Remove the whole slot (card + its "Add question" CTA), falling back to the
     // bare card for any context that doesn't use slots.
     const doomed = card.closest(".card-slot") || card
-    // Hand the still-attached node to the editor first: ⌘Z re-inserts THIS node,
-    // which is what reunites the card with any quiz/token/logic blocks parked in
-    // the sidebar (they're keyed off the card element, not its cid).
-    this.application
-        .getControllerForElementAndIdentifier(this.element, "survey-editor")
-        ?.recordCardDeletion(doomed)
+    // The editor's undo base already holds this very node (it snapshots the
+    // deck at rest), so ⌘Z re-inserts THIS element — which is what reunites
+    // the card with any quiz/token/logic blocks parked in the sidebar
+    // (they're keyed off the card element, not its cid).
     doomed.remove()
-    if (card === this.activeCardEl) {
-      this.activeCardEl = null
-      this.panelEmptyTarget.style.display  = ""
-      this.cardEditorTarget.style.display  = "none"
-      this.typeListTarget.style.display    = "none"
-      this.panelFooterTarget.style.display = "none"
-      // The deleted card's blocks (if relocated into the sidebar) go with it —
-      // there's no card left to save their data against.
-      this._parkSlotContents()
-      if (this.hasTokensEmptyTarget) this.tokensEmptyTarget.style.display = ""
-      if (this.hasQuizEmptyTarget)   this.quizEmptyTarget.style.display   = ""
-      this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.syncCardFlags(null)
-    }
+    if (card === this.activeCardEl) this.deselectCard()
     this._updateCount()
     this.dispatch("changed")
+  }
+
+  // Back to the "select a card" state: after the active card was deleted, or
+  // an undo removed it.
+  deselectCard() {
+    this.activeCardEl = null
+    this.panelEmptyTarget.style.display  = ""
+    this.cardEditorTarget.style.display  = "none"
+    this.typeListTarget.style.display    = "none"
+    this.panelFooterTarget.style.display = "none"
+    // The card's blocks (if relocated into the sidebar) go with it — there's
+    // no card left to save their data against.
+    this._parkSlotContents()
+    if (this.hasTokensEmptyTarget) this.tokensEmptyTarget.style.display = ""
+    if (this.hasQuizEmptyTarget)   this.quizEmptyTarget.style.display   = ""
+    this.application.getControllerForElementAndIdentifier(this.element, "survey-editor")?.syncCardFlags(null)
   }
 
   // Put an armed Delete button back to rest (label + styling). Safe to call

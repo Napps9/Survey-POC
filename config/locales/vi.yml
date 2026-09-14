@@ -454,8 +454,8 @@ vi:
       library_remove_failed: "Không thể xoá khỏi thư viện"
       confirm_delete: "Xóa thật chứ?"
       unsaved: Thay đổi chưa lưu
-      undo_restored: 'Đã khôi phục thẻ'
-      undo_removed: 'Đã xoá thẻ'
+      undone: "Đã hoàn tác"
+      redone: "Đã làm lại"
       saving: Đang lưu…
       saved: Đã lưu %{time}
       save_failed: 'Lưu thất bại: %{msg}'
@@ -1253,6 +1253,7 @@ vi:
     modal_collapse: "Thu gọn cửa sổ này"
     live_locked_modal_note: "Bạn vẫn có thể thêm hoặc viết lại cửa sổ của thẻ — nó giải thích câu hỏi mà không thay đổi câu hỏi."
     verto_theme: "Chủ đề"
+    redo: "Làm lại"
   dashboard_card:
     publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"

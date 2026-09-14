@@ -470,8 +470,8 @@ xh:
       library_remove_failed: "Ayikwazekanga ukuwususa kwithala"
       confirm_delete: "Ngokwenene cima?"
       unsaved: "Utshintsho olungagcinwanga"
-      undo_restored: 'Ikhadi libuyiselwe'
-      undo_removed: 'Ikhadi lisusiwe'
+      undone: "Ibuyiselwe umva"
+      redone: "Yenziwe kwakhona"
       saving: "Kuyagcinwa…"
       saved: "Kugciniwe %{time}"
       save_failed: "Ukugcina akuphumelelanga: %{msg}"
@@ -1275,6 +1275,7 @@ xh:
     modal_collapse: "Songa le festile"
     live_locked_modal_note: "Usenako ukongeza okanye ubhale kwakhona ifestile yekhadi — ichaza umbuzo ngaphandle kokuwutshintsha."
     verto_theme: "Umxholo"
+    redo: "Yenza kwakhona"
   dashboard_card:
     publish_warning: "Papasha “%{title}”? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     preview: "Jonga kuqala"

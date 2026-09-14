@@ -4786,6 +4786,9 @@ button.editor-leave-btn { cursor: pointer; }
 .editor-undo-btn:disabled { opacity: 0.4; cursor: default; }
 .editor-undo-arrow { flex-shrink: 0; }
 [dir="rtl"] .editor-undo-arrow { transform: scaleX(-1); }
+/* Redo is the same arrow mirrored — and in RTL the mirror of the mirror. */
+.editor-redo-arrow { transform: scaleX(-1); }
+[dir="rtl"] .editor-redo-arrow { transform: none; }
 .editor-save-pill {
   display: inline-flex; align-items: center;
   padding: 7px 13px; border-radius: 100px;

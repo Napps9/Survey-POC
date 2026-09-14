@@ -454,8 +454,8 @@ sw:
       library_remove_failed: "Imeshindwa kuiondoa kwenye maktaba"
       confirm_delete: "Ufute kweli?"
       unsaved: Mabadiliko hayajahifadhiwa
-      undo_restored: 'Kadi imerejeshwa'
-      undo_removed: 'Kadi imeondolewa'
+      undone: "Imetenduliwa"
+      redone: "Imerudiwa"
       saving: Inahifadhi…
       saved: Imehifadhiwa %{time}
       save_failed: 'Kuhifadhi kumeshindikana: %{msg}'
@@ -1253,6 +1253,7 @@ sw:
     modal_collapse: "Kunja dirisha hili"
     live_locked_modal_note: "Bado unaweza kuongeza au kuandika upya dirisha la kadi — linaeleza swali bila kulibadilisha."
     verto_theme: "Mada"
+    redo: "Rudia"
   dashboard_card:
     publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"

@@ -480,8 +480,8 @@ en-US:
       library_remove_failed: "Couldn't remove it from the library"
       confirm_delete: "Really delete?"
       unsaved: "Unsaved changes"
-      undo_restored: 'Card restored'
-      undo_removed: 'Card removed'
+      undone: 'Undone'
+      redone: 'Redone'
       saving: "Saving…"
       saved: "Saved %{time}"
       save_failed: "Save failed: %{msg}"
@@ -1110,6 +1110,7 @@ en-US:
     all_saved: 'Saved'
     leave_editor: 'Leave editor'
     undo: 'Undo'
+    redo: 'Redo'
     m_back_to_dashboard: "Back to My Vertos"
     m_preview: "Preview as a respondent"
     m_more: "More"
