@@ -236,8 +236,19 @@
 
     <div class="q-title" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_card_text(card, display, "text") %></div>
 
-    <% if display["description"].present? %>
-      <div class="q-subtitle" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_card_text(card, display, "description") %></div>
+    <%# The body copy under the heading, at .q-subtitle's smaller size.
+        Rendered for a welcome card in the EDITOR even when there is none yet:
+        the node IS the field (the serialiser reads this element — see
+        survey-editor#_readCard), so a front card that had only a heading gave
+        a creator nowhere to type body copy, and every line they wrote ended up
+        in the heading at heading size. "I would also consider here the main
+        header in current font size, and the remainder body copy in a smaller
+        font, as per enterprise, fully editable as all text is in the editor."
+        Empty and contenteditable it shows a placeholder; empty and not (the
+        player, and the preview overlay, which strips contenteditable) it is
+        display: none, so nothing changes for a card without body copy. %>
+    <% if display["description"].present? || (editable && type == "welcome_card") %>
+      <div class="q-subtitle" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %><% if editable %> data-placeholder="<%= t("card.body_placeholder", default: "Add body copy (optional)") %>"<% end %>><%= rich_card_text(card, display, "description") %></div>
     <% end %>
   </div>
 
@@ -837,6 +848,27 @@
            tabindex="0" role="slider"
            aria-valuemin="0" aria-valuemax="<%= n - 1 %>">
         <div class="nps-slider-stage" style="<%= nps_stage_style(shape) %>">
+          <%# The two anchor lines beside the scale's ends — "I have no say at
+              all" beside the bottom stop, "I am a decision maker" beside the
+              top — so a respondent knows what the numbers mean. A SIBLING
+              column to the digits, not two more rows in it: card-editor
+              rebuilds .nps-slider-labels wholesale (setNpsClassic) and counts
+              its rows as stops (addNpsStop/_syncNpsSteps), and the slider
+              indexes its label targets by step. The CSS gives this column the
+              digit column's exact track (height, column-reverse, the vessel's
+              insets), which is what keeps the two ends level with the first
+              and last stop whatever the step count. Rendered on the player
+              only when there are words; always in the editor, so the creator
+              has somewhere to type. No whitespace inside the text span — the
+              editor's placeholder is an :empty::before. %>
+          <% low_anchor = display["nps_low_label"].to_s; high_anchor = display["nps_high_label"].to_s %>
+          <% if editable || low_anchor.present? || high_anchor.present? %>
+            <div class="nps-anchors">
+              <% [ [ "low", low_anchor ], [ "high", high_anchor ] ].each do |which, words| %>
+                <span class="nps-anchor-row"><span class="nps-anchor-text nps-anchor-<%= which %>" data-role="nps-anchor-<%= which %>" <%= ce_attr %><% if editable %> data-placeholder="<%= t("card.nps_#{which}_placeholder") %>"<% end %>><%= words %></span></span>
+              <% end %>
+            </div>
+          <% end %>
           <div class="slider-labels nps-slider-labels">
             <%# The ROW is the flex item, in the player as well as the editor.
                 The column lays its stops out with `space-between` over a fixed

@@ -2,6 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 import { indexForDirection } from "lib/tap_scales"
 import { t } from "lib/i18n"
 
+// How long the answered card takes to fly out (_commit writes it as the card's
+// transition, _park waits for it). Named because the two have to agree: park
+// early and the fling is cut off mid-air, park late and the card's box sits
+// outside the panel's scroller for longer than it has to.
+const FLING_MS = 350
+
 // Card-stack widget. Each card is a tap-stack#card target.
 //
 // The response strip is 2-6 answers wide (TapScales). Each carries the value it
@@ -47,7 +53,7 @@ export default class extends Controller {
     const tx = dir === "left" ? "-120%" : dir === "right" ? "120%" : "0"
     const ty = dir === "up"   ? "-120%" : "0"
     const rot = dir === "left" ? "-15deg" : dir === "right" ? "15deg" : "0deg"
-    top.style.transition = this.formsMode ? "none" : "transform 350ms ease, opacity 350ms ease"
+    top.style.transition = this.formsMode ? "none" : `transform ${FLING_MS}ms ease, opacity ${FLING_MS}ms ease`
     top.style.transform  = `translate(${tx}, ${ty}) rotate(${rot})`
     top.style.opacity    = "0"
     this.position += 1
@@ -187,6 +193,10 @@ export default class extends Controller {
 
   disconnect() {
     this._dragTeardown()
+    // A pending park would fire against a card whose controller is gone.
+    this.cardTargets.forEach((c) => {
+      if (c._parkTimer) { clearTimeout(c._parkTimer); c._parkTimer = null }
+    })
   }
 
   reset(event) {
@@ -201,6 +211,7 @@ export default class extends Controller {
     this.swipeResults = {}
     this.element.dataset.swipeResults = "{}"
     this.cardTargets.forEach((c) => {
+      this._unpark(c)
       c.style.transition = "none"
       c.style.opacity    = ""
       c.style.transform  = ""
@@ -268,8 +279,12 @@ export default class extends Controller {
       if (offset < 0) {
         card.style.opacity = "0"
         card.style.pointerEvents = "none"
+        this._park(card)
         return
       }
+      // Back in the deck (Reset, or the editor's pager stepping backwards):
+      // undo the parking below before the resting transform is written.
+      this._unpark(card)
       const visible = offset <= 2
       card.style.transition = this.formsMode ? "none" : "transform 250ms ease, opacity 250ms ease"
       card.style.opacity    = visible ? "1" : "0"
@@ -289,6 +304,49 @@ export default class extends Controller {
     // statements, since the stack itself looks the same either way.
     if (this.hasPrevBtnTarget) this.prevBtnTarget.disabled = this.position <= 0
     if (this.hasNextBtnTarget) this.nextBtnTarget.disabled = this.position >= total - 1
+  }
+
+  // An answered card is flung 120% out of the stack and left there, because the
+  // fling IS the feedback. Its BOX went with it, and a box 360px to the side of
+  // a 300px stack still counts toward the scrollable overflow of the panel
+  // scroller the stack sits in (.split-right > .mt-2 is overflow-y: auto, and a
+  // scroll container clips on both axes, so overflow-x is auto too). On a
+  // desktop, where scrollbars take real space, answering the first statement
+  // therefore drew one along the bottom of the card and another down its side —
+  // and pressing Reset made them go away, because reset() clears the transforms.
+  // Phones never showed it: their scrollbars are overlays.
+  //
+  // So once the fling has played, put the box back where it started and take it
+  // out of the flow's paint. Nothing moves on screen — the card has been at
+  // opacity 0 since the fling began — and the panel stops overflowing.
+  //
+  // Timed off the fling rather than done in _commit, so every path that leaves
+  // a card behind the position lands here: an answer, a drag, a re-layout.
+  _park(card) {
+    if (card._parked || card._parkTimer) return
+    const park = () => {
+      card._parkTimer = null
+      card._parked = true
+      card.style.transition = "none"
+      card.style.transform = ""
+      card.style.visibility = "hidden"
+    }
+    // Form mode has no fling animation to wait for (see _commit).
+    if (this.formsMode) return park()
+    card._parkTimer = setTimeout(park, FLING_MS + 50)
+  }
+
+  // Clears the inline style whether or not THIS controller is the one that set
+  // it. The flag is a JS property on the element, so it does not survive being
+  // cloned or re-serialised — but the inline `visibility: hidden` does: the
+  // preview overlay clones the editor's card DOM (preview-verto), and the
+  // editor's undo stack restores card HTML. Gate the clear on the flag and a
+  // statement the creator had paged past stays invisible in the preview, on a
+  // fresh controller that has never parked anything.
+  _unpark(card) {
+    if (card._parkTimer) { clearTimeout(card._parkTimer); card._parkTimer = null }
+    card._parked = false
+    if (card.style.visibility) card.style.visibility = ""
   }
 
   // One dot per card; dots before the current position read as "done", the

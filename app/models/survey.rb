@@ -185,6 +185,8 @@ class Survey < ApplicationRecord
       "explanation" => card["explanation"].presence,
       "modal_title" => card["modal_title"].presence,
       "modal_body"  => card["modal_body"].presence,
+      "nps_low_label"  => card["nps_low_label"].presence,
+      "nps_high_label" => card["nps_high_label"].presence,
       "responses"   => (Array(card["responses"]).map { |r| r["label"].to_s }.presence if card["responses"].is_a?(Array))
     }.compact
 
@@ -203,6 +205,8 @@ class Survey < ApplicationRecord
         out["modal_body"]  = entry["modal_body"]  if entry["modal_body"].present?
         out.delete("modal_body_html")
       end
+      # The NPS anchor lines move like explanation: plain scalars, per field.
+      NPS_ANCHOR_KEYS.each { |k| out[k] = entry[k] if entry[k].present? }
 
       # Pages swap by id — the id is the page's identity across languages.
       if out["pages"].is_a?(Array) && entry["pages"].is_a?(Array)
@@ -271,7 +275,11 @@ class Survey < ApplicationRecord
         # here, so a Spanish respondent meets a Spanish modal rather than the
         # creator's English over a translated question.
         "modal_title" => t["modal_title"].presence,
-        "modal_body"  => t["modal_body"].presence
+        "modal_body"  => t["modal_body"].presence,
+        # The anchor lines beside an NPS scale's ends — the words that tell a
+        # respondent what 0 and 10 mean, so they had better be in their language.
+        "nps_low_label"  => t["nps_low_label"].presence,
+        "nps_high_label" => t["nps_high_label"].presence
       }.compact
       card.merge("i18n" => (card["i18n"] || {}).merge(locale.to_s => entry))
     end
@@ -1072,6 +1080,11 @@ class Survey < ApplicationRecord
     option_images range_theme subject
   ].freeze
 
+  # The two anchor lines beside an NPS scale's ends — respondent-facing copy,
+  # translated per language like text/description (see swap_card_primary,
+  # merge_card_translations, SurveyTranslator, LanguageCheckLines).
+  NPS_ANCHOR_KEYS = %w[nps_low_label nps_high_label].freeze
+
   # Long enough that a five-language import finishes inside it, short enough
   # that a job the memory watchdog kills (see VertoBuild#stale?, same reasoning)
   # stops holding the window open. The job clears the flag in an `ensure`; this
@@ -1362,6 +1375,20 @@ class Survey < ApplicationRecord
           c.delete("nps_custom_scale")
         end
       end
+      # The anchor lines beside an NPS scale's ends ("I have no say at all" /
+      # "I am a decision maker"). Only on an NPS card, only with words in them,
+      # capped — same allowlist-or-drop shape as the two above, and blank is
+      # dropped rather than stored so there is one representation of "none".
+      # The per-language copies under i18n get the same cap further down.
+      NPS_ANCHOR_KEYS.each do |k|
+        next unless c.key?(k)
+        words = c[k].to_s.strip.first(NpsHelper::NPS_ANCHOR_MAX)
+        if c["type"].to_s == "nps" && words.present?
+          c[k] = words
+        else
+          c.delete(k)
+        end
+      end
       # Card backdrop — the colour or image behind whatever the panel holds,
       # overriding the Verto-wide --brand-panel for this one card. Meaningful
       # wherever the panel is not already covered edge to edge: behind an
@@ -1394,6 +1421,15 @@ class Survey < ApplicationRecord
         else
           c.delete("media_bg")
         end
+        # The one media branch that used to drop in silence. Every other one
+        # reports (grep `warnings << "`), and the editor's own "an image didn't
+        # stick" pill and the controller's log line are both driven off these —
+        # so a backdrop rejected for its host, or for being a data URL over the
+        # cap, left the creator looking at a picture that was already gone.
+        if bg["image"].present? && out["image"].blank?
+          warnings << "media_bg" if warnings
+          details << dropped_media_detail("media_bg", c, bg["image"]) if details
+        end
       end
 
       # Rich-text layer: presentation-only HTML twins of the plain text
@@ -1424,7 +1460,16 @@ class Survey < ApplicationRecord
       end
       if c["i18n"].is_a?(Hash)
         c["i18n"] = c["i18n"].transform_values do |tr|
-          tr.is_a?(Hash) ? tr.reject { |k, _| k.to_s.end_with?("_html") } : tr
+          next tr unless tr.is_a?(Hash)
+          tr = tr.reject { |k, _| k.to_s.end_with?("_html") }
+          # A translated anchor line is held to the primary's cap and rule: no
+          # words, no key — the player falls back to the primary for it.
+          NPS_ANCHOR_KEYS.each do |k|
+            next unless tr.key?(k)
+            words = tr[k].to_s.strip.first(NpsHelper::NPS_ANCHOR_MAX)
+            words.present? ? tr[k] = words : tr.delete(k)
+          end
+          tr
         end
       end
 
@@ -2735,8 +2780,42 @@ class Survey < ApplicationRecord
     thankyou_title.presence || I18n.t("player.thank_you_title")
   end
 
+  # The end screen's message — the creator's words, or nothing.
+  #
+  # It used to fall back to the "from <account>" byline, which meant the two
+  # could never both be shown: a creator who wrote a message lost the byline,
+  # and a creator who merely OPENED the thank-you card had the byline saved as
+  # their message (the editor prefilled the box with this reader's value, and
+  # the card saves on open). The byline is its own line now — see
+  # thankyou_from_text — and this is the message alone.
   def thankyou_body_text
-    thankyou_body.presence || I18n.t("player.thank_you_from", org: organisation.name)
+    body = thankyou_body.to_s.strip
+    # A deck edited while the byline was this fallback has the byline sitting in
+    # the column as though it had been typed, in whichever language the
+    # creator's editor was in. Read as blank rather than migrated: the row is
+    # harmless where it is, and a read answers for the decks a one-off
+    # migration would have missed (an import, a duplicate, a restored backup).
+    body.present? && thankyou_byline?(body) ? "" : body
+  end
+
+  # "from <account>", the byline under the message. Always drawn: it is the
+  # attribution for the Verto, not a stand-in for copy the creator didn't write.
+  def thankyou_from_text
+    I18n.t("player.thank_you_from", org: organisation.name)
+  end
+
+  # Is this string the byline itself, in any language we ship? Every locale,
+  # not just the current one, because the editor prefilled it in the creator's.
+  def thankyou_byline?(text)
+    thankyou_byline_texts.include?(text)
+  end
+
+  # Memoised: thankyou_body_text is read two or three times per render and this
+  # walks every locale we ship.
+  def thankyou_byline_texts
+    @thankyou_byline_texts ||= I18n.available_locales.filter_map do |locale|
+      I18n.t("player.thank_you_from", org: organisation.name, locale: locale, default: nil).presence
+    end.to_set
   end
 
   def forward_url?
@@ -2844,7 +2923,13 @@ class Survey < ApplicationRecord
   # legacy thankyou_* / forward_url columns (so the existing single thank-you is
   # unchanged); extra screens live in the end_screens JSON column.
   MAX_END_SCREENS = 12
-  MAX_END_TITLE   = 80
+  # 120, up from 80. The 80 was silent — no counter in the editor, no
+  # validation, just `.first(80)` in update_settings — and it cut a real Verto's
+  # end screen mid-sentence at exactly 80 characters ("HALF TIME Your voice is
+  # in! You've played your half. Ours starts now. Sign up to"). The title is
+  # display type that wraps and balances, and the card is 850px wide, so three
+  # short lines of it fit; the editor now says how many are left as well.
+  MAX_END_TITLE   = 120
   MAX_END_BODY    = 400
   MAX_END_LABEL   = 40
   DEFAULT_END_ID  = "default"
@@ -2865,7 +2950,10 @@ class Survey < ApplicationRecord
       {
         "id" => s["id"].to_s,
         "title" => s["title"].to_s.strip.presence || I18n.t("player.thank_you_title"),
-        "body" => s["body"].to_s.strip.presence || I18n.t("player.thank_you_from", org: organisation.name),
+        # No byline fallback: the byline is its own line on the screen now
+        # (thankyou_from_text), so a branch screen with no message shows the
+        # title and the byline rather than the byline twice.
+        "body" => s["body"].to_s.strip,
         "forward_url" => s["forward_url"].presence,
         "forward_label" => s["forward_label"].to_s.strip.presence
       }

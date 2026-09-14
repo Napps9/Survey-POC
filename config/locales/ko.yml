@@ -159,6 +159,9 @@ ko:
       prioritise: "우선순위 정하기"
       scenario: "시나리오"
     modal_aria: "이 질문에 대하여"
+    nps_low_placeholder: "가장 낮은 값의 의미…"
+    nps_high_placeholder: "가장 높은 값의 의미…"
+    body_placeholder: "본문 추가 (선택 사항)"
   ask_submission_mailer:
     confirmation_subject: "Verto 데이터가 Ask Verto에 제출되었습니다"
     confirmation_heading: "검토 요청 제출됨"
@@ -1263,6 +1266,7 @@ ko:
     live_locked_modal_note: "카드 설명은 지금도 추가하거나 고쳐 쓸 수 있습니다. 질문을 바꾸지 않고 설명해 줍니다."
     verto_theme: "주제"
     redo: "다시 실행"
+    ty_body_placeholder: "짧은 메시지 추가 (선택 사항)"
   dashboard_card:
     publish_warning: "“%{title}”을(를) 게시할까요? 라이브가 되면 질문이 잠겨 수정할 수 없어요 — 모든 내용이 원하는 대로인지 확인하세요."
     preview: "미리보기"

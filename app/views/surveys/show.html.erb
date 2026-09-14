@@ -499,14 +499,38 @@
                  role="textbox"
                  aria-label="<%= t("editor.ty_title_label", default: "Thank-you title") %>"
                  data-gate-cards-target="tyTitle"
+                 data-max="<%= Survey::MAX_END_TITLE %>"
                  data-default-text="<%= t("player.thank_you_title") %>"
                  data-action="input->gate-cards#queueThankyouSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.thankyou_title_text %></div>
-            <div class="preview-thankyou-sub gate-editable" contenteditable="true"
+            <%# Starts EMPTY, with the placeholder idiom the share fields use,
+                rather than prefilled: this box used to arrive holding the
+                "from <account>" byline, so a creator who only glanced at the
+                card had the byline saved as their message and could never see
+                both. The byline is the line below now, and is not editable —
+                it is the account's name, not copy. %>
+            <div class="preview-thankyou-sub gate-editable gate-placeholder" contenteditable="true"
                  role="textbox" aria-multiline="true"
                  aria-label="<%= t("editor.ty_body_label", default: "Thank-you message") %>"
                  data-gate-cards-target="tyBody"
-                 data-default-text="<%= t("player.thank_you_from", org: @survey.organisation.name) %>"
+                 data-max="<%= Survey::MAX_END_BODY %>"
+                 data-default-text="<%= t("editor.ty_body_placeholder", default: "Add a short message (optional)") %>"
                  data-action="input->gate-cards#queueThankyouSave:stop"><%= @survey.thankyou_body_text %></div>
+            <div class="preview-thankyou-from"><%= @survey.thankyou_from_text %></div>
+            <%# The counters the two boxes above never had. The cap is applied
+                server-side in update_settings, so these only have to say so
+                before the truncation does — which is the whole of what went
+                wrong: an end message was cut at 80 characters with nothing on
+                screen to say it would be. Same pattern as the share card's. %>
+            <div class="unfurl-meta">
+              <span class="unfurl-meta-item">
+                <%= t("editor.ty_title_label", default: "Thank-you title") %>
+                <span class="gate-share-count" data-gate-cards-target="tyTitleCount"></span>
+              </span>
+              <span class="unfurl-meta-item">
+                <%= t("editor.ty_body_label", default: "Thank-you message") %>
+                <span class="gate-share-count" data-gate-cards-target="tyBodyCount"></span>
+              </span>
+            </div>
             <%# Field help for the two boxes above it, so it belongs in their
                 column. Left in English on purpose: every %{name} here would
                 have to be written %%{name} in YAML or Rails raises
@@ -2649,6 +2673,7 @@
           pv_message = capture do %>
           <div class="preview-thankyou-title" data-preview-verto-target="thankyouTitle"><%= @survey.thankyou_title_text %></div>
           <div class="preview-thankyou-sub" data-preview-verto-target="thankyouBody"><%= @survey.thankyou_body_text %></div>
+          <div class="preview-thankyou-from"><%= @survey.thankyou_from_text %></div>
         <% end %>
         <%
           pv_actions = capture do %>

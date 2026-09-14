@@ -169,6 +169,9 @@ st:
       prioritise: "Beha Thato"
       scenario: "Boemo"
     modal_aria: "Ka potso ena"
+    nps_low_placeholder: "E tlase ka ho fetisisa e bolela…"
+    nps_high_placeholder: "E hodimo ka ho fetisisa e bolela…"
+    body_placeholder: "Kenya sengoloa se eketsehileng (ha se tlamo)"
   ask_submission_mailer:
     confirmation_subject: "Datha ya hao ya Verto e rometswe ho Ask Verto"
     confirmation_heading: "E rometswe bakeng sa tlhahlobo"
@@ -1285,6 +1288,7 @@ st:
     live_locked_modal_note: "O ntse o ka eketsa kapa wa ngola bocha fensetere ea karete — e hlalosa potso ntle le ho e fetola."
     verto_theme: "Sehlooho"
     redo: "Etsa hape"
+    ty_body_placeholder: "Kenya molaetsa o mokgutshwane (ha se tlamo)"
   dashboard_card:
     publish_warning: "Phatlalatsa “%{title}”? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     preview: "Pontsho"

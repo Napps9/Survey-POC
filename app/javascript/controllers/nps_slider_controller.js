@@ -42,6 +42,11 @@ export default class extends Controller {
   }
 
   key(event) {
+    // Same guard as start(): a caret inside an editable — an anchor line, or
+    // a custom-scale digit — owns its arrow keys. Without this the keydown
+    // bubbled up, was preventDefault-ed, and moved the liquid instead of the
+    // caret on every Arrow press while typing.
+    if (event.target.isContentEditable) return
     const up   = ["ArrowUp", "ArrowRight"].includes(event.key)
     const down = ["ArrowDown", "ArrowLeft"].includes(event.key)
     if (!up && !down) return
@@ -81,13 +86,17 @@ export default class extends Controller {
     const value = idx // 0-indexed: the answer IS the scale position (0..N-1)
     this.element.dataset.npsValue = value
     const lbl  = this.labelTargets[idx]
-    const text = lbl ? lbl.textContent.trim() : `${value}`
+    let text = lbl ? lbl.textContent.trim() : `${value}`
+    // At either end, say what the end MEANS as well as its number — the anchor
+    // line a sighted respondent reads beside it ("0 — I have no say at all").
+    const n = Math.max(2, this.stepsValue)
+    const anchor = idx === 0 ? this._anchor("low") : idx === n - 1 ? this._anchor("high") : ""
+    if (anchor) text = `${text} — ${anchor}`
     this.labelTargets.forEach((l, i) => l.classList.toggle("is-active", i === idx))
     this.element.setAttribute("aria-valuenow", value)
     this.element.setAttribute("aria-valuetext", text)
 
     if (emit) {
-      const n = Math.max(2, this.stepsValue)
       const frame = Math.round((idx / (n - 1)) * (FRAMES - 1)) + 1
       document.dispatchEvent(new CustomEvent("nps:valueChanged", {
         detail: { value, index: idx, frame, text }
@@ -97,5 +106,10 @@ export default class extends Controller {
 
   _ratioFor(idx) {
     return this.stepsValue > 1 ? idx / (this.stepsValue - 1) : 0
+  }
+
+  // The anchor line beside one end of the scale, or "" — see .nps-anchors.
+  _anchor(which) {
+    return this.element.querySelector(`.nps-anchor-${which}`)?.textContent.trim() || ""
   }
 }

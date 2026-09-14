@@ -180,6 +180,9 @@ module ApplicationHelper
       # the DOM alone.
       "modal_title" => card["modal_title"],
       "modal_body"  => card["modal_body"],
+      # The NPS anchor lines — the same reason as the modal's words.
+      "nps_low_label"  => card["nps_low_label"],
+      "nps_high_label" => card["nps_high_label"],
       "text_html"        => card["text_html"],
       "description_html" => card["description_html"],
       "modal_body_html"  => card["modal_body_html"],
@@ -190,7 +193,8 @@ module ApplicationHelper
         tr = tr || {}
         { "text" => tr["text"], "description" => tr["description"], "options" => tr["options"],
           "pages" => tr["pages"], "responses" => tr["responses"],
-          "modal_title" => tr["modal_title"], "modal_body" => tr["modal_body"] }.compact
+          "modal_title" => tr["modal_title"], "modal_body" => tr["modal_body"],
+          "nps_low_label" => tr["nps_low_label"], "nps_high_label" => tr["nps_high_label"] }.compact
       end
     end
     out.compact
@@ -243,6 +247,12 @@ module ApplicationHelper
     if card["modal_title"].present? || card["modal_body"].present?
       merged["modal_title"] = tr["modal_title"].presence || card["modal_title"]
       merged["modal_body"]  = tr["modal_body"].presence  || card["modal_body"]
+    end
+
+    # The anchor lines beside an NPS scale's ends — plain scalars, so the same
+    # per-field fall-back as explanation.
+    Survey::NPS_ANCHOR_KEYS.each do |k|
+      merged[k] = tr[k].presence || card[k] if card[k].present?
     end
 
     merged

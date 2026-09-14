@@ -159,6 +159,9 @@ uk:
       prioritise: "Пріоритети"
       scenario: "Сценарій"
     modal_aria: "Про це запитання"
+    nps_low_placeholder: "Мінімум означає…"
+    nps_high_placeholder: "Максимум означає…"
+    body_placeholder: "Додайте основний текст (необов'язково)"
   ask_submission_mailer:
     confirmation_subject: "Ваші дані Verto надіслано в Ask Verto"
     confirmation_heading: "Надіслано на перевірку"
@@ -1265,6 +1268,7 @@ uk:
     live_locked_modal_note: "Вікно картки все ще можна додати або переписати — воно пояснює запитання, не змінюючи його."
     verto_theme: "Тема"
     redo: "Повторити"
+    ty_body_placeholder: "Додайте коротке повідомлення (необов'язково)"
   dashboard_card:
     publish_warning: "Опублікувати «%{title}»? Після публікації питання буде заблоковано й редагувати їх не можна — переконайтеся, що все саме так, як ви хочете."
     preview: "Попередній перегляд"

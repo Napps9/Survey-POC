@@ -159,6 +159,9 @@ de:
       prioritise: "Priorisieren"
       scenario: "Szenario"
     modal_aria: "Über diese Frage"
+    nps_low_placeholder: "Niedrigster Wert bedeutet…"
+    nps_high_placeholder: "Höchster Wert bedeutet…"
+    body_placeholder: "Fließtext hinzufügen (optional)"
   ask_submission_mailer:
     confirmation_subject: "Deine Verto-Daten wurden bei Ask Verto eingereicht"
     confirmation_heading: "Zur Prüfung eingereicht"
@@ -1263,6 +1266,7 @@ de:
     live_locked_modal_note: "Einen Hinweis kannst du weiterhin hinzufügen oder umformulieren — er erklärt eine Frage, ohne sie zu ändern."
     verto_theme: "Thema"
     redo: "Wiederholen"
+    ty_body_placeholder: "Kurze Nachricht hinzufügen (optional)"
   dashboard_card:
     publish_warning: "„%{title}“ veröffentlichen? Sobald es live ist, sind die Fragen gesperrt und können nicht bearbeitet werden — prüfe, ob alles genau so ist, wie du es willst."
     preview: "Vorschau"

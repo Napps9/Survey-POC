@@ -23,7 +23,7 @@ require "digest"
 #
 # FIELDS is the contract, and it is the same list SurveyTranslator writes and
 # Survey.swap_card_primary moves: text, description, options, pages,
-# explanation, responses. A field translated anywhere in the app but missing
+# explanation, the NPS anchor lines, responses. A field translated anywhere in the app but missing
 # here is a line a reviewer is never shown and therefore never checks — so the
 # list is asserted against the translator's own tool schema in the tests rather
 # than left to drift.
@@ -39,7 +39,7 @@ module LanguageCheckLines
   # Ordered so the screen reads the way a card does: the intro modal a
   # respondent meets FIRST, then the question, its sub-text, the answers, then
   # the extras only some types carry.
-  SCALAR_FIELDS = %w[modal_title modal_body text description explanation].freeze
+  SCALAR_FIELDS = %w[modal_title modal_body text description explanation nps_low_label nps_high_label].freeze
   LIST_FIELDS   = %w[options responses].freeze
   PAGE_FIELD    = "pages".freeze
   FIELDS        = (SCALAR_FIELDS + LIST_FIELDS + [ PAGE_FIELD ]).freeze

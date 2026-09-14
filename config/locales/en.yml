@@ -41,6 +41,9 @@ en:
     nps_classic_note: "Off lets you add, remove and rename the points on this scale. On puts it back to 0–10, which is what makes an NPS score comparable."
     add_scale_point: "Add a point"
     nps_scale_max: "An NPS goes up to %{max} points."
+    nps_low_placeholder: "Lowest means…"
+    nps_high_placeholder: "Highest means…"
+    body_placeholder: "Add body copy (optional)"
     tap_scale:
       "no": "No"
       "yes": "Yes"
@@ -1173,6 +1176,7 @@ en:
     required_chip: 'Required'
     ty_title_label: 'Thank-you title'
     ty_body_label: 'Thank-you message'
+    ty_body_placeholder: "Add a short message (optional)"
     ty_forward_url_label: 'Link button (optional)'
     ty_forward_url_placeholder: 'https://example.org'
     ty_forward_label_placeholder: 'Button label (e.g. Visit our site)'

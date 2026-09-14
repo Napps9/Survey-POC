@@ -159,6 +159,9 @@ tr:
       prioritise: "Önceliklendir"
       scenario: "Senaryo"
     modal_aria: "Bu soru hakkında"
+    nps_low_placeholder: "En düşük şu demek…"
+    nps_high_placeholder: "En yüksek şu demek…"
+    body_placeholder: "Açıklama metni ekleyin (isteğe bağlı)"
   ask_submission_mailer:
     confirmation_subject: "Verto verin Ask Verto'ya gönderildi"
     confirmation_heading: "İncelemeye gönderildi"
@@ -1263,6 +1266,7 @@ tr:
     live_locked_modal_note: "Bir kartın penceresini hâlâ ekleyebilir veya yeniden yazabilirsin — soruyu değiştirmeden açıklar."
     verto_theme: "Konu"
     redo: "Yinele"
+    ty_body_placeholder: "Kısa bir mesaj ekleyin (isteğe bağlı)"
   dashboard_card:
     publish_warning: "“%{title}” yayınlansın mı? Yayına girdikten sonra soruları kilitlenir ve düzenlenemez — her şeyin tam istediğin gibi olduğundan emin ol."
     preview: "Önizleme"

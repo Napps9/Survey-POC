@@ -85,6 +85,11 @@
          emitted for a card that has never been asked, and the labels answer
          for it (NpsHelper#nps_custom_scale?). %>
      <% if card['nps_custom_scale'] == true %>data-card-nps-custom-scale="true"<% end %>
+     <%# The anchor lines beside the scale's ends. The serialiser reads them off
+         the rendered column, not from here; this is the type panel's memory
+         for a card switched away from NPS and back (type_panel#_npsAnchorsFor),
+         the way data-card-options is for the labels. %>
+     <% if card['nps_low_label'].present? || card['nps_high_label'].present? %>data-card-nps-anchors="<%= { low: card['nps_low_label'].to_s, high: card['nps_high_label'].to_s }.to_json %>"<% end %>
      <%# How many answers a respondent may tick on this card. Absent = no limit,
          which is what keeps "as many as there are answers" true when the option
          list grows — see Survey::MULTI_SELECT_TYPES. %>

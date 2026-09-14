@@ -159,6 +159,9 @@ ar:
       prioritise: "ترتيب الأولوية"
       scenario: "سيناريو"
     modal_aria: "عن هذا السؤال"
+    nps_low_placeholder: "الأدنى يعني…"
+    nps_high_placeholder: "الأعلى يعني…"
+    body_placeholder: "أضف نصًا توضيحيًا (اختياري)"
   ask_submission_mailer:
     confirmation_subject: "تم تقديم بيانات Verto الخاصة بك إلى Ask Verto"
     confirmation_heading: "قُدّم للمراجعة"
@@ -1263,6 +1266,7 @@ ar:
     live_locked_modal_note: "لا يزال بإمكانك إضافة نافذة البطاقة أو إعادة صياغتها — فهي تشرح السؤال دون تغييره."
     verto_theme: "الموضوع"
     redo: "إعادة"
+    ty_body_placeholder: "أضف رسالة قصيرة (اختياري)"
   dashboard_card:
     publish_warning: "نشر «%{title}»؟ بعد النشر تُقفل أسئلتها ولا يمكن تعديلها — تأكد أن كل شيء كما تريد تمامًا."
     preview: "معاينة"

@@ -2324,15 +2324,17 @@ export default class extends Controller {
     return !card.dataset.cardImage && !card.dataset.cardVideo
   }
 
-  _readAnimBg() {
-    try { return JSON.parse(this._activeCard?.dataset.cardMediaBg || "{}") || {} }
+  // Both take the card explicitly (defaulting to the modal's own) so the
+  // editor's dropped-media cleanup can clear a backdrop off a card the picker
+  // was never opened on — see survey-editor#_clearDroppedMedia.
+  _readAnimBg(card = this._activeCard) {
+    try { return JSON.parse(card?.dataset.cardMediaBg || "{}") || {} }
     catch (_) { return {} }
   }
 
   // One writer for the card row's dataset, the live panel style and the dirty
   // flag, so the preview and what autosave will send can never disagree.
-  _writeAnimBg(bg) {
-    const card = this._activeCard
+  _writeAnimBg(bg, card = this._activeCard) {
     if (!card) return
     const clean = {}
     if (bg?.color) clean.color = bg.color

@@ -12,6 +12,7 @@ export default class extends Controller {
   static targets = [
     "consentCta", "consentCard", "consentBody", "consentLeft",
     "tyCta", "tyCard", "tyTitle", "tyBody", "tyForwardUrl", "tyForwardLabel",
+    "tyTitleCount", "tyBodyCount",
     "shareCta", "shareCard", "shareTitle", "shareStory", "shareMessage",
     "shareTitleCount", "shareStoryCount", "shareMessageCount",
     "joinCta", "joinCard", "joinTitle", "joinBody", "joinCtaText"
@@ -22,6 +23,7 @@ export default class extends Controller {
   // have to be right before anyone types.
   connect() {
     if (this.hasShareTitleTarget) this._paintShareCounts()
+    if (this.hasTyTitleTarget) this._paintThankyouCounts()
   }
 
   addConsent() {
@@ -119,7 +121,11 @@ export default class extends Controller {
     this.tyCtaTarget.hidden = false
     // Back to the player defaults, which is what the reopened card shows.
     this.tyTitleTarget.textContent = this.tyTitleTarget.dataset.defaultText || ""
-    this.tyBodyTarget.textContent = this.tyBodyTarget.dataset.defaultText || ""
+    // The message box is EMPTY by default, and its data-default-text is the
+    // placeholder rather than a value — writing it in would put the
+    // placeholder's own words in the box as though they had been typed.
+    this.tyBodyTarget.textContent = ""
+    this._paintThankyouCounts()
     // The off-site link goes with the screen. Leaving it behind would keep a
     // live redirect on a thank-you screen the creator believes they removed,
     // with nothing in the editor still showing it.
@@ -130,6 +136,7 @@ export default class extends Controller {
 
   queueThankyouSave() {
     clearTimeout(this._tyTimer)
+    this._paintThankyouCounts()
     this._tyTimer = setTimeout(() => this._saveThankyou(), 900)
   }
 
@@ -182,11 +189,25 @@ export default class extends Controller {
   // Counters are advisory: the cap is applied server-side in update_settings, so
   // this only has to tell the creator before the truncation does.
   _paintShareCounts() {
-    const pairs = [
+    this._paintCounts([
       [ this.shareTitleTarget, this.shareTitleCountTarget ],
       [ this.shareStoryTarget, this.shareStoryCountTarget ],
       [ this.shareMessageTarget, this.shareMessageCountTarget ]
-    ]
+    ])
+  }
+
+  // The thank-you card's two boxes, which had no counters at all — so an end
+  // message was cut at the server's cap with nothing on screen to say it
+  // would be ("the end message gets cut off, I assume because of character
+  // limit"). Same advisory contract as the share card's.
+  _paintThankyouCounts() {
+    this._paintCounts([
+      [ this.tyTitleTarget, this.hasTyTitleCountTarget ? this.tyTitleCountTarget : null ],
+      [ this.tyBodyTarget, this.hasTyBodyCountTarget ? this.tyBodyCountTarget : null ]
+    ])
+  }
+
+  _paintCounts(pairs) {
     pairs.forEach(([ field, count ]) => {
       if (!field || !count) return
       const max = parseInt(field.dataset.max, 10)

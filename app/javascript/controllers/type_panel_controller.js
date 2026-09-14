@@ -538,6 +538,14 @@ function npsHtml(opts, ctx = {}) {
     ? `<button type="button" class="nps-scale-add" data-action="click->card-editor#addNpsStop"
                data-card-editor-nps-add><span aria-hidden="true">＋</span> ${esc(t("card.add_scale_point"))}</button>`
     : ""
+  // The anchor lines beside the scale's ends — the ERB's sibling column, and
+  // like the ERB's editor branch always rendered here (this builder is
+  // editor-only), so the creator has somewhere to type. ctx.npsAnchors is what
+  // the slot held before this rebuild, read by _npsAnchorsFor.
+  const anchors = ctx.npsAnchors || {}
+  const anchorsHtml = `<div class="nps-anchors">${[ "low", "high" ].map(which =>
+    `<span class="nps-anchor-row"><span class="nps-anchor-text nps-anchor-${which}" data-role="nps-anchor-${which}" contenteditable="true" data-placeholder="${esc(t(`card.nps_${which}_placeholder`))}">${esc(anchors[which] || "")}</span></span>`
+  ).join("")}</div>`
   return `
     <div class="nps-slider${custom ? " is-custom-scale" : ""}"
          data-controller="nps-slider card-editor"
@@ -547,6 +555,7 @@ function npsHtml(opts, ctx = {}) {
          tabindex="0" role="slider"
          aria-valuemin="0" aria-valuemax="${n - 1}">
       <div class="nps-slider-stage" style="${npsStageStyle(v)}">
+        ${anchorsHtml}
         <div class="slider-labels nps-slider-labels">
           ${labels.map(o => `<span class="nps-label-row">${del}<span class="slider-label-text" data-nps-slider-target="label"${custom ? ' contenteditable="true"' : ""}>${esc(o)}</span></span>`).join("")}
         </div>
@@ -1333,6 +1342,9 @@ export default class extends Controller {
         npsShapeGroups:  this._npsShapePicker.groups,
         npsShapeLabel:   this._npsShapePicker.label,
         npsCustomScale:  card.dataset.cardNpsCustomScale,
+        // Evaluated before `slot.innerHTML =` replaces the old markup, so the
+        // words on screen are still there to read.
+        npsAnchors:      this._npsAnchorsFor(card),
         rangeThemes:     this._rangeThemePicker.themes,
         rangeThemeGroups: this._rangeThemePicker.groups,
         rangeThemeLabel: this._rangeThemePicker.label,
@@ -1485,6 +1497,22 @@ export default class extends Controller {
   // the autosave that followed persisted the revert. Only when the card has no
   // options on screen (it is currently a type that has none) does the snapshot
   // matter: that is the switch-away-and-back memory it exists for.
+  // The anchor lines beside an NPS scale's ends, as { low, high }. What is on
+  // screen wins, for _optionsFor's reason; the server-written snapshot
+  // (data-card-nps-anchors) is the switch-away-and-back memory, so nps → other
+  // → nps keeps the creator's words the way options do.
+  _npsAnchorsFor(card) {
+    const live = {}
+    for (const which of [ "low", "high" ]) {
+      live[which] = card.querySelector(`[data-role='nps-anchor-${which}']`)?.textContent.trim() || ""
+    }
+    if (live.low || live.high) return live
+    try {
+      const snap = JSON.parse(card.dataset.cardNpsAnchors || "{}")
+      return { low: snap.low || "", high: snap.high || "" }
+    } catch (_) { return live }
+  }
+
   _optionsFor(card, type) {
     if (type === "yes_no") return defaultOptionsFor("yes_no")
 

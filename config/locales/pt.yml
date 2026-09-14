@@ -159,6 +159,9 @@ pt:
       prioritise: "Priorizar"
       scenario: "Cenário"
     modal_aria: "Sobre esta pergunta"
+    nps_low_placeholder: "O mais baixo significa…"
+    nps_high_placeholder: "O mais alto significa…"
+    body_placeholder: "Adicione um texto complementar (opcional)"
   ask_submission_mailer:
     confirmation_subject: "Os seus dados Verto foram submetidos ao Ask Verto"
     confirmation_heading: "Submetido para revisão"
@@ -1263,6 +1266,7 @@ pt:
     live_locked_modal_note: "Ainda podes acrescentar ou reescrever a janela de um cartão: explica uma pergunta sem a alterar."
     verto_theme: "Tema"
     redo: "Refazer"
+    ty_body_placeholder: "Adicione uma mensagem curta (opcional)"
   dashboard_card:
     publish_warning: "Publicar “%{title}”? Depois de ficar no ar, as perguntas ficam bloqueadas e não podem ser editadas — confirme que está tudo exatamente como quer."
     preview: "Pré-visualizar"

@@ -159,6 +159,9 @@ vi:
       prioritise: "Ưu tiên"
       scenario: "Tình huống"
     modal_aria: "Về câu hỏi này"
+    nps_low_placeholder: "Thấp nhất nghĩa là…"
+    nps_high_placeholder: "Cao nhất nghĩa là…"
+    body_placeholder: "Thêm nội dung mô tả (không bắt buộc)"
   ask_submission_mailer:
     confirmation_subject: "Dữ liệu Verto của bạn đã được gửi tới Ask Verto"
     confirmation_heading: "Đã gửi để duyệt"
@@ -1263,6 +1266,7 @@ vi:
     live_locked_modal_note: "Bạn vẫn có thể thêm hoặc viết lại cửa sổ của thẻ — nó giải thích câu hỏi mà không thay đổi câu hỏi."
     verto_theme: "Chủ đề"
     redo: "Làm lại"
+    ty_body_placeholder: "Thêm một tin nhắn ngắn (không bắt buộc)"
   dashboard_card:
     publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"

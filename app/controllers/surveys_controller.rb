@@ -1083,11 +1083,15 @@ class SurveysController < ApplicationController
         @survey.organisation.surveys.kept.where(id: wanted).pluck(:id)
                .sort_by { |id| wanted.index(id) }.first(Survey::MAX_FOLLOW_UPS)
     end
+    # The caps the editor's counters advertise — the constants the branch end
+    # screens are already held to, rather than a second pair of literals that
+    # could drift from them (and did: the branch cap moved to 120 and this one
+    # stayed at 80, so the built-in screen cut where nothing said it would).
     if params.key?(:thankyou_title)
-      attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(80).presence
+      attrs[:thankyou_title] = params[:thankyou_title].to_s.strip.first(Survey::MAX_END_TITLE).presence
     end
     if params.key?(:thankyou_body)
-      attrs[:thankyou_body] = params[:thankyou_body].to_s.strip.first(400).presence
+      attrs[:thankyou_body] = params[:thankyou_body].to_s.strip.first(Survey::MAX_END_BODY).presence
     end
     if params.key?(:forward_url)
       attrs[:forward_url] = Survey.sanitize_forward_url(params[:forward_url])

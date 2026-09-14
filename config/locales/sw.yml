@@ -159,6 +159,9 @@ sw:
       prioritise: "Panga vipaumbele"
       scenario: "Hali"
     modal_aria: "Kuhusu swali hili"
+    nps_low_placeholder: "Ya chini kabisa inamaanisha…"
+    nps_high_placeholder: "Ya juu kabisa inamaanisha…"
+    body_placeholder: "Ongeza maandishi ya ziada (si lazima)"
   ask_submission_mailer:
     confirmation_subject: "Data yako ya Verto imewasilishwa kwa Ask Verto"
     confirmation_heading: "Imewasilishwa kwa ukaguzi"
@@ -1263,6 +1266,7 @@ sw:
     live_locked_modal_note: "Bado unaweza kuongeza au kuandika upya dirisha la kadi — linaeleza swali bila kulibadilisha."
     verto_theme: "Mada"
     redo: "Rudia"
+    ty_body_placeholder: "Ongeza ujumbe mfupi (si lazima)"
   dashboard_card:
     publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"

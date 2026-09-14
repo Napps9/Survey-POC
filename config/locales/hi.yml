@@ -159,6 +159,9 @@ hi:
       prioritise: "प्राथमिकता तय करें"
       scenario: "परिदृश्य"
     modal_aria: "इस सवाल के बारे में"
+    nps_low_placeholder: "सबसे कम का अर्थ…"
+    nps_high_placeholder: "सबसे अधिक का अर्थ…"
+    body_placeholder: "मुख्य पाठ जोड़ें (वैकल्पिक)"
   ask_submission_mailer:
     confirmation_subject: "आपका Verto डेटा Ask Verto को सबमिट हुआ"
     confirmation_heading: "समीक्षा के लिए भेजा गया"
@@ -1263,6 +1266,7 @@ hi:
     live_locked_modal_note: "आप अब भी कार्ड की विंडो जोड़ या दोबारा लिख सकते हैं — यह सवाल बदले बिना उसे समझाती है।"
     verto_theme: "विषय"
     redo: "फिर से करें"
+    ty_body_placeholder: "एक छोटा संदेश जोड़ें (वैकल्पिक)"
   dashboard_card:
     publish_warning: "“%{title}” प्रकाशित करें? लाइव होने के बाद इसके सवाल लॉक हो जाएँगे और संपादित नहीं हो सकेंगे — सुनिश्चित करें कि सब कुछ बिल्कुल वैसा ही है जैसा आप चाहते हैं।"
     preview: "पूर्वावलोकन"

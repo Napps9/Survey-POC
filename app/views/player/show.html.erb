@@ -221,10 +221,10 @@
     </div>
   <% end %>
 
-  <%# Publishing org's logo, centred above the deck — desktop only. Mobile has
-      no room for a persistent masthead above the card, so the brand there
-      stays where it already was: inside the thank-you card at the very end
-      (below).
+  <%# Publishing org's logo, centred above the deck — desktop only. On a phone
+      the same logo rides the utility bar below instead (.player-bar-logo),
+      which costs the card no height of its own because that strip is already
+      drawn; the thank-you card's own copy stands down there.
       Only drawn when there IS a logo: an org that hasn't uploaded one gets no
       masthead rather than our wordmark in their slot, and the wrapper is
       skipped along with it because its own 18px of padding would otherwise
@@ -243,6 +243,18 @@
     <% unless preview_mode %>
       <%= render "player/test_mode_hatch" %>
     <% end %>
+    <%# The publishing org's logo, centred in the bar — phones only (the
+        desktop masthead above already carries it). The bar was a band of
+        backdrop above the card holding a language pill and, on a
+        monolingual Verto, nothing visible at all: "I was going to say remove
+        the black bar at the top as it feels weird, but maybe the Unleash
+        Football logo could sit small in the middle of the bar, so it looks
+        like it serves more of a purpose?".
+        Centred by position rather than by flex order, so the hatch and the
+        language pill keep the exact places they have today. Renders nothing
+        for an org with no logo, and the bar then collapses as before. %>
+    <%= brand_logo_tag @survey.organisation, class: "player-bar-logo",
+          style: "height:24px;width:auto;max-width:45%;", direct: true %>
     <% if @survey.multilingual? %>
       <%= render "player/content_lang_switcher" %>
     <% end %>
@@ -427,9 +439,17 @@
               class: "player-thankyou-logo", direct: true %>
 
         <div class="preview-thankyou-title" data-player-target="thankyouTitle"><%= @survey.thankyou_title_text %></div>
-        <div class="preview-thankyou-sub" data-player-target="thankyouSub">
-          <%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %>
-        </div>
+        <div class="preview-thankyou-sub" data-player-target="thankyouSub"><%= safe_join(@survey.thankyou_body_text.split("\n"), tag.br) %></div>
+        <%# "from <account>". Its own line, under the message rather than
+            standing in for it: as the message's fallback the two could never
+            both appear, so a creator who wrote an end message lost the
+            attribution and one who wrote none had it saved as their message.
+            Never rewritten by a branch end screen (player#_applyEndScreen
+            swaps the title and the message) — the Verto is published by the
+            same account whichever screen a respondent lands on.
+            No whitespace inside .preview-thankyou-sub above: it is hidden
+            while :empty, and a newline is content. %>
+        <div class="preview-thankyou-from"><%= @survey.thankyou_from_text %></div>
       <% end %>
 
       <%

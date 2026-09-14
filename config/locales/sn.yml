@@ -161,6 +161,9 @@ sn:
       prioritise: "Ronga Nekukosha"
       scenario: "Mamiriro"
     modal_aria: "Nezvemubvunzo uyu"
+    nps_low_placeholder: "Yakaderera zvikuru inoreva…"
+    nps_high_placeholder: "Yakakwirira zvikuru inoreva…"
+    body_placeholder: "Wedzera mamwe mashoko (hazvisungirwi)"
   ask_submission_mailer:
     confirmation_subject: "Dhata reVerto yako yatumirwa kuAsk Verto"
     confirmation_heading: "Yatumirwa Kuti Iongororwe"
@@ -1273,6 +1276,7 @@ sn:
     live_locked_modal_note: "Uchiri kugona kuwedzera kana kunyorazve hwindo rekadhi — rinotsanangura mubvunzo usingachinji."
     verto_theme: "Musoro"
     redo: "Dzokorora"
+    ty_body_placeholder: "Wedzera meseji pfupi (hazvisungirwi)"
   dashboard_card:
     publish_warning: "Buritsa “%{title}”? Kana yava pachena, mibvunzo yayo inokiiwa uye haigoni kugadziriswa — chenjerera kuti zvose zvinoverengeka sezvaunoda."
     preview: "Tarisa"

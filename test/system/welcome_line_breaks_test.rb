@@ -124,4 +124,115 @@ class WelcomeLineBreaksTest < ApplicationSystemTestCase
                     "the CSS together: the paragraph break the creator typed is the paragraph " \
                     "break the respondent reads."
   end
+
+  # ── Body copy on a card that has none yet ─────────────────────────────────
+  #
+  # "I would also consider here the main header in current font size, and the
+  #  remainder body copy in a smaller font, as per enterprise, fully editable
+  #  as all text is in the editor."
+  #
+  # Both sizes already existed — .q-title and .q-subtitle — and so did the
+  # storage. What did not exist was a way to START using them: the subtitle was
+  # rendered only when the card already had a description, and the node IS the
+  # field (the serialiser reads this element), so a front card with only a
+  # heading had nowhere to type body copy. Every line a creator wrote therefore
+  # went into the heading, at heading size, which is exactly what the screenshot
+  # shows.
+  # A DRAFT by default: a live Verto's editor is covered by the live-warning
+  # overlay and its deck is edit-locked server-side, so the editor half of this
+  # has to happen before the Verto goes out. publish! is the other half.
+  def heading_only_survey
+    @org.surveys.create!(
+      title: "Kick off", theme: "Football", audience_age: "all", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [
+        { "type" => "welcome_card", "cid" => "k", "text" => "KICK OFF" },
+        { "type" => "yes_no", "cid" => "q", "text" => "Enjoying it?", "options" => %w[Yes No] }
+      ]
+    )
+  end
+
+  def publish!(survey)
+    survey.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
+    survey
+  end
+
+  test "a welcome card with only a heading still offers a body box in the editor" do
+    survey = heading_only_survey
+    sign_in_as(@user)
+    visit survey_path(survey)
+    dismiss_cookie_banner
+    assert_text "KICK OFF"
+
+    box = find("[data-card-cid='k'] .q-subtitle")
+    assert_equal "true", box["contenteditable"]
+    assert_equal "", box.text.strip, "the box has to start empty or the placeholder cannot show"
+    assert_equal I18n.t("card.body_placeholder"), box["data-placeholder"]
+
+    # The placeholder is drawn, not typed: an :empty::before, so it is never
+    # read back as the creator's words.
+    assert_equal I18n.t("card.body_placeholder"), page.evaluate_script(<<~JS)
+      getComputedStyle(document.querySelector("[data-card-cid='k'] .q-subtitle"), "::before")
+        .content.replace(/^"|"$/g, "")
+    JS
+  end
+
+  test "body copy typed into that box saves, reloads, and renders at the smaller size" do
+    survey = heading_only_survey
+    sign_in_as(@user)
+    visit survey_path(survey)
+    dismiss_cookie_banner
+    assert_text "KICK OFF"
+
+    box = find("[data-card-cid='k'] .q-subtitle")
+    page.execute_script("arguments[0].scrollIntoView({ block: 'center' }); arguments[0].focus()", box)
+    press_keys("For three minutes, football is yours.")
+
+    stored = nil
+    30.times do
+      stored = survey.reload.cards.first["description"]
+      break if stored.present?
+      sleep 0.5
+    end
+    assert_equal "For three minutes, football is yours.", stored,
+                 "the body copy never reached the deck — the serialiser reads this node, so an " \
+                 "absent one is a field that silently reverts"
+    assert_equal "KICK OFF", survey.reload.cards.first["text"],
+                 "the heading was rewritten by body copy going into the wrong field"
+
+    # And the two sizes a respondent actually meets, on a phone.
+    publish!(survey)
+    page.driver.browser.resize(width: 393, height: 660)
+    visit "/play/#{survey.publish_token}"
+    dismiss_cookie_banner
+    agree_to_consent_gate
+    assert_selector ".preview-card.active .q-subtitle", text: "For three minutes", wait: 5
+
+    sizes = page.evaluate_script(<<~JS)
+      (() => {
+        const px = (sel) => parseFloat(getComputedStyle(
+          document.querySelector(".preview-card.active " + sel)).fontSize)
+        return { title: px(".q-title"), sub: px(".q-subtitle") }
+      })()
+    JS
+    page.driver.browser.resize(width: 1280, height: 900)
+
+    assert_operator sizes["title"], :>, sizes["sub"] + 6,
+                    "the heading is #{sizes['title']}px and the body #{sizes['sub']}px — the whole " \
+                    "point is that the body reads as body copy rather than more heading"
+  end
+
+  # The player must not gain an empty box just because the editor has one.
+  test "a card with no body copy draws no subtitle for a respondent" do
+    survey = publish!(heading_only_survey)
+    page.driver.browser.resize(width: 393, height: 660)
+    visit "/play/#{survey.publish_token}"
+    dismiss_cookie_banner
+    agree_to_consent_gate
+    assert_selector ".preview-card.active .q-title", text: "KICK OFF", wait: 5
+
+    assert page.has_no_css?(".preview-card.active .q-subtitle", visible: true, wait: 2),
+           "an empty body box on the player is a gap under the heading with nothing in it"
+    page.driver.browser.resize(width: 1280, height: 900)
+  end
 end

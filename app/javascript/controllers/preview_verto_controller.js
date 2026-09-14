@@ -442,6 +442,15 @@ export default class extends Controller {
       el.removeAttribute("contenteditable")
     )
 
+    // 3a. An NPS anchors column the creator never filled. The player renders
+    //     no column at all for it, and an empty one still costs a stage gap
+    //     that shifts the vessel — the class of drift the preview audit exists
+    //     to catch.
+    clone.querySelectorAll(".nps-anchors").forEach(col => {
+      const words = Array.from(col.querySelectorAll(".nps-anchor-text")).some(el => el.textContent.trim())
+      if (!words) col.remove()
+    })
+
     // 3b. The intro modal, turned from the creator's editable replica into the
     //     thing a respondent meets: the editor's fold and border classes go,
     //     it starts shut (this overlay opens it on arrival, as the player

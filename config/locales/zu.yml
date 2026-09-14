@@ -167,6 +167,9 @@ zu:
       prioritise: "Beka izigaba zokubaluleka"
       scenario: "Isibonelo"
     modal_aria: "Mayelana nalo mbuzo"
+    nps_low_placeholder: "Okuphansi kusho…"
+    nps_high_placeholder: "Okuphezulu kusho…"
+    body_placeholder: "Engeza umbhalo omfushane (akuphoqelekile)"
   ask_submission_mailer:
     confirmation_subject: "Idatha yakho ye-Verto ithunyelwe ku-Ask Verto"
     confirmation_heading: "Kuthunyelwe ukuze kubuyekezwe"
@@ -1283,6 +1286,7 @@ zu:
     live_locked_modal_note: "Usengakwazi ukwengeza noma ukubhala kabusha iwindi lekhadi — lichaza umbuzo ngaphandle kokuwushintsha."
     verto_theme: "Isihloko"
     redo: "Yenza futhi"
+    ty_body_placeholder: "Engeza umlayezo omfushane (akuphoqelekile)"
   dashboard_card:
     publish_warning: "Shicilela “%{title}”? Uma isikhundleni, imibuzo yayo izovalwa futhi ngeke ihlelwe — qiniseka ukuthi konke kufundeka ngendlela oyifunayo."
     preview: "Buka kuqala"

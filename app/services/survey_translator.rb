@@ -64,6 +64,14 @@ class SurveyTranslator
               modal_body: {
                 type: "string",
                 description: "Translated body of the intro modal shown over this card — the creator's explanation of what the question is asking. Empty string if the source had none."
+              },
+              nps_low_label: {
+                type: "string",
+                description: "Translated caption beside the LOWEST point of an NPS/liquid scale (e.g. 'I have no say at all'). Empty string if the source had none."
+              },
+              nps_high_label: {
+                type: "string",
+                description: "Translated caption beside the HIGHEST point of an NPS/liquid scale (e.g. 'I am a decision maker'). Empty string if the source had none."
               }
             },
             required: %w[text options]
@@ -95,6 +103,10 @@ class SurveyTranslator
       before it is answered) when the source card has them; omit them
       otherwise. This is the creator explaining the question in their own
       voice — keep that voice, not a formal register.
+    - Translate `nps_low_label` and `nps_high_label` (the short captions beside
+      the lowest and highest points of a scale) when the source card has them;
+      omit them otherwise. Keep them as short as the source — they sit in a
+      narrow column beside the scale.
     - Keep translations concise to fit UI constraints: question text short
       (aim under ~70 characters), option labels short (aim under ~20 characters).
     - Preserve numbers, and leave proper nouns / brand names untranslated.
@@ -188,6 +200,7 @@ class SurveyTranslator
       entry[:explanation] = card["explanation"].to_s if card["explanation"].present?
       entry[:modal_title] = card["modal_title"].to_s if card["modal_title"].present?
       entry[:modal_body]  = card["modal_body"].to_s  if card["modal_body"].present?
+      Survey::NPS_ANCHOR_KEYS.each { |k| entry[k.to_sym] = card[k].to_s if card[k].present? }
       entry
     end
 
@@ -248,7 +261,7 @@ class SurveyTranslator
       # falling back to the source words so a modal is never blank in a
       # language the model skipped — blank here would mean a respondent gets an
       # empty pop-up, not the English one.
-      %w[modal_title modal_body].each do |field|
+      (%w[modal_title modal_body] + Survey::NPS_ANCHOR_KEYS).each do |field|
         entry[field] = t[field].presence || card[field].to_s if card[field].present?
       end
 

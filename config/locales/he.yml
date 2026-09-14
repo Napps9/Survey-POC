@@ -159,6 +159,9 @@ he:
       prioritise: "תעדוף"
       scenario: "תרחיש"
     modal_aria: "על השאלה הזו"
+    nps_low_placeholder: "הנמוך ביותר פירושו…"
+    nps_high_placeholder: "הגבוה ביותר פירושו…"
+    body_placeholder: "הוסיפו טקסט מלווה (אופציונלי)"
   ask_submission_mailer:
     confirmation_subject: "נתוני ה-Verto שלכם נשלחו ל-Ask Verto"
     confirmation_heading: "נשלח לבדיקה"
@@ -1263,6 +1266,7 @@ he:
     live_locked_modal_note: "עדיין אפשר להוסיף או לנסח מחדש את חלון הכרטיס — הוא מסביר שאלה בלי לשנות אותה."
     verto_theme: "נושא"
     redo: "בצע שוב"
+    ty_body_placeholder: "הוסיפו הודעה קצרה (אופציונלי)"
   dashboard_card:
     publish_warning: "לפרסם את “%{title}”? לאחר הפרסום השאלות נעולות ולא ניתנות לעריכה — ודאו שהכול בדיוק כפי שאתם רוצים."
     preview: "תצוגה מקדימה"

@@ -59,6 +59,7 @@ const SAVE_WARNING_KEYS = {
   background_image: "editor.save_warning",
   video: "editor.save_warning_media",
   lottie: "editor.save_warning_media",
+  media_bg: "editor.save_warning_media",
   duplicate_welcome: "editor.save_warning_duplicate",
   duplicate_respondent_code: "editor.save_warning_duplicate",
   duplicate_points_intro: "editor.save_warning_duplicate",
@@ -69,7 +70,7 @@ const SAVE_WARNING_KEYS = {
 // The codes whose drop is a picture ON A CARD — the ones `warning_details`
 // (cid per drop, and the statement index for a tap card) can point at, so the
 // sentence can name the card and the page can stop showing the picture.
-const CARD_IMAGE_CODES = [ "image", "option_images" ]
+const CARD_IMAGE_CODES = [ "image", "option_images", "media_bg" ]
 
 // Token-award rows are keyed by canonical option label, so the types whose
 // labels are edited live in the card need their rows rebuilt as options change
@@ -1250,6 +1251,10 @@ export default class extends Controller {
       // here — a Spanish respondent meets a Spanish modal.
       modal_title: c.modal_title || "",
       modal_body: c.modal_body || "",
+      // The anchor lines beside an NPS scale's ends — respondent-facing words,
+      // translated per language like the rest.
+      nps_low_label: c.nps_low_label || "",
+      nps_high_label: c.nps_high_label || "",
       // Rich-text layer — meaningful on the PRIMARY entry only (translations
       // are plain by design; the server strips any html they might carry).
       text_html: c.text_html || null,
@@ -1312,6 +1317,9 @@ export default class extends Controller {
       // textContent, like an option label.
       modal_title: this._modalTitleEl(cardEl)?.textContent.trim() || "",
       modal_body: this._readPlain(this._modalBodyEl(cardEl)),
+      // The NPS anchor lines: one line each, like an option label.
+      nps_low_label: this._npsAnchorEl(cardEl, "low")?.textContent.trim() || "",
+      nps_high_label: this._npsAnchorEl(cardEl, "high")?.textContent.trim() || "",
       text_html: this._readHtml(titleEl),
       description_html: this._readHtml(descEl),
       modal_body_html: this._readHtml(this._modalBodyEl(cardEl)),
@@ -1325,6 +1333,9 @@ export default class extends Controller {
   _modalLayer(cardEl)   { return cardEl.querySelector("[data-role='card-modal']") }
   _modalTitleEl(cardEl) { return cardEl.querySelector("[data-role='card-modal-title']") }
   _modalBodyEl(cardEl)  { return cardEl.querySelector("[data-role='card-modal-body']") }
+  // The anchor line beside one end of an NPS scale (`low` / `high`) — the
+  // sibling column beside the digits, never one of the digits themselves.
+  _npsAnchorEl(cardEl, which) { return cardEl.querySelector(`[data-role='nps-anchor-${which}']`) }
 
   // Line-break-preserving plain text. trim() only cuts the ends; interior
   // newlines survive. The collapse handles how engines count an EMPTY line:
@@ -1382,6 +1393,13 @@ export default class extends Controller {
     if (modalTitleEl) modalTitleEl.textContent = content.modal_title || ""
     const modalBodyEl = this._modalBodyEl(cardEl)
     if (modalBodyEl) write(modalBodyEl, content.modal_body_html, content.modal_body || "")
+    // The NPS anchor lines. Blank rather than falling back, for the modal's
+    // reason: an empty node shows the placeholder, which is the editor's way
+    // of saying this language has no words for it yet.
+    for (const which of [ "low", "high" ]) {
+      const el = this._npsAnchorEl(cardEl, which)
+      if (el) el.textContent = content[`nps_${which}_label`] || ""
+    }
     const opts = content.options || [], fopts = fallback.options || []
     const optsHtml = content.options_html || []
     this._optionEls(cardEl).forEach((el, k) => {
@@ -2701,7 +2719,22 @@ export default class extends Controller {
       // colour/image pair has no text node in the card to be re-derived from —
       // exactly like option_styles. Dropped for a card whose panel is a photo
       // or video, mirroring the server's own rule.
-      if (!video && !image && card.dataset.cardMediaBg) {
+      //
+      // "Mirroring" is the whole of it, and this line did not: the rule has a
+      // RANGE exception (a range card's panel is its reaction animation, so a
+      // backdrop shows through it whatever else the card is carrying), stated
+      // in ApplicationHelper#card_takes_backdrop?, in
+      // Survey.sanitize_cards_images! and in media_picker#_cardTakesBackground
+      // — and missing here. A range card still holding an `image` (switch a
+      // photo card to Range and it does: the panel stops drawing the picture
+      // but nothing clears it) therefore rendered its backdrop, offered the
+      // Background control, repainted live — and then omitted media_bg from
+      // every autosave. Nothing was dropped server-side, so there was no
+      // warning either: "the background image I add to a range question
+      // doesn't save, I have to re-add every time I load the editor".
+      // Four places, one rule. Change one and change all four.
+      const takesBackdrop = type === "range" || !!lottie || (!video && !image)
+      if (takesBackdrop && card.dataset.cardMediaBg) {
         try {
           const bg = JSON.parse(card.dataset.cardMediaBg)
           if (bg && (bg.color || bg.image)) out.media_bg = bg
@@ -2771,6 +2804,13 @@ export default class extends Controller {
       // only when true, because absent is not "classic" — it is "nobody has
       // said", which the labels then answer (NpsHelper#nps_custom_scale?).
       if (type === "nps" && card.dataset.cardNpsCustomScale === "true") out.nps_custom_scale = true
+      // …and the two anchor lines beside its ends. Each emitted only when it
+      // has words: absent is the one representation of "no anchor", and the
+      // server drops a blank or an anchor on any other type.
+      const npsLow  = type === "nps" ? (prim.nps_low_label  || "").trim() : ""
+      const npsHigh = type === "nps" ? (prim.nps_high_label || "").trim() : ""
+      if (npsLow)  out.nps_low_label  = npsLow
+      if (npsHigh) out.nps_high_label = npsHigh
       // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
       if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
       // Select-many cards may cap how many answers a respondent ticks. Only
@@ -2974,6 +3014,10 @@ export default class extends Controller {
         // an orphaned entry anyway.
         if (modalTitle && (t.modal_title || "").trim()) tEntry.modal_title = t.modal_title.trim()
         if (modalBody && (t.modal_body || "").trim()) tEntry.modal_body = t.modal_body.trim()
+        // The NPS anchor lines, same rule as the modal: only where the primary
+        // has one, and only when this language has words for it.
+        if (npsLow  && (t.nps_low_label  || "").trim()) tEntry.nps_low_label  = t.nps_low_label.trim()
+        if (npsHigh && (t.nps_high_label || "").trim()) tEntry.nps_high_label = t.nps_high_label.trim()
         if (primOpts.length) {
           const topts = t.options || []
           tEntry.options = primOpts.map((p, k) => ((topts[k] || "").trim()) || p)
@@ -4016,6 +4060,13 @@ export default class extends Controller {
       if (!card) return
       if (d.code === "image" && !card.dataset.cardLottie) picker._setCardImage(card, "")
       if (d.code === "option_images" && Number.isInteger(d.index)) picker._setTapOptionImage(card, d.index, "")
+      // A refused backdrop image, for the same reason: left on the card it
+      // would be re-sent, re-dropped and re-warned on every autosave. The
+      // colour stays — only the picture was refused.
+      if (d.code === "media_bg") {
+        const kept = picker._readAnimBg(card)
+        picker._writeAnimBg({ color: kept.color }, card)
+      }
     })
   }
 

@@ -159,6 +159,9 @@ fr:
       prioritise: "Prioriser"
       scenario: "Scénario"
     modal_aria: "À propos de cette question"
+    nps_low_placeholder: "Le plus bas signifie…"
+    nps_high_placeholder: "Le plus haut signifie…"
+    body_placeholder: "Ajoutez un texte complémentaire (facultatif)"
   ask_submission_mailer:
     confirmation_subject: "Vos données Verto ont été soumises à Ask Verto"
     confirmation_heading: "Soumis pour relecture"
@@ -1263,6 +1266,7 @@ fr:
     live_locked_modal_note: "Tu peux encore ajouter ou reformuler la fenêtre d'une carte : elle explique une question sans la modifier."
     verto_theme: "Thème"
     redo: "Rétablir"
+    ty_body_placeholder: "Ajoutez un court message (facultatif)"
   dashboard_card:
     publish_warning: "Publier « %{title} » ? Une fois en ligne, ses questions sont verrouillées et ne peuvent plus être modifiées — vérifiez que tout est exactement comme vous le voulez."
     preview: "Aperçu"

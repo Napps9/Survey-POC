@@ -705,7 +705,13 @@
    specificity the later rule wins — which silently zeroed the insets below and
    pushed the whole column 6px down, putting "0" 38px under the vessel floor.
    Matching both classes outranks it wherever it sits. */
-.slider-labels.nps-slider-labels {
+/* .nps-anchors is the second column on this track — the two anchor lines
+   beside the scale's ends (_card_component.html.erb, `when "nps"`). Sharing
+   the rule, rather than restating the height and insets, is what keeps the
+   anchors level with the first and last stop for any step count and every
+   --nps-h tier: there is one track, not two hand-kept copies of it. */
+.slider-labels.nps-slider-labels,
+.nps-anchors {
   display: flex;
   flex-direction: column-reverse;
   justify-content: space-between;
@@ -722,7 +728,8 @@
    the row went in when the editor's × needed somewhere to live that was NOT
    inside a contenteditable, and it is rendered on the player too so the two
    surfaces lay the same scale out the same way. */
-.nps-slider-labels .nps-label-row {
+.nps-slider-labels .nps-label-row,
+.nps-anchors .nps-anchor-row {
   flex: 0 0 0;
   height: 0;
   display: flex;
@@ -739,6 +746,64 @@
   overflow: visible;
   white-space: nowrap;
 }
+/* The anchor lines. The column yields to the vessel (.nps-control is
+   flex 0 0 auto and always wins the width) and wraps instead of overflowing;
+   beside the widest vessels (mug, flask) a long anchor becomes a few short
+   lines, which is the right trade — the vessel is the answer, the anchor is
+   its caption. The digit column's own insets are inherited from the shared
+   rule above; the side padding is not wanted here. */
+.nps-anchors { flex: 0 1 auto; min-width: 0; max-width: 6.5em; padding-left: 0; padding-right: 0; }
+/* The digits keep their content width; the anchors absorb every pixel of
+   squeeze. Measured, in the editor: the × chip sits beside a label that is
+   nowrap and overflows VISIBLY (see .nps-slider-labels .slider-label-text), so
+   a digit column narrower than chip + label draws the label straight over the
+   chip and the click to remove a stop lands on the label instead. Shrinking
+   the anchors costs a line of wrap; shrinking the digits costs a control. */
+.slider-labels.nps-slider-labels { flex: 0 0 auto; }
+/* Two columns beside the vessel instead of one, in a 361px editor panel: the
+   stage's 16px gaps were sized for one. 10px each keeps the same total gutter
+   the single column had, and the anchors read as attached to their digits. */
+.nps-slider-stage:has(.nps-anchors) { gap: 10px; }
+/* The four widest silhouettes, on a card that has captions. Measured on a
+   desktop card (panel 359px): a mug draws 248px of it and a flask 245, which
+   left the caption column 15-18px — nine lines of one word each. Still level
+   with its stop, because the line alignment above does not care how many lines
+   there are, but nobody would call it readable.
+   So those four give up a little height on a captioned card, and through
+   --nps-aspect proportionally as much width: a mug goes to 200px and the
+   captions get ~60, which is two or three lines. Nothing changes on a card
+   without captions, and nothing changes for the six narrower shapes, which
+   already leave 80-104px (a bottle, the shape this was reported on, leaves 82).
+   --nps-h is the one number both columns and the vessel size from, so the
+   digits, the captions and the liquid stay in step by construction — that is
+   the whole reason it is a single custom property.
+   min(), so a short phone (where --nps-vessel-h is already 232) keeps the
+   smaller of the two rather than being grown by this rule. */
+.nps-slider:has(.nps-anchors):has(.nps-shape-mug),
+.nps-slider:has(.nps-anchors):has(.nps-shape-flask),
+.nps-slider:has(.nps-anchors):has(.nps-shape-jar),
+.nps-slider:has(.nps-anchors):has(.nps-shape-beaker) {
+  --nps-h: min(var(--nps-vessel-h, 320px), 258px);
+}
+.nps-anchors .nps-anchor-text {
+  display: block; text-align: end; white-space: normal; overflow-wrap: anywhere;
+  font-family: "ABeeZee", sans-serif; font-size: 12px; line-height: 1.2;
+  color: rgba(0,0,0,0.55);
+}
+/* Hang toward the middle of the scale, so an anchor can never reach past the
+   column's ends into the .split-right > .mt-2 scroller, however long it is:
+   the bottom anchor's LAST line sits on stop 0 and any wrap runs upward, the
+   top anchor's FIRST line sits on the top stop and any wrap runs down. The row
+   is zero-height, so the -0.6em is what puts that one line's centre on the
+   stop rather than its edge. column-reverse ⇒ :first-child is the bottom. */
+.nps-anchors .nps-anchor-row:first-child { align-items: flex-end; }
+.nps-anchors .nps-anchor-row:last-child  { align-items: flex-start; }
+.nps-anchors .nps-anchor-row:first-child .nps-anchor-text { margin-bottom: -0.6em; }
+.nps-anchors .nps-anchor-row:last-child  .nps-anchor-text { margin-top: -0.6em; }
+/* Same placeholder idiom as .book-page-text further down: shown while the
+   span is empty, gone once contenteditable is stripped for a preview. */
+.nps-anchor-text[contenteditable]:empty::before { content: attr(data-placeholder); color: rgba(0,0,0,0.32); }
+
 /* Remove a stop. Sits to the label's leading side, in the empty column the
    right-aligned digits leave behind, and only while the card is off the
    classic 0-10 — on the classic there is nothing to remove. Dimmed until the
@@ -751,6 +816,13 @@
    fire. */
 .nps-label-delete {
   flex: 0 0 auto;
+  /* Above the label, not under it. The label beside this chip is nowrap with
+     overflow: visible (it has to be — its row is zero-height), so a column
+     narrower than chip + label paints the label's glyphs straight over the
+     chip, and the click to remove a stop lands on the label instead. Measured
+     as a real click failure the day the captions column started competing for
+     the same width. */
+  position: relative; z-index: 1;
   width: 17px; height: 17px; padding: 0;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
@@ -2591,6 +2663,15 @@
   outline: none;
   white-space: pre-line; /* same contract as .q-title above */
 }
+/* Body copy the creator has not written. In the editor the empty box IS the
+   field — the serialiser reads this element — so it stays and says what it is
+   for; anywhere else (the player, and the preview overlay, which strips
+   contenteditable) an empty box would be a .q-header gap with nothing in it. */
+.q-subtitle:empty:not([contenteditable]) { display: none; }
+.q-subtitle[contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(28,32,52,0.35);
+}
 
 /* ── Slider ─────────────────────────────────────── */
 .slider-wrap { position: relative; display: flex; flex-direction: column; gap: 14px; padding-top: 12px; }
@@ -3301,24 +3382,36 @@
 /* `position: relative` so the editor's pinned character counter has this box
    to hang off — see .option-limit-counter--pinned. */
 .rotate-wrap { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-/* Bigger, portrait card; the cards fill the stack and the controls overlay
-   sits at the bottom inside it.
+/* Portrait card; the cards fill the stack and the controls overlay sits at the
+   bottom inside it.
    The height is FLUID, not the flat 430px it was. Measured across four scenes,
    no single number can be both bigger and scroll-free: the editor's card gives
    an interior of about 600px and a tall phone's answer panel about 800, so a
    flat 540 fills the phone beautifully and costs the editor 210px of scroll.
-   Growing into whatever the panel has instead is bigger exactly where there is
-   room to be — 560 on an iPhone 15, 480 on the desktop player — and never adds
-   a pixel of scroll over the old size anywhere.
-   430 is the floor on the editor canvas, where it is today's card and a creator
-   scrolling a fixed workspace is ordinary. The PLAYER floors much lower — see
-   the mobile rule — because scrolling a swipe card is not ordinary at all.
+   Growing into whatever the panel has is bigger exactly where there is room
+   to be. The PLAYER floors much lower than the editor canvas — see the mobile
+   rule — because scrolling a swipe card is not ordinary at all.
    This is the same fix the NPS vessel already had for the same reason — it was
    a flat 232px until "a tall phone drew the same small vessel inside a panel
    with hundreds of px to spare"; see --nps-vessel-h.
    `flex`, not `height: 100%`: the percentage resolves against .rotate-wrap,
    which has no definite height, so it silently falls back to auto and the card
-   stays 430 on every viewport while looking like it works.
+   stays at its floor on every viewport while looking like it works.
+
+   300 x 300-400, down from 320 x 430-560, and the shape is the point: 1.33 at
+   the cap and square at the floor, against 1.34-1.75 before. "The cards feel
+   slightly too large for the space — consider reducing overall card size
+   (globally) a little less height and reduce width a bit... the enterprise has
+   these cards as closer to square (maybe a little taller) which always was
+   fine." The phone had already been given that shape (the mobile tier below);
+   this is the desktop and the editor canvas agreeing with it.
+   It also buys back the scrollbar the old floor cost: the desktop panel offers
+   the card about 457px between the question and the reset row, which a 430px
+   floor plus the wrap's 12px gap and the row itself did not fit — so an
+   ordinary two-line question put a scrollbar down the side of a card nobody
+   was meant to scroll. A 300px floor clears it with room for a third line.
+   The answers ride the height (see --tap-pill-h, 12cqh): 36px at the floor and
+   48px at the cap, both above the 34px a two-line label needs.
 
    `container-type: size` so the answers can size themselves against the CARD
    rather than the viewport (see --tap-pill-h). The card's height comes from
@@ -3326,9 +3419,9 @@
 .rotate-card-stack {
   position: relative;
   container-type: size; container-name: swipecard;
-  width: 320px; max-width: 100%;
+  width: 300px; max-width: 100%;
   height: auto; flex: 1 1 auto;
-  min-height: 430px; max-height: 560px;
+  min-height: 300px; max-height: 400px;
   margin: 0 auto;
 }
 .rotate-card {
@@ -6757,6 +6850,22 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
   color: rgba(255,255,255,0.85); max-width: 560px; line-height: 1.6;
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
+/* An end screen with no message of its own draws the title and the byline with
+   nothing between them. The card is a flex column with a 16px gap, so an empty
+   box here would hold a second gap open and read as a missing line. */
+.preview-thankyou-sub:empty { display: none; }
+/* "from <account>" — the byline under the message. Smaller and quieter than the
+   message: it says who is asking, it is not part of what they said.
+   Quieter, but not the 40% it was written as: this screen lost its opaque card
+   and now sits on the Verto's backdrop, which is why the subtitle above went
+   from 45% to 85% and grew a shadow. A byline nobody can read over a light
+   patch of photo is the same defect one step further down the column, so it
+   takes the same treatment and stays subordinate by size and weight instead. */
+.preview-thankyou-from {
+  font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 15px;
+  color: rgba(255,255,255,0.7); max-width: 560px; line-height: 1.5;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
 /* The card is as wide as the deck; its CONTENTS are not, because a 750px line
    of prose is not readable and a 750px pill is not a button. The card gives
    the title room to sit on one line and the block below it room to breathe —
@@ -8384,18 +8493,21 @@ body.generating-overlay-active .bottom-bar { display: none; }
      The one viewport that still scrolls is a landscape phone — 844×390 offers
      the card 228px, less than five answers can be drawn in — and it now scrolls
      32px instead of the ~200 the fixed floor cost it. */
-  /* Squarer, and lower. The stack is 320px wide and used to run to the base
-     rule's 560px cap, which on an iPhone 15 is exactly what it reached — a
-     1.75 ratio, and the card filled its scroller with nothing left over
-     ("while I love the cards on mobile, it feels a bit squashed... reduce
-     overall card height a touch, gives more room above and below").
-     448px is 1.4 — near enough square to read as a card rather than a column,
-     and it hands 112px back to the space above and below. It is also what a
-     shorter phone was already choosing for itself: an SE measured 449px here
-     before this rule existed, because its scroller could not afford the cap.
-     So this makes every phone agree with the one that was already right. */
-  .preview-overlay .rotate-card-stack { min-height: 260px; max-height: 448px; }
-  /* 448 is an absolute, and "squarer" is a RATIO — so on a phone narrow enough
+  /* Squarer, and lower. The stack used to run to the base rule's cap, which on
+     an iPhone 15 is exactly what it reached — a 1.75 ratio, and the card filled
+     its scroller with nothing left over ("while I love the cards on mobile, it
+     feels a bit squashed... reduce overall card height a touch, gives more room
+     above and below").
+     420 against the stack's 300px width is 1.4 — near enough square to read as
+     a card rather than a column, and it hands the rest back to the space above
+     and below. It is also what a shorter phone was already choosing for itself,
+     because its scroller could not afford the cap. So this makes every phone
+     agree with the one that was already right.
+     The pair moved with the base rule's 320 -> 300 width (448 was this same
+     1.4 at 320): the RATIO is what was asked for, so a width change has to
+     carry the cap with it or the card silently gets taller again. */
+  .preview-overlay .rotate-card-stack { min-height: 260px; max-height: 420px; }
+  /* The cap is an absolute, and "squarer" is a RATIO — so on a phone narrow enough
      that the stack cannot reach 320px wide, the same cap draws a taller card
      than the one it was written to replace. Measured on a folded phone (280px,
      giving the stack 248px): 248×448 is 1.81, against the 1.75 that prompted
@@ -8410,14 +8522,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
      horizontal room to spare. Swept on a Fold with a six-point scale, which is
      the tightest case there is — the closest pair of answers, by cap:
 
-       340 → 1.37, 2px apart     400 → 1.61,  8px
+       340 → 1.37, 2px apart     400 → 1.61,  8px   (against the 248px
+                                                     stack a Fold gives)
        360 → 1.45, 4px           420 → 1.69, 10px
-       380 → 1.53, 6px           448 → 1.81, 12px
+       380 → 1.53, 6px           420 → 1.69, 10px
 
      Twenty pixels of card buys two pixels of clearance, all the way down. 340
      drew the squarest card and left the answers 2px apart, under the 3px floor
      tap_card_fits_test holds — squarer is not worth answers that look joined.
-     380 is 1.53: clearly squarer than the 1.81 this tier replaces and than the
+     380 is 1.53: clearly squarer than the 1.81 this tier replaced and than the
      1.75 that prompted the request, with double the minimum clearance.
      A wider phone is unaffected either way — an SE measures 13-14px between
      the same six answers at every cap in that table, because the arc has the
@@ -9349,6 +9462,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
      desktop's size rather than being shaved to 14. */
   .preview-thankyou-title { font-size: clamp(1.5rem, 7.4vw, 2rem); }
   .preview-thankyou-sub   { font-size: 1rem; max-width: 100%; }
+  .preview-thankyou-from  { font-size: 0.875rem; max-width: 100%; }
 }
 
 /* Everything below is phone-only and stays on the flat 767px test. This block
@@ -10671,10 +10785,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
 }
 
 /* Player: persistent brand masthead above the deck, desktop only — a phone
-   screen has no room to spare above the card for a masthead, so mobile
-   keeps the logo where it already lived, inside the thank-you card
-   (.player-thankyou-logo below). */
+   screen has no room to spare above the card for a masthead of its own, so on
+   mobile the logo rides the utility bar that is already drawn there
+   (.player-bar-logo, in the phone block below). */
 .player-brand-header { display: none; }
+/* Same reasoning in the other direction: the bar's copy is phone-only, because
+   the masthead above covers every width the desktop card is drawn at. */
+.player-bar-logo { display: none; }
 /* Own display rule rather than the inline style brand_logo_tag's caller used
    to set — an inline `display:block` beats a class selector regardless of
    the media query below, which otherwise silently failed to hide it. */
@@ -10817,6 +10934,32 @@ body.generating-overlay-active .bottom-bar { display: none; }
      means the bar is showing something and earns its padding back. */
   .player-lang-bar:has(.lang-switcher),
   .player-lang-bar:has(.test-hatch-confirm:not([hidden])) { padding: 8px 14px 0; }
+
+  /* The org's logo, centred in that bar. A third thing that earns the bar its
+     padding — and the first that gives it a reason to exist on a monolingual
+     Verto, where it was a strip of backdrop holding an invisible hatch.
+     Absolutely positioned rather than a flex child: the bar is
+     justify-content: flex-end with an auto-margin hatch at the leading edge,
+     so a real centred item would have to fight both and would move the
+     language pill. This lands on the middle of the content row (half the top
+     padding down from the box's centre) and moves nothing.
+     24px tall, so the bar is ~38px with the pill and ~32px without — the same
+     band that was already there, now carrying the brand. */
+  .player-lang-bar:has(.player-bar-logo) { padding: 8px 14px 0; position: relative; min-height: 32px; }
+  .player-bar-logo {
+    display: block; position: absolute;
+    left: 50%; top: calc(50% + 4px); transform: translate(-50%, -50%);
+  }
+  /* With the logo on every card, the copies INSIDE two of them would be the
+     second one a respondent meets on the same screen: the welcome card's own
+     .split-right-logo above the title, and the thank-you card's. The bar wins
+     both — it is the one a respondent has seen all the way through the deck,
+     and one logo on the front card is what was asked for ("the Unleash
+     Football logo could sit small in the middle of the bar").
+     Phone-only, like everything in this block: on a desktop the bar carries no
+     logo (the masthead above the deck does) and these two are untouched. */
+  .preview-overlay:has(.player-bar-logo) .player-thankyou-logo,
+  .preview-overlay:has(.player-bar-logo) .split-right-logo { display: none; }
 }
 
 /* Player: the hidden Test Mode hatch (player/_test_mode_hatch.html.erb).

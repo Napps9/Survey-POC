@@ -221,4 +221,41 @@ class TapStatementPagerTest < ApplicationSystemTestCase
                  "third now, not send them back to the top of the deck"
     assert_equal "Statement 3 of 3", pager_count
   end
+
+  # The pager walks past a statement, which parks it: its box goes back inside
+  # the stack and it is hidden, so an answered (or paged-past) card stops
+  # dragging the answer panel's scroller open behind it. The flag that records
+  # that is a JS property on the element, so it does NOT survive the clone the
+  # preview overlay makes of this DOM — only the inline style does. A fresh
+  # controller therefore has to clear the style on sight rather than on its own
+  # bookkeeping, or the creator previews a card whose first statement is gone.
+  test "a statement paged past in the editor is visible again in the preview" do
+    open_editor
+    step("next")
+    assert_equal 2, evaluate_script(
+      "Number(document.querySelector(\"[data-card-cid='t1'] .tap-nav-count\").textContent.match(/\\d+/)[0])"
+    )
+
+    # Give the park its timer (the fling is 350ms; the park lands just after).
+    assert wait_until(timeout: 5) {
+      evaluate_script(<<~JS)
+        getComputedStyle(document.querySelectorAll("[data-card-cid='t1'] .rotate-card")[0]).visibility === "hidden"
+      JS
+    }, "the card the pager walked past was never parked"
+
+    page.execute_script("document.querySelector(\"[data-action*='preview-verto#open']\").click()")
+    assert_selector ".preview-overlay .preview-card", wait: 10
+
+    hidden = evaluate_script(<<~JS)
+      (() => {
+        const cards = [...document.querySelectorAll(".preview-overlay .rotate-card")]
+        return { total: cards.length,
+                 hidden: cards.filter((c) => getComputedStyle(c).visibility === "hidden").length }
+      })()
+    JS
+    assert_operator hidden["total"], :>, 0, "the preview drew no swipe cards at all"
+    assert_equal 0, hidden["hidden"],
+                 "#{hidden['hidden']} of the previewed statements are still carrying the editor's " \
+                 "parked visibility — the respondent-facing preview starts with a missing card"
+  end
 end

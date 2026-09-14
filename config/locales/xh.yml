@@ -168,6 +168,9 @@ xh:
       prioritise: "Lungelelanisa ngokobubaluleko"
       scenario: "Imeko"
     modal_aria: "Malunga nalo mbuzo"
+    nps_low_placeholder: "Esezantsi sithetha…"
+    nps_high_placeholder: "Esiphezulu sithetha…"
+    body_placeholder: "Yongeza umbhalo owongezelelekileyo (akunyanzelekile)"
   ask_submission_mailer:
     confirmation_subject: "Idatha yakho yeVerto ithunyelwe kwiAsk Verto"
     confirmation_heading: "Ithunyelwe ukuze ihlolwe"
@@ -1285,6 +1288,7 @@ xh:
     live_locked_modal_note: "Usenako ukongeza okanye ubhale kwakhona ifestile yekhadi — ichaza umbuzo ngaphandle kokuwutshintsha."
     verto_theme: "Umxholo"
     redo: "Yenza kwakhona"
+    ty_body_placeholder: "Yongeza umyalezo omfutshane (akunyanzelekile)"
   dashboard_card:
     publish_warning: "Papasha “%{title}”? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     preview: "Jonga kuqala"

@@ -159,6 +159,9 @@ id:
       prioritise: "Prioritaskan"
       scenario: "Skenario"
     modal_aria: "Tentang pertanyaan ini"
+    nps_low_placeholder: "Terendah berarti…"
+    nps_high_placeholder: "Tertinggi berarti…"
+    body_placeholder: "Tambahkan teks isi (opsional)"
   ask_submission_mailer:
     confirmation_subject: "Data Verto Anda dikirim ke Ask Verto"
     confirmation_heading: "Dikirim untuk ditinjau"
@@ -1263,6 +1266,7 @@ id:
     live_locked_modal_note: "Kamu masih bisa menambah atau menulis ulang jendela kartu — itu menjelaskan pertanyaan tanpa mengubahnya."
     verto_theme: "Topik"
     redo: "Ulangi"
+    ty_body_placeholder: "Tambahkan pesan singkat (opsional)"
   dashboard_card:
     publish_warning: "Terbitkan “%{title}”? Setelah live, pertanyaannya terkunci dan tidak bisa diedit — pastikan semuanya sudah persis seperti yang kamu mau."
     preview: "Pratinjau"

@@ -21,6 +21,14 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
       cards: [
         { "type" => "welcome_card", "title" => "hi" },
         { "type" => "range", "cid" => "r1", "text" => "How likely?", "options" => %w[0 1 2 3 4 5 6 7 8 9 10] },
+        # A range card that is STILL CARRYING A PHOTO. Switch a photo card to
+        # Range in the Answer Type panel and this is what you get: the panel
+        # draws the reaction set instead of the picture, and nothing clears the
+        # picture — so the creator cannot see that the card is holding one.
+        # It is the state the reported bug lived in.
+        { "type" => "range", "cid" => "r2", "text" => "Would you use it?",
+          "options" => [ "Wouldn't matter", "Not for me", "I might", "Probably", "Definitely" ],
+          "image" => "/assets/verto-library/backgrounds/nature.jpg" },
         { "type" => "open_ended", "cid" => "o1", "text" => "When were you born?",
           "lottie" => "/verto_library/anim/example.json" }
       ]
@@ -31,16 +39,86 @@ class RangeCardBackgroundTest < ApplicationSystemTestCase
     find(".survey-card-wrap[data-card-cid='o1']")
   end
 
-  def range_card
-    find(".survey-card-wrap[data-card-type='range']")
+  def range_card(cid = "r1")
+    find(".survey-card-wrap[data-card-cid='#{cid}']")
   end
 
-  def open_range_background_settings
+  def stored_bg(cid)
+    30.times do
+      card = @survey.reload.cards.find { |c| c["cid"] == cid }
+      bg = card["media_bg"]
+      return bg if yield(bg)
+      sleep 0.5
+    end
+    @survey.reload.cards.find { |c| c["cid"] == cid }["media_bg"]
+  end
+
+  def set_backdrop_colour(cid, hex)
+    within(range_card(cid)) { find(".add-bg-fab").click }
+    assert_selector "[data-media-picker-target='animBgSection']", visible: true
+    evaluate_script(<<~JS)
+      (() => {
+        const el = document.querySelector("[data-media-picker-target='animBgColor']")
+        el.value = "#{hex}"
+        el.dispatchEvent(new Event("input", { bubbles: true }))
+      })()
+    JS
+    find(".media-modal-close").click
+  end
+
+  def open_editor
     sign_in_as(@user)
     visit survey_path(@survey)
     dismiss_cookie_banner
     assert_text "How likely?"
+  end
+
+  def open_range_background_settings
+    open_editor
     within(range_card) { find(".add-bg-fab").click }
+  end
+
+  # ── The reported bug ───────────────────────────────────────────────────
+  # "The background image I add to a range question, that sits behind the
+  # animated assets, doesn't save. I have to re-add every time I load the
+  # editor."
+  #
+  # Everything visible worked: the modal opened, the panel repainted, the card
+  # row's dataset was written. What did not was survey-editor#serialize, which
+  # rebuilds every card from the DOM on each autosave and dropped media_bg for
+  # any card carrying an `image` — with no range exception, unlike the three
+  # other places that state the same rule. Nothing was dropped server-side, so
+  # there was no warning either. Only a save-and-reload can see it, which is
+  # why the suite that owned this feature never did.
+
+  test "a backdrop on a range card still holding a photo survives a reload" do
+    open_editor
+    set_backdrop_colour("r2", "#2255ff")
+
+    assert_equal "#2255ff", stored_bg("r2") { |bg| bg&.dig("color") == "#2255ff" }&.dig("color"),
+                 "the backdrop never reached the server — serialize() dropped it on the way out"
+
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    assert_text "Would you use it?"
+    assert_equal "#2255ff", evaluate_script(<<~JS)
+      JSON.parse(document.querySelector(".survey-card-wrap[data-card-cid='r2']").dataset.cardMediaBg).color
+    JS
+  end
+
+  # The same card, saved a second time by an edit that has nothing to do with
+  # the backdrop: this is the autosave that used to take it away again.
+  test "an unrelated edit does not take the backdrop back off" do
+    open_editor
+    set_backdrop_colour("r2", "#2255ff")
+    stored_bg("r2") { |bg| bg&.dig("color") == "#2255ff" }
+
+    title = find("[data-card-cid='r2'] .q-title")
+    page.execute_script("arguments[0].focus()", title)
+    press_keys("?")
+
+    assert_equal "#2255ff", stored_bg("r2") { |bg| bg&.dig("color") == "#2255ff" }&.dig("color"),
+                 "the next autosave dropped the backdrop the one before it had stored"
   end
 
   test "the range card's panel offers both a Change animation and a Background CTA" do

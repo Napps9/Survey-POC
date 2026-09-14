@@ -48,6 +48,120 @@ class ThankYouScreenTest < ActionDispatch::IntegrationTest
     assert_not s.forward_url?
   end
 
+  # ── "from <account>" — the byline ──────────────────────────────────────
+  # It used to be the MESSAGE's fallback, so the two could never both be shown:
+  # a creator who wrote an end message lost the attribution, and a creator who
+  # merely opened the thank-you card had the byline saved as their message,
+  # because the editor prefilled the box with it. "It's like main header, short
+  # body copy, then the 'from Unleash Football' text that's already there."
+
+  test "the byline is its own line under a message the creator did write" do
+    s = published_survey
+    s.update!(thankyou_title: "HALF TIME Your voice is in!",
+              thankyou_body: "You've played your half. Ours starts now.")
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+
+    assert_select ".preview-thankyou-title", text: "HALF TIME Your voice is in!"
+    assert_select ".preview-thankyou-sub",   text: "You've played your half. Ours starts now."
+    assert_select ".preview-thankyou-from",  text: "from Acme United", count: 1
+  end
+
+  test "with no message the byline shows once and the message box renders empty" do
+    s = published_survey
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+
+    assert_select ".preview-thankyou-from", text: "from Acme United", count: 1
+    # Empty rather than absent: player#_applyEndScreen writes a branch screen's
+    # message into this node, so it has to exist. CSS hides it while :empty.
+    assert_select ".preview-thankyou-sub", text: "", count: 1
+    assert_equal "", s.thankyou_body_text
+  end
+
+  # A deck edited while the byline was the message's fallback has the byline
+  # sitting in the column as though it had been typed. Read as blank rather than
+  # migrated, so it is not shown twice.
+  test "a stored body that IS the byline reads as blank instead of doubling up" do
+    s = published_survey
+    s.update!(thankyou_body: "from Acme United")
+
+    get play_survey_path(s.publish_token)
+    assert_response :success
+
+    assert_select ".preview-thankyou-from", text: "from Acme United", count: 1
+    assert_select ".preview-thankyou-sub", text: "", count: 1
+    assert_equal "", s.thankyou_body_text
+  end
+
+  test "the byline is recognised in whichever language the creator's editor was in" do
+    s = published_survey
+    s.update!(thankyou_body: I18n.t("player.thank_you_from", org: "Acme United", locale: :fr))
+
+    assert_equal "", s.thankyou_body_text,
+                 "the editor prefilled this box in the creator's own UI language"
+  end
+
+  test "a message that merely mentions the account is left alone" do
+    s = published_survey
+    s.update!(thankyou_body: "Thanks from Acme United and the whole team")
+
+    assert_equal "Thanks from Acme United and the whole team", s.thankyou_body_text
+  end
+
+  # ── The cap that cut a real end screen mid-sentence ───────────────────
+  # 80 characters, applied silently: no counter, no validation, just
+  # `.first(80)` in update_settings. "The end message gets cut off, I assume
+  # because of character limit."
+  test "the thank-you title is capped at the constant the editor advertises" do
+    org = sign_in_org("cap")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    # The phrase that was cut, which is exactly 80 characters long.
+    whole = "HALF TIME Your voice is in! You've played your half. Ours starts now. Sign up to hear what happens next."
+    assert_operator whole.length, :>, 80, "this is the string the old cap cut"
+    assert_operator whole.length, :<=, Survey::MAX_END_TITLE
+
+    post survey_settings_path(s), params: { thankyou_title: whole }
+    assert_equal whole, s.reload.thankyou_title
+
+    post survey_settings_path(s), params: { thankyou_title: "z" * (Survey::MAX_END_TITLE + 30) }
+    assert_equal Survey::MAX_END_TITLE, s.reload.thankyou_title.length
+  end
+
+  # The editor's own replica. The message box used to arrive holding the byline,
+  # so a creator who merely opened the card had the byline saved as their
+  # message on the spot (addThankyou saves immediately) and could never see
+  # both lines. It starts empty now, with the placeholder idiom the share
+  # fields use, and the byline sits below it as a read-only line.
+  test "the editor's thank-you card starts with an empty message box and a byline" do
+    org = sign_in_org("editor")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              thankyou_title: "HALF TIME Your voice is in!")
+
+    get survey_path(s)
+    assert_response :success
+
+    assert_select "[data-gate-cards-target='tyBody']" do |els|
+      box = els.first
+      assert_equal "", box.text.strip, "prefilled copy is copy the creator never wrote"
+      assert_equal I18n.t("editor.ty_body_placeholder"), box["data-default-text"]
+      assert_equal Survey::MAX_END_BODY.to_s, box["data-max"]
+    end
+    assert_select "[data-gate-cards-target='tyTitle'][data-max='#{Survey::MAX_END_TITLE}']"
+    # The counters that were missing when the cap cut someone's end screen.
+    assert_select "[data-gate-cards-target='tyTitleCount']"
+    assert_select "[data-gate-cards-target='tyBodyCount']"
+    # And the byline, which is the account's name rather than editable copy.
+    assert_select ".gate-card-wrap .preview-thankyou-from", text: "from Acme United"
+    assert_select ".gate-card-wrap .preview-thankyou-from[contenteditable]", false
+  end
+
   test "player renders the custom thank-you copy, a share button, and the website CTA" do
     s = published_survey
     s.update!(thankyou_title: "Big thanks!", thankyou_body: "Line one\nLine two",

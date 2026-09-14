@@ -169,6 +169,9 @@ tn:
       prioritise: "Rulaganya ka Thato"
       scenario: "Tiragalo"
     modal_aria: "Ka potso e"
+    nps_low_placeholder: "Se se kwa tlase go gotlhe se kaya…"
+    nps_high_placeholder: "Se se kwa godimo go gotlhe se kaya…"
+    body_placeholder: "Tsenya mokwalo o oketsegileng (ga go patelesege)"
   ask_submission_mailer:
     confirmation_subject: "Data ya gago ya Verto e rometswe go Ask Verto"
     confirmation_heading: "E rometswe go sekasekwa"
@@ -1285,6 +1288,7 @@ tn:
     live_locked_modal_note: "O sa ntse o ka oketsa kgotsa wa kwala sesha letlhabaphefo la karata — le tlhalosa potso ntle le go e fetola."
     verto_theme: "Setlhogo"
     redo: "Dira gape"
+    ty_body_placeholder: "Tsenya molaetsa o mokhutshwane (ga go patelesege)"
   dashboard_card:
     publish_warning: "Phasaladitsa “%{title}”? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     preview: "Leba"

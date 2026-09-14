@@ -159,6 +159,9 @@ nl:
       prioritise: "Prioriteren"
       scenario: "Scenario"
     modal_aria: "Over deze vraag"
+    nps_low_placeholder: "Laagste betekent…"
+    nps_high_placeholder: "Hoogste betekent…"
+    body_placeholder: "Voeg bodytekst toe (optioneel)"
   ask_submission_mailer:
     confirmation_subject: "Je Verto-data is ingediend bij Ask Verto"
     confirmation_heading: "Ingediend voor beoordeling"
@@ -1263,6 +1266,7 @@ nl:
     live_locked_modal_note: "Je kunt het venster van een kaart nog toevoegen of herschrijven — het legt een vraag uit zonder die te veranderen."
     verto_theme: "Onderwerp"
     redo: "Opnieuw"
+    ty_body_placeholder: "Voeg een kort bericht toe (optioneel)"
   dashboard_card:
     publish_warning: "“%{title}” publiceren? Zodra hij live is, zijn de vragen vergrendeld en niet meer te bewerken — controleer of alles precies klopt."
     preview: "Voorbeeld"

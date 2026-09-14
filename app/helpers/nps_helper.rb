@@ -187,6 +187,12 @@ module NpsHelper
   NPS_MIN_STEPS = 2
   NPS_MAX_STEPS = NPS_STEPS
 
+  # The two anchor lines beside a scale's ends (card["nps_low_label"] /
+  # card["nps_high_label"]). A caption, not a sentence: the column it sits in
+  # is a few em wide and wraps, so a limit that fits "I am a decision maker"
+  # with room for a wordier language is the right one.
+  NPS_ANCHOR_MAX = 60
+
   # Whether this card is off the classic scale.
   #
   # Three-state on purpose. `nps_custom_scale` is stored ONLY when a creator

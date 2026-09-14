@@ -444,6 +444,121 @@ class SurveyImageSanitizeTest < ActiveSupport::TestCase
     refute Survey.sanitize_cards_images!(cards).first.key?("media_bg")
   end
 
+  # The state the reported bug lived in: switch a photo card to Range and the
+  # card keeps its `image` (the panel stops DRAWING it — the reaction set is
+  # there instead — but nothing clears it). The server has always kept the
+  # backdrop here, because a range card's panel animates whatever else it is
+  # carrying; the editor's serialiser was the half that dropped it.
+  test "media_bg is kept on a range card that is still carrying an image" do
+    cards = [ { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+                "image" => ASSET_PATH,
+                "media_bg" => { "color" => "#123456", "image" => PEXELS_URL } } ]
+    out = Survey.sanitize_cards_images!(cards).first
+
+    assert_equal "#123456", out["media_bg"]["color"],
+                 "a range card animates its panel, so a backdrop behind it is real — " \
+                 "this is the rule survey-editor#serialize has to state too"
+    assert_equal PEXELS_URL, out["media_bg"]["image"]
+  end
+
+  # The one media branch that used to drop in silence, which is how a creator
+  # came to be looking at a backdrop the server had already refused.
+  test "a rejected backdrop image is reported like a rejected photo" do
+    warnings, details = [], []
+    cards = [ { "type" => "range", "cid" => "r1", "text" => "Q", "options" => %w[a b c d e],
+                "media_bg" => { "color" => "#abcdef", "image" => "https://evil.com/x.png" } } ]
+    out = Survey.sanitize_cards_images!(cards, warnings: warnings, details: details).first
+
+    assert_equal({ "color" => "#abcdef" }, out["media_bg"], "the colour it could validate stays")
+    assert_includes warnings, "media_bg"
+    detail = details.find { |d| d["code"] == "media_bg" }
+    assert detail, "the drop has to name the card, or the editor's pill can't point at it"
+    assert_equal "r1", detail["cid"]
+    assert_includes detail["value"], "evil.com"
+  end
+
+  test "a backdrop that was never given an image raises no warning" do
+    warnings, details = [], []
+    cards = [ { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+                "media_bg" => { "color" => "#abcdef" } } ]
+    Survey.sanitize_cards_images!(cards, warnings: warnings, details: details)
+
+    assert_empty warnings, "nothing was dropped — a colour-only backdrop is the common case"
+    assert_empty details
+  end
+
+  # ── NPS anchor lines (nps_low_label / nps_high_label) ──────────────────
+  # The two captions beside a liquid scale's ends: "We need a short line of text
+  # to the left of 0 and to the left of 10... having these editable per NPS
+  # question would be good as the scales relate to the question asked."
+  # Allowlist-or-drop, like nps_shape and nps_custom_scale above.
+
+  def nps_card(extra = {})
+    { "type" => "nps", "cid" => "n1", "text" => "How much say?" }.merge(extra)
+  end
+
+  test "nps anchor lines are kept, trimmed, on an nps card" do
+    out = Survey.sanitize_cards_images!([ nps_card(
+      "nps_low_label" => "  I have no say at all  ", "nps_high_label" => "I am a decision maker"
+    ) ]).first
+
+    assert_equal "I have no say at all", out["nps_low_label"]
+    assert_equal "I am a decision maker", out["nps_high_label"]
+  end
+
+  test "one anchor line on its own is kept" do
+    out = Survey.sanitize_cards_images!([ nps_card("nps_low_label" => "No say") ]).first
+
+    assert_equal "No say", out["nps_low_label"]
+    refute out.key?("nps_high_label"), "an end nobody captioned carries no key"
+  end
+
+  test "a blank anchor line is dropped rather than stored" do
+    out = Survey.sanitize_cards_images!([ nps_card("nps_low_label" => "   ") ]).first
+    refute out.key?("nps_low_label"), "absent is the one representation of 'no anchor'"
+  end
+
+  test "anchor lines are capped" do
+    long = "x" * (NpsHelper::NPS_ANCHOR_MAX + 40)
+    out = Survey.sanitize_cards_images!([ nps_card("nps_high_label" => long) ]).first
+    assert_equal NpsHelper::NPS_ANCHOR_MAX, out["nps_high_label"].length
+  end
+
+  test "anchor lines are dropped on a card that is not an nps" do
+    out = Survey.sanitize_cards_images!([
+      { "type" => "range", "text" => "Q", "options" => %w[a b c d e],
+        "nps_low_label" => "No say", "nps_high_label" => "All the say" }
+    ]).first
+
+    refute out.key?("nps_low_label"), "only a liquid scale has ends to caption"
+    refute out.key?("nps_high_label")
+  end
+
+  test "a translated anchor line is held to the same cap and rule" do
+    long = "y" * (NpsHelper::NPS_ANCHOR_MAX + 10)
+    out = Survey.sanitize_cards_images!([ nps_card(
+      "nps_low_label" => "No say",
+      "i18n" => { "fr" => { "text" => "Combien ?", "nps_low_label" => long, "nps_high_label" => "  " } }
+    ) ]).first
+
+    fr = out["i18n"]["fr"]
+    assert_equal NpsHelper::NPS_ANCHOR_MAX, fr["nps_low_label"].length
+    refute fr.key?("nps_high_label"),
+           "a blank translation is no translation — the player falls back to the primary"
+  end
+
+  # The anchors are a SIBLING column to the digits, never two more of them: the
+  # step count is the label count, and a stray anchor in `options` would add a
+  # stop to the scale (and re-point every stored answer with it).
+  test "anchor lines do not touch the scale's own labels" do
+    out = Survey.sanitize_cards_images!([ nps_card(
+      "options" => %w[0 1 2 3 4 5 6 7 8 9 10],
+      "nps_low_label" => "No say", "nps_high_label" => "All the say"
+    ) ]).first
+
+    assert_equal %w[0 1 2 3 4 5 6 7 8 9 10], out["options"]
+  end
+
   # ── Mobile header focal point (focal_y) ────────────────────────────────
   # The card image is a 9:16 portrait; the mobile header is a ~3:1 band. `cover`
   # + centre therefore shows only the middle stripe, and a subject near the top
