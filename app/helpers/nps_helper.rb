@@ -226,7 +226,10 @@ module NpsHelper
     "Simple"  => %w[pill],
     "Drinks"  => %w[glass bottle can mug],
     "Science" => %w[flask beaker tube],
-    "Food"    => %w[jar popsicle]
+    "Food"    => %w[jar popsicle],
+    # Named to match RANGE_THEME_GROUPS' own "Sport", which is where a creator
+    # already finds the sibling picker's water bottle character.
+    "Sport"   => %w[water_bottle]
   }.freeze
 
   # Picker display names where the slug doesn't read right on its own — the
@@ -395,6 +398,12 @@ module NpsHelper
     "can"      => { w: 92,  cx: 46, hw: 26, kind: nil,   top: 36, bottom: 304, path: "M16,52 Q16,36 46,36 Q76,36 76,52 L76,288 Q76,304 46,304 Q16,304 16,288 Z" },
     "bottle"   => { w: 96,  cx: 48, hw: 22, kind: nil,   top: 18, bottom: 306, path: "M40,18 L40,74 Q24,94 24,134 L24,296 Q24,306 32,306 L64,306 Q72,306 72,296 L72,134 Q72,94 56,74 L56,18" },
     "popsicle" => { w: 98,  cx: 49, hw: 26, kind: "pop", top: 26, bottom: 268, path: "M20,54 Q20,26 49,26 Q78,26 78,54 L78,258 Q78,268 68,268 L30,268 Q20,268 20,258 Z" },
+    # Converted from a 178x604 source drawing: scaled to this 340 box and drawn
+    # at half its visual width, since WIDTH_SCALE stretches every vessel by 2.
+    # The screw cap, its grip ridges and the carry loop are the "sportcap"
+    # extra — the liquid path is the neck and body alone, open at the neck's rim
+    # (top: 56) exactly as `bottle` is open at the top of its own neck.
+    "water_bottle" => { w: 100, cx: 50, hw: 18, kind: "sportcap", top: 56, bottom: 308, path: "M39.8,56.3 L39.8,70.6 C34.3,78.5 30.7,89.1 29.2,102.4 L29.2,277.2 C29.2,290.5 33,299.8 40.7,305.1 C46.9,308.8 53,308.8 59.2,305.1 C66.9,299.8 70.7,290.5 70.7,277.2 L70.7,102.4 C69.2,89.1 65.6,78.5 60.1,70.6 L60.1,56.3" },
     "glass"    => { w: 106, cx: 53, hw: 28, kind: nil,   top: 24, bottom: 306, path: "M18,24 L30,300 Q30,306 36,306 L70,306 Q76,306 76,300 L88,24" },
     "beaker"   => { w: 116, cx: 58, hw: 38, kind: nil,   top: 44, bottom: 306, path: "M18,44 L18,298 Q18,306 26,306 L90,306 Q98,306 98,298 L98,52 L110,40" },
     "jar"      => { w: 118, cx: 59, hw: 40, kind: "jar", top: 50, bottom: 306, path: "M18,64 L18,298 Q18,306 26,306 L92,306 Q100,306 100,298 L100,64 L94,50 L24,50 Z" },
@@ -467,7 +476,11 @@ module NpsHelper
     extras = {
       "jar" => %(<rect x="22" y="22" width="74" height="26" rx="8" fill="#dfe2ee" stroke="#1a1a1a" stroke-width="#{STROKE_W}" vector-effect="non-scaling-stroke"/>),
       "mug" => %(<path d="M92,116 C130,120 130,244 92,248" fill="none" stroke="#1a1a1a" stroke-width="#{(STROKE_W * 2.2).round}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>),
-      "pop" => %(<rect x="41" y="260" width="16" height="52" rx="6" fill="#c9a678" stroke="#1a1a1a" stroke-width="#{(STROKE_W * 0.7).round(1)}" vector-effect="non-scaling-stroke"/>)
+      "pop" => %(<rect x="41" y="260" width="16" height="52" rx="6" fill="#c9a678" stroke="#1a1a1a" stroke-width="#{(STROKE_W * 0.7).round(1)}" vector-effect="non-scaling-stroke"/>),
+      # Three pieces, drawn above the liquid: the screw cap (filled like the jar
+      # lid, so it reads as solid rather than as more container), its four grip
+      # ridges, and the carry loop. All keyed off STROKE_W like everything else.
+      "sportcap" => %(<path d="M36.1,27.6 V50.7 C36.1,54.4 37.2,56.3 39.3,56.3 H60.6 C62.7,56.3 63.8,54.4 63.8,50.7 V27.6 C63.8,25.5 63.2,24.5 61.9,24.5 H38 C36.7,24.5 36.1,25.5 36.1,27.6 Z" fill="#dfe2ee" stroke="#1a1a1a" stroke-width="#{STROKE_W}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="M40.7,30.8 V49.9 M45.3,30.8 V49.9 M54.6,30.8 V49.9 M59.2,30.8 V49.9 M39.8,70.6 H60.1" fill="none" stroke="#1a1a1a" stroke-width="#{STROKE_W}" stroke-linecap="round" vector-effect="non-scaling-stroke"/><path d="M51.4,16 H48.5 C48,16 47.6,17 47.6,18.1 V22.4 C47.6,23.5 48,24.5 48.5,24.5 H51.4 C51.9,24.5 52.3,23.5 52.3,22.4 V18.1 C52.3,17 51.9,16 51.4,16 Z" fill="none" stroke="#1a1a1a" stroke-width="#{STROKE_W}" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>)
     }[v[:kind]].to_s
 
     # Everything is drawn in the ORIGINAL coordinate space and stretched by
