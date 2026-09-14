@@ -38,15 +38,13 @@
           <label style="font-family:'Alata',sans-serif;font-size: var(--text-base);letter-spacing:0.08em;color:rgba(247,247,247,0.6);text-transform:uppercase;"><%= t("auth.password") %></label>
           <%= link_to t("auth.forgot_password"), new_password_path, class: "auth-link", style: "font-size: var(--text-base);" %>
         </div>
-        <div class="password-field" data-controller="password-visibility">
+        <div class="password-field" <%= tag.attributes(data: password_visibility_data) %>>
           <%= form.password_field :password,
                 required: true, autocomplete: "current-password",
                 placeholder: "••••••••", maxlength: 72,
                 class: "form-input",
                 data: { password_visibility_target: "input" } %>
-          <button type="button" class="password-field__toggle"
-                  data-action="password-visibility#toggle"
-                  data-password-visibility-target="button"><%= t("auth.show") %></button>
+          <%= render "shared/password_toggle" %>
         </div>
       </div>
 

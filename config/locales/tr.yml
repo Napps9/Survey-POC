@@ -210,6 +210,9 @@ tr:
     confirm_new_password: Yeni şifreyi onayla
     repeat_new_password: Yeni şifreyi tekrar girin
     set_submit: Yeni şifreyi kaydet
+    hide: "Gizle"
+    show_password: "Parolayı göster"
+    hide_password: "Parolayı gizle"
   results:
     share_paused_by_admin: "Bir yönetici tarafından duraklatıldı — yönetici sürdürdüğünde bağlantı yeniden çalışır."
     share_not_enabled: "Henüz paylaşılmadı — hesabınızın bir yöneticisi sonuç paylaşımını açabilir."

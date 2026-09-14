@@ -210,6 +210,9 @@ fr:
     confirm_new_password: Confirmer le nouveau mot de passe
     repeat_new_password: Répéter le nouveau mot de passe
     set_submit: Enregistrer le nouveau mot de passe
+    hide: "Masquer"
+    show_password: "Afficher le mot de passe"
+    hide_password: "Masquer le mot de passe"
   results:
     share_paused_by_admin: "Mis en pause par un administrateur — le lien fonctionnera de nouveau dès qu'il le réactivera."
     share_not_enabled: "Pas encore partagé — un administrateur de votre compte peut activer le partage des résultats."

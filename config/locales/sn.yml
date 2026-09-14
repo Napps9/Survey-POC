@@ -212,6 +212,9 @@ sn:
     confirm_new_password: "Simbisa Pasiwedhi Itsva"
     repeat_new_password: "Dzokorora Pasiwedhi Itsva"
     set_submit: "Chengetedza Pasiwedhi Itsva"
+    hide: "Vanza"
+    show_password: "Ratidza password"
+    hide_password: "Vanza password"
   results:
     share_paused_by_admin: "Yakamiswa nemutungamiri — chinongedzo chichashanda zvakare kana vachitangazve."
     share_not_enabled: "Haisati yagoverwa — mutungamiri weakaunti yako anogona kubatidza kugoverwa kwemhinduro."

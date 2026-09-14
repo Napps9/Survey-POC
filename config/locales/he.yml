@@ -210,6 +210,9 @@ he:
     confirm_new_password: אשר סיסמה חדשה
     repeat_new_password: חזור על הסיסמה החדשה
     set_submit: שמור סיסמה חדשה
+    hide: "הסתר"
+    show_password: "הצגת הסיסמה"
+    hide_password: "הסתרת הסיסמה"
   results:
     share_paused_by_admin: "הושהה על ידי מנהל — הקישור יפעל שוב ברגע שהוא יחדש אותו."
     share_not_enabled: "עדיין לא משותף — מנהל בחשבון שלך יכול להפעיל שיתוף תוצאות."

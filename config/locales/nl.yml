@@ -210,6 +210,9 @@ nl:
     confirm_new_password: Bevestig nieuw wachtwoord
     repeat_new_password: Herhaal nieuw wachtwoord
     set_submit: Nieuw wachtwoord opslaan
+    hide: "Verbergen"
+    show_password: "Wachtwoord tonen"
+    hide_password: "Wachtwoord verbergen"
   results:
     share_paused_by_admin: "Gepauzeerd door een beheerder — de link werkt weer zodra die wordt hervat."
     share_not_enabled: "Nog niet gedeeld — een beheerder van je account kan het delen van resultaten inschakelen."

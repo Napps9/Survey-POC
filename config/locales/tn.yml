@@ -220,6 +220,9 @@ tn:
     confirm_new_password: "Netefatsa lefoko-sephiri le lesha"
     repeat_new_password: "Boeletsa lefoko-sephiri le lesha"
     set_submit: "Boloka lefoko-sephiri le lesha"
+    hide: "Fitlha"
+    show_password: "Bontsha phasewete"
+    hide_password: "Fitlha phasewete"
   results:
     share_paused_by_admin: "E emisitswe ke motsamaisi — kgokelo e tla dira gape fela fa a e tswelela."
     share_not_enabled: "Ga e ise e abelanwe — motsamaisi wa akhaonto ya gago a ka bulela go abelana dipholo."

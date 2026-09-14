@@ -210,6 +210,9 @@ es:
     confirm_new_password: Confirmar nueva contraseña
     repeat_new_password: Repetir nueva contraseña
     set_submit: Guardar nueva contraseña
+    hide: "Ocultar"
+    show_password: "Mostrar contraseña"
+    hide_password: "Ocultar contraseña"
   results:
     share_paused_by_admin: "Pausado por un administrador: el enlace volverá a funcionar cuando lo reanude."
     share_not_enabled: "Aún no se comparte: un administrador de tu cuenta puede activar el uso compartido de resultados."

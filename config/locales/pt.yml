@@ -210,6 +210,9 @@ pt:
     confirm_new_password: Confirmar nova palavra-passe
     repeat_new_password: Repetir nova palavra-passe
     set_submit: Guardar nova palavra-passe
+    hide: "Ocultar"
+    show_password: "Mostrar a palavra-passe"
+    hide_password: "Ocultar a palavra-passe"
   results:
     share_paused_by_admin: "Em pausa por um administrador — a ligação volta a funcionar assim que a retomar."
     share_not_enabled: "Ainda não partilhado — um administrador da sua conta pode ativar a partilha de resultados."

@@ -210,6 +210,9 @@ it:
     confirm_new_password: Conferma nuova password
     repeat_new_password: Ripeti nuova password
     set_submit: Salva nuova password
+    hide: "Nascondi"
+    show_password: "Mostra la password"
+    hide_password: "Nascondi la password"
   results:
     share_paused_by_admin: "In pausa per scelta di un amministratore: il link tornerà a funzionare quando lo riattiverà."
     share_not_enabled: "Non ancora condiviso: un amministratore del tuo account può attivare la condivisione dei risultati."

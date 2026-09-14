@@ -210,6 +210,9 @@ sw:
     confirm_new_password: Thibitisha nenosiri jipya
     repeat_new_password: Rudia nenosiri jipya
     set_submit: Hifadhi nenosiri jipya
+    hide: "Ficha"
+    show_password: "Onyesha nenosiri"
+    hide_password: "Ficha nenosiri"
   results:
     share_paused_by_admin: "Imesitishwa na msimamizi — kiungo kitafanya kazi tena mara tu atakapokiendeleza."
     share_not_enabled: "Bado haijashirikiwa — msimamizi wa akaunti yako anaweza kuwasha kushiriki matokeo."

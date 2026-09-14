@@ -76,14 +76,23 @@
         signup, and the same form doubles as a sign-in for a returning
         address. minlength mirrors Player::MIN_PASSWORD; the server enforces
         it either way, this is only so the browser says so first. %>
+    <%# Show/Hide, because this is the one field on the card with no way to
+        check what you typed. It is a 12-character minimum invented at the end
+        of a survey on a phone keyboard, and the cost of getting it wrong is
+        not a retry — it is an account whose password is a typo, on a service
+        with no respondent password reset. %>
     <div class="join-row">
-      <input type="password" class="join-input"
-             autocomplete="new-password" enterkeyhint="send"
-             minlength="<%= Player::MIN_PASSWORD %>"
-             placeholder="<%= t("player.join_password_placeholder") %>"
-             aria-label="<%= t("player.join_password_placeholder") %>"
-             data-player-target="joinPassword"
-             data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
+      <div class="password-field join-password-field" <%= tag.attributes(data: password_visibility_data) %>>
+        <input type="password" class="join-input"
+               autocomplete="new-password" enterkeyhint="send"
+               minlength="<%= Player::MIN_PASSWORD %>"
+               placeholder="<%= t("player.join_password_placeholder") %>"
+               aria-label="<%= t("player.join_password_placeholder") %>"
+               data-player-target="joinPassword"
+               data-password-visibility-target="input"
+               data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
+        <%= render "shared/password_toggle" %>
+      </div>
       <button type="button" class="join-btn" data-player-target="joinBtn"
               data-action="click->player#joinSubmit">
         <%= @survey.join_cta_text %>

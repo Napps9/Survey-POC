@@ -219,6 +219,9 @@ xh:
     confirm_new_password: "Qinisekisa iphasiwedi entsha"
     repeat_new_password: "Phinda iphasiwedi entsha"
     set_submit: "Gcina iphasiwedi entsha"
+    hide: "Fihla"
+    show_password: "Bonisa iphaswedi"
+    hide_password: "Fihla iphaswedi"
   results:
     share_paused_by_admin: "Imiswe okwethutyana ngumlawuli — ikhonkco liya kusebenza kwakhona xa eliqhubeka."
     share_not_enabled: "Ayikabelwana ngayo okwangoku — umlawuli we-akhawunti yakho angavula ukwabelana ngeziphumo."

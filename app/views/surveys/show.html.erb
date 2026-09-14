@@ -673,7 +673,14 @@
                 <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_email_placeholder") %></span>
               </div>
               <div class="join-row">
-                <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_password_placeholder") %></span>
+                <%# The password row carries a Show toggle in the player, so it
+                    carries one here. Inert and not a ghost: .gate-join-ghost
+                    means "a box the RESPONDENT fills", and this is a control
+                    beside one. %>
+                <div class="password-field join-password-field">
+                  <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_password_placeholder") %></span>
+                  <span class="password-field__toggle" aria-hidden="true"><%= t("auth.show") %></span>
+                </div>
                 <span class="join-btn gate-placeholder gate-editable" contenteditable="true"
                       role="textbox"
                       aria-label="<%= t("editor.join_cta_label", default: "Account ask button") %>"

@@ -210,6 +210,9 @@ id:
     confirm_new_password: Konfirmasi kata sandi baru
     repeat_new_password: Ulangi kata sandi baru
     set_submit: Simpan kata sandi baru
+    hide: "Sembunyikan"
+    show_password: "Tampilkan kata sandi"
+    hide_password: "Sembunyikan kata sandi"
   results:
     share_paused_by_admin: "Dijeda oleh admin — tautan akan berfungsi lagi begitu mereka melanjutkannya."
     share_not_enabled: "Belum dibagikan — admin akun Anda dapat mengaktifkan berbagi hasil."

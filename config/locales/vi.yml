@@ -210,6 +210,9 @@ vi:
     confirm_new_password: Xác nhận mật khẩu mới
     repeat_new_password: Nhập lại mật khẩu mới
     set_submit: Lưu mật khẩu mới
+    hide: "Ẩn"
+    show_password: "Hiện mật khẩu"
+    hide_password: "Ẩn mật khẩu"
   results:
     share_paused_by_admin: "Đã bị quản trị viên tạm dừng — liên kết sẽ hoạt động trở lại khi họ tiếp tục."
     share_not_enabled: "Chưa được chia sẻ — quản trị viên của tài khoản bạn có thể bật chia sẻ kết quả."

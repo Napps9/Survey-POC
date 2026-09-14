@@ -210,6 +210,9 @@ ar:
     confirm_new_password: تأكيد كلمة المرور الجديدة
     repeat_new_password: أعد إدخال كلمة المرور الجديدة
     set_submit: حفظ كلمة المرور الجديدة
+    hide: "إخفاء"
+    show_password: "إظهار كلمة المرور"
+    hide_password: "إخفاء كلمة المرور"
   results:
     share_paused_by_admin: "أوقفه مسؤول مؤقتًا — سيعمل الرابط مجددًا عندما يستأنفه."
     share_not_enabled: "لم تتم المشاركة بعد — يمكن لمسؤول في حسابك تفعيل مشاركة النتائج."

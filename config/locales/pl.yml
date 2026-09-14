@@ -210,6 +210,9 @@ pl:
     confirm_new_password: Potwierdź nowe hasło
     repeat_new_password: Powtórz nowe hasło
     set_submit: Zapisz nowe hasło
+    hide: "Ukryj"
+    show_password: "Pokaż hasło"
+    hide_password: "Ukryj hasło"
   results:
     share_paused_by_admin: "Wstrzymane przez administratora — link znów zadziała, gdy je wznowi."
     share_not_enabled: "Jeszcze nieudostępnione — administrator Twojego konta może włączyć udostępnianie wyników."

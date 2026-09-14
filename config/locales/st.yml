@@ -220,6 +220,9 @@ st:
     confirm_new_password: "Netefatsa phasewete e ntjha"
     repeat_new_password: "Pheta phasewete e ntjha"
     set_submit: "Boloka phasewete e ntjha"
+    hide: "Pata"
+    show_password: "Bontsha phasewete"
+    hide_password: "Pata phasewete"
   results:
     share_paused_by_admin: "E emisitswe ke motsamaisi — sehokelo se tla sebetsa hape hang ha a se tsosolosa."
     share_not_enabled: "Ha e so arolelanwe — motsamaisi wa akhaonto ya hao a ka bulela ho arolelana diphetho."

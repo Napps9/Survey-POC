@@ -761,6 +761,24 @@ module ApplicationHelper
     rails_representation_path(as_thumb_representation(attachment, blob, size), only_path: true)
   end
 
+  # The wrapper attributes for a Show/Hide password toggle, to spread onto the
+  # `.password-field` div that holds the input and the button.
+  #
+  # One definition because there are now five of these — the creator's sign-in
+  # and sign-up, the respondent's sign-in, and the two copies of the
+  # end-of-Verto card — and the controller's four labels are the part that is
+  # easy to get subtly wrong: hideLabel was never passed from anywhere, so
+  # every one of them read "Afficher" and then "Hide".
+  def password_visibility_data
+    {
+      controller: "password-visibility",
+      password_visibility_show_label_value: t("auth.show"),
+      password_visibility_hide_label_value: t("auth.hide"),
+      password_visibility_show_aria_value: t("auth.show_password"),
+      password_visibility_hide_aria_value: t("auth.hide_password")
+    }
+  end
+
   # Inline `style` value that sets the Verto-experience brand variables for a
   # given palette. Spread onto a wrapper element (player overlay, preview
   # overlay, editor card feed) so the brand colours are scoped to the Verto and

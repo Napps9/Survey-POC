@@ -218,6 +218,9 @@ zu:
     confirm_new_password: "Qinisekisa iphasiwedi entsha"
     repeat_new_password: "Phinda iphasiwedi entsha"
     set_submit: "Londoloza iphasiwedi entsha"
+    hide: "Fihla"
+    show_password: "Bonisa iphasiwedi"
+    hide_password: "Fihla iphasiwedi"
   results:
     share_paused_by_admin: "Imiswe okwesikhashana ngumphathi — isixhumanisi sizosebenza futhi lapho esiqhubeka."
     share_not_enabled: "Akukabelwana ngakho okwamanje — umphathi we-akhawunti yakho angavula ukwabelana ngemiphumela."

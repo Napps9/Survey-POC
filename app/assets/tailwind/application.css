@@ -2498,8 +2498,10 @@
 .gate-join-card .join-alt { opacity: 0.6; }
 /* Continue with Google is drawn at full strength — a dimmed provider mark
    reads as "not working yet" rather than "not yours to press" — but it is a
-   div here, and nothing about it may respond to a cursor. */
-.gate-join-card .join-google { pointer-events: none; }
+   div here, and nothing about it may respond to a cursor. Same for the
+   Show toggle, which is a span in the replica and a button in the player. */
+.gate-join-card .join-google,
+.gate-join-card .password-field__toggle { pointer-events: none; }
 
 /* Structural edits are locked to the primary language, and the device frames
    preview only the question cards — hide the gate chrome in both, matching
@@ -4584,11 +4586,17 @@
   position: relative;
 }
 .password-field .form-input {
-  padding-right: 64px;
+  /* Logical, and sized for the longest label in the set rather than for
+     English — see the note on .join-row .password-field .join-input. 64px fit
+     "Show"/"Hide" and nothing else; Indonesian's "Sembunyikan" ran under it. */
+  padding-inline-end: 112px;
 }
 .password-field__toggle {
   position: absolute;
-  right: 10px;
+  /* Logical, not `right`: this control is drawn in Arabic and Hebrew too, and
+     a physically-right toggle in an RTL field sits on top of the first
+     characters typed rather than after the last. */
+  inset-inline-end: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
@@ -4596,8 +4604,11 @@
   padding: 4px 8px;
   font-family: "Alata", sans-serif;
   font-size: var(--text-sm);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  /* Sentence case, no tracking. Uppercase with 0.08em looks right on the four
+     letters of SHOW and is what made this control unusable elsewhere:
+     Indonesian's "Sembunyikan" rendered 105px wide and sat on top of the end
+     of the password it had just revealed. The word is also simply easier to
+     read this way at eleven characters. */
   color: rgba(247,247,247,0.6);
   cursor: pointer;
   border-radius: 4px;
@@ -11288,6 +11299,33 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .join-divider::before, .join-divider::after {
   content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.14);
 }
+
+/* Show/Hide on the card's password field.
+   The wrapper has to take over the input's job as the flex item — .join-input
+   declares `flex: 1 1 11rem; min-width: 0` so the address and the button can
+   share a row, and once it is a grandchild of .join-row that declaration means
+   nothing. So the wrapper inherits it and is itself a flex container, which
+   keeps the input's own rule meaningful rather than deleting it. */
+.join-row .password-field {
+  flex: 1 1 11rem; min-width: 0; display: flex;
+}
+.join-row .password-field .join-input {
+  flex: 1 1 auto; min-width: 0;
+  /* Room for the word, whichever of the two it currently is AND whatever
+     language it is in. Sized for the longest label in the set rather than for
+     English: "Show"/"Hide" is four letters, Indonesian's "Sembunyikan" is
+     eleven, and a reservation cut to the English fit puts the second half of
+     somebody's password underneath the button that revealed it.
+     PasswordVisibilityTest measures this against the real labels. */
+  padding-inline-end: 96px;
+}
+/* The toggle is positioned against the wrapper, so it needs the wrapper to be
+   a containing block — .password-field already sets position: relative. */
+.join-password-field .password-field__toggle { font-size: 0.8125rem; }
+
+/* The same field on /you/sign-in. .you-input is display:block; width:100%,
+   so the wrapper needs nothing but its own relative positioning. */
+.you-password-field .you-input { padding-inline-end: 112px; }
 
 /* "Already have an account? Sign in" — the way out for somebody returning on
    a new device. Quiet on purpose: most people meeting this card have no

@@ -211,6 +211,9 @@ af:
     confirm_new_password: "Bevestig nuwe wagwoord"
     repeat_new_password: "Herhaal nuwe wagwoord"
     set_submit: "Stoor nuwe wagwoord"
+    hide: "Versteek"
+    show_password: "Wys wagwoord"
+    hide_password: "Versteek wagwoord"
   results:
     share_paused_by_admin: "Deur 'n admin onderbreek — die skakel werk weer sodra hulle dit hervat."
     share_not_enabled: "Nog nie gedeel nie — 'n admin van jou rekening kan resultate-deling aanskakel."

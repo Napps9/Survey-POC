@@ -210,6 +210,9 @@ ja:
     confirm_new_password: 新しいパスワードを確認
     repeat_new_password: 新しいパスワードを再入力
     set_submit: 新しいパスワードを保存
+    hide: "非表示"
+    show_password: "パスワードを表示する"
+    hide_password: "パスワードを非表示にする"
   results:
     share_paused_by_admin: "管理者によって一時停止中です。再開されるとリンクは再び有効になります。"
     share_not_enabled: "まだ共有されていません。アカウントの管理者が結果の共有を有効にできます。"
