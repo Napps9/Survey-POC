@@ -62,18 +62,44 @@ class PlayerController < ApplicationController
   # generous per-minute cap here only guards against a runaway client/bot.
   rate_limit to: 30, within: 1.minute, only: :location_search, name: "location_search",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
-  # Join is the only endpoint here that SENDS MAIL to an address a stranger
-  # typed, so it is capped twice and in the SessionsController shape: the
-  # per-IP limit stops one machine walking a list, and the per-address limit
-  # stops a rotating pool of addresses-per-IP hammering ONE inbox, which the
-  # per-IP limit alone never sees. Deliberately NOT scaled by
-  # PLAYER_RATE_LIMIT_SCALE — a bigger crowd behind one NAT address is a
-  # reason to let more submits through, never more mail. #join_budget_ok? adds
-  # the two hourly budgets a per-minute cap cannot express.
+  # Join is capped twice, in the SessionsController shape: the per-IP limit
+  # stops one machine walking a list of addresses, and the per-address limit
+  # stops a rotating pool of IPs grinding at ONE account, which the per-IP
+  # limit alone never sees. #join_budget_ok? adds the two hourly budgets a
+  # per-minute cap cannot express.
+  #
+  # An earlier version of this comment justified all of that as protection for
+  # an inbox — join "SENDS MAIL to an address a stranger typed". It does not,
+  # and has not since the emailed-link era: #join mints a PlayerSignInLink with
+  # ORIGIN_SIGNUP and returns its path for an in-browser redirect, and
+  # PlayerSignInLink.mint! delivers nothing. What these caps actually bound is
+  # ACCOUNT CREATION. That is a real thing to bound and they stay — but it is
+  # also why the per-IP half of them can be scaled for a room full of people,
+  # which a mail-bomb guard could not be.
+  #
+  # PLAYER_JOIN_RATE_LIMIT_SCALE multiplies the PER-IP gates only: this one,
+  # join_google_ip, and MAX_JOIN_ADDRESSES_PER_IP. The address-keyed limit
+  # below and MAX_JOIN_PER_ADDRESS are deliberately left alone — they are what
+  # still bounds one account, and a bigger crowd is not a reason to let one
+  # address be hammered harder.
+  #
+  # It is a SEPARATE lever from PLAYER_RATE_LIMIT_SCALE rather than a reuse of
+  # it, because the two say different things: that one is a statement about how
+  # many people are answering from behind one NAT address, this one about how
+  # many accounts may be created from it. A load test wants the first and not
+  # the second; a venue event wants both. Folding them together would have
+  # meant every load run quietly raising the account cap too.
+  #
+  # Sized against the event that found this: 250 respondents on one venue NAT,
+  # of whom 30 could create an account in the first hour — and the first ten in
+  # any five minutes did so before the rest started failing SILENTLY, because
+  # the refusal below is a success's body. At the default of 1 every number
+  # here is exactly what it has always been.
+  JOIN_RATE_LIMIT_SCALE = ENV.fetch("PLAYER_JOIN_RATE_LIMIT_SCALE", "1").to_i.clamp(1, 10_000)
   #
   # Refusal is `ok: true`, the same body a success returns: a 429 here would
   # tell a caller which addresses they had already spent (see #join).
-  rate_limit to: 10, within: 5.minutes, only: :join, name: "join_ip",
+  rate_limit to: 10 * JOIN_RATE_LIMIT_SCALE, within: 5.minutes, only: :join, name: "join_ip",
              with: -> { render json: { ok: true } }
   rate_limit to: 5, within: 20.minutes, only: :join, name: "join_email",
              by:   -> { "join_email:#{params[:email].to_s.strip.downcase}" },
@@ -81,8 +107,11 @@ class PlayerController < ApplicationController
   # Continue with Google has no address in it, so there is nothing to hide and
   # it refuses plainly rather than in a success's clothing. It mints a row per
   # call, which is the thing being capped; the second budget #join needs — one
-  # inbox, many IPs — has no meaning here, because nothing is sent anywhere.
-  rate_limit to: 15, within: 5.minutes, only: :join_google, name: "join_google_ip",
+  # account, many IPs — has no meaning here, because the address comes from
+  # Google rather than from the form. Scaled for the same reason as join_ip:
+  # it is per-IP, and a venue full of people tapping "Continue with Google" is
+  # the same crowd arriving through a different door.
+  rate_limit to: 15 * JOIN_RATE_LIMIT_SCALE, within: 5.minutes, only: :join_google, name: "join_google_ip",
              with: -> { render json: { ok: false, error: "too_many" }, status: :too_many_requests }
 
   # How many respondent-facing Claude calls may be in flight in this process.
@@ -1125,14 +1154,22 @@ class PlayerController < ApplicationController
     true
   end
 
-  # How many DISTINCT addresses one IP may ask for a link for in an hour, and
-  # how often one address may be asked for from anywhere. The same two budgets
-  # recall and No retests spend, and here for a third reason: an uncapped
-  # unauthenticated endpoint that sends mail is a mail-bomb aimed at whoever's
-  # address is typed into it, and a fast route onto every ESP's suppression
-  # list. Generous enough that a venue full of respondents behind one NAT
-  # address each join once; nowhere near enough to grind a list.
-  MAX_JOIN_ADDRESSES_PER_IP = 30
+  # How many DISTINCT addresses one IP may create an account for in an hour,
+  # and how often one address may be asked for from anywhere. The same two
+  # budgets recall and No retests spend, and here for a third reason: an
+  # uncapped unauthenticated endpoint that mints accounts lets one machine walk
+  # a list of addresses into rows nobody asked for.
+  #
+  # The per-IP half was 30 flat, and the comment claimed it was "generous
+  # enough that a venue full of respondents behind one NAT address each join
+  # once". Measured rather than assumed, it was not: 30 is thirty people, and
+  # a venue full is 250. It carries JOIN_RATE_LIMIT_SCALE now so that claim can
+  # be made true by setting it, instead of being asserted and wrong.
+  #
+  # MAX_JOIN_PER_ADDRESS stays flat on purpose. It is per-address, so a crowd
+  # never pushes against it — only something grinding at one account does, and
+  # that is exactly what it is for.
+  MAX_JOIN_ADDRESSES_PER_IP = 30 * JOIN_RATE_LIMIT_SCALE
   MAX_JOIN_PER_ADDRESS      = 5
 
   # A blank or malformed address spends nothing and sends nothing — and reads

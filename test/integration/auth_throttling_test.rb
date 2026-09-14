@@ -25,10 +25,16 @@ class AuthThrottlingTest < ActionDispatch::IntegrationTest
 
   # Endpoints that verify no password but ISSUE a credential — a respondent
   # sign-in link, and the page that spends one. Same exposure for a different
-  # reason: PlayerController#join sends mail to an address a stranger typed, so
-  # an uncapped one is a mail-bomb and a fast route onto every ESP's
-  # suppression list, and PlayerSignInsController#create spends a bearer token
-  # whose only bound is that it was mailed somewhere.
+  # reason: PlayerController#join mints an account and a sign-in link from
+  # nothing but an address typed into a form, so an uncapped one lets a machine
+  # walk a list into rows nobody asked for, and PlayerSignInsController#create
+  # spends a bearer token whose only bound is that it was issued somewhere.
+  #
+  # This comment used to say #join "sends mail to an address a stranger typed",
+  # and the caps in PlayerController were sized as a mail-bomb guard on that
+  # basis. It doesn't send mail — PlayerSignInLink.mint! delivers nothing — and
+  # the caps are sized for account creation now. The endpoints still belong
+  # here; only the reason changed.
   CREDENTIAL_ISSUING_PATHS = {
     PlayerController      => :join,
     PlayerSignInsController => :create
@@ -90,6 +96,45 @@ class AuthThrottlingTest < ActionDispatch::IntegrationTest
                    "a 429 here would tell a caller which addresses it had already spent")
       assert_match(/render json: \{ ok: true \}/, block)
     end
+  end
+
+  test "the join scale leaves every number unchanged at its default" do
+    # PLAYER_JOIN_RATE_LIMIT_SCALE is unset in test, which is the promise the
+    # comment above the declarations makes: setting nothing changes nothing.
+    # Pinned as numbers rather than as source, because this is the half that a
+    # typo in the multiplication would silently get wrong.
+    assert_equal 1, PlayerController::JOIN_RATE_LIMIT_SCALE
+    assert_equal 30, PlayerController::MAX_JOIN_ADDRESSES_PER_IP
+    assert_equal 5, PlayerController::MAX_JOIN_PER_ADDRESS
+  end
+
+  test "the join scale reaches the per-IP gates and only those" do
+    source = File.read(Rails.root.join("app/controllers/player_controller.rb"))
+
+    ip_gates = source.lines.select { |l| l.match?(/name: "join_ip"|name: "join_google_ip"/) }
+    assert_equal 2, ip_gates.size, "expected exactly the two per-IP join gates"
+    ip_gates.each do |line|
+      assert_match(/\* JOIN_RATE_LIMIT_SCALE/, line,
+                   "a per-IP join gate must carry the scale or a venue crowd hits it: #{line.strip}")
+    end
+
+    address_gate = source.lines.find { |l| l.include?('name: "join_email"') }
+    refute_match(/JOIN_RATE_LIMIT_SCALE/, address_gate,
+                 "the address-keyed limit must NOT scale — a bigger crowd is not a reason " \
+                 "to let one account be ground at harder")
+    assert_match(/^  MAX_JOIN_PER_ADDRESS\s+= 5$/, source,
+                 "MAX_JOIN_PER_ADDRESS is per-address and must stay flat for the same reason")
+  end
+
+  test "the join scale cannot switch the cap off" do
+    # 0 and a fat-fingered value both .to_i to 0, and a scale of 0 is not
+    # "unlimited" — it multiplies every cap to zero, so `to: 0` refuses
+    # everyone and MAX_JOIN_ADDRESSES_PER_IP of 0 refuses every address. The
+    # clamp is the whole reason an unset or mistyped value is safe rather than
+    # a total outage of signup.
+    source = File.read(Rails.root.join("app/controllers/player_controller.rb"))
+    assert_match(/JOIN_RATE_LIMIT_SCALE = ENV\.fetch\("PLAYER_JOIN_RATE_LIMIT_SCALE", "1"\)\.to_i\.clamp\(1, 10_000\)/,
+                 source)
   end
 
   test "the matcher would notice a controller with no limit" do
