@@ -54,6 +54,31 @@ running on main", leaving nobody watching the one job that can still fail.
 Drive a change through to pushed-and-logged in one turn, or say plainly what is
 blocking and stop on purpose. Owner's standing instruction, 2026-09-14.
 
+**A check you start is a check you wait for — including the ones you invent.**
+The rule above is about `bin/gate`, but it generalises to any gate a session
+sets for itself: a review workflow, a subagent fan-out, a second opinion you
+commissioned. If its verdict would change what you push, the push waits for it;
+if it wouldn't, don't run it. 14 September, a 128-agent adversarial review
+titled "before it goes to Main" was still running when its own diff was pushed.
+It deserved to exist — between them those reviewers found a thank-you message
+box collapsed to `display: none` on the one surface whose whole job is typing
+that message, a Preview handing creators the editor's placeholder as though it
+were the respondent's copy, a translation cache key that would have left the new
+scale captions in the source language in all 25 other languages, and a digest
+change that would have made every translation approval in the product read
+"Approved, then edited". All of it arrived thirty-one minutes AFTER the code
+deployed, because nobody waited. A gate you don't wait for is a post-mortem.
+
+**Size a check to the decision it informs.** In that same run five reviewers
+produced every finding that reached the fix-forward commit, and a 123-agent
+verify phase then spent the bulk of the budget re-checking conclusions already
+implemented and shipped. Fan out to find things, not to audit the finders; and
+when a phase can no longer change what you push, stop it rather than let it
+finish. Every session on this repo draws on one weekly usage budget shared with
+every other session running that day — an afternoon of four sessions shipping is
+worth more than one session's exhaustive proof of a diff that is already live.
+Owner's standing instruction, 2026-09-14.
+
 **A red Main is fixed with a new commit, never with a re-run.** When a push
 turns CI red, land a fix-forward or a `git revert` — a NEW commit, gated like
 any other — rather than pressing "Re-run failed jobs" to get green. Every CI
