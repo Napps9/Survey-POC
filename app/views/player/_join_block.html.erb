@@ -58,9 +58,10 @@
       <div class="join-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
     <% end %>
 
-    <%# Two rows now, not one. The address and the password each get their own
-        line: side by side they were two 11rem fields fighting over a 430px
-        column, and the password is the field people mistype. %>
+    <%# Three rows, one thing each. The address and the password were once side
+        by side — two 11rem fields fighting over a 430px column, and the
+        password is the field people mistype. The button shared the password's
+        row after that, which was the same mistake one step smaller. %>
     <div class="join-row">
       <input type="email" class="join-input"
              inputmode="email" autocomplete="email" enterkeyhint="next"
@@ -75,8 +76,9 @@
         one rather than filling whatever it has for this domain — this is a
         signup, and the same form doubles as a sign-in for a returning
         address. minlength mirrors Player::MIN_PASSWORD; the server enforces
-        it either way, this is only so the browser says so first. %>
-    <%# Show/Hide, because this is the one field on the card with no way to
+        it either way, this is only so the browser says so first.
+
+        Show/Hide, because this is the one field on the card with no way to
         check what you typed. It is a 12-character minimum invented at the end
         of a survey on a phone keyboard, and the cost of getting it wrong is
         not a retry — it is an account whose password is a typo, on a service
@@ -93,13 +95,21 @@
                data-action="keydown.enter->player#joinSubmit input->player#joinTyped">
         <%= render "shared/password_toggle" %>
       </div>
+    </div>
+
+    <p class="join-note"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
+
+    <%# The button gets a row of its own rather than sharing the password's.
+        Beside a 12-character minimum and a Show toggle it left the field about
+        236px wide, which is under half of what it takes to read back a
+        passphrase — and the whole point of the toggle is reading it back. Full
+        width also makes it unambiguously the primary action, which it is. %>
+    <div class="join-row join-row-cta">
       <button type="button" class="join-btn" data-player-target="joinBtn"
               data-action="click->player#joinSubmit">
         <%= @survey.join_cta_text %>
       </button>
     </div>
-
-    <p class="join-note"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
 
     <p class="join-error hidden" role="alert" data-player-target="joinError"></p>
     <p class="join-fine"><%= t("player.join_fine") %></p>

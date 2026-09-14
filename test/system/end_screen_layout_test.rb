@@ -352,8 +352,13 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
           const inputs = [...card.querySelectorAll('.join-input')]
           const btn = card.querySelector('.join-btn')
           return { inputs: inputs.length,
-                   sameRowAsPassword: top(inputs[1]) === top(btn),
-                   hint: !!card.querySelector('.join-note') }
+                   // One thing per row. The button shared the password's line
+                   // until the Show toggle left the field under half the width
+                   // it takes to read a passphrase back.
+                   ownRow: top(inputs[1]) !== top(btn),
+                   belowPassword: top(btn) > top(inputs[1]),
+                   hint: !!card.querySelector('.join-note'),
+                   toggle: !!card.querySelector('.password-field__toggle') }
         })()
       JS
     end
@@ -373,9 +378,10 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
       editor = rows.call(".gate-join-card")
     end
 
-    assert player["sameRowAsPassword"],
-           "the player is meant to put the button beside the password — if that changed, this " \
-           "test is comparing the editor against the wrong shape"
+    assert player["ownRow"], "the player gives the button a row of its own — if that changed, " \
+                             "this test is comparing the editor against the wrong shape"
+    assert player["belowPassword"], "and puts it below the password, not above"
+    assert player["toggle"], "the password carries a Show toggle, which is why it needs the room"
     assert_equal player, editor,
                  "the editor's account card is arranged differently from the block it " \
                  "configures (player #{player.inspect} vs editor #{editor.inspect})"

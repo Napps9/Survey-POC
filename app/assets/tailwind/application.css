@@ -11323,6 +11323,12 @@ body.generating-overlay-active .bottom-bar { display: none; }
    a containing block — .password-field already sets position: relative. */
 .join-password-field .password-field__toggle { font-size: 0.8125rem; }
 
+/* The button, on the row it now has to itself. Full width because it is the
+   card's primary action and nothing is competing for the line — and because a
+   shrink-to-fit button stranded at the start of an empty row reads as a
+   leftover rather than a call to action. */
+.join-row-cta .join-btn { flex: 1 1 auto; }
+
 /* The same field on /you/sign-in. .you-input is display:block; width:100%,
    so the wrapper needs nothing but its own relative positioning. */
 .you-password-field .you-input { padding-inline-end: 112px; }

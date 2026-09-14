@@ -681,6 +681,12 @@
                   <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_password_placeholder") %></span>
                   <span class="password-field__toggle" aria-hidden="true"><%= t("auth.show") %></span>
                 </div>
+              </div>
+              <p class="join-note" aria-hidden="true"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
+              <%# The button has its own row in the player, so it has its own
+                  row here — this card is the creator's only view of the shape
+                  a respondent meets, and the word in it is theirs to write. %>
+              <div class="join-row join-row-cta">
                 <span class="join-btn gate-placeholder gate-editable" contenteditable="true"
                       role="textbox"
                       aria-label="<%= t("editor.join_cta_label", default: "Account ask button") %>"
@@ -688,7 +694,6 @@
                       data-default-text="<%= @survey.join_cta_for_editor %>"
                       data-action="input->gate-cards#queueJoinSave:stop keydown.enter->gate-cards#blockEnter"><%= @survey.join_cta %></span>
               </div>
-              <p class="join-note" aria-hidden="true"><%= t("player.join_password_hint", count: Player::MIN_PASSWORD) %></p>
             </div>
 
             <p class="join-fine" aria-hidden="true"><%= t("player.join_fine") %></p>
