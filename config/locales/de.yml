@@ -310,6 +310,10 @@ de:
     join_embedded: "Dieses Verto ist in eine andere Website eingebettet — wir können also nicht sehen, was du hier sonst gespielt hast. Der Link behält dieses trotzdem."
     modal_continue: "Alles klar"
     modal_reopen: "Nochmal lesen"
+    join_password_placeholder: "Wähle ein Passwort"
+    join_password_hint: "Mindestens %{count} Zeichen. Damit meldest du dich auf einem anderen Gerät wieder an."
+    join_have_account: "Schon ein Konto?"
+    join_sign_in: "Anmelden"
   defaults:
     range: ["Stimme überhaupt nicht zu", "Stimme nicht zu", "Neutral", "Stimme zu", "Stimme voll zu"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ de:
       leaderboard_empty: "Sei die erste Person auf der Liste!"
       already_played: "Du hast diesen Verto schon gespielt — so steht die Liste gerade."
       already_played_plain: "Du hast diesen Verto schon ausgefüllt — danke."
+      join_google_done_title: "Wir leiten dich zu Google weiter…"
+      join_use_google: "Diese Adresse meldet sich mit Google an — nimm stattdessen die Google-Schaltfläche."
     editor:
       delete_card_confirm: Diese Karte löschen?
       save_to_library: "Auch in meiner Markenbibliothek speichern"
@@ -2157,3 +2163,10 @@ de:
     rail_failed: "Fehlgeschlagen"
     rail_retry: "Erneut versuchen"
     rail_generate_one: "Diese Sprache übersetzen"
+  player_join:
+    title: "Nur noch ein Tippen"
+    body: "Schließ mit Google ab, dann bleiben deine Antworten dir erhalten."
+    body_verto: "Schließ mit Google ab, dann bleibt %{verto} dir erhalten."
+    fine: "Wir fragen Google nur nach deinem Namen und deiner E-Mail-Adresse, sonst nichts. Wir veröffentlichen nie etwas, und du kannst das Konto mit einem Tippen löschen."
+    expired_title: "Das hat einen Moment zu lange gedauert"
+    expired_body: "Dieser Link ist abgelaufen oder wurde schon benutzt — er gilt nur wenige Minuten. Spiel das Verto noch einmal, um es zu behalten."

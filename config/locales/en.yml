@@ -319,6 +319,8 @@ en:
     join_password_hint: "At least %{count} characters. You'll use it to sign back in on another device."
     join_fine: "You're signed in the moment you're done — nothing to wait for in your inbox. We never post anything, and you can delete the account in one tap."
     join_embedded: "This Verto is embedded in another site, so we can't see anything else you've played here. The link will still keep this one."
+    join_have_account: "Already have an account?"
+    join_sign_in: "Sign in"
     play_again: "Play again"
     next_person: "Next person"
     font_size: "Text size"
@@ -406,6 +408,8 @@ en:
       join_also_other: "Also add the %{count} other Vertos this device remembers"
       join_invalid: "That doesn't look like an email address."
       join_failed: "We couldn't send that just now. Try again in a moment."
+      join_google_done_title: "Taking you to Google…"
+      join_use_google: "That address signs in with Google — use the Google button instead."
       submit_rejected: "This Verto has closed, so your answers weren't saved."
       compare_cta: "See your results compared to others →"
       compare_loading: "Loading…"
@@ -1416,6 +1420,15 @@ en:
     section_live: "Live"
     section_drafts: "Drafts"
     section_archived: "Archived"
+  # The page between the end of a Verto and Google. See PlayerJoinsController
+  # for why a respondent passes through it rather than going straight there.
+  player_join:
+    title: "One last tap"
+    body: "Finish with Google and your answers are yours to keep."
+    body_verto: "Finish with Google and %{verto} is yours to keep."
+    fine: "We ask Google for your name and email address, nothing else. We never post anything, and you can delete the account in one tap."
+    expired_title: "That took a moment too long"
+    expired_body: "This link has expired or has already been used — they only last a few minutes. Play the Verto again to keep it."
   player_sign_in:
     title: "Sign in to your Vertos"
     body: "This link was sent to %{email}. Tap below to sign in and keep what you've played."

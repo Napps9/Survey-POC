@@ -2494,7 +2494,12 @@
 }
 /* The respondent's side of the card, dimmed so it reads as shape rather than
    as something the creator is expected to fill in or edit. */
-.gate-join-card .join-fine, .gate-join-card .join-note { opacity: 0.6; }
+.gate-join-card .join-fine, .gate-join-card .join-note,
+.gate-join-card .join-alt { opacity: 0.6; }
+/* Continue with Google is drawn at full strength — a dimmed provider mark
+   reads as "not working yet" rather than "not yours to press" — but it is a
+   div here, and nothing about it may respond to a cursor. */
+.gate-join-card .join-google { pointer-events: none; }
 
 /* Structural edits are locked to the primary language, and the device frames
    preview only the question cards — hide the gate chrome in both, matching
@@ -11251,6 +11256,49 @@ body.generating-overlay-active .bottom-bar { display: none; }
   color: rgba(255,255,255,0.85); text-decoration: underline;
 }
 
+/* Continue with Google, at the top of the ask.
+   White with Google's own mark rather than a brand-tinted button: this one is
+   not the Verto speaking, it is somebody else's identity provider, and their
+   brand guidance is explicit about the button being recognisable. It is also
+   why this is the ONE control in the card that does not follow --brand-cta. */
+.join-google {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 11px 16px; border-radius: 12px; cursor: pointer;
+  background: #FFFFFF; border: 1px solid rgba(0,0,0,0.12);
+  /* Google's own grey on white, not the card's light-on-dark text — this
+     button is a white surface and inherits none of the card's palette. */
+  color: #1F1F1F;
+  font-family: "Alata", sans-serif; font-size: 0.9375rem; line-height: 1.2;
+}
+.join-google:hover { background: #F1F3F4; }
+.join-google:disabled { opacity: 0.6; cursor: default; }
+.join-google:focus-visible {
+  outline: 2px solid var(--brand-primary, #01EACB); outline-offset: 2px;
+}
+
+/* "or", between the two ways in. A rule either side rather than a bare word,
+   so it reads as a fork and not as a label for what follows. */
+.join-divider {
+  display: flex; align-items: center; gap: 10px;
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.45);
+}
+.join-divider::before, .join-divider::after {
+  content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.14);
+}
+
+/* "Already have an account? Sign in" — the way out for somebody returning on
+   a new device. Quiet on purpose: most people meeting this card have no
+   account, and a second bright call to action beside the first only asks them
+   to make a decision they don't have the information for. */
+.join-alt {
+  font-family: "ABeeZee", sans-serif; font-size: 0.75rem; line-height: 1.45;
+  color: rgba(255,255,255,0.6); margin: 0;
+}
+.join-alt-link { color: var(--brand-primary, #01EACB); text-decoration: underline; }
+
 /* Points Checkpoint card body (player) — populated client-side. */
 .token-checkpoint-body { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .token-checkpoint-row {
@@ -13728,6 +13776,31 @@ body.generating-overlay-active .bottom-bar { display: none; }
   text-decoration: none; cursor: pointer;
 }
 .you-btn-primary { background: #01EACB; color: #1C2034; border-color: transparent; }
+/* Continue with Google, on the respondent's own pages. White with Google's
+   mark for the reason .join-google is: this button is not Playverto speaking,
+   and their brand guidance asks for it to stay recognisable. Full width rather
+   than the pill's shrink-to-fit, because on these pages it is the primary
+   action and sits above a form it has to line up with. */
+.you-btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; box-sizing: border-box; border-radius: 12px; padding: 12px 16px;
+  background: #FFFFFF; color: #1F1F1F; border-color: rgba(0,0,0,.12);
+  letter-spacing: 0;
+}
+.you-btn-google:hover { background: #F1F3F4; }
+
+/* "or", between Google and the address form. A rule either side rather than a
+   bare word, so it reads as a fork and not as a heading for what follows —
+   same treatment as .join-divider on the end card, which is where a respondent
+   will have met this choice first. */
+.you-divider {
+  display: flex; align-items: center; gap: 12px; margin: 18px 0 0;
+  font-family: "ABeeZee", sans-serif; font-size: 12px;
+  text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.38);
+}
+.you-divider::before, .you-divider::after {
+  content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.12);
+}
 
 /* The respondent sign-in form. Sized like .join-input rather than restyled —
    it is the same two fields the end card asks for, so 1rem here for the same

@@ -1,0 +1,51 @@
+<%# The one screen between the end of a Verto and Google. See
+    PlayerJoinsController for why it exists at all, and why it does not send
+    itself.
+
+    Same shell and same classes as player_sign_ins/show and
+    player_sessions/new — a respondent who has seen one of these pages should
+    recognise the next. %>
+<div class="you-page">
+  <div class="you-orbs" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+  <div class="you-shell you-shell-narrow">
+    <div class="you-mark"><%= image_tag "playverto.svg", alt: "Playverto", width: 120 %></div>
+
+    <div class="you-card">
+      <% if @handoff && @providers.any? %>
+        <h1 class="you-h1"><%= t("player_join.title") %></h1>
+        <p class="you-sub">
+          <%= @survey ? t("player_join.body_verto", verto: @survey.title) : t("player_join.body") %>
+        </p>
+
+        <%# The request phase must be a CSRF-protected POST, hence button_to;
+            turbo is off because the response is a redirect to google.com.
+            This page is fetched, never cached, so the token in this form is
+            live — which is the entire reason the card sent them here. %>
+        <% @providers.each do |p| %>
+          <%= button_to "/auth/#{p.key}", data: { turbo: false },
+                form: { style: "margin:0;" }, class: "you-btn you-btn-google" do %>
+            <%= render "shared/google_mark" if p.key.to_s.start_with?("google") %>
+            <span><%= t("auth.social_continue", provider: p.label) %></span>
+          <% end %>
+        <% end %>
+
+        <p class="you-fine"><%= t("player_join.fine") %></p>
+      <% else %>
+        <%# No live handoff, or Google isn't configured on this deploy. Said
+            plainly rather than 404'd: "it expired while you were deciding" is
+            the likeliest reason to be here without one, and it is the kind of
+            thing people assume they did wrong. %>
+        <h1 class="you-h1"><%= t("player_join.expired_title") %></h1>
+        <p class="you-sub"><%= t("player_join.expired_body") %></p>
+      <% end %>
+
+      <%# Always offered, in both states: somebody who already has an account
+          does not need any of the above, and somebody whose handoff expired
+          needs precisely this. %>
+      <p class="you-fine">
+        <%= t("player.join_have_account") %>
+        <%= link_to t("player.join_sign_in"), new_player_session_path, class: "you-link" %>
+      </p>
+    </div>
+  </div>
+</div>

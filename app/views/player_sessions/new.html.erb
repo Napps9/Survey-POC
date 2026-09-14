@@ -15,6 +15,26 @@
       <h1 class="you-h1"><%= t("player_session.title") %></h1>
       <p class="you-sub"><%= t("player_session.body") %></p>
 
+      <%# Google first, and for a reason beyond convenience: there is no
+          respondent password reset, so for somebody who signed up this way it
+          is not an alternative door, it is the only one. Their row has no
+          password_digest at all — the form below would tell them their
+          password was wrong about an account that has never had one.
+
+          A live page with a live token, so the CSRF-protected POST can go
+          straight out from here; the end-of-Verto card cannot do that, which
+          is what PlayerJoinsController exists for. %>
+      <% if (providers = SocialAuth.player_enabled).any? %>
+        <% providers.each do |p| %>
+          <%= button_to "/auth/#{p.key}", data: { turbo: false },
+                form: { style: "margin:0;" }, class: "you-btn you-btn-google" do %>
+            <%= render "shared/google_mark" if p.key.to_s.start_with?("google") %>
+            <span><%= t("auth.social_continue", provider: p.label) %></span>
+          <% end %>
+        <% end %>
+        <div class="you-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
+      <% end %>
+
       <%# Same path as the GET, different verb — the route has no name of its
           own, so the form posts back to where it was rendered. %>
       <%= form_with url: new_player_session_path, method: :post, data: { turbo: false },

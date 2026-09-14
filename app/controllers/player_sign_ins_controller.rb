@@ -45,7 +45,10 @@ class PlayerSignInsController < ApplicationController
     # response, so it establishes a session and nothing more — the address stays
     # unproven, and PlayerAudience.for_survey goes on refusing to mail it.
     player.verify_email! if @link.proves_address?
-    apply_claims(player, @link.claim_payload)
+    # Written here rather than when the address was typed, so nothing is ever
+    # recorded against an address until someone proves they can reach it.
+    PlayerClaimPayload.apply(player: player, payload: @link.claim_payload,
+                             reporting_context: "PlayerSignInsController#create")
     start_player_session_for(player)
 
     redirect_to you_path, notice: t("player_sign_in.welcome")
@@ -55,29 +58,5 @@ class PlayerSignInsController < ApplicationController
 
   def find_link
     @link = PlayerSignInLink.find_live(params[:token])
-  end
-
-  # The Vertos this link was minted to attach. Written here rather than when
-  # the address was typed, so nothing is ever recorded against an address until
-  # someone proves they can read it.
-  #
-  # Every step is defensive: a response may have been erased between the join
-  # and the click, and a survey may have been deleted. A claim that cannot be
-  # made is skipped, never raised — the person is signing in, and the sign-in
-  # must not fail because one of their Vertos went away.
-  def apply_claims(player, payload)
-    Array(payload).each do |entry|
-      next unless entry.is_a?(Hash)
-
-      response = Response.find_by(id: entry["response_id"])
-      next if response.nil?
-
-      source = PlayerClaim::SOURCES.include?(entry["source"]) ? entry["source"] : "signup"
-      PlayerClaim.claim!(player: player, response: response, source: source)
-    end
-  rescue => e
-    # A partial claim is better than a failed sign-in: they are in, and the
-    # missing Verto is recoverable by playing it again.
-    ErrorReporting.report("PlayerSignInsController#apply_claims", e, player_id: player.id)
   end
 end

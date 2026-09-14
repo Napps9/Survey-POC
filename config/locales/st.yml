@@ -320,6 +320,10 @@ st:
     join_embedded: "Verto ena e kentswe sebakeng se seng sa marang-rang, kahoo re ke ke ra bona letho le leng leo o le bapetseng mona. Sehokelo se sa tla boloka ena."
     modal_continue: "Ke utloile"
     modal_reopen: "Bala hape"
+    join_password_placeholder: "Khetha phasewete"
+    join_password_hint: "Bonyane litlhaku tse %{count}. U tla e sebelisa ho kena hape ho sesebelisoa se seng."
+    join_have_account: "U se u na le ak'haonte?"
+    join_sign_in: "Kena"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -434,6 +438,8 @@ st:
       leaderboard_empty: "Eba wa pele lethathamong!"
       already_played: "O se o bapetse Verto ena — sena ke kamoo lethathamo le emeng kateng."
       already_played_plain: "O se o phethile Verto ena — rea leboha."
+      join_google_done_title: "Re u isa ho Google…"
+      join_use_google: "Aterese eo e kena ka Google — sebelisa konopo ea Google ho e-na le hoo."
     editor:
       delete_card_confirm: "Hlakola karete ena?"
       save_to_library: "Boloka hape polokelong ya letshwao la ka"
@@ -2194,3 +2200,10 @@ st:
     rail_failed: "Phetolelo e hlolehile"
     rail_retry: "Leka hape"
     rail_generate_one: "Fetolela ena"
+  player_join:
+    title: "Ho setse ho tobetsa hang feela"
+    body: "Qetella ka Google 'me likarabo tsa hao e lule e le tsa hao."
+    body_verto: "Qetella ka Google 'me %{verto} e lule e le ea hao."
+    fine: "Ho Google re kopa lebitso la hao le aterese ea imeile feela, ha ho letho le leng. Ha re ke re phatlalatse letho, 'me u ka hlakola ak'haonte ka ho tobetsa hang."
+    expired_title: "Seo se nkile nako e telele hanyenyane"
+    expired_body: "Sehokelo sena se felile kapa se se se sebelisitsoe — se lula metsotso e seng mekae feela. Bapala Verto hape ho e boloka."

@@ -7,7 +7,7 @@ class PlayerController < ApplicationController
   layout "fullscreen"
   skip_before_action :require_authentication
   skip_before_action :set_current_organisation
-  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall, :eligibility, :leaderboard, :join ]
+  protect_from_forgery with: :null_session, only: [ :submit, :progress, :recall, :eligibility, :leaderboard, :join, :join_google ]
 
   # Public, unauthenticated write endpoints — cap per-IP request rate so one
   # source can't flood responses (results poisoning / storage abuse). Limits are
@@ -78,6 +78,12 @@ class PlayerController < ApplicationController
   rate_limit to: 5, within: 20.minutes, only: :join, name: "join_email",
              by:   -> { "join_email:#{params[:email].to_s.strip.downcase}" },
              with: -> { render json: { ok: true } }
+  # Continue with Google has no address in it, so there is nothing to hide and
+  # it refuses plainly rather than in a success's clothing. It mints a row per
+  # call, which is the thing being capped; the second budget #join needs — one
+  # inbox, many IPs — has no meaning here, because nothing is sent anywhere.
+  rate_limit to: 15, within: 5.minutes, only: :join_google, name: "join_google_ip",
+             with: -> { render json: { ok: false, error: "too_many" }, status: :too_many_requests }
 
   # How many respondent-facing Claude calls may be in flight in this process.
   # Rate limiting above bounds requests per IP; this bounds concurrency, which
@@ -762,6 +768,13 @@ class PlayerController < ApplicationController
       # A shell left behind by the emailed-link era, with nothing on it. Giving
       # it the password now is the same act as creating it would have been.
       player.update!(password: password)
+    elsif player.password_digest.blank? && player.player_identities.exists?
+      # Signed up with Google, now typing a password at the same address.
+      # `authenticate` on a digest-less row is simply false, so without this
+      # they are told their password is wrong — about an account that has never
+      # had one, with no way to set one (there is no respondent password
+      # reset). Name the door they already have instead.
+      return render json: { ok: false, error: "use_google" }, status: :unauthorized
     elsif !player.authenticate(password)
       return render json: { ok: false, error: "credentials" }, status: :unauthorized
     end
@@ -778,6 +791,48 @@ class PlayerController < ApplicationController
     render json: { ok: false, error: "retry" }, status: :unprocessable_entity
   rescue => e
     ErrorReporting.report("PlayerController#join", e, survey_id: @survey&.id)
+    render json: { ok: false, error: "retry" }, status: :internal_server_error
+  end
+
+  # POST /play/:token/join_google
+  #
+  # The other half of the card: the same account, asked for with a Google
+  # sign-in instead of an address and a password.
+  #
+  # This does NOT start a Google round trip. It cannot: OmniAuth's request
+  # phase is a CSRF-protected POST (omniauth-rails_csrf_protection), and the
+  # page this call comes from is service-worker cached, which is exactly why
+  # #join above runs under null_session — its token can be arbitrarily stale.
+  # So this action does the one thing the cached page genuinely can't do
+  # afterwards: it works out what this run is worth, parks it, and hands back a
+  # URL. The page it names is outside /play/, is therefore never cached, and
+  # carries a live token that can start the round trip properly.
+  #
+  # Cookie-free for all of #join's reasons, and one more of its own: the claims
+  # have to survive a trip through google.com and back, and a SameSite=Lax
+  # cookie is not sent on a cross-site POST return. The handoff row is what
+  # carries them.
+  #
+  # No address is named here and none is recorded. Everything this endpoint
+  # knows is what the run already proved, so unlike #join it has no oracle to
+  # give away and can refuse plainly.
+  def join_google
+    return render json: { ok: false }, status: :not_found unless @survey
+    return render json: { ok: false, error: "This Verto is no longer available." }, status: :gone unless @survey.playable?
+    return render json: { ok: false, error: "unavailable" }, status: :forbidden unless @survey.join_prompt?
+    return render json: { ok: false, error: "unavailable" }, status: :forbidden unless SocialAuth.player_enabled?
+
+    # The language they were playing in, twice over: on the row, so the account
+    # this ends in is created in it (remember_play_locale's job on the other
+    # path), and in the URL, where resolve_locale's ?locale= already means the
+    # pages in between are drawn in it too.
+    locale = SupportedLocales.coerce(params[:lang].presence || I18n.locale)
+    _handoff, raw = PlayerOauthHandoff.mint!(claim_payload: join_claim_payload,
+                                             survey: @survey, locale: locale)
+
+    render json: { ok: true, next: player_join_path(raw, locale: locale) }
+  rescue => e
+    ErrorReporting.report("PlayerController#join_google", e, survey_id: @survey&.id)
     render json: { ok: false, error: "retry" }, status: :internal_server_error
   end
 

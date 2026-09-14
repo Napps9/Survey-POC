@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_12_080000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_14_090100) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -686,6 +686,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_080000) do
     t.index ["player_id"], name: "index_player_email_preferences_on_player_id"
   end
 
+  create_table "player_identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "name"
+    t.integer "player_id", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.index ["player_id"], name: "index_player_identities_on_player_id"
+    t.index ["provider", "uid"], name: "index_player_identities_on_provider_and_uid", unique: true
+  end
+
   create_table "player_notifications", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "kind", null: false
@@ -701,6 +713,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_080000) do
     t.index ["survey_id"], name: "index_player_notifications_on_survey_id"
     t.index ["token"], name: "index_player_notifications_on_token", unique: true
     t.check_constraint "kind IN ('impact', 'follow_up')", name: "chk_player_notifications_kind"
+  end
+
+  create_table "player_oauth_handoffs", force: :cascade do |t|
+    t.json "claim_payload", default: [], null: false
+    t.datetime "consumed_at"
+    t.datetime "created_at", null: false
+    t.datetime "expires_at", null: false
+    t.string "locale"
+    t.integer "survey_id"
+    t.string "token_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_player_oauth_handoffs_on_expires_at"
+    t.index ["survey_id"], name: "index_player_oauth_handoffs_on_survey_id"
+    t.index ["token_digest"], name: "index_player_oauth_handoffs_on_token_digest", unique: true
   end
 
   create_table "player_sessions", force: :cascade do |t|
@@ -1251,9 +1277,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_12_080000) do
   add_foreign_key "player_claims", "surveys"
   add_foreign_key "player_email_preferences", "organisations"
   add_foreign_key "player_email_preferences", "players"
+  add_foreign_key "player_identities", "players"
   add_foreign_key "player_notifications", "organisations"
   add_foreign_key "player_notifications", "players"
   add_foreign_key "player_notifications", "surveys"
+  add_foreign_key "player_oauth_handoffs", "surveys", on_delete: :nullify
   add_foreign_key "player_sessions", "players"
   add_foreign_key "player_sign_in_links", "players"
   add_foreign_key "portfolio_common_question_sets", "common_question_sets"

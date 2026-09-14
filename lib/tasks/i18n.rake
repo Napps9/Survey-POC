@@ -370,19 +370,31 @@ def splice_into_locale!(path, code, additions)
   before   = YAML.load_file(path)[code] || {}
   lines    = original.lines
 
-  # Group by top-level namespace: a namespace the file has never seen is
-  # appended whole, one it already has needs its new leaves placed inside it.
-  additions.group_by { |k, _| k.split(".").first }.each do |ns, pairs|
-    subtree = unflatten(pairs.to_h)[ns]
-    body    = yaml_block(ns => subtree)
+  # Group by the DEEPEST block the file already has on each key's path, and
+  # splice each group in at the end of that block.
+  #
+  # It used to group by top-level namespace alone, which was correct only
+  # because every key this task had ever written was one level deep. The first
+  # `js.player.*` addition broke it: `js` exists, so the new leaves were
+  # rendered as `player:` and appended inside it — a SECOND `player:` key under
+  # `js:`, which YAML resolves by letting the last one win, silently deleting
+  # every js.player string already there. The write-back assertion caught it
+  # and reverted, which is what that assertion is for; this is the fix it was
+  # asking for.
+  #
+  # Grouped by the deepest EXISTING parent rather than by the full parent path,
+  # because the remainder has to be created: `player_join.title` in a file with
+  # no player_join namespace appends the whole namespace, exactly as before.
+  additions.group_by { |k, _| existing_block_path(lines, k.split(".")[0..-2]) }
+           .each do |parent, pairs|
+    # The part of each key that still has to be written, below the block we
+    # are about to insert into.
+    subtree = unflatten(pairs.to_h.transform_keys { |k| k.split(".").drop(parent.size).join(".") })
+    body    = yaml_block(subtree, indent: 2 * (parent.size + 1))
 
-    if (range = namespace_line_range(lines, ns))
-      # Existing namespace: splice the new leaves in at its end, keeping the
-      # file's own ordering intact. Only ever flat leaves here — a nested
-      # partial insert would need to find the parent, and nothing this task
-      # writes has ever needed it.
-      inner = body.lines.drop(1) # drop the "ns:" line; keep its children
-      lines.insert(range.end + 1, *inner)
+    if parent.any?
+      range = block_line_range(lines, parent)
+      lines.insert(range.end + 1, *body.lines)
     else
       lines << "\n" unless lines.last.to_s.end_with?("\n")
       lines.concat(body.lines)
@@ -420,11 +432,12 @@ end
 #
 # line_width: -1 so a long sentence is never folded across lines — a folded
 # scalar is legal YAML and unreadable in review.
-def yaml_block(hash)
+def yaml_block(hash, indent: 2)
   visitor = Psych::Visitors::YAMLTree.create
   visitor << hash
   quote_mapping_values!(visitor.tree)
-  visitor.tree.yaml(nil, line_width: -1).sub(/\A---\n/, "").gsub(/^(?=.)/, "  ")
+  visitor.tree.yaml(nil, line_width: -1)
+         .sub(/\A---\n/, "").gsub(/^(?=.)/, " " * indent)
 end
 
 # A YAML mapping's children alternate key, value, key, value — so the values
@@ -445,22 +458,48 @@ def quote_mapping_values!(node)
   node.children&.each { |child| quote_mapping_values!(child) }
 end
 
-# The line range a top-level namespace occupies, or nil if the file has no
-# such namespace. Indentation is the only structure a text splice can see:
-# the namespace starts at `  ns:` and ends before the next line indented two
-# spaces (its sibling) or less.
-def namespace_line_range(lines, ns)
-  start = lines.index { |l| l.start_with?("  #{ns}:") }
-  return nil unless start
+# The line range the block at `path` occupies, or nil if the file has no such
+# block. Indentation is the only structure a text splice can see: a block whose
+# path is n keys deep starts at `<2n spaces>key:` and ends before the next
+# non-blank line indented that far or less — its own sibling, or an ancestor's.
+#
+# Each level is searched only INSIDE the range the level above resolved to, so
+# a `player:` under `js:` is never mistaken for the top-level `player:`.
+def block_line_range(lines, path)
+  window = 0...lines.size
+  range  = nil
 
-  finish = start
-  lines[(start + 1)..].each_with_index do |line, i|
-    break if line =~ /\A\s*\z/ && lines[start + i + 2].to_s =~ /\A  \S/
-    break if line =~ /\A  \S/
+  Array(path).each_with_index do |key, depth|
+    pad   = "  " * (depth + 1)
+    start = window.find { |i| lines[i].start_with?("#{pad}#{key}:") }
+    return nil unless start
 
-    finish = start + i + 1
+    finish = start
+    ((start + 1)...lines.size).each do |i|
+      line = lines[i]
+      # A blank line inside a block belongs to it unless what follows has
+      # closed the block — so look past the blank rather than stopping on it.
+      next_real = lines[(i + 1)..]&.find { |l| l !~ /\A\s*\z/ }
+      break if line =~ /\A\s*\z/ && next_real.to_s =~ /\A#{pad}\S/
+      break if line =~ /\A#{pad}\S/
+
+      finish = i
+    end
+
+    range  = start..finish
+    window = (start + 1)..finish
   end
-  start..finish
+
+  range
+end
+
+# The longest prefix of `path` that the file actually has a block for. Where
+# the remainder of the path has to be created, and therefore where the splice
+# goes in. [] means "not even the top-level namespace exists": append it whole.
+def existing_block_path(lines, path)
+  candidate = Array(path)
+  candidate = candidate[0..-2] while candidate.any? && block_line_range(lines, candidate).nil?
+  candidate
 end
 
 # `before` deep-merged with the dotted-key additions, for the assertion above.

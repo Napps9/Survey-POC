@@ -39,6 +39,11 @@ Rails.application.routes.draw do
   # body, never in a URL a log, a Referer header or the service worker's page
   # cache could keep. See PlayerController#join for why it is cookie-free.
   post "play/:token/join", to: "player#join", as: :join_survey
+  # Continue with Google, from the same card. Cookie-free for the same reasons
+  # #join is, and answering in the same shape — this one parks the claims on a
+  # PlayerOauthHandoff instead of a PlayerSignInLink, because the account it
+  # will belong to has not been named yet.
+  post "play/:token/join_google", to: "player#join_google", as: :join_google_survey
   # Per-Verto PWA install manifest — see PlayerController#manifest.
   get  "play/:token/manifest", to: "player#manifest", as: :play_manifest
 
@@ -111,6 +116,12 @@ Rails.application.routes.draw do
   # The password form, for a respondent coming back on another device. Declared
   # BEFORE the :token routes below: "email" is a legal value for :token, so the
   # POST would otherwise be swallowed by the link-consuming route.
+  # Where the player page sends someone who tapped Continue with Google. It is
+  # outside /play/ deliberately: that path is the service worker's whole scope,
+  # so a page there can be served from cache with a CSRF token of any age, and
+  # OmniAuth's request phase is a CSRF-protected POST. This page is always
+  # fetched fresh, and its token is live. See PlayerJoinsController.
+  get    "you/join/:token",    to: "player_joins#show",      as: :player_join
   get    "you/sign-in",        to: "player_sessions#new",    as: :new_player_session
   post   "you/sign-in",        to: "player_sessions#create"
   post   "you/sign-in/email",  to: "player_sessions#link",   as: :player_session_link
@@ -118,6 +129,14 @@ Rails.application.routes.draw do
   post   "you/sign-in/:token", to: "player_sign_ins#create"
 
   # Social sign-in (OmniAuth). /auth/:provider itself is middleware.
+  #
+  # The respondent strategy is mounted under its own name (see
+  # config/initializers/omniauth.rb), so it comes back HERE — declared ahead of
+  # the wildcard below, which would otherwise swallow it and hand a respondent
+  # to the controller that mints creator accounts. Which kind of account a
+  # callback may create is decided by the path Google was told to return to,
+  # and nothing else.
+  get "auth/google_player/callback", to: "player_oauth_sessions#create", as: :player_oauth_callback
   get "auth/:provider/callback", to: "oauth_sessions#create", as: :oauth_callback
   get "auth/failure",            to: "oauth_sessions#failure"
 

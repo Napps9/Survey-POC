@@ -656,6 +656,19 @@
                 — the button lives in here now, and it is a focusable
                 contenteditable, which must never sit inside a hidden subtree. %>
             <div class="join-ask">
+              <%# The respondent's other way in. Inert here like the input rows
+                  — it is not the creator's to press, and its words are
+                  Google's rather than theirs — but shown, because a preview
+                  that omits the shorter of the two roads is not a preview of
+                  what a respondent meets. Absent when the strategy has no
+                  credentials configured, exactly as it is in the player. %>
+              <% if SocialAuth.player_enabled? %>
+                <div class="join-google" aria-hidden="true">
+                  <%= render "shared/google_mark" %>
+                  <span><%= t("auth.social_continue", provider: SocialAuth.label_for(:google_player)) %></span>
+                </div>
+                <div class="join-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
+              <% end %>
               <div class="join-row">
                 <span class="join-input gate-join-ghost" aria-hidden="true"><%= t("player.join_email_placeholder") %></span>
               </div>
@@ -672,6 +685,10 @@
             </div>
 
             <p class="join-fine" aria-hidden="true"><%= t("player.join_fine") %></p>
+            <p class="join-alt" aria-hidden="true">
+              <%= t("player.join_have_account") %>
+              <span class="join-alt-link"><%= t("player.join_sign_in") %></span>
+            </p>
           </div>
         </div>
 

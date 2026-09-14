@@ -22,7 +22,8 @@ const JOIN_ERRORS = {
   password_short: "player.join_password_short",
   credentials:    "player.join_credentials",
   too_many:       "player.join_too_many",
-  unavailable:    "player.join_unavailable"
+  unavailable:    "player.join_unavailable",
+  use_google:     "player.join_use_google"
 }
 
 // Cards that ask for agreement rather than an answer, and drive their own
@@ -83,7 +84,8 @@ export default class extends Controller {
                     "scoreChip", "quizScore", "scoresList", "scoresMeta",
                     "tokenScoreChip", "tokenScore", "leaderboard", "fontScaleBtn",
                     "joinBlock", "joinAsk", "joinAlso", "joinAlsoBox", "joinAlsoLabel",
-                    "joinEmbedded", "joinEmail", "joinPassword", "joinBtn", "joinError", "joinDone",
+                    "joinEmbedded", "joinEmail", "joinPassword", "joinBtn", "joinGoogleBtn",
+                    "joinError", "joinDone",
                     "testConfirm"]
   static values  = {
     progressUrl: { type: String, default: "" },
@@ -125,6 +127,11 @@ export default class extends Controller {
     // owner preview and Test Mode, and blank whenever the creator has the
     // block switched off — _renderJoinState reveals nothing without it.
     joinUrl: { type: String, default: "" },
+    // Continue with Google, from the same card. Blank on exactly the same
+    // terms as joinUrl (it is derived from it) and additionally blank when the
+    // strategy has no credentials configured — the button isn't rendered then
+    // either, so this is the belt to that view condition's braces.
+    joinGoogleUrl: { type: String, default: "" },
     // No going back: once the respondent moves on from a card its answer is
     // final — Back is hidden, the card is locked, and every advance is saved
     // so the server (locked_merge) holds each answer it pins.
@@ -3371,6 +3378,56 @@ export default class extends Controller {
     }
   }
 
+  // Continue with Google.
+  //
+  // This does NOT go to Google. It cannot from here: OmniAuth's request phase
+  // is a CSRF-protected POST and this page is service-worker cached, so its
+  // authenticity token can be any age — the same reason joinSubmit's endpoint
+  // runs under null_session. What it does is hand the run's claims to a
+  // cookie-free endpoint, which parks them and answers with a /you/ URL that
+  // is outside the worker's scope and therefore always fresh. That page starts
+  // the round trip properly.
+  //
+  // Deliberately the same shape as joinSubmit, down to sharing _joinDone: from
+  // here on the two paths are one path, and a second way of navigating would
+  // be a second thing to keep in step.
+  async joinGoogle(event) {
+    event?.preventDefault()
+    if (!this.joinGoogleUrlValue || this._joinSending) return
+
+    const wanted = this.hasJoinAlsoBoxTarget && this.joinAlsoBoxTarget.checked
+    this._joinSending = true
+    if (this.hasJoinGoogleBtnTarget) this.joinGoogleBtnTarget.disabled = true
+
+    try {
+      const res = await fetch(this.joinGoogleUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_token: this._sessionToken || null,
+          lang: this.localeValue || null,
+          device_keys: wanted ? this._joinDeviceKeys() : []
+        })
+      })
+      const data = await res.json().catch(() => null)
+
+      if (res.ok && data?.ok && data?.next) {
+        // Says Google, because that is where the next tap goes — the account
+        // page is two screens away and naming it here would be a promise this
+        // navigation does not keep.
+        this._joinDone(data.next, "player.join_google_done_title")
+        return
+      }
+      this._joinError(t(JOIN_ERRORS[data?.error] || "player.join_failed",
+                        { count: JOIN_MIN_PASSWORD }))
+    } catch (_e) {
+      this._joinError(t("player.join_failed"))
+    } finally {
+      this._joinSending = false
+      if (this.hasJoinGoogleBtnTarget) this.joinGoogleBtnTarget.disabled = false
+    }
+  }
+
   // The account exists and a single-use link to finish signing in is in hand.
   //
   // Navigating rather than rendering a "done" card: the link has to be spent on
@@ -3378,12 +3435,12 @@ export default class extends Controller {
   // respondent on a success message they then have to act on is how you lose
   // them. The card is still swapped first so a slow navigation does not leave
   // the form sitting there looking unpressed.
-  _joinDone(next) {
+  _joinDone(next, titleKey = "player.join_done_title") {
     if (this.hasJoinAskTarget) this.joinAskTarget.classList.add("hidden")
     if (this.hasJoinDoneTarget) {
       this.joinDoneTarget.classList.remove("hidden")
       this.joinDoneTarget.innerHTML =
-        `<div class="join-sent-title">${this._esc(t("player.join_done_title"))}</div>`
+        `<div class="join-sent-title">${this._esc(t(titleKey))}</div>`
     }
     window.location.assign(next)
   }

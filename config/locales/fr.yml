@@ -310,6 +310,10 @@ fr:
     join_embedded: "Ce Verto est intégré dans un autre site : nous ne pouvons donc pas voir ce que vous avez joué d'autre ici. Le lien conservera tout de même celui-ci."
     modal_continue: "J'ai compris"
     modal_reopen: "Relire"
+    join_password_placeholder: "Choisissez un mot de passe"
+    join_password_hint: "Au moins %{count} caractères. Il vous servira à vous reconnecter depuis un autre appareil."
+    join_have_account: "Vous avez déjà un compte ?"
+    join_sign_in: "Se connecter"
   defaults:
     range: ["Pas du tout d'accord", "Pas d'accord", "Neutre", "D'accord", "Tout à fait d'accord"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ fr:
       leaderboard_empty: "Soyez le premier au classement !"
       already_played: "Vous avez déjà joué ce Verto — voici le classement actuel."
       already_played_plain: "Vous avez déjà répondu à ce Verto — merci."
+      join_google_done_title: "Direction Google…"
+      join_use_google: "Cette adresse se connecte avec Google — utilisez plutôt le bouton Google."
     editor:
       delete_card_confirm: Supprimer cette carte ?
       save_to_library: "Enregistrer aussi dans ma bibliothèque de marque"
@@ -2157,3 +2163,10 @@ fr:
     rail_failed: "Échec de la traduction"
     rail_retry: "Réessayer"
     rail_generate_one: "Traduire celle-ci"
+  player_join:
+    title: "Plus qu'une touche"
+    body: "Terminez avec Google et vos réponses vous appartiennent."
+    body_verto: "Terminez avec Google et %{verto} vous appartient."
+    fine: "Nous demandons à Google votre nom et votre adresse e-mail, rien d'autre. Nous ne publions jamais rien et vous pouvez supprimer le compte en une touche."
+    expired_title: "Cela a pris un peu trop de temps"
+    expired_body: "Ce lien a expiré ou a déjà été utilisé — il ne dure que quelques minutes. Rejouez le Verto pour le conserver."

@@ -310,6 +310,10 @@ pt:
     join_embedded: "Este Verto está incorporado noutro site, por isso não conseguimos ver mais nada que tenhas jogado aqui. O link guardará este à mesma."
     modal_continue: "Percebi"
     modal_reopen: "Ler de novo"
+    join_password_placeholder: "Escolhe uma palavra-passe"
+    join_password_hint: "Pelo menos %{count} caracteres. Vais usá-la para iniciar sessão noutro dispositivo."
+    join_have_account: "Já tens conta?"
+    join_sign_in: "Iniciar sessão"
   defaults:
     range: ["Discordo totalmente", "Discordo", "Neutro", "Concordo", "Concordo totalmente"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ pt:
       leaderboard_empty: "Seja a primeira pessoa no placar!"
       already_played: "Você já jogou este Verto — veja como está o placar."
       already_played_plain: "Já respondeu a este Verto — obrigado."
+      join_google_done_title: "A levar-te ao Google…"
+      join_use_google: "Esse endereço inicia sessão com o Google — usa antes o botão do Google."
     editor:
       delete_card_confirm: Eliminar este cartão?
       save_to_library: "Salvar também na minha biblioteca de marca"
@@ -2157,3 +2163,10 @@ pt:
     rail_failed: "Tradução falhou"
     rail_retry: "Tentar novamente"
     rail_generate_one: "Traduzir este idioma"
+  player_join:
+    title: "Falta só um toque"
+    body: "Termina com o Google e as tuas respostas ficam contigo."
+    body_verto: "Termina com o Google e %{verto} fica contigo."
+    fine: "Ao Google pedimos apenas o teu nome e o teu e-mail, mais nada. Nunca publicamos nada e podes eliminar a conta com um toque."
+    expired_title: "Demorou um bocadinho de mais"
+    expired_body: "Esta ligação expirou ou já foi usada — só dura alguns minutos. Joga o Verto outra vez para o guardares."

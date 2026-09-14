@@ -310,6 +310,10 @@ it:
     join_embedded: "Questo Verto è incorporato in un altro sito, quindi non possiamo vedere nient'altro che tu abbia giocato qui. Il link conserverà comunque questo."
     modal_continue: "Ho capito"
     modal_reopen: "Rileggi"
+    join_password_placeholder: "Scegli una password"
+    join_password_hint: "Almeno %{count} caratteri. La userai per rientrare da un altro dispositivo."
+    join_have_account: "Hai già un account?"
+    join_sign_in: "Accedi"
   defaults:
     range: ["Per niente d'accordo", "In disaccordo", "Neutrale", "D'accordo", "Completamente d'accordo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ it:
       leaderboard_empty: "Sii il primo in classifica!"
       already_played: "Hai già giocato questo Verto — ecco la classifica attuale."
       already_played_plain: "Hai già completato questo Verto — grazie."
+      join_google_done_title: "Ti portiamo su Google…"
+      join_use_google: "Quell'indirizzo accede con Google: usa il pulsante Google."
     editor:
       delete_card_confirm: Eliminare questa carta?
       save_to_library: "Salva anche nella mia libreria del brand"
@@ -2157,3 +2163,10 @@ it:
     rail_failed: "Traduzione non riuscita"
     rail_retry: "Riprova"
     rail_generate_one: "Traduci questa lingua"
+  player_join:
+    title: "Un ultimo tocco"
+    body: "Concludi con Google e le tue risposte restano tue."
+    body_verto: "Concludi con Google e %{verto} resta tuo."
+    fine: "A Google chiediamo solo il tuo nome e il tuo indirizzo email, nient'altro. Non pubblichiamo mai nulla e puoi eliminare l'account con un tocco."
+    expired_title: "Ci è voluto un attimo di troppo"
+    expired_body: "Questo link è scaduto o è già stato usato: dura solo pochi minuti. Rigioca il Verto per conservarlo."

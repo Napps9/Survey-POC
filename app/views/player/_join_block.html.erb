@@ -35,6 +35,29 @@
         plainly rather than silently offering less. %>
     <p class="join-note hidden" data-player-target="joinEmbedded"><%= t("player.join_embedded") %></p>
 
+    <%# Continue with Google, above the address rows because it is the shorter
+        road: no password to invent at the end of a survey, and an address
+        Google has already verified, which is the one thing the emailed link
+        was ever for.
+
+        A button, not a form. OmniAuth's request phase is a CSRF-protected POST
+        and this page is service-worker cached, so its token can be any age —
+        the same fact that put #join under null_session. #joinGoogle posts the
+        run's claims to a cookie-free endpoint and follows the /you/ URL it
+        answers with, where the token is live. See PlayerJoinsController.
+
+        Rendered only when the strategy is actually configured, so an
+        unconfigured deploy shows the address form alone rather than a button
+        that 404s. %>
+    <% if SocialAuth.player_enabled? %>
+      <button type="button" class="join-google" data-player-target="joinGoogleBtn"
+              data-action="click->player#joinGoogle">
+        <%= render "shared/google_mark" %>
+        <span><%= t("auth.social_continue", provider: SocialAuth.label_for(:google_player)) %></span>
+      </button>
+      <div class="join-divider" aria-hidden="true"><span><%= t("auth.social_divider") %></span></div>
+    <% end %>
+
     <%# Two rows now, not one. The address and the password each get their own
         line: side by side they were two 11rem fields fighting over a 430px
         column, and the password is the field people mistype. %>
@@ -71,6 +94,26 @@
 
     <p class="join-error hidden" role="alert" data-player-target="joinError"></p>
     <p class="join-fine"><%= t("player.join_fine") %></p>
+
+    <%# The door for somebody who already has an account.
+        /you/sign-in has existed since passwords did, and until now nothing in
+        the app linked to it: a returning respondent on a new phone was shown a
+        button that says "Create my account" and left to guess that typing
+        their old password into it would work. It does — the endpoint doubles
+        as a sign-in — but "it happens to work if you don't believe what the
+        button says" is not a door.
+
+        Outside the card's flow and a plain link, because it is the way out for
+        the few rather than the path for the many. A new tab always, not only
+        when it matters: a Verto is routinely framed by a third party (see
+        allow_embedding), where following this in place would replace somebody
+        else's page with a sign-in form — and whether this render is embedded
+        is something only the browser knows. %>
+    <p class="join-alt">
+      <%= t("player.join_have_account") %>
+      <%= link_to t("player.join_sign_in"), new_player_session_path,
+                  class: "join-alt-link", target: "_blank", rel: "noopener" %>
+    </p>
   </div>
 
   <%# Sent / failed. aria-live so the change is announced: the button that was

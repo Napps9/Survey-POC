@@ -310,6 +310,10 @@ ja:
     join_embedded: "この Verto は別のサイトに埋め込まれているため、ここでプレイしたほかのものは見えません。それでもリンクはこの 1 件を保存します。"
     modal_continue: "わかりました"
     modal_reopen: "もう一度読む"
+    join_password_placeholder: "パスワードを決める"
+    join_password_hint: "%{count} 文字以上。別の端末でサインインし直すときに使います。"
+    join_have_account: "すでにアカウントをお持ちですか？"
+    join_sign_in: "サインイン"
   defaults:
     range: ["全くそう思わない", "そう思わない", "どちらとも言えない", "そう思う", "強くそう思う"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ ja:
       leaderboard_empty: "ボードの最初のひとりになろう!"
       already_played: "このVertoはプレイ済みです — 現在のボードはこちら。"
       already_played_plain: "このVertoにはすでに回答済みです — ありがとうございました。"
+      join_google_done_title: "Google に移動しています…"
+      join_use_google: "このアドレスは Google でサインインします。Google のボタンをお使いください。"
     editor:
       delete_card_confirm: このカードを削除しますか？
       save_to_library: "ブランドライブラリにも保存"
@@ -2155,3 +2161,10 @@ ja:
     rail_failed: "翻訳できませんでした"
     rail_retry: "もう一度試す"
     rail_generate_one: "この言語を翻訳"
+  player_join:
+    title: "あと一回タップ"
+    body: "Google で完了すると、回答はあなたのものとして残ります。"
+    body_verto: "Google で完了すると、%{verto} はあなたのものとして残ります。"
+    fine: "Google にお願いするのは名前とメールアドレスだけで、ほかには何もありません。こちらから何かを投稿することはなく、アカウントはワンタップで削除できます。"
+    expired_title: "少し時間が経ちすぎました"
+    expired_body: "このリンクは期限切れか、すでに使われています。有効なのは数分だけです。もう一度 Verto をプレイして保存してください。"

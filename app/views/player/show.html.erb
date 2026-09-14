@@ -125,6 +125,11 @@
   # "no live endpoint may reach this page" test asserts every *-url-value is
   # empty there.
   join_url = @survey.join_prompt? && !preview_mode && play_token.present? ? join_survey_url(play_token) : ""
+  # Derived FROM join_url rather than rebuilt beside it, so the preview and
+  # Test Mode blanking above is inherited rather than re-stated — a second copy
+  # of that condition is a second chance to get it wrong, and the thing it
+  # guards is a live endpoint reaching a page that must not have one.
+  join_google_url = join_url.present? && SocialAuth.player_enabled? ? join_google_survey_url(play_token) : ""
 
   # Answer-branching: a card's routing config is public (like token config), so
   # the player follows the graph entirely client-side from the same cards JSON.
@@ -175,6 +180,7 @@
      data-player-leaderboard-value="<%= leaderboard_mode %>"
      data-player-leaderboard-url-value="<%= leaderboard_url %>"
      data-player-join-url-value="<%= join_url %>"
+     data-player-join-google-url-value="<%= join_google_url %>"
      data-player-contact-value="<%= @survey.contact_form_enabled? %>"
      data-player-no-going-back-value="<%= @survey.no_going_back? %>"
      data-player-no-retests-value="<%= @survey.retest_basis %>"

@@ -179,8 +179,13 @@ services:
         value: "300"
       - key: SECRET_KEY_BASE
         generateValue: true
-      # Google OAuth client — used by both "Continue with Google" sign-in and
-      # the Sheets export; buttons appear once set. See .env.example.
+      # Google OAuth client — used by "Continue with Google" on BOTH sides
+      # (creators at /session/new, respondents at the end of a Verto) and by
+      # the Sheets export; buttons appear once set. The two sign-in strategies
+      # have separate callback paths, so the client needs the google_player
+      # redirect URIs as well as the google_oauth2 ones — all four are listed
+      # in .env.example. Missing the player pair fails respondent sign-in with
+      # redirect_uri_mismatch while creator sign-in carries on working.
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

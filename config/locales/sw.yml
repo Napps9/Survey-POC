@@ -310,6 +310,10 @@ sw:
     join_embedded: "Verto hii imepachikwa kwenye tovuti nyingine, kwa hivyo hatuwezi kuona kingine chochote ulichocheza hapa. Kiungo bado kitahifadhi hii."
     modal_continue: "Nimeelewa"
     modal_reopen: "Soma tena"
+    join_password_placeholder: "Chagua nenosiri"
+    join_password_hint: "Angalau herufi %{count}. Utaitumia kuingia tena kwenye kifaa kingine."
+    join_have_account: "Tayari una akaunti?"
+    join_sign_in: "Ingia"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ sw:
       leaderboard_empty: "Kuwa wa kwanza kwenye ubao!"
       already_played: "Umeshacheza Verto hii — hivi ndivyo ubao ulivyo sasa."
       already_played_plain: "Umeshakamilisha Verto hii — asante."
+      join_google_done_title: "Tunakupeleka kwa Google…"
+      join_use_google: "Anwani hiyo huingia kwa Google — tumia kitufe cha Google badala yake."
     editor:
       delete_card_confirm: Futa kadi hii?
       save_to_library: "Hifadhi pia kwenye maktaba yangu ya chapa"
@@ -2157,3 +2163,10 @@ sw:
     rail_failed: "Tafsiri imeshindikana"
     rail_retry: "Jaribu tena"
     rail_generate_one: "Tafsiri hii"
+  player_join:
+    title: "Imebaki mguso mmoja"
+    body: "Malizia kwa Google na majibu yako yatabaki yako."
+    body_verto: "Malizia kwa Google na %{verto} itabaki yako."
+    fine: "Kwa Google tunaomba jina lako na anwani yako ya barua pepe pekee, si zaidi. Hatuchapishi chochote kamwe, na unaweza kufuta akaunti kwa mguso mmoja."
+    expired_title: "Hiyo ilichukua muda kidogo zaidi"
+    expired_body: "Kiungo hiki kimeisha muda au kimeshatumika — hudumu dakika chache tu. Cheza Verto tena ili kuihifadhi."

@@ -310,6 +310,10 @@ he:
     join_embedded: "ה-Verto הזה מוטמע באתר אחר, ולכן איננו יכולים לראות שום דבר אחר ששיחקתם כאן. הקישור עדיין ישמור את זה."
     modal_continue: "הבנתי"
     modal_reopen: "לקרוא שוב"
+    join_password_placeholder: "בחרו סיסמה"
+    join_password_hint: "לפחות %{count} תווים. תשתמשו בה כדי להתחבר שוב במכשיר אחר."
+    join_have_account: "כבר יש לכם חשבון?"
+    join_sign_in: "התחברות"
   defaults:
     range: ["מאוד לא מסכים", "לא מסכים", "ניטרלי", "מסכים", "מסכים מאוד"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ he:
       leaderboard_empty: "היו הראשונים בלוח!"
       already_played: "כבר שיחקתם ב-Verto הזה — כך נראה הלוח כרגע."
       already_played_plain: "כבר השלמת את ה-Verto הזה — תודה."
+      join_google_done_title: "מעבירים אותך אל Google…"
+      join_use_google: "הכתובת הזו מתחברת דרך Google — השתמשו בכפתור Google במקום."
     editor:
       delete_card_confirm: למחוק את הכרטיס הזה?
       save_to_library: "שמור גם בספריית המותג שלי"
@@ -2164,3 +2170,10 @@ he:
     rail_failed: "התרגום נכשל"
     rail_retry: "נסו שוב"
     rail_generate_one: "תרגמו שפה זו"
+  player_join:
+    title: "עוד לחיצה אחת"
+    body: "סיימו עם Google והתשובות שלכם יישארו שלכם."
+    body_verto: "סיימו עם Google ו-%{verto} יישאר שלכם."
+    fine: "אנחנו מבקשים מ-Google רק את השם וכתובת האימייל שלכם, לא יותר. אנחנו אף פעם לא מפרסמים כלום, ואפשר למחוק את החשבון בלחיצה אחת."
+    expired_title: "זה לקח רגע יותר מדי"
+    expired_body: "הקישור פג או שכבר נעשה בו שימוש — הוא תקף לדקות ספורות בלבד. שחקו שוב ב-Verto כדי לשמור אותו."

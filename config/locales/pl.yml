@@ -310,6 +310,10 @@ pl:
     join_embedded: "To Verto jest osadzone na innej stronie, więc nie widzimy nic innego, w co tu grałeś. Link i tak zachowa to jedno."
     modal_continue: "Rozumiem"
     modal_reopen: "Przeczytaj ponownie"
+    join_password_placeholder: "Wybierz hasło"
+    join_password_hint: "Co najmniej %{count} znaków. Użyjesz go, żeby zalogować się na innym urządzeniu."
+    join_have_account: "Masz już konto?"
+    join_sign_in: "Zaloguj się"
   defaults:
     range: ["Zdecydowanie się nie zgadzam", "Nie zgadzam się", "Neutralnie", "Zgadzam się", "Zdecydowanie się zgadzam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ pl:
       leaderboard_empty: "Bądź pierwszą osobą w rankingu!"
       already_played: "Ten Verto masz już za sobą — tak wygląda ranking."
       already_played_plain: "Ten Verto został już przez Ciebie wypełniony — dziękujemy."
+      join_google_done_title: "Przenosimy Cię do Google…"
+      join_use_google: "Ten adres loguje się przez Google — użyj przycisku Google."
     editor:
       delete_card_confirm: Usunąć tę kartę?
       save_to_library: "Zapisz też w mojej bibliotece marki"
@@ -2167,3 +2173,10 @@ pl:
     rail_failed: "Tłumaczenie nieudane"
     rail_retry: "Spróbuj ponownie"
     rail_generate_one: "Przetłumacz ten język"
+  player_join:
+    title: "Jeszcze jedno dotknięcie"
+    body: "Dokończ przez Google, a Twoje odpowiedzi zostaną z Tobą."
+    body_verto: "Dokończ przez Google, a %{verto} zostanie z Tobą."
+    fine: "Prosimy Google tylko o Twoje imię i adres e-mail, o nic więcej. Nigdy nic nie publikujemy, a konto usuniesz jednym dotknięciem."
+    expired_title: "To trwało chwilę za długo"
+    expired_body: "Ten link wygasł albo został już użyty — działa tylko kilka minut. Zagraj w Verto jeszcze raz, żeby je zachować."

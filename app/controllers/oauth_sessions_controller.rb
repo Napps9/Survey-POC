@@ -3,6 +3,13 @@ class OauthSessionsController < ApplicationController
   skip_before_action :set_current_organisation
 
   def create
+    # A respondent must never be minted a creator account and a workspace. The
+    # route above this one in config/routes.rb already sends them elsewhere;
+    # this is the guard that makes reordering those two lines a visible failure
+    # rather than a silent one, because the damage would otherwise be a real
+    # account somebody has to go and delete.
+    return failure if SocialAuth.player_strategy?(params[:provider])
+
     auth = request.env["omniauth.auth"]
     return failure unless auth
 
@@ -17,9 +24,17 @@ class OauthSessionsController < ApplicationController
     failure
   end
 
+  # OmniAuth routes every strategy's failure through one path, so this is the
+  # one place both populations land. A respondent who declined the consent
+  # screen must go back to THEIR door: /session/new is the creator's, and
+  # someone who got here from the end of a Verto has never seen it and cannot
+  # use it. `strategy` is set by OmniAuth itself from the middleware, not by
+  # the browser.
   def failure
-    redirect_to new_session_path,
-                alert: t("auth.social_failed", provider: SocialAuth.label_for(params[:provider] || params[:strategy]))
+    strategy = (params[:provider] || params[:strategy]).to_s
+    back = SocialAuth.player_strategy?(strategy) ? new_player_session_path : new_session_path
+
+    redirect_to back, alert: t("auth.social_failed", provider: SocialAuth.label_for(strategy))
   end
 
   private

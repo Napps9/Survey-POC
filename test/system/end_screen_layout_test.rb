@@ -462,4 +462,83 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
     assert_equal "Edited but not yet saved", shown,
                  "Preview is showing the copy the page booted with rather than the copy on screen"
   end
+  # ── The two ways in, on the card itself ───────────────────────────────────
+
+  # Capybara's Puma runs in this process, so SocialAuth — which reads ENV on
+  # every call — sees a change made here. The OmniAuth middleware does not (it
+  # is built from ENV at boot), which is fine: what is under test is the card,
+  # not the round trip. PlayerGoogleJoinTest drives the three hops.
+  def with_google
+    ENV["GOOGLE_CLIENT_ID"]     = "test-id"
+    ENV["GOOGLE_CLIENT_SECRET"] = "test-secret"
+    yield
+  ensure
+    ENV.delete("GOOGLE_CLIENT_ID")
+    ENV.delete("GOOGLE_CLIENT_SECRET")
+  end
+
+  test "the card offers Google above the address rows, and a sign-in door below" do
+    with_google do
+      with_viewport(390, 844) do
+        play_to_the_end
+        assert_selector ".join-card .join-google", wait: 5
+
+        geometry = page.evaluate_script(<<~JS)
+          (() => {
+            const card = document.querySelector('.join-card')
+            const top = s => { const el = card.querySelector(s); return el ? Math.round(el.getBoundingClientRect().top) : null }
+            const link = card.querySelector('.join-alt-link')
+            return { google: top('.join-google'), email: top('.join-input'),
+                     divider: top('.join-divider'), alt: top('.join-alt'),
+                     href: link && link.getAttribute('href'),
+                     target: link && link.getAttribute('target') }
+          })()
+        JS
+
+        assert_operator geometry["google"], :<, geometry["divider"]
+        assert_operator geometry["divider"], :<, geometry["email"],
+                        "Google is the shorter road and goes first; the divider separates the two"
+        assert_operator geometry["email"], :<, geometry["alt"],
+                        "the sign-in door is the way out for the few, not the path for the many"
+        assert_equal new_player_session_path, geometry["href"]
+        # A Verto is routinely framed by a third party, where following this in
+        # place would replace somebody else's page with a sign-in form.
+        assert_equal "_blank", geometry["target"]
+      end
+    end
+  end
+
+  test "without credentials the card keeps the sign-in door and drops the button" do
+    with_viewport(390, 844) do
+      play_to_the_end
+      assert_selector ".join-card", wait: 5
+
+      # No message arguments: Capybara's second positional is a selector
+      # option, not a failure message, and it raises on an unknown one.
+      assert_no_selector ".join-card .join-google" # a button that goes nowhere
+      assert_selector ".join-card .join-alt-link"  # does not depend on Google
+    end
+  end
+
+  # The editor's replica has to follow, or it stops being a preview of what a
+  # respondent meets — the property the rest of this file exists to hold.
+  test "the editor's account card shows the same two doors the player does" do
+    with_google do
+      sign_in_as @user
+      with_viewport(1440, 950, mobile: false) do
+        visit survey_path(@survey)
+        assert_selector ".gate-join-card", wait: 8
+
+        assert_selector ".gate-join-card .join-google"
+        assert_selector ".gate-join-card .join-alt"
+        # Inert: the creator is looking at the respondent's side of the card,
+        # and none of it is theirs to press.
+        assert_equal "none", page.evaluate_script(
+          "getComputedStyle(document.querySelector('.gate-join-card .join-google')).pointerEvents"
+        )
+        assert_no_selector ".gate-join-card .join-google button"
+        assert_no_selector ".gate-join-card .join-alt a"
+      end
+    end
+  end
 end

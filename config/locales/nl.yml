@@ -310,6 +310,10 @@ nl:
     join_embedded: "Deze Verto is ingebed in een andere site, dus we kunnen niets anders zien wat je hier hebt gespeeld. De link bewaart deze wel."
     modal_continue: "Duidelijk"
     modal_reopen: "Opnieuw lezen"
+    join_password_placeholder: "Kies een wachtwoord"
+    join_password_hint: "Minstens %{count} tekens. Daarmee log je op een ander apparaat weer in."
+    join_have_account: "Heb je al een account?"
+    join_sign_in: "Inloggen"
   defaults:
     range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ nl:
       leaderboard_empty: "Wees de eerste op het bord!"
       already_played: "Je hebt deze Verto al gespeeld — zo staat het bord er nu voor."
       already_played_plain: "Je hebt deze Verto al ingevuld — bedankt."
+      join_google_done_title: "We brengen je naar Google…"
+      join_use_google: "Dat adres logt in met Google — gebruik de Google-knop."
     editor:
       delete_card_confirm: Deze kaart verwijderen?
       save_to_library: "Ook opslaan in mijn merkbibliotheek"
@@ -2157,3 +2163,10 @@ nl:
     rail_failed: "Vertalen mislukt"
     rail_retry: "Opnieuw proberen"
     rail_generate_one: "Deze taal vertalen"
+  player_join:
+    title: "Nog één tik"
+    body: "Rond af met Google en je antwoorden blijven van jou."
+    body_verto: "Rond af met Google en %{verto} blijft van jou."
+    fine: "We vragen Google alleen om je naam en e-mailadres, meer niet. We plaatsen nooit iets, en je kunt het account met één tik verwijderen."
+    expired_title: "Dat duurde net iets te lang"
+    expired_body: "Deze link is verlopen of al gebruikt — hij geldt maar een paar minuten. Speel de Verto opnieuw om hem te bewaren."

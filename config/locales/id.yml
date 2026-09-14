@@ -310,6 +310,10 @@ id:
     join_embedded: "Verto ini disematkan di situs lain, jadi kami tidak bisa melihat apa pun yang kamu mainkan di sini. Tautannya tetap akan menyimpan yang ini."
     modal_continue: "Mengerti"
     modal_reopen: "Baca lagi"
+    join_password_placeholder: "Pilih kata sandi"
+    join_password_hint: "Minimal %{count} karakter. Kamu akan memakainya untuk masuk lagi di perangkat lain."
+    join_have_account: "Sudah punya akun?"
+    join_sign_in: "Masuk"
   defaults:
     range: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ id:
       leaderboard_empty: "Jadilah yang pertama di papan!"
       already_played: "Kamu sudah memainkan Verto ini — beginilah papan saat ini."
       already_played_plain: "Anda sudah mengisi Verto ini — terima kasih."
+      join_google_done_title: "Mengarahkan kamu ke Google…"
+      join_use_google: "Alamat itu masuk dengan Google — pakai tombol Google saja."
     editor:
       delete_card_confirm: Hapus kartu ini?
       save_to_library: "Simpan juga ke pustaka merek saya"
@@ -2156,3 +2162,10 @@ id:
     rail_failed: "Gagal menerjemahkan"
     rail_retry: "Coba lagi"
     rail_generate_one: "Terjemahkan yang ini"
+  player_join:
+    title: "Tinggal satu ketukan"
+    body: "Selesaikan dengan Google dan jawabanmu tetap jadi milikmu."
+    body_verto: "Selesaikan dengan Google dan %{verto} tetap jadi milikmu."
+    fine: "Kami hanya meminta nama dan alamat email kamu dari Google, tidak lebih. Kami tidak pernah memposting apa pun, dan kamu bisa menghapus akun dengan satu ketukan."
+    expired_title: "Itu makan waktu sedikit terlalu lama"
+    expired_body: "Tautan ini sudah kedaluwarsa atau sudah dipakai — hanya berlaku beberapa menit. Mainkan Verto lagi untuk menyimpannya."

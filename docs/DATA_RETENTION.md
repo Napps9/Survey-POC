@@ -209,12 +209,18 @@ What is stored, and where:
 | `player_claims` | `(player_id, survey_id, response_id, claimed_at, source)` — the one cross-Verto join in the app |
 | `player_email_preferences` | `(player_id, organisation_id, unsubscribed_at)` — an opt-out from ONE organisation's mail |
 | `player_notifications` | One row per intended send: which Verto, which kind, an unsubscribe token, and whether it went |
+| `player_identities` | A linked Google account: `(provider, uid)` plus the name and address Google last reported |
+| `player_oauth_handoffs` | A sign-up in flight: its **digest** only, its expiry, and the claims it will make. Holds no address — at that point nobody knows one |
 
 Five properties this design is built on, all of them checkable in the code:
 
-1. **Nothing is stored against an address until someone proves they can read
-   it.** `PlayerController#join` mails a link and writes no claim. The claims
-   are made by `PlayerSignInsController#create`, when the link is followed.
+1. **Nothing is stored against an address until someone proves they can reach
+   it.** `PlayerController#join` writes no claim, and neither does
+   `#join_google` — each parks the claims on a row and hands back a link. The
+   claims are made on the way back in, by `PlayerSignInsController#create` or
+   `PlayerOauthSessionsController#create`, through one definition
+   (`PlayerClaimPayload.apply`). A sign-up abandoned at Google's consent
+   screen leaves a digest and an expiry behind, and no address anywhere.
 2. **The response is not modified.** No `responses.player_id`, and no digest —
    `player_claims` materialises `response_id`. A claim is invisible in the
    creator's results, in the CSV export's "Device group" column, and on the
@@ -223,10 +229,22 @@ Five properties this design is built on, all of them checkable in the code:
    `Survey#contact_form_excludes_neurodiversity` covers `join_prompt_enabled`
    exactly as it covers `contact_form_enabled`: a Verto may ask the
    neurodiversity question or ask for an address, never both.
-4. **There is no password and no sign-in form.** The only way into an account
-   is a single-use link, valid for 20 minutes, stored as a digest. `GET` on the
-   link consumes nothing (inbox scanners follow GETs); the `POST` behind a
-   button does the work.
+4. **Every credential is single-use, a digest, or somebody else's.** This
+   point used to read "there is no password and no sign-in form", and it has
+   been wrong since 2026-09-10, when the card started taking a password on the
+   owner's instruction; Google sign-in is the third way in. What is still true
+   of all three is the discipline:
+   - the emailed link is single-use, valid for 20 minutes, and stored only as
+     a digest. `GET` on it consumes nothing (inbox scanners follow GETs); the
+     `POST` behind a button does the work;
+   - the password is a bcrypt digest with the same 12-character floor as a
+     creator's, and there is no respondent password reset — the emailed link
+     is the recovery route;
+   - Google sign-in stores no credential at all, only `(provider, uid)`. An
+     address is accepted from it **only when Google says it has verified it**,
+     which is what stops a new identity walking into an existing account by
+     claiming its address — and is why an account made this way is verified
+     without any mail having to arrive.
 5. **`/you` is `no-store` and `noindex`,** and its cookie is separate from the
    creator's in every respect — different name, different table, different
    `Current` attribute.

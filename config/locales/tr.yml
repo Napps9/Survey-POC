@@ -310,6 +310,10 @@ tr:
     join_embedded: "Bu Verto başka bir siteye gömülü, bu yüzden burada oynadığın başka bir şeyi göremiyoruz. Bağlantı yine de bunu saklayacak."
     modal_continue: "Anladım"
     modal_reopen: "Tekrar oku"
+    join_password_placeholder: "Bir parola seç"
+    join_password_hint: "En az %{count} karakter. Başka bir cihazda yeniden giriş yaparken bunu kullanacaksın."
+    join_have_account: "Zaten hesabın var mı?"
+    join_sign_in: "Giriş yap"
   defaults:
     range: ["Kesinlikle katılmıyorum", "Katılmıyorum", "Kararsızım", "Katılıyorum", "Kesinlikle katılıyorum"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ tr:
       leaderboard_empty: "Tablodaki ilk kişi ol!"
       already_played: "Bu Verto'yu zaten oynadın — tablonun şu anki durumu."
       already_played_plain: "Bu Verto'yu zaten tamamladınız — teşekkürler."
+      join_google_done_title: "Seni Google'a götürüyoruz…"
+      join_use_google: "Bu adres Google ile giriş yapıyor — bunun yerine Google düğmesini kullan."
     editor:
       delete_card_confirm: Bu kart silinsin mi?
       save_to_library: "Marka kitaplığıma da kaydet"
@@ -2157,3 +2163,10 @@ tr:
     rail_failed: "Çevrilemedi"
     rail_retry: "Tekrar dene"
     rail_generate_one: "Bunu çevir"
+  player_join:
+    title: "Son bir dokunuş"
+    body: "Google ile tamamla, cevapların sende kalsın."
+    body_verto: "Google ile tamamla, %{verto} sende kalsın."
+    fine: "Google'dan yalnızca adını ve e-posta adresini istiyoruz, başka bir şey değil. Asla bir şey paylaşmıyoruz ve hesabı tek dokunuşla silebilirsin."
+    expired_title: "Bu biraz fazla uzun sürdü"
+    expired_body: "Bu bağlantının süresi doldu ya da zaten kullanıldı — yalnızca birkaç dakika geçerli. Saklamak için Verto'yu tekrar oyna."

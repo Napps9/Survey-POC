@@ -312,6 +312,10 @@ sn:
     join_embedded: "Verto iri rakaiswa mune imwe saiti, saka hatikwanisi kuona chimwe chinhu chawakatamba pano. Link richange richiri kuchengeta iri."
     modal_continue: "Ndanzwisisa"
     modal_reopen: "Verenga zvakare"
+    join_password_placeholder: "Sarudza password"
+    join_password_hint: "Zvindori zvinosvika %{count} pakuderera. Uchaishandisa kupinda zvakare pane imwe midziyo."
+    join_have_account: "Une akaundi kare here?"
+    join_sign_in: "Pinda"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Positional; keep every array's length exact.
   defaults:
@@ -422,6 +426,8 @@ sn:
       leaderboard_empty: "Iva wekutanga pabhodhi!"
       already_played: "Watotamba Verto iyi — heino kuti bhodhi rakamira sei."
       already_played_plain: "Wakatopedza Verto iyi kare — tinotenda."
+      join_google_done_title: "Tiri kukuendesa kuGoogle…"
+      join_use_google: "Kero iyoyo inopinda neGoogle — shandisa bhatani reGoogle pachinzvimbo chezvo."
     editor:
       delete_card_confirm: "Bvisa kadhi iri?"
       save_to_library: "Chengetedzawo mulaibhurari yangu yechiratidzo"
@@ -2167,3 +2173,10 @@ sn:
     rail_failed: "Kushandura kwakundikana"
     rail_retry: "Edza zvakare"
     rail_generate_one: "Shandura mutauro uyu"
+  player_join:
+    title: "Kudzvanya kumwe chete kwasara"
+    body: "Pedzisa neGoogle uye mhinduro dzako dzinoramba dziri dzako."
+    body_verto: "Pedzisa neGoogle uye %{verto} inoramba iri yako."
+    fine: "KuGoogle tinokumbira zita rako nekero yako yeemail chete, hapana chimwe. Hatimbotumire chinhu, uye unogona kudzima akaundi nekudzvanya kamwe chete."
+    expired_title: "Zvatora nguva yakareba zvishoma"
+    expired_body: "Chinongedzo ichi chapera kana kuti chatoshandiswa — chinogara maminitsi mashoma chete. Tamba Verto zvakare kuti uichengete."

@@ -319,6 +319,10 @@ xh:
     join_embedded: "Le Verto ifakwe kwenye indawo yewebhu, ngoko asinako ukubona enye into oyidlalileyo apha. Ikhonkco lisaya kuligcina eli."
     modal_continue: "Ndiyaqonda"
     modal_reopen: "Funda kwakhona"
+    join_password_placeholder: "Khetha iphaswedi"
+    join_password_hint: "Ubuncinane iimpawu ezingu-%{count}. Uza kuyisebenzisa ukungena kwakhona kwesinye isixhobo."
+    join_have_account: "Sele unayo i-akhawunti?"
+    join_sign_in: "Ngena"
   # Umxholo wesikhundla iKHADI entsha yohlobo ngalunye eqala ngawo — iinketho
   # zempendulo, iileyibhile zomlinganiselo, iingxelo. Ngokungafaniyo
   # nolwakhiwo lwe-UI (olulandela ulwimi lomboni), ezi zisonjululwa kulwimi
@@ -434,6 +438,8 @@ xh:
       leaderboard_empty: "Yiba ngowokuqala kuluhlu!"
       already_played: "Sowuyidlele le Verto — nantsi indlela uluhlu lujongeka ngayo."
       already_played_plain: "Sele uyigqibile le Verto — enkosi."
+      join_google_done_title: "Sikusa kuGoogle…"
+      join_use_google: "Loo dilesi ingena ngeGoogle — sebenzisa iqhosha likaGoogle endaweni yoko."
     editor:
       delete_card_confirm: "Cima eli khadi?"
       save_to_library: "Kwakhona gcina kwithala lam lophawu"
@@ -2196,3 +2202,10 @@ xh:
     rail_failed: "Ayiguqulelwanga"
     rail_retry: "Zama kwakhona"
     rail_generate_one: "Guqulela olu"
+  player_join:
+    title: "Kusele ukucofa kanye"
+    body: "Gqibezela ngeGoogle kwaye iimpendulo zakho zihlale zizezakho."
+    body_verto: "Gqibezela ngeGoogle kwaye %{verto} ihlale ingeyakho."
+    fine: "KuGoogle sicela igama lakho nedilesi ye-imeyile kuphela, akukho nto yimbi. Asaze sithumele nto, kwaye unokuyicima i-akhawunti ngokucofa kanye."
+    expired_title: "Oko kuthathe ixesha elide kancinci"
+    expired_body: "Eli khonkco liphelelwe lixesha okanye sele lisetyenzisiwe — lihlala imizuzu embalwa kuphela. Dlala iVerto kwakhona ukuze uyigcine."

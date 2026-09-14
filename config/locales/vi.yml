@@ -310,6 +310,10 @@ vi:
     join_embedded: "Verto này được nhúng trong một trang khác, nên chúng tôi không thấy được gì khác bạn đã chơi ở đây. Liên kết vẫn sẽ giữ lại cái này."
     modal_continue: "Đã hiểu"
     modal_reopen: "Đọc lại"
+    join_password_placeholder: "Chọn mật khẩu"
+    join_password_hint: "Ít nhất %{count} ký tự. Bạn sẽ dùng nó để đăng nhập lại trên thiết bị khác."
+    join_have_account: "Bạn đã có tài khoản?"
+    join_sign_in: "Đăng nhập"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -418,6 +422,8 @@ vi:
       leaderboard_empty: "Hãy là người đầu tiên trên bảng!"
       already_played: "Bạn đã chơi Verto này rồi — đây là bảng xếp hạng hiện tại."
       already_played_plain: "Bạn đã hoàn thành Verto này rồi — cảm ơn bạn."
+      join_google_done_title: "Đang đưa bạn đến Google…"
+      join_use_google: "Địa chỉ đó đăng nhập bằng Google — hãy dùng nút Google."
     editor:
       delete_card_confirm: Xóa thẻ này?
       save_to_library: "Cũng lưu vào thư viện thương hiệu của tôi"
@@ -2156,3 +2162,10 @@ vi:
     rail_failed: "Không dịch được"
     rail_retry: "Thử lại"
     rail_generate_one: "Dịch ngôn ngữ này"
+  player_join:
+    title: "Chỉ một chạm nữa thôi"
+    body: "Hoàn tất bằng Google và câu trả lời của bạn vẫn là của bạn."
+    body_verto: "Hoàn tất bằng Google và %{verto} vẫn là của bạn."
+    fine: "Chúng tôi chỉ hỏi Google tên và địa chỉ email của bạn, không gì khác. Chúng tôi không bao giờ đăng bất cứ thứ gì, và bạn có thể xoá tài khoản chỉ với một chạm."
+    expired_title: "Việc đó mất hơi lâu"
+    expired_body: "Liên kết này đã hết hạn hoặc đã được dùng — nó chỉ tồn tại vài phút. Chơi lại Verto để giữ nó."
