@@ -222,6 +222,40 @@ class MobileBackgroundTest < ApplicationSystemTestCase
     assert_selector "[data-media-picker-target='searchInput']", visible: true
   end
 
+  # "You've added a tint over the background that needs to be removed." A
+  # creator picking a brand texture is picking that texture — a scrim over it
+  # hands them a duller version of the thing they chose. The words keep their
+  # edge from a shadow on the ink instead, which darkens only the pixels under
+  # each glyph.
+  test "nothing is painted over the background" do
+    open_editor(build(live: false), device: "mobile")
+    layers = page.evaluate_script(<<~JS)
+      (() => {
+        const sl = document.querySelector("[data-card-cid='t1'] .split-left")
+        const after = getComputedStyle(sl, "::after")
+        const before = getComputedStyle(sl, "::before")
+        const title = getComputedStyle(document.querySelector("[data-card-cid='t1'] .q-title"))
+        return {
+          after: after.content === "none" ? null : after.backgroundColor,
+          before: before.content === "none" ? null : before.backgroundColor,
+          panel: getComputedStyle(document.querySelector("[data-card-cid='t1'] .split-right")).backgroundColor,
+          shadow: title.textShadow
+        }
+      })()
+    JS
+
+    [ [ "after", layers["after"] ], [ "before", layers["before"] ] ].each do |name, colour|
+      next if colour.nil? || colour == "rgba(0, 0, 0, 0)"
+
+      flunk "a ::#{name} layer paints #{colour} over the creator's background"
+    end
+    assert_includes [ "rgba(0, 0, 0, 0)", "transparent" ], layers["panel"],
+                    "the answer panel is tinting the background"
+    assert_not_equal "none", layers["shadow"],
+                     "the tint went and nothing replaced it — the question has no edge at all " \
+                     "against a busy texture"
+  end
+
   # "The answers need to be solid not see through." A row a respondent chooses
   # between is not a place to show a photograph off: the background is behind
   # the answer, never inside it. The other two types satisfy this by

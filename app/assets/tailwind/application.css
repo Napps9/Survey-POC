@@ -8727,22 +8727,13 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left > :is(.split-left-img, .split-left-video, .split-left-overlay, .split-left-credit) {
     display: none;
   }
-  /* The words go ON the background: no panel, no card, nothing between the
-     question and the picture but the scrim that makes it readable.
-
-     --brand-scrim is not a taste and not a new number: BrandPalette derives it
-     from the Verto's OWN colour, darkening it only as far as white needs to
-     clear 4.5:1 once composited over the brightest picture a card can carry (a
-     white one). The end screen paints this exact value for this exact reason
-     and end_screen_contrast_test measures the result, so the picture is as
-     visible here as legibility allows and no further. The literal is the
-     fallback for an unbranded Verto, where no property is emitted at all. */
-  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--brand-scrim, rgba(28,32,52,0.72));
-  }
+  /* NOTHING GOES OVER THE BACKGROUND. The words are drawn straight onto it —
+     no panel, no card, and no scrim: a creator picking a brand texture is
+     picking that texture, and a tint over it hands them a duller version of
+     the thing they chose ("you've added a tint over the background that needs
+     to be removed"). It was there to guarantee white ink 4.5:1 over the
+     brightest picture a card could carry; the guarantee now comes from the ink
+     itself (see the shadow below), which costs the picture nothing. */
   .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-right {
     position: relative;
     z-index: 1;
@@ -8765,6 +8756,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
     :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count, .nps-anchor-text,
       .slider-label-text:not(.is-active)) {
     color: rgba(255,255,255,0.8);
+  }
+  /* What the scrim used to do, done by the ink instead. A shadow darkens only
+     the pixels immediately under each glyph, so the words keep an edge against
+     a busy or mid-tone texture while the picture stays the colour the creator
+     picked — which a full-surface tint cannot do, because it dims the whole
+     background to fix legibility in the few places there are words. See the
+     frame block's copy for what this does not cover. */
+  .preview-overlay .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
+    :is(.q-title, .q-eyebrow, .q-subtitle, .rotate-reset-btn, .tap-nav-count,
+        .nps-anchor-text, .slider-label-text) {
+    text-shadow: 0 1px 3px rgba(0,0,0,0.55);
   }
   /* THE ANSWER IS SOLID. A prioritise card's rows are 3% BLACK on a white card
      — a tint, which is all they need there and nothing at all on a picture:
@@ -10984,12 +10986,6 @@ body.generating-overlay-active .bottom-bar { display: none; }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left > :is(.split-left-img, .split-left-video, .split-left-overlay, .split-left-credit) {
   display: none;
 }
-.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-left::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--brand-scrim, rgba(28,32,52,0.72));
-}
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg) .split-right {
   position: relative;
   z-index: 1;
@@ -11003,6 +10999,18 @@ body.generating-overlay-active .bottom-bar { display: none; }
   :is(.q-subtitle, .rotate-reset-btn, .tap-nav-count, .nps-anchor-text,
       .slider-label-text:not(.is-active)) {
   color: rgba(255,255,255,0.8);
+}
+/* The ink carries its own edge rather than the background carrying a tint —
+   see the player's copy. One thing this deliberately does NOT do is guarantee
+   contrast on a LIGHT background: white on a pale texture is white on a pale
+   texture whatever shadow it wears, and these brand libraries hold pale tiles
+   as well as saturated ones. The tint that did guarantee it was removed on
+   purpose; if a creator picks a near-white background the answer is to give
+   that card dark ink, not to dim every picture to suit the palest one. */
+.device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
+  :is(.q-title, .q-eyebrow, .q-subtitle, .rotate-reset-btn, .tap-nav-count,
+      .nps-anchor-text, .slider-label-text) {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55);
 }
 .device-mobile .split-card:has(.rotate-wrap, .nps-slider, .prioritise-list):has(.has-media-bg)
   :is(.choice-list-item, .pick-item) {
