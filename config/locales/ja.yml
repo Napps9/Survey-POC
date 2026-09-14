@@ -320,6 +320,7 @@ ja:
     join_password_hint: "%{count} 文字以上。別の端末でサインインし直すときに使います。"
     join_have_account: "すでにアカウントをお持ちですか？"
     join_sign_in: "サインイン"
+    org_logo: "%{org} のロゴ"
   defaults:
     range: ["全くそう思わない", "そう思わない", "どちらとも言えない", "そう思う", "強くそう思う"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2175,6 +2176,8 @@ ja:
       options: "選択肢"
       responses: "目盛りのラベル"
       pages: "ストーリーのページ"
+      nps_low_label: "スケールの説明（下端）"
+      nps_high_label: "スケールの説明（上端）"
     field_item: "%{field}%{number}"
     untranslated_note: "まだ翻訳されていません — ここに表示しているのは原文で、この言語で読む回答者にもそのまま表示されます。"
     approve: "承認"

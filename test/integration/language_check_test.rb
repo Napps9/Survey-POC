@@ -37,6 +37,38 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
 
   # ── The screen ─────────────────────────────────────────────────────────────
 
+  # Every field LanguageCheckLines reviews needs a label, because _line renders
+  # it with a bare t() — no :default — so a field added to SCALAR_FIELDS without
+  # one shows the reviewer `translation_missing` where a heading should be. The
+  # NPS scale captions were the two most recent, so this pins the rule rather
+  # than just them: the labels come from the same list the screen renders.
+  test "every reviewable field has a label on the screen" do
+    missing = LanguageCheckLines::FIELDS.reject do |field|
+      I18n.exists?("language_check.field.#{field}")
+    end
+    assert_empty missing,
+                 "#{missing.inspect} would render as translation_missing — the screen labels " \
+                 "each field with a bare t(\"language_check.field.<field>\")"
+  end
+
+  test "an NPS card's scale captions are shown for review, under their own labels" do
+    @survey.update!(cards: @survey.cards + [
+      { "type" => "nps", "cid" => "c_nps", "text" => "How much say?",
+        "nps_low_label" => "I have no say at all", "nps_high_label" => "I am a decision maker",
+        "i18n" => { "es" => { "text" => "¿Cuánta voz?", "nps_low_label" => "No tengo ninguna voz" } } }
+    ])
+    sign_in
+    get survey_language_check_path(@survey)
+    assert_response :success
+
+    assert_match I18n.t("language_check.field.nps_low_label"), response.body
+    assert_match I18n.t("language_check.field.nps_high_label"), response.body
+    assert_match "I have no say at all", response.body
+    assert_match "No tengo ninguna voz", response.body, "the Spanish caption is what a Spanish " \
+                 "respondent reads, so it is what a Spanish reviewer has to be shown"
+    assert_no_match "translation_missing", response.body
+  end
+
   test "the screen shows every language's wording for a card, primary first" do
     sign_in
     get survey_language_check_path(@survey)

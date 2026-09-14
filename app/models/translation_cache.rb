@@ -40,6 +40,12 @@ class TranslationCache < ApplicationRecord
     # every other language with nothing to show why.
     canonical["modal_title"] = card["modal_title"].to_s if card["modal_title"].present?
     canonical["modal_body"]  = card["modal_body"].to_s  if card["modal_body"].present?
+    # The NPS scale's end captions, for the same reason. They are the words
+    # that say what 0 and 10 MEAN, so a card that gains them and misses this
+    # hash would keep serving the entry that predates them — and the captions
+    # would stay in the source language in every other language, which is
+    # exactly the field where that is least survivable.
+    Survey::NPS_ANCHOR_KEYS.each { |k| canonical[k] = card[k].to_s if card[k].present? }
 
     Digest::SHA256.hexdigest(canonical.to_json)
   end

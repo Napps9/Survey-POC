@@ -320,6 +320,7 @@ tr:
     join_password_hint: "En az %{count} karakter. Başka bir cihazda yeniden giriş yaparken bunu kullanacaksın."
     join_have_account: "Zaten hesabın var mı?"
     join_sign_in: "Giriş yap"
+    org_logo: "%{org} logosu"
   defaults:
     range: ["Kesinlikle katılmıyorum", "Katılmıyorum", "Kararsızım", "Katılıyorum", "Kesinlikle katılıyorum"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2177,6 +2178,8 @@ tr:
       options: "Yanıtlar"
       responses: "Ölçek etiketleri"
       pages: "Hikaye sayfaları"
+      nps_low_label: "Ölçek açıklaması, alt uç"
+      nps_high_label: "Ölçek açıklaması, üst uç"
     field_item: "%{field} %{number}"
     untranslated_note: "Henüz çevrilmedi — burada orijinal metin görünüyor; bu dili okuyan bir yanıtlayıcı da bunu görür."
     approve: "Onayla"

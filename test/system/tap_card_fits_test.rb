@@ -160,6 +160,14 @@ class TapCardFitsTest < ApplicationSystemTestCase
     body[/min-height:\s*(\d+)px/, 1].to_i
   end
 
+  # The base rule's declared width, read rather than restated for the same
+  # reason the cap and floor are: this was a literal 320, and it went stale the
+  # day the stack was narrowed to 300 — leaving the narrow-phone guard below
+  # comparing against a width the CSS no longer sets.
+  def stack_width
+    File.read(CSS)[/^\.rotate-card-stack \{([^}]*)\}/m, 1][/width:\s*(\d+)px/, 1].to_i
+  end
+
   test "the card grows into a tall phone rather than sitting at its floor" do
     cap, floor = mobile_stack_cap, mobile_stack_floor
     assert_operator cap, :>, floor, "the stack's cap and floor have crossed over"
@@ -241,9 +249,9 @@ class TapCardFitsTest < ApplicationSystemTestCase
     open_player(deck(5), 280, 653)
     r = room_report
 
-    assert_operator r["stackW"], :<, 320,
-                    "the Fold gave the stack its full width, so this test is no longer " \
-                    "exercising the narrow case it exists for"
+    assert_operator r["stackW"], :<, stack_width,
+                    "the Fold gave the stack its full #{stack_width}px width, so this test is no " \
+                    "longer exercising the narrow case it exists for"
     assert_operator r["ratio"], :<, 1.6,
                     "the card is #{r['stackW']}x#{r['stackH']} — a ratio of #{r['ratio']}. " \
                     "A height cap in pixels gets taller as the phone gets narrower, which is " \

@@ -322,6 +322,7 @@ sn:
     join_password_hint: "Zvindori zvinosvika %{count} pakuderera. Uchaishandisa kupinda zvakare pane imwe midziyo."
     join_have_account: "Une akaundi kare here?"
     join_sign_in: "Pinda"
+    org_logo: "Logo ye%{org}"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Positional; keep every array's length exact.
   defaults:
@@ -2185,6 +2186,8 @@ sn:
       options: "Mhinduro"
       responses: "Mazita ezvipimo"
       pages: "Mapeji enyaya"
+      nps_low_label: "Tsanangudzo yechiyero, kumucheto wakaderera"
+      nps_high_label: "Tsanangudzo yechiyero, kumucheto wakakwirira"
     field_item: "%{field} %{number}"
     untranslated_note: "Haisati yashandurwa — aya mashoko epakutanga, ndiwo aizoonekwa nemupinduri ari kuverenga mumutauro uyu."
     approve: "Bvumidza"

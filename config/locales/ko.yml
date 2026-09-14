@@ -320,6 +320,7 @@ ko:
     join_password_hint: "%{count}자 이상. 다른 기기에서 다시 로그인할 때 사용합니다."
     join_have_account: "이미 계정이 있으신가요?"
     join_sign_in: "로그인"
+    org_logo: "%{org} 로고"
   defaults:
     range: ["전혀 동의하지 않는다", "동의하지 않는다", "보통이다", "동의한다", "매우 동의한다"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2175,6 +2176,8 @@ ko:
       options: "답변 옵션"
       responses: "척도 라벨"
       pages: "스토리 페이지"
+      nps_low_label: "척도 설명, 최저점"
+      nps_high_label: "척도 설명, 최고점"
     field_item: "%{field} %{number}"
     untranslated_note: "아직 번역되지 않았습니다 — 여기에는 원문이 그대로 표시되며, 이 언어로 보는 응답자에게도 이 문구가 보입니다."
     approve: "승인"

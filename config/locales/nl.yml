@@ -320,6 +320,7 @@ nl:
     join_password_hint: "Minstens %{count} tekens. Daarmee log je op een ander apparaat weer in."
     join_have_account: "Heb je al een account?"
     join_sign_in: "Inloggen"
+    org_logo: "Logo van %{org}"
   defaults:
     range: ["Helemaal oneens", "Oneens", "Neutraal", "Eens", "Helemaal eens"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2177,6 +2178,8 @@ nl:
       options: "Antwoorden"
       responses: "Schaallabels"
       pages: "Verhaalpagina's"
+      nps_low_label: "Schaallabel, onderkant"
+      nps_high_label: "Schaallabel, bovenkant"
     field_item: "%{field} %{number}"
     untranslated_note: "Nog niet vertaald — hier staat de oorspronkelijke formulering, en dat is ook wat een respondent in deze taal te zien krijgt."
     approve: "Goedkeuren"

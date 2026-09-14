@@ -320,6 +320,7 @@ pl:
     join_password_hint: "Co najmniej %{count} znaków. Użyjesz go, żeby zalogować się na innym urządzeniu."
     join_have_account: "Masz już konto?"
     join_sign_in: "Zaloguj się"
+    org_logo: "Logo %{org}"
   defaults:
     range: ["Zdecydowanie się nie zgadzam", "Nie zgadzam się", "Neutralnie", "Zgadzam się", "Zdecydowanie się zgadzam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2187,6 +2188,8 @@ pl:
       options: "Odpowiedzi"
       responses: "Etykiety skali"
       pages: "Strony historii"
+      nps_low_label: "Podpis skali, dolny koniec"
+      nps_high_label: "Podpis skali, górny koniec"
     field_item: "%{field} %{number}"
     untranslated_note: "Jeszcze nieprzetłumaczone — widzisz oryginalną treść, czyli to, co zobaczyłby respondent czytający w tym języku."
     approve: "Zatwierdź"

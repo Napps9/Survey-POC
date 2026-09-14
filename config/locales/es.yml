@@ -320,6 +320,7 @@ es:
     join_password_hint: "Al menos %{count} caracteres. La usarás para volver a entrar desde otro dispositivo."
     join_have_account: "¿Ya tienes una cuenta?"
     join_sign_in: "Iniciar sesión"
+    org_logo: "Logotipo de %{org}"
   defaults:
     range: ["Totalmente en desacuerdo", "En desacuerdo", "Neutral", "De acuerdo", "Totalmente de acuerdo"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2177,6 +2178,8 @@ es:
       options: "Respuestas"
       responses: "Etiquetas de la escala"
       pages: "Páginas de la historia"
+      nps_low_label: "Leyenda de la escala, extremo bajo"
+      nps_high_label: "Leyenda de la escala, extremo alto"
     field_item: "%{field} %{number}"
     untranslated_note: "Aún sin traducir — aquí ves la redacción original, que es lo que vería quien responda en este idioma."
     approve: "Aprobar"

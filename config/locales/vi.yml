@@ -320,6 +320,7 @@ vi:
     join_password_hint: "Ít nhất %{count} ký tự. Bạn sẽ dùng nó để đăng nhập lại trên thiết bị khác."
     join_have_account: "Bạn đã có tài khoản?"
     join_sign_in: "Đăng nhập"
+    org_logo: "Logo của %{org}"
   defaults:
     range: ["Hoàn toàn không đồng ý", "Không đồng ý", "Trung lập", "Đồng ý", "Hoàn toàn đồng ý"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2176,6 +2177,8 @@ vi:
       options: "Lựa chọn"
       responses: "Nhãn thang đo"
       pages: "Trang câu chuyện"
+      nps_low_label: "Chú thích thang đo, đầu thấp"
+      nps_high_label: "Chú thích thang đo, đầu cao"
     field_item: "%{field} %{number}"
     untranslated_note: "Chưa dịch — đây là câu chữ gốc, cũng là những gì người trả lời đọc ngôn ngữ này sẽ thấy."
     approve: "Duyệt"

@@ -392,6 +392,12 @@ class Survey < ApplicationRecord
       # explanation are genuinely optional, so clearing them is a real choice.
       value = submitted[field].to_s.strip
       next if field == "text" && value.blank?
+      # The two scale captions carry the same rules the cards sanitiser applies
+      # (NpsHelper::NPS_ANCHOR_MAX, and only on an NPS card) — this path writes
+      # straight onto the deck, and a locked Verto is never re-sanitised, so
+      # there is nowhere else for them to be enforced.
+      next if Survey::NPS_ANCHOR_KEYS.include?(field) && out["type"].to_s != "nps"
+      value = value.first(NpsHelper::NPS_ANCHOR_MAX) if Survey::NPS_ANCHOR_KEYS.include?(field)
       next if out[field].to_s == value
       out[field] = value
       out.delete("#{field}_html")
@@ -445,6 +451,8 @@ class Survey < ApplicationRecord
     LanguageCheckLines::SCALAR_FIELDS.each do |field|
       next unless submitted.key?(field)
       value = submitted[field].to_s.strip
+      next if Survey::NPS_ANCHOR_KEYS.include?(field) && card["type"].to_s != "nps"
+      value = value.first(NpsHelper::NPS_ANCHOR_MAX) if Survey::NPS_ANCHOR_KEYS.include?(field)
       # Blank removes the override, which is not the same as storing "". The
       # player falls back to the primary language for a missing field, so
       # clearing a translation means "show the original here" — a real and

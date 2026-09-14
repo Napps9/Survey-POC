@@ -320,6 +320,7 @@ fr:
     join_password_hint: "Au moins %{count} caractères. Il vous servira à vous reconnecter depuis un autre appareil."
     join_have_account: "Vous avez déjà un compte ?"
     join_sign_in: "Se connecter"
+    org_logo: "Logo de %{org}"
   defaults:
     range: ["Pas du tout d'accord", "Pas d'accord", "Neutre", "D'accord", "Tout à fait d'accord"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2177,6 +2178,8 @@ fr:
       options: "Réponses"
       responses: "Libellés de l'échelle"
       pages: "Pages de l'histoire"
+      nps_low_label: "Légende de l'échelle, extrémité basse"
+      nps_high_label: "Légende de l'échelle, extrémité haute"
     field_item: "%{field} %{number}"
     untranslated_note: "Pas encore traduit — voici la formulation originale, c'est ce que verrait un répondant lisant cette langue."
     approve: "Approuver"

@@ -568,4 +568,69 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
       end
     end
   end
+
+  # ── The message box, which is the field ────────────────────────────────
+  #
+  # The end screen's message box starts EMPTY now, behind a placeholder: it
+  # used to arrive holding the "from <account>" byline, so a creator who only
+  # opened the card had the byline saved as their message. Which made the
+  # collapse rule added for the PLAYER — an end screen with no message must not
+  # hold a gap open where one would be — a rule that also hid the editor's
+  # field. Nowhere to type the message at all, on the one surface whose whole
+  # job is typing it. .q-subtitle carries the same guard for the same reason.
+  test "the editor's empty message box is still there to be typed into" do
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    dismiss_live_warning
+
+    box = find("[data-gate-cards-target='tyBody']", visible: :all)
+    page.execute_script("arguments[0].textContent = ''; arguments[0].scrollIntoView({ block: 'center' })", box)
+
+    assert_equal "block", page.evaluate_script(<<~JS)
+      getComputedStyle(document.querySelector("[data-gate-cards-target='tyBody']")).display
+    JS
+
+    # And the placeholder is what fills it, rather than a value.
+    assert_equal I18n.t("editor.ty_body_placeholder"), page.evaluate_script(<<~JS)
+      getComputedStyle(document.querySelector("[data-gate-cards-target='tyBody']"), "::before")
+        .content.replace(/^"|"$/g, "")
+    JS
+  end
+
+  # The player still collapses it, which is the half the rule was written for.
+  test "a respondent with no message to read gets no gap where one would be" do
+    @survey.update!(thankyou_body: "")
+    play_to_the_end
+
+    assert_equal "none", page.evaluate_script(<<~JS)
+      getComputedStyle(document.querySelector(".preview-thankyou.active .preview-thankyou-sub")).display
+    JS
+    assert_selector ".preview-thankyou.active .preview-thankyou-from",
+                    text: "from Endscreen Co"
+  end
+
+  # The Preview overlay reads the editor's boxes rather than the saved deck, and
+  # its copy() helper fell back to the box's data-default-text when the creator
+  # had written nothing. That attribute is the PLACEHOLDER now, so the fallback
+  # put "Add a short message (optional)" on a respondent-facing preview.
+  test "the Preview overlay shows no message rather than the editor's placeholder" do
+    @survey.update!(thankyou_body: "")
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+    dismiss_live_warning
+
+    page.execute_script("document.querySelector(\"[data-action*='preview-verto#open']\").click()")
+    assert_selector ".preview-overlay .preview-thankyou", visible: :all, wait: 10
+
+    shown = page.evaluate_script(<<~JS)
+      (document.querySelector(".preview-overlay [data-preview-verto-target='thankyouBody']")?.textContent || "").trim()
+    JS
+    assert_equal "", shown,
+                 "the previewed end screen is reading the editor's placeholder as the message"
+    assert_equal "Thanks for taking part!", page.evaluate_script(<<~JS)
+      (document.querySelector(".preview-overlay [data-preview-verto-target='thankyouTitle']")?.textContent || "").trim()
+    JS
+  end
 end

@@ -155,16 +155,21 @@ export default class extends Controller {
   // after every keystroke.
   _syncThankyou() {
     const feed = (sel) => document.querySelector(sel)
+    // fallbackAttr null means the field has no default to fall back to.
     const copy = (target, source, fallbackAttr = "defaultText") => {
       if (!target || !source) return
       const written = source.textContent.trim()
-      target.textContent = written || source.dataset[fallbackAttr] || ""
+      target.textContent = written || (fallbackAttr && source.dataset[fallbackAttr]) || ""
     }
 
     copy(this.hasThankyouTitleTarget ? this.thankyouTitleTarget : null,
          feed("[data-gate-cards-target='tyTitle']"))
+    // No fallback for the message: it has no default any more. The box's
+    // data-default-text is its PLACEHOLDER now (the byline it used to hold
+    // moved to its own line), and falling back to it put "Add a short message"
+    // on the screen as though a respondent were meant to read it.
     copy(this.hasThankyouBodyTarget ? this.thankyouBodyTarget : null,
-         feed("[data-gate-cards-target='tyBody']"))
+         feed("[data-gate-cards-target='tyBody']"), null)
 
     // The forward button is an <input> pair in the editor and a pill here, so
     // it is rebuilt rather than copied — and hidden when there is no URL,

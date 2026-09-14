@@ -2818,7 +2818,9 @@
               each with its own title/message/link (e.g. a unique Stripe page
               per hub). Rows serialize into the hidden end_screens field. %>
           <% raw_end_screens = Array(@survey.read_attribute(:end_screens)) %>
-          <details class="publish-block panel-island" data-controller="end-screens">
+          <details class="publish-block panel-island" data-controller="end-screens"
+                   data-end-screens-max-title-value="<%= Survey::MAX_END_TITLE %>"
+                   data-end-screens-max-body-value="<%= Survey::MAX_END_BODY %>">
             <summary class="publish-block-title">Branch end screens <span class="pub-chev">⌄</span></summary>
             <%= form_with url: survey_settings_path(@survey), method: :post, local: true, style: "margin:0;" do %>
               <input type="hidden" name="return_tab" value="logic" />

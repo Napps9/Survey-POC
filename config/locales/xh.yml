@@ -329,6 +329,7 @@ xh:
     join_password_hint: "Ubuncinane iimpawu ezingu-%{count}. Uza kuyisebenzisa ukungena kwakhona kwesinye isixhobo."
     join_have_account: "Sele unayo i-akhawunti?"
     join_sign_in: "Ngena"
+    org_logo: "Ilogo ka-%{org}"
   # Umxholo wesikhundla iKHADI entsha yohlobo ngalunye eqala ngawo — iinketho
   # zempendulo, iileyibhile zomlinganiselo, iingxelo. Ngokungafaniyo
   # nolwakhiwo lwe-UI (olulandela ulwimi lomboni), ezi zisonjululwa kulwimi
@@ -2214,6 +2215,8 @@ xh:
       options: "Iimpendulo"
       responses: "Amagama esikali"
       pages: "Amaphepha ebali"
+      nps_low_label: "Inkcazo yesikali, kwicala elisezantsi"
+      nps_high_label: "Inkcazo yesikali, kwicala elingasentla"
     field_item: "%{field} %{number}"
     untranslated_note: "Ayikaguqulelwa okwangoku — apha ubona amagama antlandlolo, nto leyo umphenduli ofunda olu lwimi aya kuyibona."
     approve: "Vumela"

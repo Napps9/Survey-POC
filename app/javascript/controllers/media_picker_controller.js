@@ -2229,7 +2229,11 @@ export default class extends Controller {
 
   // One writer for the card row's dataset, the live panel style and the dirty
   // flag, so the preview and what autosave will send can never disagree.
-  _writeAnimBg(bg, card = this._activeCard) {
+  // `notify: false` for the editor's dropped-media cleanup, which repaints a
+  // card the server has already refused and must NOT schedule a save of its
+  // own (see survey-editor#_clearDroppedMedia — the two image writers beside
+  // it mark nothing dirty either).
+  _writeAnimBg(bg, card = this._activeCard, { notify = true } = {}) {
     if (!card) return
     const clean = {}
     if (bg?.color) clean.color = bg.color
@@ -2251,6 +2255,7 @@ export default class extends Controller {
       // they picked it for. Mirrors _split_left.html.erb.
       left.classList.toggle("has-media-bg", Object.keys(clean).length > 0)
     }
+    if (!notify) return
     // _notifyDirty, not dispatch("changed"): the editor root listens for
     // `input`, and there is no media-picker:changed binding to pick up — a
     // custom event here would leave the backdrop unsaved until some unrelated

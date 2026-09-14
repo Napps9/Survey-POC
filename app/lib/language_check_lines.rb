@@ -155,8 +155,16 @@ module LanguageCheckLines
   # `untranslated` is excluded deliberately — it is a derived annotation about
   # where the words came from, not the words themselves, and including it would
   # lapse every approval on a line the moment an unrelated field was filled in.
+  # A field that is blank on this card is left out entirely, rather than
+  # hashed as "". Every card of every type carries a key for every
+  # SCALAR_FIELD (canonical_content builds them off the list), so a field
+  # ADDED to that list would otherwise move the digest of every line in the
+  # product at once — and every approval anyone had ever given would read
+  # "Approved, then edited" on a line whose words had not changed. Dropping
+  # blanks makes the hash describe the words that are there, which is what an
+  # approval is an approval of.
   def digest(content)
-    canonical = content.except("untranslated")
+    canonical = content.except("untranslated").reject { |_, v| v.blank? }
     Digest::SHA256.hexdigest(canonical.to_json)
   end
 

@@ -95,15 +95,16 @@ export default class extends Controller {
     event.preventDefault()
 
     // Read live, because the card's height is fluid — it grows into whatever
-    // its panel has between a 430px floor and a 560px ceiling, so there is no
-    // single right number to hard-code. The fallbacks only fire on a zero rect
+    // its panel has between a 300px floor and a 400px ceiling (260-420 on a
+    // phone), so there is no single right number to hard-code. The fallbacks
+    // are those floors, and only fire on a zero rect
     // (a stack that is display:none), and are the floor rather than a guess at
     // the current size: under-reading the height makes the up-fling threshold
     // easier, which fails safe.
     const stack = card.parentElement.getBoundingClientRect()
     this.dragCard = card
-    this.dragW    = stack.width  || 320
-    this.dragH    = stack.height || 430
+    this.dragW    = stack.width  || 300
+    this.dragH    = stack.height || 300
     this.dragX0   = event.clientX
     this.dragY0   = event.clientY
     this.dragT0   = event.timeStamp

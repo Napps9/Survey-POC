@@ -59,7 +59,11 @@ const SAVE_WARNING_KEYS = {
   background_image: "editor.save_warning",
   video: "editor.save_warning_media",
   lottie: "editor.save_warning_media",
-  media_bg: "editor.save_warning_media",
+  // A backdrop is a PICTURE on a card, so it takes the sentence that names the
+  // card rather than the video/animation one — which, being first in the
+  // server's list, would otherwise outrank `image` and suppress the naming
+  // path for a card that lost both (see _saveWarningMessage).
+  media_bg: "editor.save_warning",
   duplicate_welcome: "editor.save_warning_duplicate",
   duplicate_respondent_code: "editor.save_warning_duplicate",
   duplicate_points_intro: "editor.save_warning_duplicate",
@@ -2811,6 +2815,19 @@ export default class extends Controller {
       const npsHigh = type === "nps" ? (prim.nps_high_label || "").trim() : ""
       if (npsLow)  out.nps_low_label  = npsLow
       if (npsHigh) out.nps_high_label = npsHigh
+      // Refresh the type panel's switch-away-and-back memory here, as the
+      // option snapshot below is refreshed: the server writes
+      // data-card-nps-anchors once, at page render, and only for an nps card —
+      // so left alone it holds the words the page booted with (or none at all
+      // for a card captioned since), and type_panel#_npsAnchorsFor falls back
+      // to a stale value the moment the live column is gone.
+      if (type === "nps") {
+        if (npsLow || npsHigh) {
+          card.dataset.cardNpsAnchors = JSON.stringify({ low: npsLow, high: npsHigh })
+        } else {
+          delete card.dataset.cardNpsAnchors
+        }
+      }
       // ...and the slider layout toggle (auto/horizontal/vertical), same gate.
       if (type === "range" && card.dataset.cardSliderAxis) out.slider_axis = card.dataset.cardSliderAxis
       // Select-many cards may cap how many answers a respondent ticks. Only
@@ -4065,7 +4082,7 @@ export default class extends Controller {
       // colour stays — only the picture was refused.
       if (d.code === "media_bg") {
         const kept = picker._readAnimBg(card)
-        picker._writeAnimBg({ color: kept.color }, card)
+        picker._writeAnimBg({ color: kept.color }, card, { notify: false })
       }
     })
   }

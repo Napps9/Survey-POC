@@ -633,7 +633,11 @@ module ApplicationHelper
       image_tag(
         direct ? PlayerAssetUrls.attachment_url(logo, proxy_path: proxy) : proxy,
         style: "#{style};object-fit:contain;",
-        alt:   alt || "#{organisation.name} logo",
+        # Translated, because this is what a screen reader reads out. It used
+        # to be an English word on every logo the platform draws — tolerable
+        # while the respondent-facing ones were a masthead and a card, and not
+        # once a phone's only logo is the one in the player's bar.
+        alt:   alt || I18n.t("player.org_logo", org: organisation.name, default: "#{organisation.name} logo"),
         class: css_class,
         data:  { controller: "brand-logo", action: "error->brand-logo#failed" }
       )

@@ -330,6 +330,7 @@ tn:
     join_password_hint: "Bonnye ditlhaka tse %{count}. O tla e dirisa go tsena gape mo sedirisiweng se sengwe."
     join_have_account: "A o setse o na le akhaonto?"
     join_sign_in: "Tsena"
+    org_logo: "Logo ya %{org}"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -2212,6 +2213,8 @@ tn:
       options: "Dikarabo"
       responses: "Maina a sekale"
       pages: "Ditsebe tsa padi"
+      nps_low_label: "Tlhaloso ya sekala, ntlheng e e kwa tlase"
+      nps_high_label: "Tlhaloso ya sekala, ntlheng e e kwa godimo"
     field_item: "%{field} %{number}"
     untranslated_note: "Ga e a ranolwa go fitlha jaanong — fano go bontshiwa mafoko a konokono, e leng se moarabi yo o balang puo e a tla se bonang."
     approve: "Dumela"

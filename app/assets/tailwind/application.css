@@ -762,8 +762,18 @@
 .slider-labels.nps-slider-labels { flex: 0 0 auto; }
 /* Two columns beside the vessel instead of one, in a 361px editor panel: the
    stage's 16px gaps were sized for one. 10px each keeps the same total gutter
-   the single column had, and the anchors read as attached to their digits. */
-.nps-slider-stage:has(.nps-anchors) { gap: 10px; }
+   the single column had, and the anchors read as attached to their digits.
+   Keyed on the column having WORDS, not on it existing: the editor renders it
+   for every NPS card (empty, so the creator has somewhere to type), so
+   :has(.nps-anchors) would tighten the gap and shrink the vessel on cards the
+   player draws at full size — the editor showing a different card from the one
+   it is previewing. :not(:empty) is also live, so the moment a caption is
+   typed the layout answers for it.
+   :where(), so the argument contributes NO specificity: :has() and :not() each
+   take their argument's, which made this (0,3,0) and beat the phone tier's own
+   `.preview-overlay .nps-slider-stage { gap: 12px }` — a rule meant to replace
+   a 16px base, quietly overriding a 12px one. */
+.nps-slider-stage:has(:where(.nps-anchor-text:not(:empty))) { gap: 10px; }
 /* The four widest silhouettes, on a card that has captions. Measured on a
    desktop card (panel 359px): a mug draws 248px of it and a flask 245, which
    left the caption column 15-18px — nine lines of one word each. Still level
@@ -779,10 +789,10 @@
    the whole reason it is a single custom property.
    min(), so a short phone (where --nps-vessel-h is already 232) keeps the
    smaller of the two rather than being grown by this rule. */
-.nps-slider:has(.nps-anchors):has(.nps-shape-mug),
-.nps-slider:has(.nps-anchors):has(.nps-shape-flask),
-.nps-slider:has(.nps-anchors):has(.nps-shape-jar),
-.nps-slider:has(.nps-anchors):has(.nps-shape-beaker) {
+.nps-slider:has(:where(.nps-anchor-text:not(:empty))):has(:where(.nps-shape-mug)),
+.nps-slider:has(:where(.nps-anchor-text:not(:empty))):has(:where(.nps-shape-flask)),
+.nps-slider:has(:where(.nps-anchor-text:not(:empty))):has(:where(.nps-shape-jar)),
+.nps-slider:has(:where(.nps-anchor-text:not(:empty))):has(:where(.nps-shape-beaker)) {
   --nps-h: min(var(--nps-vessel-h, 320px), 258px);
 }
 .nps-anchors .nps-anchor-text {
@@ -6913,7 +6923,13 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 /* An end screen with no message of its own draws the title and the byline with
    nothing between them. The card is a flex column with a 16px gap, so an empty
    box here would hold a second gap open and read as a missing line. */
-.preview-thankyou-sub:empty { display: none; }
+/* …but NOT in the editor, where the empty box IS the field: this is the same
+   guard .q-subtitle carries, and leaving it off here made the thank-you
+   message box — which this change deliberately starts empty, behind a
+   placeholder — display: none, so there was nowhere to type the message at
+   all. The player and the Preview overlay never carry contenteditable, so
+   they still collapse. */
+.preview-thankyou-sub:empty:not([contenteditable]) { display: none; }
 /* "from <account>" — the byline under the message. Smaller and quieter than the
    message: it says who is asking, it is not part of what they said.
    Quieter, but not the 40% it was written as: this screen lost its opaque card
@@ -8598,7 +8614,7 @@ body.generating-overlay-active .bottom-bar { display: none; }
        340 → 1.37, 2px apart     400 → 1.61,  8px   (against the 248px
                                                      stack a Fold gives)
        360 → 1.45, 4px           420 → 1.69, 10px
-       380 → 1.53, 6px           420 → 1.69, 10px
+       380 → 1.53, 6px           448 → 1.81, 12px  (the cap this replaced)
 
      Twenty pixels of card buys two pixels of clearance, all the way down. 340
      drew the squarest card and left the answers 2px apart, under the 3px floor
@@ -11030,7 +11046,17 @@ body.generating-overlay-active .bottom-bar { display: none; }
      and one logo on the front card is what was asked for ("the Unleash
      Football logo could sit small in the middle of the bar").
      Phone-only, like everything in this block: on a desktop the bar carries no
-     logo (the masthead above the deck does) and these two are untouched. */
+     logo (the masthead above the deck does) and these two are untouched.
+     Gated on the bar actually carrying one, and the gate is the decision
+     rather than an accident. Three surfaces wear .preview-overlay at this
+     width and only the real player renders the bar: the editor's Preview
+     overlay has no top chrome at all, on purpose ("just a floating Close, so
+     the preview card gets the full screen"), and neither does the mobile
+     studio. Ungated, those two would show the creator a phone with NO logo
+     anywhere — the brand simply missing from the preview of their own Verto.
+     Gated, they keep the card's copy instead: not where a respondent meets it,
+     but present, which is the more honest of the two wrongs. The real player
+     is the surface that has to be exactly right, and it is. */
   .preview-overlay:has(.player-bar-logo) .player-thankyou-logo,
   .preview-overlay:has(.player-bar-logo) .split-right-logo { display: none; }
 }

@@ -328,6 +328,7 @@ zu:
     join_password_hint: "Okungenani izinhlamvu ezingu-%{count}. Uzoyisebenzisa ukungena futhi kwenye idivayisi."
     join_have_account: "Usunayo i-akhawunti?"
     join_sign_in: "Ngena"
+    org_logo: "Ilogo ka-%{org}"
   # Placeholder CONTENT a new card of each type starts with — answer options,
   # scale labels, statements. Unlike UI chrome (which follows the viewer's
   # locale), these are resolved in the Verto's default locale, because they are
@@ -2210,6 +2211,8 @@ zu:
       options: "Izimpendulo"
       responses: "Amagama esilinganiso"
       pages: "Amakhasi endaba"
+      nps_low_label: "Incazelo yesikali, ngezansi"
+      nps_high_label: "Incazelo yesikali, ngenhla"
     field_item: "%{field} %{number}"
     untranslated_note: "Akukahunyushwa okwamanje — lokhu kubonisa amagama oqobo, okuyilokho umphenduli ofunda lolu lwimi azokubona."
     approve: "Gunyaza"

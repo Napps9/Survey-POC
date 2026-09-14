@@ -320,6 +320,7 @@ id:
     join_password_hint: "Minimal %{count} karakter. Kamu akan memakainya untuk masuk lagi di perangkat lain."
     join_have_account: "Sudah punya akun?"
     join_sign_in: "Masuk"
+    org_logo: "Logo %{org}"
   defaults:
     range: ["Sangat tidak setuju", "Tidak setuju", "Netral", "Setuju", "Sangat setuju"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2176,6 +2177,8 @@ id:
       options: "Jawaban"
       responses: "Label skala"
       pages: "Halaman cerita"
+      nps_low_label: "Keterangan skala, ujung bawah"
+      nps_high_label: "Keterangan skala, ujung atas"
     field_item: "%{field} %{number}"
     untranslated_note: "Belum diterjemahkan — ini menampilkan kata-kata aslinya, dan itulah yang akan dilihat responden yang membaca bahasa ini."
     approve: "Setujui"

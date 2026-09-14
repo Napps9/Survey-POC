@@ -4,13 +4,13 @@
 <div class="end-screen-row" data-end-screens-target="row" data-end-screen-id="<%= es['id'] %>"
      style="display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);">
   <div style="display:flex;gap:6px;align-items:center;">
-    <input type="text" data-end-screens-target="title" maxlength="80" value="<%= es['title'] %>"
+    <input type="text" data-end-screens-target="title" maxlength="<%= Survey::MAX_END_TITLE %>" value="<%= es['title'] %>"
            placeholder="Screen title (e.g. Join the UK hub)"
            style="flex:1;min-width:0;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;" />
     <button type="button" data-action="click->end-screens#removeRow"
             style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>
   </div>
-  <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="Message"
+  <textarea data-end-screens-target="body" maxlength="<%= Survey::MAX_END_BODY %>" rows="2" placeholder="Message"
             style="width:100%;box-sizing:border-box;padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;resize:vertical;"><%= es['body'] %></textarea>
   <div style="font-size:11px;color:rgba(255,255,255,0.45);">
     Personalise with %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{points|none yet}

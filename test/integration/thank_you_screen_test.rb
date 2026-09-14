@@ -138,6 +138,30 @@ class ThankYouScreenTest < ActionDispatch::IntegrationTest
   # message on the spot (addThankyou saves immediately) and could never see
   # both lines. It starts empty now, with the placeholder idiom the share
   # fields use, and the byline sits below it as a read-only line.
+  # The branch end screens are held to the same two constants, so their own
+  # inputs have to say so: both were literal maxlength="80", which matched
+  # until the built-in screen's cap moved to 120 and left them stopping a
+  # creator 40 characters early with nothing saying why.
+  test "a branch end screen's inputs carry the same caps as the built-in one" do
+    org = sign_in_org("branch")
+    s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",
+                              default_locale: "en", locales: [ "en" ], cards: CARDS,
+                              # The panel only draws branch screens for a Verto
+                              # with answer branching switched on.
+                              logic: true,
+                              end_screens: [ { "id" => "es_1", "title" => "Join the UK hub",
+                                               "body" => "We'll be in touch." } ])
+
+    get survey_path(s)
+    assert_response :success
+
+    assert_select "input[data-end-screens-target='title'][maxlength='#{Survey::MAX_END_TITLE}']"
+    assert_select "textarea[data-end-screens-target='body'][maxlength='#{Survey::MAX_END_BODY}']"
+    # ...and the row this controller builds client-side reads them from here.
+    assert_select "[data-controller='end-screens'][data-end-screens-max-title-value='#{Survey::MAX_END_TITLE}']"
+    assert_select "[data-controller='end-screens'][data-end-screens-max-body-value='#{Survey::MAX_END_BODY}']"
+  end
+
   test "the editor's thank-you card starts with an empty message box and a byline" do
     org = sign_in_org("editor")
     s   = org.surveys.create!(title: "T", theme: "T", audience_age: "all", key_insight: "x",

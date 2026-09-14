@@ -337,4 +337,58 @@ class NpsAnchorsTest < ApplicationSystemTestCase
     refute_includes empty, "empty", "an empty column costs a stage gap the player does not pay"
     refute_includes empty.to_s, "contenteditable"
   end
+
+  # The editor draws the captions column for EVERY nps card, empty, so the
+  # creator has somewhere to type. The two layout rules the column brings with
+  # it — a tighter stage gap and a shorter vessel on the four widest shapes —
+  # are therefore keyed on the column having WORDS, not on it existing: keyed
+  # on existence they fired in the editor and not on the player, so the editor
+  # showed a smaller card than the one it was previewing.
+  test "an uncaptioned card draws the same vessel in the editor as on the player" do
+    captionless = @org.surveys.create!(
+      title: "Bare", theme: "Football", audience_age: "adults", key_insight: "k",
+      default_locale: "en", locales: [ "en" ],
+      cards: [
+        { "type" => "welcome_card", "title" => "Hello" },
+        { "type" => "nps", "cid" => "bare", "text" => "How often?", "options" => AGREE.dup,
+          "nps_shape" => "mug" }
+      ]
+    )
+
+    sign_in_as(@user)
+    visit survey_path(captionless)
+    dismiss_cookie_banner
+    assert_text "How often?"
+    settle_box find("[data-card-cid='bare'] .nps-slider-stage")
+    editor = page.evaluate_script(<<~JS)
+      (() => {
+        const w = document.querySelector("[data-card-cid='bare'] .nps-slider")
+        return { h: Math.round(w.querySelector(".nps-control").getBoundingClientRect().height),
+                 gap: getComputedStyle(w.querySelector(".nps-slider-stage")).columnGap }
+      })()
+    JS
+
+    captionless.update_columns(publish_token: SecureRandom.hex(8), published_at: Time.current)
+    visit "/play/#{captionless.publish_token}"
+    dismiss_cookie_banner
+    agree_to_consent_gate
+    click_button "Next"
+    assert_selector ".preview-card.active .nps-slider", wait: 5
+    settle_box find(".preview-card.active .nps-slider-stage")
+    player = page.evaluate_script(<<~JS)
+      (() => {
+        const w = document.querySelector(".preview-card.active .nps-slider")
+        return { h: Math.round(w.querySelector(".nps-control").getBoundingClientRect().height),
+                 gap: getComputedStyle(w.querySelector(".nps-slider-stage")).columnGap }
+      })()
+    JS
+
+    assert_equal player["h"], editor["h"],
+                 "the editor draws the vessel #{editor['h']}px tall and the player #{player['h']}px " \
+                 "for the same uncaptioned card — the captions' own layout rules are firing on a " \
+                 "card that has none"
+    assert_equal player["gap"], editor["gap"],
+                 "the stage gap differs between the editor (#{editor['gap']}) and the player " \
+                 "(#{player['gap']}) on a card with no captions"
+  end
 end

@@ -321,6 +321,7 @@ af:
     join_password_hint: "Ten minste %{count} karakters. Jy sal dit gebruik om op 'n ander toestel weer aan te meld."
     join_have_account: "Het jy reeds 'n rekening?"
     join_sign_in: "Meld aan"
+    org_logo: "Logo van %{org}"
   defaults:
     range: ["Stem heeltemal nie saam nie", "Stem nie saam nie", "Neutraal", "Stem saam", "Stem heeltemal saam"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2180,6 +2181,8 @@ af:
       options: "Antwoorde"
       responses: "Skaaletikette"
       pages: "Storiebladsye"
+      nps_low_label: "Skaalbeskrywing, lae kant"
+      nps_high_label: "Skaalbeskrywing, hoë kant"
     field_item: "%{field} %{number}"
     untranslated_note: "Nog nie vertaal nie — dit wys die oorspronklike bewoording, presies wat 'n respondent wat hierdie taal lees, sou sien."
     approve: "Keur goed"

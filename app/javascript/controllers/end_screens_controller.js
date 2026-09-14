@@ -9,6 +9,11 @@ import { t } from "lib/i18n"
 // listed here.
 export default class extends Controller {
   static targets = ["list", "row", "field"]
+  // The server's own caps (Survey::MAX_END_TITLE / MAX_END_BODY), passed in
+  // rather than restated: they were literals here and in _end_screen_row, and
+  // the day the title cap moved from 80 to 120 a row built by this controller
+  // went on stopping the creator at 80 with nothing saying why.
+  static values = { maxTitle: { type: Number, default: 80 }, maxBody: { type: Number, default: 400 } }
 
   addRow(event) {
     event.preventDefault()
@@ -19,12 +24,12 @@ export default class extends Controller {
     const inp = "padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size:13px;outline:none;"
     row.innerHTML = `
       <div style="display:flex;gap:6px;align-items:center;">
-        <input type="text" data-end-screens-target="title" maxlength="80" placeholder="${t("editor.end_screens.title_placeholder").replace(/"/g, "&quot;")}"
+        <input type="text" data-end-screens-target="title" maxlength="${this.maxTitleValue}" placeholder="${t("editor.end_screens.title_placeholder").replace(/"/g, "&quot;")}"
                style="flex:1;min-width:0;${inp}" />
         <button type="button" data-action="click->end-screens#removeRow"
                 style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);cursor:pointer;">×</button>
       </div>
-      <textarea data-end-screens-target="body" maxlength="400" rows="2" placeholder="${t("editor.end_screens.body_placeholder").replace(/"/g, "&quot;")}"
+      <textarea data-end-screens-target="body" maxlength="${this.maxBodyValue}" rows="2" placeholder="${t("editor.end_screens.body_placeholder").replace(/"/g, "&quot;")}"
                 style="width:100%;box-sizing:border-box;resize:vertical;${inp}"></textarea>
       <div style="font-size:11px;color:rgba(255,255,255,0.45);">
         Personalise with %{score}, %{max}, %{points} — add a fallback for when it's missing, e.g. %{points|none yet}

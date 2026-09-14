@@ -320,6 +320,7 @@ sw:
     join_password_hint: "Angalau herufi %{count}. Utaitumia kuingia tena kwenye kifaa kingine."
     join_have_account: "Tayari una akaunti?"
     join_sign_in: "Ingia"
+    org_logo: "Nembo ya %{org}"
   defaults:
     range: ["Sikubaliani kabisa", "Sikubaliani", "Sina upande", "Nakubaliana", "Nakubaliana kabisa"]
     nps: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
@@ -2177,6 +2178,8 @@ sw:
       options: "Majibu"
       responses: "Majina ya alama"
       pages: "Kurasa za hadithi"
+      nps_low_label: "Maelezo ya kipimo, upande wa chini"
+      nps_high_label: "Maelezo ya kipimo, upande wa juu"
     field_item: "%{field} %{number}"
     untranslated_note: "Haijatafsiriwa bado — haya ni maneno ya awali, ndiyo ambayo mjibu anayesoma lugha hii ataona."
     approve: "Idhinisha"
