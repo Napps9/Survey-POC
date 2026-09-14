@@ -2358,7 +2358,10 @@
 
 /* Field help for the two contenteditables it sits under, in their column. */
 .gate-ty-hint {
-  font-size: var(--text-xs); color: rgba(255,255,255,0.45);
+  /* Inside .thankyou-message, so it is on the scrim — and the scrim is derived
+     to carry WHITE. At 45% it measured 3.1:1 on the halo it sits on. It stays
+     secondary at --text-xs against the subtitle's 16px and the title's 44px. */
+  font-size: var(--text-xs); color: #fff;
   line-height: 1.45; margin-top: 4px;
 }
 
@@ -2378,9 +2381,12 @@
 .gate-ty-ghost-label {
   font-family: "Alata", sans-serif; font-size: var(--text-2xs);
   letter-spacing: 0.1em; text-transform: uppercase;
-  /* 0.4 was tuned for the dark thank-you card; that card has no surface now
-     and this label sits on the Verto's photo. Brighter, with a shadow. */
-  color: rgba(255,255,255,0.7); text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+  /* 0.4 was tuned for the dark thank-you card. That card has no surface now,
+     so this is the EDITOR'S OWN chrome sitting on the Verto's photo, and it
+     measured 1.24:1 there. Editor chrome the player has no equivalent of, so
+     backing it does not make the replica any less a replica — see
+     .on-backdrop. */
+  color: #fff;
   align-self: start; margin-bottom: 2px;
 }
 /* Stands in for the join block — same tinted, full-width shape, one line of
@@ -2399,6 +2405,21 @@
 /* The facsimile group, under its own label and separated from the field above
    it — the divider is what stops "They'll also see" reading as a caption for
    the Link button. */
+/* Editor chrome that sits on the Verto's background photo.
+   The player's end screen has no card behind it any more, so the editor's
+   replica has none either — but the editor draws labels the player never
+   does ("They'll also see", "Link button"), and those had nothing behind
+   them at all: 1.24:1 and 1.21:1, measured. A small solid backing in the
+   Verto's own derived scrim colour, sized to the words. */
+.on-backdrop {
+  background: var(--brand-scrim, rgba(28,32,52,0.72));
+  border-radius: 8px;
+  padding: 4px 10px;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .gate-ty-ghosts {
   display: flex; flex-direction: column; gap: 10px;
   padding-top: 14px;
@@ -2406,7 +2427,12 @@
 }
 .gate-ty-forward-label {
   font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
-  color: rgba(255,255,255,0.6); letter-spacing: 0.02em;
+  /* Was 60% white, tuned for the dark thank-you card this used to sit on. On
+     the scrim that replaced it, 60% measured 3.87:1 where the same label at
+     full strength measures 7.45:1 — the scrim's floor is quoted for WHITE, and
+     anything less than white has to be paid for out of it. Quiet is done with
+     size and letter-spacing here, not by fading the ink. */
+  color: #fff; letter-spacing: 0.02em;
 }
 .gate-ty-forward-input {
   width: 100%; box-sizing: border-box;
@@ -2493,6 +2519,11 @@
   font-family: 'ABeeZee', sans-serif; font-size: var(--text-xs);
   color: rgba(255,255,255,0.5);
 }
+/* The same row, reused on the thank-you card, where it is not on .unfurl-mock's
+   opaque panel but on the scrim — and the scrim is derived to carry WHITE, so
+   half-strength measured 3.18:1 there. Scoped to the surface rather than
+   changed on the class: on the share card's panel, 50% is right. */
+.thankyou-message .unfurl-meta-item { color: #fff; }
 .gate-share-hint {
   font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
   color: rgba(255,255,255,0.6); line-height: 1.45; margin-bottom: 4px;
@@ -2509,7 +2540,10 @@
 /* Advisory only — update_settings applies the real cap. Tabular figures so the
    number doesn't jitter the label as it counts. */
 .gate-share-count {
-  font-size: var(--text-xs); color: rgba(255,255,255,0.35);
+  /* Not 35% white: it sits inside an .on-backdrop label, and the scrim under
+     it is derived to carry WHITE at 4.5:1 — a third-strength white measured
+     3.18:1 there. Smaller and tabular is how it stays secondary. */
+  font-size: var(--text-xs); color: #fff;
   font-variant-numeric: tabular-nums;
 }
 .gate-share-count.is-over { color: #FF5C93; }
@@ -6834,20 +6868,46 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
      and only a too-tall one starts at the top of its scroll area. */
   margin-block: auto;
 }
+/* THE SCRIM. The title and subtitle lost their card (2026-09-14) and sit on
+   the Verto's background photo, which can be any brightness at all: measured
+   over the four committed library backgrounds, the white title ran 1.64:1 on
+   `landscape` and the subtitle 1.36:1, where AA wants 3:1 and 4.5:1. A
+   text-shadow was the first answer and it is a hope, not a floor.
+
+   So: a halo in the Verto's OWN background colour, darkened by
+   BrandPalette#readable_surface only as far as it must go for white to clear
+   4.5:1 once composited at that colour's 72% over a WHITE photo — the worst
+   case a photo can present. The colour is the Verto's ("the colours are
+   important", owner 2026-09-14); the floor is arithmetic.
+
+   Solid to 62% of the ellipse and fading through the padding, so it reads as
+   a halo rather than the card that was just removed — and costs ~44px of
+   height where the card cost 64px plus its 44px of side padding. */
+.thankyou-message {
+  padding: 22px 30px 26px;
+  border-radius: 28px;
+  background: radial-gradient(ellipse 100% 100% at 50% 50%,
+    var(--brand-scrim, rgba(28,32,52,0.72)) 0%,
+    var(--brand-scrim, rgba(28,32,52,0.72)) 62%,
+    var(--brand-scrim-fade, rgba(28,32,52,0)) 100%);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; width: 100%; box-sizing: border-box;
+}
 .preview-thankyou-title {
   font-family: var(--verto-font-heading, var(--verto-font, "Alata", sans-serif)); font-size: 44px;
   color: #fff; letter-spacing: -0.5px;
-  /* On the backdrop now rather than on a card: the scrim carries most of the
-     contrast, this carries the rest over a bright patch of photo. */
+  /* The scrim is the floor; this is for the pixels at the very edge of the
+     glyphs, where the halo has begun to fade. */
   text-shadow: 0 1px 2px rgba(0,0,0,0.35);
 }
 .preview-thankyou-sub {
   font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 16px;
-  /* Was 45% white, tuned for the dark card this sat on. On the backdrop it
-     vanished against a light patch of photo (measured on the library's
-     "people" image: unreadable). Brighter, with the same shadow the title
-     carries — still subordinate to the title, no longer missing. */
-  color: rgba(255,255,255,0.85); max-width: 560px; line-height: 1.6;
+  /* Was 45% white, tuned for the dark card this sat on, then 92% — and 92% is
+     still a discount on a floor that is quoted for WHITE. readable_surface
+     darkens the scrim only as far as white needs, so on the brightest photo
+     white lands exactly ON 4.5:1 and anything fainter lands under it. Ink on
+     the scrim is white; the hierarchy here is 16px against the title's 44px. */
+  color: #fff; max-width: 560px; line-height: 1.6;
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 /* An end screen with no message of its own draws the title and the byline with
@@ -6863,7 +6923,11 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
    takes the same treatment and stays subordinate by size and weight instead. */
 .preview-thankyou-from {
   font-family: var(--verto-font, "ABeeZee", sans-serif); font-size: 15px;
-  color: rgba(255,255,255,0.7); max-width: 560px; line-height: 1.5;
+  /* 70% was the same instinct as the subtitle's 85% and lands the same way:
+     readable_surface stops at the first step that carries WHITE, so on a pale
+     palette over a bright photo this measured 3.53:1. Subordinate by size and
+     weight, exactly as the note above says — not by fading the ink. */
+  color: #fff; max-width: 560px; line-height: 1.5;
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 /* The card is as wide as the deck; its CONTENTS are not, because a 750px line
@@ -7004,9 +7068,18 @@ summary.publish-block-title::-webkit-details-marker { display: none; }
 .play-powered {
   display: flex; align-items: center; justify-content: center;
   gap: 8px; margin-top: 22px;
-  /* Deliberately quiet, but quiet on a card and quiet on a photo are
-     different numbers: 0.45 disappeared on a light backdrop. */
-  opacity: 0.75; text-shadow: 0 1px 2px rgba(0,0,0,0.45);
+  /* Our wordmark is on the photo too, and 10px type has the least margin of
+     anything here — so it gets the same halo as the message rather than an
+     opacity nudge. Quiet is done with size, not with disappearing. */
+  /* A flat pill, not the message's fading halo. The halo is sized in
+     PERCENTAGES of its own box, so it fades at the same place whatever the box
+     — which reads as a halo behind a paragraph with room around it, and as a
+     smudge behind a box barely wider than its own words. Nothing is measured
+     here that the message doesn't also measure; this is about it looking
+     deliberate. */
+  padding: 7px 16px; border-radius: 100px;
+  background: var(--brand-scrim, rgba(28,32,52,0.72));
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
 }
 /* Our wordmark, not the respondent's content — the one thing here that stays
    deliberately small. A class so it is at least reachable. */

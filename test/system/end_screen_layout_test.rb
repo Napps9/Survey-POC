@@ -253,27 +253,42 @@ class EndScreenLayoutTest < ApplicationSystemTestCase
       assert_selector ".gate-join-card", wait: 8
 
       # The rule, stated exactly: a TRANSLUCENT surface — 0 < alpha < 1 — is a
-      # fault when nothing opaque stands between it and the photo. Two things
+      # fault when nothing opaque stands between it and the photo. Three things
       # this deliberately allows: an element with no surface at all (the
       # thank-you column has none since the outer card went, 2026-09-14 — the
-      # player has none either), and a tint that sits on an opaque parent (the
-      # input rows inside the account card). What it refuses is the fault that
-      # happened: a 12% brand tint composited straight onto the background.
+      # player has none either), a tint that sits on an opaque parent (the
+      # input rows inside the account card), and THE SCRIM, which is translucent
+      # on purpose and is the one translucency that has been measured against
+      # the worst photo a Verto can carry rather than assumed (see
+      # BrandPalette#readable_surface and EndScreenContrastTest). What it
+      # refuses is the fault that happened: a 12% brand tint composited straight
+      # onto the background.
+      #
+      # The scrim is recognised by its VALUE, not by a class, so painting some
+      # other translucency and calling it a backdrop still fails here.
       faults = page.evaluate_script(<<~JS)
         (() => {
-          const alphaOf = bg => { const m = bg.match(/rgba?\\(([^)]+)\\)/); if (!m) return 1
-            const p = m[1].split(','); return p.length > 3 ? parseFloat(p[3]) : 1 }
+          const parts = c => { const m = String(c).match(/rgba?\\(([^)]+)\\)/); return m ? m[1].split(',').map(parseFloat) : null }
+          const alphaOf = bg => { const p = parts(bg); return !p ? 1 : (p.length > 3 ? p[3] : 1) }
+          const same = (a, b) => { const x = parts(a), y = parts(b)
+            return !!x && !!y && x.length === y.length && x.every((v, i) => Math.abs(v - y[i]) < 0.001) }
           const out = []
           for (const wrap of document.querySelectorAll('.gate-card-wrap')) {
             if (wrap.hidden || wrap.offsetParent === null) continue
             for (const el of wrap.querySelectorAll('*')) {
-              const a = alphaOf(getComputedStyle(el).backgroundColor)
+              const cs = getComputedStyle(el)
+              const a = alphaOf(cs.backgroundColor)
               if (a <= 0 || a >= 1) continue
+              // The scrim in force for this element: its own --brand-scrim if
+              // the palette reaches here, else the literal the stylesheet falls
+              // back to.
+              const scrim = cs.getPropertyValue('--brand-scrim').trim() || 'rgba(28, 32, 52, 0.72)'
+              if (same(cs.backgroundColor, scrim)) continue
               let opaqueAbove = false
               for (let n = el.parentElement; n && n !== wrap; n = n.parentElement) {
                 if (alphaOf(getComputedStyle(n).backgroundColor) >= 1) { opaqueAbove = true; break }
               }
-              if (!opaqueAbove) out.push(el.className + ' → ' + getComputedStyle(el).backgroundColor)
+              if (!opaqueAbove) out.push(el.className + ' → ' + cs.backgroundColor)
             }
           }
           return out

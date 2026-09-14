@@ -549,7 +549,7 @@
                   backed by the survey's own forward_url/label columns; branch
                   end screens carry their own pair in the end_screens JSON. %>
               <div class="gate-ty-forward">
-                <label class="gate-ty-forward-label" for="ty-forward-url">
+                <label class="gate-ty-forward-label on-backdrop" for="ty-forward-url">
                   <%= t("editor.ty_forward_url_label", default: "Link button (optional)") %>
                 </label>
                 <input type="url" id="ty-forward-url"
@@ -586,7 +586,7 @@
               <% ghosts = @survey.compare_results? || @survey.share_enabled? %>
               <% if ghosts %>
                 <div class="gate-ty-ghosts" aria-hidden="true">
-                  <div class="gate-ty-ghost-label">
+                  <div class="gate-ty-ghost-label on-backdrop">
                     <%= t("editor.ty_also_sees", default: "They'll also see") %>
                   </div>
                   <% if @survey.compare_results? %>
@@ -693,7 +693,7 @@
                 the respondent's; none of this is theirs to edit. Absent when
                 the strategy has no credentials, exactly as it is in the player. %>
             <div class="gate-ty-ghosts join-ghosts" aria-hidden="true">
-              <div class="gate-ty-ghost-label"><%= t("editor.ty_also_sees", default: "They'll also see") %></div>
+              <div class="gate-ty-ghost-label on-backdrop"><%= t("editor.ty_also_sees", default: "They'll also see") %></div>
               <% if SocialAuth.player_enabled? %>
                 <div class="join-google">
                   <%= render "shared/google_mark" %>
@@ -802,7 +802,7 @@
                 fields the same treatment is what made the old card read as a
                 form about one thing when it was really about two. %>
             <div class="gate-share-field">
-              <label class="gate-ty-forward-label" for="share-message">
+              <label class="gate-ty-forward-label on-backdrop" for="share-message">
                 <%= t("editor.share_message_label", default: "Message respondents send") %>
                 <span class="gate-share-count" data-gate-cards-target="shareMessageCount"></span>
               </label>

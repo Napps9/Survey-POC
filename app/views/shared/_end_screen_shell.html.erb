@@ -35,7 +35,14 @@
       and these are purely this partial's two slots. They stay because the
       partial's whole job is that the three surfaces agree on the shape, and
       naming the halves is how a caller gets it right. %>
-  <div class="thankyou-col thankyou-col-message"><%= message %></div>
+  <%# The message sits on the Verto's background photo now, so it carries its
+      own scrim — see .thankyou-message. A real box inside the display:contents
+      wrapper rather than on the wrapper itself: that wrapper must stay
+      display:contents or every percentage width in the card resolves against
+      it instead of the card (it resized the phone player for a day). %>
+  <div class="thankyou-col thankyou-col-message">
+    <div class="thankyou-message"><%= message %></div>
+  </div>
   <div class="thankyou-col thankyou-col-actions"><%= actions %></div>
   <% if powered %>
     <div class="play-powered">

@@ -32,8 +32,11 @@ class PlayerShowSmokeTest < ActionDispatch::IntegrationTest
     # Child chain, not a descendant match: the message column is the half that
     # went missing on the editor's copy of this card, and a descendant selector
     # would keep passing if the wrappers were dropped and the title reparented.
+    # .thankyou-message is the scrim the title is read on now that the card
+    # itself has no surface — it is in the chain because it has to be BETWEEN
+    # the column and the title, not merely somewhere on the page.
     assert_select "[data-player-target='thankyou'] > .preview-thankyou-card > " \
-                  ".thankyou-col-message > [data-player-target='thankyouTitle']"
+                  ".thankyou-col-message > .thankyou-message > [data-player-target='thankyouTitle']"
   end
 
   # The one context with no other guard: a respondent's very first sight of a

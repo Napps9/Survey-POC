@@ -74,6 +74,30 @@ export function readableInk(hex, on, minRatio = 4.5) {
   return "#1C2034"
 }
 
+// How much of the scrim is painted. Twin of BrandPalette::SCRIM_ALPHA — the
+// derivation below only means anything at a known alpha.
+export const SCRIM_ALPHA = 0.72
+
+// Twin of BrandPalette#readable_surface — the mirror of readableInk: a SURFACE
+// made dark enough to carry white, rather than a colour made dark enough to be
+// read on one. Composited at SCRIM_ALPHA over WHITE, the brightest a
+// background photo can be, because a colour that carries white at full
+// strength does not necessarily carry it at 72%. See the Ruby side.
+export function readableSurface(hex, forText = "#FFFFFF", minRatio = 4.5) {
+  if (!validHex(hex)) return DEFAULT.bg
+  let step = -0.02
+  while (step < 1) {
+    step += 0.02
+    const candidate = step < 0 ? hex : darken(hex, step)
+    if (contrastRatio(forText, overWhite(candidate)) >= minRatio) return candidate
+  }
+  return "#000000"
+}
+
+export function overWhite(hex) {
+  return toHex(rgb(hex).map((c) => c * SCRIM_ALPHA + 255 * (1 - SCRIM_ALPHA)))
+}
+
 export function darken(hex, amount) {
   return toHex(rgb(hex).map((c) => c * (1 - amount)))
 }
@@ -111,6 +135,12 @@ export function resolve(raw) {
     // Measured against the surface it lands on: rgba(P, 0.12) composited onto
     // white is exactly lighten(P, 0.88).
     primary_ink: readableInk(p.primary, lighten(p.primary, 0.88)),
+    // The scrim behind the end screen's words, already at the alpha it is
+    // painted with so the stylesheet cannot drift from the derivation.
+    scrim: rgba(readableSurface(p.bg), SCRIM_ALPHA),
+    // The same colour at zero alpha: a gradient fading to `transparent` goes
+    // through transparent BLACK and fringes grey on a light photo.
+    scrim_fade: rgba(readableSurface(p.bg), 0),
   }
 }
 
@@ -127,6 +157,8 @@ export const CSS_VARS = {
   surface_2: "--brand-surface-2",
   primary_soft: "--brand-primary-soft",
   primary_ink: "--brand-primary-ink",
+  scrim: "--brand-scrim",
+  scrim_fade: "--brand-scrim-fade",
 }
 
 // Apply a resolved palette's variables onto an element's inline style.

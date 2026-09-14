@@ -60,7 +60,15 @@ module BrandPalette
       # primary_soft over white, and compositing rgba(P, 0.12) onto white is
       # exactly lighten(P, 0.88). Deriving against plain white would be a
       # slightly easier test than the real one.
-      "primary_ink"  => readable_ink(p["primary"], on: lighten(p["primary"], 0.88))
+      "primary_ink"  => readable_ink(p["primary"], on: lighten(p["primary"], 0.88)),
+      # The scrim behind the end screen's words. Already an rgba() at the alpha
+      # it is painted with, so the stylesheet cannot drift from the derivation
+      # that proved it legible. See readable_surface and SCRIM_ALPHA.
+      "scrim"        => rgba(readable_surface(p["bg"]), SCRIM_ALPHA),
+      # The same colour at zero alpha. A gradient that fades to `transparent`
+      # interpolates through transparent BLACK and leaves a grey fringe on a
+      # light photo; fading to the colour's own zero-alpha does not.
+      "scrim_fade"   => rgba(readable_surface(p["bg"]), 0)
     )
   end
 
@@ -119,6 +127,49 @@ module BrandPalette
   # 4.5:1 is the WCAG AA floor for text this size. Black clears it against any
   # light surface, so the loop always terminates; the final fallback is only
   # there so a malformed colour cannot return nil into a CSS variable.
+  # How much of the scrim is painted. Here rather than in the stylesheet
+  # because the derivation below only means anything at a known alpha.
+  SCRIM_ALPHA = 0.72
+
+  # The mirror of readable_ink: a SURFACE made dark enough to carry white text,
+  # rather than a colour made dark enough to be read on one.
+  #
+  # The end screen's title and subtitle used to sit on an opaque #1C2034 card.
+  # That card is gone (2026-09-14, the owner's one-column pick), so they sit on
+  # the Verto's background PHOTO behind this scrim — and a photo can be any
+  # brightness at all. Measured over the four committed library backgrounds
+  # before this existed, the white title ran 1.64:1 on `landscape` and the
+  # subtitle 1.36:1, where AA wants 3:1 and 4.5:1.
+  #
+  # MEASURED AGAINST WHAT IT ACTUALLY LANDS ON, which is the rule primary_ink
+  # is derived by four lines up and the rule this got wrong on its first
+  # attempt: a colour that carries white text at full strength does not carry
+  # it at 72% over a photo. #757470 clears 4.68:1 on its own and 2.3:1 once
+  # composited, which is a fail dressed as a pass. So the candidate is
+  # composited at SCRIM_ALPHA over WHITE — the brightest a photo can be — and
+  # it is that result which has to clear the ratio.
+  #
+  # darken multiplies all three channels, so the hue survives: "the colours are
+  # important" (owner, 2026-09-14), and a Verto's own background colour is what
+  # its end screen is tinted with, however pale the creator picked it.
+  def readable_surface(hex, for_text: "#FFFFFF", min_ratio: 4.5)
+    return DEFAULT["bg"] unless valid_hex?(hex.to_s)
+
+    step = -0.02
+    while step < 1.0
+      step += 0.02
+      candidate = step.negative? ? hex : darken(hex, step)
+      return candidate if contrast_ratio(for_text, over_white(candidate)) >= min_ratio
+    end
+    "#000000"
+  end
+
+  # A colour composited at SCRIM_ALPHA over white: the worst case a background
+  # photo can present to the scrim.
+  def over_white(hex)
+    to_hex(rgb(hex).map { |c| (c * SCRIM_ALPHA) + (255 * (1 - SCRIM_ALPHA)) })
+  end
+
   def readable_ink(hex, on:, min_ratio: 4.5)
     return hex unless valid_hex?(hex.to_s) && valid_hex?(on.to_s)
     return hex if contrast_ratio(hex, on) >= min_ratio

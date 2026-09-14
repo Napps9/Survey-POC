@@ -809,7 +809,9 @@ module ApplicationHelper
       "--brand-surface"      => r["surface"],
       "--brand-surface-2"    => r["surface_2"],
       "--brand-primary-soft" => r["primary_soft"],
-      "--brand-primary-ink"  => r["primary_ink"]
+      "--brand-primary-ink"  => r["primary_ink"],
+      "--brand-scrim"        => r["scrim"],
+      "--brand-scrim-fade"   => r["scrim_fade"]
     }.map { |k, v| "#{k}:#{v}" }.join(";")
   end
 
