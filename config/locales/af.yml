@@ -1259,6 +1259,7 @@ af:
     modal_expand: "Sien hierdie venster soos 'n respondent dit sien"
     modal_collapse: "Vou hierdie venster op"
     live_locked_modal_note: "Jy kan steeds 'n kaart se venster byvoeg of herskryf — dit verduidelik 'n vraag sonder om dit te verander."
+    verto_theme: "Onderwerp"
   dashboard_card:
     publish_warning: "Publiseer “%{title}”? Sodra dit regstreeks is, word sy vrae gesluit en kan nie gewysig word nie — maak seker alles lees presies soos jy dit wil hê."
     preview: "Voorskou"

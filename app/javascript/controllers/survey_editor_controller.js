@@ -81,9 +81,9 @@ export default class extends Controller {
   static targets = ["card", "saveButton", "status", "tab", "feed", "localeCode", "vertoScore", "scoreBoard", "panelLight",
     "cardFlags", "panelOther", "panelRequired", "panelAskOnce", "responseScale",
                     "maxChoices", "maxChoicesPicker", "npsClassic", "panelNpsClassic",
-                    "recallToggle", "panelRecall", "vertoTitle", "undoBtn"]
+                    "recallToggle", "panelRecall", "vertoTitle", "vertoTheme", "undoBtn"]
   static values  = {
-    url: String, title: String, description: String,
+    url: String, title: String, theme: String, description: String,
     optimiseUrl: { type: String, default: "" },
     defaultLocale: { type: String, default: "en" },
     locales: { type: Array, default: [] },
@@ -2126,6 +2126,32 @@ export default class extends Controller {
     el.textContent = this.titleValue
   }
 
+  // ── Theme ────────────────────────────────────────────────────────────────
+  // The same three moves for the theme span beside the name. The theme is
+  // what respondents call the Verto — the player's tab title, the link
+  // preview, the dashboard tile's big line — and nothing could change it
+  // after the wizard, so a copy's "(Copy)" was permanent. serialize() sends
+  // it as `theme`; #update caps it and stores it.
+
+  renameTheme() {
+    const next = this.vertoThemeTarget.textContent.replace(/\s+/g, " ").trim()
+    if (!next) return
+    if (next === this.themeValue) return
+    this.themeValue = next
+    this.markDirty()
+  }
+
+  commitTheme(event) {
+    event.preventDefault()
+    this.vertoThemeTarget.blur()
+  }
+
+  restoreThemeIfBlank() {
+    const el = this.vertoThemeTarget
+    if (el.textContent.trim()) return
+    el.textContent = this.themeValue
+  }
+
   markDirty() {
     // Repaint the card being edited (or everything on a structural change) and
     // the overall score, so the lights track edits as they're typed.
@@ -2542,7 +2568,7 @@ export default class extends Controller {
     // runtime primitive) — see _compileFlows / FlowCompiler.
     this._compileFlows(cards)
 
-    return { title: this.titleValue, description: this.descriptionValue, cards, flows: this.flowsList(),
+    return { title: this.titleValue, theme: this.themeValue, description: this.descriptionValue, cards, flows: this.flowsList(),
              // Whether this page could see token controls at all: they render
              // only when tokenisation is on at page load, so a page from
              // before it was switched on provably knows nothing about tokens

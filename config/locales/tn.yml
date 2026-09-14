@@ -1274,6 +1274,7 @@ tn:
     modal_expand: "Bona letlhabaphefo le jaaka yo o arabang a le bona"
     modal_collapse: "Mena letlhabaphefo le"
     live_locked_modal_note: "O sa ntse o ka oketsa kgotsa wa kwala sesha letlhabaphefo la karata — le tlhalosa potso ntle le go e fetola."
+    verto_theme: "Setlhogo"
   dashboard_card:
     publish_warning: "Phasaladitsa “%{title}”? E fa e sena go tsena mo tirisong, dipotso tsa yona di tla tswalwa mme di ka se baakanngwe — netefatsa gore sengwe le sengwe se balega jaaka o batla."
     preview: "Leba"

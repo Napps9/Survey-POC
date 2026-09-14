@@ -20,7 +20,7 @@ import { t } from "lib/i18n"
 // (full-height snap pages, hidden rails) in application.css's M-STUDIO block.
 // Above 767px the classes are absent and the desktop editor is byte-identical.
 export default class extends Controller {
-  static targets = ["stage", "chrome", "titleText", "progressChip", "menu"]
+  static targets = ["stage", "chrome", "titleText", "themeText", "progressChip", "menu"]
 
   // The one width the studio calls a phone — the same flat test the CSS
   // blocks use. Not pointer-based, so a narrow window (and the system tests'
@@ -209,6 +209,31 @@ export default class extends Controller {
     if (!this.titleTextTarget.textContent.trim()) {
       this.titleTextTarget.textContent = desk.textContent
     }
+  }
+
+  // ── Theme (the line under the name, mirrored the same way) ──────────────
+
+  themeEdited() {
+    const desk = this.element.querySelector("[data-survey-editor-target='vertoTheme']")
+    if (!desk || !this.hasThemeTextTarget) return
+    desk.textContent = this.themeTextTarget.textContent
+    desk.dispatchEvent(new Event("input", { bubbles: true }))
+  }
+
+  themeKeydown(event) {
+    if (event.key !== "Enter") return
+    event.preventDefault()
+    this.themeTextTarget.blur()
+  }
+
+  themeBlurred() {
+    const desk = this.element.querySelector("[data-survey-editor-target='vertoTheme']")
+    if (!this.hasThemeTextTarget || !desk) return
+    if (this.themeTextTarget.textContent.trim()) return
+    // Mirroring emptied the desktop span too, so its own blur guard is what
+    // knows the saved theme: fire it, then copy the restored text back.
+    desk.dispatchEvent(new Event("blur"))
+    this.themeTextTarget.textContent = desk.textContent
   }
 
   // ── Overflow menu (undo · duplicate · delete live in the rail already) ──

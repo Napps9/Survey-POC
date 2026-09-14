@@ -82,6 +82,7 @@
      data-add-question-render-url-value="<%= render_survey_card_path(@survey) %>"
      data-add-question-demographic-url-value="<%= demographic_survey_card_path(@survey) %>"
      data-survey-editor-title-value="<%= @survey.title %>"
+     data-survey-editor-theme-value="<%= @survey.theme %>"
      data-survey-editor-description-value="<%= @survey.description %>"
      data-survey-editor-default-locale-value="<%= @survey.default_locale %>"
      data-survey-editor-locales-value="<%= @survey.verto_locales.to_json %>"
@@ -249,6 +250,21 @@
                 data-action="input->survey-editor#renameVerto:stop
                              keydown.enter->survey-editor#commitRename
                              blur->survey-editor#restoreRenameIfBlank"><%= @survey.title %></span>
+          <%# The theme, renameable beside the name. It is what respondents call the
+              Verto — the player's tab title, the link preview, the dashboard tile's
+              big line — and until now nothing could change it after the wizard, so
+              a copy's "(Copy)" was permanent. Same plumbing as the name: themeValue,
+              serialize(), #update; same lock once live. %>
+          <span class="editor-verto-title editor-verto-theme<%= ' is-locked' if live_locked %>"
+                contenteditable="<%= live_locked ? 'false' : 'true' %>"
+                role="textbox"
+                spellcheck="false"
+                data-survey-editor-target="vertoTheme"
+                aria-label="<%= t("editor.verto_theme", default: "Theme") %>"
+                title="<%= t("editor.verto_theme", default: "Theme") %>"
+                data-action="input->survey-editor#renameTheme:stop
+                             keydown.enter->survey-editor#commitTheme
+                             blur->survey-editor#restoreThemeIfBlank"><%= @survey.theme %></span>
           <%# flash() in survey_editor_controller rewrites the inner span's
               class list (text-xs + a colour), so the pill styling lives on
               the wrapper and persistent text styling inline. %>

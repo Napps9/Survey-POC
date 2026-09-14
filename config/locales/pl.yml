@@ -1254,6 +1254,7 @@ pl:
     modal_expand: "Zobacz to okno tak, jak widzi je osoba odpowiadająca"
     modal_collapse: "Zwiń to okno"
     live_locked_modal_note: "Nadal możesz dodać lub przeredagować okno karty — wyjaśnia pytanie, nie zmieniając go."
+    verto_theme: "Temat"
   dashboard_card:
     publish_warning: "Opublikować „%{title}”? Po publikacji pytania zostaną zablokowane i nie będzie można ich edytować — upewnij się, że wszystko wygląda dokładnie tak, jak chcesz."
     preview: "Podgląd"

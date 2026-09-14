@@ -67,6 +67,30 @@ class EditorAutosaveTest < ApplicationSystemTestCase
     end
   end
 
+  test "renaming the theme autosaves without a page reload" do
+    # The theme is what respondents call the Verto — the tab title, the link
+    # preview — and until the header grew this span nothing could change it
+    # after the wizard. Same path as the name: input event, debounce, PATCH.
+    sign_in_as(@user)
+    visit survey_path(@survey)
+    dismiss_cookie_banner
+
+    find("[data-survey-editor-target='vertoTheme']").click
+    execute_script(<<~JS)
+      const el = document.querySelector("[data-survey-editor-target='vertoTheme']")
+      el.textContent = "Safety At Work"
+      el.dispatchEvent(new Event("input", { bubbles: true }))
+      el.blur()
+    JS
+
+    assert_changes -> { @survey.reload.theme }, from: "Safety", to: "Safety At Work" do
+      Timeout.timeout(10) do
+        sleep 0.25 until @survey.reload.theme == "Safety At Work"
+      end
+    end
+    assert_equal "Original Name", @survey.reload.title, "a theme rename leaves the name alone"
+  end
+
   test "a blank rename is refused rather than saved" do
     # Losing a Verto's name to a stray select-all-delete would be a bad way to
     # find out autosave is eager.

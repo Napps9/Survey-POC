@@ -1274,6 +1274,7 @@ xh:
     modal_expand: "Bona le festile njengoko ibonwa ngophendulayo"
     modal_collapse: "Songa le festile"
     live_locked_modal_note: "Usenako ukongeza okanye ubhale kwakhona ifestile yekhadi — ichaza umbuzo ngaphandle kokuwutshintsha."
+    verto_theme: "Umxholo"
   dashboard_card:
     publish_warning: "Papasha “%{title}”? Xa isisebenza, imibuzo yayo icinyiwe kwaye ayinakuhlelwa — qiniseka ukuba yonke into ifundeka ngokuchanekileyo ngendlela oyifunayo."
     preview: "Jonga kuqala"

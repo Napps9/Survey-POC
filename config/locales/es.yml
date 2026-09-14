@@ -1252,6 +1252,7 @@ es:
     modal_expand: "Ver esta ventana como la ve quien responde"
     modal_collapse: "Plegar esta ventana"
     live_locked_modal_note: "Aún puedes añadir o reescribir la ventana de una tarjeta: explica una pregunta sin cambiarla."
+    verto_theme: "Tema"
   dashboard_card:
     publish_warning: "¿Publicar “%{title}”? Una vez en vivo, sus preguntas quedan bloqueadas y no se pueden editar — asegúrate de que todo esté exactamente como quieres."
     preview: "Vista previa"

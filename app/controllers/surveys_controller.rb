@@ -455,6 +455,15 @@ class SurveysController < ApplicationController
     # The editor guards this too, but a client-side guard that has already
     # failed once is not something to leave as the only one.
     attrs[:title]       = payload["title"].to_s.strip if payload.key?("title") && payload["title"].to_s.strip.present?
+    # The theme is renameable from the same header, under the same blank guard.
+    # It is the name every respondent-facing surface calls a Verto by — the
+    # player's <title> and og:title, the manifest, the mailers, the dashboard
+    # tile's big line — and nothing wrote it after the wizard, so a copy's
+    # "(Copy)" could not be taken off. Squished rather than stripped: it is one
+    # line, and the wizard's cap applies again.
+    if payload.key?("theme") && payload["theme"].to_s.strip.present?
+      attrs[:theme] = payload["theme"].to_s.squish.first(Survey::MAX_THEME)
+    end
     attrs[:description] = payload["description"] if payload.key?("description")
     attrs[:flows]       = Survey.sanitize_flows(payload["flows"]) if payload.key?("flows")
     if payload.key?("cards")

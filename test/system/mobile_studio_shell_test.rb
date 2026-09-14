@@ -129,6 +129,20 @@ class MobileStudioShellTest < ApplicationSystemTestCase
     assert_equal "Pocket Verto Renamed", @survey.reload.title
   end
 
+  test "renaming from the theme line reaches the saved Verto" do
+    open_editor(*PHONE)
+
+    line = find(".m-theme-text")
+    line.click
+    line.send_keys([ :control, "a" ], "workplace culture", :enter)
+
+    assert_text "Saved", wait: 10
+    assert_selector ".m-save-chip", text: "Saved"
+
+    assert_equal "workplace culture", @survey.reload.theme
+    assert_equal "Pocket Verto", @survey.title, "the name is not touched by a theme rename"
+  end
+
   test "the desktop editor shows no trace of the phone shell" do
     open_editor(*DESKTOP)
 

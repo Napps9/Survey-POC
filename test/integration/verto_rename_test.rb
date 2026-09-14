@@ -107,4 +107,90 @@ class VertoRenameTest < ActionDispatch::IntegrationTest
     assert_response :locked
     assert_equal "Original name", s.reload.title
   end
+
+  # ── The theme ─────────────────────────────────────────────────────────────
+  # The theme is what respondents call the Verto — the player's tab title, the
+  # link preview, the dashboard tile's big line — and nothing could change it
+  # after the wizard, so a copy's "(Copy)" was permanent. It is renameable from
+  # the same header now, through the same autosave, under the same rules.
+
+  test "the editor renders the theme as an editable field beside the name" do
+    s = draft
+    get survey_path(s)
+    assert_response :success
+    assert_select "[data-survey-editor-target='vertoTheme'][contenteditable='true']", text: "Sports"
+  end
+
+  test "the autosave payload renames the theme and leaves the name alone" do
+    s = draft
+    patch survey_path(s), params: { theme: "Sports, wave two", cards: s.cards }.to_json,
+                          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    s.reload
+    assert_equal "Sports, wave two", s.theme
+    assert_equal "Original name", s.title
+  end
+
+  test "a blank theme is ignored rather than saved" do
+    s = draft
+
+    [ "", "   ", "\n\t " ].each do |blank|
+      patch survey_path(s), params: { theme: blank, cards: s.cards }.to_json,
+                            headers: { "CONTENT_TYPE" => "application/json" }
+      assert_response :success
+      assert_equal "Sports", s.reload.theme,
+                   "a blank theme (#{blank.inspect}) must not overwrite the Verto's theme"
+    end
+  end
+
+  test "a theme is squished to one line and capped at the wizard's length" do
+    s = draft
+    patch survey_path(s), params: { theme: "  Sports \n and   more  ", cards: s.cards }.to_json,
+                          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    assert_equal "Sports and more", s.reload.theme
+
+    patch survey_path(s), params: { theme: "x" * (Survey::MAX_THEME + 40), cards: s.cards }.to_json,
+                          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    assert_equal Survey::MAX_THEME, s.reload.theme.length
+  end
+
+  test "the theme is read-only once live, like the name" do
+    s = draft
+    s.update!(publish_token: SecureRandom.urlsafe_base64(18), published_at: Time.current)
+
+    get survey_path(s)
+    assert_response :success
+    assert_select "[data-survey-editor-target='vertoTheme']"
+    assert_select "[data-survey-editor-target='vertoTheme'][contenteditable='true']", false
+
+    patch survey_path(s), params: { theme: "Nope" }.to_json,
+                          headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :locked
+    assert_equal "Sports", s.reload.theme
+  end
+
+  # The reported flow, end to end: copy a Verto, rename it, send the test link.
+  # The recipient's tab title and link preview read the new theme, and the
+  # original is untouched.
+  test "renaming a copy's theme is what its test link shows" do
+    original = draft(title: "Sports check", theme: "Sports")
+    post duplicate_survey_path(original)
+    copy = @org.surveys.order(:id).last
+
+    patch survey_path(copy), params: { theme: "Sports, wave two", cards: copy.cards }.to_json,
+                             headers: { "CONTENT_TYPE" => "application/json" }
+    assert_response :success
+    post test_link_survey_path(copy)
+    token = copy.reload.test_token
+    delete session_path
+
+    get test_survey_path(token)
+    assert_response :success
+    assert_select "head title", "Sports, wave two · Playverto"
+    assert_select "meta[property='og:title'][content=?]", "Sports, wave two · Playverto"
+    assert_select "meta[property='og:image:alt'][content=?]", "Sports, wave two · Playverto"
+    assert_equal "Sports", original.reload.theme
+  end
 end

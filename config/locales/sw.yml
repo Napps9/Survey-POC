@@ -1252,6 +1252,7 @@ sw:
     modal_expand: "Ona dirisha hili kama anavyoliona anayejibu"
     modal_collapse: "Kunja dirisha hili"
     live_locked_modal_note: "Bado unaweza kuongeza au kuandika upya dirisha la kadi — linaeleza swali bila kulibadilisha."
+    verto_theme: "Mada"
   dashboard_card:
     publish_warning: "Chapisha “%{title}”? Ikiwa hewani, maswali yake yatafungwa na hayawezi kuhaririwa — hakikisha kila kitu kiko sawasawa unavyotaka."
     preview: "Hakiki"

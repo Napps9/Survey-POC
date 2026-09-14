@@ -2444,7 +2444,13 @@ class Survey < ApplicationRecord
     organisation.surveys.create!(
       title:                   self.class.append_copy_suffix(title),
       description:             description,
-      theme:                   self.class.append_copy_suffix(theme),
+      # No "(Copy)" on the theme. It is the name a RESPONDENT sees — the player's
+      # tab title, the link preview's og:title, the manifest, the mailers — so a
+      # suffix here reached everyone the copy was ever shared with, and nothing
+      # could take it off again. The marker that tells the creator which tile
+      # is the copy is on title above, which the dashboard shows under the theme
+      # whenever the two differ.
+      theme:                   theme,
       audience_age:            audience_age,
       # Carried with the deck, not left behind: dup_cards copies any tailored
       # Heritage card's heritage_country along with it, so a copy that forgot
@@ -2747,6 +2753,9 @@ class Survey < ApplicationRecord
   # in SurveysController#update_settings alongside every other creator-written
   # column — LinkedIn truncates a title past 70; og:description is cut around
   # 200 everywhere; a respondent's message rides in an SMS body, so 160.
+  # The wizard's own cap on the theme (surveys/new, maxlength 120), applied
+  # again where the editor renames it.
+  MAX_THEME             = 120
   MAX_SHARE_TITLE       = 70
   MAX_SHARE_DESCRIPTION = 200
   MAX_SHARE_MESSAGE     = 160

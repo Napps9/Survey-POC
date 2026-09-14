@@ -21,12 +21,22 @@
 
     <div class="m-title-pill">
       <span class="m-live-dot<%= @survey.published? ? " is-live" : "" %>" aria-hidden="true"></span>
-      <span class="m-title-text"
-            data-mobile-studio-target="titleText"
-            <% unless live_locked %>
-            contenteditable="true" spellcheck="false" enterkeyhint="done"
-            data-action="input->mobile-studio#titleEdited keydown->mobile-studio#titleKeydown blur->mobile-studio#titleBlurred"
-            <% end %>><%= @survey.title %></span>
+      <span class="m-title-lines">
+        <span class="m-title-text"
+              data-mobile-studio-target="titleText"
+              <% unless live_locked %>
+              contenteditable="true" spellcheck="false" enterkeyhint="done"
+              data-action="input->mobile-studio#titleEdited keydown->mobile-studio#titleKeydown blur->mobile-studio#titleBlurred"
+              <% end %>><%= @survey.title %></span>
+        <%# The theme under the name — what respondents call the Verto — mirrored
+            into the desktop theme span the same way the name is. %>
+        <span class="m-theme-text"
+              data-mobile-studio-target="themeText"
+              <% unless live_locked %>
+              contenteditable="true" spellcheck="false" enterkeyhint="done"
+              data-action="input->mobile-studio#themeEdited keydown->mobile-studio#themeKeydown blur->mobile-studio#themeBlurred"
+              <% end %>><%= @survey.theme %></span>
+      </span>
     </div>
 
     <%= link_to preview_survey_path(@survey), class: "m-circle",

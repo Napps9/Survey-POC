@@ -1274,6 +1274,7 @@ st:
     modal_expand: "Bona fensetere ena joalo ka ha ea arabang a e bona"
     modal_collapse: "Mena fensetere ena"
     live_locked_modal_note: "O ntse o ka eketsa kapa wa ngola bocha fensetere ea karete — e hlalosa potso ntle le ho e fetola."
+    verto_theme: "Sehlooho"
   dashboard_card:
     publish_warning: "Phatlalatsa “%{title}”? Hang ha e phela, dipotso tsa yona di notlelehile mme ha di sa ka di fetolwa — netefatsa hore tsohle di ngotswe kamoo o li batlang kateng."
     preview: "Pontsho"

@@ -2266,6 +2266,12 @@
 }
 .editor-verto-title.is-locked { cursor: default; opacity: 0.75; }
 .editor-verto-title.is-locked:hover { background: transparent; border-color: transparent; }
+/* The theme beside the name: the same pill a size down and quieter, so the
+   pair reads as name-then-subject rather than as two names. */
+.editor-verto-theme {
+  font-family: 'ABeeZee', sans-serif; font-size: var(--text-sm);
+  color: rgba(255,255,255,0.72);
+}
 
 /* Off-site link for the thank-you screen. Plain inputs rather than
    contenteditable: a URL is typed, pasted and corrected, not laid out, and the
@@ -13133,7 +13139,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
   }
   .m-title-pill {
     flex: 1 1 auto; min-width: 0;
-    height: 40px; border-radius: 100px;
+    /* Two lines now (name over theme). 40px still holds both and keeps the
+       pill level with the circles beside it; a longer wrap grows it. */
+    min-height: 40px; height: auto; border-radius: 100px;
     display: flex; align-items: center; gap: 8px;
     padding: 0 14px;
   }
@@ -13153,6 +13161,22 @@ body.generating-overlay-active .bottom-bar { display: none; }
   /* Renaming needs the whole name, so the pill stops truncating while it has
      focus — and wraps rather than scrolling sideways under a thumb. */
   .m-title-text:focus {
+    white-space: normal; overflow: visible; text-overflow: clip;
+  }
+  .m-title-lines {
+    flex: 1 1 auto; min-width: 0;
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  /* The theme under the name: what respondents call the Verto, editable the
+     same way, a size down so the name stays the line the eye lands on. */
+  .m-theme-text {
+    min-width: 0;
+    font-family: "ABeeZee", sans-serif;
+    font-size: 0.6875rem; opacity: 0.72;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    outline: none;
+  }
+  .m-theme-text:focus {
     white-space: normal; overflow: visible; text-overflow: clip;
   }
   .m-title-pill:focus-within {

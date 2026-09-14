@@ -26,10 +26,36 @@ class SurveyDuplicateTest < ActionDispatch::IntegrationTest
     assert_redirected_to survey_path(copy)
     assert_not copy.published?
     assert_equal "T (Copy)", copy.title
-    assert_equal "Theme (Copy)", copy.theme
+    # The theme is what respondents see (tab title, link preview, the tile's
+    # big line), so it carries no "(Copy)" — the title above is the creator's
+    # marker, and the dashboard shows it under the theme when they differ.
+    assert_equal "Theme", copy.theme
     # Card content is copied verbatim; only the stable cids are freshly minted.
     assert_equal CARDS, copy.cards.map { |c| c.except("cid") }
     assert(copy.cards.all? { |c| c["cid"].to_s.start_with?("c_") })
+  end
+
+  # The reported bug. A copy's theme used to carry "(Copy)" into everything a
+  # respondent sees — the tab title, the link preview — and nothing could take
+  # it off, so a creator who copied a Verto and sent its test link out was
+  # sending "(Copy)" with it.
+  test "a copy's test link carries no (Copy): the theme is the name respondents see" do
+    original = @org.surveys.create!(title: "Sports check", theme: "Sports", audience_age: "all", key_insight: "k",
+                                     default_locale: "en", locales: [ "en" ], cards: CARDS.map(&:dup))
+    post duplicate_survey_path(original)
+    copy = @org.surveys.order(:id).last
+    assert_equal "Sports check (Copy)", copy.title, "the creator's own name still says which tile is the copy"
+
+    post test_link_survey_path(copy)
+    token = copy.reload.test_token
+    assert token.present?, "minting must store a token"
+    delete session_path
+
+    get test_survey_path(token)
+    assert_response :success
+    assert_select "head title", "Sports · Playverto"
+    assert_select "meta[property='og:title'][content=?]", "Sports · Playverto"
+    assert_select "meta[property='og:image:alt'][content=?]", "Sports · Playverto"
   end
 
   test "duplicating regenerates cids and remaps branching routes to the copy's cards" do

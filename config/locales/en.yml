@@ -1205,6 +1205,7 @@ en:
     consent_agreement_kicker: 'Agreement'
     thank_you_screen: 'Thank-you screen'
     verto_name: 'Verto name'
+    verto_theme: 'Theme'
     delete_card_n: 'Delete card %{n}'
     drag_to_reorder: 'Drag to reorder'
     remove_consent_gate: 'Remove consent gate'

@@ -1252,6 +1252,7 @@ vi:
     modal_expand: "Xem cửa sổ này như người trả lời nhìn thấy"
     modal_collapse: "Thu gọn cửa sổ này"
     live_locked_modal_note: "Bạn vẫn có thể thêm hoặc viết lại cửa sổ của thẻ — nó giải thích câu hỏi mà không thay đổi câu hỏi."
+    verto_theme: "Chủ đề"
   dashboard_card:
     publish_warning: "Đăng “%{title}”? Khi đã hoạt động, các câu hỏi sẽ bị khóa và không thể chỉnh sửa — hãy chắc chắn mọi thứ đúng như bạn muốn."
     preview: "Xem trước"
