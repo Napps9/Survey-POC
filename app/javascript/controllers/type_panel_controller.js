@@ -229,7 +229,7 @@ const COMPONENTS = {
     const responses = resolveResponses(ctx.responses)
     return `
     <div class="rotate-wrap" data-controller="tap-stack card-editor"
-         data-action="tap-stack:reset->tap-stack#reset tap-stack:goto->tap-stack#goto">
+         data-action="tap-stack:reset->tap-stack#reset tap-stack:goto->tap-stack#goto tap-stack:moved->media-picker#tapMoved">
       <div class="rotate-card-stack">
         ${opts.map((o,i) => {
           const img = optionImages[i]

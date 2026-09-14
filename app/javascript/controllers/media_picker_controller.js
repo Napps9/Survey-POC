@@ -92,6 +92,14 @@ export default class extends Controller {
     const card    = trigger?.closest("[data-survey-editor-target='card']")
                  || trigger?.closest(".survey-card-wrap")
     if (!card) return
+    // "Change media" / "Add design" mean the picture this panel is showing —
+    // and on a phone a tap card's panel is not showing one (see
+    // _panelTapIndex). The Background pill shares this action and is
+    // deliberately NOT redirected: a card backdrop is a card backdrop on every
+    // screen.
+    const panelMedia = trigger?.closest(".add-media-fab, .split-left-design-prompt")
+    const tapIndex   = panelMedia ? this._panelTapIndex(card) : null
+    if (tapIndex != null) return this._openTapOption(card, tapIndex)
     this._mode = "card"
     this._activeCard = card
     this._pendingUrl = null
@@ -246,6 +254,43 @@ export default class extends Controller {
     return Number.isNaN(raw) ? null : raw
   }
 
+  // A tap card's hero panel is DESKTOP furniture. On a phone the stack carries
+  // its own per-statement imagery, so the hero would only duplicate it — the
+  // player drops the strip and .split-left becomes `display: contents` ("Tap
+  // card on mobile" in application.css), and the editor's own phone/tablet
+  // bezel drops it the same way. The panel's pills floated on regardless and
+  // still pointed at the hero: "when you click Change media, it does actually
+  // upload — but to the left hand side on desktop… it replaces the main
+  // desktop asset and not the mobile background."
+  //
+  // So where the panel is not being drawn, those pills mean the picture that
+  // IS: the statement on top of the stack. Read off computed style rather than
+  // a width test, so the control follows whatever the CSS is doing at this
+  // size instead of keeping a second copy of the breakpoints.
+  _panelTapIndex(card) {
+    if (card?.dataset?.cardType !== "tap_card") return null
+    const left = card.querySelector(".split-left")
+    if (!left || getComputedStyle(left).display !== "contents") return null
+    const wrap  = card.querySelector(".rotate-wrap")
+    const total = wrap ? wrap.querySelectorAll(".rotate-card").length : 0
+    if (total === 0) return null
+    const stack = this.application.getControllerForElementAndIdentifier(wrap, "tap-stack")
+    const at    = Number.isInteger(stack?.position) ? stack.position : 0
+    // Clamped: a walked-out deck parks the position past its last card, and a
+    // picker has to land on a statement that exists.
+    return Math.min(Math.max(at, 0), total - 1)
+  }
+
+  // Keeps those pills honest as the creator walks the deck — Reposition exists
+  // only where the statement now on top has a picture to move. Bound to
+  // tap-stack's own layout, which runs on connect and after every move.
+  tapMoved(event) {
+    const wrap = event?.currentTarget
+    const card = wrap?.closest("[data-survey-editor-target='card']")
+              || wrap?.closest(".survey-card-wrap")
+    if (card) this._syncAdjustFab(card)
+  }
+
   // Opens the same modal but targets ONE tap-card statement's image instead
   // of the card's own left-panel image/video.
   openTapOption(event) {
@@ -256,11 +301,17 @@ export default class extends Controller {
                  || trigger?.closest(".survey-card-wrap")
     const index   = this._tapIndexFor(trigger, card)
     if (!card || index == null) return
+    this._openTapOption(card, index)
+  }
+
+  _openTapOption(card, index) {
     this._mode = "tapOption"
     this._optionIndex = index
     this._activeCard = card
     this._pendingUrl = null
     this._pendingVideo = null
+    this._pendingSource = null
+    this._pendingCrop = null
     this._setApplyEnabled(false)
     this._switchTabKey("library")
     // A tap-card statement's image is a photo only — no video slot here.
@@ -826,8 +877,11 @@ export default class extends Controller {
                  || trigger?.closest(".survey-card-wrap")
     if (!card) return
     // A chip inside a statement reframes that statement; the panel fab
-    // reframes the card's own hero.
-    const index = trigger?.closest(".rotate-card") ? this._tapIndexFor(trigger, card) : null
+    // reframes the card's own hero — or, where the hero is not being drawn,
+    // the statement the stack is showing in its place (see _panelTapIndex).
+    const index = trigger?.closest(".rotate-card")
+      ? this._tapIndexFor(trigger, card)
+      : this._panelTapIndex(card)
     const slot  = index == null ? this._cardSlot(card) : this._tapOptionSlot(card, index)
     if (!slot) return
 
@@ -1959,6 +2013,9 @@ export default class extends Controller {
       this._storeOptionFocals(card, focals)
     }
     this._syncTapAdjustBtn(card, index)
+    // The panel's own Reposition pill is this statement's too on a phone, so a
+    // picture arriving (or leaving) has to reach it as well as the chip.
+    this._syncAdjustFab(card)
 
     const rotateCard = card.querySelectorAll(".rotate-card")[index]
     if (!rotateCard) return
@@ -2045,8 +2102,18 @@ export default class extends Controller {
   // media gets its fab without waiting for the next server render.
   _syncAdjustFab(card) {
     const hasMedia = !!(card?.dataset.cardImage || card?.dataset.cardVideo)
+    // …and where the panel's pills act on a statement instead of the hero
+    // (_panelTapIndex), Reposition follows THAT picture: the hero is off
+    // screen, so offering to reframe it is offering to move nothing the
+    // creator can see — and a statement with no picture has nothing to move
+    // either. tapMoved re-runs this as the deck is walked.
+    const tapIndex = this._panelTapIndex(card)
     const fab = card?.querySelector(".media-adjust-fab")
-    if (fab) fab.hidden = !hasMedia
+    if (fab) {
+      fab.hidden = tapIndex == null
+        ? !hasMedia
+        : !this._parseUrls(card.dataset.cardOptionImages)[tapIndex]
+    }
     // …and its opposite number on the no-media panel. "Background" is offered
     // exactly where it does something (see ApplicationHelper#card_takes_backdrop?
     // for the one statement of that rule): on a bare card the backdrop IS the

@@ -305,6 +305,13 @@ export default class extends Controller {
     // statements, since the stack itself looks the same either way.
     if (this.hasPrevBtnTarget) this.prevBtnTarget.disabled = this.position <= 0
     if (this.hasNextBtnTarget) this.nextBtnTarget.disabled = this.position >= total - 1
+    // Which statement is on top is the editor's business as well as this
+    // widget's: on a phone the panel's "Change media" / "Reposition" pills act
+    // on the top card's picture (media-picker#_panelTapIndex), so they have to
+    // be told when it changes. Announced from layout() rather than from the
+    // pager, so connect, Reset, a drag and a jump all count as a move. Nothing
+    // listens in the player.
+    this.dispatch("moved", { detail: { index: this.position } })
   }
 
   // An answered card is flung 120% out of the stack and left there, because the
