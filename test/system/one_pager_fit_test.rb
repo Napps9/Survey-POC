@@ -30,7 +30,39 @@ class OnePagerFitTest < ApplicationSystemTestCase
   end
 
   def serve_probe_copy(pager, origin, token)
+    warm_player_render(origin, token)
     one_pager_copy(pager, origin: origin, token: token, dest: probe_path(pager))
+  end
+
+  # Each one-pager gives its embed SIX seconds to prove it booted — bootFrame's
+  # `giveUp` in public/*.html — and on failure clears the frame for the life of
+  # that page load. So a slow FIRST /play render doesn't make these tests
+  # slower, it makes them fail, and the `wait: 15` on the assertions below is
+  # waiting out a decision the page already took at second six. Raising that
+  # wait would have fixed nothing, which is worth writing down because it is
+  # the obvious thing to try.
+  #
+  # The first /play render in a worker pays Rails' lazy view compilation, and
+  # on CI four workers each do that at once, on one runner, in their own Chrome
+  # and Puma. Locally it is comfortably inside six seconds; on run 786 it was
+  # not, and system_test (3) went red on a commit that touched none of this.
+  #
+  # So render the player once before anything is measured. Once per PROCESS,
+  # not per test: each parallel worker is its own Rails app with its own view
+  # cache, and that cache is exactly what is being warmed — paying it again per
+  # test would buy nothing and cost a visit each time.
+  class << self
+    attr_accessor :player_warmed
+  end
+
+  def warm_player_render(origin, token)
+    return if self.class.player_warmed
+
+    self.class.player_warmed = true
+    visit "#{origin}/play/#{token}"
+    # The same proof bootFrame uses, so this warms the path it actually needs
+    # rather than one that merely resembles it.
+    assert_selector '[data-controller~="player"]', wait: 15
   end
 
   def published_survey
