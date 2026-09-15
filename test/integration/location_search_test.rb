@@ -27,6 +27,51 @@ class LocationSearchTest < ActionDispatch::IntegrationTest
     assert_equal "Austin, Texas, United States", r["display_name"]
   end
 
+  test "the location scale leaves the cap unchanged at its default" do
+    # PLAYER_LOCATION_RATE_LIMIT_SCALE is unset in test, which is the promise
+    # the comment above the declaration makes: setting nothing changes nothing.
+    assert_equal 1, PlayerController::LOCATION_RATE_LIMIT_SCALE
+  end
+
+  test "the location scale reaches location_search and nothing else" do
+    source = File.read(Rails.root.join("app/controllers/player_controller.rb"))
+
+    decl = source.lines.find { |l| l.include?('name: "location_search"') }
+    assert_match(/\* LOCATION_RATE_LIMIT_SCALE/, decl,
+                 "the per-IP location cap must carry its scale or a venue crowd hits it")
+
+    recall = source.lines.find { |l| l.include?('name: "recall"') }
+    refute_match(/RATE_LIMIT_SCALE/, recall,
+                 "recall and eligibility bound a code-guessing oracle for PRIVACY, not a crowd — " \
+                 "a bigger room is never a reason to allow more guesses")
+
+    assert_match(
+      /LOCATION_RATE_LIMIT_SCALE = ENV\.fetch\("PLAYER_LOCATION_RATE_LIMIT_SCALE", "1"\)\.to_i\.clamp\(1, 10_000\)/,
+      source,
+      "a scale of 0 multiplies the cap to zero and refuses every search — the clamp is what " \
+      "makes an unset or mistyped value a no-op instead of an outage"
+    )
+  end
+
+  test "a cached search term spends no outbound budget" do
+    # This is the invariant that makes scaling the per-IP cap safe, so it is
+    # pinned rather than trusted. The cap counts REQUESTS; the provider's usage
+    # policy is about API CALLS; and NominatimClient reads its day-long cache
+    # BEFORE it asks the limiter. If that order ever flips, raising the request
+    # cap starts spending real quota and becomes a way to get the app IP-banned.
+    tripwire = Object.new
+    def tripwire.allow?
+      raise "the outbound limiter must not be consulted for a cached term"
+    end
+
+    stub_method(Rails, :cache, ActiveSupport::Cache::MemoryStore.new) do
+      Rails.cache.write("geocode_search:v2:#{NominatimClient.send(:provider)}:austin:5", [ RESULT ])
+      stub_method(NominatimClient, :limiter, tripwire) do
+        assert_equal [ RESULT ], NominatimClient.search(query: "Austin")
+      end
+    end
+  end
+
   test "404s for an unknown token" do
     stub_method(NominatimClient, :search, ->(**_kw) { [] }) do
       get player_location_search_path("does-not-exist"), params: { q: "Austin" }

@@ -20,10 +20,17 @@ class PlayerController < ApplicationController
   # progress, consent, aggregate reads) in lockstep, read once at boot. Two
   # legitimate uses: the k6 load test, whose whole burst arrives from a
   # handful of runner IPs, and a real single-IP event (a venue NATing
-  # hundreds of respondents behind one address). Recall, eligibility and
-  # location_search are deliberately NOT scaled — the first two are
-  # code-guessing oracles bounded for privacy, the third spends LocationIQ
-  # quota; none is part of a bigger crowd's legitimate traffic.
+  # hundreds of respondents behind one address). Recall and eligibility are
+  # deliberately NOT scaled — they are code-guessing oracles bounded for
+  # privacy, not part of a bigger crowd's legitimate traffic.
+  #
+  # location_search USED to be in that list, on the grounds that it "spends
+  # LocationIQ quota". It has its own lever now, and the reason that sentence
+  # was wrong is worth keeping: NominatimClient reads its day-long cache
+  # BEFORE it checks the outbound budget, so a repeated search term makes no
+  # API call at all. Requests-per-IP and API-calls-per-app are two different
+  # numbers, and only the second is what the provider's policy is about —
+  # GEOCODE_MAX_RPS still bounds it, untouched. See LOCATION_RATE_LIMIT_SCALE.
   #
   # Every declaration carries a distinct `name:` because Rails keys the
   # counter on ["rate-limit", controller_path, name, ip] — with no name,
@@ -60,7 +67,28 @@ class PlayerController < ApplicationController
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # A respondent's autocomplete keystrokes are debounced client-side, so a
   # generous per-minute cap here only guards against a runaway client/bot.
-  rate_limit to: 30, within: 1.minute, only: :location_search, name: "location_search",
+  #
+  # PLAYER_LOCATION_RATE_LIMIT_SCALE multiplies it, and is its own lever rather
+  # than part of PLAYER_RATE_LIMIT_SCALE for the reason above: this cap counts
+  # REQUESTS, and the thing worth protecting is outbound API CALLS. A rate_limit
+  # is a before_action, so it fires before #location_search reaches
+  # NominatimClient — which means a term already in the day-long cache, costing
+  # the provider nothing, is refused anyway once the minute's budget is spent.
+  #
+  # Measured against the case that found it: 250 people in one room, on one
+  # venue NAT address, each typing a city into the last card of twelve. Three
+  # debounced searches apiece is ~250 requests a minute against a cap of 30 —
+  # and they are overwhelmingly the SAME few city names, so nearly all of them
+  # would have been cache hits. The cap was turning free lookups away.
+  #
+  # What a refusal looks like is why this matters more than the numbers: the
+  # 429 body has no `results` key, and location_search_controller.js does
+  # `Array.isArray(data.results) ? data.results : []` and then clears the list.
+  # So a throttled respondent sees an ordinary search box that simply never
+  # suggests anything — no error, no explanation — and since _pick is the only
+  # thing that writes an answer, they record no location at all.
+  LOCATION_RATE_LIMIT_SCALE = ENV.fetch("PLAYER_LOCATION_RATE_LIMIT_SCALE", "1").to_i.clamp(1, 10_000)
+  rate_limit to: 30 * LOCATION_RATE_LIMIT_SCALE, within: 1.minute, only: :location_search, name: "location_search",
              with: -> { render json: { ok: false, error: "Too many requests — please slow down." }, status: :too_many_requests }
   # Join is capped twice, in the SessionsController shape: the per-IP limit
   # stops one machine walking a list of addresses, and the per-address limit
