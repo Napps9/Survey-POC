@@ -137,6 +137,25 @@ class AuthThrottlingTest < ActionDispatch::IntegrationTest
                  source)
   end
 
+  test "the join scale reaches the whole join journey, not just PlayerController" do
+    # #join does not finish a signup. It mints a PlayerSignInLink and returns
+    # its path; the player navigates to PlayerSignInsController#create, and that
+    # is where the account begins. Scaling only the first half meant a crowd
+    # cleared a 250-per-5-minutes gate and hit a 20-per-5-minutes one seconds
+    # later — so the property worth pinning is that BOTH controllers read the
+    # SAME environment variable, not that either holds a particular number.
+    assert_equal PlayerController::JOIN_RATE_LIMIT_SCALE,
+                 PlayerSignInsController::JOIN_RATE_LIMIT_SCALE,
+                 "both halves of the join journey must scale together"
+
+    signin = File.read(Rails.root.join("app/controllers/player_sign_ins_controller.rb"))
+    assert_match(/ENV\.fetch\("PLAYER_JOIN_RATE_LIMIT_SCALE", "1"\)\.to_i\.clamp\(1, 10_000\)/, signin,
+                 "the sign-in half must read the same lever, with the same clamp")
+    decl = signin.lines.find { |l| l.include?('name: "signin_ip"') }
+    assert_match(/\* JOIN_RATE_LIMIT_SCALE/, decl,
+                 "signin_ip is the cap a joining crowd actually hits — it must carry the scale")
+  end
+
   test "the matcher would notice a controller with no limit" do
     # Guards the guard: without this, a matcher that returned true for
     # everything would make the assertions above meaningless — which is exactly

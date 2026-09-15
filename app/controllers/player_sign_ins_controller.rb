@@ -23,7 +23,30 @@ class PlayerSignInsController < ApplicationController
   # A link is a bearer credential, and the address it was sent to is the only
   # thing bounding who can try one. Distinct names because Rails keys the
   # counter on [controller_path, name, ip] — see PlayerController's comment.
-  rate_limit to: 20, within: 5.minutes, only: :create, name: "signin_ip",
+  #
+  # Scaled by PLAYER_JOIN_RATE_LIMIT_SCALE, the same lever PlayerController's
+  # join gates read, because the join journey does not end there. #join mints a
+  # link and returns its path; the player JS navigates here; and THIS is where
+  # the account actually begins. Scaling the door and leaving the corridor flat
+  # meant a venue crowd cleared a 250-per-5-minutes gate and then hit a
+  # 20-per-5-minutes one, five seconds later — found on the morning of the
+  # event it would have happened at, with the first fix already in production.
+  #
+  # Read from the env rather than referenced as
+  # PlayerController::JOIN_RATE_LIMIT_SCALE deliberately: a cross-controller
+  # constant would make this class's limits depend on another controller having
+  # been loaded first, which is a load-order bug waiting for the one request
+  # that arrives in the wrong order. A test pins the two to the same variable
+  # instead, which is the property that actually matters.
+  #
+  # What this widens, stated rather than glossed: the cap also bounds how many
+  # EMAILED links one address may spend, which is the brute-force bound on a
+  # bearer credential. A token is SecureRandom.urlsafe_base64(32) — 256 bits —
+  # so 500 attempts in five minutes is no nearer guessing one than 20 was, and
+  # #consume! is atomic single-use regardless. At the default of 1 this widens
+  # nothing at all.
+  JOIN_RATE_LIMIT_SCALE = ENV.fetch("PLAYER_JOIN_RATE_LIMIT_SCALE", "1").to_i.clamp(1, 10_000)
+  rate_limit to: 20 * JOIN_RATE_LIMIT_SCALE, within: 5.minutes, only: :create, name: "signin_ip",
              with: -> { redirect_to you_path, alert: t("player_sign_in.too_many") }
 
   before_action :find_link
