@@ -1346,6 +1346,7 @@ fr:
     new_name_placeholder: "Pour qui ? ex. Newsletter"
     new_url_placeholder: "newsletter"
     add_link: "Créer le lien"
+    save: "Enregistrer"
     new_link_default_name: "Nouveau lien"
     recall_link: "Rappeler le lien"
     restore_link: "Réactiver le lien"

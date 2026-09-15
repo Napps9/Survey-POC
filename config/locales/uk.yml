@@ -1348,6 +1348,7 @@ uk:
     new_name_placeholder: "Для кого? напр. Розсилка"
     new_url_placeholder: "newsletter"
     add_link: "Створити посилання"
+    save: "Зберегти"
     new_link_default_name: "Нове посилання"
     recall_link: "Відкликати посилання"
     restore_link: "Повернути посилання"

@@ -1346,6 +1346,7 @@ tr:
     new_name_placeholder: "Kime? örn. Bülten"
     new_url_placeholder: "newsletter"
     add_link: "Bağlantı oluştur"
+    save: "Kaydet"
     new_link_default_name: "Yeni bağlantı"
     recall_link: "Bağlantıyı geri çek"
     restore_link: "Bağlantıyı geri aç"

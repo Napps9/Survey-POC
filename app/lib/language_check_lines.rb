@@ -202,4 +202,39 @@ module LanguageCheckLines
       { total: rows.size, translated: translated, primary: locale == primary }
     end
   end
+
+  # Where every language stands, in the one shape both the rail and the status
+  # endpoint report. They used to work this out separately and could therefore
+  # disagree — the rail deciding whether to poll from run rows, the endpoint
+  # answering the poll from the same rows, and neither of them looking at the
+  # deck. Coverage is the deck, which is the thing a reviewer actually reads.
+  def poll_state(coverage, runs, locales, primary)
+    locales.map do |locale|
+      cov  = coverage[locale] || { total: 0, translated: 0 }
+      done = cov[:total].to_i.positive? && cov[:translated] == cov[:total]
+      state = if locale == primary then "primary"
+      elsif done            then "done"
+      else runs[locale]&.display_status || "none"
+      end
+      { locale: locale, state: state, translated: cov[:translated].to_i, total: cov[:total].to_i }
+    end
+  end
+
+  # Is anything still expected to land? Deliberately counts a language with NO
+  # run row at all ("none") as outstanding. Most translation paths never write
+  # one — VertoGeneration.translate_survey! and translate_cards! cover creation,
+  # import, generating a card, optimising one and adding a question — and those
+  # are exactly the cases that used to leave a creator staring at "Not
+  # translated yet" until they thought to reload. A recorded failure is the one
+  # thing that stops the asking: it has a Try again button of its own.
+  def outstanding?(rows)
+    rows.any? { |r| r[:total].positive? && !%w[primary done failed].include?(r[:state]) }
+  end
+
+  # What has to change before the page is worth reloading. States only: a count
+  # ticking up is repainted in place, and reloading on it would throw away
+  # whatever the creator was in the middle of doing on the board.
+  def poll_signature(rows)
+    rows.map { |r| "#{r[:locale]}:#{r[:state]}" }.join(",")
+  end
 end

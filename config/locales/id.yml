@@ -1346,6 +1346,7 @@ id:
     new_name_placeholder: "Untuk siapa? mis. Buletin"
     new_url_placeholder: "newsletter"
     add_link: "Buat tautan"
+    save: "Simpan"
     new_link_default_name: "Tautan baru"
     recall_link: "Tarik tautan"
     restore_link: "Aktifkan lagi"

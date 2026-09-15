@@ -3133,6 +3133,16 @@
 }
 .choice-list-label { flex: 1; }
 .choice-list-tick { margin-left: auto; }
+/* Label and its token amounts as one column, so the chip costs the row height
+   rather than the label's width. Only present when there are amounts to show —
+   an option without them keeps the flat row, which is also what the editor's
+   JS builders make. */
+.choice-list-labels {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+}
+.choice-list-labels > .choice-list-label { flex: 0 1 auto; }
+.choice-list-labels > .token-option-badge { max-width: 100%; }
 /* "Show the points on each answer" (Survey#token_amounts_shown): what an
    option is worth, beside its label, before it is picked. A sibling of the
    label, not inside it (see _card_component's token_badge). */
@@ -3171,6 +3181,14 @@
 }
 .choice-list:has(> .choice-list-item:nth-child(7)) .pick-text {
   font-size: 13px;
+}
+/* The chip was the one thing this tier left at full size, which mattered less
+   when it sat on the row and matters more now it sets the row's height. */
+.choice-list:has(> .choice-list-item:nth-child(7)) .choice-list-labels {
+  gap: 3px;
+}
+.choice-list:has(> .choice-list-item:nth-child(7)) .choice-list-labels > .token-option-badge {
+  font-size: 11px; line-height: 15px; padding: 1px 6px;
 }
 
 /* ── Per-type accents ─────────────────────────────
@@ -9347,6 +9365,15 @@ body.generating-overlay-active .bottom-bar { display: none; }
   .preview-overlay .pick-text { font-size: var(--play-label); line-height: 1.3; }
   .preview-overlay .choice-list-label,
   .preview-overlay .pick-text { color: #1C2034; }
+  /* The chip had no phone rule at all: it kept its desktop 12px and its nowrap
+     on a 390px screen. Scoped to the stack on purpose — a bare
+     `.preview-overlay .token-option-badge` ties on specificity with
+     `.choice-card-bg .token-option-badge` and wins on source order, which would
+     let a grid card's corner chip wrap out of its own corner. */
+  .preview-overlay .choice-list-labels { gap: 3px; }
+  .preview-overlay .choice-list-labels > .token-option-badge {
+    font-size: 11px; line-height: 15px; padding: 1px 7px; white-space: normal;
+  }
   /* Tint only, same as the desktop rule — the ring lives on the swatch now, so
      restating border-color here would put the box back around the words on
      exactly the surface the note was written about. */
@@ -10608,6 +10635,9 @@ body.generating-overlay-active .bottom-bar { display: none; }
    because it's the same act — consequential, not destructive. */
 .share-btn--warn { border-color: rgba(255,194,75,0.5); color: #FFC24B; }
 .share-btn--warn:hover { background: rgba(255,194,75,0.08); color: #FFC24B; }
+/* Sits inside a link's title row, beside a 5px-padded rename field — the full
+   9px/16px button would set the row's height on its own. */
+.share-btn--compact { padding: 5px 10px; font-size: 12px; }
 
 .share-via-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .share-chip {
@@ -11998,13 +12028,29 @@ body.generating-overlay-active .bottom-bar { display: none; }
 
 /* Points Checkpoint card body (player) — populated client-side. */
 .token-checkpoint-body { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+/* A column now: the numbers on top, a bar under them. Four totals within a few
+   points of each other are a table you have to read; as bars, which one is
+   ahead is the first thing you see. */
 .token-checkpoint-row {
-  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  display: flex; flex-direction: column; gap: 8px; padding: 10px 14px;
   border-radius: 14px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3);
 }
+.token-checkpoint-head { display: flex; align-items: center; gap: 10px; }
 .token-checkpoint-icon { font-size: 24px; }
 .token-checkpoint-amount { font-family: "Alata", sans-serif; font-size: 22px; color: #1C2034; }
 .token-checkpoint-name { font-family: "ABeeZee", sans-serif; font-size: 13px; color: rgba(0,0,0,0.55); }
+/* Drawn even at zero, so the card does not change shape between one checkpoint
+   and the next. */
+.token-checkpoint-track {
+  height: 10px; border-radius: 5px; overflow: hidden; background: rgba(245,158,11,0.18);
+}
+.token-checkpoint-fill {
+  height: 100%; width: 0; border-radius: 5px; background: #F59E0B;
+  transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+/* A token you can lose is a different story from one you collect. */
+.token-checkpoint-fill.is-loss { background: #EF4444; }
+@media (prefers-reduced-motion: reduce) { .token-checkpoint-fill { transition: none; } }
 .token-checkpoint-placeholder {
   margin-top: 8px; font-family: "ABeeZee", sans-serif; font-size: 13px;
   color: rgba(0,0,0,0.4); font-style: italic;

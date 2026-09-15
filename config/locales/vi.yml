@@ -1346,6 +1346,7 @@ vi:
     new_name_placeholder: "Dành cho ai? vd. Bản tin"
     new_url_placeholder: "newsletter"
     add_link: "Tạo liên kết"
+    save: "Lưu"
     new_link_default_name: "Liên kết mới"
     recall_link: "Thu hồi liên kết"
     restore_link: "Khôi phục liên kết"

@@ -204,11 +204,34 @@ class LanguageCheckSystemTest < ApplicationSystemTestCase
     within(".lc-rail") { assert_text "Translated", wait: 15 }
   end
 
-  test "a page with nothing running does not poll" do
+  test "a fully translated Verto does not poll" do
+    cards = @survey.cards.map do |c|
+      c.merge("i18n" => %w[es fr].index_with do |loc|
+        { "text" => "#{loc}:#{c['text']}", "description" => c["description"].presence && "#{loc}:#{c['description']}",
+          "options" => Array(c["options"]).map { |o| "#{loc}:#{o}" }.presence }.compact
+      end)
+    end
+    @survey.update!(cards: cards)
+
     sign_in_as(@user)
     visit survey_language_check_path(@survey)
     dismiss_cookie_banner
     assert_selector "[data-language-status-working-value='false']"
+  end
+
+  # The reported bug, at the rail. French has no words and no SurveyTranslation
+  # row — the shape every translation path that isn't TranslateLocalesJob leaves
+  # behind. The page used to read that as nothing to wait for, never arm the
+  # poll, and sit on "Not translated yet" until somebody reloaded by hand.
+  test "a language nobody recorded a run for still makes the page watch" do
+    sign_in_as(@user)
+    visit survey_language_check_path(@survey)
+    dismiss_cookie_banner
+    assert_selector "[data-language-status-working-value='true']"
+    # And it must not answer that by reloading itself over and over: the poll
+    # reloads on a language CHANGING state, and nothing here changes.
+    assert_selector ".lc-rail-item", text: /French/
+    assert_no_selector ".lc-rail-status--working"
   end
 
   # ── The share modal ────────────────────────────────────────────────────────

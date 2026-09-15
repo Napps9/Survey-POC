@@ -1346,6 +1346,7 @@ ar:
     new_name_placeholder: "لمن؟ مثلاً: النشرة"
     new_url_placeholder: "newsletter"
     add_link: "إنشاء رابط"
+    save: "حفظ"
     new_link_default_name: "رابط جديد"
     recall_link: "سحب الرابط"
     restore_link: "إعادة تفعيل الرابط"

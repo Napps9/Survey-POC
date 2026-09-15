@@ -8,24 +8,37 @@ import { Controller } from "@hotwired/stimulus"
 // wearing a hint: it still makes somebody do the waiting, and it still leaves
 // them unable to tell "not yet" from "not ever".
 //
-// Polls only while the server says something is outstanding, and stops the
-// moment it isn't — so a page left open on a finished Verto costs nothing. The
-// server reports display_status, which means a run abandoned by a dead worker
-// ends the poll instead of keeping a tab asking for ever
-// (SurveyTranslation#stale?).
+// Polls only while something is still expected to land, and stops when it
+// isn't — so a page left open on a finished Verto costs nothing. What counts
+// as outstanding is read off the DECK (LanguageCheckLines.outstanding?), which
+// includes a language with no translation run recorded against it at all: most
+// of the ways a Verto gets translated never write one, and those were exactly
+// the pages that sat on "Not translated yet" until somebody reloaded.
+//
+// The reload is driven by a STATE SIGNATURE, not by the absence of work. A
+// language nobody has started reports nothing outstanding for as long as it
+// stays that way, so reloading on that answer would reload this page every few
+// seconds for ever. A run abandoned by a dead worker still ends the poll —
+// display_status decides that, server-side (SurveyTranslation#stale?).
 //
 // Enhancement only. With no JavaScript the rail is exactly what it was: correct
 // at render time, refreshed by reloading — which is the same deal the rest of
 // this screen offers, every action being a plain form POST.
 export default class extends Controller {
-  static values = { url: String, working: Boolean }
+  static values = { url: String, working: Boolean, signature: String }
   static targets = ["rail"]
 
   static INTERVAL_MS = 4000
-  // ~6 minutes of asking. The server's own staleness window is longer and is
+  // Most translations land in the first minute; after that, asking every four
+  // seconds is just noise. Backing off buys a longer wall-clock window for
+  // fewer requests than the flat 90 ticks this replaces (45 against 90), which
+  // matters now that the page watches more often than it used to.
+  static SLOW_AFTER = 15
+  static SLOW_MS = 12000
+  // ~7 minutes of asking. The server's own staleness window is longer and is
   // what decides whether a run is dead; this only stops one tab pestering it
   // if something upstream never resolves.
-  static MAX_TICKS = 90
+  static MAX_TICKS = 45
 
   connect() {
     this._stopped = false
@@ -40,7 +53,10 @@ export default class extends Controller {
 
   _schedule() {
     clearTimeout(this._timer)
-    this._timer = setTimeout(() => this._tick(), this.constructor.INTERVAL_MS)
+    const ms = this._ticks >= this.constructor.SLOW_AFTER
+      ? this.constructor.SLOW_MS
+      : this.constructor.INTERVAL_MS
+    this._timer = setTimeout(() => this._tick(), ms)
   }
 
   async _tick() {
@@ -59,17 +75,33 @@ export default class extends Controller {
       return
     }
 
+    // A language has CHANGED state since this page was drawn. The board below
+    // the rail is out of date too — it was rendered before that translation
+    // existed — so the honest move is a full reload rather than repainting the
+    // rail over a stale board and leaving the two disagreeing.
+    //
+    // Reloading on "nothing outstanding" instead, which is what this did, is
+    // only safe while the page is armed exclusively by live run rows. The page
+    // now also watches a language that has no run row at all — the common case,
+    // since most translation paths never write one — and for that language the
+    // server reports nothing outstanding for as long as it stays untranslated.
+    // Reloading on that answer is a page that reloads itself every four seconds
+    // for ever, on the screen a creator is working in.
+    if (data.signature && this.hasSignatureValue && data.signature !== this.signatureValue) {
+      window.location.reload()
+      return
+    }
+
+    this._paint(data.languages || [])
+
     if (data.working && this._ticks < this.constructor.MAX_TICKS) {
-      this._paint(data.languages || [])
       this._schedule()
       return
     }
 
-    // Nothing outstanding. The board below the rail is now out of date too —
-    // it was rendered before these translations existed — so the honest move
-    // is a full reload rather than repainting the rail over a stale board and
-    // leaving the two disagreeing.
-    window.location.reload()
+    // Nothing outstanding and nothing changed. Stop, quietly: the rail is
+    // already showing what is true, and a language nobody has started is a
+    // state this screen reports rather than an event it waits for.
   }
 
   // Live counts while we wait, so a long deck visibly progresses instead of

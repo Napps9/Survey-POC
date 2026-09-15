@@ -1366,6 +1366,7 @@ st:
     new_name_placeholder: "Ke bakeng sa mang? mohlala, Koranta"
     new_url_placeholder: "newsletter"
     add_link: "Theha kgokahano"
+    save: "Boloka"
     new_link_default_name: "Kgokahano e ntjha"
     recall_link: "Hlakola kgokahano nakwana"
     restore_link: "Kgutlisa kgokahano"

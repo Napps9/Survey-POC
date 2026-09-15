@@ -1726,6 +1726,14 @@
                          placeholder="summer-feedback-2026"
                          onchange="this.form.requestSubmit()"
                          style="flex:1;min-width:0;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);outline:none;" />
+                  <%# A visible way to commit it. The field has always saved on
+                      Enter or on blur (the onchange above), but with no button
+                      and no hint, a creator who typed a link and looked for
+                      somewhere to click found nothing and assumed the feature
+                      was missing. The onchange stays — this is an addition, so
+                      both habits keep working. %>
+                  <button type="submit"
+                          style="flex-shrink:0;padding:8px 14px;border-radius:10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.85);font-family:'ABeeZee',sans-serif;font-size: var(--text-sm);cursor:pointer;">Save</button>
                 </div>
               <% end %>
               <% if params[:slug_error] == "taken" %>

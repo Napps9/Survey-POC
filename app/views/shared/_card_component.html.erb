@@ -79,6 +79,22 @@
              aria: { label: parts.map(&:last).join(", ") })
   end
 
+  # The amounts go UNDER the option's words, not beside them. The chip is
+  # flex-shrink:0 and nowrap, so on a row it never yields and the label pays for
+  # it in wrapped lines — which is fine for "Blue" and not fine for an option
+  # carrying the sentence that explains the trade-off it represents. A creator
+  # putting that sentence there is doing the right thing; the row was the thing
+  # in the wrong.
+  #
+  # Only wrapped when there IS a chip. The editor builds these same rows in
+  # JavaScript (lib/choice_templates.js) and builds them flat; badges never
+  # render there anyway (show_amounts is player-only), so leaving the unbadged
+  # shape exactly as it was keeps the two in step.
+  label_stack = lambda do |canon_label, label_html|
+    chip = token_badge.call(canon_label)
+    chip.blank? ? label_html : tag.div(safe_join([ label_html, chip ]), class: "choice-list-labels")
+  end
+
   # Logic / answer-branching: every option-bearing card can route each answer
   # to a different card, flow or end screen (LogicGraph::ROUTABLE). Editor-only
   # chrome (like the quiz/token controls); the player follows the same routes
@@ -273,8 +289,8 @@
               <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(multi) %>>
             <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
-            <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
-            <%= token_badge.call(canon[i]) %>
+            <% label = capture do %><span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span><% end %>
+            <%= label_stack.call(canon[i], label) %>
             <span class="choice-list-tick <%= multi ? 'pick-square' : 'pick-dot' %>">✓</span>
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="<%= multi ? 'multi' : 'single' %>"
@@ -356,8 +372,8 @@
               <%= option_style_data_attrs(style) if editable %>
               <%= pick_a11y.call(false) %>>
             <div class="choice-list-tile choice-bg-<%= bg %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon_label, keyword_fallback: false, index: i) %></div>
-            <span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span>
-            <%= token_badge.call(canon_label) %>
+            <% label = capture do %><span class="pick-text choice-list-label" <%= ce_attr %>><%= t("card.#{canon_label.downcase}", locale: display_locale, default: canon_label) %></span><% end %>
+            <%= label_stack.call(canon_label, label) %>
             <span class="choice-list-tick pick-dot">✓</span>
             <% if quiz_mode %>
               <button type="button" class="mark-correct" data-picker-mode="single"
@@ -592,8 +608,8 @@
                       data-selected="false"
                       <%= pick_a11y.call(false) %>>
                     <div class="choice-list-tile choice-bg-<%= (i % 6) + 1 %>" aria-hidden="true" style="<%= option_tile_style(style) %>"><%= option_tile_icon(style, canon[i], index: i) %></div>
-                    <span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span>
-                    <%= token_badge.call(canon[i]) %>
+                    <% label = capture do %><span class="pick-text choice-list-label" <%= ce_attr %> <%= "data-rich-text".html_safe if editable %>><%= rich_option_text(card, opt, i) %></span><% end %>
+                    <%= label_stack.call(canon[i], label) %>
                     <span class="choice-list-tick pick-dot">✓</span>
                     <% if quiz_mode %>
                       <button type="button" class="mark-correct" data-picker-mode="single"

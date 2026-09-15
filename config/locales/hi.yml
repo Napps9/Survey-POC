@@ -1346,6 +1346,7 @@ hi:
     new_name_placeholder: "किसके लिए? जैसे न्यूज़लेटर"
     new_url_placeholder: "newsletter"
     add_link: "लिंक बनाएँ"
+    save: "सहेजें"
     new_link_default_name: "नया लिंक"
     recall_link: "लिंक वापस लें"
     restore_link: "लिंक बहाल करें"

@@ -1366,6 +1366,7 @@ tn:
     new_name_placeholder: "Ke bakeng sa mang? sk. Lokwalo lwa Ditiragalo"
     new_url_placeholder: "newsletter"
     add_link: "Dira kgokaganyo"
+    save: "Boloka"
     new_link_default_name: "Kgokaganyo e ntšha"
     recall_link: "Gogela kgokaganyo"
     restore_link: "Busa kgokaganyo"

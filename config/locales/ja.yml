@@ -1346,6 +1346,7 @@ ja:
     new_name_placeholder: "送る相手は？ 例：ニュースレター"
     new_url_placeholder: "newsletter"
     add_link: "リンクを作成"
+    save: "保存"
     new_link_default_name: "新しいリンク"
     recall_link: "リンクを引き上げる"
     restore_link: "リンクを再開する"

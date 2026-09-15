@@ -89,6 +89,23 @@ class TokenOptionBadgesTest < ActionDispatch::IntegrationTest
     # _canonicalOf falls back to the label's text.
     assert_select ".choice-list-label .token-option-badge", count: 0
     assert_select ".choice-label .token-option-badge", count: 0
+
+    # Under the words, not next to them — label and chip stacked as siblings in
+    # one column. Sibling, still, for the same _canonicalOf reason as above.
+    assert_select ".choice-list-labels > .choice-list-label", minimum: 1
+    assert_select ".choice-list-labels > .token-option-badge", minimum: 1
+    assert_select "[data-canonical='Pizza'] .choice-list-labels > .token-option-badge",
+                  text: "🪙 500,000"
+
+    # No chip, no wrapper. The editor builds these rows in JS and builds them
+    # flat (lib/choice_templates.js); an unconditional wrapper would leave a
+    # server-rendered option and a just-added one with different DOM.
+    assert_select "[data-canonical='Gamma'] .choice-list-labels", count: 0
+
+    # The grid keeps the chip as a DIRECT child of the tile background — its
+    # corner positioning is absolute against it, so a wrapper would drop it.
+    assert_select ".choice-card-bg > .token-option-badge", text: "🪙 2 · ⚫ 1"
+    assert_select ".choice-card .choice-list-labels", count: 0
   end
 
   test "no tokenisation, no badges — whatever the switch says" do

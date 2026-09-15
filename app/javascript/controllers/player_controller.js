@@ -3167,12 +3167,46 @@ export default class extends Controller {
     if (!card || card.dataset.cardType !== "token_checkpoint") return
     const body = card.querySelector(".token-checkpoint-body")
     if (!body || !this.tokenTypesValue.length) return
-    body.innerHTML = this.tokenTypesValue.map(tt => `
+
+    const totals = this.tokenTypesValue.map(tt => this._tokenTotals[tt.id] || 0)
+    // Scaled against whoever is ahead, because there is no ceiling to scale
+    // against: awards are unbounded running sums and can go negative (tokens
+    // as lives). Magnitude sets the length, the sign sets the colour — the
+    // question a checkpoint answers is which of these is winning, and a bar
+    // drawn against an invented maximum would answer a different one.
+    const peak = Math.max(...totals.map(Math.abs))
+
+    // _update() lands here on EVERY navigation, backwards included. Rebuilding
+    // unconditionally re-ran the fill transition each time, so stepping back
+    // over a checkpoint made the bars twitch rather than arrive.
+    const sig = totals.join("|")
+    if (body.dataset.totals === sig) return
+    body.dataset.totals = sig
+
+    body.innerHTML = this.tokenTypesValue.map((tt, i) => {
+      const n = totals[i]
+      // A 2% floor so that one point against five hundred still reads as a
+      // token someone collected rather than an empty track.
+      const pct = peak === 0 ? 0 : Math.max(n === 0 ? 0 : 2, Math.round(Math.abs(n) / peak * 100))
+      return `
       <div class="token-checkpoint-row">
-        <span class="token-checkpoint-icon">${this._esc(tt.icon)}</span>
-        <span class="token-checkpoint-amount">${this._fmtTokens(this._tokenTotals[tt.id] || 0)}</span>
-        <span class="token-checkpoint-name">${this._esc(tt.name)}</span>
-      </div>`).join("")
+        <div class="token-checkpoint-head">
+          <span class="token-checkpoint-icon">${this._esc(tt.icon)}</span>
+          <span class="token-checkpoint-amount">${this._fmtTokens(n)}</span>
+          <span class="token-checkpoint-name">${this._esc(tt.name)}</span>
+        </div>
+        <div class="token-checkpoint-track" aria-hidden="true">
+          <div class="token-checkpoint-fill${n < 0 ? " is-loss" : ""}" data-pct="${pct}"></div>
+        </div>
+      </div>`
+    }).join("")
+
+    // Width last, so the transition has a zero to start from. The bar is
+    // decorative — the number it echoes is already read out beside it — so
+    // nothing here needs announcing.
+    requestAnimationFrame(() => {
+      body.querySelectorAll(".token-checkpoint-fill").forEach(f => { f.style.width = `${f.dataset.pct}%` })
+    })
   }
 
   _renderTokenScore() {

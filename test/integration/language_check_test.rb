@@ -35,6 +35,21 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
     @survey.reload.cards.find { |c| c["cid"] == "c_mc" }
   end
 
+  # Give a locale words of its own on every card, so the deck reports it as
+  # finished. The poll is armed from coverage, so a test about run rows has to
+  # say what the coverage is or the two get tangled up in each other.
+  def translate_fully!(locale)
+    cards = @survey.reload.cards.map do |card|
+      translated = LanguageCheckLines::FIELDS.each_with_object({}) do |field, acc|
+        value = card[field]
+        next if value.blank?
+        acc[field] = value.is_a?(Array) ? value.map { |v| "#{locale}:#{v}" } : "#{locale}:#{value}"
+      end
+      card.merge("i18n" => (card["i18n"] || {}).merge(locale => translated))
+    end
+    @survey.update!(cards: cards)
+  end
+
   # ── The screen ─────────────────────────────────────────────────────────────
 
   # Every field LanguageCheckLines reviews needs a label, because _line renders
@@ -451,6 +466,10 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
 
   test "a stale run stops the poll rather than keeping a tab asking for ever" do
     sign_in
+    # Spanish out of the way first: it is half-translated in the fixture, and a
+    # language still missing words is a reason to keep asking all of its own.
+    # This test is about the clock, so leave the clock as the only thing to see.
+    translate_fully!("es")
     SurveyTranslation.create!(survey: @survey, locale: "fr", status: "running",
                                attempts: 1, started_at: 2.hours.ago)
 
@@ -460,14 +479,73 @@ class LanguageCheckScreenTest < ActionDispatch::IntegrationTest
     assert_equal "failed", body["languages"].find { |l| l["locale"] == "fr" }["state"]
   end
 
-  test "a Verto with nothing running never starts the poll" do
+  test "a fully translated Verto never starts the poll" do
     sign_in
+    translate_fully!("es")
+    translate_fully!("fr")
+
     get survey_language_check_status_path(@survey)
     assert_not JSON.parse(response.body)["working"]
 
     get survey_language_check_path(@survey)
     assert_match 'data-language-status-working-value="false"', response.body,
                  "a page left open on a finished Verto must cost nothing"
+  end
+
+  # The bug this was all for: a language gets its words from a path that keeps
+  # no record — creating the Verto, importing one, generating or optimising a
+  # card, adding a question — so there is no run row to notice, and the screen
+  # sat on "Not translated yet" until somebody thought to reload.
+  test "a language nobody recorded a run for still keeps the page watching" do
+    sign_in
+    assert_nil SurveyTranslation.find_by(survey: @survey, locale: "fr")
+
+    get survey_language_check_status_path(@survey)
+    body = JSON.parse(response.body)
+    assert body["working"], "no run row is not the same as nothing to wait for"
+    assert_equal "none", body["languages"].find { |l| l["locale"] == "fr" }["state"]
+
+    get survey_language_check_path(@survey)
+    assert_match 'data-language-status-working-value="true"', response.body
+  end
+
+  # The reload loop this fix had to avoid: the rail deciding to watch while the
+  # endpoint reports nothing doing is a page that reloads itself every few
+  # seconds, for ever, on the screen a creator is working in. Neither half can
+  # be tested for it alone, which is why it could be written twice and missed.
+  test "the rail and the status endpoint agree about what is outstanding" do
+    sign_in
+
+    [ -> { }, -> { translate_fully!("es"); translate_fully!("fr") },
+      -> { translate_fully!("es")
+           SurveyTranslation.create!(survey: @survey, locale: "fr", status: "failed",
+                                     attempts: 3, last_error: "boom") } ].each_with_index do |fixture, i|
+      setup
+      sign_in
+      fixture.call
+
+      get survey_language_check_status_path(@survey)
+      endpoint = JSON.parse(response.body)["working"]
+
+      get survey_language_check_path(@survey)
+      rail = response.body.include?('data-language-status-working-value="true"')
+
+      assert_equal endpoint, rail,
+                   "fixture #{i}: the rail says #{rail}, the endpoint says #{endpoint} — " \
+                   "one of them will make the other reload for ever"
+    end
+  end
+
+  test "the signature names each language's state, and ignores a count moving" do
+    sign_in
+    get survey_language_check_status_path(@survey)
+    before = JSON.parse(response.body)["signature"]
+    assert_equal "en:primary,es:none,fr:none", before
+
+    translate_fully!("fr")
+    get survey_language_check_status_path(@survey)
+    assert_not_equal before, JSON.parse(response.body)["signature"],
+                     "a language finishing is exactly what a reload is for"
   end
 
   test "the page arms the poll when a language is being translated" do

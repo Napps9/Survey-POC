@@ -1346,6 +1346,7 @@ ko:
     new_name_placeholder: "누구에게 보내나요? 예: 뉴스레터"
     new_url_placeholder: "newsletter"
     add_link: "링크 만들기"
+    save: "저장"
     new_link_default_name: "새 링크"
     recall_link: "링크 회수"
     restore_link: "링크 복원"

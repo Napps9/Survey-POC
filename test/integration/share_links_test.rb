@@ -499,4 +499,39 @@ class ShareLinksTest < ActionDispatch::IntegrationTest
     get qr_survey_path(draft, link_id: link.id)
     assert_response :not_found
   end
+
+  # ── Every field that makes a link says how to commit it ────────────────────
+
+  # Reported as "I can't seem to find the generate custom links option — the
+  # user needs to press enter but that is non obvious". These fields have always
+  # saved on Enter or on blur, and said so nowhere: one submittable input, no
+  # button, and a creator who typed a link and looked for somewhere to click
+  # found nothing. The Create link form below them has had a button all along,
+  # which is what made the ones without read as not-a-form.
+  test "every custom-link field in the share panel carries a visible submit" do
+    org = sign_in_org("submit")
+    survey = published_survey(org)
+    survey.survey_links.create!(name: "Newsletter", slug: "news-letter")
+
+    get share_survey_path(survey)
+    assert_response :success
+
+    assert_select "form.share-slug-form button[type=submit]", 1,
+                  "the Custom URL field must offer a way to commit it that is not Enter"
+    assert_select ".share-link__top form input[name=name]", 1
+    assert_select ".share-link__top form button[type=submit]", 1, "so must renaming a link"
+    # The one that was always right, kept honest.
+    assert_select "form.share-new button[type=submit]", 1
+  end
+
+  test "the editor's own custom-link field carries one too" do
+    org = sign_in_org("submit-editor")
+    survey = published_survey(org)
+
+    get survey_path(survey)
+    assert_response :success
+    assert_select "form[action=?] input[name=slug]", survey_settings_path(survey), 1
+    assert_select "form[action=?] button[type=submit]", survey_settings_path(survey), { minimum: 1 },
+                  "the publish panel's custom link is the field the report was about"
+  end
 end

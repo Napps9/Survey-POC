@@ -93,23 +93,19 @@ class LanguageChecksController < ApplicationController
     cards = LanguageCheckLines.for(@survey)
     cover = LanguageCheckLines.coverage(cards, @survey.verto_locales, @survey.default_locale)
 
-    languages = @survey.verto_locales.map do |code|
-      run = runs[code]
-      {
-        locale:    code,
-        state:     code == @survey.default_locale ? "primary" :
-                     (cover[code][:translated] == cover[code][:total] && cover[code][:total].positive? ?
-                        "done" : (run&.display_status || "none")),
-        translated: cover[code][:translated],
-        total:      cover[code][:total]
-      }
-    end
+    languages = LanguageCheckLines.poll_state(cover, runs, @survey.verto_locales, @survey.default_locale)
 
     render json: {
       ok: true,
-      # display_status, so a run abandoned by a dead process stops the poll
-      # rather than keeping a tab asking for ever.
-      working: languages.any? { |l| %w[queued running].include?(l[:state]) },
+      # The same predicate the rail armed itself with. These were two separate
+      # expressions and could answer differently about the same Verto: the rail
+      # would decide to watch and this would immediately report nothing doing,
+      # which the poll reads as "finished" and answers with a reload — on a page
+      # whose state has not changed, for ever.
+      working: LanguageCheckLines.outstanding?(languages),
+      # What the poll compares against what it was rendered with. A reload is
+      # worth it when a language CHANGES state, not merely while one is pending.
+      signature: LanguageCheckLines.poll_signature(languages),
       languages: languages
     }
   end

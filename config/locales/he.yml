@@ -1346,6 +1346,7 @@ he:
     new_name_placeholder: "למי זה מיועד? למשל ניוזלטר"
     new_url_placeholder: "newsletter"
     add_link: "יצירת קישור"
+    save: "שמירה"
     new_link_default_name: "קישור חדש"
     recall_link: "משיכת הקישור"
     restore_link: "החזרת הקישור"

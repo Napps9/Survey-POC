@@ -1366,6 +1366,7 @@ xh:
     new_name_placeholder: "Ngobani? umz. Iindaba"
     new_url_placeholder: "newsletter"
     add_link: "Yenza ikhonkco"
+    save: "Gcina"
     new_link_default_name: "Ikhonkco elitsha"
     recall_link: "Buyisa ikhonkco"
     restore_link: "Buyisela ikhonkco"

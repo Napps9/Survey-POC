@@ -1351,6 +1351,7 @@ af:
     new_name_placeholder: "Vir wie is dit? bv. Nuusbrief"
     new_url_placeholder: "nuusbrief"
     add_link: "Skep skakel"
+    save: "Stoor"
     new_link_default_name: "Nuwe skakel"
     recall_link: "Trek skakel terug"
     restore_link: "Herstel skakel"

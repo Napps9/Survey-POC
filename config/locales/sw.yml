@@ -1346,6 +1346,7 @@ sw:
     new_name_placeholder: "Ni kwa ajili ya nani? k.m. Jarida"
     new_url_placeholder: "newsletter"
     add_link: "Tengeneza kiungo"
+    save: "Hifadhi"
     new_link_default_name: "Kiungo kipya"
     recall_link: "Sitisha kiungo"
     restore_link: "Rejesha kiungo"

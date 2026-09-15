@@ -1354,6 +1354,7 @@ sn:
     new_name_placeholder: "Ndeyani? semuenzaniso, Nhau"
     new_url_placeholder: "newsletter"
     add_link: "Gadzira Rinki"
+    save: "Chengetedza"
     new_link_default_name: "Rinki Itsva"
     recall_link: "Dzosa Rinki"
     restore_link: "Dzosera Rinki"

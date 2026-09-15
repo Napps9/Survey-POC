@@ -1346,6 +1346,7 @@ nl:
     new_name_placeholder: "Voor wie? bijv. Nieuwsbrief"
     new_url_placeholder: "newsletter"
     add_link: "Link maken"
+    save: "Opslaan"
     new_link_default_name: "Nieuwe link"
     recall_link: "Link terugtrekken"
     restore_link: "Link herstellen"

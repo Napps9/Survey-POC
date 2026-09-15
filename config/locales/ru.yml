@@ -1348,6 +1348,7 @@ ru:
     new_name_placeholder: "Для кого? напр. Рассылка"
     new_url_placeholder: "newsletter"
     add_link: "Создать ссылку"
+    save: "Сохранить"
     new_link_default_name: "Новая ссылка"
     recall_link: "Отозвать ссылку"
     restore_link: "Вернуть ссылку"
