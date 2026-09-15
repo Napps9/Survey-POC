@@ -168,15 +168,15 @@
           <div class="share-link<%= " share-link--paused" unless link.active? %>">
             <div class="share-link__top">
               <% if manage %>
-                <%# Flex so the rename field can carry a visible Save beside it:
-                    the only other way to commit a new name is Enter or blur,
-                    neither of which the row advertises. %>
-                <%= form_with url: survey_link_path(@survey, link), method: :patch, style: "margin:0;flex:1;min-width:0;display:flex;align-items:center;gap:6px;" do %>
+                <%# A class, not a style: option — form_with only passes through
+                    class/id/data/aria, and drops style silently, so the row laid
+                    itself out as a block and put Save on its own line. %>
+                <%= form_with url: survey_link_path(@survey, link), method: :patch,
+                              class: "share-link__rename" do %>
                   <input type="text" name="name" value="<%= link.name %>"
                          maxlength="<%= SurveyLink::MAX_NAME %>"
                          onchange="this.form.requestSubmit()"
                          class="share-link__name"
-                         style="flex:1;min-width:0;"
                          aria-label="<%= t("share_modal.link_name_label") %>" />
                   <button type="submit" class="share-btn share-btn--compact"><%= t("share_modal.save") %></button>
                 <% end %>

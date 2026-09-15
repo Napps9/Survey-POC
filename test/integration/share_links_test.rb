@@ -518,8 +518,12 @@ class ShareLinksTest < ActionDispatch::IntegrationTest
 
     assert_select "form.share-slug-form button[type=submit]", 1,
                   "the Custom URL field must offer a way to commit it that is not Enter"
-    assert_select ".share-link__top form input[name=name]", 1
-    assert_select ".share-link__top form button[type=submit]", 1, "so must renaming a link"
+    # The CLASS, not just the button: form_with drops a bare `style:` option on
+    # the floor (it only passes class/id/data/aria through), so a rename row
+    # styled inline laid itself out as a block and put Save on its own line
+    # under the name. The class is what makes it a row.
+    assert_select "form.share-link__rename input[name=name]", 1
+    assert_select "form.share-link__rename button[type=submit]", 1, "so must renaming a link"
     # The one that was always right, kept honest.
     assert_select "form.share-new button[type=submit]", 1
   end

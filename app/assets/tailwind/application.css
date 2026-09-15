@@ -10638,6 +10638,10 @@ body.generating-overlay-active .bottom-bar { display: none; }
 /* Sits inside a link's title row, beside a 5px-padded rename field — the full
    9px/16px button would set the row's height on its own. */
 .share-btn--compact { padding: 5px 10px; font-size: 12px; }
+/* The rename field and its Save, side by side. .share-link__name is width:100%,
+   so without a flex row of their own the button lands underneath it. */
+.share-link__rename { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; margin: 0; }
+.share-link__rename .share-link__name { flex: 1; min-width: 0; }
 
 .share-via-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .share-chip {
